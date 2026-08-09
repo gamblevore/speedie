@@ -1,0 +1,170 @@
+
+
+function PerryIDE.FindInHistory (|string| Path, |int| Line, |message|)
+	opt norefcounts
+	for s.fast in .RecentFiles
+		if s.Position == Line
+			if s.FirstName ~= Path
+				return s
+	
+	
+function PerryIDE.EnablePrevNext
+	opt norefcounts
+	for s in .RecentFiles
+		if !s.firstname.FileExists
+			s.Remove
+	
+	(.GoNext is enabled) = .NextHistory(true)
+	(.GoPrev is enabled) = .NextHistory(false)
+
+
+function DeleteHistory (GuiKeyEvent)
+	opt norefcounts
+	if key.IsDelete and self isa ListView
+		.RemoveRow(.FirstSelected)
+		.ide.EnablePrevNext
+
+
+function SelectHistory (GUIListEvent)
+	opt norefcounts
+	if  self isa ListView
+		|| i = .ide
+		if row
+			i.GoToHistory(row, 1)
+		  else
+			|| old = .obj as string
+				i.EditPath(old)
+
+
+function PerryIDE.BestFunctionName (|string| owner, |textviewline--| Scroll, |string?|)
+	|string--| good_name = .BestFunctionName(owner, scroll, .editme.selection)
+	if good_name != nil
+		return good_name
+	
+	return .BestFunctionName(owner, scroll, (-1, int.max))
+
+
+function PerryIDE.BestFunctionName (|string| parent_name, |textviewline--| Scroll, |intrange| Within, |string?|)
+	|| Remain = .EditMe.MaxVisibleLines	
+	while scroll and (--Remain >= 0)
+		if Scroll.Range overlaps Within
+			|message--| msg = Scroll.Message
+				|message--| fn = msg.OwningFunc
+				|| owner = msg.OwningModClassSub(true)
+				if fn or owner or msg == @decl
+					|| fs = FastString()
+					fs <~ parent_name
+					fs <~ ":"
+					fs <~ (' ', (27-parent_name.length) max 1)
+					if fn
+						|| fn_name = fn.OwningFullName(@emb)
+						fn_name.Render(fs)
+					  elseif msg == @decl
+						msg.Render(fs)
+					  elseif owner
+						|string--| name = owner.FirstName
+							fs <~ name
+						  else
+							fs <~ owner.name
+					return fs
+		scroll++
+	if Within.x < 0
+		return parent_name
+	return nil
+	
+
+function textview.ViewedLine (|textviewline|)
+	opt norefcounts
+	|| scr = .ScrollStart
+	|| obj = scr
+	|| n = .MaxVisibleLines
+	|| sel = .Selection()
+	for i in n
+		if obj.range overlaps sel
+			return obj
+		obj++
+		loop obj
+		
+	return scr.MoveCapped((n/3) max 1)
+
+
+function PerryIDE.AddToJumpHistory
+	opt norefcounts
+	require (.JumpMode <= 0) and perry.FinishedStartUp
+	|| p = .path
+
+	|| scr = .editme.ViewedLine
+	|| old = .FindInHistory(p, scr.linenumber)
+		old.Remove
+	|| item = .RecentFiles.msg(@str, .BestFunctionName(p.name, scr))
+	item <~ p
+	item.Position = scr.LineNumber
+	.RecentFiles.trim(16, false)
+	.RecentFiles.obj = nil
+	.EnablePrevNext
+
+
+function perryide.NextHistory (|bool| Forward, |message|)
+	opt norefcounts
+	|| Item = .RecentFiles.obj as Message
+		if item.Parent
+			return item.Step(forward)
+		.RecentFiles.obj = nil
+	if !Forward
+		return .RecentFiles.Last
+	
+	
+function perryide.ClickedFwdBack (|bool| Forward)
+	opt norefcounts
+	|| Item = .NextHistory(forward)						#expect (Beep)
+	.GoToHistory(item)
+
+
+function PerryIDE.GoToHistory (|message!| m)
+	|| J = .RecentFiles.obj!=nil
+	.GoToHistory(m, J|int|)
+
+
+function PerryIDE.GoToHistory (|message!| m, |int| J)
+	require !.JumpMode and !.DuringTempView
+	.JumpMode = J
+	.DuringTempView++
+	|| path = m.firstname
+	|| Line = m.Position
+	if .EditPath(Path)
+		.RecentFiles.obj = m
+		.EnablePrevNext
+		.Editme.ShowLine(Line)
+	.DuringTempView--
+	.JumpMode = 0
+
+
+function ClickedHistory (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	i.ClickedFwdBack(self == i.gonext)
+	return true
+
+
+function OpenHistory (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| r = i.RecentFiles
+	if r.hasany and self isa Button
+		|| s = .SubMenu
+			i.DuringTempView++
+			s.ListSource = r
+			s.obj = i.path
+			.OpenMenu
+			s.SelectLast
+			i.DuringTempView--
+
+
+function ChoseHistoryItem (GUIListEvent)
+	opt norefcounts
+	if row
+		|| i = .ide
+		i.GoToHistory(row)
+	return true
+
+

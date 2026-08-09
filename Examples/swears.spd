@@ -1,0 +1,25 @@
+
+
+// Swearing is known to:
+	// make people laugh.
+	// help reduce physical pain
+	// More intelligent people are known to swear more.
+	// Source-code containing swears tends to be higher-quality
+
+
+// Hope you enjoy!
+
+import ".Funny"
+
+main (|int| AmountOfSwears=1)
+////  You can always replace the word-list by altering ////
+////  FunnyWord.firstwords or FunnyWord.secondwords   ////
+//	FunnyWord.firstwords = "a\nb\nc\nd", FunnyWord.secondwords = "a\nb\nc\nd"
+	FunnyWord.AllowSame = app.yes("same")
+	|| hehe = FunnyWord(amountofSwears)
+	if app.yes("speak")
+		`("killall say" in terminal to stop this.)`
+		``
+		app.say hehe
+	  else
+		print hehe

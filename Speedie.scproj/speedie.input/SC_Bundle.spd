@@ -1,0 +1,83 @@
+
+
+// must create an error if not found... unless the name is "default"
+
+
+function compiler.Bundle 
+	target osx
+		require !Compiler.IsTest and !Options.ExternalCompile
+		require SC_Targets["gui"] // what about exec? or other that want to be cmd-line?
+		require !linkage["nobundle"]
+		|| Pd = .productfile
+		|| Pj = .BaseProjectPath
+			.AppleBuildApp(pd, pj)
+
+	
+function compiler.WrongConf (CollectFunc)
+	expect (!.ConfMsg) (node, "Conf already exists!")
+	error (node, "Conf must be in the app.conf file")
+
+
+function compiler.IdealName (|string|)
+	if options.output_path
+		return options.output_path.TrimExtAndPath
+	|| s = .confmsg["name"]
+		return s.name
+	return TransCompiler.ProductBaseName.TrimExtAndPath
+
+
+function compiler.AppBuildOneLib (|file| inner, |string| name)
+	|| ldest = inner.parent.sibling("Frameworks/" + name)
+	if ldest.exists
+		ldest.Delete
+	|| prefered = file.speediedir.child("/Library")
+	if !.TryCopyLib(ldest, name, prefered)
+		.TryCopyLib(ldest, name, "/usr/local/lib")
+
+
+function Compiler.TryCopyLib (|file| ldest, |string| name, |string| Base, |bool|)
+	|| lib = base.Child(name).File
+	if lib.Exists
+		lib.HardLinkTo(ldest)
+		rz = true
+
+
+function compiler.AppBuildLibs (|file| inner)
+	opt norefcounts
+	for lib in linkage.osxframeworks 
+		if lib.expect(@str)				// ok so... hard-link it?
+			.AppBuildOneLib(inner, lib.name)
+
+
+function compiler.AppleBuildApp (|file| product, |file| project)
+	target OSX
+		|| dest = product.linksto			
+		expect (!dest) (dest, "This should not be a link")
+		
+		Compiler.stage("Create MacOSX Package")
+		|| name			= .idealname
+		|| prefered_name=name + ".app"
+		|| final_app	= product.sibling(prefered_name)
+		|| copy_from	= project.child("OSX/"+prefered_name)
+		|| inner		= final_app["Contents/MacOS/"+name]!
+		if copy_from.exists
+			copy_from.copyall(Final_app)
+		if product.moveto( inner )
+			options.exe_path = inner
+			.AppBuildLibs(inner)
+			.CodeSign(final_app)
+			options.output_path = final_app
+			final_app.touch
+
+
+
+constants
+	codesign_native = "codesign_osx"
+
+function compiler.CodeSign (|file| gui_exe)
+	|| sign = app.prefs[codesign_native]
+		gui_exe.codesign(sign)
+	  else
+		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )
+	// lets not scare users. it might a well be commented out at this point but I'd rather leave it.
+	// could be useful info!

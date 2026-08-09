@@ -1,0 +1,67 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+main
+	return SpiralDemo().RunAsMain
+
+
+class SpiralDemo (Window)
+	|[bounceable]|		Spirals
+
+	constructor
+		.spirals <~ bounceable((0.5 , 0.13),  (0.25,0.0), vec4(0.1, 0,  0.3,0))
+		.spirals <~ bounceable((0.25, 0.05),  (0.5, 0.0), vec4(0.3,-0.2,0,  0))
+		.spirals <~ bounceable((0.75, -0.1),  (0.75,0.0), vec4(0.5, 0,  0,  0))
+	
+	behaviour FrameStep
+		for s in .Spirals
+			s.y.x2 -= 0.0024
+			s.x.x += s.x.x2/128
+			s.y.x += s.y.x2/128
+			s.x = s.x.Bounce
+			s.y = s.y.Bounce
+		gui.Touch
+	
+	behaviour Drawbackground
+		where.DrawRect(self, colors.black)	
+		|| C = .LastRect.vec4
+		|| C2 = C + (C.size*0.25, -C.size*0.25)
+		|| L = 24s()
+		for (s in .Spirals) (i)
+			L = -L
+			|| PS = ((s.x.x, s.y.x) * c2.size) + c2.xy
+			where.DrawSpiral(144, L, PS, s.col * 0.2[], (3s+i*1s)())
+
+
+class Bounceable
+	|vec2| X // This is wierd but i don't care
+	|vec2| Y // Its just a demo :). demos are ALWWAYS WIERD
+	|vec4| Col
+
+
+function vec2.bounce (|vec2|)
+	if .x > 1.0
+		return (2.0, 0) - self
+	if .x < 0
+		return -self
+	return self
+
+	
+function image.DrawSpiral (|float| Max, |float| angle, |vec2| XY, |vec4| HSB, |float| Pulse)
+	|| sub = 24.0
+	max += sub/2
+	Pulse = Pulse * max
+	for j in max
+		if j <= sub
+			continue 
+		|| i = j - sub
+		|| R = ((i*0.2123)+angle).SinCos
+		|| closeness = (i - Pulse + 4.0() ).Length
+		|| strength = (-0.005*closeness.pow2).Exp * 5.0
+
+		|| P = R*(50.0+i+strength) + XY
+		|| A = ((Max-i)*2.0)/max
+		|| C = Colors.wheel((i*0.005, 0.7, 1.0, A)+HSB)
+	
+		.DrawSoftCircle((P-4.0, P+4.0), C)
+

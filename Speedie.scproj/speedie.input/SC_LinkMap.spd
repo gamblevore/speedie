@@ -1,0 +1,253 @@
+
+
+module LinkMap	
+	function SCObject.CanLinkFrom (|scfunction| Fn, |bool|)
+		opt norefcounts 
+		if .CurrFuncLink == fn.LinkID
+			return false
+		.CurrFuncLink = fn.LinkID
+		return true
+
+
+	function SCFunction.DoLinkToNode (|SCNode| To)
+		opt norefcounts
+		require to isnt InBuiltDataType // int, bool, etc
+		require to.CanLinkFrom(self)
+		
+		if to.IsLibrary and (to is LibInternal) and .IsLibrary
+			check (self isnt LinkInline) (self, "Inline function should not call a libinternal function.")
+			(self is CantInline) // can't inline this
+
+		(.linkto init []) <~ to
+		
+		if Compiler.InPerry
+			(to.linkfrom init []) <~ self
+
+
+	function SCFunction.DoLinkToDecl (|SCDecl| Decl)
+		opt norefcounts
+		if decl is classobj // also need to collect the class.
+			|| C = decl.contains
+				.DoLinkToNode(C.Type) // right?
+
+		.DoLinkToNode(Decl.Type)
+
+		if Compiler.InPerry
+			if decl.CanLinkFrom(self)
+				(decl.linkfrom init []) <~ self
+
+	
+
+	function CollectAll
+		opt norefcounts
+		for (s in compiler.funclist) (i)
+			s.LinkID = i + 1		 // tableid is set later after sort...
+			.CollectLinksInOne(s)	 // so we use linkid instead
+		scfunction.currfunc = nil
+
+
+	function CollectLinksInOne (|scfunction| self)
+		opt NoRefCounts
+		scfunction.currfunc = self
+		for l in .linkto
+			l.CurrFuncLink = .LinkID
+	
+		for d in .args
+			.CollectLinks( d )
+		|| r = .ReturnType
+			.CollectLinks( r )
+		CollectFromSource(self, .sourcearg, false)
+	
+	
+	function CollectFromSource (|scfunction| self, |message| src, |bool| InBranch)
+		opt norefcounts
+		for msg.fast in src
+			|| o = msg.obj
+				.CollectLinks( o )
+			if msg.HasAny
+				if !InBranch
+					|| T = msg.ASMType
+					InBranch = (t == ASMType.kIf or ASMType.kwhile or ASMType.ktern)
+				CollectFromSource(Self, msg, inbranch)
+		
+
+
+extend SCFunction {
+
+function CollectLinks (|object!| obj)
+	opt norefcounts
+	if obj isa SCBetterNode
+		return .DoLinkToNode(Obj)
+	
+	if obj isa SCDecl
+		.DoLinktoDecl( obj )
+		obj = obj.IsLookupOnly|SCDecl|
+		if obj
+			return .CollectLinks(obj)
+
+
+function Reach
+	.ReachFunc(Compiler.VisibleFuncs!)
+
+
+function ReachFuncFromFunc (|SCFunction| from)
+	.reachfunc(From) // whatever just leave this for now.
+	
+
+function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach 
+	opt norefcounts
+	flow off							// memory order dependant!
+	
+	require .WasUnReached(from)
+	if .borked
+		error (.source,	"Borked function reached!")
+		error (from.source, from.ReachedName)
+		
+	Compiler.stReachedFunc++
+	if .IsLibrary
+		Compiler.stLibFuncs++
+
+	|| cls = .cls
+		cls.Reach(self)
+		
+	for o in .LinkTo
+		if (o isa SCFunction)
+			o.ReachFuncFromFunc(self)
+		  elseif (o isa SCClass)
+			o.Reach(self)
+	
+	
+function IsUnused (|bool|)
+	opt norefcounts
+	|| p = .project
+		require p.WarnUnusedFuncs
+
+	if self == Compiler.mainfunc
+		return false
+	
+	|| MR = .MyReacher
+	if MR and MR != Compiler.VisibleFuncs
+		return false
+	if self|scnode| is EmbeddedOnly
+		return false
+	
+	if .isvisible and .islibrary
+		return false
+
+	return (self isnt ConOrDes) and !.IsAllocOrNew
+
+}
+
+
+function message.HateUnusedFuncs
+	opt norefcounts
+	|| imp = scimport.FindImport(.name)
+		imp.WarnUnusedFuncs = true
+	  else
+		.expect(.func, "Can't find project")
+
+
+function scnode.WasUnReached (|SCNode| from, |bool|)
+	opt norefcounts
+	|| MR = .MyReacher
+	if !MR
+		.MyReacher = from
+		return true
+	
+	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
+//		target debug
+//			if (self == "message") and !from.IsLibrary and Options.modecake
+		.MyReacher = from		// set to a better thing.
+
+
+function scclass.Reach (|SCNode| from, |message| src=nil)
+	opt norefcounts
+	flow off
+	require .WasUnReached(from)
+	
+	Compiler.stReachedClass++
+	if !.IsDataTypeOnly
+		Compiler.ReachedClassTable <~ self
+	
+	if Options.BannedClasses
+		.BannedCheck(src)
+	|| s = .super
+		s.Reach(self)
+	|| b = .Behaviour
+		b.FuncTable!.cls!.reach(self)
+	
+	|| df = .DestructorFunc
+		df.ReachFunc(self)
+	
+	for d in .Properties
+		d.TypeReach(self, d.source!)
+		d.contains!.TypeReach(self, d.source!)
+	
+	.ReachBehaviours
+
+
+function scclass.ReachBehaviours
+	flow off
+	for f in .Access
+		if f isa SCFunction
+			if f.IsBehaviour
+				f.ReachFunc(self)
+
+
+function SCDecl.Reach
+	opt norefcounts
+	.type.Reach(compiler.VisibleFuncs)
+
+	
+
+function scfunction.ReachedByPack (|bool|)
+	opt norefcounts
+	|| r = .MyReacher
+		return !r.IsLibrary
+
+
+
+function compiler.DeadStrip
+	opt norefcounts
+	|| main = .MainFunc
+		main.DetectIfReached
+	
+	for f in .FuncList
+		f.DetectIfReached
+
+	for f in .FuncList
+		|| cb = f.HasProto
+			|| ty = cb.type
+			if !ty.IsInterface and (.InPerry or Options.ModeCpp or f.ReachedByPack)
+				cb.AddToGlobs
+	
+	for f in packmaker.libglobs
+		f.StoreExport
+		f.reach
+	
+	for f in packmaker.PackGlobs
+		f.reach
+
+	if options.MakeExec				// Must come before the next loop
+		for c in .classlist
+			c.reach(.Interpreter)
+	
+	for c in .classlist
+		if c.MyReacher				// Shorten-discovery-chains,
+			c.ReachBehaviours		// Behaviour chains tend to be long.
+
+
+	CodeSorter.LeafsFirst			// Super-refcounter wants this
+
+	.ReachedClassTable.sort
+	for (c in .ReachedClassTable) (i)
+		c.TableID = i+1
+	
+
+
+function scdecl.TypeReach (|SCNode| from, |message| src)
+	opt norefcounts, flow off
+	if self
+		return .type.reach(from, src)
+
+

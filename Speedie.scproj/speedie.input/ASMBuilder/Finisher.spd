@@ -1,0 +1,151 @@
+
+
+// MiniOptimisations, miniopts, optimize, finishmost 
+function Assembler.FinishASM 
+	if (.FnLength <= 0) or !.Last.IsFinisher or .ExpectOneMore
+		.MissingReturn
+
+	|| Last = .Last
+	|| S = .FuncStart
+	|| Length = 0
+	
+	target debug
+		|ASM[4]| TestSpace
+
+	while Last >= S
+		|| op = s.op
+		if op == asm.knst
+			S.ConstFinish
+//			.AskNop(s) // this is not good for consts even
+			// breaks andortest...
+			// so we need some kind of phinode.
+			// i don't really want to do that.
+			// can we check if this const is used by looking at the ASM?
+			// using the *BlockParent* map thing?
+			// if we are going linearly forward... that makes it easier
+			// but we don't know when a var opens or closes.
+			// so r4 can mean multiple variables.
+			// loops make it more tricky. Something can be used by something behind it...
+			// I think we need some kind of graphing data-structure?
+			// each thing can be used by multiple things...
+			// and each thing can use multiple things...
+			// even if we only track the "things that we use"...
+			// thats not so simple.
+			// each open/close var... (for args mostly, including if/while)...
+			// could keep track of what decls are open... and what fats made those registers
+			// then each time it is used... we track back the fats. (maybe using RegFile to help.)
+			// nopping isnt so fun then... if its separate... it should be on the fat
+			// but theres no more space. unless I wanna go to 128-bytes.
+			// leave this for now... its not so easy.
+		  elseif S.JumpPrm
+			s.JumpImprove(self)
+		  elseif op == asm.FNC3 or asm.FNC
+			if s < last
+				.TryTail(s)
+		  elseif op == asm.addb
+			s.AddBFix(Last)
+
+		|| Predicted = s.guesssize
+		length += Predicted
+		
+		target debug
+			|| Start = &TestSpace[0]
+			|| After = s.µBakeInto(Start, start+4)
+			|| Actual = After - Start
+			if Actual != Predicted		// uugh		
+		S++
+		
+	.out.µASMLength = Length
+
+
+
+function fatasm.AddBFix (|&fatasm| Last)
+	// addb(x,0)
+	|| n = self
+	require (.p1 == 0)
+	while (++n <= Last)
+		require (n.BasicBlock == .BasicBlock)
+		|| op = n.op
+		if op != asm.noop and asm.addb and asm.mark
+			._op = asm.noop
+			n.ASMIndex |= .ASMIndex // actually .breakrequest
+			return
+
+
+
+function assembler.TryTail (|fatasm| FNC)
+	opt norefcounts
+	|| Ret = Fnc + 1
+	require (ret isa asm.ret) and (!fnc.p3)	// no pext, won't fit in tail.
+	|| rr = ret.regonly
+	|| ReturnType = .out.ReturnType
+	require !returntype or fnc.RegOnly == rr					// returning same var, or nothing at all.
+
+	// If this overwrites params... then we need to copy params
+	// We could adapt the TAIL encoder! That should do it.
+
+	Fnc.prms[0] = Fnc.prms[1]
+	Fnc.prms[1] = Fnc.prms[2]
+	Fnc.prms[2] = 0
+	Fnc._Outputs = 0
+	Fnc._op = asm.tail
+	fnc.µRefCount++
+	(Fnc.info as= ASMReg.exit)
+// can't do this as its too late. Something can jump to it.
+// we'd have to do this at the time we created the fnc in the first place.
+//	if (fnc.BasicBlock == ret.BasicBlock)
+//		ret._op = asm.noop // nice
+	if 0: nil|message|!.TAIL
+
+
+
+function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
+	|| negate = v|int64| < 0
+		v = ~v
+	|| sh = 64-Space
+	if (v << sh) >> sh == v
+		.prms[2] = negate|int|
+		.prms[3] = v & 17~bits
+		.prms[4] = v >> 17
+		.prms[5] = v >> 49
+		return true
+//		Cond	1		// 0 == always, 1 = only if dest == 0
+//		Inv		1
+//		Value	17
+
+
+function fatasm.ConstFinish 
+	|| v = .const|uint64|
+	if .SimpleConst(v, 17)
+		._op = asm.KNST // already set, but its for clarity
+		return
+	if .RotateConst(V)
+		._op = asm.KNSR
+		return
+	if .SimpleConst(v, 49)
+		._op = asm.KNST2
+		return
+	.SimpleConst(v, 64)
+	._op = asm.KNST3
+
+
+function uint64.rotl1 (|uint64|)
+	return (self << 1) ||| (self >> 63)
+
+
+function fatasm.RotateConst (|uint64| v, |bool|)
+	|| BC = V.CountBits
+	|| inv = 64-BC <= 12
+		V = ~V
+	  else
+		require BC <= 12
+
+	for i in 64
+		if v <= (12~bits)|uint64|
+			.p1 = i
+			.p2 = inv|int|
+			.p3 = v|uint|
+			return true
+		v = v.rotl1
+
+

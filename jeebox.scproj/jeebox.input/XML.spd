@@ -1,0 +1,259 @@
+
+
+	
+function parser.ThingXMLAtt (|int|start, |message| Parent, |message|)
+	|| name = parser.WordAfterSub( start, CharSet.XMLNameMid )
+	return parser.new( parent, @xatt, start, name )
+
+
+function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
+	|| AllAtts = parser.new(xml, @list, Start)
+	|| s = parser.data
+	while
+		|| i = s.outwhite(.nextstart) #loop
+		|| c = s[i]
+		if (c == '>') or (c=='/' and s[i+1]=='>')
+			return i
+		loop CharSet.LettersUnderScore[c]
+		|| Attr = ThingXMLAtt(i, allatts)
+		require .ExpectEndChar(parser.nextstart, "=")
+		i = .cleanspaces
+		c = s[i]
+		ifn (c == '\'' or c == '"')
+			.erroradd("Attribute value didn't close.", i)
+			return nil
+		
+		|| After	= s.find(c, i+1)
+		|| Txt		= parser.new(Attr, @xtxt, start)
+		txt.name	= s[i+1,after].ReplaceAll(jeebox.xml_unescapestr!)
+		.nextstart	= after+1
+	
+	.erroradd("Element malformed.", .nextstart)
+
+
+function Parser.CloseXML (|message| XML, |int|i, |string| s, |message|)
+	|| CloseEnd = s.find('>', i+2)
+	ifn (CloseEnd)
+		return .erroradd( "Close-tag malformed", i)
+	|| CloseName = s[i+2, CloseEnd]
+	if (CloseName != XML.name)
+		return .erroradd( "Open/close tags mismatch! </$CloseName> vs <${XML.Name}>", i)
+	.nextstart = ++closeend
+	xml.RangeLength = xml.position - closeend
+	return XML
+
+
+function Parser.XMLWhatever (|int| s, |int| skip, |string| ender, |syntax| fn, |message|)
+	|| i = s + skip
+	|| EndPos = .data.find(ender, i)
+	if (!endpos)
+		return .erroradd("Tag didn't close", i)
+	
+	.nextstart = endpos + ender.length
+	if (fn)
+		rz = .new(nil, fn, i, .data[i, endpos])
+		rz.position = s
+		rz.after = .nextstart
+
+
+function Parser.AddXMLText (|message| XML, |string| s, |int| start, |int| i)
+	|| a = s.outwhite(start)
+	require (a < i)
+	|| str = s[start, i]
+	|| str2 = str.trim
+	|| str3 = str2.replaceall(jeebox.xml_unescapestr!)
+	.new(xml, @xtxt, start, str3)
+
+
+function Parser.FillXML (|message| XML, |ind| i, |message|)
+	|| s = .data
+	if (s[i-1] == '/')							// <abc d="e"/>
+		.nextstart = i+1
+		return xml
+	.nextstart = i
+
+	while
+		|| Prev = .nextstart
+		i = s.find('<', prev)
+		ifn i
+			return .ErrorAdd("Element didn't close", xml.position)
+		.addXMLText(xml, s, prev, i) 
+		.nextstart = i
+		|| next = s[i+1] 
+		if next == '/'
+			return .CloseXML(XML, i, s)			// </abc>
+
+		if (next != '!')
+			xml <~ fXML(i)$
+		  elseif  s[i, "<!--"]
+			xml <~ .XMLWhatever(i,4, "-->", @xcom)$
+		  elseif  s[i, "<![CDATA["]
+			xml <~ .XMLWhatever(i,9, "]]>", @xcdt)$
+		  else
+			return .erroradd("", i)
+
+
+function Parser.XMLWordEnd (|int| From, |ind|)
+	|| b = .data[from] 
+	if !CharSet.LettersUnderScore[b]
+		.erroradd( "Wrong first byte of XML", from)
+	  else
+		rz = .data.OutCharSet(CharSet.XMLNameMid, from+1)
+		if rz == -1
+			.Erroradd( "XML name does not end" )
+		.NextStart = rz
+
+
+function parser.fXML (ParseHandler)
+	|| EndPos   = .XMLWordEnd(start+1)
+		|| XML		= .newskip( nil, @xml, start, start+1, EndPos )
+		EndPos		= .XMLAttribs(XML, endpos)
+		if endpos > 0
+			rz = .FillXML(XML, EndPos + 1)
+			if rz
+				rz.after = .nextstart
+
+
+function parser.fXML_PI (ParseHandler)
+	rz = .new( nil, @xpi, start )
+	.ParseLoopFlags( rz, "?>", .ktemporal )
+
+
+function parser.fXML_Comment (ParseHandler)
+	return parser.XMLWhatever(Start, 4, "-->", @xcom)
+
+
+function parser.fXML_DTD (ParseHandler)
+	opt norefcounts
+	|| d = .data	|| i = .nextstart
+	
+	while (|| c = d[i++])
+		if c == '>'
+			.nextstart = i
+			return .newskip(nil, @xdtd, start, start+2, i-1)
+		if c == '['
+			|| after = d.find(']', i)
+			if after < 0 // not found	
+				exit
+			i = after+1
+	return .erroradd("Bad DTD Element", start)
+
+	// the internals COULD be structured.
+	// however... that will require a lot of effort.
+	// and I don't need to parse dtds. this is not an XML parser or a validating XML parser!
+	// simple things like abc-def would parse wrong
+
+
+
+extend message
+	syx XAtt (XML_Attribute)
+		opt norefcounts
+		fs <~ " ${.name}=\"${.first}\""
+
+	syx XML  (XML_Element)
+		opt norefcounts
+		fs <~ "<"
+		fs <~ .name
+		
+		|| atts = .first
+		for A in atts
+			fs <~ a
+
+		|| Children = atts.next
+		if !Children
+			fs  <~  "/>"
+			return
+
+		fs <~ ">"
+		|| SingleText = (children==@xtxt) and (!children.next) 
+		if SingleText
+			fs <~ children
+		  else
+			fs.indent++
+			for ch.forward in children
+				fs.IndentLine
+				fs <~ ch
+			fs.indent--
+			fs.IndentLine
+
+		fs <~ "</${.name}>"
+
+
+	syx XPI  (XML_ProcessingInstruction)
+		fs <~ "<?"
+		if .HasOneChild
+			fs <~ .first
+		  else
+			.FSListArg( fs )
+			fs <~ '\n'
+		fs <~ "?>"
+
+		
+	syx XCom (XML_Comment)
+		fs <~ "<!--"
+		fs <~ .name
+		fs <~ "-->"
+
+
+	syx XCDT (XML_CDATA)
+		fs <~ "<![CDATA["
+		fs <~ .name
+		fs <~ "]]>"
+
+
+	syx XTxt (XML_Text)
+		fs.appendmultireplace(.name, jeebox.XML_EscapeStr)
+
+		
+	syx XDTD (XML_DTD)
+		fs <~ "<!"
+		fs <~ .name
+		fs <~ ">"
+
+	syx max (EndMarker)
+		0
+
+
+function message.XMLToJeebox (|bool|)
+	for ch.fast in self
+		rz ?= ch == @xml
+		ch.XMLToJeeboxSub
+	check rz (self, "No XML found.")
+ 
+
+libinternal message.XMLToJeeboxSub
+	if self == @xpi
+		.remove
+	  elseif self == @xml
+		.func = @tmp
+		|| prms = .first
+			prms.func = @list // shoulda been this already.
+			prms.remove
+		|message| arg
+		while 
+			|| ch = .first #loop
+			arg ?= @arg.msg
+			arg <~ ch
+			ch.XMLToJeeboxSub
+		if prms.HasAny
+			self <~ prms
+			for ch.fast in prms
+				ch.XMLToJeeboxSub
+		if arg
+			|| first = arg.first
+			if (first == @str) and first.IsLast
+				self <~ first
+			  else
+				self <~ arg
+	  elseif self == @xtxt or @xcdt
+		.func = @str
+	  elseif self == @xatt
+		.func = @item
+		|| f = .first
+			f.func = @str
+			|| s = .name
+			|| fn = @emb
+			ifn s[].IsLetter and (CharSet.NameMid contains s)
+				fn = @str
+			.first = fn + s
+			.name = ""

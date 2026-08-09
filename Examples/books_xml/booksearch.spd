@@ -1,0 +1,31 @@
+#!/usr/local/bin/spd
+file:///usr/local/speedie/Documentation/Messages.md						 // docs here
+
+main (|file.existing| File)
+    || jb = File.parse
+    if file isa "xml"
+        jb.XMLToJeebox
+        || boxfile = File.SetExt("box")
+        if boxfile.writeall(jb.render) // write file to disk
+            "Converted XML to Jeebox: $boxfile"
+
+    || Found = BookSearch(jb, app.switches) #expect  "Can't find any books using: ${app.Switches}"
+    for f in found
+        printline f
+
+        
+function BookSearch (|message| BookFile, |[string]| queries, |message|)
+    || catalog = BookFile[@tmp, "catalog"] #require // gets "catalog" + creates error if name is wrong
+    for book in catalog[@arg]
+        for row in book[@arg,-1]
+            if book.Expect(@tmp, "book") 
+                rz <~ book.TestBook(Queries)
+
+
+function message.TestBook (|[string]| queries, |message|)
+    for row in .last(@arg)
+        require row.Expect(@tmp)
+        for Q in queries
+            if row ~= q.ArgName
+                require Row.first.name contains q.ArgValue
+                rz = self

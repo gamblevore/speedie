@@ -1,0 +1,38 @@
+
+
+// unfinished.
+
+class MessageView (ListView)
+	linkage
+		cpp_part JBV
+
+	constructor (|guicontrol| p, |GUIListEvent| sel, |GUIListEvent| ret)
+		super.constructor(p, sel, ret)
+		.MultiSelection 	= true
+		.onrightclick		= RightClickJeeboxView
+		.ondrawrow			= InsideJeeboxViewRowDraw
+		.Oneditcell			= JeeboxViewRenamer
+		.Hierarchical		= true
+		.GNormal.Separator = 0
+		.EnableDrag	
+	
+	
+	behaviour KeyDown
+		if key.isdelete
+			return true
+		rz = super.keydown(key)
+
+	
+	
+	module
+		libinternal JeeboxViewRenamer (guilisteditevent)
+
+
+		libinternal RightClickJeeboxView (GuiListevent)
+			opt norefcounts
+			|| View = .tag as MessageView
+			
+
+		libinternal InsideJeeboxViewRowDraw (ListViewRowDraw)
+			opt norefcounts
+

@@ -1,0 +1,106 @@
+
+
+// remove textual?
+// seems unnecessary.
+extend Assembler
+	function LoadTitle (|message| m, |message|)
+		// asm oof (9)
+		opt NoRefCounts
+		|| name = m[@thg]$
+		.fn.exportname = name.name
+		.fn.name = name.name
+		|| bra = name.Next(@bra)$
+		|| n = bra[@num].int
+		expect (n>=0 and n<=10) (m, "Too many arguments")
+		for n
+			.fn.args <~ TypeInt64!.TypeNormal // :) just ints!
+
+		rz = bra.Next(@arg)
+		rz.expectlast
+
+		
+
+	function TextOp (|message| m)
+		if !.TextOpSub(m)
+			debugat // retry
+			.TextOpSub(m)
+
+
+	function TextOpSub (|message| m, |bool|)
+		opt norefcounts		
+		if m == @rel
+	//    r1 = jb_str_length(r2)~5    // save 5 regs on the stack
+			|| Dest = m[@thg]$
+			|| funcMsg = dest.GetASMFunc$
+
+		require m.expect(@tmp)
+		|| op = instruction[m]						#require
+		|| list = m.first
+		expect (list == nil or @list or @bra) (m)
+
+		if op.IsSetConst
+			return .TextConst(list, m)
+		
+		|| A = .Requestop(op.opcode, m)
+		m.RangeLength = a.Index // each message now knows its fat thingy.
+		|| pos = 0
+		for p in list
+			if p != @name
+				a.AddRegParam(p, pos)
+			  else
+				a.AddLabelRequest(p, pos)
+			expect (++pos <= op.pcount) (list, "Passed too many ASM args")
+
+		// we can consider 0 to be optional? for example... add + shift?
+		// do it later!
+		return (op.pcount == pos) #expect (list, "Too few params")
+
+	
+	function fatasm.AddLabelRequest (|message| P, |int| Pos)
+		opt norefcounts
+		|| x = .info
+		x.reg = pos
+		.info = x
+		|| j = .form.RegForJump // remove JumpPrm and use forms count
+			if j != pos + 1 // what?
+		.JumpPrm = j
+		
+
+
+	function LoadLabelJumps (|bool|)
+		opt norefcounts
+		for A.fat in .out
+			require textassembler.GetLabel(a)
+		return true
+	
+	
+	function textassembler.GetLabel (|&FatASM| Jumper, |bool|)
+		opt norefcounts
+
+		|| i = jumper.JumpPrm
+		if !i
+			return true
+		i--
+		|| name = jumper.msg.first[i]
+			|| dest_index = textassembler.Labels.valuelower(name.name)		#expect (name, "arg")
+			jumper.prms[i] = dest_index[] - jumper.index
+			return true
+				
+		error (jumper, "No label found")
+	
+	
+	function AddLabel (|message| ch)
+		opt norefcounts
+		|| d = textassembler.labels init dictionary()
+		d.valuelower(ch.name) = .curr.index
+
+
+	function TextFuncSub (|message| m)
+		opt NoRefCounts
+		.vdecls = -1 // work around
+		for ch in .LoadTitle(m)
+			if ch == @name
+				.addlabel(ch)
+			  else
+				.TextOp(ch)
+

@@ -1,0 +1,47 @@
+#!/usr/local/bin/spd
+
+class Country
+	|int|		Population
+	|int|		ATP
+	|string|	name
+	constructor (|string| Name)
+		.name = name
+		.population = random[40, 100]|int|
+		.ATP = random[4, 12]|int|
+		"$name was founded with $.population population and $.ATP power"
+		
+	function Attack (|Country| other)
+		|| oth = (self == other)("itself", other.name)
+		"$.name attacks $oth"
+		other.Damage .ATP
+		if other != self
+			.Damage other.ATP
+	
+	function Damage (|int| damage)
+		.population -= damage
+		if .population > 0 
+			"$.name loses ${damage}m pop. Now has ${.population}m pop."
+		  else
+			"$.name loses ${damage}m pop and died :("
+			
+	function Alive (|bool|)
+		return .population > 0
+		
+
+main
+	|[country]| Europe
+	"\nWelcome to Europe Simulator 2000!!"
+	|| names = "Netherlands/United Kingdom/France/Germany/Italy" / '/'
+	for s in names
+		Europe <~ Country(s)
+	printline
+	
+	while Europe
+		for (cu.backwards in Europe) (i)
+			cu.Attack Europe[]!
+			if !cu.alive
+				Europe.remove(i)
+			printline
+            app.sleep(0.2s)
+
+	"Europe is gone."

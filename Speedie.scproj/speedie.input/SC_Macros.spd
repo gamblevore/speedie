@@ -1,0 +1,196 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+module Macros {
+|| InitExpand = "({
+	|| _X = _0
+	if _X == nil // useful for initing arrays... which could start as nil
+		_X = _1
+		_0 = _X
+	rejoin _X
+})".macro
+
+|| WhileDecl = "if (!_0) {
+	exit
+}".macro
+
+|| TernQMark = 	`({
+	|| _t = _0
+	(_t|bool|)(_1, nil)
+})`.Macro // Is this casting to a bool actually... working? or good enough? Does it force the syntaxcast to be called?
+|| DoubleQQ = `({
+	|| _t = _0|()--|
+	if !_t
+		_t = _1
+	(_t)
+})`.macro
+
+
+
+|| MultiDecr = `JB_DecrMulti(_0, _1)`.macro
+|| MultiEarlyDecr = `JB_EarlyDecrMulti(_0, _1)`.macro
+
+|| ConstructorNew = `if self == nil {
+	self = JB_NewClass(_0)|_0|}`.macro
+|| ConstructorNewTask = `if self == nil {
+	self = task(–taskvars, &run)|_0|
+}`.macro
+
+|| MainArgBasic		= `|| _0 =  _1.MainArg(_2+1, "_0"),				`.macro
+|| MainArgBasicReq	= `|| _0 =  _1.MainArg(_2+1, "_0") #require,	`.macro
+|| MainArgDefault	= `|| _0 =  _1.MainArg(-(_2+1), "_0"),_0 ?= _3	`.macro
+|| MainArgArray		= `
+|[_1]| _0
+|| __ArgCurr = _2
+while __ArgCurr < __ArgCount
+	_0 <~ _1.MainArg(++__ArgCurr, "_0")
+`.macro
+
+|| MainArgNoNE = `
+	check (__ArgCount <= _0) ("Unexpected argument: " + app.args[_0]!)
+`.macro
+}
+
+
+
+function macro.clean (|macro|)
+	if !.Cleaned
+		.cleaned = true
+		|| s = .source
+			s.clean
+	return self
+
+
+
+function message.TargetTestOp (|message| C, |int|)
+	opt norefcounts
+	if C
+		|| n = .name
+		if n == "or"
+			return 1
+		if n == "and"
+			return 2
+	.SyntaxExpect // failed
+
+	
+function message.TargetTest (|bool|) // target true, target false,
+	opt norefcounts
+	real self
+	while .func == @bra
+		self = .first!
+
+	|| fn = .func
+	if fn == @rel
+		|| C = .last
+		|| op = .second!.TargetTestOp(C)$
+		|| AOK = .first!.TargetTest
+		if (op == 1) == AOK
+			return AOK
+		return C!.TargetTest		
+	
+	if (fn == @brel) and (self == "!")
+		return !.first!.TargetThg
+	
+	if .expect(@thg)
+		return .TargetThg
+
+
+function message.TargetThg (|bool|)
+	return .name.targetthg(self)
+
+
+function string.InBuiltTargetWrong (|string?|)
+	if (self ~= "mac" or "macos")
+		return "OSX"
+	if (self ~= "linux")
+		return "lin"
+	if (self ~= "windows")
+		return "win"
+	if (self ~= "import")
+		return "imported"
+	return nil
+
+
+function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target true, target false,
+	opt norefcounts
+	|| Prefered = .inbuilttargetwrong
+	if Prefered != nil
+		if err
+			error (Err, "Use " + Prefered)
+		return 0
+		
+	if self ~= "cake"
+		return options.mode == options.cake
+	if self ~= "cpp"
+		return options.mode == options.cpp
+	if self ~= "debug"
+		return options.TargetDebug
+	if self ~= "perry"
+		return options.perryoutput
+	if self ~= "imported"
+		return scimport.CurrIsManuallyImported
+	if self ~= "osx"
+		return Platform.osx
+	if self ~= "win"
+		return Platform.win
+	if self ~= "lin"
+		return Platform.lin
+	if self ~= "vm"
+		return Linkage.vm
+	if self ~= "exec"
+		return Options.MakeExec
+	if self ~= "direct"
+		return options.IsDirectTest
+	if self ~= "true"
+		return true
+	if self ~= "library"
+		return Options.ProjectisLibrary
+	if self ~= "minilib"
+		return options.ProjectIsMiniLib
+	return -1
+		
+
+function string.TargetThg (|message| err, |bool|)	// target true, target false,
+	|| Found = .InBuiltTarget(err)
+	if Found >= 0
+		return Found
+	return SC_Targets[.name]
+
+
+
+function message.Tran_Target (|message|)
+	.tran_targetsub
+	rz  = .next
+	rz ?= .flatafter
+	.Remove
+
+
+function message.TranAllTargets
+	opt norefcounts
+	for s.flat in self
+		if s == "target"
+			continue_with s.tran_target
+
+
+function message.Tran_TargetSub
+	opt norefcounts
+	|| value = self.needfirst					#require
+	|| arg = self[@arg, 1]						#require
+	if !value.TargetTest
+		arg = self[2][@arg]
+
+// can't handle target false
+	while arg.hasany
+		.next = arg.pop
+
+
+function message.BecomeTarget
+	opt norefcounts
+	|| s = self[@nil,1]$
+	|| b = s.TargetTest.string
+	.become(@thg, b)
+		
+	
+	

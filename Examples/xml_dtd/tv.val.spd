@@ -1,0 +1,78 @@
+#!/usr/local/bin/spd
+
+// modelled after https://sources.debian.org/src/xmltv/1.0.0-1/xmltv.dtd/
+// but shrunk and simplified to make a good demo! :)
+
+
+|| Noisy = app.yes("noisy")
+main (|Message| TV_Guide)
+	|| tv = tv_guide.Validate(@tmp, "tv")					#require
+	
+	for item in tv.allow(@list).All(@item)
+		|| n = item[@thg]
+			check (n ~= "generator_name" or "generator_url" or "source_name" or "source_url" or "source_data") (n)
+			item.GetRealName
+	
+	for Chan in tv.Arg.All("channel")
+		Chan.GetRealName
+		|| Arg = chan.arg
+		for D in arg.Some("display_name")
+			D.NameAndLang
+
+		for prog in Arg.Any("programme")
+			|| A = prog.arg
+				A.ProcessProgram
+	
+	if StdErr.OK
+		"\nTV Guide seems fine!"
+
+
+
+function Validator.GetRealName (|validator|)
+	rz = self[@str]$
+	expect (rz.name) (rz, "Empty name")
+	if noisy
+		printline rz						// just make output more interesting
+
+
+function validator.NameAndLang
+	.GetRealName
+	.Allow(@bra).end[@thg]					// does not make error if @bra missing :]
+
+
+function validator.CheckTime
+	|| num = self[@num]
+		expect (num.msg.int > 0) (num, "Bad time")
+
+
+function Validator.StrList (|string| name)
+	for Item in .Any(name)
+		item.GetRealName.end
+
+
+function Validator.GetRatio (|int| Max, |validator|)
+	|| R = self[@Rel]$						// try doing this in XML! You can't!
+	R[@num].int(0,max)
+	R[@opp, "/"]
+	R[@num].int(1,max)						// can't divide by 0, right?
+
+
+function validator.ProcessProgram
+	self[@tmp, "start"].CheckTime
+	.allow(@tmp, "stop").CheckTime
+	
+	for title in .Some("title"):	title.NameAndLang
+	for desc in .Any("desc"):		desc.NameAndLang
+	
+	|| credits = .Allow("credits").arg
+		credits.StrList("director")
+		credits.StrList("actor")
+		
+	.Allow("date")[@num].End
+	.StrList("country")
+	.StrList("episode_num")
+	
+	.Allow("video").arg["aspect"].GetRatio(20)
+	.Allow("star_rating").arg["value"].GetRatio(100)
+	.ChildEnd
+

@@ -1,0 +1,1174 @@
+
+target cake {
+
+struct StructWithObj
+	|object|	A
+	|object|	B
+	|vec4[2]|	carray
+
+
+
+module ASMExamples {
+|int|		Glob
+|int|		Bolg
+|byte|		BBB
+|vec2[2]|	carray
+|float|		KNOB1 = 10
+
+
+
+function TestKnst
+	visible
+	opt norefcounts
+/	|| Start = 62.5
+	while Start < 100.0
+		"Exit $Start"
+		Start += 0.25
+
+
+function MacroNew (|message| s, |bool| UseSelf, |Macro!|)
+	visible
+	rz = Message()
+	rz.Indent = UseSelf|byte|
+	rz <~ s
+
+function ivec4.CenterBroken2 (|ivec2|)
+	rz.x = (.x2 + .x)
+	rz.y = (.y2 + .y)
+	rz >>= 1 // wierd output
+
+function ivec4.CenterBroken (|ivec2|)
+	visible
+	rz.x = (.x2 - .x) // these seem to confusing each other
+	rz.y = (.y2 - .y)
+	
+
+function VecTest (|&vec2| A, |&vec4| B, |structwithobj| C, |int| n)
+	visible
+	|| f = 0.0
+	f += A[5].x
+	f += A[10].y
+	f += B[5].x
+	f += B[5].y
+	f += C.carray[1].y
+	f += asmexamples.carray[1].y
+	#!eh!
+	f += A[n].x
+	f += A[n].y
+	f += B[n].x
+	f += B[n].y
+	f += C.carray[n].y
+	f += asmexamples.carray[n].y
+
+	
+	
+
+function SoundMain2 (|float| input,  |float|) {
+	visible
+	|| thresh = .KNOB1 / 20.0
+	|| output = (input.abs min thresh).CopySign(input)
+	return output * 20
+}
+
+
+function ConstBranch2 (|int| y)
+	visible
+	|| x = 1
+	if y
+		x = 1
+		if y		
+			y |= x
+
+
+function ConstBranch3 (|int| y)
+	|| x = 2
+	|| z = 2
+	while y
+		y |= z
+		y |= x
+		x++
+		y--
+
+
+function ConstBranch1 (|int| y)
+	|| x = 1
+	if y
+		y |= x // x is always equal to 1
+		x = 2
+	if y
+		y |= x
+	
+	x = 3
+	if y
+		y |= x
+		x = 4
+	y |= x
+	
+	
+function UintOnly (|int|)
+	return ASMExamples.BBB
+
+
+function Uint64Trim (|uint64|)
+	visible
+	return UintOnly()
+
+
+function AndOrTest (|int| a, |int| b, |bool| c,  |int|)	/// Active ///
+	opt norefcounts
+	visible
+	|| five = 5, || min = -1
+	if a or b
+		rz = 4
+	if !a and b
+		rz = 3
+	if a and b
+		rz = 2
+	if a
+		rz = 1
+	if b > five
+		rz = 7
+	if b < min and b > five
+		rz = 5
+	if b < min or b > 20
+		rz = 6
+
+
+function BranchTest (|int|)												/// Active ///
+	visible
+	|| a = 1
+	|| b = 2
+	for i in 10
+		if i&1
+			a = 1
+		  else
+			b++
+	b = 2
+	
+	while a==b
+		b = 2
+		app.Quit
+
+	|| c = 0
+	|| d = 0
+
+	while c!=d
+		app.Quit
+
+	while a <= 3
+		d += a == b
+		if a == b: c++
+		if d!=c: return 5
+
+		d += a > b
+		if a > b: c++
+		if d!=c: return 1
+
+		d += a < b
+		if a < b: c++
+		if d!=c: return 2
+
+		d += a >= b
+		if a >= b: c++
+		if d!=c: return 3
+
+		d += a <= b
+		if a <= b: c++
+		if d!=c: return 4
+
+		d += a != b
+		if a != b: c++
+		if d!=c: return 6
+
+		a++
+
+	return 0
+		
+	
+function TestRefs (|int| x)
+	|| m = ({|| i = 123, rejoin Message()})
+	(m)
+
+
+function DeAllocTest
+	cpp_Part AAAA
+	|int[5]| Mints
+	"hi"
+	{
+		|| a = 0
+		|int[7]| Mince 
+	}
+	|| b = 1
+	
+
+
+function StructWithObj.TestProperty
+	visible
+	.a = ""
+	.b = ""
+
+
+function Intrinsics (|vec4| x, |vec4| y, |float| a, |float| b)
+	visible
+	|| z = x • y
+	|| z2 = x cross x
+	|| z3 = x.Sum
+	|| z4 = x.sin
+	|| z5 = x.Length
+	|| z6 = a mod b
+	|| z7 = a.sin
+	|| z8 = b.Length
+	
+	
+function ModTest (|float| f, |vec4| v, |float| f2, |vec4| v2)
+	visible
+	f = f mod f2
+	v = v mod v2
+	
+
+function SyntaxShift (|syntax| A, |int| B, |int|)
+	visible
+	return (a|int|<<1)
+
+
+function BitTest (|int| i, |bool| Value)
+	visible
+	|| M = .glob
+	M |=  value << i
+	M &=  ~(!value << i)
+	.glob = M 
+
+
+function SwapTest
+	maxasm 5				// Allows checking that opts are working properly!
+	|| x = 1				// speedie isnt returning errors properly... via autocompletes
+	|| y = 2
+	swap (x) (y)
+	
+function GlobRead  
+	|| s = Compiler.OriginalInputPath
+	|| m = typefloat64
+	|| I = compiler.stTotalSourceSize
+
+
+function Copy (|&fatasm| A, |&fatasm| b)
+	Memory.Copy(a, b, 64)
+	a.info = b.info
+	a[0] = b[0]
+	
+function Grab
+	cpp_part greb
+	|| b = '1'
+	.grab2(b)
+
+
+function grab2 (|$byte| b, |int|)
+	|| x = b++
+	b = b / 4
+	return b + b
+
+
+function Munt (|uint| Y, |uint| X)
+	if x > y		// y = max(y,x)
+		y = x
+	if x > y		// x = min(y,x)
+		x = y
+	if x >= y		// y = max(y,x)
+		y = x
+	if y >= x		// y = min(x,y)
+		y = x
+
+
+function ForTest (|int| x)
+// if a var is altered in a loop, and were in a loop
+// don't rely on it to access as a knownvalue.
+// seems to just work?
+
+	|| y = 0
+	|| v = 0
+	for (i in 10)
+		if v == 0
+			x++
+
+		v = 5
+		if i == 7
+			x <<= 1
+		if v == 5
+			x--
+		y++
+
+
+function asmclip (|ivec2| self, |ivec2| p, |ivec2|)
+	p.x = .x.clamp(p.x) 
+	p.y = .y.clamp(p.y)
+	return p
+
+
+function Clamp (|uint64| u1, |uint64| u2)
+	if u2 > u1
+		u1 = u2
+	if u2 >= u1
+		u2 = u1
+
+
+function ClampVec (|vec4| a, |vec4| b, |vec4| c)
+	cpp_part CV
+	|| d = a.clamp(b, c) 
+	b = b + 1.0
+
+
+function ClampOof (|int| x, |float| f1, |float| f2, |float| f3)
+	visible
+	f1 = f1.Clamp(f3, f2)
+
+
+function ClampFloat (|float| f1, |float| f2, |f64| d1, |f64| d2)
+	if f2 > f1
+		f1 = f2
+	if f2 >= f1
+		f2 = f1
+	if d2 > d1
+		d1 = d2
+	if d2 >= d1
+		d2 = d1
+	|| v = vec4(f1)
+	v = v.clamp(v,v)
+
+
+class LargeClass2 {
+	|byte[100]|   a
+	|uint16[100]| b
+}
+
+
+function FastMemory (|&int| x, |int| a, |int| b, |int| c)
+	(x++)[] = a
+	(++x)[] = b
+	(x--)[] = c
+	(--x)[] = 0
+
+
+function StructInner (|scdecl| d)
+	|| z = 3 // just to make it easier to see
+	|| y = &d.mu.info
+	|| x = d.mu.info
+	d.mu.info = x
+	y[] = 1
+
+	
+function AddStuff (|int64| A, |int| B, |int64|)
+	|| X = A-B // shouldn't rely on B being bit-correct.
+	return A+B
+
+	
+function CheckSize
+	opt norefcounts
+	|| f = FastString()
+	if f isa list
+		"1"
+
+function ggg_const (|int| A, |int|)
+	if A > 0
+		return 1
+	return -1
+
+
+function hhhMaybeConst (|int| A, |bool|)
+	if ggg_const(A) > 0
+		return true
+	return 0.5[]
+
+
+function Inline_Branch1
+	|| x = 0
+	if hhhMaybeConst(7)
+		x = 1
+	if hhhMaybeConst(0)
+		x = 2
+
+
+function IB2 (|scdecl| x, |bool|)
+	opt inline
+	|| y = scdeclinfo.param
+	return (!x.nilstated) and (x is param)
+
+
+function Inline_Branch2 (|scdecl| D)
+	// what about inlining more complex expressions into branches?
+	require IB2(d)
+	|| x = 0
+	if hhhMaybeConst(7)
+		x = 1
+	if hhhMaybeConst(0)
+		x = 2
+	if gggFunc(2) > 4
+		x = 3
+	if gggFunc(1) > 4
+		x = 4
+
+
+function gggFunc (|int| A, |int|)
+	if A > 1
+		return 5
+	return compiler.ConfMsg.Count
+
+
+function gggAlter (|int| QA, |int| B, |int|)
+	QA ++
+	if QA > 0
+		return B+1
+	return B-1
+
+
+function Tail (|int| x, |int|)
+	return const_branching(x+1)
+
+
+function ReturnX (|int| x, |int|)
+	if x or 1
+		return x
+	return 0
+
+
+function ReturnY (|int| y, |int|)
+	if y and 0
+		return y
+	if y and 1
+		return y + 1 
+	return 0
+
+
+function Const_Branching (|int| x, |int|)
+	|| k = 1
+	|| y = 0
+	if x
+		y = 3
+	  else
+		y = k
+	y++
+	y*=3
+	y >>= 2
+	y^=9
+	y <<= 19
+	return y
+
+
+function loop_const (|int| n, |int|)
+	for (n)
+		|| x = 1
+		rz += x
+
+	
+function Inline_More
+	|| y = 1
+	y = gggFunc(y)
+
+	#!Set consts
+	y = gggAlter(1, 2)
+	#!ConstsTheSecond
+	y = gggAlter(-1, 2)
+	
+	#! Just alter Y
+	y = gggAlter(y, 2)
+
+	#!Y Separate
+	y = gggAlter(y, y)
+	
+	#! IDK
+	y = gggAlter(2, Y)
+	
+	#! IDK2
+	y = 0	
+	y = gggAlter(2, Y)
+
+	#! IDK3
+	y = 1
+	y = gggAlter(2, Y)
+
+
+function LLL (|int| Y, |int|)
+	if Y&1
+		Y++
+	return Y
+
+function istmp (|message| s, |bool|)
+	if s istmp "no"
+		return true
+	
+function LLL2 (|int| Y, |int|)
+	return Y*2				// return can handle this.
+
+function LLL3 (|int| Y, |int|)
+	// unecesary extra const here in r2.
+	// could do the same solution as in inline_consts?
+	// OR... put temps in temps always unless we are unable to.
+	// or at least mark those things as "temp-like" once we are done with them!
+	// i mean... getreal... should return something "temp-like"? it is used
+	// in that way!
+	|| X = 9 + Y
+	return X
+
+
+function Inline_LLL
+	|| V = 0
+	|| E = 10
+	v = lll(v)
+	v = 1
+	v = lll2(v)
+	v = lll2(v)
+	v = lll3(e)
+	v = lll3(-1)
+
+
+function gggTest1 (|int| X, |int| Y, |int|)
+	if X > 0
+		return Y+1
+	return Y-1
+
+
+function Inline_Consts (|int| A)
+	#!BBB
+	|| B = gggTest1(1, 2)
+	#!CCC
+	|| C = gggTest1(-1, 2)
+	#!DDD
+	|| D = gggTest1(-1, 0)
+	#!EEE
+	// unnecessary temp-var created here in E.
+	// best idea is to say that because we had something in r5
+	// and we just set over it... and its unused, to remove it.
+	// maybe just for inlines?
+	|| E = A+gggTest1(-1, 0)
+	#!FFF
+	|| F = gggTest1(-1, A)
+	#!GGG
+	|| G = gggTest2(A, 0)
+	#!HHH
+	|| H = gggTest1(A, A)
+
+
+function gggTest2 (|int| X, |int| Y, |int|)
+	if X > 0
+		return Y+1
+	return Y-1
+
+	
+function AskConst (|int| x)
+	|| y = 14
+	|| z = x << y
+
+
+function AddK 
+	|| y = 1
+	|| x = (1+y)+1
+
+function AddK2 (|int| x, |int|)
+	x++
+	x++
+	return x
+
+function AndOrConstTest (|int|) /// active ///
+	visible
+	|| f1 = 4 or  0
+	|| f2 = 0 and 5
+	|| f3 = 0 and 0 // these first 3 should be optimised of the add!
+	|| T4 = 7 and 8
+	|| T5 = 6 and 0
+	|| T6 = 0 or  3
+	|| f7 = 0 or  0
+	|| T8 = 9 or  2
+	|| X = (t8+t8)+(t8-t8)
+	return f1 + f2 + f3 + t4 + t5 + t6 + (f7 + f7) + t8
+
+
+function VarConst (|int| a)
+	|| x = 11 // opt this later.
+	|| y = 12 // during the opt-phase
+	|| z = y<<x
+	|| w = a<<x
+
+
+function SemiConstTest (|int| f1, |int|) /// active ///
+	visible
+	|| y6  =  1  or  f1
+	y6  =  true  or  f1
+
+
+target nothing
+	function DidntReportError (|int| f1, |int|) // this should report an error in perry!
+		visible									// but its not.
+		|| x2 = f1 or  1
+		return x2
+
+
+function SemiConst2 (|int| f1, |int|)
+	visible
+	|| x2 = f1 or  1
+	|| x3 = f1 or  0
+	|| x4 = f1 and 1
+	|| x5 = f1 and 0
+	#!------
+
+	|| y6 = 1 or  f1
+	|| y7 = 0 or  f1
+	|| y8 = 1 and f1
+	|| y9 = 0 and f1
+	#!------
+	y6 = 1 or  f1
+	y7 = 0 or  f1
+	y8 = 1 and f1
+	y9 = 0 and f1
+	#!y6
+	
+	y6 = y7*2
+	#!y8
+	y8 = !y8 and x2*3
+	#!ret
+	return y6+y8
+
+
+function MiniBool (|bool| a1, |bool| b2, |bool| c)
+	c = !(!a1 and !b2)			// c = a or b			//   a|b
+	c = (!a1 and !b2)			// c = !a and !b		// !(a|b)
+	c = !(a1 and b2)			// c = !a or !b			// !(a&b)
+	c = (a1 and b2)				// c = a and b			//  (a&b)
+	
+	c = !(!a1 or !b2)			// c = a and b
+	c = (!a1 or !b2)			// c = !a or !b
+	c = !(a1 or b2)				// c = !a and !b
+	c = (a1 or b2)				// c = a or b
+
+
+function MiniBool2 (|bool| a1, |bool| b2, |bool| c)
+	c = !(a1 and !b2)
+	c = !(!a1 and b2)
+	c = !(a1 and b2)
+	c = !(!a1 and !b2)
+
+	
+function MiniBool3 (|bool| a1, |bool| b2, |bool| c)
+	c = (a1 and !b2)
+	c = (!a1 and b2)
+	c = (a1 and b2)
+	c = (!a1 and !b2)
+
+
+function AndOrRest (|int| a, |int| b, |bool| x3, |bool| x4, |int|) // stragglers
+	#!AAAA
+	|| x5 = !(!x3 and !x4)		// x = x3 or x4
+	|| x6 = a and b
+	|| x7 = x3 and x4
+	|| x8 = !(x3 or x4)
+	|| x9 = !(x3 and x4)
+
+	#!BBBB
+	x5 = x3 or x4				// no need cmpb
+	x3 = (0 or b)+1				// x3 = b+1
+	x7 = (0 or x3)+1			// x7 = x3+1
+	#!CCCC
+	x3 = x4 or x4
+	#!DDDD
+	x4 = !(a and b)
+	#!EEEE
+	x4 = a or b					// old bool logic
+	x3 = a and b
+	x4 = !(!a or b)
+	x3 = !(a or b)				// new bool logic
+	x4 = (a and !b)
+	x3 = !(a or !b)
+	#!FFFF
+	return x9 + x8
+
+
+syntax access (|string| name, |SCNodeFindMode| Mode=0, |SCClass|)
+	cpp_part FindClassName
+	return compiler.program.FindClass(name, mode)
+
+
+function InitTypes2
+	#!AAAAAAA
+	TypeInt = compiler.program.FindClass("int", 0)
+	#!BBBBBBB
+	TypeInt = self["int"]
+
+
+function InlineParam2 (|$int| vq)
+	vq++
+
+function JumpConst (|int| x, |int|)
+	if x == 2
+		return 3
+	return 4
+	
+function InlineParam ()
+	|| x = 0
+	.inlineparam2(x)
+
+
+function StructTest (|float|)
+	|RetroFloat| RR
+	|| x = terntest(1,2,3)
+	return rr.amount
+
+
+function AddShifted (|bool| boolie)
+	|| x = -1
+	x += boolie << 1 // opt!
+
+
+function TernTest (|int| a, |int| b, |int|)
+	rz = (a!=0)(a, b+1)
+	rz <<= 1
+
+
+function TernTest (|int| a, |int| b, |int| c, |int|)
+	return (c!=0)(a, b)
+
+
+function AndOrRest2 (|int| a, |int| b) // more stragglers
+	if 1 and b: b = 5
+	if 1 or  b: a = 2
+	if 0 and b: b = 4	
+					//
+	|| x3 = (1!=0)(a, b)
+	|| x4 = (0!=0)(a, b)
+	if a or a
+		x3 = (b or b)|int|
+	  else
+		x4 = (a and a)|int|
+
+	if 0 or a: a = 3
+
+
+function Nill (|int| a, |int| b,  |bool|)
+	if a == nil
+		return true
+	if b == 0
+		return true
+
+
+function Floats (|float| A, |float| B, |bool|)
+	if A < B
+		return true
+	return A > B
+
+
+function Floats2 (|float64| A, |float64| B, |bool|)
+	if A < B
+		return true
+	return A > B
+
+
+function FloatConstTest (|float64|) /// active ///
+	visible
+	
+	|float64| r1 = 2							// int as f64
+	|| r2 = (1.0/2|float64|)
+	r2 = (1.0/r1)
+	|| r3 = 0.1 + 1								// f32 + int
+	|| r4 = 3.4567 + r1|float|					// f64 + f32
+	|| r5 = 1234.5|float64| + 5678.9|float64|	// f64 + f64
+	|float| r6 = 2								// int as f32
+	|float64| r7 = 1.0							// f32 as f64
+	|| r8 = r3 + r4
+	|| r9 = r4|float64| + r7
+	return r2 + r5
+
+
+function Incr (|int| x, |int| y, |int|)
+	return .math2test(x++, --y)
+
+
+function ForeignFuncTest (|string?| x, |string?| y, |string|) /// /
+	visible
+	|| x3 = x.inwhite(12345, 98765)
+	|| x4 = x.Length
+	|| x5 = x._Addr
+	|| x6 = x! + y!
+	|| x7 = string.utf8(0xb16b00b5) // JB_Str_ChrUTF8
+	|| x8 = Message()
+	if x8.parent
+	x8.parent
+	return x6 + x7 // fails?
+
+
+function ConstRemovals (|message| AAA, |string|)
+	|| x2 = 2
+	x2 = aaa.length + 0
+	#!zero
+	if x2 // will not be removed :)
+		x2 = aaA.Length
+	#!One
+	if aAa.Length & 0
+		x2 = aAA.Length & 0
+	#!Two
+	if Aaa.Length * 0
+		x2 = AaA.Length * 0
+
+
+function TestGlob (|int|)
+	|| g = &.Glob // sigh
+	g[]++
+
+
+function TestAtomic (|int|)
+	visible
+	for (i in 100)
+		.Glob++
+		.Glob += i&1
+		.bolg--
+	return .Glob - .bolg*10
+
+
+function ConstRemovals2 (|message| a, |string|)
+	|| x2 = 2
+	if a.Length ||| -1
+		x2 = a.Length ||| -1
+	#!---
+	if a.Length & -1
+		x2 = a.Length & -1
+	#!---
+	if a.Length ||| 0
+		x2 = a.Length ||| 0
+	
+
+function RefFuncs (|message| a, |string|)
+	|| b = "abc"
+	if a.parent
+	|| c = 2
+	a.parent
+	|| d = 3
+
+
+function RefCountOpts (|message| m)
+	|| x = m.name
+	|| y = m.name
+	
+
+function RefCountTests (|string| a, |string| b, |message| m, |message| mm)
+	#!function call for freeifdead.
+	|| e = string.utf8(0xb16b00b5)
+	
+	#!all 4 combos of mem/ptr set
+	e = b  
+	b = m.name
+	m.name = b
+	|| f = b
+	m.name = mm.name
+	(e)
+
+
+function MulTest (|int| a, |int| b, |int| c, |int| d, |int|)			/// Active ///
+	visible
+	|| x = 12 * 10
+	return ((a + b) * c) / d
+
+
+function Math2Test (|int| a, |int| b, |int|)							/// Active ///
+	visible
+	return ((a + b) / 2) - ((a / b) * 2)
+
+		
+function AndOr2Test (|bool| c, |bool| d, |int|) /// Active ///
+	visible
+
+	if (c or d)
+		rz = 6
+	if (d and c)
+		rz = 7
+	if !(c or d)
+		rz = 8
+	if !(d and c)
+		rz = 9
+	if !(d and !c)
+		rz = 10
+		
+
+
+target false {
+// case 1
+	
+function No1 (|int| a, |int| b, |int| c, |int|)
+	if a
+		b = 1
+	  else
+		b = 2
+	c = b + 1
+	return c // won't optimise
+
+
+function Yes1 (|int| a, |int| b, |int| c)
+	if a
+		b = 1
+	  else
+		b = 2
+	c = b + 1
+	// NOOP whole thing. cos c is unused.
+
+
+// case 2
+function Yes2 (|int| y, |int|)
+	|| x = 1
+	if !y
+		y = 2
+	return x + 1	// should just be return 2
+
+
+function No2 (|int| y, |int|)
+	|| x = 1
+	if !y
+		y = 2
+	return x + y
+
+
+// case 3
+function Yes3 (|int| b, |int|)
+	|| c = 0		// noop
+	b = b + 1		// noop
+	c = b + 2		// c = b + 3
+	return c
+
+function No3 (|int| x, |int| b, |int| c, |int|)
+	if x
+		b = b + 1
+	c = b + 2
+	return c
+
+
+// case 4
+function Yes4 (|int| b, |int| c, |int|)
+	b = b + 1
+	c = b + 2	// OPT  // only if (b = b + 1).refcount == 1
+	return c
+
+
+function No4 (|int| b, |int| c, |int| d, |int|)
+	b = b + 1
+	c = b + 2	// opt c = b + 3? but only if .refcount == 1
+	d = b * 2
+	return c-d
+
+
+// case 5
+function Yes5 (|int| b, |int| c, |int|)
+	b = b + 0   // NOOP
+	b = b + 1	// NOOP
+	c = b + 2	// OPT  // cos (b = b + 1).refcount == 1
+	return c
+
+
+// case 6
+function YesTail6 (|int| b, |int| c, |int|)
+	return No4(b+1, c, c)
+
+
+function NoTail6 (|int| b, |int| c, |int|)
+	return No4(b, c, c) + 1
+
+
+function YesInline6 (|int| b, |int| c, |int|)
+	return No4(b+1, c, c)
+
+
+function NoInline6 (|int| b, |int| c, |int|)
+	return No4(b, c, c) + 1
+
+
+
+// case 7
+function LoopTest7 (|int|)
+	for (10)
+		rz++
+
+
+function Loop2Test7 (|int| x, |int|)
+	for (i in 10)
+		if i&1 == x&1
+			rz += i
+
+function No8 (|int| x, |int| b, |int|)
+	if x == 1
+		b += 1
+	  elseif x == 2
+		b += 4
+	  elseif x == 3
+		b += 90
+	b += 5
+	return b
+	
+function Yes8 (|int| x, |int| b, |int|)
+	if x == 1
+		b += 1 // --> b += 6
+	  else
+		b += 2 // --> b += 7
+	b += 5		// NOOP
+	return b
+
+function Yes9 (|int| x, |int| b, |int| c, |int| d, |int| e, |int|)
+	b *= -1			// opt b = 0-b
+	if x
+		c = b+1		// refcounts (b*=-1)
+		d = b+2		// refcounts (b*=-1)
+	e = b + 1		// technically... this is still OK.  its not altered.  same parentblock.
+	return e + c + d
+
+function YesBasic10 (|int|)
+	|| x = 0 // noop
+	return x
+	
+
+function YesBasic11 (|int|)
+	|| x = 12 * 10
+	|| y = 0+0+0+1+2+3+4 // 10
+	return x
+	
+function YesBasic12 (|int|)
+	|| x = (0+0+0+1+2+3+4)*12 // 120
+	return x
+
+function YesBasic13 (|int|)
+	|| x = (13*13*13)|byte| // 149
+	return x
+
+function YesBasic14 (|int| x, |int|)
+	return ((x + 0) * (1 * -1 * -1)) * 2 // << 1
+
+
+function YesBasic15 (|uint| x, |int|)
+	return x / (15+(8/8))
+
+
+function YesBasic16 (|uint| x, |int|)
+	return x / 256
+
+
+function YesBasic17 (|int|)
+	|| x = 0 // noop
+	return x
+	
+
+function YesBasic18 (|float|)
+	|| x = 0.0+0.0+0.0+1.0+2.0+3.0+4.0 // 10
+	return x
+	
+function YesBasic19 (|float|)
+	|| x = (0.0+0.0+0.0+1.0+2.0+3.0+4.0)*12.0 // 120
+	return x
+
+function YesBasic20 (|float|)
+	|| x = (13*13*13)|float| // 149.0
+	return x
+
+function YesBasic21 (|float| x, |float|)
+	return ((x + 0.0) * (1.0 * -1.0 * -1.0)) * 2.0 // << 1
+
+
+function YesBasic22 (|float| x, |float|)
+	return x / (15.0+(8.0/8.0))
+
+
+function YesBasic23 (|float| x, |float|)
+	return x / 256.0
+	
+
+function FloatConv24 (|float|)
+	|| r = 1.0
+	|| x = 0
+	while ++x != 0
+		|| v = x|float|
+		r += v
+	return r
+	// just compare c++ and spd versions
+	
+
+function loop25 (|int| a, |int|)
+	for (i in 24) // the loop might opt, though? just not the rz
+		if a[i] // unless we generate tight code in the first place?
+			rz += i*9
+	rz *= 2
+
+
+function Func26 (|message?| m, |string?|)
+	if m != @arg
+		return m.name
+	return nil
+
+
+function Func27 (|message?| m)
+	opt norefcounts
+	for (s in m)
+		printline s.name
+
+
+helper asm_test_add (|int| a, |int| b, |int|)
+	cpp_name asm_test_sub
+	visible
+	|| y = 2.0
+	return ((a + b) / 2) - ((a / b) * 2)
+
+
+helper asm_test_func (|int| a, |int| b, |int|)
+	cpp_name asm_test
+	visible
+	return asm_test_add(b*b, a*a)
+
+
+helper asm_test_ptr (|fixeddict| a, |&int| b,  |int|)
+	cpp_name asm_test_ptr // many bugs here
+	visible
+	b[] = 0
+	b[0] = 1
+	a.letter = -1
+	|| n = 10
+	b[n] = 5
+	n = b[1]
+	n = b[0]
+	a.Value = a|&nil|
+	a.items[1] = 5|&nil|
+	a.items[n] = 5|&nil|
+
+
+helper asm_test_largeclass (|LargeClass2| L)
+	l.a[3] = 0
+	l.a[3] = 1
+	l.b[4] = 0
+	|| y = l.b[1]
+	|| x = l.a[1]
+	l.a[3] = y
+	l.b[4] = x
+	|| z = &l.b[5]
+
+
+helper jump_improvements (|int| a, |int|)
+	Rz = 1
+	|| m = message()
+	if a
+		rz++
+	  else
+		rz--
+	(m)
+	
+
+
+helper asm_test_flow (|int| a, |int| b, |int|)
+	cpp_name asm_test_flow
+	visible
+	if 3.CountBits == 4.CountBits
+		|| x = 2
+	if a > b
+		a = b
+	if b < a
+		b = a
+	if a == a // NOOP
+		a = 0
+	if b != b // NOOP
+		b = 0
+}}}
+
+// im not sure what other tests need doing? We'll think of some... over time!!
+
+
+
+
+
+

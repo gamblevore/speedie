@@ -1,0 +1,98 @@
+
+https://pboyd.io/posts/one-c++-footgun     // original article
+
+class CheeseShop // An example to show how bad c++ is compared to speedie.
+	|messagetable| inventory
+	|string| ClerkName
+
+	constructor (|message| cfg)
+		.inventory = cfg["cheeses"]
+		.clerkName = cfg["clerk"]
+
+	syntax access (|string| cheeseName, |string|)
+		if (cheeseName ~= .clerkName)
+			return "Sir?"
+		return (.inventory[cheeseName]!=nil)("Yes", "No")
+
+//	return JB_Ternary(( JB_FreeIfDead( Get(.inventory, cheeseName) )|bool|), <(`Yes`)>, <(`No`)>)
+
+main
+	|| shop = CheeseShop(ConfigData.parse #require)
+	"Red Leicester? ${shop[`red leicester`]}"
+	"Tilsit?        ${shop[`tilsit`]}"
+	"Wenslydale?    ${shop[`wenslydale`]}"
+	"Cheddar?       ${shop[`cheddar`]}"
+	"Barris?        ${shop[`barris`]}"
+	
+/*
+   The original C++ uses 'toml::parse' that raises an exception... causing issues.
+Speedie has no exceptions, but a far better error-handling system.
+
+   Speedie is refcounted, avoiding C++'s issues around constructors and destructors.
+*/
+
+
+|| ConfigData = `
+cheeses
+	"Red Leicester"
+	"Flamange"
+	"Chester"
+	"Cheddar"
+clerk
+	Barris
+`
+
+
+/* original C++
+
+class CheeseShop {
+	public:
+		CheeseShop() :
+			clerkName{nullptr} {}
+		CheeseShop(std::string configPath) :
+			clerkName{nullptr}
+		{
+			auto cfg = toml::parse(configPath);
+
+			auto cheeses = toml::find<std::vector<std::string>>(cfg, "cheeses");
+			for (auto name : cheeses)
+				inventory.insert(name);
+
+			if (cfg.contains("clerk")) {
+				clerkName = new std::string{toml::find<std::string>(cfg, "clerk")};
+			}
+		}
+
+		~CheeseShop() {
+			if (clerkName)
+				delete clerkName;
+		}
+
+		std::string gotAny(std::string cheeseName) const {
+			if (clerkName && cheeseName == *clerkName)
+				return "Sir?";
+
+			return inventory.count(cheeseName) == 1 ? "Yes" : "No";
+		}
+
+	private:
+		std::unordered_set<std::string> inventory;
+		std::string *clerkName;
+};
+
+int main() {
+	CheeseShop shop;
+	try {
+		shop = CheeseShop{"config.toml"};
+	} catch(std::exception &e) {
+		// Silently continue anyway..
+	}
+
+	std::cout << "Red Leicester? " << shop.gotAny("Red Leicester") << std::endl;
+	std::cout << "Tilsit? " << shop.gotAny("Tilsit") << std::endl;
+	std::cout << "Wenslydale? " << shop.gotAny("Wenslydale") << std::endl;
+	std::cout << "Cheddar? " << shop.gotAny("Cheddar") << std::endl;
+
+	return 0;
+}
+*/

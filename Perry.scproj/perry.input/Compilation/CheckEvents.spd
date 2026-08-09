@@ -1,0 +1,276 @@
+
+
+
+extend PerryIDE
+	function ReCheck (|object| ReloadOnly=nil)
+		|| StartAt = Perry.FinishedStartUp					#require
+		StartAt += 0.125s * .index
+		require StartAt.Fired or .ModifiedForCompile
+
+		|| p = .path
+		if .ModifiedForCompile
+			.ModifiedForCompile = false
+			if .ProjectIsCode and !.UsingSpdLib
+				.Feedback = nil
+				.ASMProcess = nil
+
+		|| unused = @tmp + "check"
+		unused <~ p * .EditorIsCode
+		
+		if ReloadOnly
+			unused.name = "unused"
+		|| lf = .LostFunks
+			// this is just to help debug my libs.  So it displays which functions are unused
+			// within some libraries that I wrote. (GUI, jeebox, etc). This helps me to spot
+			// unused functions that need to be removed.
+			unused <~ lf.copy
+		.SendFeedbackMsg(unused)
+	
+	
+	function AskCheck
+		.SendFeedbackStr "check"
+		
+
+	syntax is (|ListViewState| s, assigns:|bool| mod)
+		opt norefcounts
+		|| r = .SharedProjectTabSource
+			r.syntaxis(s) = mod
+		
+		if (s is modified)
+			|| sub = .CurrFileName.SubMenu
+				(sub.ListSource is modified) = Mod
+
+
+	function ClearErrors (|bool| Compiled, |errorseverity| AtLeast=0)
+		isnt Broken
+		.CompileOKString = (Compiled)("Compile OK", "Check OK")
+		.editme.ClearErrors(AtLeast)
+		.errorlist.Clear
+		.filelist.ClearErrors
+		.RelistStartupErrors
+		.UpdateErrorCount
+		
+	
+	function CheckedOK (|string| kind, |bool|)
+		.ClearErrors(kind=="compile", errorseverity.error)
+		if .viewing == .ViewErrors
+			.NoNeed(.CompileOKString, .viewfiles)
+		return true
+
+
+	function message.ActualReplaceError (|string| src)
+		|| SubError = src.parse.first
+			.ReplaceWith(suberror)
+	
+	
+	function message.CleanErrors
+		opt norefcounts
+		for e in self
+			|| a = e.arg
+				|| f = a["file"]
+				|| str = a.firstName
+				if (f ~= "(string)") and (str[0, "error\n"])
+					e.ActualReplaceError(str)
+
+
+	function ShowCompileOK (|string| kind, |bool|)
+		.ErrorList.clear
+		.UpdateErrorCount
+		return .CheckedOK(kind)
+
+		
+	function ShowCompileErrorsFB (|message!| msg, |bool| RealErrors, |bool|)
+		opt norefcounts
+		if msg.first.yes
+			return .ShowCompileOK(msg.name)
+		return .ShowCompileErrors(msg, RealErrors)
+	
+	
+	function ShowCompileErrors (|message!| msg, |bool| RealCompile, |bool|)
+		// inconsistant input...
+		|| arg = msg.arg
+		arg.cleanErrors
+		
+		is Broken
+		.NoNeed
+		|| newlist = error.from(arg)
+		newlist ?= Error()
+		.errorlist.listsource = newlist
+		.UpdateErrorCount
+		if .IsFront and RealCompile// or .ErrorList isnt Visible
+			beep
+		.ShowErrors
+
+
+	function UpdateErrorCount
+		opt norefcounts
+		|| h = .errorlist.Columns.first
+			h.name = ""
+			|| n = .errorlist.listsource.Count
+				h.name = n of "issue"
+
+	
+	function ExpandCompileSep (|bool|)
+		opt norefcounts
+		if .ProductSep.Collapsed()
+			.ShowCompileTab(.SpeedieText)
+			rz = !.ProductSep.Collapsed()
+
+
+	function CheckMsg (|string| operation, |message|)
+		opt norefcounts
+		|| cmd = @tmp + operation
+		cmd <~ .Project.path
+		return cmd
+	
+	
+	function NameStr (|string| s, |string|)
+		return .projname.trimext + s
+		
+	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
+		|| RealErrors	= msg ~!= "check"
+		.ClearErrors(RealErrors)
+
+		|| NoErrors = .ShowCompileErrorsFB(msg, RealErrors)
+		|| ErrsVis	= .isviewing(.ErrorList)
+		.errorlist.SelectFirst
+		if !RealErrors or NoErrors
+			0
+		  elseif !errsvis
+			.view(.viewerrors)
+			.say(.namestr(" failed. Could not compile"))
+		.LoadErrors(RealErrors, realerrors)
+		.showstats
+
+	
+	function CrashLog (|UnixProcess| c, |bool|)
+		|| StdOut = c.ReadStdOut
+		.SpeedieText.log(StdOut)
+		|| Errors = c.readstderr
+			|| p = errors.parse
+				.ShowCompileErrors(p, true)
+		.compilr = nil
+		|| d = .DebugMode
+		(d isnt compiling)
+		.DebugMode = d
+		.RenableAfterCompile
+		return true
+
+
+	function ReadLog (|bool| Killed)
+		|| c = .Compilr $
+		|| StdOut = c.ReadStdOut
+		.SpeedieText.log(StdOut)
+		|| IsRunning = c.status.IsRunning
+		require !IsRunning or Killed
+
+		.DebugMode &= ~CompileMode.Compiling
+		// can we call .crashlog? lets say... c.status.crashed?
+		// simplify this?
+		|| Bad = .CheckCrashed(c,  "compiler")
+		|| Errors = c.readstderr
+			|| p = errors.parse
+				.ShowCompileErrors(p, true)
+			// Notifications will pick up the err otherwise!
+		  elseif !bad
+			if !killed
+				.ShowCompileOK("compile")
+			.CompiledOK(killed)
+		.compilr = nil
+		.RenableAfterCompile
+
+
+	function Say (|string| str)
+		target osx
+			if !.IsFront or GUI.IsBackground
+				.Talker = unixProcess.spawn("/usr/bin/say", [str])
+				(.talker)
+	
+	
+	function CompiledOK (|bool| Killed)
+		|| db = .DebugMode
+		.CheckedOK("compile")
+		|| last = .speedietext.text.parse.last
+		
+		ifn last == @tmp and "Product"
+			if !killed
+				error last
+		  else
+			|| path = last[@nil]
+			if path.ExpectString
+				|| file = @url + "file"
+				file <~ path
+				|| str = "\n\nCompiled OK!"
+				|| f = path.name.file
+				if !f.exists
+					str += " But it doesn't exist :("
+				str = .NameStr(str)
+				.notify(str, file)
+				.say(str)
+				if !killed
+					if (db is run or debug) and f.exists and stderr.ok
+						.run_compile_wrap(f)
+
+
+	function Notify (|string| What, |message| response=nil)
+		|| c = what
+		if response
+			c = what + ("\n" + response.render) // hmmm... seems awkward
+		.LogOneComm(@emb + c, "\1b ")
+		notifications <~ (what, response)
+	
+	
+	function CancelKey (|bool|)
+		if .compilr
+			return .CancelCompile(true)
+		if .RunningProd
+			return .MakeNothingRunning
+	
+	
+	function CancelCompile (|bool| Beep=false, |bool|)
+		opt norefcounts
+		|| c = .Compilr
+			c.Kill(0)
+			app.Sleep(0.025) // allow pipes to work
+			return .CrashLog(c)
+
+		if beep
+			Notifications <~ "Nothing is building"
+			beep
+		.debugmode = 0
+		return .RenableAfterCompile
+
+
+	function RenableAfterCompile (|bool|)
+		|| code = .ProjectIsCode
+		(.buildbutton is enabled) = code
+		(.runbutton is enabled) = code
+		(.buildbutton is visible)
+		(.progress isnt visible)
+		.HideStuff
+		isnt active
+		return true
+
+
+	function IsBuilding (|bool|) // .isbuilding, .iscompiling, .compiling 
+		return .buildbutton isnt enabled
+
+
+
+function fnBuildIsDead (fnConfirmCanceller)
+	if self mustbe perryide
+		if !.IsBuilding
+			return .CancelCompile
+
+
+function ClickedCancel (GUIAction)
+	|| i = .ide
+	if !i.Isbuilding
+		return true
+	|| can = ConfirmCanceller(i, fnBuildIsDead)
+	|| name = i.project.TrimCodeExt
+	|| q = "Currently building $name... Cancel building $name?"
+	if q.confirm(can)
+		rz = i.CancelCompile
+
+

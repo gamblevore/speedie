@@ -1,0 +1,237 @@
+
+target !minilib {
+
+class SpdProcess (UnixProcess)
+	linkage
+		cpp_part Proc
+	description "SpdProcess is a process, that happens to be made by Speedie. Speedie processes come with a pico (message-passer), so they can be talked to, if you want.
+
+We also make it easier to send and receive message objects, instead of pure strings.
+
+SpdProcess handles your subprocess dying, or needing resetting.
+
+The DebugName is normally a file-path, but might not be, for example you are in fact running a function in a thread and using that function as a subprocess.
+
+(This is possible if the function is an entire speedie program, complete with 'main', loaded from a library.)
+"
+	contains SpdProcess
+	|jbin|						Writer
+	|?MicroProcess|				SubProcess		// mostly exists for debug
+	|int|						DeathLimit
+	|bool|						AlreadyWarnedDied
+
+	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+		mode |= ProcessMode.MsgPassing
+		super.constructor(path, mode, params, pico)
+		.deathlimit = 12
+		.SubProcess = fn
+		.writer = FastString()
+
+			
+	destructor
+		pico.destroy(.pico, "destructor")
+			
+	function CommsOpen (|bool|)
+		if self
+			return .pico.MessageError == 0
+	
+	
+	libinternal ParentAlive (|bool|)
+		return app.ParentID > 1
+
+
+	libinternal ChildAlive (|bool|)
+		if .SubProcess
+			return .CommsOpen
+		return .status.isrunning
+
+
+	syntax append (|message| msg, |bool|)
+		cpp_part Send
+		opt norefcounts			
+		if .status.NotStarted
+			.start
+		if .pico.MessageError == 0
+			.writer.length = 0
+			msg.RenderJbin(.writer)
+			rz = .pico <~ .writer|string|
+			.writer.length = 0
+
+
+	syntax append (|faststring| fs, |bool|)
+		inlined
+		rz = (self <~ fs|string|)
+		fs.Length = 0
+	
+	
+	syntax append (|string| str, |bool|)
+		cpp_Part SendStr
+		if .status.NotStarted
+			.start
+		if .pico.MessageError == 0
+			return .pico <~ str
+
+
+	function Get (|float| T=0, |message|)
+		// this should take a Date. seems easier?
+		// pico could use dates internally... at least for this?
+		// that, or we do the conversion in here.
+		opt norefcounts
+		if self
+			if .status.NotStarted
+				.start
+			|| str = .pico.get(T)
+				rz = str.parse
+	
+
+	inline LastSend (|date|)
+		|| p = .pico
+		return p.config.lastsend
+	
+	
+	function TimeWaitingForReply (|date|)
+		|| c = .pico.config
+		|| last = c.lastsend
+		if c.lastread < last
+			return last.ago
+
+
+	function CanActivate (|bool|)
+		if !.Deathlimit or .Diedcount < .Deathlimit
+			.alreadywarneddied = false
+			return true
+		if !.AlreadyWarnedDied
+			.AlreadyWarnedDied = true
+			error (.path, "Too many disconnections, blocking reconnection.")
+	
+	
+	libinternal Kill
+		disabled "Explain why"
+
+
+	syntax expect (|string| err)
+		cpp_part Fail
+		if .CommsOpen
+			printline err
+			errorreceiver.NewError(nil, err, .path)
+		.Disconnect(err)
+
+
+	function Disconnect (|string| why = "")
+		.pico.close(why.zeroterm)
+
+	
+	function SpawnAsChild (|bool|)
+		|| s = .pico.MessageError
+		if s == 255 // impossible?
+		if s > 0
+			require pico.replace(.pico)
+		return .Start.successful
+
+
+	function TimedOut (|date| Durr, |bool|)
+		if (.TimeWaitingForReply > durr)
+			error (self, "child timed out.")
+			return true
+	
+		
+	function ActivateChild (|bool|)
+		if .CommsOpen and .Status.IsRunning
+			return true
+		.Kill(0)
+		if .CanActivate
+			expect (.path) (self, "Can't re-activate process without a path.")
+			return .SpawnAsChild
+
+
+	iterator
+		while .pico.CanGet
+			|| msg = .get(10.0)
+			if !msg
+				continue
+			yield msg
+
+
+	function app.Parent (|bool| Expect=false, |spdprocess?|)
+		opt norefcounts
+		if spdprocess.CheckedParent
+			return spdprocess._parent
+		spdprocess.CheckedParent = true
+
+		|| comms = spdprocess._ForceParent
+		if comms or pico.HasParentSocket
+			if !comms
+				comms = pico.new
+			if comms
+				if app.IsThreadedAsLib or comms.CompleteExec
+					|| p = SpdProcess(comms.name, nil, comms)
+					SpdProcess._parent = p
+					return p
+				comms.Close("Parent lost connection")
+
+		if expect
+			error "Parent lost connection"
+
+
+	module
+		|bool|			CheckedParent
+		|&pico|			_ForceParent
+		|SpdProcess|	_Parent
+				
+
+		libinternal CreateArgs (|string| path, |[string]!| Args, |&cstring|)
+			cpp_wrapper
+
+
+		inline string.Spawn (|string| Name, |[string]| Params=nil, |spdprocess|)
+			return SpdProcess.Spawn(self, params, name)		
+		
+		
+		function Spawn (|string| app_path, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |string| Name, |SpdProcess|)
+			require app_path.file.mustexist
+			|| pico = pico.new(name)
+				rz = SpdProcess(app_path, nil, pico, params, Mode)
+				if !rz.SpawnAsChild
+					rz = nil
+
+
+		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
+			disabled "This function needs rework. Feel free to fix it"
+//			|| p = pico.new$
+//			|| id = p.spawnfork
+//			if id < 0
+//				pico.destroy(p, "fork failed")
+//				return nil
+//
+//			if id == 0 // we are child
+//				id = app.parentid
+//				mode = ProcessMode.PassThru
+//			rz = spdprocess(app.path, nil, p, nil, mode)
+//			rz.pid = id
+
+	
+prototype MicroProcess (|&pico| Comms, |int64| Mode, |&cstring| args, |int|)
+	linkage
+		cpp_part MPC
+	function Spawn (|string| ThreadName,  |[string]!| R = [],  |SpdProcess|)
+		description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
+		
+		|| c_args = SpdProcess.CreateArgs("", r)
+		// its the called-threads responsibility to free the std-args received.
+		// (Look at Speedie_Main in Speedie.scproj for example)
+		|| pico_fn = pico.new(threadname)
+			|| proc = SpdProcess(threadname, self, pico_fn, r)
+			if proc.pico.SpawnThread(self|picothreadfn|, 7, c_Args)
+				return proc
+		// free cos we never had a chance to free it.
+		memory.free(c_args)
+
+
+
+//prototype SpdDeathActionFn
+
+}
+
+
+// too many "function spawn" things all over the place. 7! Need to reduce them somehow?
+

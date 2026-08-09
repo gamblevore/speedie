@@ -1,0 +1,463 @@
+#!/usr/local/bin/spd
+import "GUI"
+
+// todo:
+// seems to rotate 2x per keypress when things get fast. No good!
+// pink cloudy blocks with cute faces? and hearts/rainbows/stars as they disappear
+	// Clouds via overlapping volumetric spheres and edge detection post-processing
+	// the ghost block kinda spoils the fun a bit... you end up staring at the bottom all the time.
+		// maybe speed the game up over time? then add it.
+	// frilly frames?
+// crashed? or didnt do anything? laying a I block on the bottom row after rotating it?
+
+
+
+main
+	return TetrisWin().RunAsMain(60)
+
+
+datatype Tetronimo (uint64)
+	flags
+		|Tetronimo|
+		(1<<8)
+		Ghost
+		Dropper
+		Pivot
+		Real
+//		Destroying
+		Proper = Dropper + pivot
+
+	syntax is (|Tetronimo| V, |bool|)
+		return self&V
+
+	syntax is (|Tetronimo| V, assigns:|bool|, |Tetronimo|)
+		if Value
+			return self|||v
+		return self&~v
+
+
+|| Shapes = [
+	"aa\naa"
+	"bb\n Bb"
+	" Bb\nbb"
+	"tTtt"
+	"ttTt"
+	"dDd\nd"
+	"dDd\n  d"
+	"eEe\n e"
+]
+
+|| TrollShapes = [
+	"xxxxXxxxx"
+	`
+ jj jj
+jjjJjjj
+ jjjjj
+   j`
+	" Ex\ny  z\n io"
+	" x   x \n   Y\n  ___"
+	"tttTttt\n"*3 // haha
+]
+
+
+class TetrisWin (Window)
+	|Tetris|			Grid
+	|textview|			Time
+	|textview|			History
+	|textview|			HighestField
+	|textview|			LevelField
+	|textview|			Score
+	|config|			Prefs
+	
+	constructor
+		.grid = Tetris()
+		.HighestField = TextView.Block(self, -2.5, -5.0,  19.5, -3.0)
+		.Score = TextView.Block(  self, -2.5, -5.0,  16.5, -3.0)
+		.history = TextView.Block(self, -2.5, -15.0,  13.5, -10.0)
+		.time = TextView.Block(   self, 13.5,  5.0,   5.0,  3.0)
+		.LevelField = TextView.Block(self, 13.5,  7.0,   2.0,  3.0)
+		.prefs = config.Create("tetris.spd.pref")
+		.grid.Highest = .prefs["max"].int
+		.History.text = .prefs["history"]
+		
+		.blockheight = 24
+		.blockX(true) = -6
+		.blockY = 1.5
+	
+	function GameOver
+		if .grid.state == 1
+			|| H = .grid.Highest
+			if (H == .grid.Score)
+				|| Name = "Enter your name, champion!".ask
+					.History.text = "$name @ $H\n${.History.text}"
+				.prefs["history"] = .History.text[0, 1K]
+			.prefs["max"] = H
+			.prefs.save
+			.grid.State = 2
+		if keys.SPACE[] or Keys.RETURN[]
+			.Grid.Restart		
+
+	
+	behaviour FrameStep
+		require WindowActive
+		if .Grid.State >= 1 // game over
+			.GameOver
+		  else
+			.grid.HandleInput
+		gui.Touch
+
+
+	behaviour DrawBackground
+		where.DrawRect(self, colors.black)
+		.Grid.draw(where)
+		.HighestField.Text = "Highest:\n${.grid.Highest}"
+		.Score.Text = "Score:\n${.grid.Score}"
+		|| time = (.grid.TotalFrames|float| / 60.0)
+		.time.Text = "Time:\n" + time.renderduration
+		.LevelField.Text = "Level - ${.grid.Level|int|}"
+
+
+
+class Tetris (GridSection)
+	contains Tetronimo
+	|int|				Score
+	|int|				FramesLeft
+	|int|				FrameRate
+	|byte|				Level // 0-255 is more historical
+	|uint16|			LinesRemaining
+	|int|				TotalFrames
+	|int|				Highest
+	|int|				LockDelay
+
+	
+	constructor
+		super.constructor(21,24)
+		.restart
+		
+	function Restart
+		.FrameRate = 60
+		.FramesLeft = .FrameRate
+		.State = 0
+		.Score = 0
+		.Level = 1
+		.LinesRemaining = .Level*10 min 30
+		.TotalFrames = 0
+		shapes.shuffle
+		
+		|| i = 0
+		|| h = .Height
+		for y in h
+			for x in 12
+				|Tetronimo| B
+				if !y or (x == 0 or 11)
+					B = '*' ||| Tetronimo.Real
+					b += y >= (h-4)
+				  elseif y <= 4
+					B = ++i & 15
+					b |= !b
+					b |= Tetronimo.Real
+				self[x, y][] = b
+			if y
+				self[10()+1, y][] = 0
+		.NextShape()
+
+
+	syntax Access (|int| x, |int| y, |&Tetronimo|)
+		return .at(x + y*16)
+			
+	function AddShape (|string| s)
+		for i in 4
+			if .TryShape(s, 4+i) or .TryShape(s, 4-i)
+				exit
+		
+	function TryShape (|string| s, |int| Left, |bool|)
+		|| y = 22
+		|| x = left
+		for c in s
+			if c == '\n'
+				y--
+				x = left
+				continue 
+			if c != ' '
+				if self[x,y][] is Real
+					return .fail
+				|| T = (c&~32) ||| Tetronimo.Dropper
+				(T is pivot) = c.IsUpper
+				self[x,y][] = T<<16
+			x++
+		.Pass
+		.move(-16)
+		.move(-16)
+		return true
+
+
+	function SomethingIsBeneath (|bool|)
+		rz = .MoveIsBlocked(-16, Tetronimo.real)
+		.fail
+
+		
+	function HandleInput
+		|| f = (.framerate max 40)|float|*2048th
+		|| M = (3.0, 1.0, 3.0, 13.0)*f
+		M = keys.Movement(M)
+		|| w = m.w
+		if w or m.z > 0
+			.rotate(w)
+		|| x = m.x
+			.move(x.sign|int|)	
+		if (.FramesLeft <= 0) or (m.y > 0) or (m.z < 0)
+			.drop(m.y > 0)
+		  elseif .SomethingIsBeneath
+			.LockDelay--
+		
+		(.Highest max= .Score)
+		.MakeGhost
+		.FramesLeft--
+		if .TotalFrames++ isa 300
+			.FrameRate = .FrameRate-1 max 22
+		
+	
+	function NextShape (|bool| Troll=false)
+		|| bag = (troll)(trollshapes, Shapes)
+		|| B = bag.Next
+		if !b
+			bag.Shuffle
+			b = bag.Next!
+		.AddShape(b)
+
+	function FindPivot (|int| adjust, |ivec2|)
+		for y in .Height
+			for x in 10
+				|| c = self[x+1,y][]
+				if !adjust
+					if c is pivot
+						return (x+1,y)
+				  elseif c is Dropper
+					if adjust == 1
+						return (x+1,y)
+					adjust--
+				
+
+	///// ROTATIONS /////
+	function RotateOne (|ivec2| P, |int| x, |int| y, |Tetronimo| b, |float| r, |int| move,  |bool|)
+		|| V = (x,y) - p
+		if r > 0
+			v = v.RotateRight
+		  else 
+			v = v.RotateLeft
+		V += P
+		if  v.x|uint| <= 10  and  v.y|uint| >= 1
+			|| NewPos = self[v.x, v.y]+move
+			if NewPos[] is Real
+				return .Fail
+			NewPos[] |= b<<16
+			return true
+
+	function Rotate (|float| r)
+		require .FindPivot(0)
+		for pivot in 4
+			for Move in 3
+				require !.CanRotate(r, (move&1)-((move&2)>>1), pivot)
+
+		.CanRotate(r,16,0)
+
+	function CanRotate (|float| r, |int| move, |int| pivot, |bool|)
+		|| P = .FindPivot(pivot)$
+		for y in .Height
+			for x in 11
+				|| c = self[x,y][]
+				if c is Dropper
+					require .RotateOne(p, x, y, c, r, move)
+		return .pass
+	////////////////////////
+	
+	
+	function Fail (|bool|)
+		for (b in self) (c)
+			c[] = b & 16~bits
+
+	function Pass (|bool|)
+		for (b in self) (c)
+			|| m = b>>16
+				b = m
+			  elseif b is Dropper
+				b = 0
+			c[] = b & 16~bits // flush
+		return true
+		
+	function MoveIsBlocked (|int| x, |Tetronimo| test, |Tetronimo|)
+		rz = -1
+		for (b in self) (c)
+			if b is dropper
+				rz = 0
+				|| dest = x+c
+				|| T = -1
+				if (dest >= .at)
+					T = dest[]&test
+				if t
+					.fail
+					return t
+				dest[] |= b<<16
+
+	function Move (|int| x, |bool|)
+		return !.MoveIsBlocked(x, Tetronimo.real) and .Pass
+	
+	function RowIsFull (|int| y, |bool|)
+		for x in 10
+			require self[x+1, y][]
+		return true
+	
+	function PullDown (|int| y)
+		for x in 10
+			self[x+1, y][] = 0
+		while y < .Height-1
+			for x in 10
+				self[x+1, y][] = self[x+1, y+1][]
+			y++
+
+	
+	function Drop (|bool| Lock)
+		.FramesLeft = .FrameRate / 2
+		if .Move(-16)
+			.LockDelay = 48
+			
+		  elseif (lock or .LockDelay <= 0)
+			.LockDelay = 48
+			.MakeReal
+	
+	
+	function MakeGhost
+		.FlushGhost
+		|| i = -32
+		while .MoveIsBlocked(i, Tetronimo.real ||| Tetronimo.proper) isnt Real
+			.FlushGhost
+			i-=16
+	
+	
+	function FlushGhost
+		for (b in self) (c)
+			|| m = b>>16
+				b = m
+				(b isnt proper)
+				(b is ghost)
+			  elseif b is ghost
+				b = 0
+			c[] = b & 16~bits // flush
+
+	
+	function int.Tri (|int|)
+		return (self*(self+1))/2
+
+	
+	function MakeReal
+		for (b in self) (c)
+			if b is Dropper
+				c[] = (b &~ Tetronimo.proper)|||Tetronimo.Real
+		
+		|| Score = 0
+		|| Rows = 0
+		for y in .Height-1
+			if .RowIsFull(y+1)
+				Rows++
+				if Score
+					Score *= 3
+				  else
+					score = 100
+				.PullDown(y+1)
+				y--
+		
+		|| X = .LinesRemaining|int| - rows.Tri
+		|| LevelChange = X <= 0
+		while X <= 0
+			.level++
+			X += .level|uint16|*6
+		.LinesRemaining = X
+		
+		.Score += Score
+		if .Reached < .height-5
+			.NextShape(LevelChange)
+			keys.Reset
+			return
+
+		beep "Game Over"
+		.State = 1
+	
+	
+	function Reached (|int|)
+		|| range = 23 downto 1
+		for y in range
+			for x in 10
+				if self[x+1,y][] is Real
+					return y
+		
+	
+	function Draw (|image| where)
+		|| h = .Reached|float|
+		for y in 21
+			.DrawRow(where, y, h)
+		|| n = shapes.marker
+		for i in 3
+			.DrawNextInBag(where, 14, 18-i*4, shapes[n+i])
+		
+		
+	function DrawNextInBag (|image| where, |int| x1,   |int| y=21,  |string?| s)
+		require s
+		|| x = x1
+		for c in s
+			if c == '\n'
+				y--
+				x = x1-1
+			  elseif c != ' '
+				.DrawBlock(where, y, x, c, 1.0)
+			x++
+	
+	
+	function DrawBlock (|image| where, |int| y, |int| x, |Tetronimo| b, |float| h)
+		|| R = (x, y, x+1, y+1).screen
+		|| Hu = ((b&31)+8) div 11
+		Hu -= (b is pivot)|float| * 0.025
+		if b&255 == '*'
+			Hu = 0.75+(h*70th)
+		
+		|| sa = 1.0
+		|| Br = 0.8
+		if b is ghost
+			br = 0.04
+		|| C = colors.wheel(Hu, SA, br, 1.0)
+		where.DrawRect(R, C)
+		
+		// outline
+		if b is Dropper
+			if b is Pivot
+				br += 4th
+			  else 
+				br *= 0.9
+		  else
+			hu += 24th
+		if b is ghost
+			br = 0.006 / c.lum
+			br += gui.Cycle(5s, (x+y)*1s).pow8*0.08
+			r+=(0,0,1,1)
+		C = colors.wheel(Hu, SA, br, 1.0)
+		where.DrawOutlineOnly(R, C.px)
+	
+	
+	function DrawRow (|image| where, |int| y, |float| h)
+		|| row = .at(y*16)
+		|| f = y >= (.Height-4)
+		|| x = 0+f
+		while x < (12-f)
+			|| b = row[x]
+				.DrawBlock(where, y, x, b, h)
+			x++
+
+	iterator
+		|| y = 0
+		while y < .height
+			|| x = 0
+			while x < 12
+				|| c = self[x,y]
+				yield (c[]) (c)
+				++x
+			y++
+

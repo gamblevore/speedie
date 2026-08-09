@@ -1,0 +1,187 @@
+
+
+extend Message {
+
+function RedundantDeclare (|nilstate| D,  |nilstate|)
+	|| str = "Redundant test (currently real): " + .OrigRender
+	error (self, str)
+	return D
+
+
+function RedundantVar (|scdecl| dcl,  |nilcheckmode| Test,  |nilstate|)
+	if (Test is soft or while) // allow redundant
+		return Test & nilstate.either
+
+	if ArchonPurger.loops.BranchDepth == 0
+		|| fs = FastString()
+		fs <~ "Redundant test on "
+		fs <~ dcl.nilcurr.RawName
+		fs <~ ": "
+		.OrigRender(Fs)
+		error (self, fs)
+	return Test & nilstate.either
+
+
+function FastDeclSafe (|SCDecl|)
+	opt norefcounts
+	|| d = .obj
+	if d isa scdecl
+		|| l = d.IsLookupOnly
+		ifn l isa scdecl
+			return d
+		return l|scdecl|
+
+
+function NilDecl (|SCDecl|)
+	opt norefcounts
+	|| obj = .obj
+	if obj isa scdecl
+		|| l = obj.IsLookupOnly
+		if l isa scdecl
+			return l
+		return obj
+
+
+function FastDecl (|SCDecl!|)
+	opt norefcounts
+	|| obj = .obj
+	if obj isa scdecl // seems easier to just test
+		|| l = obj.IsLookupOnly
+		if !l
+			return obj // faster
+		if l isa scdecl
+			return l
+		return obj
+	if obj isa scmodule
+		error (self, "This module is not an object: " + obj.name)
+	  else
+		error (self, "No decl found on: " + .locate)
+	return Compiler.GetTypeVoid
+
+
+function SCBlockage.BlockCombine (|SCBlockage| B, |int|)
+	if B == self
+		return self
+	if self is Return
+		return B
+	if B is Return
+		return self
+	debugger,	#!would this even happen ever???
+	return SCBlockage.Continue 	// continue is weaker than exit, so return continue?
+
+
+function LastInBlock (|SCBlockage| Reason)
+	opt norefcounts
+	.RemoveAfter
+
+	|| arg = .parent!
+	arg.Blocks = reason
+	.Blocks = reason
+	|| Test = arg.parent
+	if Test istmp "else"
+		while test
+			arg = test.prev!
+			|| B = arg.Blocks		#require
+			Reason = Reason.BlockCombine(B)
+
+			test = arg.parent!
+			if test.ASMType is kif					// what about kElseIf? does this already handle that
+				return test.LastInBlock(reason)		// bubble up :O
+			  else
+				test.Blocks = Reason
+	
+	if (reason == scblockage.quit) and (self == @func) and scfunction.currfunc!.returntype
+		|| ret = arg.AddReturn				// make cleaner c++
+		ret <~ ret.CreateNil
+}
+
+
+|message| SelfEqNilReturn
+
+function @message.NilchCompare (|message|)
+	if SelfEqNilReturn
+		return SelfEqNilReturn
+	SelfEqNilReturn = "return self!=nil"~parse
+	return SelfEqNilReturn
+
+
+function message.NilCheckMode (|bool| ok, |int|)
+	opt norefcounts
+	rz = 2*OK
+	if rz
+		|| f = .first
+			rz += f.deepequals(message.NilchCompare)
+
+
+function message.KinderRemoveAfter
+	opt norefcounts
+	while (|| x = .next)
+		check (x is inserted) (x, "Unreachable code found.") // only complain about user-generated code...
+		x.remove
+	
+
+function scdecl.CanUpgradeRegister (|int|)
+	opt norefcounts
+	|| i = .Internal // erase this eventually
+		if (i Is Local) and i.Suffers
+			return 1
+	
+	if (self is Reference)
+		if (self is local) and .Suffers
+			return 2
+		
+
+
+function scdecl.PrmStateMsg (|string| Needed, |string|)
+	|| fs = faststring()
+	fs <~ "Please state "
+	if self is self
+		fs <~ "self"
+	  else
+		fs <~ "param "
+		fs <~ .name
+	fs <~ "'s nilness. "
+	fs <~ Needed
+	return fs
+
+
+function scdecl.NilPrmFail (|scfunction| f)
+	error (f.Source, .PrmStateMsg(""))
+
+
+function message.IsNowNil (|int|)
+	opt norefcounts
+	|| d = .obj|scdecl|
+		Target debugnil: if !(d as scdecl)
+		if (d == TypeNil)
+			return 1
+		if d.NilCurr == nilstate.nilish
+			return 2
+
+
+function scdecl.TypeSuffers (|bool|)
+	if .iscarray
+		return false
+	if .PointerCount
+		return true
+	|| d = .type.BaseType
+	return d == SCNodetype.ProtoType or SCNodetype.Object
+
+
+
+function scdecl.NilStated (|bool|)
+	return .NilDeclared is Stated
+
+
+function SCFunction.HasProperSpeedieCode (|bool|)
+	if .badness != 0 and .badness != 128
+		return false
+	return !.IsMacro and (self Isnt cpp) and (self isnt disabled)
+
+
+function SCFunction.WantAs (|nilstate| NS)
+	opt norefcounts
+	|| dcl = .args.first
+	expect (dcl and dcl.typesuffers and .cls) (.source, `This function should not specify nilness of self.`)
+	dcl.nildeclared = NS
+

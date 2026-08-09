@@ -1,0 +1,183 @@
+
+
+	
+function PerryFuncListFilter (GUIListFilterEvent)
+	opt norefcounts
+	if value!=nil
+		.ide.ListAllFuncs(false, value)
+	  else
+		debugger
+
+
+function MenuAllFuncs (GUIaction)
+	opt norefcounts
+	if self isa Button
+		.ide.ListAllFuncs(true, "")
+		.OpenMenu
+
+
+function PerryIDE.ListAllFuncs (|bool| Sel = false, |string| Filter = "")
+	|| submenu = .FunctionMenu.submenu!
+	|| result = SubMenu.listsource
+	result.clear
+	.ListAllFuncsMsg(.EditMe.Parse, result, filter)
+	if sel
+		.FindSelectedMenuItem(result)
+	result.obj = (sel)(.editme.ScrollStart, nil)
+	result.Sort(FuncListSorter)
+	(.FunctionMenu is visible) = filter or result.HasAny
+	.FunctionMenu.text = "(" + result.Count.Render + ")"
+	.ImproveFuncList(Result)
+
+
+function message.FuncAtPos (|int| n, |message|)
+	opt norefcounts
+	for s in self
+		if s.position > n
+			return s.prev
+	return .last
+
+
+function PerryIDE.FindSelectedMenuItem (|message| result)
+	opt norefcounts
+	if result.hasany
+		result.FuncAtPos(.editme.Selection.x)
+		.FunctionMenu.SubMenu!.select(result)
+
+
+function string.FuncListSep (|string|)
+	|| fs = faststring()
+	|| n = .length
+	|| missing = (24 - n)/2
+	fs <~ ('-', missing)
+	fs <~ '<'
+	fs <~ self
+	fs <~ '>'
+	fs <~ ('-', missing)
+	return fs
+
+	
+function PerryIDE.ImproveFuncList (|message| result)
+	opt NoRefCounts
+	|message| p0
+	for s.fast in result
+		|| p = s[@nil][@nil]
+			if !p.ShallowEquals(p0, true)
+				|| d = listviewrow()
+				d.name = p.name.funclistsep
+				(d is Separator)
+				s.prev = d
+			|| n = s.first!.name
+			if p != @name
+				n = "." + n 
+			s.name = n
+			p0 = p
+
+
+function perryide.CurrSelFunc (|message|)
+	opt norefcounts
+	|| msg = .EditMe.MessageAtSel
+		return msg.OwningFunc
+
+
+function PerrySuperAutoComplete (guilistevent)
+	opt norefcounts
+	|| i = .ide
+	|| fn = i.CurrSelFunc
+		i.editme.ShowAndSelect(fn.Position, true)
+		i.SectionKeyTime = i.MaybeSendMessage("callfrom", fn)
+	return true
+
+
+function PerryAutoCompleteSelected (GUIListEvent)
+	opt norefcounts
+	require mode isnt InitialSelection
+
+	|| i = .ide
+	i.DuringTempView++
+
+	|| e = i.EditMe
+	|| p = row.firstname
+	if !row
+		p = .ListSource.obj as string
+	if p and i.EditPath2(p)
+		|| rl = row[2]
+			e.ShowAndSelect(rl.int, true)
+	i.DuringTempView--
+
+
+function PerryFuncMenuSelected (GUIListEvent)
+	opt norefcounts
+	|| e = .ide.EditMe
+	if row
+		e.ShowAndSelect(row.position)
+		return false
+	|| obj = .ListSource.obj as TextViewLine
+		e.scrollstart() = obj
+
+
+function FuncListSorter (SorterComparer of message)
+	opt norefcounts
+	|| aa = self[]
+	|| bb = b[]
+	if (!aa or !bb)
+		return (aa < bb)
+	if aa.func != bb.func
+		return bb.func|int| - aa.func|int|
+	
+	if aa == @emb
+		// replace with aa.name.syntaxcompare and just replace the number
+/		return aa.name.SyntaxCompare(bb.name, true)
+	
+	|| af = aa[]
+	|| bf = bb[]
+	if (!af or !bf)
+		return (af < bf)
+	|| an = af.name
+	|| bn = bf.name
+	|| cmp = an.SyntaxCompare(bn, true)
+	cmp ?= (Af.func|int| - bf.func|int|)
+	cmp ?= aa.name.SyntaxCompare(bb.name, true)
+	return cmp
+
+
+function message.FuncArg (|message|)
+	opt norefcounts
+	|| s = .last
+	if s == @arg
+		return s
+
+
+function PerryIDE.ListAllFuncsMsg (|message| items, |message| result, |string| filter)
+	opt norefcounts
+	for line in items
+		if line == @decl
+			0 // result.IDEAddfunc(line, filter)
+		  elseif line == @tmp
+			if line ~= "target"
+				|| arg = line.last
+				if arg == @arg
+					.ListAllFuncsMsg(arg, result, filter)
+			  elseif AutoComplete.owner_dict.valuelower(line.name)						// class/module/etc
+				.ListAllFuncsMsg(line.funcarg, result, filter)
+			  elseif AutoComplete.isafunc(line)
+				result.IDEAddfunc(line, filter)
+
+
+function message.IDEAddfunc (|message| line, |string| filter)
+	if line != @decl
+		|| name = line.OwningFullName(@emb)
+		if name and filter.filter(name.name)
+			|message--| fn = .msg(@str)
+			fn.position = line.position
+			fn <~ name
+
+
+function string.Filter (|string| find, |bool|)
+	if !find
+		return true
+	for s in .words
+		if s
+			require find contains s
+	return true
+

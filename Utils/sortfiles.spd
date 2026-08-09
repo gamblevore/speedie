@@ -1,0 +1,64 @@
+#!/usr/local/bin/speedie
+
+app.usage = `Usage: ` + app.filename + ` path1 [path2, path3]
+
+Prints a list of files that match the extensions. Default extension is spd. Sorts the files by file-size. Useful to see how big your speedie projects are. Also sums the total file-size.
+
+options:
+	types=txt/html
+	quiet
+	
+example:
+	sort.spd /usr/local/speedie
+	sort.spd dir1 dir2 --types=zip/rar/xz
+	sort.spd /usr/local/speedie -quiet
+	sort.spd /usr/local/speedie --types=cpp -quiet
+	sort.spd /usr/local/speedie --types=md
+`
+
+|[file]|				Found
+|dictionary?|			Types
+|int|					Total
+
+main (|[file]| files)
+	if !files
+		printline app.Usage
+		return 0
+	types = dictionary.new
+	types!["spd"] = "x"
+	|| t = app["types"]
+		if t == "*"
+			types = nil
+		  else
+			types = t.Dict('/')
+		
+	for f in files
+		app.Collect(f)
+	found.sort(MySorter)
+	|| remover = app.Findremover
+	if app.No("quiet") and app.no("q")
+		for f in found
+			"${f.trimstart(remover)} --> ${f.size.strsize}"
+	"Total: ${Total.strsize} in ${found.length} files"
+
+
+function App.FindRemover (|string|)
+	require app.args == 1
+	|| s = app.args[0]
+		return s.PathDir
+		
+
+function app.Collect (|file| f)
+	require	f.MustExist
+	if f.IsDir
+		for c.files in f
+			if c.visible
+				.collect(c)
+	  elseif !types or types[f.ext]
+		total += f.size
+		found <~ f
+
+	
+function MySorter (SorterComparer of file)
+	return .size - b.size
+	

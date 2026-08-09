@@ -1,0 +1,561 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+// we have opposites... perhaps the negate operator could use it.
+
+
+datatype OpMode (int)
+	flags
+		|OpMode|
+		CompOrSet  = [Compare, Assigns]
+		MathLike = [Bit, Math]
+		Addition
+		ShiftOnly
+		MakesSigned		// -
+		ExactlyEquals
+		EqualOrNot
+		Comparison		// >  >=  <  <=
+		More			// >				// if unsigned > 0
+		Less			// <				// if 0 < unsigned
+		MoreOrEqual		// >=
+		LessOrEqual		// <=
+		NilTest			// not the same as EqualOrNot... because those include customops
+		Multiply
+		SyntaxIs
+		Subtraction = (makessigned + Addition)
+		SameOrLessBits = [NoExtraBits, LoseBits]
+		RightShift = ShiftOnly + NoExtraBits
+		AndOr = [OR, AND]
+		Custom
+		CaseAware
+		CustomOnFloat
+		ExactEquals = niltest + exactlyequals + equalornot + compare
+		ExactNotEquals = niltest + equalornot + compare
+		
+		
+	syntax is (|OpMode| x, |bool|)
+		return (self & x) == x
+		
+
+
+
+class SCOperator {
+linkage
+	cpp_part		Opp
+
+|int|			Score
+
+|string|		Name
+|string|		CompOp
+|string|		CompParam
+|string|		FuncName
+|fn_OpASM?|		OpASM
+|OpMode|		Kind
+|SCOperator--?|	Opposite
+
+
+constructor (|string| name="", |fn_opasm?| ASM, |OpMode| mode=0)
+	stores_self
+	.name = name
+	.kind = mode
+	.OpASM = asm
+	if name
+		dict[name] = self
+
+syntax is (|OpMode| x, |opmode|)
+	return .kind & x
+	
+render
+	fs <~ .name
+
+
+function SimpleName (|String|)
+	opt norefcounts
+	|| n = .name
+	if (self Is CaseAware)
+		Return n[1...]
+	Return n
+
+
+function SetFuncName (assigns:|string| s)
+	.funcname = "Operator" + s.UpperFirst
+	dict[ s.Lowercase ] = self
+
+
+function InitComp (|string| name_)
+	if name_[] == '~'
+		.kind |= opmode.CaseAware
+	.kind |= opmode.Compare
+	.FuncName = "OperatorCompare"
+	
+	// (a==b) =   0
+	// (a<b)  =  -1
+	// (a>b)  =   1
+	// (a<=b) <=  0
+	// (a>=b) >=  0
+	
+	|| s = .SimpleName
+	if (s.length == 2)
+		.CompOp = s
+	  else
+		.CompOp = "=="
+	
+	if (s == "<")
+		.CompParam = "-1"
+		.CompOp = "<="
+	  elseif (s == ">")
+		.CompParam = "1"
+		.CompOp = ">="
+	  elseif (s == "<=") or (s == ">=")
+		.CompParam = "0"
+	  else
+		.CompParam = "0"
+
+
+module {
+	|{SCOperator}|						Dict = dictionary()
+	|int|								CustomOperatorScore
+	|scoperator|						Assigns
+	|scoperator|						Negative= SCOperator.new(&Assembler.minus, opmode.Subtraction)	// -b... not a-b!
+	|scoperator|						Subtract														// a-b!!
+	|scoperator|						Bnot	= SCOperator.new(&Assembler.BitNot, opmode.Bit)
+	|scoperator|						LeftShift
+	
+	function Lookup ( |Message| opch, |SCOperator| )
+		opt norefcounts
+		if opch.func == @opp
+			|| result = opch.obj|SCOperator|
+				if (result isnt custom)
+					opch.name = result.name
+				return result
+			
+			|| op = opch.name
+			Result = .dict[ op ]
+			
+			if (!Result)
+				result = AddCustom( op )
+
+			  elseif (op != result.name)
+				if (result isnt custom)
+					opch.name = result.name
+			
+			return Result
+
+		error (opch)
+		return .bnot
+
+
+	function Init 
+		opt norefcounts
+		.Negative.name = "-"
+		.Bnot.name = "~"
+
+		.AddComp("==",					&Assembler.Equals,		OpMode.ExactEquals)
+		.AddComp("<",					&Assembler.Less,		opmode.Comparison + opmode.less)
+		.AddComp( ">",					&Assembler.More,		opmode.Comparison + opmode.more)
+		.AddComp( "<=",					&Assembler.LessEq,		opmode.Comparison + opmode.LessOrEqual)
+		.AddComp( ">=",					&Assembler.MoreEq,		opmode.Comparison + opmode.MoreOrEqual)
+		.AddComp( "!=",					&Assembler.NotEq,		OpMode.ExactNotEquals)
+		.OppositeComp("==", "!=")
+		.OppositeComp("<", ">=")
+		.OppositeComp(">", "<=")
+
+		.AddBasic
+		
+		.AddMath( "mod",	"mod",		&Assembler.Mod,			/*.Mod*/	opmode.CustomOnFloat)
+		.AddMath( "+",		"Plus",		&Assembler.Plus,		/*.Add*/	opmode.Addition)
+		.AddMath( "-",		"Minus",	&Assembler.Subtract,	/*.sub*/	opmode.subtraction)
+		.AddMath( "*",		"Mul",		&Assembler.Multiply,	/*.mul*/	opmode.Multiply)
+		.AddMath( "/",		"Divide",	&Assembler.Divide,		/*.div*/)
+
+		.AddBit( ">>",	"ShiftRight",	&Assembler.SHR,			/*.shru*/	opmode.Rightshift)
+		.LeftShift = .addbit( "<<",	"ShiftLeft",	&Assembler.SHL,		/*.shl*/	opmode.shiftonly) // can add bits
+		.AddBit( "(|)",	"BitOr",		&Assembler.BitOr,		/*.bor*/)
+		.AddBit( "&",	"BitAnd",		&Assembler.BitAnd,		/*.ban*/	opmode.SameOrLessBits)
+		.AddBit( "^",	"Xor",			&Assembler.bitxor,		/*.xor*/	opmode.noextrabits)
+
+		.Subtract = .dict["-"]
+
+		|| BitOr = .dict[ "(|)" ]
+		.dict["|"] = bitor // for: a |= b
+		.dict["|||"] = bitor
+		.dict["operatorsub"] = .dict["operatorminus"]
+		
+		// these two arent bits???
+		.AddBit( "is",		"is", nil, opmode.SyntaxIs )					// if obj is flag
+		.AddBit( "isnt",	"isnt", nil, opmode.SyntaxIs )				// if obj isnt flag
+
+		.BuildOrder
+
+
+	function OppositeComp (|string| A, |string| B)
+		opt norefcounts
+		|| pA = .dict[A]
+		|| pB = .dict[B]
+		if pa and pb
+			pa.Opposite = pB
+			pb.Opposite = pa
+
+
+	function AddComp (|string| s, |fn_opasm| ASM, |OpMode| Mode=0)
+		|| opp = SCOperator.new(s, ASM, mode ||| opmode.compare)
+		opp.InitComp( s )
+
+		|| NotEq = (s != "==")
+		|| newname = (noteq)("~" + s, "~=")
+		Mode = mode &~ opmode.NilTest
+		SCOperator.new(newname, nil, mode ||| OpMode.custom).InitComp( newname )
+	
+		
+	function AddBasic
+		.assigns = SCOperator.new("=", nil, OpMode.assigns)
+		SCOperator.new("and", nil, OpMode.AND)
+		SCOperator.new("or", nil, OpMode.OR)
+
+		
+	function AddMath (|string| s,  |string| FuncName, |fn_opasm| ASM, |OpMode| Mode=0)
+		|| opp = SCOperator.new(s, asm, mode ||| opmode.math)
+		opp.SetFuncName = funcname
+	
+
+	function AddCustom (|string| s, |SCOperator|)
+		|| opp = SCOperator.new(s, nil, OpMode.custom)
+		opp.score = .CustomOperatorScore
+		opp.SetFuncName = s
+		return opp
+
+
+	function AddBit (|string| s, |String| FuncName,	|fn_opasm?| ASM, |OpMode| Mode=0, |scoperator|)
+		|| opp = SCOperator.new(s, asm, mode ||| opmode.Bit)
+		opp.SetFuncName = FuncName
+		return opp
+	
+	
+	function BuildOrder // reordering , orderops, operator ordering, 
+		|| Strs = "
+<<
+>>
+>>>
+mod
+^ pow
+/ divide
+* multiply
+- minus
++ plus
+&&& &
+^^^ xor ^
+||| | (|)
+to from custom
+by
+is isnt
+in
+<
+<=
+>
+>=
+==
+!=
+and
+or
+="	
+
+		|| order = strs.split
+		|| fake = @opp + ""
+		for (wi in order) (i)
+			for s2 in wi.words
+				if s2
+					fake.name = s2
+					.lookup(fake).score = i
+
+		.dict["="]!.score = 100
+		.CustomOperatorScore = .dict["custom"]!.score
+
+}
+
+}
+
+
+
+
+function Message.OpScore (|int|)
+	opt norefcounts
+	|| o = .obj
+		return o|scoperator|.score
+	|| op = scoperator.dict.ValueLower(.name)
+		.obj = op
+		return op.score
+	return scoperator.customoperatorscore
+
+
+function Message.AOrBExpand (|bool|)
+	opt norefcounts
+	if self in @rel
+		|| rel = .parent!
+		|| prms = macro.TmpPrms
+		prms <~ .prev
+		prms <~ .next
+		rel.BecomeMacro(macros.DoubleQQ, nil, prms) // just use .run?
+		prms.clear
+
+	return true
+
+
+function Message.OppExpand (|bool|)
+	if self == "??"
+		return .AOrBExpand
+	if self == "init"
+		return .initexpand
+
+
+function Message.InitExpand (|bool|)
+	opt norefcounts
+	|| rel = .parent!
+	.name = "?="
+	using self
+	rel.FixErl
+	return true
+
+
+function Message.RelFix (|bool| force, |bool|)
+	require .AndOrExpansionTest != -1
+	// 1 + 2 < 4
+	//   $
+	// 1 + $
+	//     2 < $
+	//         4 + 5
+	|| One =  .first!
+	|| Plus = One.Next!
+	if force or !plus.obj
+		|| PlusScore = plus.opscore // just do it now
+		|| SubRel = Plus.next
+		if  Plus == "?="
+			.FixErl
+		  elseif SubRel == @Rel
+			rz = subrel.relfix(true)
+			ifn self in @decl or @arg
+				|| Two = SubRel.First!
+				|| LessThan = Two.Next!
+				|| Last = lessthan.next
+				if LessThan.OpScore > PlusScore
+					self <~ lessthan
+					self <~ last
+					subrel.first = plus
+					subrel.first = one
+					subrel.relfix(true)
+					rz = true
+
+	//       $
+	//     $ < $
+	// 1 + 2   4 + 5
+
+
+
+function CustomFuncOp (|Message| exp, |SCOperator| comp, |SCNode|name_space, |Message|RN, |SCDecl|)
+	// a + b   --> a.operator_plus(b)
+	// a ?? b  --> a.operator_oar(b.syntaxcast?)
+	opt norefcounts
+	using exp
+	exp.become(@Dot, comp.FuncName)
+	|| prm = @prm.msg
+	prm <~ RN 
+	exp <~ prm
+	exp.second.Remove
+	
+	|| ty = TypeOfExpr( exp, name_space )
+	if ty and rn and (prm.obj == compiler.fnAs)
+		|| cls = rn.ObjCls
+			if cls isnt Hassubclass
+				prm.obj = compiler.fnFastas // noice
+			ty = cls.typenormal
+			
+	return ty
+
+
+
+module CustomOps
+	constants
+		RecheckType = 4
+		TypeCastFromBool = 16
+		TypeCastToBetter = 32
+		TypeCastToSmaller = 64
+		Needed = 256
+		OnlyLeftIsVector = Needed+1
+		OnlyRightIsVector = Needed+2
+
+
+
+function scdecl.CompareUnclear (|scdecl| d, |bool| MakesSenseVsZero, |bool|)
+	|| L = .typeinfo, || R = d.typeinfo
+	|| bitdiff = l.bitcount - r.bitcount
+	
+	if (l.IsSigned and bitdiff <= 0)
+		if (self is directnumber)
+			|| x = .ExportPosition
+				return x|int64| < 0
+			return !MakesSenseVsZero
+		return true
+
+
+function scdecl.IsZero (|bool|)
+	return (self is directnumber) and !.ExportPosition
+
+
+function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
+	opt norefcounts
+
+	if (comp is Custom or CaseAware)
+		return CustomOps.Needed
+	
+	|| LNT		= LC.TypeInfo
+	if lnt.isfloat and comp is CustomOnFloat
+		return CustomOps.Needed
+		
+	|| RNT		= RC.TypeInfo
+	if (lnt isnt numeric) and lc.IsReallyNumeric
+		(lnt is numeric)
+	if  (rnt isnt numeric) and rc.isreallyNumeric
+		(rnt is numeric)
+
+	|| LN		= LNT.NumericCountBoolsToo(lc)
+	|| RN		= RNT.NumericCountBoolsToo(Rc)
+
+	if lnt is numeric and rnt is numeric
+		if (comp is Comparison) and (lnt.issigned != rnt.issigned)
+			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
+			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
+				error (MsgRel, "Unclear signed vs unsigned comparison.")
+
+		if comp is Comparison
+			|| always = 0
+			if lc.iszero and !rnt.IsSigned
+				always = (comp is LessOrEqual) - (comp is more)
+			if rc.iszero and !lnt.IsSigned
+				always = (comp is MoreOrEqual) - (comp is less)
+			if always
+				error (MsgRel, "Unchanging unsigned comparison vs zero.")
+	
+	ifn LN and LN == RN	   		// not both same numbers
+		if ln and rn and (ln == 1 or rn == 1)
+			if (comp is CompOrSet)
+				return CustomOps.Needed
+			if (comp is Multiply)
+				|| B = TypeBool!
+				if lc exact_isa B
+					return CustomOps.OnlyRightIsVector
+				if rc exact_isa B
+					return CustomOps.OnlyLeftIsVector
+			expect (LNT.isfloat == RNT.isfloat) (MsgRel, "Vector type mismatch.")
+			if LN > RN
+				return CustomOps.OnlyLeftIsVector
+			  else
+				return CustomOps.OnlyRightIsVector
+		return CustomOps.Needed				// num + obj
+	
+	
+	|| extra = 0
+	if LN and RN
+		|| GotABool = (DataTypeCode.bool == lnt or rnt)
+		if lnt != rnt
+			expect !(GotABool and comp is compare) (MsgRel, "Cant compare bools to non-bools")
+			if (comp is mathlike)
+				if (comp is NoExtraBits)
+					if comp is losebits // nice
+						extra = customops.TypeCastToSmaller
+				  elseif (comp is ShiftOnly) and (lnt.isfloat) and (rnt.isint)
+					extra = CustomOps.Needed
+				  else
+					extra = CustomOps.TypeCastToBetter			
+		  else
+			if GotABool and comp isnt Compare
+				extra = CustomOps.TypeCastFromBool
+			  elseif (comp is MakesSigned) and lc.isuintlike
+				extra = CustomOps.TypeCastToBetter
+
+	if (!SCNode.ConstantsLoadingOverride and LC.Type is TreatAsBaseType)
+		return CustomOps.Needed ||| extra
+	if (LN > 1) and (comp is CompOrSet)									// can't compare vectors directly in C++
+		return CustomOps.Needed ||| extra
+
+	if !extra
+		|| t = lc.type
+		if  t.super  and  t.hasOperator(comp.funcname)
+			return CustomOps.Needed
+
+	if  comp is shiftonly  and  rc is const
+		// check shift size
+		|| IsLeft = comp == scoperator.LeftShift
+		//  || x = 1<<32 // upgrade
+		//  || x = y<<32 // fail
+		if lc isnt const
+			msgrel.CheckConstShift(lc, rc, isleft)
+			
+		if (isleft) and (lc is const)							// we need to check for something
+			extra |= MsgRel.TryImproveShiftConstants(lc, rc)
+
+	return extra
+
+
+function message.CheckConstShift (|scdecl| LC, |scdecl| RC, |bool| Bigger)
+	|int64| rk = rc.ExportPosition
+	expect (rk >= 0) (self, "Invalid bit shift")
+	|| T = lc.typeinfo
+	|| BC = T.BitCount
+	if (bigger and T == datatypecode.bool)
+		BC = 32
+	
+	expect (rk < BC) (self, "Too large bit shift")
+		
+	
+
+function int64.BitsNeeded (|int|)
+	if self
+		return .log2 + 1
+
+
+function message.TryImproveShiftConstants (|scdecl| LC, |scdecl| RC, |int|)
+	opt norefcounts
+	|| lk = lc.ExportPosition
+	|| uk = lc is unknownconst
+	|| rk = rc.ExportPosition
+	require (lk ||| rk) or uk
+	|| nk = lk << rk
+	|| size = nk.BitsNeeded
+	require uk or size > lc.typeinfo.bitcount
+
+	|| IsBig = (size > 32)
+	|| ty =  (isbig)(typeint64!, typeint!)
+	if uk and rk > 32
+		ty = typeint64!
+	|| ty2 = ty.typenormal.copydecl
+	.obj = ty2
+	(ty2 is const)
+	if uk
+		(ty2 is unknownconst)
+	  else
+		ty2.ExportPosition = nk
+		.become(@num, nk|int64|.render)
+		.clear
+	return customops.RecheckType
+		
+// what about more complex things? like (1) << (2)
+// or (1+1) << (3) ?
+// just report an error in my ASMifier
+// seems OK
+
+
+
+function SCClass.HasOperator (|string| op, |bool|)
+	opt norefcounts
+	|| obj = self[op]
+	if obj isa scfunction
+		return true
+
+
+function message.Become (|scoperator| op)
+	.obj = op
+	.name = op.name
+	
+	
+	

@@ -1,0 +1,54 @@
+
+
+// Selectors! Actually wasn't my best idea. Probably should remove this.
+
+
+//class Selector
+//	linkage
+//		cpp_part Sel
+//	
+//	contains selector
+//	|int|			ID
+//	|string|		Name
+//	||				Next // its a list
+//	
+//	syntax cast (|int|)
+//		cpp_part Cast
+//		inlined
+//		return .ID
+//	function ID (|int|)
+//		nil safe
+//		if (self)
+//			return .id
+//	
+//	constructor (|selector?| Next, |&selector| Place, |string| name)
+//		.name = name
+//		.next = next
+//		place[] = self
+//	
+//	Function GiveIDs
+//		opt norefcounts
+//		|| ID = 0
+//		for (curr in self)
+//			curr.id = id
+//			++id
+//	
+//	
+//	iterator
+//		|| Curr = self
+//		while (Curr)
+//			yield curr
+//			curr = curr.next
+//
+//
+///*
+//// even better would be:
+//	struct Selector {
+//		|int|	   ID
+//		|string|	Name
+//	}
+//	module materials {
+//		|selector[10]| Selectors // last is empty, no name.
+//	}
+//// this way... its simple! and fast as possible.
+//*/

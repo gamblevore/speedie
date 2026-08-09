@@ -1,0 +1,97 @@
+
+
+function ClickedCompile (GUIAction)
+	opt norefcounts
+	|| i = .ide
+	|| mode = i.WantCake(CompileMode.compiling)
+		i.compile(mode)
+
+
+function perryide.WantCake (|CompileMode| Mode, |compilemode|)
+	opt norefcounts
+	|| DebugArgs = .DebugArgs
+		|| req = DebugArgs["compile"]
+			if req ~= "cake"
+				(mode is cakemode)
+			  elseif req ~= "cpp"
+				(mode isnt cakemode)
+			  else
+				Notifications <~ "Unrecognised compile mode: " + req.name
+	  else
+		.RunArgsText.SetFocus
+		notifications <~ "Please fix the debug args first."
+		mode = nil	
+	return mode	
+
+
+function ClickedDebug (GUIAction)
+	opt norefcounts
+	|| i = .ide
+	if (.text == "\07")				// stop
+		i.Stop(i.RunningProd)
+		return nil
+	return i.start
+	
+
+function perryide.Start (|bool|)
+	if .MakeNothingRunning(" before debugging?")
+		|| CakeMode = .WantCake(CompileMode.CakeMode ||| compilemode.DebugSet)
+			.compile(CakeMode)
+			.Showoutput
+	return true
+
+
+function Perryide.ShowOutput
+	opt norefcounts
+	.ShowText(.ProductOut, "", false)
+	|| itm = .CompileTabs.ButtonSource[3]
+		(itm is hidden)
+	.ProductErrors.text = ""
+
+
+function PerryIDE.Compile (|CompileMode| Mode)
+	if !.IsBuilding
+		(mode is compiling)
+		.DebugMode = mode
+		.Actual_Compile
+		return
+
+	// They pressed it twice
+	.DebugMode = 0
+	if !.ExpandCompileSep					// appeared to do nothing
+		ClickedCancel(.BuildButton)			// might as well just do the next thing then
+
+
+function PerryIDE.DebugArgs (|message|)
+	.RunArgsText.InitDebugArgs
+	return .RunArgsText.text.Parse(@arg)	
+
+
+function PerryIDE.GUIIsCompiling (|[string]| args)
+	.LogOneAction(speedie + " " + args.render)
+	.SpeedieText.text = ""
+	
+	(.BuildButton isnt enabled)
+	(.BuildButton isnt visible)
+	(.RunButton isnt enabled)
+	(.Progress is visible)
+
+	(self is preparing)
+	.ShowCompileTab(.SpeedieText)
+	.ViewAsCurr
+
+
+function PerryIDE.RunCompileSub (|unixprocess?| r)
+	if r and r.PID or (r isa SpdProcess)
+		.RunningProd = r
+		if r isa SpdProcess
+			|| btn = .DebugBtns.last
+				btn.text = "\0E" // pause
+
+		.ShowProductIfMoreOutput = 0
+		.RunButton.text = "\07"
+		.SetAppInfo
+
+
+
+

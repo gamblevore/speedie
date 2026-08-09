@@ -1,0 +1,78 @@
+
+
+module Clipboard
+	cpp_part Clip
+	|string| _InternalCopy
+	|string| _Clip2
+
+	cpp_func SDL_GetClipboardText (|cstring|)
+	cpp_func SDL_SetClipboardText (|cstring| s, |errorint|)
+	
+	
+	libinternal Data (|string|)
+		|| cstr = .SDL_GetClipboardText
+		|| s = cstr.Wrap
+			return s
+		return ._InternalCopy
+	
+	
+	function Text (|string|)
+		if keys.Shift
+			return ._Clip2
+		return .data.FixLineEndings
+	
+	
+	function Text (assigns: |string| s)
+		description "Pass valid UTF-8 only"
+		expect (s) (beep)
+
+		._internalcopy = ""
+		
+		|| c = s
+		if keys.Option
+			c = c.TabsToSpaces
+			Notifications <~ "Copied (without tabs):\n" + c.Preview(128)	
+			
+		if keys.Shift
+			._clip2 = c
+			Notifications <~ "Clip 2 used for:\n" + c.Preview(128)
+			return
+		
+		c = c.ZeroTerm
+		|| err = .SDL_SetClipboardText(c.addr|cstring|)
+		if (err!=0) and c											// can't use .FindBadUTF8, osx might fail anyhow
+			._internalcopy = c
+			Notifications.NotifySDLError		
+	
+
+	function NotifiedText (assigns: |string| s)
+		opt norefcounts
+		if s
+			.text = s
+			Notifications <~ "Copied: " + s
+
+
+
+function string.FixLineEndings (|string| dest="\n", |String|)
+	|| type = .DetectLineEndings()
+	if type <= 1
+		return self
+	|| repl = self
+	if type & 4
+		repl = .ReplaceAll("\r\n", dest)
+	if type & 2
+		repl = repl.ReplaceAll("\r", dest)
+	return repl
+	
+	
+libinternal string.DetectLineEndings (|int|)
+	for (c in self) (i)
+		if c == 10
+			rz |= 1
+		  elseif c == 13
+			if self[i+1] == 10 // CRLF
+				rz |= 4
+				i++
+			  else
+				rz |= 2
+	

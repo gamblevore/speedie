@@ -1,0 +1,350 @@
+
+// Copyright, Theodore H. Smith 2019.
+// Released under jeebox-licence http://jeebox.org/licence.txt
+
+/*
+	Copyright (C) 2017 Theodore H. Smith.
+*/
+
+#include "JB_Umbrella.hpp"
+#define __spdsort_type__ JB_Object*
+#define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
+#include "spdsort/spdsort.h"
+
+#define kArrayLengthMax (2147483644)
+#define PtrSize (sizeof(void*))
+
+#if __VM__
+#undef __SPD_SORT__
+#undef __spd_variant__
+#undef __spdsort_func__
+#define __spd_variant__(fn) (fn##VM) 
+#define __spdsort_func__(fp,b,c)  ({					\
+														\
+	auto V = JB_GlobalVM;								\
+	((JB_Object**)((V->ProposedStack)+2))[0] = b;		\
+	((JB_Object**)((V->ProposedStack)+3))[0] = c;		\
+	JB_ASM_CallBack(V, (u32*)fp)[0][0];					\
+})
+// This COULD be optimised but I don't want to ruin my life optimising everything.
+// You need to err on one side or the other... and I tend to err on the optimising side
+// so... I might as well err the other way, for once.
+
+#include "spdsort/spdsort.h"
+#endif
+
+
+extern "C" {
+void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
+	int N = JB_Array_Size(self);
+	require0 (N >= 2);
+
+	#if __VM__
+	if (((IntPtr)fp)>>63)		// speedie func!
+		return SpdSortVM((void*)fp, self->_Ptr, self->_Ptr+N-1);
+	#endif
+	
+	SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
+}
+
+
+
+
+
+
+void OutOfMem_ (Array*self, int Count=0) {
+    JB_OutOfUserMemory((self->Capacity+Count)*sizeof(void*));
+}
+
+
+static bool ReAlloc_ (Array* self, int C) {
+	auto X = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
+	if (!X)
+		return false;
+	self->_Ptr = X;
+	self->Capacity = (int)(JB_msize(X)/sizeof(void*));
+	return true;
+}
+
+
+static bool GrowToLength_ (Array* self, int N, bool Extra) {
+	int C = self->Capacity;
+	if (N <= C) {				// fast grow length
+		self->Length = N;
+		return true;
+	}
+	
+	if (N <= kArrayLengthMax) {
+		if (ReAlloc_(self, N+((N*Extra)>>1))) {
+			self->Length = N;
+			return true;
+		}
+    } else {
+        JB_TooLargeAlloc(N, "array allocation");
+    }
+    return false;
+}
+
+
+static void ArrayClear (Array* self) {
+	auto P = self->_Ptr;
+	self->Capacity = 0;
+	self->Length = 0;
+	self->_Ptr = 0;
+	JB_Free(P);
+}
+
+
+static void ShrinkCapacity_ (Array* self, uint Length) {
+	if (Length <= 0)
+		return ArrayClear(self);
+	self->Length = Length;
+
+	int C = self->Capacity;
+	if (C <= 5  or  Length*2 > C)
+		return;
+	C = std::max((int)Length, 8);
+	self->Capacity = C;
+	self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
+}
+
+
+int JB_Array_Find (Array* Self, JB_Object* F) {
+	if (Self) {
+		auto P = Self->_Ptr; 
+		int N = Self->Length;
+		int i = 0; 
+		while (i < N) {
+			if (P[i] == F)
+				return i;
+			i++;
+		}
+	}
+	return -1;
+}
+
+
+
+
+bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
+	require (Value and Count > 0);
+	int n = self->Length; 
+	require(GrowToLength_(self, n+Count, true));
+	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
+	auto P = self->_Ptr + n;
+	auto Pf = P + Count;
+	while (P < Pf)
+		*P++ = Value;
+	return true;
+}
+
+
+bool JB_Array_Append( Array* self, JB_Object* Value ) {
+	return JB_Array_AppendCount(self, Value, 1);
+}
+
+
+bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
+	int n = self->Length;
+	if ( (uint)Pos > n  or  !JB_Array_AppendCount(self, Value, 1) )
+		return false;
+	if (Pos == n)
+		return true; // already done.
+	
+	auto P = self->_Ptr;
+	
+	JB_Object** Curr = P+n;
+	JB_Object** First = P+Pos;
+	while (Curr > First) {
+		Curr--;
+		Curr[1] = Curr[0];
+	}
+	First[0] = Value;
+	
+	return true;
+}
+
+
+static void ArrayDecrDownTo_(Array* self, int64 NewLength) {
+	JB_Object** Curr = self->_Ptr + self->Length-1;
+	JB_Object** First = self->_Ptr + NewLength;
+	while ( Curr >= First ) // backwards is safer.
+		JB_Decr( *Curr-- );
+}
+
+
+void JB_Array_Shrink (Array* self) {
+	int L = self->Length;
+	if (L < self->Capacity) {
+		self->Capacity = L;
+		self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, L*sizeof(void*));
+	}
+}
+
+void JB_Array_SizeSet( Array* self, int NewLength ) {
+    int Length = self->Length;	
+    if (NewLength >= Length)
+		return;
+	ArrayDecrDownTo_(self, NewLength);
+	ShrinkCapacity_(self, NewLength);
+}
+
+
+JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
+	FastString* fs = JB_FS__FastNew(fs_in);
+	if (!self) {
+		JB_FS_AppendCString(fs, "nil");
+	} else {
+		JB_FS_AppendByte(fs, '[');
+		int n = JB_Array_Size(self);
+		for_(n) {
+			JB_Object* obj = JB_Array_Value(self, i);
+			if (i)
+				JB_FS_AppendCString(fs, ", ");
+			JB_Obj_Render(obj, fs);
+		}
+		JB_FS_AppendByte(fs, ']');
+	}
+	return JB_FS_SmartResult(fs, fs_in);
+}
+
+
+void JB_Array_Reverse( Array* self ) {
+    int n = (int)(self->Length)/2;
+    auto F = self->_Ptr;
+    for_(n)
+        F[i] = F[n-(i+1)];
+}
+
+
+void JB_Array_Remove( Array* self, int Pos ) {
+	auto Item = JB_Array_Value(self, Pos);
+	if (Item) {
+		int N = self->Length;
+		while (Pos < N) {
+			self->_Ptr[Pos] = self->_Ptr[Pos+1];
+			Pos++;  
+		}
+		ShrinkCapacity_(self, N-1);
+		JB_Decr(Item);
+	}
+}
+
+
+void JB_Array_Destructor( Array* self ) {
+	if (self->_Ptr) {
+		ArrayDecrDownTo_(self, 0);
+		ArrayClear(self);
+	}
+	JB_Obj_Destructor(self);
+}
+
+
+int JB_Array_Size( Array* self ) {
+    if (self)
+        return (int)(self->Length);
+    return 0;
+}
+
+
+Array* JB_Array_Copy(Array* self) {
+    require(self);
+	Array* Result = JB_Array_Constructor0(nil);
+	int n = self->Length;
+	if (!n)
+		return Result;
+	if (!GrowToLength_(Result, n, false)) {
+		JB_Array_Destructor(Result);
+		return 0;
+	}
+
+    auto Dest = Result->_Ptr;
+    auto After = Dest + n;
+    auto Src = self->_Ptr;
+	while (Dest < After) {
+		auto O = *Src++;
+		*Dest++ = O;
+		JB_Incr(O);
+	}
+    return Result;
+}
+
+
+void JB_Array_Swap (Array* self, uint i, uint j) {
+	uint n = JB_Array_Size(self);
+	if (i < n and j < n) {
+		std::swap(self->_Ptr[i], self->_Ptr[j]);
+	}
+}
+
+
+Array* JB_Array_Constructor0 ( Array* self ) {
+	JB_New2(Array);
+	self->Length = 0;
+	self->Capacity = 0;
+	self->_Ptr = 0;
+	self->Marker = 0;
+	return self;
+}
+
+
+int JB_Array_Wipe (Array* self) {
+    if (self)
+		JB_Array_SizeSet(self, 0);
+    return 0;
+}
+
+
+void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
+	if ((u32)Pos < (u32)(self->Length)) {
+		JB_SetRef( self->_Ptr[Pos], Value );
+	}
+}
+
+
+JB_Object* JB_Array_Pop(Array* self) {
+	if (self) {
+		int n = self->Length - 1;
+		if (n >= 0) {
+			JB_Object* rz = self->_Ptr[n];
+			ShrinkCapacity_(self, n);
+			return rz;
+		}
+	}
+	return nil;
+}
+
+
+JB_Object* JB_Array_Value( Array* self, int Pos ) {
+    if (self and (u32)Pos < self->Length) {
+        return self->_Ptr[ Pos ];
+    }
+    return 0;
+}
+    
+void JB_FillInts(int* Start, int N, int Value) {
+	std::fill(Start, Start+N, Value);
+}
+
+
+#ifndef AS_LIBRARY
+void JB_Array_Shuffle( Array* self ) {
+	int n = JB_Array_Size(self);
+	JB_Object** Array = self->_Ptr;
+	uint64 Hash = ~1234567;
+	self->Marker = 0;
+
+	for_(n) {
+		auto ai = Array[i];
+		Hash = JB_uint64_hash(RDTSC() xor (~(uint64)ai) xor Hash);
+		int i2 = Hash % n;
+		Array[i] = Array[i2];
+		Array[i2] = ai;
+	}
+}
+#endif
+
+
+} // 
+
+

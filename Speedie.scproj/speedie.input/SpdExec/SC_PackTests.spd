@@ -1,0 +1,95 @@
+	
+	
+target debug and !perrydbg {
+extend_module PackMaker	
+	syntax access (|int| v, assigns:|int64|)
+		|| r = testvm.Registers(false)+v
+		r|&int64|[] = Value
+	
+	
+	syntax access (|int| v, assigns:|object|)
+		|| r = testvm.Registers(false)+v
+		r|&object--|[] = value
+	
+
+	function TestFn (|string| s, |scfunction--|)
+		opt norefcounts
+		|| mod = compiler.program.FindModule("ASMExamples")
+			testvm.registers(true) // clears
+			rz = mod.Findfunction(s)
+			scfunction.currfunc = rz 
+			
+	
+function PackMaker.RunAFewTests 
+	|scfunction--| fn
+	
+	fn = .testfn("BranchTest") /// active ///
+	if fn
+		|| Err = fn.TestObesity|&bool|[]
+		if Err
+	
+	fn = .testfn("AndOrTest")
+	if fn
+		self[0] = 0,   self[1] = 6,   self[2] = 1,   self[3] = "A: "
+		|| AndOr = fn.TestObesity|&int64|[]
+		if AndOr != 7
+	
+	fn = .testfn("FloatConstTest")
+	if fn
+		|| D = fn.TestObesity|&f64|[]
+		D = D
+	
+	fn = .testfn("SemiConstTest")
+	if fn
+		for i in 2
+			self[0] = i*16K
+			|| found = fn.TestObesity|&int|[]
+	
+	fn = .testfn("AndOrConstTest")
+	if fn
+		|| AndOrConst = fn.TestObesity|&int64|[]
+		AndOrConst++
+	
+	fn = .testfn("ForeignFuncTest")
+	if fn
+		self[0] = "hello",   self[1] = "abc"
+		|| str = fn.TestObesity|&string|[]
+		printline str
+	
+	fn = .testfn("Math2Test")
+	if fn
+		for i in 5
+			self[0] = 12+i,   self[1] = 6+i
+			|| num = fn.TestObesity|&int64|[]
+	
+	fn = .testfn("MulTest")
+	if fn
+		self[0] = 8725,   self[1] = 275,   self[2] = 4,   self[3] = 2
+		#!  ((8725+275)*4)/2 == 18000
+		|| num = fn.TestObesity|&int64|[]
+		if num != 18000
+	
+	fn = .testfn("AndOr2Test")
+	if fn
+		for i in 4
+			self[0] = i&1,   self[1] = (i&2)>>1
+			|| AndOr2 = fn.TestObesity|&int64|[]
+	
+	fn = .testfn("TestAtomic")
+	if fn
+		|| atomic = fn.TestObesity|&int|[]
+		if atomic != 1150 // oof
+
+
+|ivec4| Butter 
+function SCFunction.TestObesity (|!&ivec4|)
+	target debug
+		|| mu = .µFATLength
+			|(memory of asm)--| mu2 = .µTest
+			.µprint
+			testvm.Load(mu2.ptr, mu2.length)
+			return testvm.Run(0)
+	return butter
+
+}
+

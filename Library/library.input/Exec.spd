@@ -1,0 +1,106 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+datatype FileDes (int)
+	constants
+		|FileDes|
+		StdIn  = 0
+		StdOut = 1
+		StdErr = 2
+
+	function IsTerminal (|bool|)
+		cpp_wrapper JB_IsTerminal
+		
+	syntax cast (|bool|)
+		inlined
+		return self >= 0
+
+
+
+datatype PID_Int (int)
+	description "This is the process ID of a process."
+	syntax cast (|bool|)
+		inlined
+		return self > 0
+	function Kill (|ErrorInt|)
+		cpp_wrapper JB_Kill
+	function Signal (|int| Sig, |errorint|)
+		cpp_wrapper JB_Signal
+
+
+
+datatype ExitCode (int)
+	constants
+		EINPROGRESS = 36
+		SIGKILL = 9
+	
+	description "Can describe both signal errors, and exit codes."
+	
+	inline Killed (|bool|)
+		return self == SIGKILL|||128
+	
+	inline Crashed (|bool|)
+		// not all signals are really a crash? what about sigkill?
+		description "This is a signal error (a crash)" 
+		return  self > 128
+		
+	inline NoErrors (|bool|)
+		description "We have either completed successfully, or not yet started. Either way there is no error." 
+		return  self <= 0
+		
+	inline Successful (|bool|)
+		description "Completed successfully." 
+		return  self == 0
+		
+	syntax cast (|bool|)
+		disabled "Do you mean self != 0, or .Successful"
+
+	function Name (|StringZeroTerminated|)
+		description "The name of the error (if any)."
+		if .Crashed
+			return (self|errorint|&~128).SignalName
+		return self|errorint|.Name
+	
+	inline IsRunning (|bool|)
+		return self == -1 or EINPROGRESS
+
+	inline NotStarted (|bool|)
+		return self < -1
+
+
+
+datatype ErrorInt (int) // useful for unix-functions which has 0 == success
+	default 0 // defaults to true... unlike everything else.
+	false -1
+	syntax cast (|bool|)
+		inlined
+		return self == 0
+
+	function SignalName (|StringZeroTerminated|)
+		cpp_wrapper JB_Err_SignalName
+
+	function Name (|StringZeroTerminated|)
+		cpp_wrapper JB_Err_Name
+
+
+
+
+target !minilib {
+extend string	
+	function Execute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessMode| Mode=ProcessMode.StdOutPassThru, |date| timeout=0, |ExitCode|)
+		cpp_wrapper JB_Str_Execute
+
+	function SilentExecute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
+		return .execute(args, out, errs, ProcessMode.Silence, timeout)
+
+	function ExecuteStr (|[string]| Args=nil, |string|)
+		|| fs = faststring()
+		if .execute(args, fs).Successful
+			rz = fs
+
+	function System (|int|)
+		cpp_wrapper	// bad? execute is better?
+}

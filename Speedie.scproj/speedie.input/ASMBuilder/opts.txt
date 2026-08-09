@@ -1,0 +1,15 @@
+
+
+todo:
+
+* go over ASM and remove a lot of testing code/vars once its working...
+
+* if func returns input param... it doesnt need freeifdead? I mean... assuming we didn't incr while sending it in.
+
+* RefOpts. Do it bit by bit
+   * get property but only did math
+   * mark a few string funcs as not-modifier/disowner/capturer
+   * mark entire class
+   * fast capture of disowned things. like: r1 <~ r2.pop
+   * check entire program for modification during nil-sweep
+

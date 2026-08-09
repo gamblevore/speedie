@@ -1,0 +1,47 @@
+
+class Country
+	|int|		Population
+	|int|		ATP
+	|string|	name
+	constructor (|string| Name)
+		.name = name
+		.population = random[40.0, 100.0]|int|
+		.ATP = random[4.0, 12.0]|int|
+		"$name was founded with $.population population and $.ATP power"
+		
+	function Attack (|Country| other)
+		|| oth = ("itself", other.name)(self == other)
+		"$.name attacks $oth"
+		other.Damage .ATP
+		if other != self
+			.Damage other.ATP
+	
+	function Damage (|int| damage)
+		.population -= damage
+		if .population > 0 
+			"$.name loses ${damage}m pop. Now has ${.population}m pop."
+		  else
+			"$.name loses ${damage}m pop and died :( UwU"
+			
+	function alive (|bool|)
+		return .population > 0
+		
+
+main
+	|[country]| Europe
+	"\nWelcome to Europe Simulator 2000!!"
+	|| names = "Netherlands/United Kingdom/France/Germany/USA" / '/'
+	random.shared.timeseed
+	for s in names
+		Europe <~ Country(s)
+	""
+	
+	while Europe
+		for (cun.backwards in Europe) (i)
+			cun.Attack Europe[]!
+			if !cun.alive
+				Europe.remove(i)
+			""
+            app.sleep(0.2s)
+
+	"Europe is gone. Uwu :3"

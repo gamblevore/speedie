@@ -1,0 +1,712 @@
+
+
+struct FatASM 
+	linkage
+		cpp_part FAT
+		sort_properties true
+	
+	|ASMParam[6]|		Prms
+	|ASMReg|			Info
+	|Message--|			Msg				// Only used for reporting now. Not ASMGen. Not easy to remove.
+	|uint64|			_Const
+	|uint|				FatMap
+	|uint16|			BasicBlock
+	|int16|				µRefCount
+	|uint16|			ASMIndex
+	|byte|				CurrGrabID
+	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
+	|byte|				InputPrms	
+	|byte|				_Outputs
+	|byte|				_Op
+	|byte|				JumpPrm
+	
+	
+	function Op (|byte|)
+		return ._op
+	
+	setter SetOp (|byte| value)
+		opt norefcounts
+		|| m = .Msg
+		|| s = .FatMap
+		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
+		|| b = .BasicBlock
+		self[0] = nil
+		.Msg = m
+		.FatMap = s
+		._Const = k
+		._op = value
+		.BasicBlock = b
+	
+	setter _op (|byte|)
+		._op = value
+		
+	setter FatMap (|uint|)
+		.FatMap = value
+	
+	setter FatMap (|message|)
+		opt inline //
+		.msg = Value
+		.FatMap = value.SrcMap
+		
+	function InputFat (|int| i, |&fatasm|)
+		|| r = (.prms[i] << 1) >> 16
+			return r.fat
+	
+	function IsRead (|bool|)
+		|| op = .op
+		return op >= asm.RD1U and op <= asm.RD16 
+	
+	function IsFunc (|bool|)
+		|| b = .BaseOp
+		return b == asm.fncx or asm.fnc
+	
+	function asm.IsReffer (|bool|)
+		return self >= asm.RFUN and self <= asm.RFRD
+
+	function IsTrasher (|bool|)
+		|asm| b = .BaseOp
+		return (b == asm.fncx or asm.fnc) or b.isReffer
+	
+	function BaseOp (|int|)
+		|| f = .op
+		if f == asm.FNCX3
+			return asm.FNCX
+		if f == asm.FNC3
+			return asm.FNC
+		return f
+
+	
+	function Form (|µform|)
+		|| i = instruction.typelist[.op]
+			return i.Sizes
+		debugger
+		return instruction.typelist[0]!.Sizes
+
+
+	function Vectorise (|asmreg| Dest, |asm| VOpp,  |asmreg|)
+		dest.FatIndex = .index
+		
+		.info = dest
+		if dest.IsVec
+			._op = VOpp
+		return dest
+	
+	
+	function VectoriseSmall (|asmreg| Dest, |asm| VOpp, |asm| SOpp, |asmreg|)
+		dest.FatIndex = .index
+		.info = dest
+		if dest.IsVec
+			if !vopp // oof?
+			._op = VOpp
+		  elseif dest.issmall
+			._op = sopp
+		return dest
+	
+	
+	function ConstFill (|asmreg| dest, |int64| K, |asmreg|)
+		(dest is Const)
+		dest = dest.FatIndex(.index)
+		.Const = K
+		.info = dest
+		return dest
+	
+	
+	operator mul (|asmreg| flags, |asmreg|)
+		cpp_part AsReg
+		
+		(flags isnt FlagsToRemove)
+		if (flags is Exit) and !.IsFinisher(flags)
+			(flags isnt exit)				// right?
+		flags = flags.FatIndex(.index)
+		.info = flags
+		return flags
+
+	
+	function Const (|int64|)
+		opt norefcounts
+		return ._const
+		
+	function Const (assigns:|int64|)
+		opt norefcounts
+		._const = value
+		
+	function F32 (|float|)
+		|&uint64| A = &._Const 
+		rz = (A|&float|)[]
+		if !rz: rz = 0						// rationalise
+
+	function F64 (|Float64|)
+		rz = ((&._const)|&f64|)[]
+		if !rz: rz = 0						// rationalise
+		
+	syntax equals (|uint| x, |bool|)
+		disabled "Use isa asm.xxx instead"
+		// if I need to compare vs an int, I can do... if 123 == fat
+	
+	function Index (|uint|)					// for storing in uint16 actually
+		return self - Assembler.sh.funcstart_
+
+	function uint.FAT (|&FATASM|)
+		if self
+			rz = Assembler.sh.funcstart_ + self
+	
+	operator isa (|asm| m, |bool|)
+		nil checker
+		if self
+			return m == .op
+			
+	syntax is (|asmreg| flags, |bool|)
+		nil checker
+		if self
+			return (.info & flags)|uint64| != 0
+
+	syntax is (|asmreg| F, assigns:|bool|)
+		|| i = .info &~ F
+		if value
+			(i as= F)
+		.info = i
+
+
+	function asmreg.Within (|asm| op, |&fatasm|)
+		|| f = .fat
+			if (f isa op) and Assembler.sh.IsWithin(f)
+				return f
+
+
+	function CopyFrom (|fatasm| D, |bool|)
+		(self)[0] = (d)[0]
+		for i.FatInputs in self
+			if i 
+				i.µRefCount++
+	
+
+	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
+		|int| o = f._Outputs
+			target debug: if !o.IsPow2
+			return .ReDest(f, dest, o.log2)
+		error (f, errorreceiver.nonfatal) // what?
+		
+		
+	function assembler.ReDest (|fatasm| f, |asmreg| dest, |uint| a, |asmreg|)
+		// asmtodo: what if the old is a ref and new isnt,  or new is a ref and old isnt?
+		// references need to be incremented, as their output is needed.
+		
+		|| old = f.prms[a] & 31 							// Need to remove the old output.
+			if .Register(old) == f
+				.SetRegister(old, nil, f.FindOlder)
+		
+		return f.Dest(a, dest, self)						// Then we set it to the new value
+	
+
+
+	function FindOlder (|&fatasm|)
+		|| reg = .Output.reg$
+		|| b = .BasicBlock
+
+		// maybe better if each fat refers to the prev setter
+		// then we get a linked-list back.
+		
+		
+		|| f = self-1
+		while f.BasicBlock == b
+			// asmtodo: use blockid
+			// asmtodo: also, if the function returns or exits past some code... it can't affect those regs
+			// or if its in a branch that couldn't have reached us.
+
+			|| d = f.Output.reg
+			if d == reg
+				return f
+			if f.IsTrasher and d < reg
+				return nil // can't go past ops that wipe stuff!
+			f--
+		
+		
+	function Output (|asmparam|)
+		|| o = ._Outputs|uint|
+			o = o.log2
+			return .Prms[o]
+
+	
+	Syntax Expect (|string| Error)
+		target debug
+			assembler.PrintProgress
+			"----"
+			.DebugPrint
+		error (.msg, error)
+
+	
+	function Jump (|int|)
+		|| j = .JumpPrm
+			return .prms[j-1]
+
+
+	function JumpTo (|&fatasm|)
+		|| j = .JumpPrm
+			return self + 1 + .prms[j-1]|int|
+	
+	
+	function JumpTo (|&fatasm| value)
+		cpp_Part JumpToSet
+		|| j = .JumpPrm
+			|| D = (value - self) - 1
+			check (D != -1) (self, "Infinite loop")
+			.prms[j-1] = D
+			if d == 0
+				assembler.sh.nop(self)
+		  else
+			target debug
+				|| ID = .Index
+				debugger
+
+////////////////////////////////////////////////////////////
+	function p0 (|ASMParam|): return .prms[0]
+	function p1 (|ASMParam|): return .prms[1]
+	function p2 (|ASMParam|): return .prms[2]
+	function p3 (|ASMParam|): return .prms[3]
+
+	function p0 (assigns:|uint|): .prms[0] = value
+	function p1 (assigns:|uint|): .prms[1] = value
+	function p2 (assigns:|uint|): .prms[2] = value
+	function p3 (assigns:|uint|): .prms[3] = value
+	
+	
+	function RegOnly (|int| i=0, |int|)
+		return .prms[i] & 31 // remove tmpbit + fatindex		
+
+
+	function ASMReg (|int| a=0, |asmreg|)
+		return .prms[a].ASMReg
+
+
+	function NumInput (|int| a, assigns:|int| v)
+		.prms[a] = v
+
+
+	function JumpInput (|int| a, assigns:|int| v)
+		.prms[a] = v
+		.JumpPrm = a + 1
+		.µRefCount += !.µRefCount // control flow is always used?
+		Assembler.sh.NextBasicBlock
+	
+	
+	function RegInput (|int| a, assigns:|asmreg|)
+		cpp_part Prm		
+		|| i = value.FatIndex
+		.prms[a] = value.Prm
+		.InputPrms |= 1<<a
+		if i
+			|| src = i.fat // we refcount dests too. shouldn't!
+			if src < self
+				.InputFats |= 1<<a
+				if src
+					src.µRefCount++
+			  else
+				debugger // what?
+	
+	
+////////////////////////////////////////////////////////////
+
+
+	syntax call (|uint| i, |asmreg|)
+		|| p = .Prms[i]
+		if p.reg
+			return p.ASMReg
+	
+	
+	function CheckHasOutput 
+		target debug {
+		opt norefcounts
+		for (b.bits in ._outputs|int|) (i)
+			if !.regonly(i)
+				error (self, "Missing ASM output")
+		}
+	
+	
+	function µBakeInto (|!&asm| Where, |!&asm| After, |!&asm|)
+		opt inline
+		return (ASM.encoders[.op]!)(self, where, after)
+
+
+	function FuncPrms (|uint64|)
+		|| A = .p2|uint64|
+		|| B = 0|uint64|
+		if self isa asm.tail
+			B = A
+			A = .p1
+		  else
+			B = .p3
+			
+		|| R = A ||| (B << 32)
+		|| op = ._op
+		ifn op == asm.fncx or asm.fncx3
+			return R >> 5
+		return R >> 12
+	
+	
+	function PrmCollectCounterPart (|FastString| fs)
+		opt norefcounts
+		|| exp = .msg
+		if exp != @func
+		|| fn = exp.last!.Obj|scfunction|
+		ifn fn isa scfunction
+			fn = nil
+			|| obj = exp.first!.obj
+			if obj isa scfunction
+				fn = obj
+			  elseif obj isa scdecl
+				fn = obj.type.funcproto
+			  else
+				debugger
+			if !fn
+				fs <~ "(unknown)"
+				return
+		|| regs = .FuncPrms
+		|int64| n  = fn.Args.Length
+		fs <~ "("
+		
+		if n > 10
+			n = 10 // sigh
+
+		|| IsC = (self isa asm.fncx or asm.fncx3)
+
+		while (n > 0)
+			n--
+			fs <~ 'r'
+			|| r = regs
+			if isc
+				r = regs >> (n*5)
+			  else
+				regs >>= 5
+			
+			fs <~ r&31
+			if n > 0
+				fs <~ ", "		
+
+		fs <~ ")"
+	
+	
+	function WillRenderFat (|bool|)
+		if (.GuessSize == 0)
+			if .msg.func == @sheb
+				return false
+			if self isa asm.mark
+				return false
+		return true
+	
+
+	function RendaOpenClose (|faststring| fs)
+		opt norefcounts
+		if self is DebugVarClose
+			fs <~ "\t\tClose: "
+			|| any = false
+			for i.bits in ._Const
+				if any
+					fs <~ ", "
+				fs <~ i.log2
+				any = true
+			fs <~ "\n"
+		  elseif self is DebugVarOpen
+			fs <~ "\t\tOpen: "
+			fs <~ .output.reg
+			fs <~ "\n"
+	
+	
+	function RenderFat (|FastString| fs, |bool| Simpler=false)
+		opt norefcounts		
+		target debug
+			if self is debugvars
+				.RendaOpenClose(fs)
+		if !.WillRenderFat
+			target debug
+				.RendaMsg(fs, 0)
+			return
+		
+		|| M = fs.StreamLength
+		|| op = instruction.typelist[.BaseOp]!
+		if .baseop != asm.noop
+			if self is Const
+				fs.appendlower(op.name)
+			  else
+				fs <~ op.name
+			fs <~ ':'
+			target debug
+				|int| bb = .basicblock
+				fs <~ "("
+				fs <~ bb
+				fs <~ "/"
+				fs <~ assembler.sh.parentblock(bb)
+				fs <~ ")"
+		fs <~ (' ', 5-op.name.length)
+		|| GotAny = ""
+		|| Remain = 24
+		|| f = op.sizes
+		
+		for i in f.count
+			|| bs = f[i].BitSize
+			if bs and (remain > 0)
+				fs <~ GotAny
+				GotAny = ", "
+				|int| v = .prms[i]
+				if (.IsFunc and (i == 2 or 3)) or (self isa asm.tail and i == 1)
+					if i != 3
+						.PrmCollectCounterPart(fs)
+					  else
+						fs.Length-=2
+				  else
+					if f[i].isreg
+						fs <~ ('r' + v|uint| >> 30)|byte|
+						v &= 31
+					fs <~ v
+				remain += bs
+			if .op == asm.knst
+				exit
+		
+		if (self  isa  asm.knst or asm.knsr or asm.gtab or asm.knst2 or asm.knst3)
+			.RendaKnst(fs, fs.StreamLength-m)
+			fs <~ ' '
+		
+		|| n = fs.StreamLength - m
+		if n <= 2
+			fs.length--
+			fs <~ "..."
+			n += 2
+
+		if !Simpler
+			target debug
+				.RendaMsg(fs, n)
+	
+	
+	function GuessSize (|int|)
+		// don't really know the size, as consts are awkward to guess
+		// and long-jumps might require more awkward encoding.
+		|| o = ._op
+		if (o != asm.noop and asm.mark)
+			if o < 32
+				return 2 + (o&1)
+			return 1
+	
+	
+	target debug {
+	function TmpRender (|faststring| fs, |message| msg)
+		opt norefcounts
+		|| arg = msg.Find(@arg)
+		if !arg
+			msg.Render(fs)
+			return 
+		
+		|| Start = fs.Length
+		arg.Render(Fs)
+		if fs.Length > start + 30
+			fs.Length = start + 30
+
+
+	function RendaMsg (|faststring| fs, |int| sofar)
+		opt norefcounts
+		|| msg = .msg
+		if msg == @sheb
+			msg.render(fs)
+			return
+		fs <~ (' ', 47-sofar)
+		require msg != @arg
+
+		fs <~ "/*"						// reuse /* string lol.
+		fs <~ " "
+
+		|| Start = fs.length
+		if msg == @prm
+			msg = msg.parent
+		  else
+			while msg == @num or @thg or @opp or @bra or @char
+				loop !(msg in @prm)
+				msg = msg.parent
+		if (msg == @tmp)
+			.TmpRender(fs, msg)
+		  else
+			msg.render(fs)
+		
+		|| After = fs.length
+		|| OrigAfter = After
+		if after - Start > 40
+			after = start + 40
+			fs.length = After
+
+		After = fs|string|.find('\n', Start, After)
+		if After > Start
+			fs.length = after
+		if OrigAfter < OrigAfter
+			fs <~ "..."
+		
+		fs <~ " "						// reuse "*/" string
+		fs <~ "*/"
+	}
+	
+	
+	function RendaKnst (|faststring| fs, |int| SoFar)
+		|| ty = .info.µType
+		fs <~ (' ', 26-sofar)
+		fs <~ "/# "
+		if ty.IsInt
+			fs <~ .const|int64|
+		  else
+			|float64| num
+			if ty.ByteCount == 4
+				num = .F32
+			  else
+				num = .f64
+			fs.AppendDouble(num, 9, true)
+			if ty.ByteCount == 4
+				fs <~ "f"
+			  else
+				fs <~ "d"
+		fs <~ " #/"
+		
+	
+	function JumpNegate
+		|| m = .op
+		if m == asm.jmpi or asm.jmpf
+			.prms[2] xor= 1
+		  else
+			._op = m xor 1
+	
+	
+	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)
+		.JumpNegate
+		|| j = .JumpPrm - 1
+		.prms[j] += mid.Jump
+		sh.nop(mid)
+		return true
+		
+	
+	function JumpImprove (|assembler| sh, |bool|)
+		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
+		|| n = 0
+		
+		while d isa asm.jump
+			d = d.JumpTo!
+			expect (++n < 30) (.msg)
+		
+		|asm| m = .op
+		if  m == asm.jump
+			if  d.IsFinisher
+				return .CopyFrom(d)		// jumping to a function-exit.
+
+		  elseif (d == self + 2) and (m != asm.LUPU and asm.LUPD)
+			|| mid = self + 1
+			if mid isa asm.JUMP
+				return .JumpNegate(sh, mid)
+		
+		if n > 0
+			.JumpTo(D)
+			return true
+	
+	
+	function IsFinisher (|asmreg| Info, |bool|)
+		opt norefcounts
+		|| o = .op|asm|
+		if o == asm.ret or asm.TAIL or asm.rfrt or asm.halt
+			return true
+		if o == asm.jump
+			return .jump < 0
+		if info is exit
+			if o == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3
+				return true
+	
+	
+	function IsFinisher (|bool|)
+		return .IsFinisher(.info)
+
+
+	function DebugPrint 
+		target debug {
+		visible
+		nil self
+		if !self
+			"(nil)"
+			return
+		if asm.NoisyASM >= 3
+			|| fs = faststring()
+			.RenderFat(fs)
+			printline fs
+		}
+
+	iterator RegInputs
+		|| ir = .InputPrms
+		|| i = 0
+		while (i < –count .prms)
+			ifn ir & (1 << i)
+				i++
+				continue
+			yield i
+			i++
+			
+	iterator FatInputs
+		|| ir = .InputFats
+		|| i = 0
+		while (i < –count .prms)
+			ifn ir & (1 << i)
+				continue
+			yield (.inputfat(i))
+			i++
+			
+	iterator RegOutputs
+		|| oo = ._Outputs|int|
+		while oo
+			|| i = oo.lowestbit
+			oo &=~ i
+			yield .prms[i.log2]
+
+
+	module
+		function VerifyNumbers (|bool|)
+			require (asm.jmpe xor 1) == asm.jmpn
+			require (asm.jmkm xor 1) == asm.jmkl
+			require (asm.jmke xor 1) == asm.jmkn
+			require (asm.jbor xor 1) == asm.jban
+			|| S = –sizeof FatASM
+			require S == 64
+			require (asm.rfrd > asm.RFUN and asm.rfwr and asm.rfst)
+			require (asm.rfun < asm.RFST and asm.RFWR)
+			return true
+
+
+
+datatype ASMParam (uint)
+	// this would have been better if I had planned this all out ahead of time
+	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits,
+	// for 21-bits after that we have 11 more bits that we could either use or keep empty...
+	// depending on if they confuse the code or not, but at least we have something that
+	// makes sense, easy to convert from one to the other!
+	// at this point... its too late, really.
+	
+	function ASMReg (|asmreg|)
+		if self >> 31
+			(rz is temp)
+		rz.reg = self&31
+		|uint64| fatindex = (self >> 15)&0xFFFF
+		rz = rz as (fatindex << 48)|asmreg|
+	function Reg (|int|)
+		return self&31
+	operator iz (|asmreg| M, |bool|)
+		return .reg == M.reg
+
+
+function asmreg.Prm	(|asmparam|)
+	|| i = .FatIndex << 15
+	|| r = .reg
+	|| t = (self is Temp)<<31
+	return r ||| t ||| i
+
+
+
+datatype FatNopMode	(byte)
+	default 0
+	flags
+		Hard = 0
+		CanClose
+		Soft
+		Rewind
+	
+	syntax is (|fatnopmode| f, |bool|)
+		return self&f
+		
+

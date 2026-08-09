@@ -1,0 +1,235 @@
+
+
+prototype PicoThreadFn (|pico| Comms, |uint| Mode, |&cstring| Args=nil, |ErrorInt|)
+		description "This acts like main. So you are passing a function that will receive arguments, as if it were a C++ main function."
+
+prototype PicoActionFn (|&nil| self, |&int8| Data, |int| Length, |ErrorInt|)
+	description "Used by CakeVM right now. Not used elsewhere yet. This will notify the VM, that it received a message. So Cake can pause the VM.
+
+So PicoActionFn basically notifies you that a message was received, and does it from a thread. So any PicoActionFn you write must be threadable. This includes almost nothing out of speedie :] which is highly object oriented, and can't refcount objects across threads. Assuming you can avoid that, you can use this. Doing work on global ints... thats usually much safer."
+
+
+// todo: pico could use shared memory, instead of pipes. Reduces memory use
+
+
+struct PicoMessage
+	linkage: wrapper, cpp_part Pico
+	|int|			Length
+	|?&int8|		Data
+	
+	syntax cast (|bool|)
+		inlined
+		if self
+			return .data
+//		return (.data, false)(self) // fails?
+	
+	module
+		function From (|string| s, |PicoMessage|)
+			rz.length = s.length
+			rz.data = s.addr|&int8|
+
+
+function @string.FromPico (|picomessage| M, |string|)
+	|| x = m.data|&byte|
+		return string.own(x, M.length)
+
+
+struct PicoConfig
+	// needs to be adjusted (For cake) along with ALL the speedie structs ;_;
+	linkage: wrapper, cpp_part PCF
+	|int8[16]|				Name
+	|Date|					LastRead
+	|Date|					LastSend
+	|int|					QueueSize
+	|uint16|				DeathCount
+	|uint16|				SendFailCount
+	|uint16|				ReadFailCount
+	|byte|					Noise
+	|byte|					SendTimeOut
+	|int16|					PIDStatus
+	|byte|					SocketStatus
+	|bool|					LeaveOrphaned
+	|byte|					Bits
+	|bool|					IsParent
+
+
+struct Pico
+	linkage: wrapper, cpp_part Pico, cpp_class PicoComms
+
+	function IsParent (|bool|)
+		cpp_wrapper PicoIsParent
+		
+	function CanGet (|ind|)
+		nil self
+		cpp_wrapper PicoCanGet
+		
+	libinternal SpawnFork (|cstring| Name=nil, |PID_Int|)
+		nil self
+		cpp_wrapper PicoStartFork
+
+	function SpawnThread (|PicoThreadFn| fn, |uint16| Mode, |?&cstring| Args = nil, |bool|)
+		cpp_wrapper PicoStartThread
+
+	function CompleteExec (|bool|)
+		cpp_wrapper PicoRestoreExec
+	
+	syntax append (|string| str, |bool| Wait=false, |bool|)
+		cpp_part SendString
+		return ._send(str.addr|&int8|, str.length, wait)
+		
+	libinternal _Send (|?&int8| msg, |int| Length, |bool| Wait=false, |bool|)
+		cpp_wrapper PicoSend
+		
+	inline Tickle (|bool|)
+		return self <~ ""
+	
+	libinternal __Get (|PicoMessage| Msg, |float| T)
+		nil checker
+		cpp_wrapper PicoGet
+
+	function Get (|float| T, |string|)
+		nil checker
+		if (T > 0) or (.canget > 0)				// important that Pico pauses if asked! Or else we get hot-loops...
+			|picomessage| msg
+			.__get(msg, T)
+			return string.FromPico(msg)
+		
+	function Close (|cstring| Why)
+		cpp_wrapper PicoClose
+	
+	function MessageError (|ErrorInt|)
+		nil checker
+		cpp_wrapper PicoError
+	
+	function IsSending (|bool|)
+		cpp_wrapper PicoStillSending
+
+	inline Config (|&PicoConfig|)
+		return self|&PicoConfig|
+	
+	function Name (assigns:|string|)
+		|| x = &.config.name[0]
+		|| n = value.length min 15
+		x[n] = 0
+		memory.copy(x|&nil|, value.addr|&nil|, n)
+	
+	function Name (|string|)
+		|| x = &.config.name[0]
+		return string.copy(x|cstring|)
+		
+	
+
+	module
+		function GlobalConfig (|&PicoGlobalConfig|)
+			cpp_wrapper PicoGlobalConf
+			
+		function SleepForSend (|float| During=5.0, |float| After = 0.5)
+			cpp_wrapper PicoSleepForSend
+		
+		function Start (|int| ThreadCount = 0)
+			cpp_wrapper PicoInit
+
+		function Destroy (|?&pico| Where, |Cstring| Why, |?&pico|)
+			cpp_wrapper PicoDestroy
+			
+		function Replace (|&&pico| Where, |bool|)
+			|| New = pico.new									#require
+			.destroy(where, "replace")
+			where[0] = new
+			return true
+
+		function HasParentSocket (|bool|)
+			cpp_wrapper PicoHasParentSocket
+			
+		function Create (|cstring| Name, |int| ByteBufferSize = 0, |?&pico|)
+			cpp_wrapper PicoCreate
+		
+		// could we rename this to app.fork? it kinda makes more sense, right?
+		// i mean... we don't HAVE an app.fork...
+		function Fork (|StringZeroTerminated| name="", |int| Noise=piconoise.events, |&pico|)
+			|| p = .new(name, noise)
+				|| pid = p.spawnfork
+				if pid >= 0
+					return p
+				p.close(nil)
+		
+		function New (|stringzeroterminated| name="", |int| Noise=piconoise.events,   |&pico|)
+			|| p = pico.Create(name)
+				p.config.Noise = noise
+				return p
+			|PicoGlobalStats| St
+			St.Read
+			error ("Couldn't create a pico object. Too many picos: " + St.OpenPicos)
+	
+		prototype Thread (|pico| Comms, |uint16| Data, |&nil| Argument, |bool|)
+			function Spawn (|pico| Comms, |uint16| Data, |&nil| Argument,  |int| BuffBits=0, |&pico|)
+				description "Just a wrapper around pico.thread" 
+				|| name = (&comms.config.name[0])|cstring|
+				|| pico_out = pico.new(name.wrap, -1)
+					if BuffBits
+						pico_out.config.Bits = BuffBits
+					if comms.SpawnThread(self|picothreadfn|, Data, Argument|&cstring|)
+						return pico_out
+					pico_out.Close("")
+
+
+module PicoNoise
+	constants
+		DebugChild	= 1
+		DebugParent	= 2
+		Debug		= 3
+		EventsChild	= 4
+		EventsParent= 8
+		Events		= 12
+		All			= 15
+
+
+
+struct PicoGlobalConfig
+	linkage: wrapper
+	|Date|						LastActivity
+	|Date|						TimeOut
+	|int|						ExitCode
+	
+
+
+struct PicoGlobalStats
+	linkage: wrapper
+	|int|						TimeOutCount
+	|int|						OpenSockets
+	|int|						OpenPicos
+
+	autogen Read
+		cpp_wrapper PicoGlobals
+	module
+		function New (|PicoGlobalStats|)
+			inlined
+			rz.read
+
+
+
+// could be useful for threads :]
+struct AtomicLock
+	linkage
+		cpp_part LOK
+	
+	|bool| Locked
+	function Lock
+		cpp_wrapper PicoLock
+
+	function Enter (|bool|)
+		cpp_wrapper PicoEnter
+	
+	inline Leave
+		.Locked = false
+
+	syntax Using (|&AtomicLock|) // I don't like how this works... I want to return nothing.
+		inlined
+		.Enter
+		return self
+
+	syntax UsingComplete (|&AtomicLock| idk=nil)
+		inlined
+		// param order should be reversed! sigh...
+		.locked = false
+

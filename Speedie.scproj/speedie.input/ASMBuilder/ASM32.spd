@@ -1,0 +1,68 @@
+
+
+
+function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
+	|| sh = Assembler.sh
+	|| closer = sh.OpenVars
+	|| Where = sh.TempOnly(Type|asmreg|)
+	|| dest = sh.BFLG_Sub(self, where, Src, 32, 32, Src.Signed)
+	return sh.CloseVars(Closer, dest)
+
+
+
+function message.AddInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	|| Subtract = l is subtract
+	if dest.IsVec									// Extra bits get clipped if we do:    ivec4 + big
+		if Subtract
+			return .QSUB(dest, l, r, sh)
+		return .QADD(dest, l, r, sh)
+			
+	|| BigLast = R.IsBig
+	if L.IsBig != BigLast
+		if  BigLast  and  (sh == 0  and  l isnt Alternate)
+			swap (L) (R)							// r1 = small + big --> r1 = big + small
+			BigLast = false
+		if !BigLast									// r1 = big + small << sh
+			if l isnt Alternate
+				return .ADDM(dest, L, R, sh)
+			return .SUBM(dest, L, R, sh)
+
+		if !l.IsBitCorrect
+			l = .ExpandBits(L, r.µtype)
+			if subtract
+				problem (self, "Subtraction upon smaller type, by a bigger one.")
+	
+	if Subtract
+		return .OptIntVecMath(dest, l,r,sh, asm.SUB)
+
+	if (r is temp)
+		|| oof = .AddShifted(dest, l, r, sh)
+			return oof
+			
+	// if its a normal add a = b + c, then LMUL==1, which comes through here.
+	return .OptIntVecMath(dest, l,r,sh, asm.add)
+
+
+function message.AddShifted (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fatasm|)
+	|| beef = r.fat
+	require beef isa asm.BFLG
+
+	|| up = beef.Prms[2] + sh
+	|| total = beef.Prms[3] - up
+	require total > 0
+	
+	|| bits = r.BitCount
+	require total|int| < (64-bits)
+	
+	|| input = beef.asmreg(1)
+	Assembler.sh.softnop(beef)
+	return .ADD(dest, l, input, total)
+
+
+
+function Assembler.MUL_ (|ASMReg| dest, |ASMReg| A, |ASMReg| B, |asmreg| Add, |message| exp, |&fatasm|)
+	|| A2 = .SmallToBig(A, B, exp)
+	|| B2 = .SmallToBig(B, A, exp)
+	return exp.MUL(Dest, A2, B2, add)
+
+

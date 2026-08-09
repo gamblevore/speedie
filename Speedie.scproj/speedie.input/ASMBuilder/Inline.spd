@@ -1,0 +1,285 @@
+
+struct InlineInfo
+	|asmreg[10]|	Items
+	|uint|			Altered
+	|uint|			References
+	|uint|			Normal
+	
+	function DoImmediates (|?message| p, |[scdecl]| args)
+		opt norefcounts
+		|| sh = Assembler.sh
+		for (a in args) (i)
+			.Items[i] = .PreInlineOneParam(p!, a, sh)
+			p++
+
+		.CleanupClash(args)
+
+
+	function NopParams (|int| n, |asmreg| Ret)
+		|| sh = Assembler.sh
+		while  --n >= 0
+			|| r = .Items[n]
+			|| v = r.reg
+			if !v
+				0
+			  elseif r is Const 
+				sh.Decr(r.needfat, fatnopmode.hard)
+			  elseif r iz Ret
+				0
+			  else
+				|| s = r.fat
+				if s  and  !s.µrefcount  and  s.guesssize
+					sh.nop(s) 
+
+	
+	function PreInlineOneParam (|message| p, |scdecl| a, |assembler| sh, |asmreg|)
+		opt norefcounts
+		p = p.ASMUnbra
+		require (p.func == @thg)
+		|| d = p.ASMDecl
+		require d is local
+		|| v = sh.LocalThg(d)
+		|| vr = 1<<v.reg
+		if a is Reference
+			.References |= vr
+		  elseif a is Altered
+			if .Altered & vr
+				.Normal |= vr
+			.Altered |= vr
+		  else
+			.Normal |= vr
+
+		(a is reference) = (d is reference)
+		a.mu.Info |= (d.mu.info & scdeclinfo.alteredcopy)
+		if a is TypeImprove // oof? typeimprove param?
+//		require self is TypeImprove
+//		|| orig = .IsLookupOnly
+//		if orig isa SCDecl
+		return v	
+	
+	
+	function CleanupClash (|[scdecl]| args)
+		|| AR = .References & .Altered
+		|| AN = .Normal & .Altered
+		if AR ||| AN
+			.ClearInlineParamClash(args, AR, AN)
+
+
+	function ClearInlineParamClash (|[scdecl]| args, |int| AR, |int| AN)
+		opt norefcounts
+		|| n = args.Length
+		while n-- > 0
+			|| V = .items[n]
+				|| a = args[n]!
+				|| r = 1<<v.reg
+				if (AR & r) and (a isnt reference)
+					.items[n] = asmreg.ForceInto				// needs copy to save other regss
+				  elseif (AN & r) and (a is altered)
+					.Items[n] = asmreg.ForceInto
+	
+
+
+extend assembler {
+function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
+	opt norefcounts
+	dest.tmpcheck
+	|| dest2 = dest
+	if (dest isnt discard) and (!dest.reg or dest is temp)
+		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
+		dest2.tmpcheck
+	
+	dest2 = dest2.simplify
+	dest2.µtype = fn.ASMReturn.ASMRegType
+	if !dest2.reg
+		(dest2 is discard)
+	
+	target false // sigh... a nice idea but causes deep issues somewhere. dont wanna do it now.
+		if 	fn.ReturnedVars == 1
+			|| last = fn.SourceArg.last
+			if (last and last.asmtype is kReturn)
+				(dest2 as= (dest & asmreg.InlineCopyable))	// <-- Makes assign fail
+			// needs to be looked at properly...
+			// Also causes slightly different behaviour.
+			// Assigns is now getting vars with reg0 that aren't const??
+	
+	return dest2
+				
+	
+	
+function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
+	opt norefcounts
+	|| OV = .OpenVars
+	|int| ID = .inlinedepth
+	|| st = .inlinestate[ID+1]
+	st[0] = .inlinestate[ID]
+	st.ParentVars = .openvars
+	st.fn = fn
+	st.BranchDepth = 0
+	
+	st.Return = .SetInlineDest(prms, dest, fn)
+
+	.InlineDepth = ++ID
+	.DeepestInline = ID max .DeepestInline
+
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
+	if dest isnt ExitFunction
+		.state.TailInlineable = false
+
+	
+	|fatrange| LL
+	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
+		if fn is constructor
+			|| des = fn.cls!.DestructorFunc
+				.ASMReach(des)
+	
+	.InlineState[ID] = nil
+	.InlineDepth = --ID
+	if !ID
+		.InlineEnd = nil
+	
+	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
+
+
+
+function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
+	opt norefcounts
+	LL.Start = .curr
+	
+	|SavedRegisters| svregs
+	|InlineInfo| Info
+	svregs.Collect(fn.args, self)
+	.InlineParams(prms, info)
+	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
+	asmtype.ArgumentSub(self, fn.SourceArg!)
+	info.NopParams(fn.args.length, .state.return)
+	svregs.Restore(fn.args)
+	
+	ll.after = .curr
+	rz = .InlineFinish(ll, svregs)
+	|| Grown = .CurrGain(RealStart)
+	if (Grown > AllowedGain) or .EntireInlineFailed
+		if .EntireInlineFailed  and  (fn isnt linkinline)
+			.EntireInlineFailed = 0
+		svregs.Rewind(self)
+		.Rewind(ll.start, .curr)					// rewind
+		return nil
+	
+	if svregs.ReturnCount > 1
+		.NextBasicBlock
+	if !rz
+		(rz is Const)								// no longer zero
+
+	if (.curr > RealStart)							// useful, to stop jumping all over in IDE
+		if RealStart isnt DebugVars					// dont break the type
+			realstart.Fatmap = prms.parent!			// cleanup
+
+
+	
+function InlineParams (|message| prms, |InlineInfo| Info)
+	opt norefcounts
+	|| p = prms.first$
+
+	|| args = .fn.args
+	info.DoImmediates(p, args)
+	
+	for (a in args) (i)
+		|| V = info.Items[i]
+		target debug: || trap = ++asmtrapper, if trap == -1
+		if !(V asnt ASMReg.ForceInto) // its nil or into
+			info.items[i] = .µInlineParam(p, a, V)
+		
+		a.AsmReg = info.Items[i] // a is the output, nt the input decls.
+		p = p.next!
+
+
+	
+function CurrGain (|&fatasm| Start, |int|)
+	|| C = .curr
+	while Start < C
+		rz += start.GuessSize
+		start++
+
+
+
+function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
+	opt norefcounts
+	|| N = fn.µfatlength
+	if fn isnt LinkInline
+		require N and (N < 64)
+		|| MaxEnd = .InlineEnd
+			|| SubInline = .curr + (N / 3)
+			require SubInline < MaxEnd
+	
+	|| AllowedGain = 5 + (fn is OptInline) * 18		// Assume that functions have 5 instruction overhead.
+	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
+	if fn is LinkInline
+		allowedgain += 2
+	  elseif fn.IsLibrary
+		AllowedGain -= 1 + (fn is OptInline)<<2
+
+	AllowedGain -= .inlinedepth
+	
+	for p.fast in prms
+		Grace += .IsASMConst(p)<<2
+
+	if (AllowedGain + Grace)|uint| <= N
+		require fn is linkinline
+		problem (prms, "Inline function oversized")
+
+	if !.InlineDepth
+		.InlineDepthLimit = 3
+		.DeepestInline = 0
+		.InlineEnd = .curr + AllowedGain
+	
+	|| I = .TryInline(prms, dest, fn, AllowedGain)
+		return I
+
+	// try weaker inline
+	require !.InlineDepth and (.DeepestInline > 1)
+
+	.InlineDepthLimit = 1
+	return .TryInline(prms, dest, fn, AllowedGain)
+
+
+
+function InlineFinish (|FatRange| R, |savedregisters| sv, |ASMReg|)
+	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
+	for s in R
+		|| op = s.op
+		if op == asm.RFRT
+			sv.ReturnCount++
+		  elseif op == asm.ret
+			sv.ReturnCount++
+			if rz
+				rz = rz.simplify
+			  else
+				|| dest = s.inputfat(0)
+					rz = dest.info
+				  else
+					rz.reg = s.asmreg(0) // what about the temp?
+					rz.µType = .state.return.µType
+			s.SetOp = asm.jump
+			s.JumpPrm = 1
+			s.JumpFix(.curr)
+
+		  elseif op == asm.knst
+			|| reg = s.RegOnly
+			|| Info = sv.decls[reg-1].info
+			if info is reference
+				s.µRefCount++			// what about refcounting ALL references, not just knst?
+			
+			.AskNop(s)					// nopping ALL ops... has issues
+			
+		if s.GuessSize
+			(s.info as= asmreg.FromInline)
+	
+	rz &= ~ASMReg.Exit
+	|| dest = .state.return
+	(rz as= dest&asmreg.exit)
+	rz = rz.ExpectSameType(dest)
+	if !rz.reg
+		(rz is const) // make compiler happy
+
+
+}
+

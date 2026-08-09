@@ -1,0 +1,76 @@
+
+
+function compiler.UsingScript (|file| f, |file|)
+	require (Options.Mode) and options.compile
+	require !f.isdir
+	require f.Read(16) starts "#!"
+	
+	rz = feedback.TryUseProject(f, true).ScriptLocation.file
+	
+	stderr.PrintNewErrors = 0
+	
+	options.output_path = rz
+	options.scripting = true
+	options.silent = true
+	options.PrintCompileString = false
+	options.OperationCount++
+	app._rawargs.remove(0)
+
+
+function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
+	if !script_build.exists
+		return true
+	if (script_build.modified < f.modified)
+		return true
+
+
+function compiler.CanTryModes (|file|)
+	opt norefcounts
+	require !app["perry"] and !app["nocompile"]
+	|| p = app._rawargs[0]
+	if p and !p.argname
+		rz = p.file
+
+
+function compiler.exe (|string|)
+	opt norefcounts
+	return options.exe_path ?? options.output_path
+
+
+function compiler.TryVariousStartModes (|bool|)
+	|| f = .CanTryModes$		
+	|| it = compiler.UsingScript(f)
+		|| cwd = app.cwd
+		if compiler.ScriptRecompile(f, it)
+			compiler.CompileTime
+		if stderr.ok
+			app.cwd = cwd
+			app.ChildEnv("OrigScriptPath") = f
+			app.turninto(.exe, app._rawargs)
+		rz = true
+
+
+
+function string.ContainerName (|string| ext, |string|)
+	|| After = .find(ext.PathDir)
+		return self[0, after].name
+
+
+function string.SpdScriptName (|string|)
+	// if we are in  'ABC.scproj'  use  'ABC'
+	rz  = .ContainerName(".scproj")
+	rz ?= .ContainerName(".uwu")
+	rz ?= .name.trimextandpath
+
+
+function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |string|)
+	return container[.hash|int64|.abs.render]
+
+
+function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
+	|| full = .AbsolutePath ?? self
+	|| dest = full.Scriptcontainer(container)
+	dest.MakeEntirePath
+	rz = dest[full.SpdScriptName]
+	if options.modecake
+		rz += Compiler.CakeExt

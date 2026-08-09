@@ -1,0 +1,164 @@
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+extend_module Message
+	libinternal TreeComparePrint (|message| orig)
+		"Trees ${orig.MiniName} are identical."
+		
+	function TreeCompare (|message| orig, |Message| reparse, |bool| PrintIfSame=false, |bool|)
+		opt norefcounts
+		ifn orig and reparse
+			return CompareError(orig, reparse)
+
+		if (orig.func != reparse.func) or (orig.name != reparse.name)
+			return CompareError(orig, reparse)
+
+		|| r1 = reparse.First
+		|| s1 = orig.First
+		while (r1 or s1)
+			require message.TreeCompare( s1, r1 )
+			r1++
+			s1++
+		if PrintIfSame
+			.TreeComparePrint(orig)
+		return true
+
+
+function Message.Locate (|string|)
+	if (!self)
+		return "(nil)"
+	
+	|| s = .Render
+	|| fname = .func.name
+	|| fs = faststring.new
+
+	.name.render(fs)
+	fs <~ "@"
+	fs <~ fname
+	fs <~ ": '"
+	fs <~ s
+	fs <~ "'"
+	if (.position >= 0)
+		fs <~ " at byte: "
+		fs <~ .position
+		|| r = .memorylayer.obj
+		if (r isa string)
+			if r.length
+				fs <~ " in "
+				fs <~ r
+	fs <~ '\n'
+	return fs
+
+
+libinternal message.plocate (|string|)
+	if (self)
+		return .parent.locate
+
+
+libinternal CompareError (|Message?| expected, |Message?| found, |bool|)
+// I want to see it printed, for my use. Must think about my needs first!
+	
+	|| fs = FastString()
+	fs <~ "Expected ${expected.locate} but found ${found.locate}\n"
+	fs <~ "parent of expected is ${expected.plocate}\n"
+
+	if (found)
+		fs <~ "parent of found is ${found.plocate}\n"
+	  else
+		found = expected
+	printline fs
+	found.SyntaxExpect
+
+
+libinternal EntityTest (|string|)
+	|| replicate	= `\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) `
+
+	|{string}| repl = dictionary.new
+	repl["\\n"] = "\n"
+	SetDecodeEntities(repl, true)
+	SetEscapeCode(repl, true)
+
+	|| s3 = replicate.unescape               // inbuilt
+	replicate = replicate.ReplaceAll(repl)   // cobbled together
+
+	|| jb = "\n\(&#x134;&#xEB;\C3\AA\C6\81o&#9447;\) "
+	debugger (jb == replicate and s3)
+
+	return replicate.lowercase + " loaded successfully\n"
+
+
+libinternal Message.Test (|string| new_render, |string| name)
+	ifn .TestSub(new_render, name)
+		print "Test $name: Failed\n\n$new_render"
+		stderr.clear
+
+
+libinternal Message.test_style
+	opt norefcounts
+	|| b = false
+	for s.flat in self
+		if s == @arg or @list
+			b = !b
+			(s is style2) = b
+
+
+libinternal Message.TestSub (|string| new_render, |string| name, |bool|)
+	|| LKT = leaktester(name)
+	{
+		|| reparse = new_render.Parse				#require
+		
+		reparse.test_style
+		self.test_style
+		require message.TreeCompare( self, reparse )
+		|| self_render = .render					#require
+		|| reparse_render = reparse.render			#require
+		require StdErr.ok and (self_render == reparse_render)
+	}
+	(lkt.test)
+
+	return true
+
+
+libinternal string.EscapeTest (|bool|)
+	|| esc = .escape
+	|| back = esc.unescape 
+	return (back == self)
+
+
+function Jeebox.Test (|string|)
+	cpp_Part TestJB
+	|| fs = FastString.new
+	for (c in 256)
+		fs <~ c|Byte|
+	
+	|| str = fs.getresult
+	require str.escapetest
+
+	|string--| natural_input = –SELF_TEST_NATURAL
+	|string--| jbin_input    = –SELF_TEST_JBIN
+	// Parse,  render,  re-parse,  compare tree,  compare re-render
+	
+	{
+		|| LKT = leaktester("entities")
+		EntityTest()
+		LKT.Test
+	}
+	if stderr.ok
+		|| root = natural_input.parse
+			root.jbinTest
+			if (jbin_input)
+				message.TreeCompare( root, root.copy ) // make sure compare works
+				message.TreeCompare( root, jbin_input.parse )
+				root.Test( root.Render,		"normal" )
+				root.Test( root.renderjbin,	"jbin" )
+			if StdErr.ok
+				rz = EntityTest()
+
+
+libinternal message.jbinTest (|bool|)
+	|| msg = .renderjbin.parsejbin
+	return message.TreeCompare( self, msg )
+

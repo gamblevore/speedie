@@ -1,0 +1,365 @@
+
+
+prototype fn_asm	(|&Assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
+
+
+
+datatype ASMReg (uint64)
+	default 0|AsmReg|
+	linkage
+		cpp_part Reg
+		numeric false
+	
+	Flags
+		|asmreg|
+		Temp = 1024			// Sigh.
+		(1<<16)				// Starting point
+		Negate				// negate must be at 64K (I forgot why.)
+		AlreadyNegated
+		Discard
+		Param
+		Alternate
+		Subtract = Alternate
+		Set
+		NewlyDeclared
+		DebugVars = [DebugVarOpen, DebugVarClose]
+		ForceInto
+		NoScale
+		FromInline
+		ContainsAddr
+		Textual
+		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest
+		CondRequest			// Perhaps the responses could also be merged into a number, all exclusive.
+		CondAnswer
+		OKAsTemp
+		AllowNopDest
+		BlockNop
+		GlobalMemory
+		VerySpecial
+		Const
+//		NotNil				// probably a big addition. Will need tests...
+		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
+		Exit			= [ExitFunction, ExitAtAll]
+		SetAlways		= Textual	||| Set			// reuse const
+		TempFlags		= OKAsTemp	||| Temp
+		FlagsToRemove	= Const		||| Discard
+		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
+		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
+
+		// don't go above 47
+
+	
+
+	function TestBit
+		|| x = ExitAtAll, (x)
+
+	
+	target debug
+		render
+			if self is Const
+				fs <~ "k"
+			fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
+			fs <~ .reg
+			fs <~ "("
+			.µtype.render(Fs)
+			fs <~ ")"
+	
+	
+	function F32 (|float|)
+		if .reg
+			return .needfat.F32
+		
+	function F64 (|Float64|)
+		if .reg
+			return .needfat.F64
+	
+	function float (|Float64|)
+		if .reg
+			|| f = .needfat
+			if .isbig
+				return f.f64
+			return f.f32|float64|
+
+	function Simplify (|asmreg|)
+		return .ReallySimplify as (self & tempflags) // okastemp
+
+	function ReallySimplify (|asmreg|)
+		return self|uint16||asmreg|
+	
+	
+	function ConstCheck
+		target debug
+			|| v = .reg$
+			|| k = .const
+			|| g = Assembler.sh.Register(v) #debug_require
+			|| k2 = g.const
+			if k2 != k // well fuck
+		
+	function Const (|int64|)
+		// every single caller must check for Const (and does!)
+		|| F = .FAT
+			return f.const
+
+		target debug
+			if .reg == 0
+				return 0
+			if self is Const // WHA DA FA!
+			if self isnt param
+				.NeedFAT
+		
+
+	function Zero (|asmreg|)
+		// keep the fatasm... like for .write() which returns reg0.
+		.reg = 0
+		is const
+		isnt TempFlags
+		return self
+		
+	function IsZero (|bool|)
+		if .reg == 0 // what if "const" needs fixing?
+			return true
+		return  (self is Const) and (.const == 0)
+	
+	function Negate (|bool| Neg=true, |asmreg|)
+		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
+	
+	function BitCount (|int|)
+		return .µtype.bitcount
+		
+	function ByteShift (|int|)
+		return .ByteCount.log2
+	
+	function ByteCount (|int|)
+		return .µType.ByteCount
+	
+	function FatIndex (|uint|)
+		return self|uint64| >> 48
+	
+	function FatIndex (assigns:|uint|, |asmreg|)
+		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
+
+	function FAT (|?&fatasm|)
+		return .FatIndex.fat
+	
+	function NeedFAT (|&fatasm|)
+		|| f = .fatindex.fat
+			return f
+		error "anorexic register"
+		return Assembler.sh.Start
+	
+	operator isa (|datatypecode| M, |bool|)
+		return .µtype == M
+
+	function asmreg.Fat (|asm| Op, |&FatAsm|)
+		|| f = .fat
+			if f isa Op
+				return f
+
+	operator iz (|asmreg| M, |bool|)
+		return .reg == M.reg
+
+	function FourBytes (|bool|)
+		opt inline
+		return self|datatypecode|.ByteShift == 2
+
+	function BasicVec (|asmreg|)
+		if .IsFloat
+			.µType = DataTypeCode.Vec4
+		  else
+			.µType = DataTypeCode.iVec4
+		return self
+		
+	function IsVec (|bool|)
+		return self|datatypecode| & 0x03
+	
+	function EqulClip (|int|)
+		if !.reg
+			return 0
+		return self|datatypecode|.ByteShift
+
+	function uint.EqulInputsAreBothBool (|bool|)
+		// we don't actualy know if something is a bool now... not based on the input
+		// only 5 bits remain, split into 2,2,1
+		return (self >> 1) == 0	
+	
+	function IsBig (|bool|)
+		opt inline
+		return self|datatypecode|.ByteShift == 3 // could also be an int?
+
+	function IsSmall (|bool|)
+		opt inline
+		return (self|datatypecode|.ByteShift < 3)
+
+	function IsFloat (|bool|)
+		opt inline
+		return self|datatypecode|.isfloat
+
+	function IsInt (|bool|)
+		opt inline
+		return self|datatypecode|.isint
+
+	function IsBitCorrect (|bool|)
+		if self is Const
+			return true
+		if .reg == 0 // what?
+			return true
+		|| f = .fat
+			return f.IsRead
+		
+	function Signed (|bool|)
+		return self|DataTypeCode|.issigned
+		
+	function BitLoss (|int|)
+		if .isbool
+			return 63
+		return 64 - .bitcount
+	
+	function IsBool (|bool|)
+		opt inline
+		return .µType is bool
+	
+	function µType (|DataTypeCode|)
+		opt inline
+		return self|DataTypeCode| & DataTypeCode.PossibleBits
+	
+	function µType (assigns:|DataTypeCode|, |asmreg|)
+		return .µType(value|asmreg|)
+	
+	function µType (assigns:|asmreg|, |asmreg|)
+		|| Mask = DataTypeCode.PossibleBits|uint64| // first 10 bits
+		return ((self|uint64| & ~Mask) ||| (value|uint64|&Mask))|asmreg|
+	
+	syntax is (|AsmReg| R, |bool|)
+		return self & R
+	
+	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
+		if (value)
+			return self as r
+		return self asnt r
+		
+	function datatypecode.zero (|asmreg|)
+		|| K = asmreg.Const
+		K.µtype = self
+		return K
+	
+		
+	function HaveAddr (|asmreg|)
+		rz = self asnt AddrRequest
+		rz = self asnt AddrForceRequest
+		rz = rz as ContainsAddr
+	
+	
+	function Reg (|int|)
+		return (self|uint64| >> 11)&31
+	
+		
+	function Reg (assigns:|int|, |AsmReg|)
+		|| Bugged = value&31
+		self &= ~(31 << 11)|asmreg|
+		(self as= (Bugged << 11)|asmreg|)
+		if value >> 31
+			(self is temp)
+			if value < 26
+				(self is okastemp) // no other way.
+		return self
+
+	
+	function Reg (assigns:|asmreg|, |asmreg|)
+		// we could do all of this in two bit-operations...
+		// just clear, then copy
+		.reg = value.reg
+		self = .temp(value)
+		.fatindex = value.fatindex
+		return self
+
+
+	function SCDecl.ASMReg (assigns:|asmreg|)
+		target debug
+			if !value.reg and self is alteredorref
+		
+		isnt const
+		.ExportPosition = 0 // this is for a local. locals store their consts in fats...
+		if value is Const
+			value.incr
+			value.ConstCheck
+			if self isnt Altered
+				is const
+		
+		value.µType = .mu.DataType
+		.WholeType = value
+	
+	
+	operator mul (|bool| b, |asmreg|)
+		return (b)(self, nil)
+			
+
+	operator mul (|message| m, |asmreg|)
+		disabled "use temp"
+	
+	operator temp (|message| m, |asmreg|)
+		if !m.ContainsFunc
+			is temp
+		return self
+	
+	function Temp (|asmreg| Other, |asmreg|)
+		self &=~ TempFlags
+		(self as= other&tempflags)
+		return self
+		
+
+	syntax cast (|int|)
+		disabled "use .reg"
+		
+	operator bitand (|asmreg| A, |asmreg|)
+		return (self|int64| & A|int64|)|asmreg|
+	
+	operator as (|asmreg| A, |asmreg|)
+		return (self|int64| ||| A|int64|)|asmreg|
+
+	operator asnt (|asmreg| A, |asmreg|)
+		return (self|int64| &~ A|int64|)|asmreg|
+
+	operator • (|asmreg| dest, |asmreg|)
+		if .reg == dest.reg
+			return dest.µtype.zero
+		return dest
+	
+	function TryReg (assigns:|asmreg| dest, |asmreg|)
+		if .reg or dest isnt temp
+			return self
+		.reg = dest
+		return self
+	
+	target debug {
+	function DebugPrint 
+		target debug
+			print .render
+			|| f = .fat
+				print " - "
+				f.DebugPrint
+			  else
+				""
+	}
+	
+	function TmpCheck (|bool| AllowZero=false, |bool|)
+		|| R = .reg
+		if !r and AllowZero
+			return true
+		|| IsTmp = self is temp and self isnt OKAsTemp
+		|| Big = R >= 26
+		if big == IsTmp or (big and self is temp)
+			return true
+		if big
+			"big reg $R unmarked"
+		  else
+			"low reg $R marked"
+		debugger
+	
+			
+	module
+		function New (|asmreg|)
+			return Zero
+		
+		function New (|int| reg, |asmreg|)
+			rz.reg = reg
+		

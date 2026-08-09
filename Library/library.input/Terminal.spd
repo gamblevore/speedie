@@ -1,0 +1,160 @@
+
+
+// cleanup:
+	// Replace Dictionary with FixedDict
+	// Validator should be embedded (if used)
+	// FlowLog can be deleted... i don't know if we need it. Perhaps after getting speedie working.
+
+
+datatype TerminalColor (int)
+	constants
+		|TerminalColor|
+		Black = 30
+		Red, Green, Yellow, Blue, Magenta, Cyan, White
+	
+	constants
+		Normal		= "\1b[0m"
+		Bold		= "\1b[0;1m"
+		Error		= "\1b[0;1;31m"
+		Good		= "\1b[0;1;32m"
+		Warn		= "\1b[0;1;33m"
+		Underline	= "\1b[0;1;32m"
+
+	module
+		|bool| RainbowTerm
+	
+	render
+		opt norefcounts
+		fs <~ "\1b[${self|int|}m"
+
+	inline FastString.SyntaxAppend (|TerminalColor| Col)
+		cpp_part AppendTermCol
+		col.Render(self)
+		
+
+
+target !minilib {
+
+function TerminalColor.Colorise (|string| S, |string|)
+	// handy trick of using high-bits on objects
+	|int64| C = (self-Black)&7
+	|| S2 = (s|int64|<<3)>>3
+	return (S2|||(C<<60))|string|
+
+
+inline string.TerminalColor (|terminalcolor|)
+	return (self|int64| >> 60) + TerminalColor.black
+
+
+function String.PrintlineColor (|string| color)
+	if (TerminalColor.RainbowTerm): print color
+	printline self
+	if (TerminalColor.RainbowTerm): print TerminalColor.normal
+
+
+
+
+struct TerminalDisplay
+	visible false
+	|[[string]]|		Screen
+	|faststring| 		fs
+	|date| 				LastDisplay
+	visible true
+	
+	constants
+		w = 80
+		h = 35 // too many lines will break the clearscreen/reset function!
+	
+	inline Size (|ivec2|)
+		return (w, h)
+	
+	module
+		function New (|TerminalDisplay|)
+			rz.Screen = []
+			rz.fs = FastString()
+			for h
+				|[string]| s
+				s <~ (" ", w)
+				rz.Screen <~ s
+		
+		function GetChar (|CodePoint|)
+			cpp_wrapper JB_App__GetChar
+	
+	syntax access (|CodePoint|)
+		inlined
+		return TerminalDisplay.getchar
+		
+	
+	syntax append (|string| text, |ivec2| V, |TerminalColor| Colors = 0)
+		|| x0 = v.x
+		for c.codepoints in text
+			if c == 10 or 13
+				++v.y
+				v.x = x0
+			  elseif c == ' '
+				++v.x
+			  elseif v inrange .size  and  c != ' '
+				if c == 127
+					c = ' ' // lol
+				|| row = .Screen[v.y]
+					row[v.x] = colors.colorise(c)
+				++v.x
+	
+	
+	function DrawRect (|ivec4| Rect, |string| inside="", |terminalcolor| colors=0)
+		opt norefcounts
+		
+		|| r2 = rect + (1, 1, -2, -2)
+		for s.rect in rect
+			|| c = inside
+			|| X = r2.x1x2 contains s.x
+			|| Y = r2.y1y2 contains s.y
+			if !x and !y
+				c = "+"
+			  elseif !x and y
+				c = "|"
+			  elseif !y and x
+				c = "-"
+			self <~ (c, s, colors)
+
+
+	function Flat (|string|)
+		opt norefcounts
+		|| PrevCol = 0
+		for line in .Screen
+			for (cell in line) (i)
+				|| CCol = cell.terminalcolor
+				if PrevCol != CCol
+					PrevCol = CCol
+					.fs <~ CCol
+				.fs <~ cell
+				line[i] = " "
+			.fs <~ '\n'
+		return .fs.GetResult
+
+
+	function Display
+		|| now = date.now
+		if .LastDisplay
+			app.Sleep((.LastDisplay + 1s/60) - now)
+		  else
+			"\1b[2J"			// clear
+		.LastDisplay = now
+		"\1b[1;1H"				// reset
+		print .flat
+	
+	
+	function FrameText (|string| s, |ivec4| Frame, |terminalcolor| FrameCol=terminalcolor.white, |terminalcolor| TextCol=0)
+		|| p = frame.xy + 1
+		for i.rect in frame ± 1
+			|| row = .Screen[i.y]
+				row[i.x] = " "
+		for l.lines in s
+			self <~ (l, p, textcol)
+			++p.y
+		.DrawRect(frame, FrameCol)
+	
+	function Beep
+		"\07" // bell character
+}
+

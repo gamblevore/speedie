@@ -1,0 +1,569 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+class list
+	size 48
+	|int|			Position
+	|object?|		Obj
+	linkage
+		wrapper
+		cpp_part		Tree
+		cpp_class		JB_List
+
+	cpp_refs
+		disturbs nil
+		disowns  false
+
+	
+	saveas nil
+	contains		list
+
+	
+	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
+	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
+
+	destructor							{ cpp_wrapper JB_Ring_Destructor }
+	
+	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
+	function Parent (assigns:|...?|)
+		nil self // for .remove
+		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
+		cpp_refs {disturbs self} 
+	
+	function Next (||)					{ cpp_wrapper JB_Ring_NextSib, nil checker }
+	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
+
+	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib, nil checker  }
+	function Prev (assigns:|...?|)		{ cpp_wrapper JB_Ring_PrevSibSet }
+
+	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
+	function First (assigns:||)			{ cpp_wrapper JB_Ring_FirstSet, nil safe }
+	
+	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
+	function Last (assigns:||)			{ cpp_wrapper JB_Ring_LastSet}
+
+	syntax Append (|| Last)
+		inlined
+		.Last = Last
+
+	function Second (||)
+		nil checker
+		opt norefcounts
+		|| x = .first
+			return x.next
+
+
+	function Root		(|...!|)		{ cpp_wrapper JB_Ring_Root }
+	function IsRoot		(|bool|)		{ cpp_wrapper JB_Ring_IsRoot, nil checker }
+	inline IsFirst		(|bool|)		{ opt norefcounts, return .prev == nil }
+	inline IsLast		(|bool|)		{ opt norefcounts, return .next == nil}
+
+	function HasAny		(|bool|)		{ cpp_wrapper JB_Ring_HasChildren, nil checker }
+	function HasChildren (|bool|)		{ Disabled ".hasany" }
+	function HasChildCount (|int| Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
+		
+
+	function PrependAll (|| src)
+		opt norefcounts
+		real self
+		while (|| l = src.Last)
+			.First = l
+	
+	function AppendAll (|| src)
+		opt norefcounts
+		real self // why is it not assumed real? it should be.
+		while (|| l = src.first)
+			.last = l
+	
+	syntax Compare (|int| n, |int|)
+		inlined
+		return .Count - n
+	
+	syntax Equals (|int| n, |bool|)
+		inlined
+		return .HasChildCount( n )
+	
+	syntax Equals (|byte| b, |bool|)
+		disabled `Did you mean == int, or == "string"?`
+	
+	
+	operator More (|int| N, |bool|)
+		disabled "use >" // has more children than N	
+	
+	operator LessOrEqual (|int| N, |bool|)
+		// has N children or less.
+		// would be nice if this could directly work from
+		// a <= b... and just prefer this over the syntaxcompare.
+		
+		opt norefcounts
+		|| c = .first
+		while c
+			require n > 0
+			--n
+			++c
+		return true
+
+	
+	function Across (||)
+		opt norefcounts
+		|| n = .next
+			return n
+		return .parent.next.first
+
+			
+	function DeepLast (|...!|)
+		disabled "Use .flatlast"
+
+	
+	function FlatLast (|...!|)
+		opt norefcounts
+		real self
+		while
+			|| l = .last #loop
+			self = l
+		return self
+
+
+	function FlatNext  (||)	
+		nil checker
+		cpp_wrapper JB_Ring_FlatNext0
+
+	inline WrapWith (|...!| W, |...!|)
+		.Prev = W
+		W.first = self
+		return W
+
+	function FlatPrev (||)
+		opt norefcounts
+		|| p = .prev
+			return p.FlatLast
+		return .parent
+	
+	function FlatNextDepth  (|$int| Depth, |bool| Down=true, ||)
+		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
+	
+	function FlatAfter (||)
+		cpp_wrapper JB_Ring_FlatAfter, nil checker
+			
+	function IsAncestor (|| root, |bool|)
+		disabled "Use inside or contains operator"
+
+	operator In (|list| P, |bool|)
+		opt norefcounts
+		description "Checks if the parent is P" 
+		inlined
+		return .parent == P
+
+	operator contains (|| baby, |bool|)
+		opt norefcounts
+		for s.up in baby	
+			if s == self
+				return true
+		
+
+	inline Remove
+		.Parent = nil
+
+	
+	function ClearTree
+		opt norefcounts
+		require self
+		while (|| f = .first)
+			f.ClearTree
+			f.remove
+				
+
+	function FwdDist (|list!| F, |int|)
+		opt norefcounts
+		|| c = 0
+		while F
+			if self == F
+				return c
+			++F
+			++C
+					
+	operator gt (|list| rt, |bool|)
+		inlined
+		return .FwdDist(rt)
+
+	operator plus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	operator minus (|int| n, ||)
+		disabled ".moveflat or .move?"
+	
+
+		
+	function Step (|bool| fwd, ||)
+		cpp_Part stepbool
+		if fwd
+			return .next
+		return .prev
+	
+	function Move (|bool| fw, ||)
+		disabled "use .move(int) or .step(bool)"
+	function Step (|int| i, ||)
+		disabled "use .move(int) or .step(bool)"
+
+	
+	inline MoveCapped (|int| n, |...!|)
+		|| r = 0
+		return .MoveCapped(n, r)
+	
+	
+	// it would be nice to be able to pass "nil" to $int params
+	// and have the compiler insert some global to get the address of
+	// Objects would suffer refcount issues, so I guess not allowed.
+	// or clear after, and before.
+	function MoveCapped (|int| n, |$int| r, |...!|)
+		cpp_part StepN
+		opt NoRefCounts
+		real self
+		|| p = .parent
+			|| c = .movesub(n, r)
+				return c
+			|| Nega = n < 0
+			return (nega)(p.first!, p.last!)
+		return self
+
+	
+	function Move (|int| n, ||)
+		cpp_part MoveN
+		|| r = 0
+		return .movesub(n, r)
+
+
+	libinternal MoveSub (|int| n, |$int| r, |...?|)
+		opt NoRefCounts
+		real self
+		if !n
+			return self
+		|| m = 0
+		|| c = self
+		|| lim = n.abs
+		while m < lim
+			c = c.step(n > 0)
+			if !c
+				r = m
+				return nil
+			++m
+
+		r = m
+		return c
+
+
+	function Pop (||)
+		// don't opt this :3
+		rz = .last
+		if rz 
+			rz.remove // really bad bug here if you do
+
+
+	function PopFirst (||)
+		rz = .first
+		if rz
+			rz.remove
+
+
+	function ReplaceWith (|| x)
+		.Prev = x
+		.Parent = nil
+
+
+	function MoveTo (|...!| dest)
+		// remove?
+		require self != dest
+		if Dest gt self
+			dest.next = self
+		  else
+			dest.prev = self
+
+
+	function ShuffleNow
+		opt norefcounts
+		|| n = .count
+		for n
+			.first = .last!.move(-n.now)
+
+
+	function IsOnlyChild (|bool|)
+		return .IsLast and .IsFirst
+
+
+	inline HasOneChild (|bool|)
+		nil checker
+		return .HasChildCount(1)
+
+
+	function RemoveChildren
+		disabled ".clear now"
+
+
+	function Clear   // for debug
+		opt norefcounts
+		while (|| f = .first)
+			f.remove
+	
+	function Count (|int|)
+		description "This will loop over the list and count them."
+		opt norefcounts
+		for c.fast in self
+			++rz
+
+
+	function FlatCount (|int|)
+		opt norefcounts
+		for c.flat in self
+			++rz
+
+
+	inline ExtractChild (||)
+		opt norefcounts
+		|| f = .First
+		f.parent = nil
+		return f
+
+
+	syntax access (||)
+		inlined
+		description "Returns the first item. Consistant with ptr[] == ptr[0]" 
+		return .first
+ 
+
+	function Index (|int|)
+		opt norefcounts
+		|| p = .parent
+			|| c = -1
+			while self
+				self--
+				c++
+			return c
+		return -1
+		
+	
+	syntax Access (|int| n, ||)
+		cpp_part Get
+		opt norefcounts
+		if self
+			if n >= 0
+				rz = .First
+				while rz and (--n >= 0)
+					rz++
+			  else
+				rz = .last
+				while rz and (++n < 0)
+					rz--
+	
+	function Rand (||)
+		return self[.Count()()]
+
+	render
+		nil self
+		cpp_name JB_List_Render
+		visible
+		if self
+			fs <~ .position
+			fs <~ ":"
+			fs <~ "("
+			for f in self
+				f.__render__(Fs)
+				fs <~ ","
+				fs <~ " "
+			fs <~ ")"
+		  else
+			fs <~ "(nil)"
+
+
+	function RemoveAfter
+		opt norefcounts
+		while (|| x = .next)
+			x.remove
+
+	function RemoveBefore
+		opt norefcounts
+		while (|| x = .prev)
+			x.remove
+
+
+	function Trim (|int| n, |bool| First = true)
+		opt norefcounts
+		if n <= 0
+			.clear
+		  elseif first
+			self = self[n-1]
+			if self
+				.removeafter
+		  else
+			self = self[-n]
+			if self
+				.removebefore
+
+
+	function AppendAfter (|| item, || after)
+		if after
+			after.next = item
+		  else
+			.first = item
+	
+	
+	function Flatten (|[...]|)
+		opt norefcounts
+		for c.flat in self
+			rz <~ c
+	
+	
+	function Array (|[...]|)
+		opt norefcounts
+		for msg.fast in self
+			rz <~ msg
+
+
+	function AppendBefore (|| item, || Before)
+		if Before
+			before.prev = item
+		  else
+			.Last = item
+
+
+//	libinternal SortAfter (|SorterComparer| fnc, |list|)
+//		opt norefcounts			// find the first obj that we are "more than"
+//		|| p = .prev
+//		while p
+//			if (fnc)(self, p)
+//				return p
+//			p--
+
+
+	function Sort (|SorterComparer| fnc=&(...).Sorter)
+		opt NoRefCounts
+		for f in self
+			f.SortAfterSub(self, fnc)
+
+
+	libinternal SortAfterSub (|list| parent, |SorterComparer| fnc)
+		opt norefcounts
+		|| p = .prev
+		// Find the first thing that we are larger than. end there.
+		// if we are smallest, we go to the end.
+		while p
+			|| diff = (fnc)(self, p) 
+			if diff >= 0 // bigger
+				p.next = self
+				return
+			  else
+				p--
+		parent.first = self // smallest
+
+
+	function FlatLoop (|bool| fwd=true, |list!| Owner, |...!|)
+		description "Owner must contain us. Otherwise this function will break."
+		opt norefcounts
+		real self
+		if fwd
+			return .FlatNext ?? Owner.First!
+		return .flatPrev ?? Owner.FlatLast!
+		
+
+	function Loop (|bool| fwd=true, |...!|)
+		opt norefcounts
+		real self
+		|| p = .parent
+		if !p
+			return self
+		if fwd
+			return .next ?? p.first!
+		return .prev ?? p.last!
+	
+	
+	function Parent (|int| n, |...?|)
+		opt norefcounts
+		while self and --n >= 0
+			self = .parent
+		return self
+
+
+	iterator
+		|| ch_ = .First
+		while ( ch_ )
+			|| N = ch_.Next|...|
+			yield ch_ (ch_)
+			ch_ = N
+		(self)
+	
+	
+	iterator Backwards
+		|| ch_ = .last
+		while ( ch_ )
+			yield ch_ (ch_)
+			ch_ = ch_.prev|...|
+		(self)
+			
+
+	iterator fast
+		|| ch_ = .First
+		while ( ch_ )
+			yield ch_ (ch_)
+			ch_ = ch_.Next|...|
+		(self)
+
+	
+	iterator forward
+		|| _curr = self // just uses self not first
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.next
+		(self)
+
+	iterator flat
+		|| _curr = self
+		|| after = .FlatAfter
+
+		while ( _curr ) and ( _curr != after )
+			|| N_ = _curr.FlatNext|...|
+			yield _curr (_curr)
+			_curr = N_
+		(self)
+
+
+	iterator fastflat
+		|| _curr = self
+		|| after = .FlatAfter
+
+		while ( _curr != after )
+			yield _curr (_curr)
+			_curr = _curr.FlatNext|...|
+		(self)
+
+	
+	iterator up
+		|| _curr = self
+		while _curr
+			yield _curr (_curr)
+			_curr = _curr.parent
+		(self)
+
+
+	module // just for making a simple demo involving storing numbers.
+		inline New (|| Parent=nil, |int| Position, |list|)
+			opt norefcounts
+			visible
+			|| List = list(parent)
+			list.Position = Position
+			return list
+
+		function Sorter (SorterComparer of list)
+			return .position < b.position
+
+
+
+//module RingTree
+//	function New ()
+//		disabled "Use List() instead of ringtree()"
+
+//datatype notind (int)
+//	syntax cast (|bool|)
+//		disabled "sigh"
+
+

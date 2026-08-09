@@ -1,0 +1,244 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+// We use FastString naming convention:
+	// Size means:      The buffer capacity, both used and unused.
+		// (Capacity is in terms of items, not bytes!)
+	// Length means:    Length of data that is written to, so far.
+	// FreeSize means:  Size - Length
+// Additionally, we have a ItemSize.
+
+
+class Memory
+	linkage
+		cpp_part Mem
+		cpp_class MWrap
+		pragma noearlyfree
+	
+	|int|				Size
+	|&byte|				_Ptr
+	|int|				Length
+	|uint|				ItemSize
+	|byte|				DeathAction
+	contains byte
+	
+
+	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
+		cpp_part ConstructorPtr
+		.ItemSize = ItemSize
+		.size = itemcount
+		.deathaction = deathaction
+		.length = 0
+		._ptr = ptr
+	
+	
+	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
+		.ItemSize = ItemSize
+		.size = itemcount
+		if .deathaction == dataobject.kfree
+			Memory.free(._ptr)
+		.deathaction = 0
+		._ptr = P|&byte|
+	
+	
+	inline Ptr (|&...|)
+		return ._ptr|&...|
+		
+	function Next (|&...|)
+		return (._ptr + .Bytelength)|&...|
+		
+	setter Length (|int|)
+		if Value > .size
+			value = .size
+		  elseif Value < 0
+			value = 0
+		.length = Value
+	
+	operator plus (|int| n, |&...|)
+		return (._ptr + .itemsize*n)|&...|
+	
+	function CopyFrom (|string| Src, |int|)
+		cpp_Part CopyFromString
+		|| cap = .ByteCapacity min src.Length
+			memory.Copy(.ptr, src.Addr, cap)
+			return cap		
+	
+	function CopyFrom (|&nil| Src, |int| Length, |int|)
+		|| cap = .ByteCapacity min Length
+			memory.Copy(.ptr, Src, cap)
+			return cap		
+	
+	function CopyTo (|memory| other, |bool|)
+		|| A1 = .ByteCapacity
+		|| A2 = other.ByteCapacity
+		|| A3 = A1 min A2
+			memory.copy(other.ptr, .ptr, A3)
+		return A3 == A1
+		
+		
+	function AppendPlace (|&...|)
+		|| L = .length
+		if (L >= .size)
+			// try grow
+			|| NewSize = .itemsize*L*2
+			|| P2 = Memory.realloc(._ptr, NewSize)
+			if (!P2) // fail
+				return (&Memory.MDummy_)|&...|
+			|| OldSize = .ByteCapacity
+			Memory.zero((p2 + OldSize), NewSize - OldSize) 
+			._ptr = p2
+	
+		.length = l + 1
+		return (._ptr + (.itemsize*L))|&...|
+	
+	
+	function Temporal
+		random.temporal(self)
+	
+	function Count (|int|)
+		disabled "Use .size"
+		
+	setter Size (|int|)
+		.SetSize(value)
+	
+	libinternal SetSize (|int| ItemCount, |bool|)
+		if ItemCount == .size
+			return true
+		require .DeathAction == DataObject.kfree
+		|| S = .itemsize|int|
+		|| old = S * .size
+		|| New = S * ItemCount
+		|| Mem = Memory.realloc(._ptr, New)
+			._ptr = mem
+			.size = ItemCount
+			if ItemCount < .length
+				.length = ItemCount
+			if New > Old
+				memory.Zero(mem+old, New-Old)
+			return true
+		error (self, "Can't allocate bytes: " + new)
+
+	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
+		|| Q = .length + reqitems
+		if .size < Q
+			require .SetSize(Q+Extra)
+		return (.ptr + .size*.itemsize)|&...|
+
+	inline HasSpare (|bool|)
+		return .Length < .size
+	
+	inline ByteCapacity (|int|)
+		return .ItemSize|int|*.size|int|
+	
+	inline ByteLength (|int|)
+		return .ItemSize|int|*.Length|int|
+	
+	function Clear
+		disabled "Do you mean .Free or .Zero?"
+	
+	
+	function Zero
+		zero(._ptr, .length * .itemsize)
+	
+
+	function DebugPrint
+		printline .dump
+	
+	
+	inline String (|string|)
+		return string.Copy(._ptr, .ByteLength)
+	
+	
+	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
+		opt norefcounts
+		|| p = ._ptr
+		|| p2 = p + .ByteCapacity
+		|| i = 0
+		|| com = 0
+		fs <~ "dumping memory:\n"
+		
+		while (p < p2)
+			|| c = p++[]
+			fs.appendhex(c, 2)
+			if (++i >= BytesOnRow)
+				i = 0
+				com = 0
+				fs <~ "\n"
+			  elseif ++com >= TabsAfterBytes
+				com = 0
+				fs <~ ", "
+
+	
+	destructor
+		if (.deathaction == DataObject.kfree)
+			Memory.free(._ptr)
+		
+
+	iterator safe
+		|| i = 0
+		while (i < .length)
+			yield self[i] (i)
+			++i
+
+
+	iterator
+		|| FFFirst = .ptr
+		|| Curr = FFFirst
+		|| After = curr + .length
+		while (Curr < after)
+			yield Curr[0] (curr - FFFirst)
+			++Curr
+
+	
+	macro SyntaxAccess
+		(_0.ptr|&...|)[_1]
+	
+	macro SyntaxAppend
+		(_0.appendplace |&...|)[0] = _1
+
+	syntax cast (|&...|)
+		inlined
+		return .ptr
+
+	module
+		|uint64[2]| MDummy_
+		function Object (|int| Count, |int| ItemSize, |Memory|)
+			visible 
+			description "Returns a memory of object size requested. Creates an error() if fails."
+			|| p = .zalloc(Count * ItemSize)
+				return .new(Count, ItemSize, p)
+
+		function Random  (|int| n, |memory|)
+			rz = byte[n]
+			if rz
+				random.temporal(rz)
+		
+		inline		Zalloc	(|int| count, |?&byte|)
+			inlined
+			return .realloc(nil, count) // why is this not inlined in the cpp??
+										// more mysteries to solve!
+
+		libinternal	_memset	(|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
+		function	Fill	(|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
+		function	Fill	(|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
+		function	Unmap	(|&nil| p, |int| n):						cpp_wrapper JB_munmap
+		function	Realloc	(|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_Realloc
+		function	Zero	(|&nil| addr, |int| n):						cpp_wrapper memzero
+		function	Copy	(|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
+		function	Free	(|?&nil| b):								cpp_wrapper JB_Free, description "same as free() but also decreases the reported used-memory count."
+
+		autogen		Test		(|!&nil| p, |int| n, |int| Mode=0, |ErrorInt|): cpp_wrapper JB_TestMemory
+		inline		Readable	(|!&nil| p, |int| n, |ErrorInt|):		return .Test(p|&nil|, n)
+		inline		Writeable	(|!&nil| p, |int| n, |ErrorInt|):		return .Test(p|&nil|, n, 3)
+		inline		TestObject	(|object!| p, |ErrorInt|):				return .Test(p|&nil|, -1)
+
+		libinternal _Free (|?&nil| b):									cpp_wrapper free
+	
+		autogen Sort (|&nil| FP, |&object| First, |&object| Last)
+			cpp_wrapper SpdSort
+			

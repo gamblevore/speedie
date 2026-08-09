@@ -1,0 +1,241 @@
+#!/usr/local/bin/spd
+
+// INSTALL:
+// sudo /usr/local/speedie/Terminal/make.spd
+
+
+main {
+	|| R = app.args
+	ifn R.Last isa "git"
+		expect (!R.length) ("This script takes no arguments.")
+	
+	app.Gen("osx", platform.OSX)
+	app.Gen("linux", platform.lin)
+}
+
+
+|| Speedie = "/usr/local/speedie"
+|| ExecFlags = ""
+
+
+|| GetUserName = `
+U="$SUDO_USER"
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$USER
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$LOGNAME
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   U=$(basename -- "$HOME")
+fi
+if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
+   echo "Please set LOGNAME to the desired user's name so we can make these files and folders owned properly."
+   exit 1
+fi
+`
+
+function UnMod (|string| Dir, |string|)
+	return "chmod 775 $dir
+chown \$U $dir"
+
+	
+function compile_example (|string| name, |string|)
+	return "echo \"Compiling ${name}.cpp\"
+g++ -o Build/$name  $ExecFlags  ${name}.cpp
+${unmod(`Build/`+name)}
+"
+
+function mkdir (|string| dir, |string|)
+	rz = "echo \"Creating dir $dir\"
+mkdir -p \"$dir\"
+${unmod(dir)}
+"
+
+function link (|string| src, |string| dest, |string|)
+	return "
+ln -sf $src $dest
+${unmod(dest)}
+"
+
+
+|string|	CFlags
+|string|	shared
+|string|	LinkLibFlags
+|string|	ext
+|string|	PerryPreReqs
+|string|	LibName
+|string|	LibFlags
+|file|		CppLib
+|string|	SpdSrc
+|string|	SpdTerm
+|string|	CakeTerm
+|string|	LibPath
+
+
+module Vars
+	function InitVars (|string| plat)
+		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+		// what about -D __VM__=1 ???
+		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
+		shared = "shared"
+		LinkLibFlags = ""
+		ext = "so"
+		PerryPreReqs = ""
+		if plat ~= "osx"
+			shared = "dynamiclib"
+			ext = "dylib"
+			CFlags += " -lc++"
+		if plat ~= "linux"
+			CFlags += " -rdynamic"
+			LinkLibFlags += "-lrt -pthread"
+			PerryPreReqs = `
+echo "Getting GUI files that Perry needs"
+sudo apt install libsdl2-dev
+sudo apt install gedit
+`
+		  else
+			PerryPreReqs = `echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."`
+		
+		LibName  = "libjeebox.$ext" 
+		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
+		ExecFlags= "$CFlags -g -ljeebox"
+		CppLib   = "$Speedie/Library/CppLib".file
+		SpdSrc   = "$Speedie/Speedie.scproj/Build"
+		SpdTerm  = "$Speedie/Terminal/Speedie"
+		CakeTerm = "$Speedie/Terminal/Cake"
+		LibPath  = "/usr/local/lib/$LibName"
+
+
+	function CreateScriptOut (|string| list, |string|)
+		return "#!/bin/bash
+echo \"Starting Speedie Build\"
+set -e
+cd ${CppLib}
+
+$GetUserName
+echo \"Compiling Speedie to $SpdTerm\"
+g++ -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+mv ${SpdTerm}tmp $SpdTerm
+${unmod(SpdTerm)}
+
+
+cd $Speedie/jeebox.scproj/Examples
+echo \"Creating directories\"
+${mkdir(`Build`)}
+${mkdir(`/usr/local/include/`)}
+
+echo \"Cleaning old files\"
+rm -rf Build/* 2>/dev/null || true
+
+echo \"Installing headers\"
+cp    *.h /usr/local/include/
+${unmod(`/usr/local/include/jeebox*`)}
+
+echo \"Symlinking Speedie\"
+${link(SpdTerm, `/usr/local/bin/spd`)}
+${link(SpdTerm, `/usr/local/bin/speedie`)}
+
+echo \"Making 🎂 Cake 🎂\"
+$SpdTerm $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
+
+echo \"Symlinking 🎂\"
+${link(CakeTerm, `/usr/local/bin/cake`)}
+${link(CakeTerm, `/usr/local/bin/🎂`)}
+
+echo \"\"
+echo \"Compiling JeeboxLib\"
+
+
+set +e									# better to continue if libjeebox can't be compiled
+cd $Speedie/Library/CppLib				# allow source to be found!
+$SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
+echo \"Compiling $LibPath for user '\$U'\"
+g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+${unmod(LibPath)}
+
+
+cd $Speedie/jeebox.scproj/Examples
+${compile_example(`jb`)}
+${compile_example(`xml`)}
+${compile_example(`test`)}
+${compile_example(`users`)}
+
+
+set -e
+
+
+echo \"Speedie Compiling Perry (Optional Extra)\"
+$PerryPreReqs
+$SpdTerm $Speedie/Perry.scproj
+"
+
+
+
+function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
+vars.initvars(plat)
+|| tocompile = FastString()
+|| Count = 2							//JB.cpp and JB_Globals.cpp
+for ch in CppLib!
+	if ch isa "cpp" or "S"
+		tocompile <~ ch
+		tocompile <~ ' '
+		Count++
+|| list = tocompile.render
+
+
+////////////////////////////
+<(`    (((generating cpp files)))    `)>
+////////////////////////////
+
+expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
+.cwd = Speedie.child("jeebox.scproj").resolve
+|| ScriptOut = "$Speedie/Terminal/make$plat.sh".file
+|| PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
+
+
+PrepareCpp.writeall `#!/bin/bash
+echo "Prebuild .cpp files"
+/usr/local/bin/speedie   .    --x --nocompile
+/usr/local/bin/speedie --self --x --nocompile
+`
+if IsCurrentPlatform
+	printline "cwd: " + app.cwd
+	require PrepareCpp.NeedExecute								/* <----- ACTUAL CALL POINT -----> */
+
+
+////////////////////////////
+<(`    (((generating script)))    `)>
+////////////////////////////
+
+printline "Creating $scriptout"
+scriptout.writeall vars.CreateScriptOut(list)
+
+"Script generated at: $scriptout"
+if IsCurrentPlatform
+	"Running Script: $scriptout ($Count+ .cpp files)\n\n"
+	scriptout.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
+}
+
+
+function file.NeedExecute (|bool|)
+	|| Exit = .Execute
+	if exit.Successful: return true
+	error ("Failed to execute script: $self ($exit) ${exit.name}")
+
+
+// ANTI-MAKE THEORY:
+	// NO:    unix 'make' or cmake
+	// DO:    Call g++ (etc), from a bash script that you create via code.
+	// MOVE:  All possible control-flow + vars out of bash, and into speedie (or whatever lang).
+
+	// This basically makes YOU replace cmake with your small program. This 205 lines of code
+	// replaces all of cmake. Meaning I don't need to remember or understand it!
+	
+// TODO:
+	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
+	// at least if they already exist!
+
+
+
+

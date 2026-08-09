@@ -1,0 +1,116 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+
+Module Jeebox
+	|SyntaxObj[64]|				_FuncArray
+	|{SyntaxObj}|	_SyxDict = Dictionary.New
+	linkage
+		cpp_part Constants
+	
+	|| EscapeStr = [
+		"\00"	: `\00` // just for escaping, not unescaping
+		"\0A"	: `\n`
+		"\0D"	: `\r`
+		"\09"	: `\t`
+		`"`		: `\"`
+		`'`		: `\'`
+		`\`		: `\\`
+		`&#`	: `\&#`
+	]
+	
+
+	|| XML_EscapeStr = [
+		"&"		: `&amp;`
+		"'"		: `&apos;`
+		"\""	: `&quot;`
+		"<"		: `&lt;`
+		">"		: `&gt;`
+	]
+
+	
+	|| JS_EscapeStr = [
+		"\08"	: `\b`
+		"\0C"	: `\f`
+		"\0A"	: `\n`
+		"\0D"	: `\r`
+		"\09"	: `\t`
+		"\""	: `\"`
+		"\\"	: `\\`
+	]
+	
+	|{string}| UnEscapeStr
+	|{string}| JS_UnEscapeStr
+	|{string}| XML_UnEscapeStr
+	|{string}| EscapeChr
+
+	.InitConstants
+
+
+	libinternal AddEscape (|byte| i, |faststring| fs)
+		opt norefcounts
+		|| f = string.byte(i)
+		require  !.EscapeStr![f]  or  !.EscapeChr![f]
+		fs <~ '\\'
+		fs.appendhex(i, 2)
+		|| t = fs.getresult
+		.EscapeStr![f] ?= t 
+		.Escapechr![f] ?= t
+
+
+	libinternal InitConstants
+		|| Temp = array.new // needed by argv
+
+		.EscapeChr = dictionary.Copy(.EscapeStr!)
+		.EscapeStr[`$`] = `\$`
+		.UnEscapeStr		= dictionary.Reverse(.EscapeStr!)			// unify data
+		.JS_UnEscapeStr		= dictionary.Reverse(.JS_EscapeStr!)		// unify data
+		.XML_UnEscapeStr	= dictionary.Reverse(.XML_EscapeStr!)		// unify data
+		.EscapeChr![`"`]	= nil|string|
+		.EscapeChr![`$`]	= nil|string|
+
+		.UnEscapeStr![`\0`]	= nil|string|					// handle normally
+		.Unescapestr![`\`]	= ""
+		.EscapeStr!["'"]	= nil|stringzeroterminated|
+		
+		|| tfs = faststring()
+		for i in 256
+			// this will avoid printing garbage to console.
+			if i <= 31 or (i == 127 or 0xc0 or 0xc1) or i >= 0xf5
+				.addescape(i, tfs)
+		
+		SetEscapeCode(.UnEscapeStr!, true)
+		SetDecodeEntities(.UnEscapeStr!, true)
+		SetDecodeEntities(.XML_UnEscapeStr!, true)
+
+		.EscapeStr![`${`] = `$\{`
+
+
+	libinternal string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+		after = after min .length
+		while (off < after)
+			|| c = self[off++]
+			if (c == '\\')
+				off++
+			  elseif c == find
+				if find == '$'
+					if off >= after: exit
+					|| nxt = self[off]
+					ifn (nxt == '{' or '.') or CharSet.LettersUnderScore[nxt]
+						continue
+				return off - 1
+	
+
+inline String.Unescape (|string|)
+	return .ReplaceAll( Jeebox.UnEscapeStr! )
+
+inline String.Escape (|string|)
+	return .ReplaceAll( jeebox.EscapeStr! )
+
+inline String.EscapeChr (|string|)
+	return .ReplaceAll( jeebox.EscapeChr! )
+

@@ -1,0 +1,108 @@
+
+
+function Button.FillMenuPath (|string| L, |listviewrow| tab=nil)
+	|| p = .SubMenu		#require
+	|| orig = l
+	p.listsource.clear
+	p <~ menuitem("Copy " + l.name, MenuCopyFile, self)
+	p.AddSep
+	while l
+		|| S = filerow.FileIcon(l, "").render + " " + l.NameOrRoot
+		|| dirfile = ".nothing" * (l != orig)
+		|| row = filerow(l, s, dirfile)
+		(row isnt editable)
+		p <~ row
+		if l.IsVolume
+			exit
+		l = l.parent
+	.OpenMenu(tab)
+
+
+function string.NameOrRoot (|string|)
+	opt norefcounts
+	|| s = .name
+		return s
+	return "Root"
+
+
+function PressingTabs (guiaction)
+	opt norefcounts
+	if self isa Button
+		|| p = .submenu|listview|
+			|| ide = row.ide
+				p.ListSource.clear
+				p <~ ("Copy " + ide.projname,	MenuCopyProject, self)
+				p <~ ("Show In Desktop",		MenuShowProject, self)
+				p <~ ("Close",					MenuCloseProject, self)
+				if ide.RunningProd.Status.IsRunning
+					p <~ ("Kill",				MenuKillProject, self)
+					
+				.OpenMenu(row)
+
+
+function message.IDE (|perryide|)
+	opt norefcounts
+	if self
+		|| o = .MenuIDE
+			return o
+		for w in window.all
+			if w isa PerryIDE
+				if .name ~= w.Project
+					return w
+
+function ClickedOpenRecent (GUIaction)
+	if self isa Button
+		|| s = .SubMenu
+			s.ListSource = Perry.RecentProjects
+			s.ColumnFinder = &perry.RecentProjNames
+			.OpenMenu
+
+
+function list.MenuIDE (|Perryide|)
+	opt norefcounts
+	|| o = .Obj
+	if o isa GuiControl
+		if o isa PerryIDE // leak!
+		return o.ide
+	
+	
+function MenuCopyProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		clipboard.notifiedtext = ide.project
+
+
+function MenuCopyFile (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		clipboard.notifiedtext = ide.Path
+
+
+function MenuCloseProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		ide.Close
+
+function MenuKillProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		ide.Stop(ide.RunningProd)
+
+
+function ClickedTabs (GUIAction)
+	opt norefcounts
+	|| i = row.ide
+		i.ShowIDE(True)
+
+
+function MenuShowProject (guimenuevent)
+	opt norefcounts
+	|| ide = menu.MenuIde
+		ide.Project.Reveal
+	
+
+function RightClickedTabs (GUIAction)
+	if row and self isa Button
+		|| i = row.ide
+			.FillMenuPath(i.Project, row)
+

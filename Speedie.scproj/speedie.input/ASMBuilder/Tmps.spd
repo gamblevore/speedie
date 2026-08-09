@@ -1,0 +1,48 @@
+
+
+// for some reason, replacing this will cause speedie to generate bad code
+// I guess I am setting the Flags somewhere, or testing them? but I can't see where.
+function Message.ASMType (|ASMType|)
+	return .FLAGS & 63
+	
+	
+// if we can fix this... we can get a bigger ASMType table!
+function Message.ASMType (assigns:|ASMType|)
+	value = (.FLAGS &~ 63) ||| value
+	.FLAGS = value 
+
+
+
+datatype ASMType (uint16)
+	syntax is (|ASMType| t, |bool|)
+		(krefcount)
+		return self == t
+
+	function IsBlocker (|bool|)
+		return self >= kContinue and self <= kRejoin
+
+	constants
+		|ASMType|
+		kUnusedFirst = 47 // other values come after 
+		kTern
+		kStatExpr
+		kIf
+		kWhile
+		kContinue
+		kExit
+		kReturn
+		kRejoin
+		kSwap
+		kSwizzle
+		kSetRel
+		kIgnore
+		kDebugger
+		kRefCount
+		kFail = 63
+	
+	function Tester
+		disabled 
+		(kUnusedFirst)
+		|| x = kRefCount // last value
+	
+	

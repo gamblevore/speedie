@@ -1,0 +1,175 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+function dictionary.Expect (|message| m, ||)
+	opt norefcounts
+	|| v = self[m.name]
+	if !v
+		error m
+	return v
+
+
+
+//  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
+
+
+function Message.AsDecl (|SCDecl|)
+	// .MsgDecl uses this
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa scdecl)
+		return obj
+
+
+function Message.AsFunc (|SCFunction|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa SCFunction)
+		return obj
+
+
+function Message.AsArg (|SCArg|)
+	opt norefcounts
+	|| obj = .obj
+	if (obj isa SCArg)
+		return obj
+
+
+
+function Message.ListAll (|[Message]|)
+	opt norefcounts
+	for A in self
+		rz <~ A
+
+
+
+//  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
+
+
+helper @memory.CollectLeaks_ (|object| self, |[]|)
+	JB_FindLeakedObject(self, rz)
+
+
+function @memory.PrintLeaks (|object| self)
+	description "Finds the object that refers to this leaked object."
+	visible
+	|| i = 0
+	|| R = memory.CollectLeaks_(self)
+	while 
+		|object--| bad = r[i++]
+		if !bad
+			exit
+		bad.debugprint
+		debugger
+	
+
+
+
+target debug and !cake
+	function list.PrintLocate
+		visible
+		cpp_name jdbloc
+		if !self or self isa message
+			printline self|message|.locate
+
+
+
+
+
+//  //  //  //  //  //  // syntax type detection //  //  //  //  //  //  //  // 
+
+extend Message {
+	function IsAddr (|bool|)
+		Return (self) and (.func == @brel) and (.name == "&")
+		
+	operator IsThing (|String| name, |bool|)
+	// case aware....
+	// if I had my... "nil.fnc always returns nil"... then I could
+	// remove the self-check! :D So beautiful code.
+		Return (self) and (.func == @Thg) and (.name ~= name)
+
+	operator IsOpp (|string|name, |bool|)
+		Return (self) and (.func == @Opp) and (.name ~= name)
+
+
+//	operator IsArg (|string|name, |bool|)
+//		Return (self) and (.func == @arg) and (.name == name)
+
+
+	operator IsTmp (|String| name, |bool|)
+	// case blind...
+		Return (self) and (.func == @Tmp) and (.name == name)
+
+
+	operator IsARel (|String| name, |bool|)
+	// case blind...
+		Return (self) and (.func == @Arel) and (.name == name)
+
+
+	operator IsBRel (|String| name, |bool|)
+	// case blind...
+		Return (self) and (.func == @Brel) and (.name == name)
+
+
+	operator IsDot (|string| name, |bool|)
+		Return (self) and (.func == @dot) and (.name ~= name)
+
+	
+	function TrueOrFalse (|bool|)
+		if self ~= "true"
+			return true
+		if self ~= "false"
+			return false
+		error (self, "This value should be 'true' or 'false'.")
+}
+
+
+
+
+extend Message		// scanning
+	iterator ScanArg
+// Just go through all the arg-level children! Will return temporal
+// statements. but also go into the arguments within a temporal statement.
+		|| Curr_  = .First
+		|| After_ = .FlatAfter
+		
+		while (Curr_ and Curr_ != After_)
+			if !(Curr_ in @Arg)
+				continue
+			yield Curr_
+			Curr_ = Curr_.FlatNext
+
+
+function SCNode.ListFunctions (|[SCFunction]|)
+	if !.Access
+		return []
+	for o in .access
+		ListFunctionsSub(o, rz)
+
+
+function ListFunctionsSub (|object!| o, |[SCFunction]| out)
+	opt norefcounts
+	if o isa SCDecl
+		o = o.hiderfunc|scdecl|
+	if o isa SCFunction
+		for f in o
+			out <~ f
+
+
+function message.IsReffer (|bool|)
+	opt norefcounts
+	return .MsgFunc is reffer
+
+
+
+module SCGlobals
+	linkage
+		cpp_part		SC
+	|int| UniqueNum
+
+
+

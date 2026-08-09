@@ -1,0 +1,59 @@
+
+
+module Globals
+	|&uint16|				LibLink = Globals.GlobTable
+	|&byte|					LibBase = Globals.LibGlobs|&byte|
+	|&byte|					PackGlobs
+	|uint|					LibMax
+	|uint|					PackGlobSize
+	|string|				Strings
+
+
+	function GlobTable (|&uint16|)
+		cpp_wrapper JB_App__GlobTable
+
+
+	function LibGlobs (|&&nil|)
+		cpp_wrapper JB_App__LibGlobs
+	
+	
+	function CollectPackGlobs (|message| size_msg, |bool|)
+		opt norefcounts
+		|int| Glob_Size = size_msg.int(0, 1, 216MB)$
+		expect (!(Glob_Size&7)) (size_msg, "Unaligned")		// always a multiple of 8.
+		
+		|| input		= InputStream(.strings)
+		|| n_strs		= input.HInt
+		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
+		|| Alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
+		|| g = Memory.Zalloc(alloc_size)								#require
+		.PackGlobs = g
+		.PackGlobSize = Glob_Size
+	
+		|| StringTable = (g + glob_size + 8)|&string|
+		|string| Last = nil
+		for i in n_strs
+			|| n = input.hint
+			if last
+				Last.Addr[last.length] = 0					// c-string! :]
+			Last = string.new((input.Data.Curr)|cstring|, n)
+			input.data.position += n
+			jb_incr(last)									// oof
+			StringTable[i] = Last
+		
+		cake.vm.ExecInit(.LibBase!, g, spdtable.LibFuncs!)
+		return true
+	
+	
+	function VerifyGlobs (|bool|)
+		opt norefcounts
+		|| T = .LibLink!
+		for i in 4K
+			|| G = T[i]
+			if !G
+				.LibMax = i
+				return true
+			expect (G == 64K-1) or (G < 16K) ("LibGlobs item too far: " + i)
+		error "Too many LibGlobs?"
+
+

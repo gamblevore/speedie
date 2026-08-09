@@ -1,0 +1,125 @@
+
+
+// Use message... as a config-file!
+
+role config (message)
+	linkage
+		pragma noearlyfree
+	iterator
+		|| C = .conffirst
+		while (C)
+			yield C
+			C++
+
+	syntax cast (|string|)
+		cpp_part AsString
+		inlined
+		if self
+			return .Value
+			
+	syntax cast (|int64|)
+		cpp_part AsInt
+		inlined
+		return .int
+			
+	syntax cast (|f64|)
+		cpp_part AsFloat
+		inlined
+		return .float
+	
+	syntax cast (|MessageTable|)
+		cpp_part AsTable
+		inlined
+		return .Dict(true)
+	
+	function Save (|bool|)
+		|file--| f = .path
+			|| r = .render
+			|| p = r.parse(@arg)
+				rz = f.smartdata(r)
+	
+	inline Path (|file|)
+		return .obj as file
+	
+	function ConfFirst (||)
+		opt norefcounts
+		|| l = .confarg
+			return l|message|.first
+			
+	module
+		function Create (|string| path,  |config!|)
+			opt norefcounts
+			return path.Resolve(true).file.Config
+
+
+
+function file.Config (|int| Limit = 1MB, |config|)
+// why would a conf-file be so big?
+	opt NoRefCounts
+	if .Exists
+		rz = .Parse(Limit, @arg)|config|
+	rz ?= message()
+	rz.obj = self
+
+
+
+extend message
+	libinternal ConfArg (|config|)
+		opt norefcounts
+		if self == @arg or nil
+			return self
+		|| w = .next
+		if self == @tmp
+			w = .last
+		if w == @arg
+			return w
+			
+
+	inline GiveItem (|string| Key, |syntax| ValueType, |string| DefaultName="", |config|)
+		description "Creates the correct child type if not found"
+		if !valuetype
+			valuetype = @str // oof!
+		return .ConfigItem(key, valuetype, defaultname)!
+
+
+	inline SyntaxAccess (|string| Key, |config|)
+		description "Returns the value of the config item found by Key. To create (if not found), use .GiveItem"
+		return .ConfigItem(key, nil, nil)
+
+
+	libinternal ConfigValue (|message| item, |syntax| ValueType, |message|)
+		opt norefcounts
+		if item.func == @msg
+			if (!ValueType or ValueType == @msg)	// handle @msg differently
+				return item
+			return .ReportFailiure(ValueType, "", item)
+		
+		|| f = item.first
+			if ValueType == nil or f.func			// matched
+				return f
+			return .ReportFailiure(ValueType, "", f)
+
+		if ValueType								// item lacks a value. seems bad.
+			return item.ReportFailiure(@nil, "", nil)
+
+	
+	autogen ConfigItem (|string| key, |syntax| ValueType=nil, |string?| DefaultName=nil, |config|)
+		opt norefcounts
+		for item in .confarg
+			if item ~= key
+				return .configvalue(item, valuetype)
+		if ValueType
+			|| arg = .GiveArg
+			return arg.msg(@tmp, key).msg(valuetype, DefaultName)
+	
+	
+	function Value (|string|)
+		if self
+			if self == @msg
+				return .FirstName
+			if self == @tmp and self in @arg
+				return .firstname
+			if self != @arg
+				return .name
+			return .FirstName
+

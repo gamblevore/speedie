@@ -1,0 +1,872 @@
+
+
+datatype ivec4
+	function Clip (|ivec4| R, |ivec4|)
+		r.x  = r.x  max .x
+		r.y  = r.y  max .y
+		r.x2 = r.x2 min .x2
+		r.y2 = r.y2 min .y2
+		return R
+		
+	function BoundClip (|ivec4| bn, |ivec4|)
+		return .bound(bn).clip(bn)
+
+	function Bound (|ivec4| bn, |ivec4|)
+		rz = self
+		if rz.x < bn.x
+			rz.x = bn.x
+			rz.x2 = bn.x + .width
+		  elseif .x2 > bn.x2
+			rz.x2 = bn.x2
+			rz.x = bn.x2 - .width
+		if rz.y < bn.y
+			rz.y = bn.y
+			rz.y2 = bn.y + .height
+		  elseif .y2 > bn.y2
+			rz.y2 = bn.y2
+			rz.y = bn.y2 - .height
+		
+	function Vec4 (|vec4|)
+		// should be an intrinsic...
+		return (.x|float|, .y|float|, .z|float|, .w|float|)
+
+	operator minus (|ivec2| D, |ivec4|)
+		inlined
+		return self - (D,D)
+
+	operator plus (|ivec2| D, |ivec4|)
+		inlined
+		return self + (D,D)
+
+	operator right (|int|x, |ivec4|)
+		inlined
+		return self + (x,0,x,0)
+	
+	operator up (|int|x, |ivec4|)
+		inlined
+		return self + (0,x,0,x)
+
+	operator left (|int|x, |ivec4|)
+		inlined
+		return self - (x,0,x,0)
+		
+	operator down (|int|x, |ivec4|)
+		inlined
+		return self - (0,x,0,x)
+		
+	function MoveTo (|ivec2| XY, |ivec4|)
+		return (XY, XY + .size)
+
+	syntax Equals (|ivec4| v, |bool|)
+		return ((.x == v.x) & (.y == v.y)) & ((.z == v.z) & (.w == v.w))
+	
+	operator ± (|int| i, |ivec4|)
+		cpp_part Shrink
+		return (.x+i, .y+i, .z-i, .w-i)
+	
+	inline Width (|int|)
+		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
+	
+	function Width (assigns:|int|, |ivec4|)
+		.x2 = .x1 + Value
+	function Height (assigns:|int|, |ivec4|)
+		.y2 = .y1 + Value
+	
+	function Width (|bool|d, |int|)
+		disabled "use .length"
+	
+	function Length (|bool| d, |int|)
+		return self[2+d|int|] - self[0+d|int|]
+	
+	inline H (|ivec2|)
+		return .x1x2
+	
+	inline V (|ivec2|)
+		return .y1y2
+		
+	inline Height (|int|)
+		return .y2 - .y1
+		
+	function Area (|int|)
+		return .width * .height
+	
+	function Aspect (|float|)
+		return .width div .height
+	
+	function Horz (|intrange|)
+		return .x1 to .x2
+	
+	function Vert (|bool|d=false, |intrange|)
+		return .dim(1-d|int|)
+	
+	function Dim (|int|d, |intrange|)
+		return self[d] to self[d+2]
+		
+	function Horz (assigns:|ivec2|r, |ivec4|)
+		.x1 = r.x1
+		.x2 = r.x2
+		return self
+	
+	inline Contains (|int| x, |int| y, |bool|)
+		cpp_part ContainsInt
+		return .contains((x,y), 0)
+		
+	function Contains (|ivec2| P, |int| i=0, |bool|)
+		cpp_part ContainsIvec2
+		require p.x >= .x+i and p.x < .x2-i
+		require p.y >= .y+i and p.y < .y2-i
+		return true
+	
+	operator Min (|ivec4| v, |ivec4|)
+		return (.x min v.x, .y min v.y,  .z min v.z,  .w min v.w )
+	
+	operator contains (|ivec4| v, |bool|)
+		disabled "why?"
+		return .contains(v.x1y1) and .contains(v.x2y2)
+	
+	operator overlaps (|ivec4| v, |bool|)
+		if v.x2 > .x1  and  v.x1 < .x2 
+			if v.y2 > .y1  and  v.y1 < .y2
+				return true
+	
+	operator contains (|ivec2| v, |bool|)
+		inlined
+		return .contains(v)
+	
+	function IsPositive (|bool|)
+		return (.x2 > .x) and (.y2 > .y)
+	
+	function IsNegative (|bool|)
+		return (.x2 < .x) or (.y2 < .y)
+		
+	syntax cast (|bool|)
+		cpp_part Bool
+		inlined
+		return self!=ivec4()	
+
+	function Soothe (|ivec4|)
+		return (0, 0, .x2 - .x1, .y2 - .y1)	
+	
+	function Size (|ivec2|)
+		return (.x2 - .x1, .y2 - .y1)	
+
+	render
+		opt norefcounts
+		fs <~ "(${.x}, ${.y}, ${.z}, ${.w})"
+	
+	module
+		function Load (|&byte| B, |ivec4|)
+			cpp_wrapper JB_ivec4_Load
+
+		inline New (|ivec4|)
+			cpp_part New0
+			return (0, 0, 0, 0)
+		inline New (|int| x, |ivec4|)
+			cpp_part New1
+			numeric
+			return (x,x,x,x)
+		inline New (|int| x, |int| y, |int| z, |int| w, |ivec4|)
+			cpp_part New4
+			numeric
+			return (x,y,w,z)
+	
+	iterator Rect
+		|| curr = (.x1,.y1)
+		while (curr.y < .y2) // just changed this ooofff
+			while (curr.x < .x2)
+				yield curr
+				curr.x++
+			curr = (.x1, curr.y+1)
+
+
+
+
+
+datatype vec3
+	size 16 // We are using vec4 for vec3 :)
+	syntax cast (|bool|)
+		cpp_part Bool
+		inlined
+		return (self != vec3())
+			
+	syntax Compare (|float| Other, |float|)
+		// this function is sooo nice. avoids doing a sqrt on both sides!
+		|| LSq = .lengthsq
+		|| Osq = other*other
+		return lsq - Osq
+			
+	syntax Compare (|vec3| Other, |float|)
+		cpp_Part CompareVec3
+		.w = 0
+		other.w = 0
+		return self|vec4|.Syntaxcompare(other|vec4|)
+
+	syntax Equals (|vec3| v, |bool|)
+		return (.x == v.x) & (.y == v.y) & (.z == v.z)
+	
+	function Lum (|float|)
+		return ((self*self) • (0.299, 0.587, 0.114)).sqrt
+
+	inline Sin (|vec3|)
+		return self|vec4|.sin|vec3|
+
+	inline Cos (|vec3|)
+		return self|vec4|.cos|vec3|
+
+	inline Fract (|vec3|)
+		return self|vec4|.fract|vec3|
+
+	inline Ceil (|vec3|)
+		return self|vec4|.ceil|vec3|
+
+	function SinBad (|vec3|)
+		return (self * math.iTau).sin
+
+	function CosBad (|vec3|)
+		return (self * math.iTau).cos
+
+	operator Pow (|vec3| p, |vec3|)
+		return self|vec4|.Operatorpow(p|vec4|)|vec3|
+
+	operator min (|vec3| s, |vec3|)
+		inlined
+		cpp_part Min3
+		return self|vec4|.Operatormin(s|vec4|)|vec3|
+
+	operator max (|vec3| s, |vec3|)
+		inlined
+		cpp_part Max3
+		return self|vec4|.Operatormax(s|vec4|)|vec3|
+
+	operator max (|float| s, |vec3|)
+		inlined
+		return self|vec4|.Operatormin(vec4(s))|vec3|
+	
+	function Max (|float|)
+		return .x max .y max .z
+
+	function Min (|float|)
+		return .x min .y min .z
+		
+	operator Sign (|vec3| C, |vec3|)
+		inlined
+		return (self|vec4| sign C|vec4|)|vec3|
+
+	function iVec3 (|ivec3|)
+		return (.x|int|, .y|int|, .z|int|)
+
+	function Clamp (|float| min=0.0, |float| max=1.0, |vec3|)
+		inlined
+		return self|vec4|.clamp(min, max)|vec3|
+	
+	function Clamp (|vec3| min=0.0, |vec3| max=1.0, |vec3|)
+		cpp_part ClampVec
+		inlined
+		return self|vec4|.clamp(min|vec4|, max|vec4|)|vec3|
+	
+	inline Round (|vec3|)
+		inlined
+		return self|vec4|.round|vec3|
+
+	inline Length (|float|)
+		inlined
+		.w = 0
+		return self|vec4|.length
+		
+	function Normal (|vec3|)
+		return self / .Length
+
+	inline LengthSq (|float|)
+		.w = 0
+		return self|vec4| • self|vec4|
+
+	operator mul (|float| x, |vec3|)
+		cpp_part MulF
+		inlined
+		return (x,x,x)*self
+
+	operator mul (|vec3| v, |vec3|)
+		cpp_part Mul3
+		return (.x*v.x, .y*v.y, .z*v.z)
+	
+	inline Abs (|vec3|)
+		return self|vec4|.abs|vec3|
+	
+	operator • (|vec3| other, |float|)
+		cpp_part Dot
+		inlined
+		return (self * other).sum
+
+	function Reflect (|vec3| plane, |vec3|)
+		return self - 2.0 * (self • plane) * plane
+
+	function Sum (|float|)
+		return .x + .y + .z
+
+	operator x (|vec3| V, |vec3|)
+		cpp_part Cross
+		description "Cross Product: Gives something at right angles. IDK its just maths dont ask me." 
+		return self|vec4|.OperatorCross(v|vec4|)|vec3|
+
+	render
+		opt norefcounts
+		fs <~ "(${.x}, ${.y}, ${.z})"
+	
+	module
+		inline New (|vec3|)
+			cpp_part zero
+			return (0.0, 0.0, 0.0)
+		inline New (|float| x, |float| y, |float| z, |vec3|)
+			numeric
+			return (x,y,z)
+		inline New (|vec2| xy, |float| z, |vec3|)
+			cpp_part New21
+			numeric
+			return (xy,z)
+		inline New (|float| x, |vec3|)
+			cpp_part New1
+			numeric
+			return (x,x,x)
+		inline Up   (|vec3|)
+			return (0.0,  1.0, 0.0)
+		inline Down (|vec3|)
+			return (0.0, -1.0, 0.0)
+
+
+
+datatype ivec3
+	inline syntaxcast (|bool|)
+		cpp_part Bool
+		return self != ivec3()
+
+	function Vec3 (|vec3|)
+		// should be instrinsic
+		return (.x|float|, .y|float|, .z|float|)	
+
+	render
+		opt norefcounts
+		fs <~ "(${.x}, ${.y}, ${.z})"
+
+	syntax Equals (|ivec3| v, |bool|)
+		|| d = (v-self)|ivec4|
+		return !d.x and !d.y and !d.z
+	
+	module
+		inline New (|ivec3|)
+			return (0, 0, 0)
+
+
+
+
+
+// mousetest
+datatype IntRange (ivec2)
+	linkage
+		cpp_part Rg
+	
+	inline Width (|int|)
+		return .x2 - .x
+	
+	operator Inside (|ivec4| R, |bool|)
+		inlined
+		return R.Contains(.x, .y)
+
+	operator overlaps (|intrange| r, |bool|)
+		return r.x1 < .x2 and r.x2 > .x1
+	
+	function By (|intrange| r, |ivec4|)
+		return (.x, r.x, .y, r.y)
+
+	operator ± (|int|i, |intrange|)
+		cpp_part Shrink
+		return (.x+i, .x2-i)
+	
+	operator dtd  (|intrange| R, |bool|)
+		if (r.x2 <= .x) or (r.x >= .x2)
+			return false
+		return true
+		
+	function Resolve (|intrange|)
+		return (.lower, .higher)
+	inline Higher (|int|)
+		return .x1 max .x2
+	inline Lower (|int|)
+		return .x1 min .x2
+	inline Mid (|int|)
+		return (.x1 + .x2)/2
+	function LimitTo (|int| i, |ivec2|)
+		if (.x  < 0):		.x  = 0
+		if (.x2 < 0):		.x2 = 0
+		if (.x  > i):		.x  = i
+		if (.x2 > i):		.x2 = i
+		return self
+
+	operator Contains (|int| i, |bool|)
+		cpp_part Contains1
+		return (i >= .x) and (i < .x2)
+	
+	operator Contains (|ivec2| i, |bool|)
+		cpp_part Contains2
+		return self contains i.x and i.x2
+
+	iterator
+		|| _End = .x2
+		|| _Curr = .x
+		while (_curr < _end)
+			yield _Curr (_Curr)
+			++_Curr
+
+
+
+datatype ivec2
+	operator • (|ivec2| other, |int|)
+		cpp_part Dot
+		return (self * other).sum
+
+	function LengthSq (|float|)
+		return (.x * .x)|float| + (.y * .y)|float|
+
+	function Hash (|ivec2|)
+		return (.x.hash, .y.hash)
+		
+	inline Width (|int|)
+		return .x2 - .x
+	
+	operator Sign (|ivec2| C, |ivec2|)
+		return (.x.copysign(c.x), .y.copysign(c.y))
+
+	syntax Compare (|float| Other, |int|)
+		|| LSq = .lengthsq
+		|| Osq = other*other
+		if (Lsq > osq)
+			return 1
+		if (Lsq < osq)
+			return -1
+
+	inline syntaxcast (|intrange|)
+		return self|intrange|
+
+	inline Grow (|ivec2|g, |ivec4|)
+		return (self-g, self+g)
+		
+	function Clip (|int| p, |int|)
+		if p < .x
+			return .x
+		return p min .x2
+		
+	function Clip (|ivec2| p, |ivec2|)
+		cpp_part Clip2
+		p.x = .x.clamp(p.x)
+		p.y = .y.clamp(p.y)
+		return p
+			
+	inline Mid (|int|)
+		return (.x1+.x2)/2
+		
+	operator contains (|int| x, |bool|)
+		return (x >= .x1) and (x <= .x2)
+
+	function Contains (|ivec2| i, |int| within=0, |bool|)
+		if i.x >= within  and  i.x < .x-within
+			if  i.y >= within  and  i.y < .y-within
+				return true
+
+	operator mul (|float| x, |ivec2|)
+		return (.vec2*x).ivec2
+
+	operator align (|int| a, |ivec2|)
+		return (.x align a, .y align a)
+
+	operator max (|ivec2| o, |ivec2|)
+		cpp_part Max2
+		return (o.x max .x, o.y max .y)
+
+	operator max (|int| o, |ivec2|)
+		cpp_part Max1
+		return (o max .x, o max .y)
+
+	operator min (|ivec2| o, |ivec2|)
+		return (o.x min .x, o.y min .y)
+		
+	operator min (|int| o, |ivec2|)
+		cpp_part MinInt
+		return (o min .x, o min .y)
+		
+	operator fma (|int| w, |int|)
+		inlined
+		return .x + .y*w
+
+	operator inrange (|ivec2| p, |bool|)
+		return .x inrange p.x  and  .y inrange p.y
+
+	inline Sum (|int|)
+		return .x + .y
+
+	inline Area (|int|)
+		return .x * .y
+
+	function Inside (|ivec4| R, |bool|)
+		return R.Contains(.x, .y)
+	
+	function Vec2 (|vec2|)
+		return (.x|float|, .y|float|)
+	
+	inline Rect (|ivec4|)
+		return (0, 0, .x, .y)
+
+	inline syntaxcast (|bool|)
+		cpp_part Bool
+		return self != ivec2()
+	
+	syntax Equals (|ivec2| v, |bool|)
+		cpp_part Equals2
+		return (.x == v.x) & (.y == v.y)
+
+	syntax Equals (|int| v, |bool|)
+		inlined
+		return self == (v,v) 
+	
+	inline RotateRight (|ivec2|)
+		description "Rotates like a steering wheel, so turning the top to the right" 
+		return (.y, -.x)
+	
+	inline RotateLeft (|ivec2|)
+		description "Rotates like a steering wheel, so turning the top to the left" 
+		return (-.y, .x)
+		
+	render
+		opt norefcounts
+		fs <~ "(${.x}, ${.y})"
+	
+	
+	iterator
+		|| curr = (0,0)
+		while (curr.y < .y)
+			while (curr.x < .x)
+				yield curr
+				++curr.x
+			curr = (0,curr.y+1)
+			
+	module
+		inline New (|int| x=0, |ivec2|)
+			cpp_Part New1
+			numeric
+			return (x, x)
+		inline New (|int| x, |int| y, |ivec2|)
+			cpp_Part New2
+			numeric
+			return (x, y)
+
+
+
+datatype vec2
+	render
+		opt norefcounts
+		fs <~ "(${.x}, ${.y})"
+
+	inline iVec2 (|ivec2|)
+		// should be inline...
+		return (.x|int|, .y|int|)
+	
+	function Reflect (|vec2| plane, |vec2|)
+		return self - (2.0 * (self • plane) * plane)
+		
+	function Rotation (|float|)
+		return .y.untan(.x)
+
+	function RotateAroundY (|mat4|)
+		description "Assumes normalised vec2" 
+		rz.reset
+		rz[0,0] =  .y, rz[2,0] = .x
+		rz[0,2] = -.x, rz[2,2] = .y
+
+	function RotateAroundX (|mat4|)
+		description "Assumes normalised vec2" 
+		rz.reset
+		rz[1,1] =  .y, rz[2,1] = .x
+		rz[1,2] = -.x, rz[2,2] = .y
+
+	function OperatorCMul (|vec2| v, |vec2|)
+		description "Complex number multiply" 
+	    rz.x = (.x * v.x) - (.y * v.y)
+	    rz.y = (.y * v.x) + (.x * v.y)
+	
+	function Normal (|vec2|)
+		return self / .Length
+	
+	function Box (|float| x, |vec4|)
+		return (self-x, self+x)
+
+	function IFloor (|ivec2|)
+		return .floor.ivec2
+	
+	function Floor (|vec2|)
+		return (.x.floor, .y.floor)
+
+	function Ceil (|vec2|)
+		return (.x.ceil, .y.ceil)
+
+	function Log2 (|vec2|)
+		return (.x.log2, .y.log2)
+
+	operator Pow (|vec2| v, |vec2|)
+		return (.x pow v.x, .y pow v.y)
+		
+	inline Max (|float|)
+		return .x max .y
+
+	inline syntaxcast (|bool|)
+		cpp_part Bool
+		return self != vec2()
+
+	libinternal float.RoundEvenSub (|float|)
+		return (self*0.5).Fract*2.0
+
+	function RoundEven (|vec2|)
+		self += 0.5
+		rz = self - .Fract
+		if !.x
+			rz.x -= .x.RoundEvenSub
+		if !.y
+			rz.y -= .y.RoundEvenSub
+	
+	syntax Equals (|vec2| v, |bool|)
+		return (.x == v.x) & (.y == v.y)
+	
+	operator • (|vec2| other, |float|)
+		cpp_part Dot
+		return (self * other).sum
+
+	operator min (|vec2| s, |vec2|)
+		(s.x min= .x)
+		(s.y min= .y)
+		return s
+
+	operator max (|vec2| s, |vec2|)
+		(s.x max= .x)
+		(s.y max= .y)
+		return s	
+
+	inline Sum (|float|)
+		return .x + .y
+
+	function LengthSq (|float|)
+		return (.x * .x)  +  (.y * .y)
+
+	inline Width (|float|)
+		return .x2 - .x1
+	
+	function Length (|float|)
+		return .LengthSq.sqrt
+
+	function Fract (|vec2|)
+		return (.x.fract, .y.fract)
+		
+	function Abs (|vec2|)
+		return (.x.length, .y.length)
+
+	function SinCos (|vec4|)
+		return (.x.sincos, .y.sincos)
+		
+	function Sin (|vec2|)
+		return (.x.sin, .y.sin)
+
+	function Cos (|vec2|)
+		return (.x.cos, .y.cos)
+
+	inline SinBad (|vec2|)
+		return (self * math.iTau).sin
+
+	inline CosBad (|vec2|)
+		return (self * math.iTau).cos
+
+	syntax Compare (|float| Other, |int|)
+		|| L = .LengthSq
+		other = other * other
+		if (L > other)
+			return 1
+		if (L < other)
+			return -1
+	
+	module
+		inline New (|vec2|)
+			cpp_part New0
+		inline New (|float| a, |vec2|)
+			cpp_part New1
+			numeric
+			return (a, a)
+		inline New (|float| a, |float| b,  |vec2|)
+			cpp_part New2
+			numeric
+			return (a, b)
+
+
+datatype mat2 (vec4)
+	function vec2.operatormul (|mat2| m, |vec2|)
+		return (m.xy • self, m.zw • self)
+	function vec3.operatormul (|mat2| m, |vec3|)
+		cpp_part YRotation
+		|| XZ = .xz
+		XZ = (m.xy • xz, m.zw • xz)
+		return (xz.x, .y, xz.y)
+	module
+		inline New (|vec4| x, |mat2|)
+			numeric
+			return x|mat2|
+		inline New (|float| a, |float| b, |float| c, |float| d,  |mat2|)
+			cpp_part New4
+			numeric
+			return (a,b,c,d)|mat2|
+		inline New (|mat2|)
+			cpp_part Identity
+			return (1.0, 0.0, 0.0, 1.0)|mat2|
+
+
+
+inline vecmix (|vec2|a, |vec2|b, |vec4|)
+	cpp_part mix22
+	opt inline
+	return (a.x, a.y, b.x, b.y)
+inline vecmix (|float|a, |float|b, |vec2|c, |vec4|)
+	cpp_part mix112
+	return (a, b, c.x, c.y)
+inline vecmix (|vec2|a, |float|b, |float|c, |vec4|)
+	cpp_part mix211
+	return (a.x, a.y, b, c)
+inline vecmix (|float|a, |vec2|b, |float|c, |vec4|)
+	cpp_part mix121
+	return (a, b.x, b.y, c)
+inline vecmix (|vec3|a, |float|b, |vec4|)
+	cpp_part mix31
+	a.w = b
+	return a|vec4|
+inline vecmix (|float|a, |vec3|b, |vec4|)
+	cpp_part mix13
+	return (a, b.x, b.y, b.z)
+inline vecmix (|vec2|a, |float|b, |vec3|)
+	cpp_part mix21
+	return (a.x, a.y, b)
+inline vecmix (|float|a, |vec2|b, |vec3|)
+	cpp_part mix12
+	return (a, b.x, b.y)
+inline ivecmix (|ivec2|a, |ivec2|b, |ivec4|)
+	cpp_part imix22
+	return (a.x, a.y, b.x, b.y)
+inline ivecmix (|ivec2|a, |int|b,|int|c, |ivec4|)
+	cpp_part imix211
+	return (a.x, a.y, b, c)
+inline ivecmix (|int|a, |int|b, |ivec2|c, |ivec4|)
+	cpp_part imix112
+	return (a, b, c.x, c.y)
+inline ivecmix (|int|a, |ivec2|b, |int|c, |ivec4|)
+	cpp_part imix121
+	return (a, b.x, b.y, c)
+inline ivecmix (|ivec3|a, |int|b, |ivec4|)
+	cpp_part imix31
+	a.w = b
+	return a|ivec4|
+inline ivecmix (|int|a, |ivec3|b, |ivec4|)
+	cpp_part imix13
+	return (a, b.x, b.y, b.z)
+inline ivecmix (|ivec2|a, |int|b, |ivec3|)
+	cpp_part imix21
+	return (a.x, a.y, b)
+inline ivecmix (|int|a, |ivec2|b, |ivec3|)
+	cpp_part imix12
+	return (a, b.x, b.y)
+
+
+function ivec2.Abs (|ivec2|)
+	return (.x.abs, .y.abs)
+
+function ivec4.Clamp (|int| L, |int| H, |ivec4|)
+	cpp_wrapper
+
+function ivec4.Max (|int| L, |ivec4|)
+	return (.x max L, .y max L, .z max L, .w max L )
+
+function ivec4.Min (|int| L, |ivec4|)
+	return (.x min L, .y min L, .z min L, .w min L )
+
+inline ivec4.CenterVec2 (|vec2|)
+	return .vec4.center
+	
+function ivec4.Center (|ivec2|)
+	rz.x = (.x2 + .x)
+	rz.y = (.y2 + .y)
+	rz >>= 1
+
+
+function vec4.Center (|vec2|)
+	return (.x+.x2, .y+.y2)*0.5
+
+
+
+datatype Plane3D (vec4)
+	module
+		function New (|vec3| A, |vec3| B, |vec3| C, |vec4|)
+		    || N = (B-A) x (C-B)
+		    n = n.normal
+			return (N, N • A)
+
+		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)
+			|| N = D1 x D2
+			n = n.normal
+			return (N, -(N • Start))
+
+
+
+
+
+struct DDA_Caster
+	|ivec2|		Goal
+	|int|		Steps
+	|int|		i
+	|vec2|		Curr
+	|vec2|		Add
+
+// Not sure this matches up with the mathematical line?
+// Worry about the fine-details later? A ray is rarely casted for a pixel to pixel.
+// Its normally a pixel to a block. So we'd have to create a test for that first.
+
+// If its OK, then for optimisation, this could use a loop in a loop, and
+// just update each slot individually.
+// Could store the sign on .add, and store the remaining steps in add.w
+// and both would be vec4s
+
+// I could also use this for drawing line in the GUI
+// perhaps add some Anti-aliasing too?
+
+	function ivec2.RayCast (|DDA_Caster|)
+		rz.goal = self
+		|| A = .vec2.abs					// Using fixed math would be faster AND more reliable!
+		|| Vy = (a.y+1.0) / (a.x+1.0)		// no rounding errors or at least predictable ones.
+		|| Vx = (a.x+1.0) / (a.y+1.0)
+		|| D = (a.x <= a.y)|int|
+		rz.add = (vx, vy)
+		rz.add[D] = 1.0
+		rz.Steps = a[D]|int|*2
+	
+	function Next (|ivec2|)
+		|| C = .curr
+		|| P = C.iVec2
+		|| i = .i
+		|| g = .goal
+		while i++ < .Steps
+			c[i&1] += .add[i&1]
+			
+			|| C2 = C.iVec2
+			if C2 != p
+				.Curr = c
+				c2 = c2 sign g
+				if c2 == g
+					.Steps = 0 // finish
+				.i = i
+				return C2
+
+	iterator
+		while
+			|| cc = .next
+			if !cc: exit
+			yield (cc) (.i)
+		

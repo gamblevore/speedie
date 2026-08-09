@@ -1,0 +1,306 @@
+
+
+
+function Message.ExpandToBool (|SCNode| name_space, |Message|)
+	opt norefcounts
+	|| decl = TypeOfExpr( self, name_space )
+		if decl.isnormal and !decl.type.theboolfunc
+			return self
+		expect (!decl.isbarestruct) (self, "Can't auto-cast a bare-struct to a bool")
+			
+		|| upon = .unbra
+		rz = TypeBool!.TypeNormal.ExpectMatch( decl, kTypeCastTrue, upon )
+	
+		while (rz == @bra) and (rz.first == @bra)
+			rz = rz.ReplaceWithChild
+
+
+function RelSetOrExpansion (|Message| exp)
+	// (x = a) or (x = b)
+	// --> x = a, if (!x) {x = b}
+	|| L = exp.first
+	|| R = exp.last						// should probably go within collectdecls at least?
+	using (exp)
+	exp.clear
+	l.AppendAllInto(exp)
+	|message--| cond = r.first!.copy
+	|message--| tmp = @tmp + "if"
+	tmp <~ cond.Negate
+	tmp.msg(@arg) <~ r
+	|message--| P = exp.parent
+	|| IsDecl = P == @decl
+	((isdecl)(p!, exp)).next = tmp
+
+
+
+function Or_And_Expansion (|SCDecl| LC, |SCDecl| RC, |Message| exp, |SCNode| name_space, |SCDecl|)
+	|| LBool = LC.Minimatch( TypeBool!.TypeNormal )
+	|| RBool = RC.Minimatch( TypeBool!.TypeNormal )
+		
+	if RBool and LBool
+		Return LC // easy
+
+	// if  !RBool  and  !lbool  and  comp is OR
+		//return lc.highestmatch(lc)
+/*
+		We got 15 of these only in speedie. And they are all within "if" or AND
+		We COULD make this an upgrade, so you can do this:
+			strx = str1 or str2 
+*/
+
+	// x = (mybool and myint)		// convert to bool
+	|| ch0 = exp.first!
+	|| ch2 = ch0.next.next!			// ch0 could change
+	if !LBool and lc.type.TheBoolFunc
+		ch0.ExpandToBool( name_space )
+	if !RBool and rc.type.TheBoolFunc
+		ch2.ExpandToBool( name_space )
+	
+	Return TypeBool!.TypeNormal
+
+
+function scdecl.FastMatch (|SCDecl| O, |bool|)
+	require o.type == .type
+	require o.pointercount == .pointercount
+	return o.c_array == .c_array
+
+
+// 
+function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |int|)
+	real self
+	
+	if (o == nil)
+		require .default
+		Return kUseDefaultParams
+
+	if (o == self)
+		Return kSimpleMatch		
+
+	if (o is const) and (self is reference) and (TypeCast&kTypeCastForParams)
+		return 0 // would be nice to allow nil to refs... but do it later.
+				 // we would need to allocate a temp var, clear it... 
+				 // and if its an object, then decr it after. sigh. not worth it rn!
+	
+	if (o.IsNil and (TypeCast & kTypeCastTrue))		// nil cast
+		if .CantBeNilInCpp							// |mystruct| x = nil
+			if !exp
+				return kNeedsTypeCast
+			|| NilStruct = .CreateStructNil(exp)
+			exp.replacewith(nilstruct)
+			return kCastedMatch
+		Return kSimpleMatch // will this work?
+	
+	// Don't .Match on the contains? It would run into "array covariance" errors?
+	if O.PointeryMatch(self)
+		|| ooop = .PointeryMatchSub(o, typecast)
+		if !ooop and (TypeCast & kTypeCastBothways) and o.IsNormalObject and .IsNormalObject
+			ooop = o.PointeryMatchSub(self, typecast)
+		if (ooop)
+			return ooop
+
+	if (TypeCast & kTypeCastTrue) and (.IsvoidPtr) and (o.pointercount or o.type.funcproto)
+		if (!exp)
+			return kNeedsTypeCast ||| kVoidPtrMatch
+		if (o.type.funcproto)
+			return exp.CastFPToVoidPtr // actually do it.
+		return kCastedMatch
+
+	if TypeCast & kActualTypecasts
+		Return .TryTypeCast( O, exp, TypeCast )
+
+
+
+function scdecl.SafelyWrappable (|bool|)
+	opt norefcounts
+	|| n = .IsNumeric
+	if (n <= 1) or (.isbool)
+		return true
+	
+	|| fns = TypeWrapper!.modul["new"]|scfunction|
+	require fns isa scfunction
+
+	for f in fns
+		|| p = f.args
+		if (p.length == 1) and p[0]!.TypeMatch(self, 0)
+			return true
+ 
+
+function scdecl.TryTypeCastCarray (|SCDecl| O, |Message| exp, |int|)
+	opt norefcounts
+	|| si = .Internal
+	|| oi = o.internal
+	if si.MiniMatch(Oi)
+		if !exp
+			return kNeedsTypeCast
+		return kCastedMatch
+ 
+
+function scdecl.TryTypeCastPointer (|SCDecl| O, |Message| exp, |int| TypeCast, |bool| CArray, |int|)
+	opt norefcounts
+	if o is reference
+		if exp
+			error (exp, "Can't get the address of references")
+		return 0 // pretty sure we can't do this under any circumstance
+	
+	if .Internal.MiniMatch(O)	
+		|| OAddr = O.GetAddress
+		if CArray
+			oaddr.C_Array = 0
+		
+		if .MiniMatch( OAddr, TypeCast ) and (!exp or exp.CanGetAddress(nil))
+			rz = exp.GetAddressOf(OAddr, CArray)
+
+
+function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |int|)
+	opt norefcounts
+	|| i = o.Internal!
+	require .MiniMatch(i, typecast)
+	if !exp
+		Return kNeedsAddressOf
+
+	|| Addr = @acc.msg
+	exp.next = addr
+	Addr <~ exp
+	|| num = addr.msg(@arr).msg(@num, "0")
+	num.obj = typenil
+	Addr.obj = i
+	Return kAddressOfMatch		
+
+
+function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
+	opt norefcounts
+	
+	|| t = .type
+	|| ot = o.type
+	if (.PointerCount == O.PointerCount + 1)
+		|| found = .TryTypeCastPointer(o, oexp, typecast, false)
+			return found
+	
+	if (o.IsCArray) and (.pointercount == 1)
+		|| found = .TryTypeCastCarray(o, oexp)
+			return found
+	
+	/// hmmmm... need to test it... without the c-array? how?
+	ifn typecast & knobooltypecast
+		if (t == TypeBool) and (.IsNormal) and (o.pointercount)
+			return oexp.CastToBool(nil)
+	
+	if (.PointerCount + 1 == O.PointerCount)
+		|| found = .TryTypeCastDeref(o, oexp, typecast)
+			return found
+
+	if TypeCast & (kTypeCastMost|||kTypeCastNumbers)
+		|| CounterPart = t.Signed				// int vs uint
+			if (CounterPart.type == ot) and (CounterPart.TypeMatch(o, typecast, oexp).isnormalmatch)
+				return kSimpleMatch
+
+
+	|| NoBools = (TypeCast&kTypeCastBothWays) or (typecast & knobooltypecast) 
+	if (TypeCast & kTypeCastMost)				// Type Casting
+		// we do bool casting after, as its usually a sign of a bug.
+		for (b.Upwards in Ot)
+			for (C.backwards in b.Casts)
+				ifn NoBools and (C.returnType.isbool)
+					|| Loss = .TypeMatch( C.ReturnType, kTypeCastNumbers )
+					if Loss.IsNormalMatch
+						if (loss == kSimpleMatch) or !.type.IsdatatypeOnly
+							#! sigh
+							#! If theres one that doesnt need numeric cast... that should be considered a stronger match
+							#! C.CreateTypeCast should return the result, bitored with needscast.
+							return C.CreateTypeCast( O, oexp, loss )
+		
+		
+		|| IsaBool = (t == TypeBool) and (.IsNormal)
+		if (!NoBools) and isabool
+			return oexp.CastToBool(nil)
+
+	
+		if (!isabool or !NoBools) and O.canwrap
+			if (Typewrapper!.typenormal.TypeMatch( self, 0	 ).IsNormalMatch)
+				// Already have all the type info! So check the contained type is correct!
+				|| it = .contains
+					require it.TypeMatch(O, kTypeCastNumbers)
+					return oexp.WrapExpr(O)
+
+			if .TypeMatch( Typewrapper!.typenormal, 0 ).isNormalMatch and O.SafelyWrappable 
+				return oexp.WrapExpr(o)  // only OK to turn to a bool if O is a bool.
+
+	
+	if TypeCast & kTypeCastNumbers
+		|| OIsNum = O.IsNormalNumber
+		|| SIsNum =  .IsNormalNumber
+		if sisnum and (o.isnil or TypeCast & kTypeCastFromzero)
+			Return kNumericMatch
+		
+		if Oisnum and sisNum
+			|| ff = o.IsFloat + .IsFloat
+			if ff == 0
+				return kNumericMatch
+			if (ff == 2)
+				|| L = .typeinfo
+				|| R = o.typeinfo
+				if (L.ByteCount == R.ByteCount)
+					return kNumericMatch
+				if (typecast&kTypeCastSetToMemory)
+					return .FloatCast(o, oexp)
+				if (o is const) and Typecast&kTypeCastForSetRel
+					return oexp.CastToClass(.type)
+				if (self is const) or (o is const)
+					if Typecast&kTypeCastForSetRel
+						return oexp.CastToClass(.type)
+					return kNumericMatch // Just do this at ASM time. makes no sense otherwise.
+			  elseif TypeCast & kTypeCastFromSmallInt // int to float
+				return oexp.CastToClass(.type)
+ 
+		
+		if TypeCast&kTypeCastBothWays
+			if Oisnum and  .IsNormalBool
+				return kNumericMatch
+			if sisnum and o.IsNormalBool
+				return kNumericMatch
+
+	// so much nicer!
+	if ot.FuncProto.EqualOrMoreSpecific(t.FuncProto) and .PointeryMatch(O)
+		return oexp.CastToClass(t, nil)
+
+
+
+function scdecl.FloatCast (|scdecl| orig, |message| exp, |int|)
+	/* floats suck :D thats why I prefer Posits
+	 ideally... heres my plan
+	 
+	 1) Remove floats. Just relegate them to "IEEFloat" name. This way, its still available.
+	 2) Float and float64 just become posits. I think hfloat can become Float16 (posit16)
+	 3) We can also have a "FastFloat" type, which is EITHER. Depending on your hardware. (floats only for now.)
+	*/
+	if .IsNormal
+		return exp.CastToClass(.type, nil)
+	.ExpectFail(orig, exp, nil)
+
+
+
+function Compiler.GetTypeVoid (|scdecl!|)
+	opt norefcounts
+	rz = typevoid
+	if rz
+		return rz
+	
+	|| msg = `datatype _void {
+	linkage
+		cpp_class void
+		noauto				// dont want them to see this.
+	size 0
+	syntax cast (|bool|)
+		disabled "Can't cast void to a bool."
+}` ~ Parse
+
+	compiler.program.CollectOne(msg)
+	|| vc = Compiler["_void"]
+	TypeVoid_ = vc
+	
+	if !vc
+		app.Quit("_void failiure", -1)
+	
+	rz = vc.TypeNormal
+	typevoid = rz
+	TypeVoidPtr = rz.GetAddress

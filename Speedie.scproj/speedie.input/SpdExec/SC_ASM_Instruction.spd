@@ -1,0 +1,79 @@
+
+
+// why is this needed by exec?
+// exec wants to be able to load stuff, so we need the ASM datatype?
+// or just fake one. We just wanna call the VM really.
+
+
+class Instruction 
+	initafter (µform)
+	
+	|byte|			OpCode
+	|byte|			aType
+	|byte|			PCount
+	|µForm|			Sizes
+	|string|		Name
+
+	
+	constants
+		kTypeConst		= 2
+//		kTypeFunc		= 1
+	
+	constructor (|string| FormName, |string| Name, |int| Pos)
+//		.formname = formname
+		.opcode = pos
+		.name = name
+		.sizes = µform.NeedForm(FormName, nil)
+		.PCount = .sizes.count
+	
+	render
+		fs <~ .name
+		fs <~ "\n"
+		.sizes.render(Fs)
+
+//	syntax equals (|string| other, |bool| aware, |bool|)
+//		return .name.syntaxequals(other, aware)
+//	
+//	function IsFunc (|bool|)
+//		return .atype == kTypeFunc
+//
+//	syntax access (|int| i, |µParam|)
+//		return .sizes.params[i]
+
+	function IsSetConst (|bool|)
+		return .atype == kTypeConst
+
+	function Const 
+		if self
+			.atype = kTypeConst
+			//.NoExpect // shouldnt have removed this?
+
+	module
+		|{instruction}|						OpDict = dictionary()
+		|instruction[256]|					TypeList
+
+		syntax access (|message| m, |instruction|)
+			opt norefcounts
+			return .OpDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
+
+		syntax Access (|int| pos, |instruction|)
+			return .TypeList[pos]!
+		
+		function Add (|string| FormName, |string| name, |int| pos)
+			opt norefcounts
+			|| ins = .OpDict.valuelower(name) // can occur multiply
+			if !ins
+				ins = instruction(formname, name, pos)
+				.OpDict.valuelower(name) = ins
+			.typelist[pos] = ins
+	
+		function InstructionInit
+			__instructionlist__
+			|| ERR = .typelist[0]
+				for i in 256
+					.typelist[i] ?= ERR 
+			  else
+				debugger 
+			.OpDict["bra"] = .OpDict["jbor"]
+			.OpDict["eror"] = .OpDict["halt"]
+

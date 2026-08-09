@@ -1,0 +1,251 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+module SC_Errors
+	linkage
+		cpp_part Errors
+	
+//	function Color (|string| Col)
+//		if Pipe.ErrorIsTerminal
+//			PrintError( Col )
+	
+/*	
+0: reset colors/style
+1: bold
+4: underline
+30 - 37: black, red, green, yellow, blue, magenta, cyan, and white text
+40 - 47: black, red, green, yellow, blue, magenta, cyan, and white background
+*/	
+
+	|{error}| IgnoredBranches = dictionary.new
+
+	function AlreadyIgnored (|Message| F, |scfunction| fn, |error|)
+		opt norefcounts
+		|| e = .IgnoredBranches.obj(F)
+			return e
+		|| RipRoot = fn.SourceArg
+		for Curr.up in F
+			if (Curr == @arg)
+				|| e2 = .IgnoredBranches.obj(Curr)
+					return e2
+			require (Curr != RipRoot)
+
+	
+	function CanKeep (|Error| Err, |bool|)
+		opt norefcounts
+		if Err is dontstrip
+			return true
+		if (!Err.node or Err.iswarning)
+			return true // why not
+		
+		|| A = Err.node
+			ifn a.obj isa scfunction // keep otherwise
+				a = a.Ancestor(@arg)
+		if a
+			|| Fn = A.MsgOwningFunc
+				|| OldErr = .AlreadyIgnored(A, fn)
+				if olderr and OldErr.Severity >= err.Severity
+					return false
+				.IgnoredBranches.obj(A) = err
+		return true
+
+ 
+function errorreceiver.PrePrintErrors 
+	for err in .errors
+		err.improve
+	if !options.KeepAllErrors
+		for err in .errors
+			if !SC_Errors.CanKeep(err)
+				err.remove
+
+
+function Compiler.PrintErrors (|errorseverity| MinSev)
+	|| s = ""
+	using ErrorSeverity.IgnoreAllErrors
+		s = .RenderErrors(stderr, minsev)
+	
+	if stderr.errorcount
+		if options.perryoutput == 2
+			s = s.digest
+		printerror s
+	  else
+		print s
+
+
+function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, |string|) // render_errors
+	|| Printable = stderr.problemcount+stderr.errorcount 
+	if (Printable and minsev < errorseverity.problem)
+		minsev = errorseverity.problem
+	
+	|| Count = 0
+	|| Problems = 0
+	|| msg = faststring()
+	for (err in stderr)
+		if err.severity >= MinSev
+			Count++
+			if (err.severity != errorseverity.problem) or (++problems <= 10)
+				err.scrender(msg)
+	
+	return msg
+
+
+//function Message.FileLocation (|string|)
+//	opt norefcounts
+//	return .file$.path
+
+
+function Error.Improve					// sc_improve 
+	opt norefcounts
+	|| node = FindBytePos( .node )		#require
+	
+	if !.HasPosition
+		.position = node.position
+
+	if !.path
+		|| SC = node.File$
+		if SC != .node.file
+			.node = node // wrong file!!
+		if sc.exists
+			.path = sc.path
+
+
+function FindBytePosSub (|Message?| Node, |Message?|)
+	opt norefcounts
+	if !node or node.Position >= 0
+		Return node
+
+	// OK so now let's go inside...
+	for m.flat in node
+		if m.Position >= 0
+			Return m
+
+
+function FindBytePos (|Message?| Node, |Message?|)
+	opt norefcounts
+	|| first = FindBytePosSub( node )
+		return first
+	|| msg = FindBytePosSub( node.parent )
+		Return msg
+
+	// Last try...
+	|| fn = node.MsgOwningFunc
+		return FindBytePosSub( fn.Source )
+
+
+
+extend Error
+	function SCGrabLine (|faststring| fs, |bool| Usecolor)
+		if Usecolor
+			fs <~ TerminalColor.Normal
+
+		|| d = .SCOriginalData	#require
+		require .HasPosition
+
+		|| Start  = d.find( CharSet.Line, .Position, 0	) + 1
+		|| Finish = d.find( CharSet.Line, .Position... )
+		if (Finish == -1)
+			Finish = D.Length + 1
+		finish = finish min start+84
+		
+		|| Line = d[Start, Finish].unicodesync
+		Line.ReplaceAll("\t", " ", fs)
+
+		|| Spaces = (.Position - Start)
+		fs <~ '\n'
+		if Usecolor
+			fs <~ TerminalColor.Underline
+		// mark where in the line the error occurs
+		fs <~ (' ', spaces min 100) // it happened once, due to bugs. Another bug could cause this to be off and ruin things.
+		fs <~ '^'
+
+
+	function SCOriginalData (|string|)
+		|| p = .SCOriginalpath
+			|| f = p.file
+			if f.exists and !f.isdir
+				return f.readall
+		return .originaldata
+
+
+	function SCOriginalPath (|string|)
+		|string| str = .node.file
+		str ?= .path
+		return str
+
+
+	function SCLineCount (|int|)
+		|| f = .SCOriginalData
+			rz = .LinePos( f )
+	
+	
+	function SCLineIdentifiers (|faststring| fs, |string| Data)
+		if (!.HasPosition)
+			|| fn = .node.MsgOwningFunc #require // fallback...
+			fs <~ fn.ExportName
+		  else
+			fs <~ (.SCLineCount	 #require)
+			fs <~ ":"
+
+			|| Start = Data.find( CharSet.Line, .Position, 0 )
+			fs <~ .Position - Start
+			fs <~ ":"
+
+
+	render Render_Unix
+// <path>:<line number>:<bytedownline>: error/warning: <message>
+///.../Speedie.scproj/BuildTest/JB.cpp:2679:10: error: conflicting types for 'JB__Comp_InputFile'
+
+		if options.color: fs <~ TerminalColor.Bold
+		
+		|| node = .node
+		|| data = .SCOriginalData
+			|| p = .SCOriginalPath ?? "(string)"
+			fs <~ p
+			fs <~ ':'
+			.SCLineIdentifiers(fs, data)
+			
+		  elseif node
+			node.render(fs)
+			|| fn = node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
+				fs <~ " in:\n"
+				fn.render(fs)
+		
+		fs <~ ' '
+		if options.color
+			if (.iswarning)
+				fs <~ TerminalColor.warn
+			  else
+				fs <~ TerminalColor.Error
+		
+		if .severity is problem
+			fs <~ "warning" // "problem" isnt a valid unix thingy
+		  else
+			.severity.render(Fs)
+		fs <~ ": "
+		if options.color: fs <~ TerminalColor.Bold
+		fs <~ .name
+		fs <~ '\n'
+
+					// fs.whoops
+					//   ^
+		.SCGrabLine(fs, options.color)
+		fs <~ '\n'
+		if options.color: fs <~ TerminalColor.Normal
+		
+
+		
+	render SCRender
+		.path ?= .SCOriginalPath
+		.path ?= "(string)"
+		if options.perryoutput
+			.render(fs)
+		  else
+			.render_unix(fs)
+
+
+
+|| ErrorDelayer = ErrorReceiver()
+

@@ -1,0 +1,970 @@
+
+
+
+dispatch fn_asm_table (fn_asm)
+	@arg:					ASMType.Argument
+	@tril:					ASMType.Argument
+	@decl:					ASMType.decl
+	@num:					ASMType.num
+	@char:					ASMType.char
+	@rel:					assembler.DoMath
+	@thg:					ASMType.Thg
+	@bra:					ASMType.First
+	@item:					ASMType.Second
+	@sheb:					ASMType.Sheb
+	@sstr:					Assembler.Str
+	@list:					Assembler.VectorLoad
+	@func:					ASMType.ASMFunction
+	@dot:					ASMType.Dot
+	@acc:					ASMType.Access
+	@brel:					ASMType.Brel		// ++, --, -, &
+	@arel:					ASMType.arel		// ++, --, 
+	@type:					ASMType.TypeCast
+	@tmp:					ASMType.unexpected
+
+	(ASMType.kif):			Assembler.MainBrancher
+	(ASMType.kwhile):		Assembler.While
+	(ASMType.kTern):		Assembler.Ternary
+	(ASMType.kContinue):	Assembler.Continue
+	(ASMType.kExit):		Assembler.Exit
+
+	(ASMType.kDebugger):	ASMType.Debugger
+	(ASMType.krejoin):		ASMType.Rejoin
+	(asmtype.kswap):		ASMType.Swap
+	(ASMType.kreturn):		ASMType.return
+
+	(ASMType.kSetRel):		ASMType.SetRel
+	(ASMType.kStatExpr): 	ASMType.StatExpr
+	(asmtype.kRefCount):	Assembler.RefCount
+	(asmtype.kSwizzle):		Assembler.VecSwizzle
+	(ASMType.kIgnore):		ASMType.Ignore
+	(ASMType.kFail):		ASMType.Ignore
+
+	63:						ASMType.unexpected
+
+
+
+extend_module ASMType {
+constants
+	IncrAfter = 2
+	IncrBefore = 0
+	
+|asm[10]|	ReadASM
+|asm[5]|	WriteASM
+
+function InitAccess
+	|| R = &ASMType.ReadASM[0]
+	|| W = &ASMType.WriteASM[0]
+	R++[] = ASM.RD1U
+	R++[] = ASM.RD1S
+	R++[] = ASM.RD2U
+	R++[] = ASM.RD2S
+	R++[] = ASM.RD4U
+	R++[] = ASM.RD4S
+	R++[] = ASM.RD8U
+	R++[] = ASM.RD8U
+	R++[] = ASM.RD16
+	R++[] = ASM.RD16
+	#!Write	
+	W++[] = ASM.WR1U
+	W++[] = ASM.WR2U
+	W++[] = ASM.WR4U
+	W++[] = ASM.WR8U
+	W++[] = ASM.WR16
+
+
+function Debugger (fn_asm)
+	opt norefcounts
+	|| fn = exp.func
+	if (fn == @tmp) and (exp is BreakPoint)
+//		.Breakrequest |= assembler.BreakPoint		// unnecessary? argumentsub does it.
+		return nil
+
+	require Options.ShouldBuildTrap
+		// inperry because I just wanna see it... in action. Its confusing a little otherwise
+		// what difference does it make?
+										
+	|| num = 0
+	|&fatasm| fat
+	if fn == @func
+		exp = exp.last!
+		|| ch = exp.first
+			num = ch.int + 1
+			if num <= 1								// debugat 0 --> non-removeable noop. To track BreakCount
+				|| r1 = 56|asmreg|
+				r1.reg = 1
+				fat = exp.ADDB(r1, 0)
+	if !fat
+		fat = exp.TRAP(num)
+	
+	fat.µRefCount++
+
+
+function Swap (fn_asm)
+	opt norefcounts
+	|| prms = exp.last
+	|| A = .ExistingVar(prms.first!)
+	|| B = .ExistingVar(prms.second!)
+	expect (A.reg and B.reg) (Exp, "Can only swap registers")
+	
+	|| T = .assign(exp, .TempOnly, A)
+	.assign(exp, A, B)
+	.assign(exp, B, T)
+	|| f = T.fat
+	if f and f.µrefcount <= 0
+		.SoftNop(F)
+	return asmreg()
+
+
+function Rejoin (fn_asm)
+	opt norefcounts
+	(dest isnt discard)
+	return .µGetASM(exp.first!, dest)
+
+
+function First (fn_asm)
+	opt norefcounts
+	return .µGetASM(exp.first!, dest)
+
+
+function Second (fn_asm)
+	opt norefcounts
+	return .µGetASM(exp.second!, dest)
+
+
+function Sheb (fn_asm)
+	opt NoRefCounts
+	exp.noop
+	return nil
+
+
+
+function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
+	opt norefcounts
+	|| rr = ret.reg
+	if !rr or !.state.TailInlineable
+		return ret
+
+	|| BFLG = .last(asm.bflg)
+	if !bflg or (BFLG.RegOnly != rr)
+		return ret
+
+	if BFLG.prms[2] or BFLG.prms[3] // no shifts!
+		return ret
+	
+	|| BeefIn = BFLG.ASMReg(1)
+	|| R = .Register(BeefIn.reg)
+	if !R or !.IsCurr(R)
+		return ret
+	
+	BeefIn = r.info
+	ret.reg = beefin			// keep exit flags or other stuff
+	ret.µtype = beefin.µtype	// not copied in .reg...
+	.SoftNop(BFLG)
+	return ret
+	
+		
+function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
+	opt norefcounts
+	// What about getting the address of registers?
+	|| extras = asmreg.ExitAtAll
+	if .state.TailInlineable
+		(extras is exitfunction)
+
+	(dest as= extras)
+	|| f = exp.first
+		if dest.reg
+			dest = .µinto(f, dest)
+		  else
+			dest = .µ(f, asmreg.discard)
+	
+	(dest as= extras) // it can get lost... sadly.
+	if .state.TailInlineable
+		.ClearAllStructs(exp)
+		dest = ReturnOpt(self, dest)
+	
+	|| fat = exp.RET(Dest)
+	fat.µRefCount = 1
+	(dest is CondAnswer) // discard surely?
+	return fat * Dest
+
+
+function ExpandBits2 (|&assembler| self, |message| exp, |asmreg| dest, |scdecl| ty,  |asmreg|)
+	if !dest.IsBitCorrect
+		|| Needed = ty.ASMRegType
+		|| BC = dest.BitCount
+		if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
+			|| Wipe = 64 - BC
+			return .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+	return dest
+	
+	
+function Return (fn_asm)
+	opt norefcounts
+	|| L = .state.return
+		return InlinedReturn(self, exp, L)
+
+	dest = ASMReg.ExitFunction
+	|| f = exp.first
+		dest = .µGetASM(f, dest)
+	
+	.ClearAllStructs(exp)
+
+	dest = ReturnOpt(self, dest)
+	
+	|| SafeDecr = FinalDecrements(self, exp, Dest)
+		return SafeDecr
+
+	dest = ExpandBits2(self, exp, dest, .out.ASMReturn)	
+			
+	|| K = .Const(dest, 8, true)
+	|| HasK = K>=0
+	|| fat = exp.RET(dest*!HasK, K * HasK)
+	fat.µRefCount = 1
+	return fat * asmreg.Exit
+	
+
+
+function TypeCast (fn_asm)
+	opt norefcounts
+	|| f = exp.first!
+	|| NewDecl = exp.ASMDecl
+	if newdecl.isbarestruct
+		return asmreg() as asmreg.discard
+
+	dest.µtype = newdecl.mu.DataType
+	|| From = .µGetASM(F, dest)
+	if From.µtype == dest.µtype
+		return From // already done!
+
+	|| NewType = NewDecl.ASMRegType
+	if !from.Reg												// x = 0|float|
+		from.µtype = NewType
+		return from
+
+	|| OldType = from.µtype	
+	if oldtype is bool // bools are normally considered bitcorrect. it would be impossible to do jbor otherwise.
+		from.µtype = newtype
+		return from
+
+	if NewType is bool
+		if (OldType is bool) and (dest isnt negate)				// x = true|bool| // why?
+			return from
+		return .exists(exp, dest, from)
+
+	dest.µType = NewType
+	if from is Const
+		return ConstConvert(self, exp, dest, from, oldtype, newtype)
+
+	|| OV = OldType.VecCount
+	|| NV = NewType.VecCount
+	if (OV|||NV) <= 1
+		if  (NewType.BitCount == OldType.BitCount)  and  NewType.IsFloat == oldtype.isfloat
+			from.µtype = newtype
+			return from
+	
+	dest = .TempOnly(dest)
+	
+	if (OV|||NV) > 1
+		if NewType.IsFloat == oldtype.isfloat
+			if (ov == 3 and nv == 4) or (nv == 3 and ov == 4)
+				return from
+			if dest iz from
+				return dest
+			return exp.VMOV(dest, from) * dest
+		return exp.QCNV(dest, from, OldType.isfloat|int|) * dest
+		
+	if oldtype.isfloat or newtype.isfloat
+		return exp.CONV(dest, from, oldtype.ASMConv(newtype)) * dest
+
+	// what if it came frmo a memory-read
+	|| sh2 = 64 - (NewType.BitCount min OldType.BitCount)
+	return .BFLG_Sub(exp, dest, from, sh2, sh2, dest.signed)
+
+
+
+function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| from, |Datatypecode| Old, |Datatypecode| New, |ASMReg|)
+	// this converts in place...	// we don't want that.
+	
+	|| srf = from.NeedFAT
+	|| NC = New.BitCount
+	|int64| K
+	if old.isint != new.isint
+		K = srf.FloatIntConvConst(old, new)
+	  elseif new.isfloat
+		K = srf.FloatConvConst(NC)
+	  else
+		|| sh = 64 - NC
+		|| oof = srf.Const << sh
+		K = oof|uint64| >> sh
+		if dest.Signed						// shift up and down
+			K = (oof|int64| >> sh)			//
+
+	if srf._const == K // haha.
+		return srf.info
+	
+	.NopConst(from)
+	return .NumToReg(exp, dest, K, new)
+
+
+
+function SetRel (fn_asm)						// function relset (
+	opt	norefcounts								//     x[func()] = y++
+	|| A = exp.first!.asmunbra
+	|| X = .ExistingVar(A)
+		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
+
+	// Probably x.y = z, or x[y] = z 
+
+	exp = exp.last!
+	dest = nil|asmreg| temp a
+	|| Src = .µGetPrms(exp, dest)
+	(Src is SetAlways)
+	.µ(A, Src)
+	return asmreg.discard
+
+
+
+function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+	|| Reff = d.WholeType
+	|| dr = dest.reg
+	if dest is AddrRequest // (|$int|) v {v++}
+		return reff.haveaddr	
+	
+	if dr == d.WholeType.reg
+		return dest
+
+	dest.µType = Reff.µType
+	
+	if dest isnt set
+		dest = .TempOnly(dest)
+		if dest is ContainsAddr // how?
+		// dest = reff --> dest = *reff
+		return .Read(dest, exp, Reff, nil, nil) * dest
+
+	// reff = dest --> *reff = dest
+	(dest is discard)
+	return .write(dest, exp, reff, nil, nil) * dest
+
+
+function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |asmreg|)
+	size = (size+15)>>4
+	|| fat = exp.ALLO(dest, size*dir)
+	fat.µRefCount++ // makes sense it is always reffed
+	return fat * dest
+
+	
+function Decl (fn_asm) // DeclareSub declare 
+	opt norefcounts
+	
+	|| ty = exp.fastdecl
+	.DeclReset(ty)
+	|| Start = .curr
+	|| Declared = DeclSub(self, exp, dest, ty, exp.last!)
+	return .MarkVarOpen(exp, Declared, ty, Start)
+
+	
+function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
+	opt norefcounts
+	if !dest
+		dest = .DeclareBody(exp, ty)
+	  else
+		dest.µType = ty.CalculateASMType
+		ty.WholeType = dest
+		
+	(dest is NewlyDeclared)
+	.RegDebugInfo |= 1<<dest.reg
+	if ty.IsBareStruct or ty.IsCarray
+		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
+	
+	rel = rel.last!
+	|| Incr = (.InlineDepth > 0)			// tail
+	rz = .µInto(rel, dest)
+	if incr					// and rel isnt Inserted // what about deliberate syntactic sugar?
+		rz = rz.incr		// either way... SOME things could go. like the appinit decls.
+	
+	
+	
+function StatExpr (fn_asm)
+	opt norefcounts
+	exp = exp.first
+	|scdecl| Rejoined
+	|| ch = exp.last.first
+	ifn dest is NewlyDeclared or Temp
+		dest = nil
+	  elseif ch
+		Rejoined = ch.FastDecl
+		if rejoined isnt body
+			Rejoined = nil
+	
+	ch = exp.first
+
+	|| v = .OpenVars
+	
+	while ch
+		|| sent = dest
+		if ch.func == @decl
+			if ch.obj != Rejoined
+				sent = nil
+			rz = decl(self, ch, sent)
+		  else
+			if !ch.islast
+				sent = asmreg.discard
+			rz = .µ(ch, Sent)
+		ch++
+		
+	rz = .CloseVars(v, exp, rz)
+
+
+function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
+	// merge into argument?
+	opt NoRefCounts
+	|| ch = exp.first
+	if !ch
+		return asmreg()
+	|| v = .OpenVars
+	|regfile| Restore = .Regs	// adapt nilchecker to check if arg COULD return? If not... dont save.
+	
+//	.parentsanity
+	while
+		.BreakRequest |= assembler.Breakable
+		if (ch is BreakPoint)
+			.Breakrequest |= assembler.BreakPoint
+		if ch.func == @decl
+			rz = decl(self, ch, nil)
+		  else
+			rz = .µ(ch, asmreg.discard)
+//		.parentsanity
+		ch++
+		loop ch and rz isnt exit
+	
+	
+	if !Mask
+		.RegDebugInfo = 0		// Leave all debug info open, but still dealloc structs
+		// exp = nil			// Can't set exp = nil, or we block dealloc.
+		
+	rz = .CloseVars(v, exp, rz & Mask)
+
+	if rz is ExitFunction		// this is being triggered by inlined returns
+		.regs = Restore			// but they don't ACTUALLY exit. Did I alter how inline returns work?
+								// i didn't get this problem before?
+
+
+function Argument (fn_asm) // argument 
+	return ArgumentSub(self, exp)
+
+
+
+function Access (fn_asm)										// a[b], struct.mem[b]
+	opt	NoRefCounts
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
+	
+	|| f = exp.first!
+	|| d = f.asmdecl
+	
+	|| sc = exp.Second.first!
+	|| mode = ASMReg.AddrRequest temp sc
+	
+	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
+		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
+															// So we simplify
+	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
+	|| vara = .µGetASM(sc)
+
+	|| TyA = d.ASMRegType
+	if tya.VecCount > 1
+		return .VecAccess(exp, dest, base, vara)
+
+	target debug: if !d.PointerCount and !d.IsCarray
+	
+	if d.CanCopyNormally
+		if dest isnt AddrRequest
+			dest.µType = exp.ASMDecl.mu.DataType
+			return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
+	  elseif dest is set
+		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()	
+		
+	return .IncrPointerByVar(dest, base, vara, exp)
+	
+
+
+function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
+	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
+	|| fn = prop.Func
+		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
+		return DoGlobal(self, dest, exp, prop)
+	return ConstFromThgName(self, exp, dest, prop)
+
+
+function Dot (fn_asm)										// a.b
+	opt	NoRefCounts
+
+	|| prop = exp.ASMDecl		
+	if prop is const
+		return DotConst(self, dest, exp, prop)
+	
+	if prop is global
+		return DoGlobal(self, dest, exp, prop)
+	
+	|| OV = .OpenVars				// is this safe? Not sure! delete if it causes problems.
+	|| Obj = .µGetASM(exp.first!)
+	|| TyA = prop.ASMRegType
+	dest.µtype = tya
+	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
+	
+	|| Index = prop.ExportPosition 
+	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
+		debugger
+		prop.typeinfo
+		
+	if (dest isnt set) and !dest.reg and (obj is temp)
+		dest.reg = obj // keeps the const. not what we want
+		(dest isnt Const)
+	
+	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
+		return .DotAddr(exp, dest, Index, prop, obj)
+	
+	index >>= dest.ByteShift
+	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
+
+
+
+function Char (fn_asm)
+	return num(self, exp, dest) // its just a num, right?
+
+
+function Num (fn_asm)
+	opt norefcounts
+	|| d = exp.ASMDecl
+	|| T = d.typeonly
+	dest.µtype = T
+	return .NumToReg(exp, dest, d.ExportPosition, T)
+
+
+function Thg (fn_asm)
+	|| thg = asmtype.ThgSub(self, exp, dest)
+	target debug
+		|| reg = thg.reg
+		if (reg-1)|uint| >= 31								// what?
+			if (!reg) and (thg is Const or discard or set)
+				return thg
+			error (exp, "Register out of bounds")
+	return thg										// Its still ok.   nil/false
+
+
+function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+	(dest is Const)
+	if dest isnt ConstRequest
+		dest.µtype = d.mu.DataType
+		return .NumToReg(exp, dest, d.ExportPosition, dest.µtype)
+	return dest
+
+
+
+function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
+	opt norefcounts
+	|| d = exp.ASMDecl
+	if d is local
+		if dest is ConstRequest
+			return nil
+		if d is reference
+			return ThgReference(self, exp, dest, d)
+			
+		if dest isnt AddrForceRequest
+			return .LocalThg(d)
+			
+		|| T = .LocalThg(d)
+		if d.IsBareStruct or d.iscarray					// it already has the address 
+			return T.haveaddr
+		return .GrabAddr(exp, dest, d, T)
+	
+	if d isnt global
+		if dest is Discard
+			return asmreg()	
+		return ConstFromThgName(self, exp, dest, d)
+
+//	if d is classobj
+//		(dest is AddrNeed) // that would be storing the classdata directly in the globs
+// which is totally doable and faster and uses less memory.
+// But my design does not do that right now. So... lets get the system working first optimise later.
+
+	if (dest is ConstRequest)
+		return nil
+
+	if dest is Discard
+		return asmreg()	
+
+	|| fn = d.Func
+		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
+	return DoGlobal(self, dest, exp, d)
+		
+
+
+
+function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
+	opt	NoRefCounts
+	
+	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
+		|| addr = .GlobAddr(d, exp, dest)$ 
+		addr.µtype = d.mu.DataType
+		return addr.HaveAddr
+	
+	|asmreg| addr
+	if dest isnt set // read
+		addr = dest
+	addr = .GlobAddr(d, exp, addr)$ 
+	dest.µtype = d.mu.DataType
+	(dest isnt ContainsAddr)
+
+	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
+	
+
+	
+function AddressOf (fn_asm)
+	opt norefcounts
+	if exp.declfunc					// function pointers need to be read normally...
+		return .µGetASM(exp, dest)
+
+	rz = .µGetASM(exp, dest  as asmreg.AddrNeed)
+	target debug: if (rz isnt ContainsAddr)
+	(rz isnt ContainsAddr)
+	(rz isnt AddrRequest)
+	(rz isnt AddrForceRequest)
+
+
+
+function BoolNot (fn_asm)							// !a
+	dest = dest.negate
+	|| src = .µGetASM(exp, dest)
+	if src is AlreadyNegated
+		return src
+	return .Exists(exp, dest, src)
+	
+
+
+function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
+	opt	NoRefCounts
+	|| TmpCloser = .OpenVars
+	if dest is Discard
+		dest = .TempOnly(Dest)
+	if Dest iz Addr
+		dest = .TempOnly
+
+	(addr is BlockNop)
+	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ
+	(value is noscale)
+	if mode & incrafter
+		dest = value
+		Value = .AddToReg(f, nil, value, amount)							// ADD AFTER
+	  else
+		value = .AddToReg(f, value, value, amount)							// ADD BEFORE
+		dest = value
+	(addr isnt BlockNop)
+	(dest isnt noscale)
+	.Write(Value, f, addr, nil, glob).operatormul(Value)					// WRITE BACK
+	return .CloseVars(TmpCloser, nil, dest)
+
+
+
+function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
+
+	if !dest.reg
+		(dest is const)				// in case its not been cleared.
+
+	ifn  dest.isint  and  amount.fits(6)
+		return IncrSlowOnAddr(self, exp, dest, mode, Addr, Amount, glob)
+
+	|| bc = dest.µtype.ByteCount.log2
+	|| offset = 0
+	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
+	
+	|| fat = exp.CNTD(dest, Addr, offset, amount, bc)
+	fat.µRefCount++					// memory alteration!
+	(dest is set)
+	if !dest.reg
+		fat._Outputs &= ~1			// clear output
+	
+	if mode & IncrAfter
+		if 0: exp.CNTC
+		fat._op = asm.cntc
+	return fat * dest
+
+
+
+function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
+	opt norefcounts
+	rz = (IsPlus & 1)|bool|.dir
+	if upon.isfloat
+		if upon.FourBytes
+			rz = rz|float|.asint
+		  else
+			rz = rz|Float64|.asint
+	  elseif D.TypeSuffers
+		rz *= D.PointerIncrement
+
+
+
+function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
+	|| r = .state.return.reg
+	if r and r == src.reg
+		return
+	check (src isnt temp) (p, "Can't increment temporary value.")
+
+	
+function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
+	opt	NoRefCounts
+	
+	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
+	|| D = exp.ASMDecl
+	|| Amount = IncrAmount(src, mode, D)
+
+	if dest is discard
+		mode = IncrBefore
+	  elseif !dest.reg
+		(dest isnt const)
+		if mode & IncrAfter
+			dest = .TempTyped(exp, dest)
+		  else
+			dest.reg = src
+	  elseif (dest iz src) and (mode & IncrAfter)
+		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	// x = x++ makes no sense
+		return src
+	
+
+	src = src as asmreg.noscale
+	dest.µType = src.µType									// right? it can't be different.
+	|| p = exp.parent!										// better positions
+	if src is ContainsAddr
+		return IncrOnAddr(self, p, dest, mode, src, amount, D)
+	
+	if src is temp											// x[1]++,  // y = x[1], y++, x[1] = y
+		|| fat = src.fat
+		if fat isa asm.VGET
+			return .IncrVectorPart(p, dest, src, amount, mode)
+
+	NotTemp(self, src, p)
+		
+	if mode & IncrAfter
+		return .IncrPost(p, dest, src, amount)				// x++,	 y = x++
+	return .IncrPre(p, dest, src, Amount)					// ++x,	 y = ++x
+
+
+
+function ARel (fn_asm)
+	opt	NoRefCounts
+	|| F = exp.name[]
+	if F == '?' or '!'
+		return .µGetASM(exp.first!, dest)
+	|| M = (F == '+')|int|
+	if dest isnt discard
+		M += IncrAfter
+	return Incrementa(self, exp.first!, dest, M)
+
+
+
+function BRel (fn_asm)						//  --a,  ++a,  &a,  --glob,  --a.b, -a
+	opt	NoRefCounts
+	|| S = exp.name
+	|| n = S[]
+	if n == '~'
+		return .DoMathSub(exp, dest, scoperator.bnot.OpASM!)
+	if n == '-' and S == 1								// -a
+		return .DoMathSub(exp, dest, scoperator.Negative.OpASM!)
+
+	|| F = exp.first!
+	if n == '!'
+		return BoolNot(self, F, dest)
+	if n == '&'
+		return AddressOf(self, f, dest)
+	
+	|| IsPlusPlus = n == '+'						// ++a, --a
+	return Incrementa(self, F, dest, IsPlusPlus|int|)
+
+
+function Ignore			(fn_asm)
+	return ASMReg()
+
+
+function Unexpected		(fn_asm)
+	if !exp.ASMType
+		|| f = exp.func|int|
+			exp.asmtype = f
+			return .µGetASM(exp, dest)
+	error (exp, "bad ASMType")
+}
+
+
+
+extend Assembler {
+
+function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmreg| obj, |AsmReg|)
+	if prop.iscarray
+		dest.µtype = DataTypeCode._voidptr
+	dest = dest.haveaddr
+	dest.µtype = obj.µtype // i guess?
+	obj = obj as asmreg.NoScale
+	return .AddToReg(exp, dest, obj, pos)
+
+
+function message.ASMUnbra (|message|)
+	opt	norefcounts
+	real self
+	|| fn = .func 
+	while (fn == @bra) or ((fn == @type) and .TypeCastDoesnothing)
+		self = .first!
+		fn = .func
+	return self
+
+
+
+function ExistingVar (|message| m, |asmreg|)
+	opt	norefcounts
+
+	m = m.ASMUnbra
+	|| fn = m.Func
+	
+	require fn == @thg or @num
+	
+	|| d = m.ASMDecl
+	if fn == @thg
+		require d is local and d isnt Reference
+		return .LocalThg(d)
+
+	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.mu.DataType)
+
+
+
+function Str (fn_asm)
+	opt	norefcounts
+	dest = .TempOnly(dest)
+	dest.µtype = DataTypeCode._voidptr
+	
+	|| real = exp.name|MessageID|
+	|| k = real.Position
+	if !k and (Compiler is Hungry)
+		PackMaker.PackStrings <~ real
+		k = PackMaker.PackGlobSize + (PackMaker.PackStrings.length<<3)
+		real.Position = k
+	
+	if k <= 20~bits										// this is never a lib. always pack.
+		return exp.GOBJ(dest, 0, 0, K>>3) * dest		// seems good!
+	
+	if !StringsOutOfRange++
+		problem (exp, "String performance may slow. Large global table pushed a string out of fast-reach.")
+	
+	|| addr = .PackGlobAddr(nil, exp, dest, k)
+	return .Read(dest, exp, addr, nil, exp.obj as scdecl) * dest
+
+
+helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
+	|| T = src.BasicVec.reg(0)
+	T = .TempOnly(T)
+	|| Mode = (1<<2) + (1<<5) + (1<<8) + (1<<11)
+	return exp.VSWZ(T, src, Mode) * T
+
+
+function CanConst (|scdecl| D, |&fatasm| f, |bool|)
+	if .IsCurr(f)
+		return true
+	if (.LoopDepth > d.DepthOfLoop) and (d is Alteredinloop)
+		return false
+	if .IsWithin(f)
+		return true
+	if d is alteredinif
+		return false // remove this test? not sure how this works.
+	return f isnt FromInline
+	
+
+function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
+	opt norefcounts
+	|| T = d.WholeType
+
+	(t is param) = d is param
+	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
+		if .CanConst(d, f)
+			t.FatIndex = f.index
+			(T is Const) = (f is Const)	
+	
+	
+	|| rr = T.reg
+		|| Ret = .State.Return
+		if rr == ret.reg
+			t = t.temp(ret)
+	  else
+		(T is const)
+		
+	return T
+}
+
+
+
+function message.HasAsmStuff (|bool|)
+	opt norefcounts
+	nil checker
+	for ch in self
+		|| chh = ch.ASMUnbra
+		|| fn = chh.func
+		if fn != @sheb and @num and @char
+			return true
+
+
+function FatASM.FloatConvConst (|int| DestBitSize, |int64|)
+	|| f = &._Const
+	if DestBitSize == 64						// f32 to f64
+		return (f|&float|[]|Float64|).asint
+												// f64 to f32
+	return f|&f64|[]|float|.asint
+
+
+function FatASM.FloatIntConvConst (|datatypecode| src, |datatypecode| dest, |int64|)
+	|| dbc = dest.ByteCount
+	|| f = (&._Const)|&nil|
+	if src.IsInt
+		|| v = .Const
+		if src.IsSigned
+			if dbc == 4
+				return v|float|.asint			// i to f32
+			return v|Float64|.asint				// i to f64
+		if dbc == 4
+			return v|uint64||float|.asint		// u to f32
+		return v|uint64||Float64|.asint			// u to f64
+
+	// src.isfloat
+	if src.ByteCount == 4
+		|| f32 = f|&float|[]
+		if dest.IsSigned
+			return f32|int64|					// f32 to i
+		return f32|uint64|						// f32 to u
+	
+	|| f64 = f|&f64|
+	if dest.IsSigned
+		return f64|int64|						// f32 to i
+	return f64|uint64|							// f32 to u
+
+
+function DataTypecode.ASMConv (|Datatypecode| To, |int|)
+	return to.ASMPart<<2 ||| .asmpart
+
+
+function DataTypecode.ASMPart (|int|)
+	if .isfloat
+		return 0 + (.bitcount > 32)
+	return 2 + .issigned
+
+
+function Message.TypeCastDoesNothing (|bool|)
+	opt norefcounts
+	|| Output = .ASMDecl.typeonly
+	|| Input = .first!.ASMDecl.typeonly
+	require  Output.VecCount == Input.VecCount			// Vectors
+	require  Output.IsFloat  == Input.isfloat			// Floatness
+	if (Output is bool) == (Input is bool)				// Boolness
+		return Input.ByteCount == Output.ByteCount
+
+
+function message.DeclFunc (|scfunction|)
+	opt norefcounts
+	|| D = .obj
+	if D isa SCDecl
+		return d.Func

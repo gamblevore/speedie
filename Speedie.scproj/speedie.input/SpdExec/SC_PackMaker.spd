@@ -1,0 +1,493 @@
+
+
+module PackMaker
+	|[messageID]|			PackStrings
+	|[SCFunction]|			LibFuncs
+	|[SCDecl]|				LibGlobs
+	|[SCFunction]|			PackFuncs
+	|[SCDecl]|				PackGlobs
+	|int|					PackFuncIndex
+	|int|					PackGlobSize
+	|int|					LibGlobSize
+	|HairyMan|				PackSaved
+	
+	
+	helper scfunction.NeedsLibExport (|bool|)
+		opt norefcounts
+		require (.MyReacher or options.MakeExec)
+		require !.ismacro
+		require self|scnode| isnt LibInternal
+		require self|scnode| isnt embeddedonly
+		require (.IsCppInBuilt < 2)
+		if (self is NoExport)
+			if Options.ModeCpp
+				return false
+			if self is DontCheckInCakeLib
+				return false
+		return true
+			
+	// not sure why I have two versions of the same thing?
+	// one is to allow a stableID generated
+	// but surely... if we have no stable ID, we don't need lib-export?
+	
+	function scfunction.NeedsStableID (|bool|)
+		opt norefcounts
+		require (self|scnode| isnt EmbeddedOnly)
+		if (!.IsMacro) and (self isnt disabled and LinkInline)
+			if self|scnode| is LibInternal // hmm
+			return true
+	// why not use noexport instead? (NoExport = LinkInline + Disabled + InitFunc)							
+
+	
+	helper AddFunc (|SCFunction| f)
+		opt norefcounts
+		if f.IsLibrary
+			if f.NeedsLibExport
+				.LibFuncs <~ f
+		  elseif f isnt dylib
+			|| R = f.MyReacher
+				check (f isnt ExternalLib) (R.Source, "External library functions can't yet be used in cake files.")
+			if R or compiler.InPerry // otherwise we'll get missing packid[1] bugs...
+				.PackFuncs <~ f
+	
+	
+	function AddAll
+		opt norefcounts
+		for f in Compiler.FuncList
+			if f.CanLibLoad
+				.addfunc(f)
+			
+	
+	function GlobalsSize (|[scdecl]| List, |bool| IgnoreUnused=false, |int|)	// SortGlobals, GlobalsSort
+		opt norefcounts
+		|| Globals = 1									// always positive.
+
+		for d in list
+			if IgnoreUnused and (d is ClassObj)			// optimisation
+				|| c = d.contains!.type
+				if c.IsLibrary and !packmaker.needspackexport(c, -1)
+					d.ExportPosition = 0xFADE // fake
+					continue
+
+			|| s = d.CarraySize
+			|| s16 = s min 16
+			globals = globals align s16
+
+			|| X = d.ExportPosition
+			if !X or X == globals
+				d.ExportPosition = globals				// its ok
+			  elseif (options.MakeExec)
+				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes.")
+			  elseif (x <= globals)
+				error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
+			
+			globals += s
+
+		return (Globals+7).AlignUp(8)					// add sentinel
+
+
+	function UseMain (|string| Name, |int| id, |bool|)
+		opt norefcounts
+		|| Fn = compiler.xfunc(name)				// we need app and pack inits separately
+			fn.fpackid = id
+			(fn is usedbyasm)
+			return true
+
+
+	function BuildPackGlobs (|bool|)
+		opt norefcounts
+		require .UseMain("JB_SP_AppInit", 1)
+		require .UseMain("JB_Main", 2)
+
+		LibStability.StabiliseFuncs	
+		LibStability.StabiliseGlobs
+		
+		.PackIDFuncs(.PackFuncs)
+		.PackGlobs.sort
+		.PackGlobSize = .GlobalsSize(.PackGlobs, true)
+	
+		return true
+	
+	
+	function message.InlineCount (|int| Limit, |int|)
+		opt norefcounts
+		// this is pretty much a definition of "what does stuff in C" :]
+		for s.flat in self
+			|| fn = s.func
+			if fn == @char or @opp or @brel or @num or @acc or @dot or @type or @tmp
+				rz++
+			  elseif fn == @arel
+				if s != "!" and "?"
+					rz++
+			  elseif fn == @thg
+				|| obj = s.obj
+				if obj isa SCDecl
+					if (obj is Global or Const) and (obj.ExportPosition)
+						rz++
+			  elseif fn == @func
+				rz += 2
+			if rz > Limit
+				exit
+	
+
+	helper PackIDFuncs (|[scfunction]| list)
+		opt norefcounts
+		list.sort(&CodeSorter.fPackID)
+		|| ID = 0
+		while (|| f = list[id])
+			f.fPackID = ++id
+
+
+	function FatCompileSub
+		opt norefcounts
+		.PackFuncIndex = 0
+		while (|| fn = .packfuncs[.PackFuncIndex++])
+			require Assembler.sh.FatterCompile(fn)
+	
+	
+	function FATCompile (|bool|)
+		opt norefcounts
+		.FinalPrepare
+		scfunction.currfunc = nil
+		assembler.sh.FillDebugInfo
+
+		(Compiler is Hungry)
+		.Packfuncs.sort(&CodeSorter.Leafness)
+		.FatCompileSub
+		.Packfuncs.sort(&CodeSorter.fPackID)
+		
+		target debug and !perrydbg
+			if !Compiler.InPerry
+				.RunAFewTests
+		return true
+	
+		
+	function MakePack 
+		opt norefcounts
+		(compiler is Packing)
+		.OrderLibGlobs
+		assembler.sh.ASMInit
+		PackMaker.AddAll
+		if stderr.OK and .BuildPackGlobs
+			if .FATCompile and options.ModeCake		// ModeCake can be false, if compiler.InPerry
+				.BakePackToDisk
+		compiler.During = 0
+	
+	
+	function BakePackToDisk 
+		|jbin| j = Compiler.ProductPath.OutputStream$
+		|| boomerang = FastString() // callback? Or is it a throwback? 
+		(Compiler is Baking)
+
+		j.RunHeader("/usr/local/bin/cake")
+		j.Enter(@tmp, "cake")
+		j.AddHInt(.PackGlobSize.AlignUp(8))
+		j.enter
+		
+		if .BakeASM(j, boomerang)
+			.BakeCallbacks(j, boomerang)
+			.BakeStrings(j)
+			.BakeClasses(j)
+			.BakeDebug(j)
+			j.ExitAll
+	
+	
+	function scfunction.ASMRange (|ivec3|)
+		opt norefcounts
+		|| low = int.max
+		|| high = 0
+		|| file = 0
+		|| src = .source
+		if src and src isnt Inserted				// sigh
+			file = src.tag >> 5
+			for s.flat in src
+				if (s isnt inserted) and s.infile(file)
+					|| r = s.Range
+					(low min= r[0])
+					(high max= r[1])				// unnecessary now we unlocked the spy?? write a test maybe...
+			|| after = src.FrenchSpyReturn(file)
+				(high max= after)
+		if !high									// oof
+			low = 0
+		return (low, high, file)
+	
+		
+	function BakeDebug (|jbin| j)		
+		|faststring--| p = SourceMap.Positions$
+		|| JL = J.Length
+		j.tmparg("debug")
+		.DebugClassesAndGlobals(j)
+		|| files = SCImport.AllFiles.join("\n")
+//		if !Options.Dev
+//			files = files.Compress
+		j.addrow(@str, "files", files)
+
+		j.addrow(@bin, "pos", p|string|)
+		|faststring--| Breakable = SourceMap.Breakable
+			SourceMap.SortBreaks(breakable)
+			j.addrow(@bin, "breakmap", Breakable|string|)
+
+		|faststring--| Points = SourceMap.Breakpoints
+			j.addrow(@bin, "breakpoint", Points|string|)
+
+		j.exit(2)
+		compiler.stDebugInfo += j.Length - JL
+	
+	
+	function BakeASM (|jbin| j, |faststring| boomer, |bool|)
+		opt norefcounts
+		j.enter(@tmp, "code")
+		j.Enter
+		require .BakeAllFuncs(j, boomer)
+		j.exit(2)
+		scfunction.currfunc = nil
+		return true
+		
+
+	function BakeCallbacks (|jbin| j, |faststring| booma)
+		if booma.Length
+			j.enter(@tmp, "call")
+			j.Add(@str, booma)
+			j.exit
+	
+	
+	function BakeStrings (|jbin| j)
+		|| strs = FastString()
+		.DumpStringsSub(strs)
+		strs <~ 0|byte|			// will all be cstrings... Overwrite lengths during load
+		j.enter(@tmp, "strs")
+		j.Add(@str, strs)
+		j.exit
+	
+	
+	helper DumpStringsSub (|jbin| strs)
+		opt norefcounts
+		strs.AppendHInt(.packstrings.length)
+		for s in .PackStrings
+			strs.AppendHInt(s.length)
+			strs <~ s
+
+
+	function AnyClassesNeeded (|bool|)
+		opt norefcounts
+		for c in Compiler.ClassList
+			if .NeedsPackExport(c, kAny)
+				return true
+
+
+	function PackClasses (|jbin| j, |int| LibOrPack)
+		opt norefcounts
+		for c in Compiler.ClassList
+			if .NeedsPackExport(c, LibOrPack)
+				C.DescribeInPack(j)
+
+
+	function BakeClasses (|jbin| j)
+		if .AnyClassesNeeded
+			j.TmpArg("clss")
+			.PackClasses(j, kLib)
+			.PackClasses(j, kPack)
+			j.exit(2)
+	
+	
+	constants
+		kLib	= 1
+		kPack	= 2
+		kAny	= 3
+	
+	
+	function NeedsPackExport (|scclass| self, |int| LibOrPack, |bool|)		// needsexport, needexport, PackneedsExport
+		opt norefcounts
+		require .isobject and !.IsRole and !.IsBehaviourTable
+
+		// Perhaps this is better to just to make it project-based? And remove EmbeddedOnly?
+		|| IsLibLike = .IsLibrary and (self|scnode| isnt embeddedonly)
+			require LibOrPack&klib
+			if LibOrPack != -1
+				require (.ClassType is ASMReached)
+		  else	
+			require LibOrPack&kpack
+
+		|| R = .MyReacher
+		return r and !r.IsLibrary
+
+	
+	function scclass.CollectBehaviours (|jbin| j, |SCBehaviour!| B)
+		opt norefcounts
+		|| up = b.upwards
+			.CollectBehaviours(j, up)
+
+		|| ft = b.functable$
+		|| ftc = ft.cls!
+		for (M in ftc.properties)					// could I change the cpp exporter to use this same approach?
+			|| fn = .BestBehaviourFor(m.name)		// might as well?
+				|| BaseClass = .InterfaceForBehaviour(fn)
+					j.Cakeify(fn)
+					continue
+			.MissingBehaviour(m.name)
+
+	
+	function jbin.Cakeify (|scfunction| fn)
+		if !fn
+			.addhint 0
+			return
+		.Enter(@name, fn.name)
+		|| id = fn.fPackID							#check ( fn.source,  "Missing PackID[2]" )
+		id = (id << 1) + fn.IsLibrary
+		.AddHint(id)
+		.exit
+
+	
+	function SCClass.DescribeInPack (|jbin| j)
+		|scbehaviour--| B = .behaviour				#expect ( .source,  "Missing behaviour" )
+		|| sz = .clssize
+		j.enter(@tmp, .name.lowercase)
+		
+		j.Enter(@list)		//////		//////		//////
+		
+		j.AddhInt(.classtype!.ExportPosition)
+		if !.IsLibrary
+			j.Add(@thg, .super!.name.lowercase)
+			j.addhint(sz)
+		j.exit				///
+		
+		if !.IsLibrary		//////		//////		//////
+			j.enter(@list)
+			j.Cakeify(.destructorfunc)
+			.CollectBehaviours(j, B)
+			j.exit			///
+		j.exit
+
+
+function SCFunction.WrappedName (|string|)
+	if !.IsCppInBuilt
+		return .ExportName
+	return .ExportName + "Wrap"
+
+
+function SCFunction.CanLibLoad (|bool|)
+	if !.ismacro and (self isnt disabled) and (.iscppinbuilt != 2)
+		return true
+
+
+function SCFunction.CanPrepareInline (|bool|)
+	opt norefcounts
+	require (self isnt cpp) and .HasProperSpeedieCode
+	require self isnt noinline
+	
+	|| Allowed = 14 + (self is OptInline)<<4
+	|| Count = .SourceArg!.InlineCount(Allowed)
+	if Count <= Allowed
+		return true
+
+
+function packmaker.FinalPrepare
+	opt norefcounts
+	Assembler.jsm.length = 0
+
+	for c in Compiler.ClassList
+		if c.IsRole
+			|| t = c.ClassType!
+			|| t2 = c.RealClass.ClassType!
+			t.ExportPosition = t2.ExportPosition
+
+	require Options.InlineLib
+
+	// These lib funcs are not actually going into the pack.
+	// We just want to see the size of the libfunc, if it were inlined.
+	for fn in .LibFuncs
+		if fn.CanPrepareInline
+			require Assembler.sh.FatterCompile(fn)
+			Assembler.jsm.length = 0
+
+
+
+struct HairyMan 
+// i just went a little insane while writing this code.
+// What do you expect writing a compiler on your own?
+// I might have been drunk too.
+	|uint16| Savings
+	|uint16| Curr
+	|uint|	 Total
+
+	function AddOrShrink (|jbin| j, |scfunction| F, |bool|)
+		.Total++
+		if (f is usedbyasm) or f.isbehaviour
+			|| c = .curr
+				j.addhint(c)
+			.curr = 0
+			return true
+		.curr++
+		.Savings++
+			
+	function Churn (|faststring| fs)
+		fs <~ "$.Savings / $.Total"
+
+
+
+function Message.IsCake (|bool|)
+	opt norefcounts
+	real self
+	if self == @arg
+		self = .first
+	require self == @tmp
+	require .first.IsInt
+	|| s = .second
+	if s == @arg
+		require s.first istmp "code"
+		return true // ooof. its actually a cake file.
+
+
+/////
+
+
+
+
+function scclass.NeedsClassLayout (|bool|)
+	opt norefcounts
+	if (.IsLibrary == options.MakeExec)
+		return true
+	|| r = .MyReacher
+		if R.IsLibrary == Options.MakeExec
+			return true
+
+
+function packmaker.ClassLayout (|jbin| j)
+	opt norefcounts
+	|| names = FastString()
+	for c in Compiler.ReachedClassTable
+		if c.IsRole or c.IsBehaviourTable
+			j.add(@char)
+			continue
+		
+		c.exportname.MiniName(names, c.IsObject)
+		|| fn = @msg
+		|| NeedsLayout = c.NeedsClassLayout
+			if c.IsLibrary
+				fn = @tmp // whatever
+		  else
+			fn = @thg
+			if c.IsLibrary
+				fn = @sthg
+		
+		j.Enter(fn, names|string|)
+		if NeedsLayout
+			c.ListLayout(j)
+		  else
+			j.AddHint(c.islibrary|int|)
+		j.exit
+		names.Length = 0
+
+
+function packmaker.DebugClassesAndGlobals (|jbin| j)
+	opt norefcounts
+	j.Enter(@msg, "type")
+	.ClassLayout(j)
+	j.exit
+	
+	j.Enter(@msg, "glob")
+	|| G = PackMaker.LibGlobs
+	if !options.makeexec
+		g = PackMaker.PackGlobs
+	j.PropertyLayout(G)
+	j.exit

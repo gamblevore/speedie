@@ -1,0 +1,89 @@
+
+
+class XType
+	|XType?|		Super
+	|bool|			IsObject
+	|bool|			IsLib
+	|message|		Msg
+	|[XVar]|		Properties
+	
+	constructor
+		.msg = @emb + "(unreached)"
+	
+	constructor (|message| msg, |int| index)
+		opt norefcounts
+		|| fn = msg.func
+		.IsLib = fn == @tmp or @sthg
+		.msg = msg
+		|| Sup = msg[@nil]
+		|| SupIndex = Sup.Int
+		.IsObject = (SupIndex & 1)
+		.Super = xtype.GetType(SupIndex, Sup)
+		if .IsObject and (fn == @tmp or @msg)
+			|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
+				jbcls.Index = index
+	
+	function Name (|string|)
+		return .msg.name
+	
+	syntax compare (|string| s, |bool| Aware, |int|)
+		if self
+			return .msg.name.syntaxcompare(s, aware)
+		return 1
+		
+	operator in (|xtype| Sup, |bool|)
+		opt norefcounts
+		while self
+			if self == sup
+				return true
+			self = .super
+		
+	render
+		opt norefcounts
+		fs <~ .name
+	
+	
+	module
+		|InputStream|	Shared = InputStream("")
+		|XType|			Unreached = xtype()
+		|[XType]|		Types
+
+		function LoadTypes (|message| Pack)
+			opt norefcounts
+			.LoadTypesSub(pack)
+
+			for T in .types
+				|| P = T.msg.Second
+					P.LoadXVars(nil, T.properties)
+		
+		
+		function LoadTypesSub (|message| list)
+			opt norefcounts
+			|| i = 0
+			for Type.fast in List
+				++i
+				|| fn = Type.Func
+				if fn == @msg or @tmp or @thg or @sthg
+					.types <~ XType(Type, i)
+				  else
+					.types <~ .unreached
+		
+		
+		function GetType (|int| i, |message| err, |xtype|)
+			opt norefcounts
+			i >>= 1
+			if i > 0
+				|| Sup = xtype.Types[i-1]
+					return sup
+				error (err, "TypeID out of range")
+
+
+
+datatype Wierdness (uint)
+	flags
+		Pointer
+		Reference
+		CArray
+	syntax is (|Wierdness| N, |bool|)
+		return self & N
+

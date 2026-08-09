@@ -1,0 +1,76 @@
+
+/*	
+	* Here is the approach we will use: "Pre-compile... analyse, then rewind""
+		* Can be sped up by making it more complex to avoid stuff.
+*/
+
+function message.Declable (|message!|)
+	opt norefcounts
+	|| fn = .func
+	if fn == @decl
+		self = .second!
+		fn = .func
+	while fn == @type
+		self = .first! // no go into the type!
+		fn = .func
+	if fn == @func
+		return .second!
+	return self
+
+
+
+
+extend Assembler {
+
+
+function SCDecl.ASMIsPack (|bool|)
+	opt norefcounts
+	if self isnt library
+		return true
+	|| fn = .islookuponly
+	if fn isa scfunction
+		return fn|scnode| is embeddedonly
+	// what if its an embedded function
+
+
+function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+	opt norefcounts
+	if compiler is hungry
+		(d is asmreached)
+	dest = .temptyped(d, dest)
+	(Dest is GlobalMemory)
+	dest = dest.haveaddr	
+	dest.µtype = DataTypeCode._voidptr
+	
+	if d.ASMIsPack
+		return .PackGlobAddr(d, exp, dest, d.exportposition)
+	
+	|| ID = d.gpackid							#expect (exp, errorreceiver.nonfatal)
+	|| fat = exp.GTAB(dest,  1,  ID)
+	fat.Const = d.ExportPosition
+	return fat * dest
+
+
+
+// GTAB stores the values directly, not shifted by 6.
+function PackGlobAddr (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| ExportPos, |asmreg|)
+	opt norefcounts
+	check (ExportPos <= 32~bits)			(exp, "Too much global data used: " + ExportPos)
+	if  dest isnt AddrNoFiddle  and  d isnt ClassObj
+		ExportPos &= ~63
+	
+	|| Direct = ExportPos & 18~bits
+	|| fat = exp.GTAB(dest,  0,  Direct)
+	fat.Const = Direct										// Is this needed?
+	rz = fat * dest
+	
+	|| Missing = ExportPos - Direct
+	if Missing >= 4096
+		fat.const = -1									// Not directly accessable anymore.
+		fat = exp.ADDB(dest, missing >> 12)
+//		fat.const = Direct + ((missing >> 12) << 12)	// Not needed.
+		rz = fat * dest
+
+}
+
+

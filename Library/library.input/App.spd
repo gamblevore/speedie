@@ -1,0 +1,328 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module App {
+|[string]?|					_Args = nil
+|string|					Usage
+|message|					_Conf
+|config|					_Prefs
+|string?|					_Path = nil
+|file?|						_StdOut
+|file?|						_stdin
+
+inline Sleep (|float| Duration)
+	.sleep(duration.date)
+
+function Sleep (|Date| Duration=1s)
+	cpp_wrapper JB_Date__Sleep
+	
+function TrySleep (|date| Duration=1s, |bool|)
+	cpp_wrapper JB_Date__TrySleep
+	
+inline TrySleep (|float| Duration, |bool|)
+	return .TrySleep(duration.date)
+	
+syntax access (|int| i, |string?|)
+	opt norefcounts
+	inlined
+	return app.args[i]
+
+syntax access (|string| name, |string|)
+	cpp_part ArgValue
+	opt norefcounts
+	for R in ._rawargs
+		if R.argname ~= name
+			rz = R.argvalue
+			exit
+
+function Option (|string| name, |bool|)
+	disabled "Use app.yes()"
+
+function Yes (|string| name, |bool|)
+	opt norefcounts
+	inlined
+	return app[name].yes
+	
+//operator Has (|string| name, |bool|)
+//	return .yes(name)
+
+inline No (|string| name, |bool|)
+	inlined
+	return !.yes(name)
+
+function Created (|date|)
+	return __now__|date|
+	
+function TimeID (|uint64|)
+	return __time_id__
+
+function AllowInteruptCrash (assigns:|bool|)
+	cpp_wrapper JB_App__CrashOnInterupt
+
+function Crash (|string?| reason=nil)
+	opt norefcounts
+	if reason
+		printline reason
+	-1|&byte|[] = 0
+	app.quit(-1)
+
+
+function CrashLog (|cstring| value)
+	cpp_wrapper JB_Rec__CrashLog
+
+syntax expect (|string?| s=nil)
+	inlined
+	.quit(s, -1)
+
+
+function Options (|[string]|)
+	disabled "Use .Switches()"
+
+
+function Switches (|[string]|)
+	opt norefcounts
+	for R in ._RawArgs
+		if R.ArgName
+			rz <~ R
+
+
+function Args (|[string]|)
+	cpp_part ArgsArray
+	opt norefcounts
+	|| r = ._Args
+	if r != nil
+		return r
+	r = []
+	._Args = r
+	for s in ._rawargs
+		if s[] != '-' or s == 1
+			r <~ s
+	return r
+			
+
+
+function CrashPrint
+	cpp_wrapper JB_CrashTracer
+
+
+function exepath (|string|)
+	cpp_wrapper JB_App__Path
+
+
+function Path (|string|)
+	cpp_part OrigPath
+	opt norefcounts
+	visible class~file
+	|| p = ._Path
+	if p != nil
+		return p
+	p = .env["OrigScriptPath"]
+	if p == nil
+		p = .exepath
+	._Path = p
+	return p
+
+
+render StackTrace (|int| skip = 2)
+	cpp_wrapper JB_App__StackTrace
+
+
+inline Restart
+	opt norefcounts
+	.turninto(.path, ._rawargs)
+
+function ThreadName (assigns:|string|)
+	cpp_Wrapper JB_App__SetThreadName
+
+function AppName (|string|)
+	opt norefcounts
+	return .path.name
+
+function AppPath (|string|)
+	if platform.osx
+		return .path.backtoapp
+	return .path
+
+
+inline CallPath (assigns:|cstring| NewPath)
+	description "Sets the path that this program was called from."
+	opt norefcounts
+	cpp_part CallPathSet
+	.CallPath(NewPath)
+
+function CallPath (|?cstring| NewPath=nil, |stringzeroterminated--|)
+	description "Gets the path that this program was called from."
+	cpp_wrapper JB_App__CallPath
+
+function TurnInto (|string| ExePath, |[string]| R=nil, |bool|)
+	description "Replaces this program, with the program at {ExePath}, with arguments {R}... Sort of like monster-transformation. Used by .Restart() which turns the program into itself..."
+	cpp_Wrapper JB_App__TurnInto
+
+function ObjMemory (|int64|)
+	cpp_wrapper JB_MemCount
+
+function StringMemory (|int64|)
+	cpp_wrapper JB_MemUsedString
+
+function OtherMemory (|int64|)
+	cpp_wrapper JB_MemUsedOther
+
+function GUIMode (assigns:|bool|)
+	cpp_wrapper JB_App__GUIMode
+	
+function Env (|{string}|)
+	cpp_wrapper JB_App__Env
+
+function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)
+	cpp_wrapper JB_App__SetEnv
+
+function Input (|string|)
+	cpp_Wrapper JB_App__Readline
+
+function IsMainThread (|bool|)
+	return !.IsThreadedAsLib
+
+libinternal IsThreadedAsLib (|bool|)
+	cpp_wrapper JB_LibIsThreaded
+	
+function ParentID (|pid_int|)
+	cpp_wrapper JB_App__ParentID
+	
+function ID (|pid_int|)
+	cpp_wrapper JB_App__ID
+
+function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
+	cpp_Wrapper JB_SP_Run
+
+function _RawArgs  (|array of string|)
+	cpp_wrapper JB_App__Args
+
+function exit (|int| Code=0)
+	disabled "Use app.quit instead (to avoid confusion with the 'exit' statement, which exits loops!)"
+
+
+function Quit (|string?| Err = nil, |int| Code=0)
+	cpp_wrapper JB_App__Quit
+
+function ErrorNumber (|&byte|)
+	cpp_wrapper JB_App__ErrorNumber
+
+
+function Name (|string|)
+	disabled ".Filename (terminal) or .appname (gui package osx)"
+
+
+function FileName (|string|)
+	return .Path.Name
+
+
+function StdIn (|File!|)
+	opt norefcounts
+	return ._Stdin init File.newpipe(filedes.stdin)
+
+
+function StdOut (|file!|)
+	opt norefcounts
+	return ._StdOut init file.NewPipe(filedes.stdout)
+
+
+function CWD (|string|)
+	cpp_wrapper JB_File__CWD
+
+
+function CWD (assigns:|string|, |ErrorInt|)
+	return ._chdir(Value.AbsolutePath)
+
+
+libinternal _chdir (|string| path, |ErrorInt|)
+	cpp_wrapper JB_File__chdir
+
+
+target debug
+	function DebugBreaksActive (|bool| b)
+		cpp_wrapper JB_App__SetCanBreak
+
+
+libinternal MemorySorter (sortercomparer of classdata)
+	return .MemoryUsed < b.MemoryUsed
+
+
+render MemoryUsage (|int| AtLeast=0)
+	|[]| items
+
+	for cls in classdata.First_
+		if cls.memoryused >= AtLeast
+			items <~ cls|object|								// hackity hack hack hack
+	items.sort(MemorySorter)
+
+	fs <~ "\n"
+	|| i = 0
+	while 
+		|&classdata| C = items[i++]|&classdata|				#loop
+		fs.memoryreport(c.name, nil, C.memoryused)
+	fs <~ "\n"
+
+	fs.memoryreport(nil, "obj",	.ObjMemory)
+	fs.memoryreport(nil, "str",	.StringMemory)
+	fs.memoryreport(nil, "arr",	.OtherMemory)	
+	
+	
+libinternal FastString.MemoryReport (|cstring?| name, |string?| name2, |int64| Amount)
+	opt norefcounts
+	if amount
+		self <~ name
+		self <~ name2
+		self <~ ": "
+		amount.strsize(self)
+		self <~ "\n"
+	
+
+libinternal LeakMarkMemory
+	cpp_wrapper JB_Mem_Mark
+
+libinternal LeakUnMarkMemory
+	cpp_wrapper JB_Mem_Unmark
+	
+libinternal IsQuarantined (|bool|)
+	opt norefcounts
+	return .path contains "/AppTranslocation/"
+
+
+
+target !minilib {
+function Say (|string| s, |bool| print=true,  |ExitCode|)
+	// what if we don't want to wait. pass -1 for the timeout?
+	if print
+		printline s
+	return "/usr/bin/say".execute([s])
+	
+function AppleScript (|string| str, |ExitCode|)
+	return "/usr/bin/osascript".execute(["-e",str], nil)
+
+function Sudo (|string| p, |ExitCode|)
+	return .applescript("do shell script \"$p\" with administrator privileges")
+
+function Icon (assigns:|string| path)
+	|| ico = path.AbsolutePath
+		.SetIcon(ico.zeroterm)
+
+function SetIcon (|cstring| path)
+	cpp_wrapper JB_App__SetIcon
+
+function ShowURL (|string| path)
+	cpp_part ShowURLStr
+	if path
+		.showurlc(path.zeroterm)
+
+function ShowURLC (|cstring| path)
+	cpp_wrapper JB_App__ShowURL
+}
+
+
+}
+
+
+

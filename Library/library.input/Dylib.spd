@@ -1,0 +1,94 @@
+
+
+struct DynamicLibrary
+	linkage
+		cpp_part dylib
+		cpp_class JB_Dylib
+		wrapper // commenting out this causes speedie to not compile vaguely
+				// but why.
+	|?&nil|		_handle
+	
+	
+	flags
+		Lazy
+		Now
+		Local
+		Global
+		NoLoad
+		Default = Now + Local
+		NoDelete	= 0x80
+	
+	inline IsOpen (|bool|)
+		return ._handle != nil
+	
+	syntax access (|string| S, |?&nil|)
+		cpp_wrapper JB_dylib_Load
+		
+	function DyLibOpen (|string?| F, |int| Mode = dynamiclibrary.Default, |bool|)
+		description "Opens a dylib. Will also close the existing library (if any)."
+		cpp_wrapper JB_dylib_Open
+	
+	function DyLibClose
+		cpp_wrapper JB_dylib_Close
+	
+	function DyLibError (|cstring|)
+		cpp_wrapper JB_dylib_Error
+	
+	
+	// dylib paths really suck. So hard to make something nice.
+	
+	libinternal LocaliseLib (|string| Path, |string|)
+		target osx
+			return path.addext("dylib")
+		
+		target lin
+			return path.addext("so")
+		
+		target win
+			return path.addext("dll")
+		return path
+	
+	
+	function DyLibInit (|string--| Path, |uint| Mode, |string| Funcs, |faststring| errors=nil, |bool|)
+		target osx
+			|| Bases = "~/Library
+/usr/local/lib
+/Library
+/usr/lib
+/System/Library
+"
+
+		  else // linux + windows...
+			|| Bases = "~/lib
+~/.local/lib
+/usr/local/lib
+/usr/lib
+/lib
+"
+
+		|| local = .LocaliseLib(path)
+		for full.lines in bases
+			if full
+				full = full.append("/", local)
+			  else
+				full = local
+		
+			rz = .DyLibOpen(full, mode)
+			if rz
+				|| Curr = &._handle + 1
+				for fname.lines in Funcs
+					|| Fn = .SyntaxAccess(fname)
+					if !fn
+						rz = false
+						.DyLibClose
+						exit
+					Curr++[] = Fn
+			if rz
+				exit
+			if errors
+				errors <~ .dyliberror
+
+
+		
+	
+

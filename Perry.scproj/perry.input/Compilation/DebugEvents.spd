@@ -1,0 +1,628 @@
+
+
+datatype CompileMode (int)
+	flags
+		|CompileMode|
+		Compiling
+		Debug
+		Run
+		CakeMode
+		ReceivedHello
+		Paused
+		Finished
+		Crashed
+		DebugSet = Debug // easier to search for. now I know which places set it.
+
+		
+	syntax is (|CompileMode| M, |bool|)
+		return (self&M) == M
+	
+	syntax is (|CompileMode| M, assigns:|bool|, |CompileMode|)
+		if Value
+			return self|||M
+		return self&~M
+	
+
+
+function perryide.ViewRun (|bool|)
+	.UseThisView(.ViewDebugger, true)
+	.AppInfo.SetFocus
+	return true
+
+
+function perryide.ResumeRunning (|int| state, |bool|)
+	if !.RunningProd
+		return .start
+
+	if .DebugMode isnt Paused
+		return .SendRunMsg("pause", state)
+
+	return .SendRunMsg("run", state)
+
+
+function perryide.DebugStepEvent (|bool|)
+	if Keys.Shift
+		return .DebugStep("stepin")
+	if keys.Option
+		return .ResumeRunning(-1)
+	return DebugStepOver(self, -1)
+
+
+function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
+	opt norefcounts
+
+	|| i = .ide
+	if key is PERIOD
+		return i.MakeNothingRunning
+	
+	if key is up or down
+		|| st = i.stack
+		if st.ListSource.HasAny
+			st.setfocus
+			st.Selectedge(key is up)
+		return true
+	
+	if key.IsAccept or (key is SPACE)
+		if i.RunningProd
+			return i.debugstepevent
+		return (key is space) or i.start
+	
+	if !i.RunningProd
+		if !key.IsModifier
+			i.Editme.SetFocus
+		return true
+
+	if key is RIGHTBRACKET
+		return i.ResumeRunning(-1)
+
+	if key is ESCAPE or SQUOTE
+		if i.RunningProd
+			if (keys.Shift or keys.option) and "Run fast?\n\n(Breakpoints will not fire)".Confirm
+				return .SendRunMsg("run fast", -1)
+		return DebugStepOut(self, -1)
+		
+
+function DebugArgsKeyDown (GUIKeyEvent)
+	opt norefcounts
+	if key.IsCancel
+		.window!.SetFocus(nil)
+		return true
+
+
+function DeleteableListKeys (GuiKeyEvent)
+	opt norefcounts
+	require key.IsDelete
+	if self isa ListView
+		|| s = .FirstSelected
+			|| p = s.parent
+			.RemoveRow(s)
+			if !p.HasAny
+				.RemoveRow(p)
+		.ide.UpdateFoundHeader
+	return true
+
+
+function DebugArgsGotFocus (guiaction)
+	opt norefcounts
+	|| vis = state == 1
+	if  self isa textview
+		.InitDebugArgs
+		if !vis
+			.save
+	|| Durr = movecode.open.flip(vis)
+	.SlideOpen(0.2s, Durr)
+
+
+function textview.InitDebugArgs
+	|| i = .ide
+	if i.ProjectIsCode
+		if !.Document
+			|| f = i.DebugArgsFile
+			.LoadDocument(Document(f), true)
+		// we want to read this from the actual file.
+	
+		if !.text
+			|| conf = i.FindConfFile
+				|| s = conf.ReadFrom.file.parse
+				|| args = s["conf"]["perry_args"]
+					.text = args.name
+			.text ?= templates.DebugArgs
+		
+
+function fnStillRunning (fnConfirmCanceller)
+	if self isa perryide
+		.UpdateDebuggedApp(false)
+		return !.RunningProd
+
+
+function PerryIDE.Stop (|unixprocess| prod, |bool|)
+	if prod
+		prod.kill(-1)
+		.UpdateDebuggedApp(true)
+	return true
+
+
+function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
+	|| prod = .RunningProd
+		.showide
+		|| str = "Kill running product '".append(.projName, "'", Reason) // should be automatic but isnt FN
+		// from a + b + c + d --> a.append...
+		if .confirm(str, fnStillRunning)
+			if .stop(prod)
+				prod = nil
+	return !prod
+
+
+function PressingDebug (GUIAction)
+	opt norefcounts
+	|| db = .ide.RunArgsText
+	if db.HasAnyFocus
+		db.ClearFocus
+	  else
+		db.setfocus
+	return true
+
+
+function PerryIDE.DebugEnvs (|message| env)
+	opt norefcounts
+	for rel in env
+		|| ch2 = rel[2]
+		if ch2 and rel[1] == "="
+			app.ChildEnv(rel.first!.name) = ch2.name
+
+
+function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststring|)
+	#!------
+	rz = FastString()
+	rz <~ f.name
+	rz <~ ":"
+	for a in args
+		rz <~ ","
+		start
+		rz <~ " "
+		rz.AppendQuotedEscape(a)
+	rz <~ "\n----\n"
+
+
+
+function PerryIDE.DebugPath (|message| conf)
+	|| p = .Project
+	if !p.isdir
+		p = p.Parent
+	app.cwd = p
+	
+	|message--| pwd = conf["pwd"] ?? conf["cwd"]
+		|| path = pwd.GoodArgName
+		if pwd != "."
+			app.cwd = path
+
+
+function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete
+	return .CompileTabs.ButtonSource[i]
+
+
+function PerryIDE.AddProductErr (|string| err)
+	if err
+		.ProductErrors.log(err)
+		|| t = .CompileTab(3)$
+		if .ProductSep.Collapsed or t is hidden
+			.ShowText(.ProductErrors, nil, true)
+		(t isnt hidden)
+
+
+function PerryIDE.UpdateProductText (|Unixprocess| r, |string| rout)
+	.ProductOut.Log(rout, 256K)
+	if r and !(r.userflags&1)
+		.ShowCompileTab(.productout)
+		r.UserFlags |= 1					// remove userflags next time and use OutputShouldOpenWithinDebug?/??
+
+	if .ShowProductIfMoreOutput < .ProductOut.Length
+		.ShowProductIfMoreOutput = int.max	// no more updates
+		.CompileTabSelect(.ProductOut)
+		.ProductSep.Open
+	
+
+function perryide.GotHello (|string| msg)
+	opt norefcounts
+	|| m = .DebugMode
+	require m isnt Finished					// hah. a bit slow.
+	if m is ReceivedHello
+		Notifications <~ msg				// Weird?
+	  else
+		.ReloadBreaks
+		(M is ReceivedHello)
+		.DebugMode = M
+		.StrongView(.ViewDebugger)			// View debugger!
+	.SetAppInfo
+	.AppInfo.setfocus						// I generally don't like stealing the focus... leads to mistypes
+											// But as long as it runs instantly, it should be OK?
+
+function PerryIDE.ClearRun
+	.LogOneCake("--Finished--")
+	.DebugMode = CompileMode.Finished
+	.RunButton.text = "\02"
+	.DelayedRun = nil
+	.lastcakeerror = nil
+	.SetAppInfo
+	.RunningProd = nil
+	.editme.DebugLevel = TextView.DebugLevelOff	
+	.stack.clear
+	
+		
+function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
+	|| r = .RunningProd						#require
+
+	|| rout = r.ReadStdOut
+		.UpdateProductText(r, rout)
+
+	|| x = r.Status	
+	if kill or !x.IsRunning
+		.ClearRun
+	
+	.AddProductErr(r.ReadStdErr)
+	
+	if !kill and r isa SpdProcess
+		.CakeTalk(r)
+
+	if kill
+		.ProductOut.log("\n(--Process Killed--)")
+	  elseif !x.IsRunning
+		|| exitcode = "\n(--Exit OK--)"
+		if x!=0
+			exitcode = "\n(--Exit Error: ${x}--)"
+			.AddProductErr(exitcode)
+		.ProductOut.log(exitcode)
+	
+	return !kill
+		
+
+
+constants
+	PerryReturnStack = 0
+	PerryClickedStack
+	PerryUpdateStack
+	
+function ReturnStack (GUIListEvent)
+	opt norefcounts
+	if row
+		|| i = .ide
+		|| Found = i.UpdateCodePointer(row, PerryReturnStack)
+		if Found != Row											// its a var, not a func
+			return false
+		i.AppInfo.SetFocus
+	return true
+
+	
+function ClickedStack (GUIListEvent)
+	opt norefcounts
+	if row
+		.ide.UpdateCodePointer(row, PerryClickedStack)
+	return true
+
+
+function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,  |ListViewRow|)
+	opt norefcounts
+	|| Path = ""
+	while
+		path = row.firstname
+		if path[] == '/'
+			exit
+		row = row.parent				#require
+			
+	if .EditPath(path, false)	
+		|| Where = row[1].int
+		|| file_path = row.first
+			file_path.Position = where
+		
+		|| e = .editme
+		e._ActiveLine = file_path
+		|| Line = e.show(Where, textviewjumpmode.CompilePos)
+		if (Mode == PerryUpdateStack) or (.LastStack != row)
+			e.DoExplode(Line)
+	
+		.LastStack = row	
+
+	return Row
+
+
+	
+function PerryIDE.DebugMode (|CompileMode|)
+	return ._DebugMode
+
+
+function PerryIDE.DebugMode (assigns:|CompileMode|)
+	opt norefcounts
+	if (._DebugMode is debug) != (value is debug)
+		for btn in .DebugBtns
+			btn.Decluttered = value isnt debug
+
+	._DebugMode = value
+	(self is preparing) = value is compiling
+	(self is active) = (value is Run or debug) and (value is ReceivedHello)
+
+	.EditMe.DebugLevel = .DebugLevel(value)
+
+
+function PerryIDE.DebugLevel (|CompileMode| value, |int|)
+	if value is CakeMode
+		if value is debug
+			return textview.debugleveldebugging
+		if value is run
+			return textview.debuglevelrunning
+	
+	
+function DebugBreakAdd (GuiTextLineEvent)
+	opt norefcounts
+	|| i = .ide
+	require i.DebugMode is CakeMode and Debug	
+	|| cmd = (direction > 0)("brkadd", "brkrem")
+	|| j = i.LineCommand(cmd, line)
+		.SendJbin(j)
+
+
+function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
+	opt norefcounts
+	|| CP = line.CompilePos
+	if CP >= 0
+		|| j = VarPrinter.start(@tmp, cmd)
+		j.AddStr .path
+		j.AddInt CP
+		j.AddInt line.Length
+		j.exit
+		return j
+	debugger 
+
+
+function perryide.DebugStep (|string| kind, |bool|)
+	|| Err = .DebugStepSub(kind)
+	if err != 0
+		Notifications <~ "Can't step. Failed at stage: $Err"
+		beep
+	return true
+
+
+function perryide.DebugStepSub (|string| kind, |ErrorInt|)
+	opt norefcounts
+	|| e = .editme
+	|| active = e._ActiveLine
+	if !active
+		return 1
+	
+	if !.EditPath(active.name, false)
+		return 2
+		
+	|| Vline = -1
+	|| l = e.FindTextLine(active.position, Vline, true)
+	if !l
+		Notifications <~ ("Can't find debug position: " + active.Position) + "\nTry stepping out or running instead."
+		return 0
+		
+	|| j = .LineCommand(kind, l)
+	if !j
+		return 4
+	.SendJbin(j)
+	return 0
+
+	
+function DebugStepOver (guiaction)
+	opt norefcounts
+	return .ide.DebugStep("stepover")
+
+
+function DebugStepIn (guiaction)
+	opt norefcounts
+	if keys.Shift
+		return .SendRunMsg("stepincutely", state)
+	return .ide.DebugStep("stepin")
+
+
+function DebugStepOut (guiaction)
+	return .SendRunMsg("stepout", state)
+
+
+function DebugStepRun (guiaction)
+	// would be nicer if we immediately hide the buttons for this
+	// but delayedly do it for the other .sendrunmsg
+	return .ide.ResumeRunning(State)
+	
+	
+
+function GUIControl.SendRunMsg (|string| s, |int| state, |bool|)
+	// need to disable gui? or is it ok already.
+	return .SendMsg(s, state >= 0)
+
+
+function GUIControl.SendJbin (|jbin!| j, |bool|)
+	.SendMsg(j.getresult, false)
+
+
+function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
+	|perryide--| i = .ide
+	|unixprocess--| r = i.RunningProd
+	if r isa SpdProcess
+		i.LogOneCake(s.parse, "\1C ")
+		if (r <~ s)
+			if PressingAButton
+				i.AppInfo.SetFocus
+		  else
+			Notifications <~ "Debugger connection failed"
+	  else
+		if PressingAButton
+			Notifications <~ "Program already finished"
+		  else
+			beep
+	return true
+	
+
+function Perryide.ASMVis (|bool|)
+	return .ASMStretch.IsViewable and !.ASMStretch.collapsed
+
+
+function Perryide.ASMVis (assigns:|bool|)
+	(.ASMStretch is Visible) = Value
+	if value and .ASMStretch.Collapsed()
+		.ASMStretch.Open
+	
+
+function ClickedASMButton (guiaction)
+	opt norefcounts
+	|| i = .ide
+	|| v = i.ASMView
+	v.clear
+	if i.ASMVis
+		i.HideASM
+		return true
+
+	i.CurrASMFunc = nil
+	expect (i.UpdateASM) (beep)
+	i.ASMVis = true
+	v.AddFail "Displaying ASM..."
+
+
+
+function perryide.TryReselectASM (|bool|)
+	require !.DuringASMEvent and (.ASMVis)
+	.DuringASMEvent = true
+	.UpdateASM
+	.ReselectASM
+	.DuringASMEvent = false
+
+
+function perryide.ReselectASM
+	opt norefcounts
+	|| AV = .ASMView
+	|| Sel = AV.FirstSelected
+	if sel and AV.InView(sel)
+		|| i = .editme.SelectedLine.Position
+		for s in AV.ListSource
+			if !(s.name contains "JUMP: ") and (s.first.int >= i)
+				AV.Select(s)
+				exit
+	
+	
+function perryide.HideASM
+	.ASMVis = false
+	.ASMView.clear
+	.CurrASMFunc = nil
+
+
+function perryide.UpdateASM (|bool|)
+	opt norefcounts
+	|| fn = .CurrSelFunc
+	if fn != .CurrASMFunc
+		.CurrASMFunc = fn
+		return fn and .MaybeSendMessage("asm", fn)
+	
+
+function ListView.AddFail (|string| s)
+	|| D = listviewstate.disabled ||| listviewstate.aligncenter ||| listviewstate.Disabled
+	self <~ ListViewRow(s, D)
+
+
+function perryide.GotASM (|message| asm)
+	.DuringASMEvent = true
+	.ClearOldASMErrors
+	.GotASMSub(asm)
+	.ReselectASM
+	.DuringASMEvent = false
+	
+
+
+function perryide.ClearOldASMErrors
+	opt	norefcounts
+	|| err = .Editme.MyError$
+
+//	.editme.ClearErrors // <-- remove this? Breaks s.lineerror below?
+	
+	
+	|| msg = .editme.MessageAt(err.Position)$
+	|| fn = msg.owningfunc$
+	|| After = fn.FlatLast.After
+	|| Start = fn.Position
+	
+	// how to clear lines in this range.
+	|| s = .EditMe.FindTextLine(Start)
+	while s and (s.Position <= after)
+		err = s.LineError
+		if err and err.tag == 8888
+			s.LineError = nil
+		s++
+		
+
+
+function perryide.GotASMError (|message| Error_List)
+	opt norefcounts
+	.ClearOldASMErrors
+	for s in Error_List
+		|| arg = s.arg
+			|| f = arg.first
+			if f.isstring and f == "nofile"
+				|| v = .ASMView
+				v.clear
+				v.AddFail "ASM unavailable for " + .path.name
+				v.addfail "File not in " + .projname
+				continue
+			
+		|| err = error.from(s)
+			s.Tag = 8888
+			.editme.addErrorToLine(err, false)
+
+
+function perryide.GotASMSub (|message| asm)
+	|ListViewRow--| name = asm.first$
+	|listview--| l = .ASMView
+	|| index = l.ScrollStart.Index
+	l.clear
+	|| src = l.ListSource
+	(name is AlignCenter)
+	src <~ name
+	|message--| arg = asm.last
+	if !arg.HasAny
+		l.AddFail "--(ASM Unavailable)--"
+	
+	|| n = 0
+	|message--| file
+	for s in arg
+		if !s.name
+			(s|listviewrow| is separator)
+			(s|listviewrow| is active)
+		if s == "file"
+			file = s.first
+		  else
+			n++
+			|| cpy = s.copy
+			src <~ cpy
+			cpy.obj = file.name
+	
+	l.ScrollStart() = src[index]
+	
+	|| fs = FastString()
+	fs <~ name.name
+	file = arg.first
+	fs <~ ": "
+	fs <~ file[1].int
+	fs <~ " / "
+	file[2].int.strsize(Fs)
+	name.name = fs
+	
+
+
+function ASMViewKeys (guikeyevent)
+	if key.IsCancel
+		(self isnt visible)
+
+
+function SelectedASM (guilistevent)
+	require row
+	|| i = .ide
+	require !i.DuringASMEvent
+	|| file = row.obj as string				#require
+	|| f = row.first
+	|| n = f.int
+	i.DuringASMEvent = true
+	i.EditPath(file, false)
+	if f
+		i.editme.ShowAndSelect(n, true)
+	i.DuringASMEvent = false
+
+

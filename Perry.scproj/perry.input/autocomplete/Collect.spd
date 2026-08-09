@@ -1,0 +1,130 @@
+
+
+function PerryIDE.MaybeSendMessage (|string| cmd, |message| where,  |string| name="", |string| reason="", |date|)
+	#!sendmsg, msgsend, sendcmd, cmdsend
+	|| fn = where.Func
+	.SectionKeyTime = nil
+	if (fn == @name) and cmd[0, "autocomplete"]
+		return nil
+	|| isString = fn.IsString
+		if where.ShouldDisplayString
+			ifn cmd starts "autocomplete_sel"
+				.SetAutoPoint(where.Position)
+				return .DisplayStr(where)
+
+	if (fn == @char or @num) or fn.isstring
+		.PopupHide
+		return nil
+	
+	.SetAutoPoint(where.Position)
+	return .SendFeedbackRequest(cmd, where, name, reason)
+
+
+function PerryIDE.SendFeedbackRequest (|string| cmd,  |message| where,  |string| name,  |string| reason, |date|)
+	|| msg = .BuildCmd(cmd, where, name, reason)		#require
+
+	|| CmdStr = msg.RenderJbin	// why are we rendering this? then sending the feedbackmsg?
+								// i think cos of the date... to avoid sending duplicate msgs
+
+	if .CanSend(Cmdstr)
+		rz = .SendFeedbackMsg(msg)
+	.LastCmdStr = CmdStr
+	.LastSendTime = rz
+
+
+function message.ShouldDisplayString (|bool|)
+	if self == @bin
+		return true
+	require self == @str or @char
+	require .name.LengthUTF8 < 350
+	return .name.Escape != .name
+	
+
+function PerryIDE.CanSend (|string| cmd, |bool|)
+	if .LastCmdStr != cmd
+		return true
+	if !.LastSendTime or .LastSendTime.ago > 0.667s
+		return true
+
+
+function PerryIDE.SendFeedbackStr (|string| op)
+	if .ProjectIsCode
+		.SendFeedbackMsg(.checkmsg(op))
+	
+
+function PerryIDE.DateWrap (|message| msg, |date| d, |message|)
+	rz = @arg + "Perry"
+	rz <~ d
+	rz <~ msg
+	if msg.name[0, "autocomplete"]
+		.LastAutoCompleteDate = d
+
+
+function PerryIDE.SendFeedback (|message| msg, |spdprocess|)
+	opt norefcounts
+	if msg ~= "asm"
+		|| fb = .FeedbackInit(.ASMProcess)
+			.ASMProcess = fb
+			return fb
+	
+	  else
+		|| fb = .FeedbackInit(.feedback)
+			.feedback = fb
+			return fb
+	
+	
+function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
+	require msg and .ProjectIsCode
+	|| fb = .SendFeedback(msg)						#require
+	|| d = gui.framestart
+	|| record = .DateWrap(msg, d)
+	fb <~ record
+	.LogOneComm(msg, "\1C ")
+	.SpeedieMsgReceive(fb)
+	return d
+
+
+function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler, initfeedback
+	if c
+		if !c.subprocess and C.TimedOut(5s)
+			c.kill(32)		// epipe
+		if c.SubProcess
+			return c		// can't deactivate it.
+		if c.ActivateChild
+			return c
+		return nil			// ded?
+
+	|| f = .SharedProjectTabSource[@nil]$
+	|| p = [.project, "--perry=bin", "--nocolor"]
+	|| Noisy = SpdLibAlreadyInUse
+		p <~ "--noisy"
+	p <~ "--check"
+	
+	SpdLibAlreadyInUse = SpdLibAlreadyInUse
+	target debug and !perryexec and xcode
+		if !SpdLibAlreadyInUse
+			SpdLibAlreadyInUse = true
+			if !.UsingSpdLib
+				.UsingSpdLib = true
+				f.name = .projname.TrimExt + "()"
+			|| spd = (Speedie_Main).Spawn(f.name, p)
+				return spd
+
+//	|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")
+	|| spd_on_disk = speedie.resolve
+		|| Mode = ProcessMode.CaptureAll
+		if !noisy
+			mode = ProcessMode.silence
+		|| spd = SpdProcess.spawn(spd_on_disk, p, mode, f.name)
+			spd.pico.name = .project.name
+			return spd
+
+
+target debug and xcode
+	target perryexec
+		cpp_libwrapper Cake_Main (spdprocess.MicroProcess)
+	  else
+		cpp_libwrapper Speedie_Main (spdprocess.MicroProcess)
+|| SpdLibAlreadyInUse = false
+
+

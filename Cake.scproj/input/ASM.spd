@@ -1,0 +1,42 @@
+
+
+datatype ASMOp (uint)
+	function IsSPDFunc (|bool|)
+		return (self == asm.FNC or asm.fnc3 or asm.tail)
+	
+	function IsGlob (|bool|)
+		return (self == asm.GOBJ or asm.GTAB)
+	
+
+datatype ASM (uint)
+	function Op (|asmOp|)
+		return self >> 24
+
+	operator isa (|asm| Kind, |bool|)
+		return .op == Kind
+	
+	function Size (|int|)
+		self >>= 24
+		if self >= 32
+			return 1 
+		return 2 + (self&1)
+	
+	function IsLibGlob (|bool|)
+		return (Self >> 18) & 1
+	
+	target debug
+		function PrintType
+			|| T = argh[.op]
+				printline T
+			  else
+				"Can't find OP for: ${.op}"
+		
+		module
+			|| Argh = asm.types.ListASM
+			
+		function dictionary.ListASM (|[string]|)
+			rz <~ ("", 256)
+			for (num in self) (name)
+				if num isa DataObject
+					rz[num.PrivValue] = name
+			

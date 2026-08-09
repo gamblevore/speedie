@@ -1,0 +1,39 @@
+#!/usr/local/bin/spd
+
+main (|int| Width=3, |int| Depth=6, |int| Reps = 100000)
+	"Tree Investigator Timing System"
+	|| t = Message()
+	t.GrowTITS(Width, Depth)
+
+	for 10							// tits needs to be warmed up first
+		.FlatTits(t)		
+	time "flat"						// now tits are nice and warm
+		for Reps
+			.FlatTits(t)
+	
+	for 10							// warm the other tits
+		.ExploreTits(t)		
+	time "explore"
+		for Reps
+			.ExploreTits(t)
+
+function message.GrowTITS (|int| Width, |int| Depth)
+	opt norefcounts
+	depth--
+	for width
+		|| tits = .msg(@list)
+		if Depth > 0
+			tits.GrowTITS(depth, width)
+
+function app.FlatTITS (|message| t, |int|)
+	opt norefcounts
+	for s.fastflat in t
+		rz++
+
+function app.ExploreTITS (|message| t, |int|)
+	opt norefcounts
+	for s.fast in t
+		rz++
+		if s.hasany
+			rz += .ExploreTits(s)
+

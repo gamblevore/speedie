@@ -1,0 +1,89 @@
+
+
+dispatch PerryCommands (|perryide| self, |string| s)
+	+'cr_fix'
+		.editme.beep = s.ReplaceAll("\r\n", "\r").ReplaceAll("\r", "\n")
+	
+	+'crash'
+		opt norefcounts
+		if keys.shift
+			|| fs = faststring()
+			fs.destructor!
+			fs <~ "\r\n"
+		  else
+			app.crash
+	
+	+'cr_use'
+		.editme.beep = s.ReplaceAll("\n", "\r\n")
+	
+	+'lower'
+		.editme.beep = s.lowercase
+	
+	+'upper'
+		.editme.beep = s.Uppercase
+	
+	+'ascii'
+		app.alert string.ASCII_Chart
+	
+	+'string'
+		|| s2 = s.parse
+		if s2 == @arg
+			s2 = s2.first
+		.editme.beep = s2.name
+
+	+'render' // 'parse'
+		.editme.beep = s.parse.Render
+		
+	+'tetris'
+		tetriswin().RunAsMain(60)
+	
+	+'breakout'
+		Breakout().RunAsMain(60)
+	
+	+'8ball'
+		|| Q = "Ask the magic 8-ball a question!".ask
+			beep "You: " + Q + "\n\n8-Ball: " + eightball.ask(Q)
+
+	+'bubbles'
+		bubbles().RunAsMain(60)
+
+//	+'DebugSwitch'
+//		DebugGUI = !DebugGUI
+
+
+|listviewrow| _PerryCommandsMenu
+function PerryCommandsMenu (|listviewrow|)
+	|listviewrow--| L = _PerryCommandsMenu
+		return L
+	L = ListViewRow()
+	for (v in perrycommands) (k)
+		|message--| M = L.msg(@str, k)
+		m.obj = v
+	_PerryCommandsMenu = L
+	return L
+	
+
+
+function MenuCommands (GUIAction)
+	opt norefcounts
+	if self isa Button
+		|| s = .SubMenu
+			.OpenMenu
+
+
+function ReturnCommands (GUIListEvent)
+	require row
+	|DataObject of Fn_PerryCommands| o = row.obj as DataObject	#require
+	|| fn = o[]
+	|| i = .ide
+	|| s = i.editme.SelText
+	(fn)(i, s)
+
+
+
+function textview.beep (assigns:|string| s)
+/	expect (.text != s) (beep)
+	.SelText = s
+
+
+

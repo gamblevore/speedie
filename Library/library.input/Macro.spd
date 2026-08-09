@@ -1,0 +1,128 @@
+
+
+role Macro (Message)
+	// Its a role. One less class to bloat Speedie.
+	constructor (|message| s)
+		disabled "Use string.macro instead"
+		super.constructor
+		
+	constructor (|message| s, |bool| UseSelf)
+		opt norefcounts
+		super.constructor
+		.Indent = UseSelf|byte|
+		self <~ s
+	
+	
+	inline Cleaned (|bool|)
+		return self is MacroMade
+	
+	inline Cleaned (assigns:|bool|)
+		(self is MacroMade) = value
+	
+	inline Source (|message|)			// can't I use a getter?
+		return .first
+	
+	inline Run (|[message]| prms=nil, |message|)
+		opt norefcounts
+		opt inline						// more breathing room.
+		|| msg = message()
+		msg.BecomeMacro(self, prms[0], prms)
+		return msg
+	
+	function Run (|message| prm1, |message| prm2=nil, |message| prm3=nil, |message|)
+		cpp_part CallFast
+		rz = message()
+		TmpPrms_ <~ prm1
+		TmpPrms_ <~ prm2
+		TmpPrms_ <~ prm3
+		rz.BecomeMacro(self, prm1, TmpPrms_)
+		TmpPrms_.clear
+	
+	module
+		|[message]| TmpPrms_
+		
+		function TmpPrms (|[message]|)
+			opt norefcounts
+			|| r = .TmpPrms_
+			if r.Length
+				r.clear
+			return r
+		
+
+
+macro string.Macro
+	macro.new((–digest "_0").parsejbin, false)
+	
+
+extend message
+	libinternal MacroAvoidCopy (|message| Orig, |message|)
+		if self isnt MacroMade
+			is Macromade
+			return self
+		return  .CopyWithoutUsing(orig)
+
+
+	libinternal MacroSame (|message| orig, |message| prm, |message|)
+		rz = .CopyWithoutUsing(orig)
+		(prm is MacroMade)
+		rz.name = prm.name // why?
+	
+	
+	libinternal MacroPrm (|message!| orig, |message| root, |array? of message| prms,  |message| dest,  |Message|)
+		opt norefcounts
+		|| n = .name
+		|| c = n[]
+		if (c == '*') and (self == @brel)
+			|| f = .first
+			if f == "_" and @thg
+				for p in prms
+					if p isnt MacroMade							// take all unused.
+						dest <~ p.MacroAvoidCopy(orig)
+				return nil
+		
+		if (c == '_'  and  n > 1) and n.IsInt(1)
+			|| oop = prms[n.int|int|]							#expect (root, "Not enough params.")
+			|| f = .func
+			if f == @dot or @sdot or @str or @sstr or @char		// anything except @thg?
+				return .MacroSame(orig, oop)
+			return oop.MacroAvoidCopy(orig)
+		
+		rz = Message(self)
+		rz.position = orig.position
+		rz.tag = orig.tag										// speedie needs this.
+
+		.MacroCopy(orig, root, prms, rz)
+
+
+	libinternal MacroCopy (|message!| orig, |Message| root,  |array? of message| prms,  |Message| dest)
+		opt norefcounts
+		for v in self
+			dest <~ v.MacroPrm(orig, root, prms, dest)
+
+
+	function BecomeMacro (|Macro| M, |message?| orig = nil,  |array? of message| prms=nil)
+		opt norefcounts
+		|| s = m.source
+			.clear
+			.func = s.func
+			.name = s.name
+			.appendmacro(m, orig, prms)
+	
+
+	function AppendMacro (|Macro| M, |message?| orig = nil,  |array? of message| prms=nil)
+		if .indent or !orig					// remove this? I mean... are we doing it at the call site now?
+			using self						// rather than at creation? Or should we just check that it
+			.AppendMacrosub(m, self, prms)	// always adds up. Never pass orig if .indent?
+		  else
+			.AppendMacrosub(m, orig, prms)
+	
+	
+	libinternal AppendMacroSub (|Macro| M,  |message!| orig,  |array? of message| prms)
+		opt norefcounts
+		for r in prms
+			(r isnt MacroMade)						// in case it was passed in
+		m.Source.MacroCopy(orig, self, prms, self)
+		for r in prms
+			check (r is MacroMade)  (r, "Unused param to macro")
+
+

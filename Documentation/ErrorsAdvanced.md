@@ -1,0 +1,160 @@
+## Advanced Error Handling
+
+Speedie's error-reporting system has some more advanced features:
+
++ Problems: These get printed like errors, but leave `stderr.ok` true.
++ Warnings: Also leaves `stderr.ok` true, but won't get printed unless you ask.
++ Logging of errors to a file.
++ Lowering errors to warnings during certain code-sections
++ Can temporarily replace `stderr` with during certain code-sections, in case you want to contain your errors from harming the rest of the program.
++ You can loop over the errors to "clean" them if you like.
+
+Most programs won't need them, but its there if you do.
+
+
+### Warnings and Problems
+
+Speedie has multiple error levels:
+
+        Critical: 5   // Severe errors that get priority attention from the user
+        Error:    4   // Real errors that stop the program doing what you wanted.
+        Problem:  3   // Not bad enough to stop the program working, but still bad.
+        Warning:  2   // Probably is bad, best to let the user know about it.
+        Hint:     1   // A suggestion for possible improvement.
+
+The severity level doesn't have much difference in effect. The object still uses the same **`error`** class, and is added to the error-list, even if it's severity is **`hint`**.
+
+However: Severities of **`Problem`**, **`Warning`**, and **`Hint`** leave `stderr.OK` as `true`.
+
+To make a **`warning`** instead of an **`error`**, do this:
+    
+    main (|message| msg, |bool| PrintWarnings)
+        if msg.name != "hello"
+            warn (msg, "Aren't you going to say hello?")
+        printline msg
+        if PrintWarnings
+            stderr.Filter = ErrorSeverity.Warning        
+
+To print the warnings, we need to lower the filter-level to `ErrorSeverity.Warning`.
+
+Theres no need to worry about setting `stderr.Filter` to print **`warnings`** in all your apps. Because Speedie itself, does not create any **`warnings`**.
+
+For example: All file-errors are proper **`errors`**, if created at all.
+
+The only **`warnings`** created, are the ones you yourself explicitly created.
+
+
+#### Problems
+
+**Problems** are considered something "bad", but still leave `stderr.ok` as true. However, **problems** _do_ get printed by default.
+
+    
+    main (|message| msg)
+        if msg.name != "hello"
+            problem (msg, "Aren't you going to say hello?")
+        if stderr.ok                       // this should be true!
+            printline "We are still OK!"
+        printline msg
+
+You should see one **`error`** printed after this program completes. We don't have to print them manually, as **`errors`** (and **`problems`**) are printed by default after your code ends.
+
+Why use **`problems`** instead of **`errors`**?
+
+Lets say you deprecated a feature. Lets say you are processing a song databank, and your song nodes were previously called "songinfo", but now you wanted to rename it to be just "song".
+
+So your users have to update their databanks. But you want old databanks to work, _and_ you want the user to know to update them. So try this:
+
+    function LoadAllSongs (|message| music_list)
+        for song in music_list
+            if song == "songinfo"
+                problem (song, "This should be renamed to 'song'")
+                song.name = "song"
+            if song == "song"
+                .LoadSong(song)
+            require stderr.ok // exit loop if real errors occur (not the problem above)
+
+Now your files still work as before, `stderr.ok` is still true, and the user is informed!
+
+
+
+### Logging
+
+    main (|message| msg)
+        stderr.LogFile = "demo.log"
+        if msg.name != "hello"
+            // this problem is logged to the file demo.log at the line below...
+            error (msg, "Aren't you going to say hello?")
+            // even if the program crashes after this, it is already logged.
+
+You'll see one **`error`** printed, but also you'll find a file `demo.log` in `/tmp/logs/` containing this **`error`** logged nicely. 
+
+This will log everything: **`warnings`**, **`errors`** and all. (No filtering.)
+
+You can also specify a full filepath to `stderr.logfile`, in case you don't want it in `/tmp/logs`.
+
+
+
+### Error Reduction
+
+    function app.CheckMsg (|message| msg)
+        if msg != "oof"
+            error (msg, "Expected an 'oof'")
+        printline msg
+    
+    main (|message| msg)
+        .checkmsg(msg)
+        using ErrorSeverity.Warning
+            .checkmsg(msg)
+        stderr.Filter = ErrorSeverity.Warning // allow seeing the warnings
+
+Here... we should see two **`errors`** printed after the program exits:  Both are _"Expected an 'oof'"_. But one will be marked as a **`warning`**.
+
+
+
+### Replacing StdErr
+
+Sometimes, you want to "contain" **`errors`**... But still detect them. Here is one nice way to do it. Lets look at the first example:
+
+    main
+        || f = "/missing/file".FileThatExists // this creates an error
+        error "Only one error allowed!"
+    
+We should see two **`errors`** created. One at the **`error`** line, and the other because we can't read that wierd file-path. So lets contain that **`error`**:
+
+    main
+        using errorreceiver.new
+            || f = "/missing/file".FileThatExists // this creates an error
+            if !stderr.ok
+                printline "Awesome! we found an error but its not gonna harm us"
+        error "Only one error allowed!"
+
+Now we only see the last **`error`** created. And we see "Awesome!..." printed, proving that the **`error`** did exist... for a while.
+
+
+
+### Error Cleaning
+
+    main
+    	for i in 1 to 3
+    		error "Lets keep this: " + i
+    		for j in 10
+    			error "Remove this: " + j
+    	for err in stderr
+    		if !(err.name contains "keep")
+    			err.remove
+
+So... we created 33 **`errors`**. But we removed 30 of them. We only see these output:
+    
+    error: Lets keep this: 1
+    error: Lets keep this: 2
+    error: Lets keep this: 3
+    3 issues found
+
+Can be quite useful... for situations where one bad input, causes many **`errors`**.
+
+
+
+
+
+
+

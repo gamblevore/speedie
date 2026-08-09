@@ -1,0 +1,18 @@
+#!/usr/local/bin/spd
+
+|uint64| Total
+|uint64| Fiddle
+
+function FailingFunc (|int64| Max, |int64| Progress,   |int64|)
+	Total++
+	if ++Progress < Max
+		progress = failingfunc(Max, progress)
+		Fiddle ^= Progress // force stack use.
+	return Progress
+		
+main
+	for i in 100
+		"Start $i"
+		|| Deep = FailingFunc(i*10000, 0)
+		"End $i: $deep deep"
+	"Total: $Total"

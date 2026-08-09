@@ -1,0 +1,168 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Dictionary
+	size 2080 // wow. would be great to use fixeddict instead.
+	linkage
+		wrapper
+		cpp_part Dict
+
+	contains object
+	constructor
+		cpp_wrapper
+	destructor
+		cpp_wrapper
+		
+	syntax Access (|string?| Key, assigns:||)
+		cpp_wrapper JB_Dict_ValueSet
+			
+	syntax Access (|string?| Key, ||)
+		cpp_part Value0
+		inlined
+		return self[key, nil]
+			
+	syntax Access (|string?| Key, |...| Default=nil, ||)
+		nil checker
+		cpp_wrapper JB_Dict_Value
+		
+	function MakePlace (|string?| key, |&...|)
+		cpp_wrapper JB_Dict_MakePlace
+	
+		
+	syntax Access (|uint64| Key, assigns:||)
+		opt norefcounts
+		cpp_part SetInt
+		inlined
+		self[key|int64|._DictName] = Value
+
+	syntax Access (|uint64| Key, ||)
+		opt norefcounts
+		cpp_part ValueInt
+		inlined
+		return self[key|int64|._DictName]
+	
+
+	function Find (|string| match, |$ivec2| Found, ||)
+		cpp_wrapper JB_Dict_FindStr
+	
+	
+	function ValueLower (|string?| s, ||)
+		if s.islower
+			return self[s]
+		|| l = s.lowercase
+		|| v = self[l]|...--|
+		return v
+
+
+	function ValueLower (|string| s, assigns:||)
+		if s.IsLower
+			self[s] = value
+			return
+		self[s.lowercase] = value
+
+
+	function Dispose
+		cpp_wrapper
+
+
+	// "..." means "Whatever it is that we contain"
+	// so.. we return a dictionary reader containing whatever we contain.
+	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate, nil checker }
+	
+	function List (|[...]|)
+		for V in self
+			rz <~ V
+
+	function Keys (|array of string|)
+		for (V in self) (key)
+			rz <~ key
+		
+	render
+		cpp_wrapper
+	
+	iterator
+		|| nav = .Navigate
+		while
+			|| v = nav.NextValue
+			if v == nil: exit
+			yield v (nav.Name)
+	
+	
+	module
+		function Reverse (|{string}| Dict, |{string}|)
+			cpp_name JB_Dict__Reverse
+			rz = dictionary()
+			for (value in Dict) (key)
+				rz[value] = key
+
+		function Copy (|{string}| Dict, |{string}|)
+			cpp_name JB_Dict__Copy
+			rz = dictionary()
+			for (value in Dict) (key)
+				rz[key] = value
+
+
+
+class DictionaryReader
+	size 48
+	linkage
+		wrapper
+	contains		object	
+
+	function Name (|string|)
+		cpp_wrapper JB_Nav_Name
+
+	function Value (||)
+		cpp_wrapper JB_Nav_Value
+
+//	function Value (assigns:||)
+//		cpp_wrapper JB_Nav_ValueSet
+	
+	function MoveNext (|bool|)
+		cpp_wrapper JB_Nav_MoveNext
+		
+	function NextValue (|...|)
+		if .MoveNext
+			return .value
+	
+	constructor (|dictionary| dict)
+		cpp_wrapper JB_Nav_Constructor
+
+	destructor
+		cpp_wrapper JB_Nav_Destructor
+
+	syntax cast (|bool|)
+		disabled "Do you mean .movenext or self!=nil"
+
+
+
+function String.ReplaceAll (|{string}| Dict, |ErrorReceiver| Rec=StdErr, |string|)
+	cpp_wrapper JB_Str_MultiReplaceAll
+
+function SetDecodeEntities (|{string}|Dict, |bool| Value)
+	cpp_wrapper JB_MSR_DecodeEntitySet
+
+function SetEscapeCode (|{string}| Dict, |bool| Value)
+	cpp_wrapper JB_MSR_EscapeCodeSet
+
+
+////////////////////////////////////////////////////////////////////////
+
+function dictionary.Obj (|object| prm, ||)
+	opt norefcounts
+	return self[prm._Dictname]
+
+	
+function dictionary.Obj (|object| prm, assigns:||)
+	opt norefcounts
+	self[prm._Dictname] = Value
+
+
+autogen object._dictname (|string|): cpp_wrapper JB_Obj_DictName
+autogen int64._dictname (|string|): cpp_wrapper JB_int64_DictName
+// can't remove diacritics cos... spanish needs them for disambig!
+// literally two words with different diacritics
+

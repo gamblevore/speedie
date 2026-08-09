@@ -1,0 +1,134 @@
+
+
+function CakeRun.CountClasses (|message| list)
+	opt norefcounts
+	|| ClassCount = 0
+	|| VirtualCount = 0
+	for c.fast in list
+		|| PK = c.second
+			ClassCount++
+			|| PB = pk.Count
+			VirtualCount += PB
+			pk.RangeLength = PB
+	Classdata.CakePrepare(ClassCount, VirtualCount)
+
+
+
+function CakeRun.LoadPackClasses (|message| PackCls) // loadclasses
+	opt norefcounts
+	for c.fast in PackCls
+		.LoadPackClass(C)
+
+
+
+function CakeRun.Virtual (|message| V, |uint64|)
+	opt norefcounts
+	|| Info = V.int(0, 1, 64K)$
+	|| Index = Info >> 1
+	|| Spd = 1|uint64|<<63
+	if Info&FuncIsLib
+		expect (index|uint64| < 8K)							(V, "VirtualEscaped")
+		index += 31
+		return ((spdtable.LibFuncs![Index|int|])|int64|) &~ Spd
+
+	|| Fn = SpdTable.Funcs[Index]					#EXPECT (V, "VirtualEscaped")
+	|| spdfn = fn.ASMStart							#EXPECT (V, "VirtualMissing")
+	return spdfn|int64| ||| Spd
+
+
+
+function Cakerun.UnpackClass (|message| s, |message| c, |&?&classdata| where, |message| PK)
+	opt norefcounts
+	|| sz = c[2].int
+	|| Parent = cakerun[c[@thg, 1]]$
+
+	|| Name = s.Name
+	Name.Addr[name.Length] = 0		// :]
+	|| ClsData = Classdata.CakeNew(name.Addr|cstring|, sz, Parent, PK.rangelength)
+	where[0] = ClsData
+	cakerun.ClassTable[name] = ClsData
+
+	|| V = ClsData.Virtuals|&&nil|
+	target debug
+		|| fs = faststring.shared
+		fs <~ Name
+		fs <~ ": 0x"
+		fs.AppendHex(v|int64|)
+		printline fs
+		fs.Length = 0
+
+	for VFn.fast in PK
+		|| msg = Vfn[@nil]
+		V++[] = .Virtual(msg)|&nil|
+
+
+
+function Cakerun.LoadPackClass (|message| s)
+	opt norefcounts
+	|| c = S[@list]!
+	|| Num = c[@nil]
+	|| I = Num.int(0, 0, globals.PackGlobSize-8)										#require
+	|| Where = (globals.packglobs + I)|&?&classdata|!
+	|| PK = c.next
+		PK.Expect(@list)
+		return .UnpackClass(s, c, where, pk)
+	where[0] = cakerun[s]
+
+
+
+function CakeRun.SyntaxAccess (|message| m, |&ClassData|)
+	opt norefcounts
+	if m
+		|| obj = .ClassTable[m.name]
+			return (obj)|&Classdata|
+		error (m, "Can't find class: " + m.name )
+
+
+
+function CakeRun.ClassesToTable (|&ClassData| cd)
+	|| name = cd.Name.wrap
+	.ClassTable.ValueLower(name) = cd|object|
+
+
+/*
+How to cross-call? Single-table, and branch
+
+* From Cpp using branch. (GOOD! HAPPY WITH THIS)
+	* Cpp is easy
+	* finds SPD
+		* LongJump
+		* Run VM
+	* wrap SPD in a C-func
+		* awkward and not fun
+
+* From SPD using branch (EASY BUT IM NOT HAPPY WITH IT. WHY?)
+	* spd is easy
+	* cpp is easy
+	* SPeedie is not virtual obsessed
+		* Just make it work!
+		* Speedie is all about direct calls... or function pointers.
+		* virtuals are just to get things working. just deal with it!
+
+tmp tetris
+	list ...
+	list
+		unit "Destructor"
+			num "64"
+		unit "Render"
+			num "3455"
+*/
+
+
+function cakerun.TestOffsets
+	cpp_wrapper JB_Cake__Tester
+
+//function cakerun.Virtuals (|int| n, |$?&&nil| Cpp, |$?&&nil| Spd) 
+//	cpp_Wrapper JB_Cake__Virtuals // no callers?
+
+function @ClassData.CakeNew  (|cstring| Name, |int| Size, |?&ClassData| Parent, |int| Virtuals,  |&ClassData|)
+	cpp_wrapper JB_Cake__Class
+
+function @ClassData.CakePrepare  (|int| ClassCount, |int| VCount, |bool|)
+	cpp_wrapper JB_Cake__Prepare
+
+

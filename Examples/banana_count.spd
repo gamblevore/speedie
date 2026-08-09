@@ -1,0 +1,24 @@
+#!/usr/local/bin/spd
+
+// press command-R to run this app.
+
+main (|int| amount)	
+	if amount > 10
+		app.say "$amount ??"
+		return app.say("thats too many bananas")
+	if amount <= 0
+		return app.say("you don't like bananas?")
+	
+	for count in 0 to Amount
+		app.say count of "banana"
+	app.say "thanks for the bananas"
+
+
+
+
+// This is the config area. Used here just to make the example more fun!
+// Upon pressing command-R in perry, perry will ask the question below:
+
+conf
+	perry_args "args\n\t'how many bananas'?"
+

@@ -1,0 +1,184 @@
+
+
+class DrawToolBar (Guicontrol)
+	// selection/airbrush/stamps/eraser
+
+
+// unfinished!
+// should have pure display mode... and edit mode.
+// can load qoi files or our own editor format
+
+
+class GraphicsEditor (GuiControl)
+	linkage
+		cpp_part Draw
+	|[image]|				Layers
+	|image|					Merged
+	|file?|					Backing
+	|int|					BG
+	
+	constructor (|guicontrol| parent)
+		super.Constructor(parent)
+		.Merged = image()
+	
+	
+	function Load (|bool|)
+		require .Backing
+		|| d = .backing!.Read(64MB)
+		if d.IsJbin
+			rz = .LoadNative(d)
+		  else
+			rz = .LoadImage(d, .backing!)
+	
+	
+	function Size (|ivec2|)
+		opt norefcounts
+		return .merged.size
+	
+	behaviour Draw
+		where.DrawRect(self, .gnormal.bg)
+		.merged.DrawCenteredForViewer(where, .gnormal)
+
+
+	libinternal LoadNative (|string| f, |bool|)
+		return false
+		|| root = f.parsejbin
+		|| imgs = root["jdraw"]["layers"]
+		for l in imgs
+			if l.Expect(@tmp)
+				|| p = .Loadmsg(l)
+					.layers <~ p
+		|| size = .Size
+		for p in .Layers
+			expect (p.Size == size) ("Layers have different sizes.")
+		return true
+	
+		
+	function LoadMsg (|Message| l, |image|)
+		disabled
+		|| w = l[@num, 0].int
+		|| h = l[@num, 1].int
+		|| d = l[2].name.decompress
+		require (w > 0) and (h > 0) and d
+		|| img = image((w,h), l.name)
+			img.CopyFrom(d)
+			return img
+	
+	function Save
+/*jdraw 1
+	layers
+		oof (#data#)*/
+		|| b = .backing					#expect ("This image has no file to save to.")
+		|jbin| j = b.outputstream		#require
+		j.start(@arg)
+		j.enter(@tmp, "jdraw")
+		j.addhint 1
+		j.enter @arg
+		j.enter(@tmp, "layers")
+		j.enter @arg
+		for l in .Layers
+			j.addimage(l, l.name)
+		j.exit 5
+		j.Flush
+	
+	
+	function image.RawData (|string|)
+		return string.FromPtr(.ptr, .ByteCapacity)
+	
+					
+	function jbin.AddImage	(|image| img, |string| name)
+		.enter(@tmp, name)
+		.addhint(img.Width)
+		.addhint(img.height)
+		.add(@bin, img.rawdata.compress)
+		.exit
+		
+		
+	libinternal image.DrawCenteredForViewer (|image| Where, |drawstyle?| g = nil)
+		|| Diff = (where.CurrSize - .CurrSize)/2
+		.DrawForViewer(where, diff, g)
+
+
+	libinternal imagepixel.Underlay (|vec4| b, |$imagepixel| Dest)
+		|| Old = .color
+		|| C = Old.a.mix(b, Old)
+		C.a = old.a
+		Dest = C.px
+	
+
+	libinternal image.DrawForViewer (|image| Where, |ivec2| D=(0,0), |drawstyle?| g=nil)
+		D += where.controlclip.xy
+		|| OurShit = ._Controlclip		// take our shit
+		|| Up = OurShit + D				// move it up
+		|| ClippedShit = where.clip(up) // clip the shit
+		|| BackDown = ClippedShit - D	// move the shit back down
+		
+		|| range = self[BackDown]
+		if !g
+			for (P in range) (V)
+				where[v+d] <~ p
+		  else
+			|| b1 = g.Separator
+			|| b2 = g.edge
+			for (P in range) (V)
+				|| dest = where[v+d]
+				if (v.x>>4) + (v.y>>4) isa 2
+					p.underlay(b1, dest)
+				  else
+					p.underlay(b2, dest)
+	
+	
+	function DoMerge (|bool| bg=true)
+		if bg
+			.DoBG
+		for p in .layers
+			p.DrawForViewer(.Merged) // cell-system would be better than doing all this work
+							  // everytime a single pixel is altered! Of course... we'd need cells...
+							  // just get it working for now!
+
+	behaviour MouseDown
+		if Clicks >= 1
+			.Rotate(keys.shift)
+			return MouseDragging.Handled
+	
+	behaviour RightClick
+		.Rotate(true)
+	
+	function Rotate (|bool| right)
+		|| s = .size$
+		|| img2 = image(s.yx)
+			.Merged.Rotate(img2, right)
+			.Merged = img2
+			GUI.Touch
+	
+		
+	function DoBG (|int| size=3)
+		if .bg == 0 // checkerboard
+			.Merged.Clear
+			return 
+			
+		|| g = colors.gray
+		|| w = colors.white
+		for (p in .Merged) (v)
+			|| col = (v<<size).sum isa 2
+			p[0] = ((col)(g, w)).px
+	
+	
+	function Export (|file| dest)
+		.Domerge(false)
+		dest[] = .Merged.WriteQOI
+		
+		
+	function LoadFile (|string| path, |message| Where=nil, |bool|)
+		|| data = path.Readall									#require
+		if path isa "png"
+			data = imagehelper.ConvertPNGToVOI(data, where)		#require
+		return .LoadImage(data, path)
+		
+
+
+	libinternal LoadImage (|string| data, |string| path, |bool|)
+		|| p = data.Loadqoi(path)
+			.Merged = p
+			return true
+

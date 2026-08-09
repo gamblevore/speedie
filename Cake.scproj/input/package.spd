@@ -1,0 +1,58 @@
+
+
+module CakeRun
+	linkage: cpp_part Pack
+	|{object}| ClassTable = dictionary()
+	
+	constants
+		FuncIsLib = 1
+	
+
+	function LibDebug (|string|)			// I think this should be just for comparison.
+		cpp_Wrapper JB_App__LibDebug		// just check the types are the same size, properties the same, etc.
+
+	function LibFuncs (|&&nil|)
+		cpp_wrapper JB_App__LibFuncs
+	
+
+	function message.Arg (|string| name, |bool| Err = false, |message|)
+		opt norefcounts
+		|| Ch = self[name]
+			return ch
+		if !err
+			return message()
+		.ReportFailiure(@tmp, name)
+		
+	
+	function GetStructure (|bool|)
+		opt norefcounts
+		
+		for cd in ClassData.First_
+			.ClassesToTable(cd)
+
+		|| App = Cake.CollectInput
+		|| sz = app[@nil]
+		|| arg = sz.next(@arg)$
+		arg.ExpectLast
+
+		SpdTable.CopyCodeToVM(arg[@tmp, "code"][@arg])
+		Debugger.PackInfo = arg["debug"]
+		GLobals.Strings = arg["strs"].name
+		spdtable.CallBack = arg["call"].name
+
+		|| PackCls = arg["clss"]
+		.CountClasses(PackCls)
+		if globals.CollectPackGlobs(sz)
+			.LoadPackClasses(PackCls)
+			return true
+		
+
+	function string.Compile (|string?|)
+		|| args = ["-bake", "-quiet", self]
+		if debugger.WantDebug
+			args <~ "-d"
+		|| Answer = cake.speedie.ExecuteStr(args)
+		if !Answer.FileExists
+			Answer = nil
+		return Answer
+	

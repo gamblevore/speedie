@@ -1,0 +1,51 @@
+#!/usr/local/bin/spd
+
+
+main (|int| Count = 100)
+	for Count
+		|| num = 4MB()
+		"$num --> ${num.words}"
+
+
+function int64.Words (|string|)
+    || Negate = self < 0
+		self = -self
+	if !self
+        return "Zero"
+    
+    || Units = " one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen" / ' '
+    || Tens = "  twenty thirty forty fifty sixty seventy eighty ninety" / ' '
+    || Multiplier = " thousand million billion trillion quadrillion quintrillion" / ' '
+    || Group = 0
+    
+    while self
+		|| Value = self mod 1000						// Process number in group of 1000s
+		Self = self / 1000
+		if value
+            || temp = ""
+            || word = units[value / 100]				// Handle 3 digit number
+                (value mod= 100)
+                temp = word + " hundred "
+				temp += "and " * (value > 0)
+
+            word = tens[value / 10]						// Handle 2 digit number
+            if word
+                (value mod= 10)
+                temp += word + " "
+
+            word = units[value]							// Handle unit number
+            if word
+                temp += word + " "
+
+            temp += multiplier[group] + " "            // Add the multiplier according to the group            
+            rz = temp + rz							   // Add this group result to overall result
+
+        group++
+        
+	rz = "Negative "*Negate + rz
+    rz = rz.trim
+
+
+function int.Words (|string|)
+	return self|int64|.words
+

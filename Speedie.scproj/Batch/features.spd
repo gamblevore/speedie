@@ -1,0 +1,5 @@
+
+
+main 
+	|| x = stderr
+	x.logfile = "features.spd.log"

@@ -1,0 +1,377 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+function SCNode.CollectOneConstants (|Message| ch)
+	constantsloadingoverride = true
+	.project.use
+	using ch
+	.CollectConstantsSub( ch )
+	ConstantsLoadingOverride = false
+
+	
+
+function SCNode.CalculateConstRel (|message!| value, |$datatypecode| Ty, |uint64|)
+	opt norefcounts
+	|| A = value.first!
+	|| L = .CalculateConstSub(A, Ty)
+	require ty!=DataTypeCode.Failed
+	
+	|| B = A.next!
+	|| C = b.next!
+	if value == @brel
+		expect (ty == datatypecode.int) (value, "Not an integer")
+		return ~L
+		
+	|| op = scoperator.lookup(B)
+	|| R = .CalculateConstSub(C, Ty)
+	expect (op is MathLike) (B)
+	|| N = B.name[]
+	|| Lg = b.name.length
+	|| Ints = (ty).isint
+	if n == '+'
+		if Ints
+			return L + R
+		  else
+			return (L|int64|.asfloat + R|int64|.asfloat).asint
+	if n == '-'
+		if Ints
+			return L - R
+		  else
+			return (L|int64|.asfloat - R|int64|.asfloat).asint
+	if n == '/'
+		if Ints
+			return L / R
+		  else
+			return (L|int64|.asfloat / R|int64|.asfloat).asint
+	if n == 'm' // mod
+		if Ints
+			return L mod R
+		  else
+			return (L|int64|.asfloat mod R|int64|.asfloat).asint
+	if n == '*'
+		if Ints
+			return L * R
+		  else
+			return (L|int64|.asfloat * R|int64|.asfloat).asint
+	
+	expect (ints) (value, "Not an integer")
+	if n == '&'
+		return L & R
+	if n == '|' or '('
+		return L ||| R
+	if lg == 2
+		if n == '<'
+			|| T = L << R
+			expect ((T >> R) == L) (value, "Loses numeric info.")
+			return T
+		if n == '>'
+			|| T = L >> R
+			expect ((T << R) == L) (value, "Loses numeric info.")
+			return T
+	
+	error (value)
+	
+	
+
+function SCNode.CalculateConst (|message!| value, |uint64|)
+	|uint| Ty
+	return .CalculateConstSub(value, ty)
+
+
+function message.TypeExpect (|$datatypecode| Ty, |datatypecode| In)
+	|| v = ty
+		if  (v != in)  and  v != DataTypeCode.Failed
+			ty = datatypecode.failed
+			error (self, "Can't mix floats/ints here.")
+	  else
+		ty = In
+
+
+function scdecl.AsConst (|message| value, |$datatypecode| Ty, |uint64| )
+	expect (self is const) (value, "Not a constant")
+	if .isfloat
+		value.typeexpect(ty, datatypecode.float)
+	  elseif .isint
+		value.typeexpect(ty, datatypecode.int)
+	  else
+		error (value, "Not a number")
+		
+	return .ExportPosition
+
+
+function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64|)
+	opt norefcounts
+	|| f = value.func
+	if f == @num
+		if value.name contains '.'
+			value.TypeExpect(ty, datatypecode.float)
+			return value.float.asint
+		value.TypeExpect(ty, datatypecode.int)
+		return value.int
+
+	if f == @bra
+		return .CalculateConstSub(Value.first!, ty)
+	
+	if f == @thg
+		if value ~= "true"
+			value.TypeExpect(ty, DataTypeCode.bool)
+			return 1
+		if value ~= "false"
+			value.TypeExpect(ty, DataTypeCode.bool)
+			return 0
+		
+		|| d = self[value]
+		if d isa scdecl
+			return d.AsConst(value, ty)
+		error (value)
+		return 0
+	
+	if f == @rel
+		return .CalculateConstRel(value, ty)
+		
+	if f == @char // what about non-ascii bytes?
+		|| n = value.Name
+		if (n == 1)
+			return n[]
+		return n.codepoint							#expect (value, "Not a valid UTF-8 codepoint.")
+	
+	if value isbrel "~"
+		return .CalculateConstRel(value, ty)
+	
+	error value
+	
+	
+		
+	
+	
+
+
+function SCNode.CollectConstantsSub (|Message| ch)
+	opt norefcounts
+	|| FuncName = ch.first									#require
+	|| arg = ch[-1]
+	|| vs = funcname
+
+	if funcname == @thg
+		vs = funcname.next
+	  else
+		funcname = nil
+
+	expect (arg == vs) and (arg == @arg or arg == @list) (vs)
+	
+	|uint64| NextNum = 0 + (ch == "flags")
+	|uint64| StartNum = NextNum
+	|uint64| LastFlag = 0
+	
+	|[SCDecl]|	FixLater
+	|[message]|	NameList
+	|SCDecl--|	CurrType
+
+	for line1 in arg
+		|| LF = line1.first.func
+		|| LL = line1.Last.func
+		if (line1 == @rel) and (LF == @arr) or (LL == @arr)
+			.ConstantExpand( line1 )
+		  elseif (line1 == @tmp)
+			expect !line1.hasany (line1)
+			line1.Func = @thg
+
+
+	for (Line in arg)
+		if (line == @decl)
+			CurrType = ExtractDecl( line.first!, self, declmode.Globals )		#expect line
+			line.remove
+			continue
+		if (line == "...")
+			NextNum = StartNum
+			Continue
+		
+		|scdecl| NewItem
+			
+		if (line == @Thg) // default numeric constant
+			using (line)
+			NewItem = SCDecl(typeint!)
+			|| NewNum = NewDeclNumConst( NewItem, NextNum, line.name, true )
+			newitem.source = line
+			if (ch == "flags")
+				LastFlag++
+				NextNum <<= 1
+			  else
+				NextNum++
+
+			if currtype
+				currtype.copytypeinfoto(newitem)
+				newitem.AssignabilityCheck(nil, newnum, newitem)
+			
+		  elseif line == @bra
+			nextnum = .CalculateConst(line.first!)
+		
+		  else
+			|| ValueNode = Line.last
+			|| thg = line[ @Thg ]
+			require  line.expect(@rel)  and  line[@opp, 1].expect(@opp, "=")  and  valuenode  and  thg
+			|| OMGType = TypeOfExpr( ValueNode, self )		#require // can’t seem to remove this.
+			|| NewType = CurrType ?? OMGType
+			NewItem = SCDecl(newtype.type)
+
+			if (ValueNode == @Str or @sstr)
+				SCFunction.ObjectifyString(ValueNode)
+				ValueNode.obj = TypeString!.typenormal
+				
+			  elseif (valuenode.isint) or (valuenode == @unit)
+				|| WasHex = ValueNode.Name[0, "0x"] or ValueNode.Name[0, "0b"]
+				newitem.washex = washex
+				NewType.AssignabilityCheck(nil, ValueNode, OMGType, washex)
+				nextnum = valuenode.int
+				if WasHex and (nextnum >= 0x8000_0000 and nextnum <= 0xFFFF_FFFF) and !currtype // hmmm lets see.
+					error (ValueNode, "Unclear what type to use here. Use |int| or |int64| to specify")
+				newitem.NumberConst = nextnum
+				nextnum++
+			  else
+				newitem.NumberConst = .CalculateConst(Valuenode)
+			
+			FixLater <~ NewItem
+			
+			NewType.CopyTypeInfoTo( NewItem )
+			NewItem.name = thg.name
+			NewItem.Default = ValueNode
+			newitem.source = thg
+
+		if newitem
+			compiler.newconst(NewItem)
+			NameList <~ NewItem.source!
+			.TryAdd( line, NewItem, NewItem.Name )
+	
+	for (D in FixLater)
+		.Tran_Const( D, self )
+
+	if (FuncName)
+		.CreateNameDict( FuncName, NameList )
+		scfunction.currfunc = nil
+
+
+
+function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
+	|| root = D.default!
+	|| Using = root.SyntaxUsing
+
+	for curr.flat in root
+		if curr == @thg
+			require TypeOfExpr(curr, base)
+			|| actual = base[curr.name]
+			if actual isa SCDecl
+				|| BetterVersion = actual.Default!.Copy(curr)
+				curr.ReplaceWith( BetterVersion )				
+			  else
+				expect ((curr.obj == TypeString!.TypeNormal) or (curr ~= "true") or (curr ~= "false")) (curr, "This type isn't allowed for a constant.")
+			
+		  elseif curr == @unit
+			require TypeOfExpr(curr, base)
+			
+		  elseif (curr == @str) or ((curr==@num) and !(curr in @unit))
+			require TypeOfExpr(curr, base)
+
+
+
+
+function message.ConstIntValueSub (|$int64| v, |bool|)
+	opt norefcounts
+	|| s = self
+	while s == @bra
+		s = s.first!
+	if s == @num
+		v = s.int
+		return true
+	if (s == @thg) and s.name[0,"syx"]
+		|| find = jeebox._syxdict.valuelower(s.name[3...])
+			v = find.id|int64|
+			s.become(@num, v.render)
+			return true
+
+
+function message.ConstIntValue (|SCNode| name_space, |$int64| v, |bool|)
+	opt norefcounts
+	if .ConstIntValueSub(v)
+		return true
+
+	|| t = TypeOfExpr(self, name_space)
+		|| d = t.Default
+			return d.ConstIntValueSub(v)
+
+
+struct ArgArrayCounter
+	|int|  i
+	|int|  Max
+	|bool| IsItem
+	|bool| IsNotItem
+	
+	function Check (|message| exp)
+		if (.isitem and .isnotitem)
+			error (exp, "Mixed indexes found. (Some have ':' and some don't)")
+
+	function Do (|string| name, |message| item, |SCNode| name_space, |message|)
+		opt norefcounts
+		|| acc = @acc.msg
+		acc <~ (@thg, name)
+		|| arr = acc.msg(@arr)
+		|| value = item
+		if value == @item
+			.IsItem = true
+			|| key = item[@nil]
+				|int64| v
+				if key.ConstIntValue(name_space, v)			#check (item, "Can't load constant.")
+					(.max max= v)
+				arr <~ key
+				value = item.first
+		  else
+			.IsNotItem = true
+			arr <~ (.i)++
+			.max = .i
+		return NeweqRel( acc, value )			// [1:x, 4:y]
+
+
+function @scmodule.ConstantCollector (collectfunc)
+	opt norefcounts
+	|| arg = node.Last
+		arg.Expect(@arg)
+	  elseif Compiler.InPerry
+		problem (node, "No constants declared")
+	compiler.ConstantsList <~ node
+	if name_space isa SCClass
+		node.Obj = name_space.Modul
+	  else
+		node.Obj = name_space
+	return compiler.program
+
+
+function compiler.CollectConstants
+	opt norefcounts
+	scfunction.currfunc = nil
+	for ch in .constantslist
+		|| b = ch.obj as SCNode
+			b.CollectOneConstants(ch)
+
+
+function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
+	opt norefcounts
+	if Self is numeric
+		return .VecCount
+	if self & bool
+		return 1
+	if scnode.ConstantsLoadingOverride and (d is const)
+		return .VecCount
+		
+
+function scdecl.NumericCountWithBools (|int|)
+	if .pointercount					// what about objects?
+		return 1
+	if .iscarray
+		return .internal!.NumericCountWithBools
+	if .mu.DataType & datatypecode.bool
+		return 1
+	return .Type.TypeInfo.VecCount
+		
+

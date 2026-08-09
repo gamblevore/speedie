@@ -1,0 +1,860 @@
+
+
+// vm.box
+forms
+	U0:
+	U1:		r1 R
+	U2:		r1 R,  r2 r
+	U3:		r1 R,  r2 r,  r3 r
+	U4:		r1 R,  r2 r,  r3 r,  r4 r
+
+
+	Func
+		r1		R
+		JUMP	l
+		Prm1	x
+		Prm2	x
+
+// func needs the reg/return wierdness defined also, but as an "ignored" value
+// so it comes after the prm info. Like 3 prms takes 15 bits, then 3 more bits for wierdness
+// using 32-bits, we can fit 5 regs leaving 7 bits for the total info with 1 bit left to spare.
+	ForeignFunc
+		r1		R
+		Table	l			// functions in registers use the first 32 values...
+		Prm1	x
+		Prm2	x
+		
+	Tail
+		JUMP	l
+		Prm1	x
+		
+	FuncAddr
+		r1		R
+		Library 1
+		Index	l
+
+	Alloc
+		r1		R
+		Amount	l
+	
+	Jump
+		JUMP	j
+		
+	RotateConst
+		r1		R
+		Rot		6
+		Inv		1
+		Value	12
+
+	JCmpEq
+		r1		r
+		r2		r
+		LSmall	1
+		RSmall	1
+		Jmp		j
+
+	HALT
+		Reserved l
+
+	AddOrSubM
+		r1		R
+		r2		r
+		r3		r
+		Sh		6
+
+	BoolNot
+		r1		R
+		r2		r
+		r3		r
+		K		l
+
+	TERN
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		Small	1
+		
+	JCmpI
+		r1		r
+		r2		r
+		Cmp		4
+		Jmp		j
+
+	CmpI
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
+	CmpF
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
+	JCmpF
+		r1		r
+		r2		r
+		Cmp		3
+		Jmp		j
+
+	Compare4
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		Small	1
+		
+		
+	JCmpK // assume signed?
+		r1		r
+		K		9
+		Jmp		j
+
+	Bra		// bra:
+		r1		r
+		Small	1
+		Jmp		j
+		
+	JBitTest
+		r1		r
+		Sh		6
+		Jmp		j
+	
+	Loop
+		r1		R // assume one is an int64?
+		r2		r
+		Small	1
+		Jmp		j
+	
+	GTable
+		r1		R
+		Mode	1
+		Add		l
+
+	
+	GObj
+		r1		R
+		Mode	1
+		Ref		1
+		Add		l
+	
+	Read
+		r1		R	// dest (big r!)
+		r2		r	// Base
+		r3		r	// VarAdd
+		Offset	7	// Const A
+		move	2
+
+	Write
+		r1		r	// Src (small r!)
+		r2		r	// Base
+		r3		r	// VarAdd
+		Offset	7	// Const A
+		move	2
+
+	MemUtil
+		r1		R
+		r2		r
+		Op		3
+		N		l
+	
+
+	CNTC
+		r1		R
+		r2		r
+		offset	6
+		cnst	6
+		size	2 // 1, 2, 4, 8
+		// *p1[offset] += cnst
+
+	BFLD
+		r1		R
+		r2		r
+		up		6
+		down	6
+		sign	1
+
+	Convert
+		r1		R
+		r2		r
+		Mode	4
+		
+	RET
+		r1		r
+		Value	19
+
+	REQ
+		r1		r		// 
+		r2		r		// 
+		Mode	4		// compare mode for u1 & u2 (==, !=, >, >=, AND, |, & )
+						// AND can ! either left or right side
+		Val		10		// bitor r2 with Val. 
+	
+	Div
+		r1		R
+		r2		R
+		r3		r
+		r4		r
+		Kind	2
+	
+	Trap
+		At		l
+
+	Float
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		D		1
+
+	Float3
+		r1		R
+		r2		r
+		r3		r
+		D		1
+
+	FloatConst
+		r1		R
+		r2		r
+		High	14
+
+	ConstStretchy // rename to just Const
+		r1		R
+		Cond	1		// 0 == always, 1 = only if dest == 0
+		Inv		1
+		Value	17
+//		Extra	x
+	
+	MemoryCopy
+		r1		r		// dest
+		r2		r		// src
+		Length  14
+		
+	AddB
+		r1		P
+		K		l
+	
+	AddK
+		r1		R
+		r2		r
+		K		l
+		
+	AddAK
+		r1		R
+		r2		P
+		K		l
+	
+	Div2
+		r1		R
+		r2		r
+		Clear	6
+		Down	6
+	
+	Shift
+		r1		R
+		r2		r
+		r3		r
+		Sh		9
+	
+	Swap
+		r1		R
+		r2		R
+		r3		R
+		r4		R
+	
+
+	// refcounting
+	RefReturn
+		r1		r
+		r2		r		
+
+	RefSetApart
+		r1		r
+		r2		r
+		r3		r
+		Save	5
+	
+	RefSet1
+		r1		R
+		r2		r
+		Save	5
+
+	RefSet2
+		r1		r		// Small R
+		r2		r
+		Save	5
+		Offset	l
+	
+	RefSet3
+		r1		R		// Big R
+		r2		r
+		Save	5
+		Offset	l
+	/// yeeeet
+	
+	VecMix
+		r1		R
+		r2		r // can load a float, vec2, or vec3
+		r3		r
+		r4		r
+		Mode	3 // only 6 actual cases. Only list possible entries.
+
+
+	VecGet
+		r1		R
+		r2		r
+		r3		r
+		Ind		2
+
+	VecOpPart
+		r1		P
+		r2		r
+		r3		r
+		Mode	6
+
+	VecSet
+		r1		P
+		r2		r
+		r3		r
+		Ind		2
+	
+	
+	VecBuild
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		r5		r
+
+	VecSwizzle
+		r1		R
+		r2		r
+		Fields	12
+		
+	VecConst
+		r1		R
+		K1		l
+		K2		x
+		
+	VecInc
+		r1		R
+		r2		P
+		part	2
+		Amount	l
+		
+	
+// this file:
+// 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
+// 2) builds the instruction-info speedie uses exec can just include this file too.
+// 3) builds the µforms
+
+
+
+#!						 (((((STOP)))))
+/**/ HALT (HALT)
+		if (Op == VMHexEndCleanly)
+			vm.Registers[2].Int = 0
+		else if (Op == VMHexFinalReturn)
+			0
+		else
+			CakeCrashed(&vm, SIGILL)
+		return &vm.Registers[2].Ivec
+
+
+/**/ TRAP (Trap)
+	TryTrap()
+
+
+#!						 (((((UTIL)))))
+
+/**/ NOOP (U0)	// does nothing // (could be replaced with bitor 0?)
+		0
+		#!NOOP
+///**/ DUMB (U2)
+//		0 // Can be added or removed... just to align the jumps really!
+/**/ TIME (U2)
+		Time_(r, Op)
+/**/ CONV (Convert)
+		RegConv(r, Op)
+					// for SPD~>ARM conversion
+					// we can just do:	double from double --> int64reg = F64reg 
+					//					int64  from int64  --> F64Reg = int64
+					// floats or other size ints shouldn't be affected.
+
+/**/ FEET (AddK)	// Request available features. do nothing for now
+		u1 = 0		// allows doing stuff like initing hardware.
+
+
+
+#!						 (((((FUNC)))))
+/**/ GRAB (U2)
+		u1 = (uint64)(&u2)
+
+/**/ RET (Ret)
+		Code = RestoreStack(vm, r, Op, Code)
+		if (!Code)
+			return &(r[1].Ivec)
+
+POS 2
+	TAIL (Tail)
+		Code = TailStack(vm, r, Code+1, Op, *Code)
+
+
+POS 23
+	FNC3 (Func)
+		Code = BumpStack(vm, r, Code+2, Op, Code64)
+
+POS 24					// force position
+	FNC (Func)			// fnc:		// want to merge these two...
+									// the problem is, my system doesn't really... allow for that.
+									// what if I explicitly say "Fallthrough" then it can?
+		Code = BumpStack(vm, r, Code+1, Op, *Code)
+		fallthrough // we also need to swap fnc3 and fnc... more annoying things...
+
+
+POS 25
+	FNCX3 (ForeignFunc)
+		BridgeEntry(vm, Code, r, Op, Code64) 
+		Code += 2
+
+POS 26
+	FNCX (ForeignFunc)
+		BridgeEntry(vm, Code, r, Op, *Code)
+		Code++ 
+
+POS 255
+	MARK (U0)
+		0 // not a real instruction.
+
+// we could make the function call a relative address
+// like add a number to the current PC?
+// It doesn't work for libglobs, though. For now... just do prototypes
+// as globals.
+
+/**/ AFNC (FuncAddr)
+		i1 = FuncAddr(vm, Op, Code)
+
+
+/**/ ALLO (Alloc)
+		AllocStack(vm, r, Op)
+
+
+
+#!						 (((((Consts)))))
+/**/ KNSR (RotateConst)
+		RotateConst(r, Op)
+
+/**/ KNST (ConstStretchy)
+		LoadConst(r, Op, 0)
+
+POS 4
+	KNST2 (ConstStretchy)
+		LoadConst(r, Op, *Code++)
+POS 5
+	KNST3 (ConstStretchy)			// this leaves 17 bits unused. Perhaps can be reused for SIMD?
+		LoadConst(r, Op, *((uint64*)(Code)))
+		Code+=2
+
+
+
+#!						 (((((Math)))))
+
+/**/ ADDB (AddB) // add big
+		i1 = i1 + (AddB_Ki<<12)
+/**/ ADDK (AddK)
+		i1 = i2 + AddK_Ki
+/**/ ADAK (AddAK) // after-increment (post-increment)
+		i1 = i2
+		i2 = i2 + AddAK_Ki
+/**/ MULK  (AddK)
+		i1 = i2 * AddK_Ki
+/**/ ADD  (Shift)
+		i1 = i2 + (i3 << Shift_Shu)
+/**/ SUB  (Shift)										// must come after ADD
+		i1 = (i2 - i3) >> Shift_Shu
+/**/ MUL  (U4)
+		i1 = (i2 * i3) + i4
+/**/ DIV (Div)
+		DivMath(r, Op)
+/**/ DIV2 (Div2)
+		i1 = Div2(i2, Div2_Clearu, Div2_Downu)
+
+/**/ ICLM (Compare4)
+		i1 = std_clamp(btc(i2), btc(i3), btc(i4))
+/**/ UCLM (Compare4)
+		u1 = std_clamp(btc(u2), btc(u3), btc(u4))
+
+
+#!					((((((((32-bit math))))))))
+// Need signed/unsigned versions?        0xFFFFffff != -1|int64|
+/**/ ADDM (AddOrSubM) // mixed math
+		i1 = i2 + (ii3 << AddOrSubM_Shu)
+/**/ SUBM (AddOrSubM)
+		i1 = (i2 - ii3) >> AddOrSubM_Shu
+/**/ DIVS (Div)
+		DivMath32(r, Op)
+/**/ MULS  (U4)
+		i1 = (ii2 * ii3) + ii4
+
+
+
+#!						 (((((Bitshifts)))))
+/**/ BFLG  (BFLD)
+		if (BFLD_signu)
+			i1 = ((i2 << BFLD_upu) >> BFLD_downu)
+		else
+			u1 = ((u2 << BFLD_upu) >> BFLD_downu)	
+///**/ BFLS  (BFLS) // over-complex
+//		if (BFLD_signu)
+//			i1 |= ((i2 << BFLD_upu) >> BFLD_downu)
+//		else
+//			u1 |= ((u2 << BFLD_upu) >> BFLD_downu)	
+/**/ BRSS  (Shift)
+		i1 = ((i2 << Shift_Shu) >> Shift_Shu) >> i3
+/**/ BRSH  (Shift)
+		u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3
+/**/ BLSH  (Shift) 
+		u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu
+
+
+
+#!						 (((((BitOps)))))
+/**/ BAND  (Shift)
+		u1 = u2  &  ((u3 << Shift_Shu) >> Shift_Shu)
+/**/ BORR  (Shift)
+		u1 = u2 ||| ((u3 << Shift_Shu) >> Shift_Shu)
+/**/ BXOR  (Shift)
+		u1 = u2  ^  ((u3 << Shift_Shu) >> Shift_Shu)
+/**/ BNOT  (BoolNot)
+		u1 = (~u2) & (u3|||BoolNot_Ki)
+/**/ BANK  (AddK)
+		u1 = u2  &  AddK_Ki
+/**/ BORK  (AddK)
+		u1 = u2 ||| AddK_Ki
+/**/ BXRK  (AddK)
+		u1 = u2  ^  AddK_Ki
+
+
+
+
+#!						 (((((Branches)))))
+/**/ JUMP (jump)
+		Code += Jump_JUMPi
+
+
+/**/ JMPI  (JCmpI)
+		Code = JumpI(r, Op, Code)
+
+/**/ JMPF  (JCmpF)
+		Code = JumpF(r, Op, Code)
+
+/**/ JMPE  (JCmpEq)
+		Code = JumpEq(r, Op, Code)
+
+/**/ JMPN  (JCmpEq)
+		Code = JumpNeq(r, Op, Code)
+
+/**/ JMKM  (JCmpK)						// (jump more)
+		Code = JumpK(r, Op, Code)
+
+/**/ JMKL  (JCmpK)						// (jump less)
+		Code = JumpKN(r, Op, Code)
+
+/**/ JMKE  (JCmpK)
+		Code = JumpKE(r, Op, Code)
+
+/**/ JMKN  (JCmpK) 
+		Code = JumpKNE(r, Op, Code)
+	
+/**/ JBOR  (Bra)
+		if (u1<<(Bra_Smallu<<5))
+			Code += Bra_Jmpi
+
+/**/ JBAN  (Bra)				
+		if (!(u1<<(Bra_Smallu<<5)))
+			Code += Bra_Jmpi
+
+/**/ LUPU  (Loop)
+		if (ii1++ < ii2)
+			Code += Loop_Jmpi
+
+/**/ LUPD  (Loop)
+		if (ii1-- > ii2)
+			Code += Loop_Jmpi
+
+/**/ JTST  (JBitTest)				
+		if (!(u1&(1ull<<JBitTest_Shu)))
+			Code += JBitTest_Jmpi
+
+
+#!						 (((((MiniCompare)))))
+// maybe good to get a comparison vs a const? do later...
+/**/ EQUL  (CmpI)
+		u1 = BitComp(r, Op)
+
+/**/ NQUL  (CmpI)
+		u1 = !BitComp(r, Op)
+
+/**/ TERN  (TERN)
+		if (u2) // needs a shift
+			r[n1] = r[n3]
+		else
+			r[n1] = r[n4]
+
+/**/ CMPI  (CmpI)
+		CompI(r, Op)
+
+/**/ CMPF  (CmpF)
+		CompF(r, Op)
+
+
+
+#!						 (((((Refs)))))
+
+/**/ RALO  (U2)	// could be nicer to use a gtab const directly.
+		o1 = alloc(o2) // 1 less instruction... gtabs suck anyway.
+
+/**/ RFUN  (RefSetApart)							// freeifdead, safedecr, incr
+		Code = SetRefApart(vm, r, Op, Code)
+
+/**/ RFST  (RefSet1)								// RefCount reg --> reg
+		Code = SetRefBasic(vm, r, Op, Code)
+
+/**/ RFWR  (RefSet2)								// RefCount reg --> mem
+		Code = SetRefRegToMem(vm, r, Op, Code)
+
+/**/ RFRD  (RefSet3)								// RefCount reg <-- mem
+		Code = SetRefMemToReg(vm, r, Op, Code)
+	
+/**/ RFRT  (RefReturn)								// its ONLY used for returns...
+		Code = DeRefRegs(vm, r, Op, Code)
+		if (!Code)
+			return &(r[1].Ivec)
+
+
+
+#!						(((((Memory)))))
+/**/ GOBJ  (GObj)
+		o1 = gobj(vm, Op)
+/**/ GTAB  (gtable)
+		u1 = gtable(vm, Op)
+/**/ RD1U  (Read)
+		u1 = mem1(uint8)
+		mem2(uint8)
+/**/ RD1S  (Read)
+		u1 = mem1(char)
+		mem2(char)
+/**/ RD2U  (Read)
+		u1 = mem1(u16)
+		mem2(u16)
+/**/ RD2S  (Read)
+		u1 = mem1(s16)
+		mem2(s16)
+/**/ RD4U  (Read)
+		u1 = mem1(u32)
+		mem2(u32)
+/**/ RD4S  (Read)
+		u1 = mem0(int)
+		mem2(int)
+/**/ RD8U  (Read)
+		u1 = mem1(u64)
+		mem2(u64)
+/**/ RD16  (Read)
+		((ivec4*)r)[n1] = mem1(ivec4)
+		mem2(ivec4)
+/**/ WR1U  (Write)
+		mem1(uint8) = u1
+		mem2(uint8)
+/**/ WR2U  (Write)
+		mem1(u16) = u1
+		mem2(u16)
+/**/ WR4U  (Write)
+		#! xcode only complains about this one? ?
+		mem1(u32) = (u32)u1
+		mem2(u32)
+/**/ WR8U  (Write)
+		mem1(u64) = u1
+		mem2(u64)
+/**/ WR16  (Write)
+		mem1(ivec4) = (ivec4)(((ivec4*)r)[n1])
+		mem2(ivec4)
+
+/**/ CNTC  (CNTC)
+		IncrementAddr(r, Op, 1) // same with a few others actually
+
+/**/ CNTD  (CNTC)
+		IncrementAddr(r, Op, 0)
+
+// rename to WRCP // write copy
+/**/ WCPY  (MemoryCopy) // can zero memory, if we pass r0 as src.
+		MemCopyRDWR(r, Op)
+
+
+
+#!						(((((Float)))))
+
+/**/ FADD  (Float)
+		if (!Float_Du)
+			d1 = d2 + d3 - d4
+		else
+			f1 = f2 + f3 - f4
+
+/**/ FADK (FloatConst)
+		// we just want simple things like MyFloat += 2.0
+		f1 = f2 + FloatIncr1(Op)
+
+/**/ FMUL  (Float)
+		if (!Float_Du)
+			d1 = (d2 * d3)+d4
+		else
+			f1 = (f2 * f3)+f4
+
+/**/ FMLK  (FloatConst)
+		f1 = f2 * FloatIncr1(Op)
+
+/**/ FDIV  (Float3)
+		if (!Float_Du)
+			d1 = d2 / d3
+		else
+			f1 = f2 / f3
+
+/**/ FMOD  (Float3)
+		if (!Float_Du)
+			d1 = fmod(d2, d3)
+		else
+			f1 = fmodf(f2, f3)
+
+/**/ FMAX (Float3)
+		if (!Float_Du)
+			d1 = std_max(d2,d3)
+		else
+			f1 = std_max(f2,f3)
+
+/**/ FMIN (Float3)
+		if (!Float_Du)
+			d1 = std_min(d2,d3)
+		else
+			f1 = std_min(f2,f3)
+
+/**/ FCLM (Float)
+		if (!Float_Du)
+			d1 = std_clamp(d2,d3,d4)
+		else
+			f1 = std_clamp(f2,f3,f4)
+
+
+
+#!						(((((Vectors)))))
+/**/ VGET (VecGet)
+		i1 = iv2[u3+VecGet_Indu]
+/**/ VSET (VecSet)
+		iv1[u3+VecSet_Indu] = i2
+/**/ VBLD (VecBuild)
+		v1 = VBuild(r, Op)
+/**/ VSWZ (VecSwizzle)
+		v1 = VSwiz(r, Op)
+/**/ VMOV (U4)
+		iv1 = iv2
+		iv3 = iv4
+
+
+
+#!						(((((Float VecMath)))))
+/**/ VADD  (Float)
+		v1 = v2 + v3 - v4
+/**/ VADK (FloatConst)
+		v1 = v2 + FloatIncr1(Op)
+/**/ VMUL  (Float)
+		v1 = (v2 * v3)+v4
+/**/ VMLK  (FloatConst)
+		v1 = v2 * FloatIncr1(Op)
+/**/ VDIV  (float)
+		v1 = v2 / v3
+/**/ VMOD  (float)
+		v1 = JB_vec4_Mod(v2, v3)
+/**/ VMAX (U3)
+		v1 = JB_vec4_Max(v2,v3)
+/**/ VMIN (U3)
+		v1 = JB_vec4_Min(v2,v3)
+
+
+
+#!						 (((((vec4 parts)))))
+/**/ UADD (VecOpPart)
+		pv1 = pv2 + pv3
+/**/ USUB (VecOpPart)
+		pv1 = pv2 - pv3
+/**/ UMUL (VecOpPart)
+		pv1 = pv2 * pv3
+/**/ UDIV (VecOpPart)
+		pv1 = pv2 / pv3
+
+
+
+#!						(((((Integer VecMath)))))
+/**/ QADD  (Shift)
+		iv1 = iv2 + (iv3 << Shift_Shu)
+/**/ QSUB  (Shift)              						// must come after ADD
+		iv1 = (iv2 - iv3) >> Shift_Shu
+/**/ QMUL  (U4)
+		iv1 = (iv2 * iv3) + iv4
+/**/ QDIV (Div)
+		iv1 = iv2 / iv3
+/**/ QADK (AddK)
+		iv1 = iv2 + AddK_Ki
+/**/ QCLM (U4)
+		iv1 = JB_ivec4_ClampVec(iv2,iv3,iv4)
+/**/ QINC  (VecInc)
+		QInc(r, Op)
+
+
+
+#!						 (((((Vector Bitshifts)))))
+/**/ QFLG  (BFLD)
+		iv1 = ((iv2 << BFLD_upu) >> BFLD_downu)
+///**/ QFLS  (BFLS) // over complex.
+//		if (BFLD_signu)
+//			iv1 |= ((iv2 << BFLD_upu) >> BFLD_downu)
+//		else
+//			uv1 |= ((uv2 << BFLD_upu) >> BFLD_downu)	
+/**/ QRSS  (Shift)
+		iv1 = (iv2 >> Shift_Shu) >> iv3
+/**/ QRSH  (Shift)
+		uv1 = (uv2 >> Shift_Shu) >> uv3
+/**/ QLSH  (Shift) 
+		uv1 = (uv2 << uv3) << Shift_Shu
+
+
+
+#!						 (((((Vector BitOps)))))
+/**/ QAND  (Shift)
+		uv1 = uv2  &  (uv3 ||| Shift_Shu)
+/**/ QXOR  (Shift)
+		uv1 = uv2  ^  (uv3 ||| Shift_Shu)
+/**/ QORR  (Shift)
+		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
+/**/ QNOT  (BoolNot)
+		uv1 = (~uv2) & (uv3|||BoolNot_Ki)
+/**/ QCNV (Convert)
+		VecConv(r, Op)
+
+
+
+#!						 (((((ivec4 parts)))))
+/**/ PADD (VecOpPart)
+		piv1 = piv2 + piv3
+/**/ PSUB (VecOpPart)
+		piv1 = piv2 - piv3
+/**/ PMUL (VecOpPart)
+		piv1 = piv2 * piv3
+/**/ PDIV (VecOpPart)
+		piv1 = piv2 / piv3
+
+
+
+#!						(((((Intrinsics!)))))
+/**/ BSTT  (addk)
+		u1 = bitstats(u2, AddK_Ki)
+  

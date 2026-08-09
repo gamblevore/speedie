@@ -1,0 +1,144 @@
+
+
+module Notifications
+	linkage: cpp_part Note
+	|Guicontrol of window| Alerts = guicontrol(nil)
+	init()
+	
+	function Init
+		(.alerts is visible)
+		.alerts.lastrect = (0,0,64K,64K)
+
+	
+	constants
+		height = 70
+		width = 200
+		|int64|
+		disappear = 7.5
+	
+	
+	function ShouldDraw (|window| w, |bool|)
+		opt norefcounts
+		|| ago = w.CreatedDate.guiago.Float
+		|controlrect| sz
+		|| wd = width|float|
+		if !w.tag											// fall
+			|| X = ((0.5-ago)*wd*2.0)|int|~left
+			|| Y = (height)~up back height
+			sz = X by Y
+			if ago >= 0.5
+				return false
+		  elseif ago < 1.0									// raise
+			|| h = (ago*height|float|)|int|
+			sz = (width)~left  by  (h)~up back height
+		  elseif ago < 5.0									// stay
+			sz = (width)~left  by  (height)~up back height
+		  elseif !(w contains GUI.mousexy)				// swap-direction
+			w.CreatedDate = gui.FrameStart
+			w.obj = nil
+				
+		w.Size = sz
+		return true
+		
+
+	function Clicked (|window| w)
+		opt norefcounts
+		|| t = w.tag as error
+			|| n = t.node
+			if n == @str
+				app.alert(n.name)
+			  elseif n == @url and "file"
+				n.firstname.Reveal
+			  else
+				clipboard.text = T.name
+		w.obj = nil
+		w.CreatedDate = gui.FrameStart
+	
+	
+	function ClickedAt (|ivec2| XY, |bool|)
+		opt norefcounts
+		for w in .Alerts
+			if w contains xy
+				.Clicked(w)
+				return true
+
+
+	function Draw  // drawnotifications, drawnote
+		opt norefcounts
+		for w in .Alerts
+			w.DrawWindow(GUI.Screen)
+
+
+	function Window.Remove
+		gui.Touch
+		super.remove
+		
+		
+	function CheckForDisappear
+		opt norefcounts
+		for w in .Alerts
+			if !.shoulddraw(w)
+				w.remove
+		
+	
+	syntax append (|string| desc, |message| details=nil, |errorseverity| strength=errorseverity.ok)
+		cpp_part Str
+		self <~ error(details, desc, strength)
+
+	
+	syntax append (|error| note)
+		cpp_part Msg
+		|| s = note.name
+		if note.path
+			s = (s + "\n\"") + (note.path + "\"")
+		|| w = .NewWindow(s)
+			w.obj = note
+			if note.IsError
+				printerror s
+				printerror "\n"
+
+
+	function NewWindow (|string| s, |window|)
+		opt norefcounts
+		|| last = .alerts.last
+			if last.text ~= s
+				return nil // sigh
+			
+		|| sz = (width)~left  by  (0~up back height)
+		rz = Window(sz, false)
+		.Alerts <~ rz
+		(rz is visible)
+		rz.id = "note"
+		rz.text = s
+		|| txt = TextView(rz)
+		txt.id = "note"
+		txt.size = the~area
+		txt.text = s
+		|| W = 0.8~white
+		|| B = 0.8~black
+		rz.GNormal.Edge <~ W
+		rz.GNormal.BG <~ B
+	
+	
+	function ShowTip (|string| data, |string| prefix = "Tip:  ")
+		|| p = data.parse.Rand
+			Notifications <~ (prefix + p.name)
+
+	cpp_func SDL_GetError (|cstring|)
+		
+	function NotifySDLError
+		opt norefcounts
+		self <~ (sdl_geterror().copy, errorseverity.error)		
+
+
+function error.Useable (|date| ago=8s, |error|)
+	require self and .name
+	if !.when
+		.when = gui.FrameStart
+		return self
+	if !ago
+		return self
+	if .when.fired and self < ago
+		return self
+
+		

@@ -1,0 +1,22 @@
+
+
+function string.Path_Expand (|{string}| dict, |string|)
+	// @lib/abc --> /usr/local/lib/abc
+	// or other paths that you input into dict
+	if self[0] != '@'
+		return self
+	|| i = .Find('/') ?? .length
+	|| name = self[1, i]
+	|| found = dict[name]
+		return found.TrimSlashes + self[i...]
+
+
+function PerryIDE.DebugArgsFile (|file|)
+	|| p = .Project
+	if p.IsDir
+		return p.Child(".args")
+	return .PrefsFolder.child("args/".append(.projname,".args"))
+
+	
+function PerryIDE.PrefsFolder (|file|)
+	return file.Prefs("perry.klinkerhoppen")

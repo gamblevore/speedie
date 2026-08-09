@@ -1,0 +1,848 @@
+
+
+extend PerryIDE
+	constructor (|file| project, |bool| Dummy)
+		super.constructor
+		(dummy)
+		.IsMainWindow		= true
+		.DebugHideUnderscore = true
+		.Project			= project
+		.CanAskingAboutMissing = true
+		.LogComms			= Message()
+		.LogActions			= Message()
+		.LogCake			= Message()
+		.RecentFiles		= message()
+		.id					= "IDE"
+		.Debugger			= guicontrol(self)
+		.AppInfo			= TextView(self, nil, PerryAppInfoKeys)
+		.DebugBtns			= guicontrol(self)
+		.Stack				= listview(self, ClickedStack, ReturnStack)
+		.SearchArea			= guicontrol(self)
+		.ViewButtons		= guicontrol(self)
+		.RBorder			= guicontrol(self)
+		.CompileArea		= guicontrol(self)
+		.Toolbar			= Button(self,			ClickedToolBar)
+		.RunButton			= Button(.Toolbar,		ClickedDebug,		PressingDebug, nil, PressingDebug)
+		.BuildButton		= Button(.Toolbar,		ClickedCompile)
+		.ProjectTabs		= Button(.Toolbar,		ClickedTabs,		PressingTabs,	ReturnProjectPath,  RightClickedTabs) 
+		.RecentAndSplash	= Button(.Toolbar,		&StartupWindow.open,ClickedOpenRecent, ReturnRecents)
+		.Progress			= ProgressBar(.Toolbar,	ClickedCancel)
+		.GoPrev				= Button(.RBorder,		ClickedHistory, OpenHistory, ChoseHistoryItem, OpenHistory)
+		.GoNext				= Button(.RBorder,		ClickedHistory, OpenHistory, ChoseHistoryItem, OpenHistory)
+		.CurrFileName		= Button(.RBorder,		OpenProjectPath, nil,	ReturnProjectPath)
+		.FunctionMenu		= Button(.RBorder,		MenuAllFuncs,	 nil,	ReturnAllFuncs)
+		.CommandsMenu		= Button(.RBorder,		MenuCommands,	 nil,	ReturnCommands)
+		.ASMButton			= Button(.rborder,		ClickedASMButton)
+		.MassSearchField	= TextView(.SearchArea,	nil,					PressedSearchKeys)
+		.MassReplaceField	= TextView(.SearchArea,	nil,					PressedReplaceKeys)
+		.SubFindCheckBox	= Button(.searcharea,	PressedSearchWithin)
+		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
+		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
+		.CommsLogList		= ListView(self,		nil,					nil)
+		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
+		.ASMView			= Listview(self,		SelectedASM,			SelectedASM)
+		.ASMStretch			= StretchControl.horz(self, 200~left,  113, 210)
+		.FileSep			= StretchControl.horz(self, 175~right, 113, 210)
+		.DrawMe				= GraphicsEditor(self)
+		.FileList			= FileViewer(self,		SelectedFile,			nil, .editme)
+		.EditStatus			= TextView(self,		ClickedStatus)
+		.ProjectInfo		= TextView(self,		ClickedProjectInfo)
+		.CharInfo			= TextView(self,		PressedCharInfo)
+		.LineInfo			= TextView(self,		PressedLineInfo)
+		.JeeboxText			= TextView(self)
+		.SpeedieText		= TextView(self)
+		.ProductOut			= TextView(self)
+		.ProductErrors		= TextView(self)
+		.CompileTabs		= Button(.CompileArea,	ClickedCompileTabs)
+		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
+		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
+		.ViewFiles			= Button(.ViewButtons,	ClickedAView)
+		.ViewSearch			= Button(.ViewButtons,	ClickedAView)
+		.ViewDebugger		= Button(.ViewButtons,	ClickedAView)
+		.ViewErrors			= Button(.ViewButtons,	ClickedAView)
+		.viewlog			= Button(.ViewButtons,	ClickedAView)
+		.Views				= [.filelist,  .errorlist,  .debugger,  .searcharea,  .CommsLogList]
+		.ProductSep			= StretchControl.vert(self, 0~right, 113, 100)
+		.PopupDisplay		= textview(self)
+		.RunArgsText		= textview(self)
+		
+		.InitIDE
+		perry.AddRecent(project)
+	
+	
+	function perry.FindRecent (|string| p, |message|)
+		opt norefcounts
+		|| c = Perry.RecentProjects.first
+			return .FindRecent(p, c)
+
+
+	function perry.FindRecent (|string| p, |message!| curr, |message|)
+		opt norefcounts
+		while curr
+			if curr ~= p
+				return curr
+			curr++
+	
+	
+	function perry.AddRecent (|file| project)
+		|| f = .Findrecent(project)
+			f.name = project // fix case
+			return
+		|| Added = @tmp + project
+		added <~ (@str, project.name)
+		Perry.RecentProjects.first = added
+		Perry.RecentProjects.trim(15)
+	
+	
+	function InitIDE // perryide.init
+		.size		= the~area
+		.CopyPaste	= CopyPasteFlags.PasteFile
+		.onpaste	= perryopendoc
+
+		|| LeftBG = vec4(0.125, 0.975)
+		with .toolbar
+			.size			= the~width  by  20~down
+			.takesfocus		= 0
+			.ID				= "toolbar"
+			isnt drawsfocus
+			.align			= ListViewState.aligncenter
+			.gnormal.solid  = vec4(0.125, 0.94)
+			.DontDrawClicked  = true
+		
+		
+		with .RunArgsText
+			isnt visible
+			is editable
+			.size =  the~left+4 for 360  by  15~down back 150
+			.id = "debugargs"
+			.OnFocus = DebugArgsGotFocus
+			.gnormal.solid = (0.05, 0.05, 0.05, 0.95)
+			.gnormal.edge = (0.0, 0.0, 0.0, 0.125).px
+			.OnKeyDown = DebugArgsKeyDown
+			.JeeboxMode = DocumentJeeboxMode.Expect
+			.attachedfrom = movecode.top
+			.ClickOutsideCloses = true		
+
+
+		with .ViewButtons
+			.ID				= "LBorder"
+			.size 			= the~width  by  15~down
+			.gnormal.solid  = vec4(0.077, 0.95)
+
+
+		with .Rborder
+			.ID				= "RBorder"
+			.size 			= the~width  by  15~down
+			.gnormal.solid	= vec4(0.077, 0.95)
+
+
+		with .FileList
+			.IsMainListView = true
+			.tooltip		= "Displays files in project"
+			.folfile		= ".perry"
+			.takesfocus		= takesfocusflag.CanFocus
+			.ID				= "FileList"
+			.size			= the~width by the~bottom to 15~down
+			.copypaste		|= copypasteflags.pastefile
+			.OnSearchWithin	= PerrySearchWithin
+			.onpaste		= PerryOpenDoc
+			.newcmm				// for the hideside test
+			.sizecheckers	= "spd,txt" / ','
+			if self.Project.isdir
+				.NoFind			= "jb.cpp,jb.h,jb_globals.cpp".dict(',')
+			isnt drawsfocus
+			is NoSearch
+			
+			.GNormal.Solid = LeftBG
+			.OnRightClick = PerryFileViewRightClick
+			.OnChange = PerryRecheckEvent
+			.KeepOneSelected = true
+			.SetFocus
+			.Init
+	
+	
+		with .EditMe
+			is	enabled
+			is	editable
+			is	codeeditor
+			isnt drawsfocus
+			.ID				= "EditMe"
+			.GroupSaveAll	= true
+			.size = the~width  by  the~bottom to 0~before 
+			.OnTextChanged	= EditMeModified
+			.OnShowExtraInfo = OnShowExtraInfo
+			.gnormal.solid	= vec4(0.1, 0.974)
+			.OnSelChanged	= EditMeSelChange
+			.OnSelError		= EditMeSelError
+			.OnBreakPoint	= DebugBreakAdd
+			.OnDrawLineNumber = PerryColorLineNum
+
+
+		with .DrawMe
+			is   enabled
+			is   editable
+			isnt drawsfocus
+			.ID				= "DrawMe"
+			.size = the~width by the~bottom to 0~before
+			.gnormal.bg		= vec4(0.0, 0.81).px
+			.gnormal.edge	= vec4(0.2, 1.0).px
+			.gnormal.Separator	= vec4(0.4, 1.0).px
+
+
+		with .ASMView
+			.tooltip		= "Displays ASM"
+			.MultiSelection	= true
+			.TakesFocus		= TakesFocusFlag.CanFocus
+			.ID				= "ASM View"
+			.size			= the~area
+			is NoSearch
+			.AttachedFrom	= ~MoveCode.Left
+			.GNormal.inside	= LeftBG + vec4(0.004, 0.002, -0.002, 0) // warmer
+			.GNormal.Edge	= self.asmstretch.Divider.GNormal.Edge
+			.GNormal.Edge.a	= (0.05*255.0)|int|
+			
+			.OnKeyDown = ASMViewKeys
+		
+
+		with .autocomplete
+			.OnRightClick	= PerrySuperAutoComplete
+			.onselected		= PerryAutocompleteSelected
+			.ID				= "AutoComplete"
+			.takesfocus		= takesfocusflag.CanFocus
+			|| dark			= self.filelist.GNormal.bg.color
+			.GNormal.bg		= 0.05.mix(  dark, vec4(0.5, 1.0, 0.0, 1.0)).px	// mostly dark
+			.GNormal.edge	= 0.1.mix(dark, colors.green ).px				// less dark
+			is TypeThrough
+			isnt visible
+
+
+		with .ErrorList
+			.Columns = ListViewRow("", listviewstate.aligncenter)
+			.IsMainListView = true
+			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
+			.GNormal.Solid = LeftBG
+			.onpaste = ErrorListPaste
+			.OnKeyDown = DeleteableListKeys
+			.listsource = error()
+			.copypaste |= copypasteflags.pastetext
+			.copypaste |= copypasteflags.CopyText
+			
+		
+		with .CommsLogList
+			.IsMainListView = true
+			.GNormal.Solid = LeftBG
+			.oncopy = listview.PerryCopyComms|guicopyevent|
+		
+		
+		.ASMVis = false
+		.ErrorLogInit(.Errorlist, "ErrorList" )
+		.ErrorLogInit(.CommsLogList,   "LogArea" )
+
+		with .UnNeededLabel
+			.takesfocus		= 0
+			.ID				= "NoNeed"
+			.size			= 5~inside  by  100~down back 60
+			isnt editable
+			isnt visible
+			isnt drawsfocus
+			.copypaste		|= copypasteflags.copytext
+			.alignment		= MoveCode.Center
+			.gnormal.Clear
+
+
+		with .SearchArea
+			.tooltip		= "Searches stuff. Press \1f; or \1f' to step in list."
+			.takesfocus		= takesfocusflag.CanFocus
+			.ID				= "SearchArea"
+			.size			= the~width by the~bottom to 15~down
+			isnt visible
+			isnt drawsfocus
+			.gnormal		= self.errorlist.gnormal
+
+
+		with .MassSearchField
+			is   editable
+			is   visible
+			isnt drawsfocus
+			.OnTextChanged	= PerrySearchChanged
+			.tooltip		= self.SearchArea.Tooltip			
+			.SingleLine		= TextView.SingleLine
+			.ID				= "find"
+			.size 			= 3~inside  by  2~down back 15
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.autocompletestring = "Find..."
+
+
+		with .MassReplaceField
+			is   editable
+			isnt enabled
+			is   visible
+			isnt drawsfocus
+			.tooltip		= self.SearchArea.Tooltip			
+			.SingleLine		= TextView.SingleLine
+			.ID				= "replace"
+			.size			= 3~inside  by  2~under back 15
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.autocompletestring = "Replace..."
+
+
+		with .SubFindCheckBox
+			isnt visible
+			.size		= 3~inside  by  2~under back 15
+			.Tooltip	= "Searches within only selected files"
+			.id			= "SubFind"
+			.gnormal.solid = (0, 0, 0, 0.25)
+
+
+		with .FoundList	// with .findlist
+			is   editable
+			is   visible
+			is   UnSearchable
+			isnt DrawsFocus
+			.Columns = ListViewRow("", listviewstate.aligncenter)
+			.IsMainListView	= true
+			.RowHeight		= .rowheight + 3
+			.Hierarchical	= true
+			.tooltip		= self.SearchArea.Tooltip			
+			.KeepOneSelected = true
+			.OnKeyDown		= DeleteableListKeys
+			.ID				= "FoundList"
+			.size 			= the~width  by  the~bottom to 0~under 
+			.AlwaysSendChangeEvent = true
+			.gnormal		= self.FileList.GNormal.copy
+			.GNormal.Solid = LeftBG
+			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
+			.GNormal.Separator = 0
+		.UpdateFoundHeader
+			
+
+		{
+			|| D = .debugger
+			D <~ .appinfo
+			D <~ .DebugBtns
+			D <~ .Stack
+			with D
+				.size			= the~width by the~bottom to 15~down
+				is enabled
+				.takesfocus		= takesfocusflag.CanFocus
+				.ID				= "DebuggerArea"
+				.gnormal		= self.errorlist.gnormal
+		}
+
+		
+		with .appinfo
+			is	visible
+			is	drawsfocus
+			.Alignment		= MoveCode.Center
+			.tooltip		= self.debugger.Tooltip
+			.ID				= "Application Info"
+			.size			= (the~width back 1)  by  1~down back 40
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			.GNormal.edge	= (0.5, 0.5, 0.1, 0.25).px
+			.GNormal.PixelShader = image.CurlieQueDrawer
+
+
+		with .DebugBtns
+			is   visible
+			isnt drawsfocus
+			.ID = "DebugButtons"
+			.tooltip		= self.debugger.Tooltip
+			.size			= the~width  by  1~under back 18
+			.gnormal.solid	= (0.0, 0.0, 0.0, 0.25)
+			self.AddDebugButtons(DebugStepOver,	"\02",		"Step Over = \1f\15")
+			self.AddDebugButtons(DebugStepIn,	"\03",		"Step In = \1f\04\15")
+			self.AddDebugButtons(DebugStepOut,	"\04",		"Step Out = \1f;")
+			self.AddDebugButtons(DebugStepRun,	"\02\02",	"Run")
+
+
+		with .stack
+			if self.stack isnt Editable // hmmmm
+			is   editable
+			is   visible
+			is   UnSearchable
+			isnt DrawsFocus
+			.OnKeyDown		= PerryStackKeyDown
+			.ColumnFinder	= &Perry.VariableFinder
+			.OnExpandRow	= &Perry.collectexpansion
+			.Hierarchical	= ListViewHierarchy.Last
+			.RowHeight		= .rowheight + 3
+			.IsMainListView	= true
+			.MultiSelection	= true
+			.OnEditCell = PerryStackEditCell
+			.AlwaysSendChangeEvent = true
+			.tooltip		= "Variables and the Stack"
+			.ID				= "Stack"
+			.xindentperdepth = font.Width
+			.size			= the~width by 0~up to 1~under
+			.gnormal		= self.FileList.GNormal.copy
+			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)
+			.gRowSel.solid	= vec4(0.11, 0.335, 0.12, 0.675)
+			.GNormal.Separator	= 0
+			.GNormal.PixelShader = image.CurlieQueDrawer
+			
+			
+		with .progress
+			isnt visible
+			.gnormal.edge = vec4(0.5).px
+
+
+		with .PopupDisplay
+			isnt visible
+			is PassThru
+			.clipmode = ControlClipMode.SlideBackInWindow
+			.ID				= "PopupDisplay"
+			.size			= the~area
+			.takesfocus		= 0
+			.JeeboxMode		= documentjeeboxmode.prefer
+
+
+		with .EditStatus
+			.ID				= "Status And Errors"
+			.alignment		= MoveCode.Center
+			isnt editable
+			.takesfocus		= 0
+			.size			= the~width  by  0 to 13
+			.gnormal.solid	= vec4(0.125, 0.94)
+
+
+		with .ProjectInfo
+			.ID				= "ProjectInfo"
+			.alignment		= MoveCode.MiddleLeft
+			.SingleLine		= TextView.SingleLine
+			isnt editable
+			.takesfocus		= 0
+			.size			= the~left for 400  by  0 to 13
+			.gnormal.clear
+
+		with .CharInfo
+			.ID				= "CharInfo"
+			.alignment		= MoveCode.Center
+			.SingleLine		= TextView.singleline
+			isnt editable
+			.takesfocus		= 0
+			.size			= 2~left back 92  by  0 to 13
+			.gnormal.clear
+
+		with .LineInfo
+			.ID				= "LineInfo"
+			.alignment		= MoveCode.Center
+			.SingleLine		= TextView.singleline
+			isnt editable
+			.takesfocus		= 0
+			.size			= 5~before back 75  by  0 to 13
+			.gnormal.clear
+
+		with .FileSep
+			is enabled
+			.ID	= "filesep"
+			.size = the~width by 14~up to 20~down
+			.addright self.Rborder
+			.addright self.ProductSep
+			.addleft  self.ViewButtons
+			.addleft  self.ErrorList
+			.addleft  self.CommsLogList
+			.addleft  self.debugger
+			.addleft  self.SearchArea
+			.addleft  self.FileList
+			.addleft  self.UnNeededLabel
+		
+		with .filesep.divider
+			.onhide = FileSepClicker
+			.onshow = FileSepClicker
+			.onstretch = HideSomeStuffOnResize
+
+		with .ProductSep
+			is enabled
+			.size = the~area
+			.divider.defaultFraction = 0.125
+			.ID	= "edit+stdout"
+			.AddLow  self.CompileArea
+			.addhigh self.rborder
+			.addhigh self.editme
+			.addhigh self.drawme
+			.addhigh self.ASMStretch
+		
+		with .ASMStretch
+			.id = "ASMStretch"
+			.size = the~width by the~bottom to 15~down
+			.divider.defaultFraction = 0.7
+			.AddRight(self.asmview)
+	
+		.JeeboxText.SetupOut("Jeebox")
+		.SpeedieText.SetupOut("Speedie")
+		.ProductOut.SetupOut("Product", documentjeeboxmode.NotJeebox)
+		.ProductErrors.SetupOut("Errors")
+
+		.AddIDEButton(.RunButton,		"\02", "Debug Project", "debug")
+		.AddIDEButton(.buildbutton,		"\1C", "Build Project", "compile")
+		.BuildButton.next = .Progress
+		.AddIDEButton(.progress,	"", "", "progress")
+		.RunButton.size =	5~after for 22  by  3~inside
+		.buildbutton.size = 5~after for 22  by  3~inside
+		.RecentAndSplash.size = 7~left back 22  by  3~down back 14
+		.progress.size =	0~before for 60  by  3~inside
+		
+		.RunButton.ExpandOnMouseOver = 1
+		.BuildButton.ExpandOnMouseOver = 1
+		.Progress.ExpandOnMouseOver = 1
+		.CurrFileName.ExpandOnMouseOver = 1
+		.FunctionMenu.ExpandOnMouseOver = 1
+		.ProjectTabs.ExpandOnMouseOver = 2
+	
+			
+		with .CompileArea
+			.ID				= "OutBorder"
+			.size			= the~width  by  18~down
+			.gnormal.solid	= vec4(0.087, 0.95)
+
+		with .ProjectTabs
+			.id = "Tabs"
+			.size = 10~after to the~right  by  3~inside
+			.itemwidth = 84
+			.CanReOrderButtons = true
+			.ButtonSource = perry.projects
+			.ColumnFinder = &Perry.ReadButtonNames
+			.gnormal.solid	= (0.7, 1.0, 0.2, 0.2)
+			.GNormal.PixelShader = image.RoundRectDrawer
+			.GNormal.CornersCut = 6
+			.GNormal.CornerSize = 6
+
+		with .CompileTabs
+			.id = "CompileTabs"
+			.size = the~width by 18~down
+			.itemwidth = 101
+			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
+			.ButtonSource = message()   // ("Jeebox, Speedie, '', Errors"~parse)|listviewrow|
+			|| btnsrc = .ButtonSource
+				self.IDESetNext(self.JeeboxText, btnsrc )
+				self.IDESetNext(self.SpeedieText, btnsrc)
+				self.IDESetNext(self.ProductOut,  btnsrc)
+				|| c = self.IDESetNext(self.ProductErrors, btnsrc)
+	
+				(c is hidden)
+				(c is Broken)
+			
+
+		.AddIDEButton(.RecentAndSplash,	"\1a", "Startup screen", "startup")
+		.AddViewButton(.Viewfiles,		"\10",	.filelist)
+		.AddViewButton(.viewsearch,		"\16",	.searcharea)
+		.AddViewButton(.viewerrors,		"\17",	.errorlist)
+		.AddViewButton(.viewdebugger,	"\18",	.debugger)
+		if app.prefs["dev"]
+			.AddViewButton(.viewlog,	"  &#x2261;",	.CommsLogList)
+
+		.viewfiles.left = 5 ~ right
+		.view(.Viewfiles)
+		
+		.addlbutton(.goprev,		"<",	"prev", "Go to previous file.")
+		.addlbutton(.gonext,		">",	"next", "Go to next file.")
+		
+		{
+			|| submenu = .GoPrev.SubControl as menu
+				.gonext.SubControl = submenu
+				submenu.OnKeyDown = &DeleteHistory
+				submenu.OnSelected = &SelectHistory
+		}
+		
+		
+		with .CurrFileName
+			.gnormal.solid	= (0.7, 1.0, 0.2, 0.1)
+			.id = "CurrFileName"
+			.tooltip = "Show File Path"
+
+		with .FunctionMenu
+			.gnormal = self.currfilename.gnormal
+			.id = "AllFuncs"
+			.tooltip = "List Functions In File"
+			.size = 4~after for 40 by the~same
+		
+		with .FunctionMenu.SubMenu
+			isnt drawsfocus
+			.ID = "AllFuncsMenu"
+			.OnSelected = PerryFuncMenuSelected
+			.OnTypingFilter = PerryFuncListFilter
+
+		with .CommandsMenu
+			.gnormal = self.currfilename.gnormal
+			.id = "Commands"
+			.text = "Commands"
+			.tooltip = "Available Commands"
+			.size = 4~after for 70 by the~same
+		
+		with .CommandsMenu.submenu
+			isnt drawsfocus
+			.ID = "CommandsMenu"
+			.ListSource = PerryCommandsMenu()
+
+		with .ASMButton
+			.gnormal = self.RecentAndSplash.gnormal
+			.id = "asm"
+			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
+			.size = 6~left back 23  by  the~same
+			.text = "\1d"
+
+		with .RecentAndSplash.submenu
+			isnt drawsfocus
+			.ID = "RecentList"
+
+		with .CurrFileName.submenu
+			isnt drawsfocus
+			.ID				= "PathMenu"
+		
+		.ViewAsCurr
+		.SetupLogArea
+		.ReTextSubFind
+		.CompileTabSelect(.SpeedieText)
+	
+	
+	function IDESetNext (|guicontrol| obj, |listviewrow| root, |listviewrow!|)
+		opt norefcounts
+		rz = listviewrow()
+		if !root.first
+			(rz is selected)
+		rz.name = obj.id
+		root <~ rz
+		rz.obj = obj
+		obj.obj = rz
+
+
+	function textview.SetupOut (|string| name, |documentjeeboxmode| Parse=documentjeeboxmode.expect)
+		opt norefcounts
+		is enabled
+		is alwaysscrollable
+		isnt editable
+		isnt drawsfocus
+		.ID				= name
+		.size			= the~width by the~bottom to 0~under
+		.gnormal.solid	= vec4(0.077, 0.95)
+		.JeeboxMode	= Parse
+		.IsALogTextView = true
+		.ide.productsep.addleft(self)
+		
+		
+	function SetupLogArea
+		|| g = .CommsLogList
+		g.Hierarchical = true
+		g.id = "log"
+		require !app.prefs["nolog"]
+		g.gnormal.Separator = g.gnormal.bg
+		g.gnormal.Separator.alpha *= 0.8
+		
+		g.OnKeyDown = LogAreaKeys
+		.AddBaseLog("-- speedie comms --", .logcomms)
+		.AddBaseLog("-- perry actions --", .logactions)
+		.AddBaseLog("-- cake actions --", .logcake)
+	
+	
+	function AddBaseLog (|string| s, |ListViewRow| list)
+		list.name = s
+		.CommsLogList.listsource <~ list
+		(list is expanded)
+		(list is aligncenter)
+
+
+	function LogOneThing (|object| msg, |string| type, |ListViewRow| m)
+		if !type
+			if msg isa Message
+				m <~ msg
+			  elseif msg isa string
+				m <~ @emb + msg
+		  else
+			|| fs = FastString()
+			fs <~ type
+			if msg isa Message
+				msg.Render(fs)
+			  elseif msg isa string
+				fs <~ msg
+			m <~ @emb + fs.GetResult
+		m.position++
+		
+		while m.position > 300
+			m.first.remove
+			m.position--
+		
+		if .CommsLogList.IsViewable
+			GUI.Touch
+	
+	
+	function LogOneCake (|object| msg, |string| type="")
+		.LogOneThing(msg, type, .LogCake)
+		
+	
+	function LogOneComm (|object| msg, |string| type="")
+		.LogOneThing(msg, type, .LogComms)
+
+
+	function LogOneAction (|object| msg, |string| type="")
+		.LogOneThing(msg, type, .LogActions)
+
+
+	function ErrorLogInit (|listview| lv, |string| s)
+		with lv
+			.takesfocus		= takesfocusflag.CanFocus
+			.ID				= s
+			.size			= the~width by the~bottom to 15~down
+			isnt visible
+			isnt drawsfocus
+			is unsearchable
+			.MultiLineDraw = true
+			.AlwaysSendChangeEvent = true
+			.copypaste		|= copypasteflags.copytext
+			.gnormal.edge	= .gnormal.bg
+			.rowheight		= .rowheight * 2
+
+
+	function AddViewButton (|Button| BTN, |string| Oof, |guicontrol| tag)
+		.ViewButtons <~ btn
+		btn.obj		= tag
+		.addlbutton(Btn, oof, tag.id, tag.tooltip)
+		btn.id		= "btn_"+tag.id
+		btn.size	= 3~after for 21  by  1~down back 13
+		tag.tooltip	= ""
+	
+	
+	function AddLButton (|Button| BTN, |string| txt, |string| id, |string|tool)
+		.AddIDEButton(btn, txt, tool, id)
+		btn.size = 1~after for 16  by  1~inside
+		btn.gnormal.clear
+	
+	
+	function AddIDEButton (|guicontrol| BTN, |string| txt, |string| tip, |string| id)
+		btn.id = id
+		btn.tooltip = tip
+		btn.Text = txt
+		(btn is Spacer)
+		|| opacity	= 0.93
+		|| f		= 0.15 / opacity
+		if btn isa Button
+			btn.gnormal.solid = (f, f, f, opacity)
+			btn.GNormal.PixelShader = image.RoundRectDrawer
+
+
+	function AddDebugButtons (|GUIAction| action, |string| icon, |string| id)
+		|| btn = Button(.DebugBtns, action)
+		btn.Decluttered = true
+		btn.size = 5~after for (22*icon.length)  by  3~inside
+		btn.id = id
+		btn.Tooltip = id
+		btn.Text = icon
+		btn.GNormal.PixelShader = image.RoundRectDrawer
+		(btn isnt enabled)
+		|| opacity	= 0.93
+		|| f		= 0.15 / opacity
+		btn.gnormal.solid = (f, f, f, opacity)
+		
+		
+	function LoadProject (|bool|)
+//		require .project.mustexist("load project")
+		.DuringLoad++
+		.JumpMode++
+		.StartFileList
+		.DuringLoad--
+		.StartProj
+
+		StartupWindow.hide
+		.ViewAsProject
+		.AskCheck
+		GUI.SavePrefs // for pref-file editing
+		.ShowIDE
+		.ViewAsbetter
+		.LoadStartupErrors
+		.SetAppInfo
+		.RecentFiles.clear
+		.RecentFiles.obj = nil
+		.EnablePrevNext
+		.JumpMode--
+		return true
+	
+		
+	function RelistStartupErrors
+		for err in .startuperrors
+			ifn err isa error
+				log "RelistStartupErrors bug"
+			.errorlist <~ err
+			is broken
+		// * need to alter the saved errors when the .perry file is altered...
+	
+	
+	function StartFiles
+		|| IsDir	 = .project.isdir
+		|| ProjConf	 = .perryfile
+		error.BackupErrorSource = @tmp+projconf
+		|message| conf
+		if !isdir
+			.FileList.NoFind = nil
+		  elseif projconf.exists
+			conf = projconf.parse
+
+		|| f = .FileList
+		f.clear
+		f.AddRoot(.project, true)
+		f.FocusOn( .root! )
+		.LoadConfSub(conf)
+
+
+	function LoadConfSub (|message| conf)
+		|| f = .FileList
+		f.Excludes = dictionary()
+		for ex in conf["excludes"]
+			f.Excludes![ex.value] = "x"
+		
+		if !conf and .ProjectIsCode
+			conf = templates.Roots.parse
+		
+		.LostFunks = conf["unused_lib_funcs"]
+		for lib in .LostFunks
+			lib.name = PathExpand(lib.name)
+		
+		for ro in conf["roots"]
+			error.BackupErrorSource = ro
+			if ro.expect(@str)
+				file.OSXMaxCaseWarnings_[] max= 1 // like /usr/local/bin vs /USR/LOCAL/BIN . Allows to report case errors.
+				|| str = PathExpand(ro.name)
+					f.addroot(str.file)
+				  else
+					error (ro, "Can't find project root. Please fix this path.")
+		
+		f.CheckSize
+		error.BackupErrorSource = nil
+
+
+	function DesiredStart (|filerow| projfol, |$int| pos,  |filerow|)
+		opt norefcounts
+		|| edit = .SharedProjectTabSource["edit"]
+			pos = .SharedProjectTabSource["pos"].int
+			|| n = edit.name
+				return self.filelist[n]
+		|| tod = .nottodo
+			return tod
+		return projfol
+	
+	
+	function StartProj
+		opt norefcounts
+		|| projfol = .MainProjFol
+		if !projfol
+			.EditRow(.filelist.liststart)
+			return
+		
+		projfol.dirfile = ".todo"
+		.findnottodo
+		(projfol is expanded)
+		|| pos = 0
+		|| file = .DesiredStart(projfol, pos)
+			.EditRow(file)
+			.EditMe.ShowAndSelect(pos)
+
+
+	function PerryFile (|file!|)
+		return .project.child(".perry")
+	
+	
+	function StartFileList
+		perry.AddProj(.project.path, self)
+		|| r = .root
+			.id = r.FilePath
+		.nottodo = nil
+		.StartFiles
+	

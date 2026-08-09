@@ -1,0 +1,269 @@
+
+
+/*
+	NilTracker keeps track of a 3D-ish table. (2D + 2-layers)
+	
+	We have rows (declarations), columns (branch-depth), and each cell has two values for the two branch-side.
+	
+	We actually store it as bit-fields, but its still the same.
+	
+	Its a true work of art. Beyond which giants cannot compare.	
+*/
+
+
+struct ArchonPurger
+	linkage: cpp_part nil
+	|&NilRecord|			Neel
+	|&NilRecord|			RowEnd
+	|Nilrecord|				Realnesses		// could be removed after we remove the param upgrader!
+	|Scdecl--[32]|			Decls
+	|message--[32]|			Closers
+	|scdecl?|				Return
+	|int|					InsideBoolLogic
+	|bool|					FnAbleToNilCheck
+	|bool|					AnyReturns
+	|bool|					NeedsRestart
+	|NilRecord[64]|			Rows
+	
+	
+	function BranchDepth (|int|)
+		return (.Neel - &.rows[0])|int|
+	
+	
+	function BranchEnter (|message| where, |NilRecord|)
+		if .Neel < .RowEnd
+			|| n = .Neel++[]
+			.neel[] = n // no realnesses
+			return n
+			
+		error (where, "Branch depth too deep (over 63)")
+		
+	
+	function BranchSwap (|NilRecord| A, |nilrecord|)
+		rz = value()
+		.value = A
+	
+	
+	function BranchExitBool (|NilRecord| A, |NilCheckMode| Test, |nilrecord| Orig,  |nilstate|)
+		if test is ForBools
+			return .BranchExit(a)
+		.neel[] = 0
+		return .BranchRestore(orig) // restore old value
+	
+	
+	function BranchRestore (|NilRecord| A,  |nilstate|)
+		.Neel--[] = 0 // cleanup
+		.value = A
+		if .BranchDepth == 0
+			.Realnesses = -1
+		return NilState.real
+	
+	
+	function BranchExit (|NilRecord| A,  |nilstate|)
+		|| B = value()
+		.Neel--[] = 0 // cleanup
+		.value = A ||| B
+		if .BranchDepth == 0
+			.Realnesses = -1
+		return nilstate.real
+	
+			
+	function Declare (|scdecl| D, |nilstate| nd, |message| ToClose, |nilstate|)
+		rz = .DeclareSub(d, nd, toclose)
+	
+	
+	function DeclareSub (|scdecl| D, |nilstate| nd, |message?| ToClose, |nilstate|)
+		nd &= nilstate.either
+		|| N = .value.DepthOfVars + 1
+		expect (N < 31)							(D.source, "Too many declarations")
+		.decls[n] = d
+		d.suffers = d.TypeSuffers			
+		d.NilReg = N
+		if !d.Suffers
+			d.NilDeclared = NilState.Real
+		
+		.closers[n] = nil
+		if d isnt Grabbed						// grabbed's previous use was only on properties. can't clash.
+			.closers[n] = ToClose
+		
+		d.DepthOfBranch = .BranchDepth
+		|| P = (.Neel)|&nilrecorder|
+		(p)(n) = nd
+		return nd
+	
+	
+	function scdecl.NilCurr (|nilstate|)
+		if self Isnt Local
+			return .NilDeclared & nilstate.either
+		return (ArchonPurger.Value)[.NilReg]
+	
+	
+	function SetNilness (|SCDecl| d, |NilState| New, |NilState|)
+		opt inline
+		|| P = (.Neel)|&nilrecorder|
+		(P)(d.NilReg) = new
+		return New
+
+
+	function CheckParam (|scdecl| d)
+		d.Paramfix
+		.DeclareSub(d, d.nildeclared, d.source!)
+
+
+	function StartNil (|SCFunction| f, |message|)
+		opt norefcounts
+		require f.HasProperSpeedieCode
+
+		SCFunction.CurrFunc = f
+		.rows[0] = nilstate.Basic
+		.InsideBoolLogic = 0
+		.Neel = .rows[0]
+		.rowend = .Neel + 63
+		.Realnesses = -1
+		loops = nil
+		.AnyReturns = false
+		.NeedsRestart = false
+		.CheckNilCheck(F)
+		
+		for d in f.args
+			.CheckParam(d)
+		
+		|| r = f.ReturnType
+			if !r.nilstated
+				r.nildeclared = 0 // build this up carefully.
+
+		return f.SourceArg
+
+
+	function FinishNil (|SCFunction| f)
+		opt norefcounts
+		if NewFuncsLoaded
+			linkmap.CollectLinksInOne(f) // more ;|
+			NewFuncsLoaded = false
+			
+		|| r = f.ReturnType
+			r.nildeclared |= nilstate.stated
+		for a in f.Args
+			a.nildeclared |= nilstate.stated
+	
+
+	function CheckNilCheck (|SCFunction| f)
+		opt norefcounts
+		.FnAbleToNilCheck = false
+		.return = f.returntype
+		|| s = f.args.first
+			if (s.nildeclared is nilish) and s.TypeSuffers and .return.CanNilCheck
+				.FnAbleToNilCheck = true
+
+
+	function Value (|nilrecord|)
+		return .Neel[]
+	
+	
+	function Self (|nilstate|)
+		return (.value)[1]
+
+
+	setter Value (|NilRecord| Dest)
+		.neel[] = dest & .Realnesses
+
+	function ExterminateZergBugs (|SCFunction| f)
+		opt norefcounts
+		
+		|| arg = .Startnil(f)
+			Argument(arg)
+			if .NeedsRestart
+				RestartCount++
+				StdErr.Clear
+				arg = .StartNil(f)
+				Argument(arg)
+				
+			if .FnAbleToNilCheck and !f.isnilchecker
+				f.isnilchecker = 1
+		.FinishNil(f)
+
+
+	module
+		|LoopInfo|				Loops
+		|ArchonPurger|			T
+		|byte|					OldPrint
+		|bool|					NewFuncsLoaded
+		|int|					RestartCount
+
+		function BeginLoop (|bool| HasExitCond, |Loopinfo|)
+			rz = .loops
+			.Loops.BeginLoop(hasexitcond)
+
+		function Value (|NilRecord|)
+			return .t.value
+
+		function EndBlock (|nilrecord|)
+			rz = .value
+			.t.value = nilstate.basic
+
+		function DeclKill
+			.t.value = nilstate.Basic
+
+		function ExterminateZergBugs (|SCFunction| f)
+			.t.exterminatezergbugs(f)			
+		
+		function LaunchMothership
+			(compiler is NilChecking)
+			|| Old = stderr
+			|| Rec = ErrorReceiver()
+			.LaunchMothershipSub(old, rec)
+			SCFunction.currfunc = nil
+	
+	
+		function LaunchMothershipSub (|ErrorReceiver| Old, |ErrorReceiver| Rec) // purgearchons, firelasers
+			opt norefcounts
+			if !compiler.ConfBool("nil_check")
+				rec.LowerErrorsTo = ErrorSeverity.Warning
+
+			using rec
+				for xoxo in compiler.funclist
+					target debug
+						if (xoxo.islibrary) and (!IntMaxObj or xoxo.intprmcount > IntMaxObj!.intprmcount)
+							IntMaxObj = xoxo
+					.ExterminateZergBugs(xoxo)
+					rec.ReturnErrors(old)
+
+
+
+target debug
+	|SCFunction| IntMaxObj
+		 
+
+		
+			
+function message.OrigRender	(|faststring| fs_in=nil, |string|)
+	opt norefcounts
+	|| n = .OrigMsg
+	|| fs = faststring(fs_in)
+
+	if n and n != self
+		n.Render(fs)
+		if self is inserted
+			fs <~ " ("
+			.render(fs)
+			fs <~ ")"
+	  else
+		.Render(fs)
+	
+	if !fs_in
+		return fs
+
+
+
+function message.OrigMsg (|message|)
+	opt norefcounts
+	|| f = .File
+		return f.orig.findtightest(.position, false, true)
+
+
+function errorreceiver.ReturnErrors (|errorreceiver| To = StdErr, |int|)
+	opt norefcounts
+	for e in self
+		To <~ e
+		rz ++
+

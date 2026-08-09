@@ -1,0 +1,219 @@
+ 
+// confirm, ask, confirmit, beep, alert
+module beep
+	|date| OK = 1
+	syntax expect (|string?| s=nil)
+		inlined
+		app.beep(s)
+
+
+extend_module app
+	function BeepSub
+		cpp_Wrapper JB_App__Beep
+	
+	function Beep (|string?| q=nil)
+		if beep.OK.fired
+			.BeepSub
+			beep.OK = date.now + (1s/12) // really must be date.now, NOT framestart!
+		if q
+			.alert(q)
+	
+	function Alert (|string| Q)
+		if GUI.StartedProperly
+			confirmationdialog.ask(q, "", ["OK"])
+		  else
+			GUI.PendingAlerts <~ q
+
+
+function String.ConfirmOrCancel (|string| Q,  |string| Title="",  |int|)
+	|| Answers = ["Yes", "No", "Cancel"]
+	return confirmationdialog.ask(q, title, answers)
+
+
+function string.AskSaveOrCancel (|string| Title="",  |int|)
+	|| Answers = ["Save", "Dont", "Cancel"]
+	return confirmationdialog.ask(self, title, Answers)
+
+
+function string.Confirm (|string| Title="", |ConfirmCanceller| Canceller=nil, |bool|)
+	|| Answers = ["Yes", "No"]
+	return confirmationdialog.ask(self, title, Answers, Canceller) == 1
+
+
+function string.Ask_Named (|string| Answers,  |int|)
+	return confirmationdialog.ask(self, "", Answers.Components)
+
+
+function string.Ask (|string| response="",  |string| Title="",  |stringthatwasreadsafely|)
+	|| Answers = ["OK", "Cancel"]
+	if confirmationdialog.ask(self, title, Answers, response) == 1
+		return ConfirmationDialog._asker!.response.text
+	return String.Error
+
+
+libinternal window.TryCloseDialog (|bool|)
+	opt norefcounts
+	.cancelreturn
+	|| count = 0
+	if self isa ConfirmationDialog
+		for b in .Buttons
+			if b is visible
+				count++
+		if count == 1
+			.remove
+			return true
+
+
+function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
+	|| w = ConfirmationDialog._asker init ConfirmationDialog()
+	if !q or w is visible		// recursive... sigh
+		if answers[2]
+			return -1			// cancel
+		return 0
+
+	w.DelayUntil = gui.FrameStart + 0.5s
+	with w
+		.text = title
+		.Resize(q)
+		.question.text = q
+		for i in 3
+			|| b  = .buttons[i]!
+			|| bw = b.textwidth+8 max 40
+			|| a = answers[i]
+			a ?= ""
+			b.vistext = a
+			|| l = (i > 0)(3, 7)
+			b.size    = (l)~after for bW  by 5~up  for 17
+		.SetResponse(response)
+		
+		|| p = (W)(Cancel)
+		ifn (.response isnt visible) or (p != .yes) or (.response.text)
+			beep
+			
+		.text = ""
+		.question.text = "" // clear memory :)
+
+		if p == .yes
+			return 1
+		if p == .cancel or nil
+			return -1
+
+	
+	
+class ConfirmationDialog (Window)
+	linkage
+		cpp_part cwin
+	|textview|			Question
+	|textview|			Response
+	|Button|		Yes
+	|Button|		No
+	|Button|		Cancel
+	|[Button]|		Buttons
+	|date|				DelayUntil // for accidental presses.
+
+	constructor
+		super.constructor
+		.id				= "confirm"
+		.Yes			= Button(self, OnConfirmAnswer)
+		.No				= Button(self, OnConfirmAnswer)
+		.Cancel			= Button(self, OnConfirmAnswer)
+		.response		= textview(self, nil)
+		.Question		= textview(self, nil)
+		.gnormal		 = ¥.systemstyle 
+		.EntireScreen	= (300, 150)
+		.AddButton(.yes, "Yes")
+		.AddButton(.No,	 "No" )
+		.AddButton(.Cancel, "Cancel")
+		
+		isnt visible
+		.init
+	
+	
+	function Resize (|string| s)
+		|| desired = .question.TextSize(s) + (19, 34)
+		|| actual = desired max (200, 100)
+		actual = actual min (450, 550)
+		actual = actual min (GUI.Screensize.x2y2 - 8)
+		.size = actual.layout
+
+
+	function SetResponse (|string| response)
+		opt norefcounts
+		|| R = .response
+		|| vis = response != string.byte(0)
+		r.visible = vis
+		if vis
+			r.text = response
+			r.SelectAll
+			r.SetFocus
+
+
+	function Init
+		with .question
+			 is AlwaysScrollable // why isnt
+			.id			= "question"
+			.size 		= 6~inside  by  2~above to the~top-6
+			.takesfocus = 0
+			&.gnormal.edge<~ (0,0,0,0)
+			&.gnormal.bg  <~ ((0.11,0.11,0.11,1.0))
+		with .response
+			is editable
+			isnt drawsfocus
+			.id			= "response"
+			.singleline = TextView.SingleLineWithTabs
+			.gnormal	= self.question.gnormal
+			.size		= 6~inside  by  2~above for 15
+
+		
+	behaviour KeyDown
+		opt NoRefCounts
+		
+		|| cans = key.iscancel
+		if (.cancel is visible) and cans
+			.returnvalue = .cancel
+			return true
+
+		if (.no is visible)
+			if cans or ((.response isnt visible) and (key.isdelete or key is n or d))
+				.returnvalue = .NO
+				return true
+
+		if (.yes is visible) and (key.IsAccept or cans or (key is space))
+			.returnvalue = .YES
+			return true
+		return super.keydown(key)
+
+
+	function AddButton (|Button| BTN, |string| Oof)
+		.Buttons <~ btn
+		btn.ExpandOnMouseOver = 2
+		btn.Text			= Oof
+		btn.gnormal.solid	= (0.15, 0.15,0.15,1.0)
+	
+	module	
+		|ConfirmationDialog| _asker
+
+
+	
+function Window.Confirm (|string| Q, |fnConfirmCanceller| fn, |bool|)
+	|| can = ConfirmCanceller(self, fn)
+	return q.confirm(can)
+
+
+libinternal OnConfirmAnswer (GUIAction)
+	opt norefcounts
+	|| w = .window
+		w.ReturnValue = self // self isa button, not a window! (i made this mistake once)
+
+
+// this could be better as a task... one less class to think about.
+prototype fnConfirmCanceller (|object| self, |bool|) 
+class ConfirmCanceller
+	linkage
+		cpp_part cncl
+	|object|					Owner
+	|fnConfirmCanceller|		Func
+	syntax call (|bool|)
+		if self
+			return (.func)(.owner)
+	

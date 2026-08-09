@@ -1,0 +1,662 @@
+
+
+class GUIControl (list)
+	linkage: cpp_part ctrl	
+	contains GuiControl
+
+	|GUIAction?|				OnClicked
+	|GUIAction?|				OnFocus
+	|GUIPasteEvent?|			OnPaste
+	|GUICopyEvent?|				OnCopy
+	|GUIKeyEvent?|				OnKeyDown
+
+	|ivec4|						LastRect
+	|string|					ID
+	|string|					Text
+	|string|					Tooltip
+	|Drawstyle|					GNormal
+	
+	|TimeFader|					Declutterer
+	|ControlSize|				Sizer
+	|uint16|					TabIndex
+	|ControlClipMode|			ClipMode
+	|GuiControlFlags|			State
+	|TakesFocusFlag|			TakesFocus
+	|uint16|					_TransitionFraction
+	|movecode|					AttachedFrom
+	|byte|						TextAlteredForDraw
+	|byte|						Padding
+	|byte|						ExpandOnMouseOver
+	|bool|						ClickOutsideCloses
+	|bool|						_CanSeeAllLines
+	|bool|						_CanSeeLastLine
+	|CopyPasteFlags|			CopyPaste
+
+
+	constructor (|guicontrol| parent)
+		super.constructor(parent)
+		.id = (parent!=nil)("", "root")
+		if parent
+			.tabindex = parent.loadtabindex
+		.gnormal = drawstyle()
+
+		._TransitionFraction = 4K
+		is visible
+		is Enabled
+		is Drawsfocus
+
+	setter tag (|object|)
+		disabled "use .obj"
+		inlined
+		.obj = value
+		
+	function tag (|object|)
+		inlined
+		return .obj
+	
+	render
+		if !self
+			fs <~ "(nil)"
+		  else
+			fs <~ "("
+			fs <~ .class.name
+			fs <~ "  "
+			.lastrect.render(fs)
+			fs <~ `): '`
+			fs <~ .id
+			fs <~ "'"
+			fs.indent++
+			for ch.fast in self
+				fs.IndentLine
+				ch|object|.render(Fs)
+			fs.indent--
+		
+	
+	virtual Search		(|string| S, |bool| JustUpdate, |bool|)
+	virtual MouseMove	(|ivec2| P,  |ivec2| Move,   |SDL_WindowEventID| State, |bool|)
+	virtual Gesture		(|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
+	virtual RightClick	(|ivec2| P)
+	virtual KeyDown		(|keys| Key, |bool|)
+		if (.OnKeydown)(self, key)?
+			return true
+	virtual MouseUp		(|ivec2| P)
+	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)
+		return 1
+	virtual Draw		(|image| Where)
+		opt norefcounts
+		|| G = .GNormal
+		using g
+			g.Strengthen(.declutterer.strength)
+			Where.DrawRectStyled(.lastrect, g)
+	virtual PostLoad
+		0
+	virtual Copy
+	virtual GotFocus
+		(.OnFocus)(self, 1)?
+	virtual LostFocus (|bool|)
+		return (.OnFocus)(self, 0)?
+	virtual AppForeGroundChange (|bool| IsForeGround)
+		0
+	virtual Resized (|bool| Initial)
+		0
+	
+	behaviour Search
+	behaviour MouseMove
+		if state isnt leave
+			if self is editable
+				SystemCursor.IBeam.use
+			  elseif .OnClicked
+				SystemCursor.Hand.use
+			  else
+				SystemCursor.Arrow.use
+	
+	behaviour Gesture
+	behaviour RightClick
+	behaviour MouseUp
+	behaviour Copy
+	virtual TypedString (|string| Input, |bool|)
+		0
+
+	function Size (|ivec2|)
+		inlined
+		return .lastrect.size
+
+	setter Size (|ivec2|)
+		cpp_part Size2
+		.lastrect = value.rect
+		.size = .lastrect.layout
+
+	setter Size (|controlrect|)
+		.sizer.setsize(self, value)
+		if value.IsBasic
+			.MiniSizeSet(value.basicsize)
+
+	function BlockSize (|float| X, |float| Width, |float| Y, |float| Height)
+		is blocksized
+		|| Sz = VObject.Size2d(x, width, y, height)
+		.sizer.setsize(self, sz)
+
+
+	libinternal MiniSizeSet (|ivec4| Rect)
+		opt norefcounts
+		|| p = .parent
+		// not sure this should happen? its going to be set later, anyhow, right?
+			|| l = p.lastrect
+			if p isa window
+				l = l.soothe
+			rect += l.xyxy
+			if .lastrect != rect
+				.LastRect = rect // right?
+				gui.Resized(self)
+
+
+	libinternal LoadTabIndex (|uint16|)
+		opt norefcounts
+		|| w = .window
+			rz = w.tabindex + 1
+			if rz >= 0x10000
+				rz = 1
+			w.tabindex = rz
+
+
+	libinternal NextFocus (|bool| dir, |bool| force, |guicontrol|)
+		opt NoRefCounts
+		real self
+		|| c = self
+		|| w = .window$
+		
+		while
+			c = c.FlatLoop(dir, w)
+			if c == self
+				exit
+			if .IsBetterFocus(c, rz, force)
+				rz = c
+
+
+	libinternal Tabbability (|guicontrol| c, |int|)
+		return  c.tabindex  -  .tabindex
+		
+	
+	libinternal IsBetterFocus (|guicontrol| c, |guicontrol| b, |bool| force, |bool|)
+		require c.IsViewable and c is enabled
+		require (c isa ListView or textview)
+		require c.takesfocus.tab(force) or (c is opensmenu)
+		if !b
+			return true
+		
+		require c.tabindex
+		if !b.tabindex		// 0 is lower priority... but better than nothing.
+			return true
+		
+		|| c_extra = .Tabbability(c)
+		|| b_extra = .Tabbability(b)
+		if c_Extra > 0 == b_Extra > 0
+			return c_Extra < b_Extra
+		return c_Extra > 0
+	
+	
+	libinternal TextWidth (|int|)
+		opt norefcounts
+		return .text.bounds.x * font.width
+	
+	syntax cast (|ivec4|)
+		inlined
+		return .lastrect
+	
+	syntax append (|guicontrol| g)
+		inlined
+		super <~ g
+		
+	syntax is (|guicontrolflags| F, |bool|)
+		if self
+			return .state & F
+		
+	syntax is (|guicontrolflags| F, assigns:|bool|)
+		require ((.state&f)!=0) != value
+		
+		if value
+			.state |= f
+		  else
+			.state &= ~F
+		
+		if f & guicontrolflags.visible
+			GUI.resized(self)
+			
+
+	inline Decluttering (|bool|)
+		return .Declutterer.final
+
+	setter Decluttered (|bool|)
+		.declutterer.fire(0.334, 0.5) = value
+		
+	inline Decluttered (|bool|)
+		return .Declutterer.Finished
+	
+	
+	function Touch (|int| Amount = 1)
+		opt norefcounts
+		if (Amount < 0) and gui.IsBackground
+			return 
+		Amount = amount.abs
+		if gui.TouchCount < amount
+			gui.TouchCount = amount
+
+
+//// SCROLL ////
+	task ScrollEvent (taskgui)
+		constructor
+			libinternal
+			is animation
+		run
+			libinternal
+			// do nothing
+
+
+	libinternal NoScroll
+		opt norefcounts
+		|| scr = .myscroller
+			scr.Remove
+
+
+	function TouchScrollBar (|bool|)
+		opt norefcounts
+		|| scr = .myscroller
+			scr.duration = 0.75s
+			scr.StartTime = gui.FrameStart
+			.addtask(scr)
+		  else
+			|| w = .window$
+			scr = ScrollEvent(self, 0.75s)
+			w._Scroller = scr
+		scr.starttime += 0.25s // start on full
+		return true
+//// SCROLL END ////
+
+
+	function SizeFraction (assigns:|float|)
+		|| t = (value.clamp * 4.0K)|int|
+		if ._TransitionFraction != t
+			._TransitionFraction = t
+			GUI.resized(self)
+	
+	
+	function Transition (|int| Value, |int| Field, |movecode| Matching, |int|)
+		if matching.field == field
+			value *= ._TransitionFraction
+			return value >> 12
+		return value
+	
+
+	function VisText (assigns:|string| S)
+		.TextSet(s)
+		(self is visible) = s > 0
+	
+	
+	setter Visible (|bool|)
+		inlined
+		(self is visible) = value
+
+	
+	function IsViewable (|bool|)
+		opt norefcounts
+		nil checker
+		require self
+
+		|| r = (0, 0, 64K, 64K)
+		while self
+			require self is visible
+			|| r2 = .LastRect
+			if self isa window
+				r2 = r2.soothe
+			if (self isa menu)
+				self = .window|&nil||menu|
+				continue
+			r = r.clip(r2)
+			require R.ispositive
+			self = .parent
+		return true
+
+		
+	function ContainsMouse (|bool|)
+		opt norefcounts
+		|| w = .window
+		if w and w.IsFront
+			return self contains w.CurrMouseOver
+	
+	
+	libinternal DrawChildren (|image| where,  |ivec4| Lim,  |GuiControl| avoid=nil) // drawcontrols
+		opt norefcounts
+		for R in self							// .last gets drawn last, so .last is actually the "front".
+			if (r!=avoid) and R.IsViewable
+				|| SubLim = Lim.clip(r.lastrect)
+				where.ControlClip = SubLim
+				r.__Draw__(Where)
+				if r.HasAny
+					r.drawchildren(where, Sublim, avoid)
+
+	
+	function CopyToClipboard (|bool|)
+		opt norefcounts
+		|| S = .GetCopy
+		clipboard.text = s
+		return S
+	
+
+	libinternal PasteSub (|string| Data, |copypasteflags| Type, |window| w, |bool|)
+		|guicontrol--| c = self
+		if !c.PasteEvent
+			c = w
+		  elseif !(c.CopyPaste & Type) and (w.copypaste & type)
+			c = w
+		
+		|| P = c.PasteEvent
+		if P and (c.CopyPaste & copypasteflags.paste)
+			|| items = [Data]
+			if (c.copypaste == copypasteflags.pastefile) // split by lines
+				items = data.split
+			|ListViewrow--| After
+			if c isa ListView
+				after = c.lastselected
+				c.selectnone
+			for file in items
+				if (file) and (P)(c, after, file, c.CopyPaste)
+					rz = true
+	
+		
+	function PasteFromClipboard (|Object| Data, |copypasteflags| Type = CopyPasteFlags.PasteText, |bool|)
+		|| w = .window
+		if w and (data isa string)
+			rz = .PasteSub(Data, type, w)
+		if !rz
+			beep
+	
+	
+	libinternal PasteEvent (|GUIPasteEvent|)
+		if self isa textview and self isnt editable
+			return nil
+		return .OnPaste
+
+	
+	libinternal DragList (|array|)
+		opt norefcounts
+		if self isa ListView
+			return .MultiDragList
+		if self isa textview
+			return [.seltext]
+		return []
+
+
+	function Width (|int|)
+		inlined
+		return .lastrect.width
+	
+	setter Width (|controlline|)
+		.sizer.g(0, self) = value[0]|controlpoint|
+		.sizer.g(2, self) = value[1]|controlpoint|
+
+	function Height (|int|)
+		inlined
+		return .lastrect.Height
+	
+	setter Height (|controlline|)
+		.sizer.g(1, self) = value[0]|controlpoint|
+		.sizer.g(3, self) = value[1]|controlpoint|
+	
+	libinternal GetCopy (|object?| item=nil, |string|)
+		return (.oncopy$)(self, item)
+	
+	
+	syntax equals (|string| s, |bool|)
+		if self
+			return .id.syntaxequals(s, true) // why would we want to tell "EditMe" apart from "editme"?
+
+	syntax equals (|string| s, |bool| Aware, |bool|)
+		disabled "Just use == which is always case-aware"
+
+	operator Contains (|ivec2| p, |bool|)
+		inlined
+		return .lastrect.contains(p)
+	
+	function Window (|Window|)
+		opt norefcounts
+		nil checker
+		for p.up in self
+			if p isa Window
+				return p
+	
+	setter Size (|int| i, |ControlPoint|)
+		cpp_Part SizePart
+		.sizer.g(i, self) = value
+	
+	function Right (|int|)
+		disabled "Use .lastright"
+
+	setter Left (|ControlPoint|)
+		inlined
+		.size(0) = value
+	setter Bottom (|ControlPoint|)
+		inlined
+		.size(1) = value
+	setter Right (|ControlPoint|)
+		inlined
+		.size(2) = value
+	setter Top (|ControlPoint|)
+		inlined
+		.size(3) = value
+		
+	inline LastBottom (|int|)
+		return .lastrect.y
+	inline LastLeft (|int|)
+		return .lastrect.x
+	inline LastRight (|int|)
+		return .lastrect.x2
+	inline LastTop (|int|)
+		return .lastrect.y2
+
+	inline Left (|controlpoint|)
+		return .sizer.GSize[0]|controlpoint|
+	inline Bottom (|controlpoint|)
+		return .sizer.GSize[1]|controlpoint|
+
+	inline Horz (|intrange|)
+		return .lastrect.x1x2
+
+	inline Vert (|intrange|)
+		return .lastrect.x1x2
+
+	function OuterFocus (|guicontrol|)
+		opt norefcounts
+		|| w = .window
+			|| i = w.innerfocus
+			if i == self
+				return w.focus
+
+	function HasFocus (|bool|)
+		opt norefcounts
+		|| w = .window
+			return self == w.realfocus
+
+	function HasAnyFocus (|bool|)
+		opt norefcounts
+		|| w = .window
+			return self == w.focus or w.InnerFocus
+
+
+	libinternal DrawFocus (|image| where, |float| strength=1.0)
+		if self
+			.DrawFocusRect(Where, .lastrect, .FaintingEdge * strength)
+
+
+	libinternal FocusBorderStyle (|drawstyle--|)
+		if (self isnt modified) or (self is NeverDrawModified)
+			return ¥.FocusBorder
+		return ¥.ModifiedBorder
+		
+		
+	libinternal DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
+		opt norefcounts
+		require strength > 0
+		|| oldclip = where._ControlClip			// maybe outside
+		where.ControlClip() = (0, 0, 31K, 31K)
+		|| g = .FocusBorderStyle
+		|| g2 = .GNormal
+		if g2.PixelShader
+			g = g2
+		using g									// restores old values
+			g.edge.alpha = Strength
+			g.bg.a = 0
+			where.DrawEdge(R, g, ~.FindAttachedEdge)
+		where.controlclip = oldclip
+
+	
+	libinternal FindAttachedEdge (|MoveCode|) // .EdgeAllow
+		opt norefcounts
+		|| a = .AttachedFrom
+			return a
+		if .Sizer[0] is high
+			return MoveCode.right
+		if .sizer[1] is high
+			return MoveCode.bottom
+		if .sizer[2] is low
+			return MoveCode.left
+		if .sizer[3] is low
+			return MoveCode.top
+		
+	
+	libinternal FaintingEdge (|float|)
+		opt norefcounts
+		if self is DrawsFocus
+			return 0.75
+		if .HasFocus
+			return .FaintingEdgeSub
+	
+	
+	libinternal FaintingEdgeSub (|float|)
+		opt norefcounts
+		|| w = .window!
+		|| f = w._AlphaFader				#require
+		|| delay = gui.FrameStart - f
+		|| remain = 1s - delay
+		if w._FlashSelf & 2
+			remain += 0.5s
+		if .Decluttered
+			remain -= 0.5s
+			remain >>= 1
+		
+		if remain > 0
+			GUI.touch(Self)
+			|| f2 = (remain)|float| / 1s|float|
+			if w._FlashSelf&2
+				f2 *= 0.2
+			return f2
+			
+		w._AlphaFader = 0
+		w._FlashSelf = 0
+	
+			
+	function SetFocus
+		opt norefcounts
+		.window$.setfocus(self)
+
+
+	function ClearFocus
+		opt norefcounts
+		if .HasFocus
+			.window!.SetFocus(nil)
+
+
+	libinternal MouseIsDown (|bool|)
+		opt norefcounts
+		|| w = .window
+			return w.CurrMouseDown == self
+	
+	
+	setter Text (|string|)
+		inlined
+		.textset(value)
+
+	
+	setter Text (|faststring|)
+		inlined
+		cpp_Part FS
+		.TextSet(value)	
+	
+	
+	autogen TextSet (assigns:|object| text, |bool|)
+		cpp_part TextSetter
+		opt norefcounts
+
+		if text isa string
+			if (text == .text)
+				return false
+			.text = text
+		  elseif text isa FastString
+			if (text|&nil||string| == .text) // same!
+				text.Length = 0
+				return false
+			.text = text.GetResult
+		  else
+			return false
+		.TextAlteredForDraw |= 2
+		.Touch
+		return true	
+	
+	
+	inline Hide
+		isnt visible
+
+	
+	libinternal RefSanity
+		visible
+		opt norefcounts
+		for r in self
+			r.RefSanity
+
+
+	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
+		constructor
+			is animation  // doing this seems to break the system? no idea why.
+		run
+			libinternal
+			|| hide = (progress >= 1.0 and .dir is close)
+			(.upon is visible) = !hide
+			if .dir is close
+				progress = 1.0 - progress			
+			.upon.SizeFraction() = progress
+
+
+	libinternal AddTask (|TaskGUI| t)
+		opt norefcounts
+		|| w = .window
+			w.tasks <~ t
+	
+// Should I remove upon... and move duration/start to the task itself?
+// I mean... tasks in general want a time? UNLESS... its like functional programming
+// (which sucks anyhow). I guess we can worry about this when we make functional
+// programming or nested subtasks.
+
+	task TaskGUI ( |...!| Upon,  |duration| duration,  |date| StartTime = gui.framestart )
+		|float| PrevProgress
+		contains –parentclass			// super cool feature
+		constructor						// upon,  StartTime,  duration are automatically set
+			stores_self
+			upon.addtask(self)
+		
+		function TaskProgress (|date| now=gui.framestart, |float|)
+			|| d = .duration
+				|| Over = ((Now - .StartTime) max 256)|duration|
+				if over < D
+					return Over.float / D.float
+			return 1.0
+				
+		run (|window| window, |float| progress, |ErrorInt|)
+			libinternal
+			inlined
+			return -1
+		
+		function Remove
+			inlined
+			gui.touch
+			super.remove
+			
+

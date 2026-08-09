@@ -1,0 +1,317 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+	
+extend String
+	function IsOK (|bool|)
+		cpp_wrapper JB_Str_IsOK
+		nil checker
+	
+	function FileThatExists (|string| operation="access",  |File|)
+		|| f = .file
+		if f.MustExist(operation)
+			return f
+
+	function FileExists (|bool|)
+		nil checker
+		cpp_wrapper JB_File_Exists
+	
+	function FileSize (|int64|)
+		|| f = .file
+		return f.size
+	
+	function MakeEntirePath (|bool|Last=true, |ErrorInt|)
+		visible class~file
+		|| p = (last)(self, .parent)
+		
+		for S.Paths in p
+			|| err = S.MakeDir|int|
+				rz = err
+				exit
+	
+	function PathDir (|string|) // asdir, todir
+		if self and .last != '/'
+			return self + "/"
+		return self
+
+	function Sibling (|string| name, |string|)
+		inlined
+		return .ReplacePathComponent(-1, Name)
+		
+	function file.Sibling (|string| name, |file|)
+		return super.sibling(name).file
+	
+	function Components (|[string]|)
+		|| i = 0
+		while i < self
+			|| n = .find('/', i) ?? .length
+			if i == 0 or n > i
+				rz <~ self[i, n]
+			i = n + 1
+
+
+	function ReplacePathComponent (|int| i, |string| With, |string|)
+		|| R = .components
+		if (i < 0)
+			i += R.length
+		
+		R[i] = With
+		return r.join("/")
+	
+	
+	function TrimSlashes (|string|)
+		// passing "/" returns ""
+		// not sure this is the right behaviour?
+		
+		|| trail = .FindTrailingSlashes
+		if trail >= self
+			return self
+		
+		if !.find("//", 0, trail)
+			return self[0, trail]
+			
+		|| fs = FastString()
+		|| prev = 0
+		for i in trail
+			|| c = self[i]
+			if (c != '/'  or  prev != '/')
+				fs <~ c // remove multiple "/"
+			prev = c
+		return fs
+			
+	
+	libinternal FindTrailingSlashes (|int|)
+		rz = .Length
+		while self[rz-1] == '/'
+			rz--
+
+	function Resolve (|bool| AllowMissing = false, |string|) 
+		description "Calls the unix realpath() function, and also fixes filepaths a little. Returns an empty string if not found. If AllowMissing is true, then this will never return an empty string."
+		cpp_wrapper JB_Str_ResolvePath
+
+	function IsVolume (|bool|)
+		if self == "/"
+			return true
+		|| p = .parent.pathdir
+		rz = p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
+
+	function TrimExt (|string|)
+		inlined
+		return .TrimExtAndPath(false)
+
+	function NamePart (|bool| RemovePath=true, |ivec2|)
+		|| N	 = .FindTrailingSlashes
+		|| slash = .find('/', n-1, 0) + 1
+		|| dot	 = .find('.', n-1, slash)
+		dot ?= n
+		if !RemovePath
+			slash = 0
+		return (slash, dot)
+		
+	inline TrimExtAndPath (|bool| RemovePath=true, |string|)
+		Description "Extracts the name only. Using .TrimExtAndPath can replace .name.trimext"
+		|| V = .NamePart(RemovePath)
+		return self[V]
+	
+	function ReadAll (|int| lim = 16MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
+		return .file.readall(lim, AllowMissing)
+
+	function Child (|String| cname, |String|)
+		if !self
+			Return cname
+		|| C = (.last == '/')|int|
+		C += (cname[] == '/')
+		if (C == 1)
+			return self+cname
+		if (C == 0)
+			Return self + "/" + cname
+		Return self + cname[1, int.max]
+
+	syntax access (|string| s, |string|)
+		inlined
+		return .child(s)
+
+	function Parent (|string|)
+		description "Gets the file path's parent'"
+		// this won't handle a bad path like "////" sigh.
+		if self != "/"
+			return .TrimSlashes.BeforeLastByte('/', 1)
+
+	function RegularPath (|string|)
+		return .AbsolutePath.TrimSlashes
+	
+	function AbsolutePath (|StringZeroTerminated|)
+		cpp_wrapper JB_File_PathFix
+		description `Replaces "~/" with the username.
+Relative paths take the current working directory.`
+
+	function MakeDir (|ErrorInt|)
+		cpp_wrapper JB_Str_MakeDir
+
+	libinternal TrimLastSub (|Byte| b, |int|)
+		// replace with .outbyte(-1,0,b)?
+		|| N = .Length
+		while (self[N - 1] == b)
+			N--
+		return N
+	
+	function TrimFirst (|Byte| b, |string|)
+		|| s = .outbyte(b)
+		return self[s...]
+	
+	function AfterByte (|Byte| b, |int| Last=-1, |string|)
+		|| Start = .find( b, Last, 0 )
+		return self[Start + 1, Last]
+
+	function BeforeLastByte (|Byte| b, |int| fudge=0, |string|)
+		|| Last = .TrimLastSub(b)
+		|| Start = .find( b, Last, 0 )
+		return self[ 0, Start + fudge ]
+		
+	function AddExt (|string| ext, |string|)
+		if !ext
+			return self
+		if ext[] != '.'
+			return .append(".", ext)
+		return self + ext
+		
+	function Ext (|string| ext, |string|)
+		disabled "Do you mean .addext or .setext?"
+
+//	function NeedExt (|string| ext, |bool| Aware=false, |string|)
+//		if .ext.SyntaxCompare(ext, aware) == 0 // same
+//			return self
+//		return .AddExt(ext)
+
+	function SetExt (|string| ext, |string|)
+		return .trimext.AddExt(ext)
+	
+	function FindExt (|ivec2|)
+		// abc/d.//////	 --> .findext == ""
+		|| End = .Length
+			|| a = .Addr
+			while a[End-1] == '/'
+				End--
+				require End > 0
+			
+			|| i = End
+			while --i >= 0
+				|| c = a[i]
+				require c != '/'
+				if c == '.'
+					require ++i < end
+					return (i, end)
+	
+	
+	function Ext (|string|)
+		return self[.FindExt]
+
+	function BackToApp (|string|)
+		|| s = .TrimSlashes
+		|| Final = ".app/Contents/MacOS/" + .name
+		if s endswith final
+			rz = s[0, 4+(s-final)]
+		  else
+			rz = self
+
+	function Name (|string|)
+		|| Last  = .TrimLastSub('/')
+		return .AfterByte('/', Last)
+	
+
+	autogen String.FindSlash (|int| from, |ind|)
+		if from < .length
+			rz = .find('/', from)
+			if !rz
+				rz = .length		
+
+
+	iterator Paths
+		|| P = .regularpath
+		|| i = p.FindSlash(1)
+
+		while i > 0
+			yield P[0, i]
+			i = p.FindSlash(i+1)
+
+
+
+/// ACTUAL FILE STUFF
+
+	operator isa (|string| s, |bool|)
+		if self
+			|| X = .FindExt
+			if s == x.Width
+				return self[x.x, s, true]
+
+	function HasName (|string| s, |bool|)
+		|| Last = .length
+			while self[last-1] == '/'
+				last--
+			|| First = .find('/', Last, 0) + 1
+			|| length = Last - First
+			if s == length
+				return self[first, s, true]
+		
+	function File (|File!|)
+		cpp_part AsFile
+		nil self
+		if self isa file
+			return self
+		return file.new(self)
+		
+	function FileCh (|string| ch, |File|)
+		cpp_Part ChildFile
+		return self.Child(ch).file
+	
+	target !minilib {
+	function OpenInEditor (|ExitCode|)
+		|| p = .AbsolutePath
+			return "/usr/bin/open".SilentExecute([p], NIL, nil)
+	
+	function Reveal (|bool|)
+		if self and platform.osx
+			|| p = .AbsolutePath
+			require p.fileExists
+			|| R = ["-R", p]
+			if .last == '/'
+				r.remove(0)
+			"/usr/bin/open".SilentExecute(R)
+			return true
+	}
+
+
+		
+function @file.OSXMaxCaseWarnings_ (|&int|)
+	cpp_Wrapper JB_File__Compar
+
+
+function string.ShellPath (|string|)
+	return .replaceall(" ", `\ `)
+
+
+role StringThatWasReadSafely (string)
+	linkage
+		cpp_part Safe
+	false string.error
+	syntax cast (|bool|)
+		inlined
+		return .isok
+
+
+datatype FileSizeInt (int64)
+	description "Used by file.write(). FileSizeInt makes it easier to check if a write succeeded or not, because it returns true if you intended to write 0 bytes of data, perhaps you wanted to clear a file."
+	// also filesizeint.mainargs exists... kinda handy for demos
+	default 0
+	false -1
+	syntax cast (|bool|)
+		inlined
+		return self >= 0
+	render
+		opt norefcounts
+		inlined
+		return .strsize(fs)
+
+

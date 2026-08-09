@@ -1,0 +1,247 @@
+
+
+module SC_Init
+	function SCModule.BuildInitArg (|message!|)
+		opt norefcounts
+		|| arg
+		|| s = .source
+			using s
+				arg = .BuildInitArgSub
+
+		if !arg
+			arg = .BuildInitArgSub
+		return arg
+	
+	
+	function SCModule.BuildInitArgSub (|message!|)
+		rz = @arg.msg
+		rz <~ @arg
+		rz.msg(@tmp, "opt") <~ (@thg, "norefcounts")
+		|| src = .source
+			|| ig = src.msg(@tmp, "ignore")
+			ig.Obj = self // ignore in the renderer.
+			ig <~ rz
+
+
+	function Message.SettingToNil (|bool|)
+		opt norefcounts
+		if (self == @Decl)
+			|| d = .Last
+			if (d == @Rel) and (d.Last ~= "nil")
+				Return true
+
+
+	function SCModule.AvoidMain (|message| c, |bool|)	
+		opt norefcounts
+		
+		require (self == compiler.program)
+		|| f = c.file
+			return !f.proj.IsLibraryImp
+		return !(compiler.project!.IsLibraryImp) // never happens?
+
+
+	function SCModule.InitDecls
+		description "Collects global decls from this module." 
+		opt norefcounts
+		|| a = .InitVarsArg.First
+		// would be nicer to use .globals
+		if a.HasAny
+			CollectDeclsGlobals( a, self )
+		if self == compiler.program
+			CollectDeclsGlobals( compiler.AppInitGlobals, self )
+
+
+	function SCModule.MoveToInitFunc (|Message| c)
+		description "Put globally found decls+funcs, into a function that can be called at init-time. Each module will have an init-func... and it will be called if it has any code. We just store the stuff right now, but later, we create them via .CreateInitFunc"
+		opt norefcounts
+		
+		if (c == @sheb or @url)
+			c.remove
+			return
+		expect c.AllowedMoveToInit (c)
+
+		|message| dest
+		if .AvoidMain(c)
+			if c != @decl
+				dest = compiler.AppInitCode!
+			  else
+				dest = compiler.AppInitGlobals!
+		  elseif c == @decl
+			require !c.SettingToNil
+			dest = .InitVarsArg init .BuildInitArg
+			dest = dest.first!
+		  else
+			dest = .InitCodeArg init .BuildInitArg
+		dest <~ c			
+
+
+function Message.AllowedMoveToInit (|bool|)
+	opt norefcounts
+	|| type = .func
+	if (type == @dot or @sdot or @func or @rel or @decl)
+		return true
+
+
+function SCModule.CreateInitFuncSub (|message| init, |string| name)
+	|| type = "libinternal "
+	|| curr = scimport.curr
+	if !.islibrary or (curr and !curr.IsLibraryImp)
+		type = "autogen "
+	|| msg = "$type$Name (|int|)".ParseClean
+		msg <~ init
+	|| fn = .NewModuleFunc( msg )
+		(fn is InitFunc)
+
+
+function SCModule.CreateInitFunc
+	SCNode.CurrVisibility = true
+	scmodule.Curr = self
+	|| arg = .InitCodeArg
+		.CreateInitFuncSub(arg, "InitCode_")
+	
+	|| arg2 = .InitVarsArg
+		.CreateInitFuncSub(arg2, "Init_")
+	scmodule.curr = nil
+
+
+function SCModule.TryInit (|array of scmodule| req, |bool|)
+	opt norefcounts
+	for name in .InitAfter
+		name.expect(@thg)$
+		|| m = compiler.FindModuleMsg(name)
+		require m and m.Inited
+
+	.Inited = true
+	req <~ self
+	return true
+
+
+extend_module SCModule
+	function DoInitAfter (CollectFunc)
+		opt norefcounts
+		|| mod = name_Space.SpaceModule(node)$
+		mod.InitAfter = node[@prm, @bra]
+		return compiler.program
+
+
+function SortInitOrderSub (|array of scmodule| mods, |array of scmodule| out, |bool|)
+	opt norefcounts
+	|SCModule| failed
+	|| GotAny = false
+	for m in mods
+		require stderr.ok
+		if m.inited
+			//
+		  elseif m.tryInit(out)
+			gotany = true
+		  else
+			Failed = m
+
+	expect (gotany or !failed) (Failed.source, "Modules has recursive init order")
+	return failed
+
+	
+function SortInitOrder (|array of scmodule| mods, |array of scmodule|)
+	while SortInitOrderSub(mods, rz)
+		0 // this is such a wierd loop. But it works well. :)
+
+	
+function SCModule.CallInit (|message| src, |message| dest, |string| fn_name)
+	opt norefcounts
+	require src and src.HasActualCode and (self != Compiler.program)
+	for s.flat in src
+		if s.position < 0
+			s.position = 0
+	using src
+	dest <~ (@sheb, "// " + .Name)
+	|| dot2 = dest.msg(@dot,  fn_name)
+	dot2 <~ (@thg, .name)
+	dot2 <~ @prm
+	
+
+function SCModule.CallOurInitsByTheBiggerInitFunc
+	opt norefcounts
+	|| p = Compiler.program
+	if p == self
+		.InitDeclFixer(compiler.appinitglobals)		
+	if .IsLibrary
+		.CallOurInits(p.InitVarsArg, p.InitCodeArg)
+	  else
+		.CallOurInits(compiler.appinitglobals, compiler.appinitcode)
+	
+
+
+function SCModule.InitDeclFixer (|message| list)
+	opt norefcounts
+	for msg in list
+		if .InitRootDecl( msg )
+			msg.Remove
+
+
+function SCModule.CallOurInits (|message| DestVars, |message| DestCode)
+	opt norefcounts
+	.CallInit(.InitCodeArg, destcode, "InitCode_")
+	|| list = .InitVarsArg.first
+		.InitDeclFixer(list)	
+		.CallInit(list.parent!, destvars, "Init_")
+
+
+
+function message.HasActualCode (|bool|)
+	opt norefcounts
+	nil self
+	for curr.flat in self
+		if (curr == @Decl or @sheb)
+			continue_with curr.FlatAfter
+		  elseif (curr != @arg) 
+			return true // found something!
+
+
+
+function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
+	opt norefcounts
+	require (declmsg.func == @Decl)
+	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
+	
+	|| decl = .LookUpVarRootDecl( name.name, name )
+	if decl isa SCDecl
+		if decl.isbarestruct
+			return true
+		using (name)
+
+		|| P = name.parent
+		|| PRel = (P == @Rel)
+		|| NewDefault =  (PRel)(P.last, nil)
+		
+		if !NewDefault
+// this code seems wrong... these decls always have a default! So why create a default?
+			if !Decl.IsNormal
+				return true
+			NewDefault = Decl.CreateDefault(name)
+			if (NewDefault and decl.contains)
+				NewDefault = decl.WriteTypeCast(NewDefault)
+				NewDefault.Obj = nil // just keep doing what it used to do
+		
+		if newdefault
+			if !newdefault.IsNilOrZero
+				|| fn = @sdot
+				if self == compiler.program
+					fn = @thg
+				DeclMsg.Prev = NeweqRel( fn + name.name, NewDefault )
+		Return true
+}
+
+
+function message.IsNilOrZero (|bool|)
+	opt norefcounts
+	|| f = .func
+	|| n = .name
+	if f == @thg
+		if .obj == typenil or FalseBool
+			return true
+		if n == "nil" or "false" // what?
+	if f == @num
+		return .iszero
+	if f == @arg
+		return !.hasany
+		

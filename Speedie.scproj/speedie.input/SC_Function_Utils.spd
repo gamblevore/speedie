@@ -1,0 +1,219 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+prototype fnPreReader (|scfunction| self, |message| msg, |bool|)
+
+
+function SCFunction.PreRead (|message| Arg)
+	opt NoRefCounts
+
+	.NilSelf = 0			// need to clear stuff that could be error-checked, or removed.
+	isnt disabled			// Autocomplete, will call .PreRead
+	
+	for s in arg
+		if s == @tmp
+			|| fn = FuncPreReader[s.name]
+				(fn[])(self, s)
+				s.remove
+
+
+dispatch FuncPreReader (fnPreReader)
+	+'asm'
+		opt norefcounts
+		.intrinsic = msg[@func]
+		.intrinsic.ExpectLast
+	
+	+'trin'
+		.AddTrin(msg)
+
+	+'disabled'
+		opt norefcounts
+		is disabled
+		check (self isnt dylib) (msg, "Can't disable cpp-funcs")
+		.description = "Called a disabled function."
+		|| s = msg.first
+			s.Expectlast
+			s.ExpectString
+			.description = s.name
+
+	+'todo'
+		opt norefcounts
+		msg[@nil].expectlast
+		compiler.TodoList <~ msg
+	
+	+'libinternal'
+		.MakeLibInternal(msg)
+
+	+'embedded'
+		.SetLibOrEmbed(msg, scnodeinfo.embeddedonly)
+
+	+'numeric'
+		opt norefcounts
+		|| f = msg.first
+			error f
+		(self is numbercreator)
+		
+	+'inline'
+		opt norefcounts
+		problem (msg, "Use 'inlined' instead")
+		msg.expectempty
+		.MakeLinkInline
+
+	+'inlined'
+		opt norefcounts
+		msg.expectempty
+		.MakeLinkInline
+	
+	+'stores_self'
+		opt norefcounts
+		msg.expectempty
+		is StoresSelf
+	
+	+'opt'
+		opt norefcounts
+		|| f = msg[@thg]
+			if f ~= "min"
+				|| Min = f.next(@num)
+					.minopt = min.int
+			  else
+				f.expectlast
+				if f ~= "NoRefCounts"
+					is NotRefCounted
+				  elseif f ~= "inline"
+					is OptInline
+				  elseif f ~= "noinline"
+					is CantInline
+				  else
+					error f
+
+	
+	+'nil'
+		opt norefcounts
+		|| f = msg[@thg]$
+		if f ~= "self"
+			.NilSelff(msg, nilstate.optional)
+		  elseif f ~= "checker"
+			.MakeNilChecker(msg)
+		  elseif f ~= "safe"
+			.MakeNilChecker(msg)
+			is HidesProperties
+			is OptInline
+			.isvisible = true
+			
+		  else
+			error f
+	
+	
+	+'real'
+		opt norefcounts
+		|| f = msg[@thg]$
+		if f ~= "self"
+			.NilSelff(msg, nilstate.real)
+		  else
+			error f
+	
+
+	+'description'
+		if (self isnt disabled)
+			.ReadDescription(msg)
+		
+	
+
+function message.RefFallback (|bool|)
+	opt norefcounts
+	// just check if we STILL have an address
+	|| ch = self
+	while ch == @acc
+		ch = ch.first
+	if ch and ch != self
+		return ch.FastDecl is Referable
+	// not exhaustive but I don't care its good enough for now
+	
+
+function SCFunction.MakeLinkInline
+	check (.islibrary) (self, "Only library funcs can use this. Use `opt inline` if you want to optimise without affecting linking.")
+	if Options.AutoOptInline
+		is OptInline
+	is LinkInline
+
+
+function SCFunction.MakeNilChecker (|message| msg)
+	.NilSelff(msg, nilstate.optional)
+	.IsNilChecker = 1
+	
+
+function SettingSelfProperty (|Message| Rel, |bool|)
+	// .bla = X
+	opt norefcounts
+	|| Dot = SettingAProperty(rel)
+		return (Dot.first IsThing "self")
+
+
+function SettingAProperty (|Message| Rel, |Message|)
+	// bla.bla = X
+	opt norefcounts
+	require (Rel.IssetRel)
+	|| f = Rel.first
+	if f and f.IsProperty
+		return f
+
+
+function SettingMemory (|Message| Rel, |bool|)
+	// bla.bla = X
+	opt norefcounts
+	require Rel.IsSetRel
+
+	|| f = Rel.first$
+	if f.func == @acc
+		return true
+	|| d = f.obj
+	if d isa scdecl
+		return  d is Property  or  d is Global
+
+
+function SCFunction.NilSelff (|message| where, |nilstate| v)
+	expect (!.nilself) (where, "Nilness of self, already stated")
+	.NilSelf = v
+
+
+function string.UnicodeSafeName (|faststring| fs_in=nil, |string|)
+	opt norefcounts
+	if .IsASCII
+		if fs_in
+			fs_in <~ self
+		return self
+	
+	|| fs = FastString(fs_in)
+	for s in self
+		if CharSet.SafeInC[s]
+			fs <~ s
+		  else
+			fs <~ 'x'
+			fs.appendhex(s)
+	return fs.GetResult(fs_in)
+
+
+function scfunction.Unfinished (|bool|)
+	opt norefcounts	
+	|| f = .file
+		return f.Unfinished
+
+
+datatype SCBlockage (int)
+	flags
+		Bits		= 0b111
+	
+		Continue	= 0b001
+		Exit		= 0b010
+		Return		= 0b100
+	
+		Quit		= Return		// for now
+	
+	syntax is (|SCBlockage| b, |bool|)
+		return self == b
+	
+	

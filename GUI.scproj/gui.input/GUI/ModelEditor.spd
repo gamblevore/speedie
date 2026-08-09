@@ -1,0 +1,16 @@
+
+/*
+
+Modelling system:
+	* We want someway to construct better shapes.
+	* A text + raytracer interface: 
+		* text gets sliders for nums
+		* mouse/keys for pos/rotation
+		* color-slider
+		* etc
+	* Composeable too. define subshapes in text.
+	* How to do things like clouds? Only code can really specify it. Need speedie recompiles?
+	* I think a modeller should be as basic as a text-editor. Ubiquitous.
+
+*/
+

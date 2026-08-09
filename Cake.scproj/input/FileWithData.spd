@@ -1,0 +1,40 @@
+
+
+class FileWithData (stringshared)
+	linkage
+		cpp_part File
+	default	NIL
+	false	NIL
+	|string?|		_Data
+	|string|		FileName
+	|int|			Index
+
+	constructor (|string| Path, |int| I=0)
+		super.constructor(Path)
+		._data = nil
+		.FileName = path.name
+		.Index = I
+	
+	function GetLine (|int| Pos, |string|)
+		opt norefcounts
+		require pos >= 0
+		|| d = .data
+		|| Start = d.Find(charset.Line, pos, 0)
+		|| End = d.find(charset.line, pos, int.max)
+		return d[Start+1, End]
+	
+	function Data (|int| Lim=16MB, |string|)
+		opt norefcounts
+		|| d = ._Data
+		if d == nil
+			d = .ReadAll(lim)
+			._Data = d
+		return d
+	
+	syntax cast (|bool|)
+		return self!=nil
+	
+	render
+		opt norefcounts
+		fs <~ self|string|
+	

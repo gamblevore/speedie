@@ -1,0 +1,8 @@
+#!/usr/local/bin/spd
+
+main (|[string]| inputs)
+	|float| wierdness = app["w"].float|float|  ??  8.0
+	for i in inputs
+		for l.lines in i
+			printline l.Zalgo(wierdness)
+

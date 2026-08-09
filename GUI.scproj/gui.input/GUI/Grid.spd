@@ -1,0 +1,63 @@
+
+
+// Could use its own memory-allocator, at least for fixed-size allocations.
+class GridSection
+	contains uint64
+	|&...|		Map
+	|object--?| Owner
+	|int|		Width
+	|int|		Height
+	|int|		Depth
+	|uint64|    State
+
+	constructor (|int| W, |int| H, |int| D=1)
+		w = w max 1,  h = h max 1,  d = d max 1
+		|| M = Memory.zalloc(w*h*d*8)|&uint64|
+		if !M
+			w = 0
+			h = 0
+			d = 0
+			m = nil|&uint64|! // sigh
+		.map = m
+		.width = w
+		.height = h
+		.depth = D
+
+
+	destructor
+		Memory.free(.map)
+	
+	function Total (|uint|)
+		return .Width*.Depth*.Height
+	
+	function Fill (|uint64| V)
+		|| C = .map
+		for i in .total
+			C[i] = v
+
+	function At (|int| i=0, |&...|)
+		if i|uint| < .total
+			return .map+i
+		return Dummy
+		
+	syntax Access (|ivec2| V, |&...|)
+		cpp_part AccessVec
+		return self[v.x, v.y]
+	
+	syntax Access (|int| x, |int| y, |&...|)
+		opt norefcounts
+		if x inrange .width and y inrange .Height
+			return .map[x+y*.width]
+	module
+		|...| Dummy
+		
+	iterator
+		|| ptr = .map
+		|| y = 0
+		while y < .height
+			|| x = 0
+			while x < .width
+				yield (ptr) ((x,y))
+				x++
+				ptr++
+			y++

@@ -1,0 +1,45 @@
+#!/usr/local/bin/spd
+
+main (|int| Length=8, |int| Height=7, |string| A="0", |string| B="1")
+	printline Arrow(length, height, a[], b[])	
+
+
+function Arrow (|int| Length, |int| Height, |byte| A, |byte| B, |string|)
+	|| stride = Length + 1
+	|| Arrow = byte[stride * height] #require	// if allocate fails, this returns ""
+	for i in stride*Height
+		arrow[i] = ' '
+		if i+1 isa stride
+			arrow[i] = '\n'
+	
+	|| barh = (height-1)/2
+	|| bary = (height-barh)/2
+	|| barw = length/2	
+		
+	for x in barw								// draw bar
+		for y in barh
+			arrow[x + (y+bary)*stride] = a
+			
+	|| l1 = Length-1
+	for x in barw to l1							// draw arrow
+		|| frac = x|float|.RangeConvert(barw|float|, l1|float|, 1.0, 0.0)
+		|| mid = x + barh*stride
+		arrow[mid] = b
+		|| extra = (((Height+1)/2)|float|*frac)|int|
+		for y in extra
+			arrow[mid + (y+1)*Stride] = b
+			arrow[mid - (y+1)*Stride] = b
+		
+	arrow.Length = arrow.Size
+	return Arrow.String
+
+
+/*
+    1
+    11
+0000111
+00001111
+0000111
+    11
+    1
+*/

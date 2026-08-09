@@ -1,0 +1,231 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+function TypeOfDotDotDot (ExprResolver)
+	using (exp)
+		exp.become(@bra)
+		|| P = exp.parent
+		|| c = exp
+		while p != @prm and @arr
+			expect (p and p!=@arg) (exp, "Should be in a list.")
+			c = p
+			p = p.parent
+		
+		|| dot = @dot + "max"
+		dot <~ (@thg, "int")
+		dot <~ @emb
+		c.next = dot
+	return TypeOfExpr(exp.first, name_space)
+
+
+
+function message.QMarkRel (|message|)
+	opt norefcounts
+	|| x = self
+	while
+		|| p = x.parent
+		if (p.issetrel) and x.isfirst
+			expect !(p in @decl) (self)
+			return p
+		x = p
+		require x == @dot
+
+
+function message.BecomeAppend (|string| s)
+	opt NoRefCounts
+	|| p = .parent!
+	require p.expect(@rel)
+	p.become(@dot, s)
+	.obj = nil
+	.func = @prm
+	|| n = .next
+		|| b = n.unbra
+		if b == @msg
+			b.MsgFix // «
+	if n == @list // fs <~ (' ', 1)
+		.ReplaceWith(n)
+		n.func = @prm
+	  else
+		.last = n
+
+
+function message.MsgFix (|message!|)	// «
+	opt norefcounts
+	using self
+
+	|| f = .first
+	|| n = f.next
+	.func = @list
+	.first = @name + .name
+	.name = ""
+
+	while n
+		|| n2 = n.next
+		self = .WrapWith(@rel)
+		self <~ (@opp, "~>")
+		self <~ n
+		target debug // can't see whats going on!
+			self = .WrapWith(@bra)
+		n = n.unbra
+		if n == @msg
+			n.msgfix
+		n = n2
+	return self
+
+
+
+function message.Tran_QMark				//"?"
+	opt norefcounts
+	|| thedot		= .first$
+	|| IsNormal		= (thedot == @dot or @sdot or @func)
+	if !isnormal							// if x? --> if (x)
+		expect (thedot == @thg) (thedot, "Question-mark must be:  a.b?  or  (a)(b)?  or  a.b?=c")
+		.func = @bra
+		return
+	if thedot == @sdot
+		scfunction.Tran_Sdt(thedot)
+	|| inside = thedot.first!
+	if thedot == @func
+		require inside.expect(@bra)
+		inside = inside.first!
+	
+	using (self)
+	|| rel = .QMarkRel						// a().b? = c   -->   {|| t = a(),  if t: t.b = c}
+		.prev = thedot
+		rel.next = self
+		.become(@arg)
+		inside.next = @thg.msg("_t")
+		|message--| decl = MakeDecl("",  "_t", inside, scdeclinfo.temp) 
+		self <~ decl
+		decl.msg(@arg) <~ rel
+		return
+
+	|| Cond = @thg + inside.name
+	|| tern = self							//  a.b?		  OR   a().b?
+	if self in @arg							//  {if a: a.b}   OR   {|| t = a(), if t: t.b}
+		.become(@arg)
+		tern = .msg(@tmp, "if")
+		tern <~ cond
+		// add |()--| to thedot?
+		// is there an easier way? Just add... like a bit somewhere to the msg?
+		tern.msg(@arg) <~ thedot
+		if inside != @thg
+			cond.name = "_t"
+			inside.next = @thg.msg("_t")
+			tern.prev = MakeDecl("",  "_t", inside, scdeclinfo.temp)
+
+	  elseif (inside == @thg)
+		error self
+
+	  else
+		|| r = macro.TmpPrms
+		r <~ inside
+		r <~ thedot
+		.BecomeMacro(macros.TernQMark, nil, r) // just use .run?
+		thedot.first.msg(@thg, "_t")
+		r.clear
+
+
+function message.MainArgDotFix (|message|)
+	opt norefcounts
+	real self
+	while
+		if self == @thg
+			return self
+		require .expect(@dot)
+		self[@emb, 1]
+		self = .first!
+
+
+function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
+	opt norefcounts
+	
+	|| type = self[@nil]
+	|| name = type.next(@nil)
+	require name and type
+	|| IsArray = type == @arr
+		.ExpectLast$
+		type = Type.first!
+	
+	|| MaybeNil = Type isarel "?"
+		Type = Type.first!
+	
+	|| InnerType = type.MainArgDotFix					#require
+	|| cls = Compiler[InnerType]						#require
+	if !maybenil
+		maybenil = cls.IsDataTypeOnly	
+	
+	|| prms = [name, type, i.msg]
+	require (prms == 3)
+	check !(found & 1) (arg, "Can't come after arrays")
+	
+	if IsArray
+		arg.AppendMacro(macros.mainargArray.clean, prms)
+		return 1
+	
+	if name != @rel
+		check !(found & 4) (arg, "Can't come after defaults")
+		if MaybeNil
+			arg.AppendMacro(macros.MainArgBasic.clean, prms)
+		  else
+			arg.AppendMacro(macros.MainArgbasicReq.clean, prms)
+		return 2
+	
+	name = name[@thg]									#require
+	prms[0] = name
+	|| opp = name.next(@opp, "=")
+	|| l = opp.Next(@Nil)
+		prms <~ l
+	
+	expect (prms == 4) (prms)
+	arg.AppendMacro(macros.MainArgDefault.clean, prms)
+	return 4
+
+
+function message.MainArgsCanBeZero (|bool|)
+	opt norefcounts
+	for dcl in self
+		require  dcl.second == @rel  or  dcl.first == @arr
+	return true
+
+
+function message.InsertMainArgs (|message| prms)
+	opt norefcounts
+	|| usage = `Usage: $app ` + prms.Render
+	|| Src = –digest `
+	|| __ArgCount = app.mainargsstart("_0")
+	if !__ArgCount
+		return 0
+`
+	if prms.MainArgsCanBeZero
+		Src = –digest`
+	|| __ArgCount = app.mainargsstart("_0", true)
+`
+
+	|| FirstArg = macro.new(src.parsejbin, false)	
+	using prms
+	.AppendMacro(FirstArg, [Usage.msg])
+	|| i = 0
+	|| Found = 0
+	for ch in prms
+		Found |= ch.MainOneArg(self, i++, Found)
+
+	ifn found&1
+		macros.mainargNone.clean
+		.AppendMacro(macros.mainargNone, [i.msg])
+
+	self <~ "require stderr.ok"~parse
+
+
+
+function compiler.AddFunny (|message| msg, |message| curr)	// autoimport
+	require !.HasFunny
+	.HasFunny = true
+	warn (curr, "Haha funny")
+	msg.msg(@tmp, "import") <~ ".Funny"			// hehe
+
+
+

@@ -1,0 +1,37 @@
+
+
+module Templates
+	|| Todo = "
+					*** Todo file ***
+
+* Enter list of things to do
+* Do them
+* Enjoy
+"
+	
+	|| Roots = `
+roots	// Extra roots for the IDE to display. This doesn't affect compilation.
+	"@spd/Library/library.input/"
+	"@spd/jeebox.scproj/jeebox.input/"
+
+`
+
+
+	|| DebugArgs = `args {
+	// "arg1", "arg2" // uncomment to activate
+}
+pwd '.'
+env
+	key="value"
+`
+
+	function EmptyMainFile (|string| name, |string|) // replace with "newprojects" folder
+		return "#!/usr/local/bin/spd
+
+// Basic empty file
+main
+	\"Hello $name!\"
+
+"
+		
+

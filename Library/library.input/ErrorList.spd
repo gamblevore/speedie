@@ -1,0 +1,290 @@
+
+
+|ErrorReceiver| StdErr = ErrorReceiver.new
+
+
+prototype fnErrorLogger (|ErrorReceiver| self, |string| Data)
+
+class ErrorReceiver
+	linkage
+		cpp_part Rec
+		cpp_class JB_ErrorReceiver
+		visible true
+
+	contains ErrorReceiver
+
+	|Error|					Errors
+	|fnErrorLogger?|		_LogFunc
+	|object?|				_LogObj
+	|int|					MaxErrors
+	|int|					MaxProblems
+	|int|					ErrorCount
+	|int|					ProblemCount
+	|int|					WarnCount
+	|ErrorSeverity|			LowerErrorsTo
+	|ErrorSeverity|			Filter
+	|byte|					PrintNewErrors
+	|string|				Source
+
+	constructor
+		.errors = error()
+		.MaxErrors = 512
+		.MaxProblems = 64
+		.Filter = ErrorSeverity.Problem
+		JB_API.NilHappened_ = nil
+
+
+	function Clear
+		.errors.clear
+		.errorcount = 0
+		.warncount = 0
+		.problemcount = 0
+	
+	
+	function OK (|bool|)
+		if self
+			Return !.errorcount
+		return !stderr.errorcount
+	
+	
+	function HasProblems (|bool|)
+		description "Nearly OK. Errors or problems included, but no warnings."
+		opt norefcounts
+		if !self
+			self = stderr!
+		Return (.errorcount ||| .problemcount)
+	
+	
+	function HasAnything (|bool|)					// Totally OK
+		description "Nothing at all reported! No warnings even!"
+		opt norefcounts
+		if !self
+			self = stderr!
+		Return (.errorcount ||| .problemcount ||| .warncount)
+	
+	
+	syntax append (|errorreceiver--| Self, |Error| Err)
+		cpp_part AppendErr
+		if !self
+			self = StdErr
+
+		err.path ?= .source
+		if Error.KeepStackTrace
+			err.StackTrace ?= app.StackTrace
+
+		|| CanPrint = .PrintNewErrors
+		if CanPrint and err.IsBad
+			if (CanPrint != ErrorFlags.PrintFirst) or !.errorcount
+				printline err.render
+				target debug
+					if err.severity > Errorseverity.problem
+						debugat
+		
+		.incr(err)
+		
+		|| log = ._logfunc
+			(log)(self, err.render)
+
+		.errors <~ err
+
+
+	syntax append (|string| LogString)
+		cpp_part Log
+		if !._LogFunc
+			.LogFile = app.filename + ".log"
+		|| log = ._logfunc
+			(log)(self, LogString)
+
+
+	setter LogFile (|string|)
+		opt norefcounts
+		ifn Value contains "/"
+			value = file.Logs[value]
+		if value
+			._LogObj = value.file
+			._LogFunc = LogFileWriter
+	
+	
+	libinternal LogFileWriter (fnErrorLogger)
+		opt norefcounts
+		visible class~file
+		|| f = ._LogObj
+		if f isa file
+			if !f.Opened
+				f.OpenEmpty
+			f.write(data)
+			
+
+	function Incr (|error| err, |bool| add=true)
+		|| n = add.Dir
+		
+		if err.severity == errorseverity.problem
+			.problemcount += n
+		  elseif err.isError
+			.errorcount += n
+		  elseif err.iswarning
+			.warncount += n
+
+
+	function Pop (|error|)
+		opt norefcounts
+		|| err = .errors.pop
+			.incr(err, false)
+			return err
+		
+	
+	function Mark (|errormarker|)
+		inlined
+		return .ErrorCount
+	
+	function Count (|int|)
+		disabled "Do you mean .ErrorCount or .WarnCount, or .TotalCount?"
+
+	function List (|error|)
+		disabled "Do you mean .Errors?"
+
+	
+	render
+		opt norefcounts
+		.rendererrors(errorseverity.hint, false, fs)
+
+
+	inline ShellPrintErrors (|errorseverity| Level=nil, |int|)
+		visible									// for jb_main.cpp
+		return .PrintErrors(Level, true)
+
+
+	function RenderErrors (|errorseverity| Level, |bool| shell, |faststring| fs, |int|)
+		opt norefcounts
+		Level ?= .Filter
+		for err in self
+			|| S = err.Severity
+			if S >= level
+				rz++
+				if shell
+					err.renderunix(Fs)
+				  else
+					err.render(fs)
+				fs <~ "\n"
+	
+	
+	function PrintErrors (|errorseverity| Level=nil, |bool| shell=false, |int|)
+		cpp_part PrintErrorsMain
+		|| rec = (self!=nil)(self, StdErr)
+		|| fs	= faststring()
+		|| Count = rec.RenderErrors(level, shell, fs)
+			"issue".Pluralize(fs, Count)
+			fs <~ " found\n"							// "1 issue found"
+			PrintError fs|string|
+			if rec.BadCount
+				rz = -1
+	
+	
+	inline BadCount (|int|)
+		visible
+		return .errorcount + .problemcount
+	
+	
+	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
+		require .LowerErrorsTo < ErrorSeverity.IgnoreAllErrors
+		require !ErrorReceiver.OutOfMemory
+		if level == ErrorSeverity.problem
+			return (.problemcount < .maxproblems)
+		if level >= ErrorSeverity.error // a warning
+			return (.ErrorCount < .MaxErrors)
+		return (.WarnCount < .MaxErrors)
+	
+	
+	Syntax UsingComplete (|object| idk=nil)
+		inlined
+//		stderr.printerrors // note to self: don't readd this!
+		stderr = self
+
+		
+	Syntax Using (|ErrorReceiver|)
+		|| old = stderr
+		stderr = self
+		return old
+	
+	
+	function LastError (|error|)
+		visible
+		opt norefcounts
+		for err.backwards in .errors
+			if Err.iserror
+				return err
+
+
+	module
+		function OutOfMemory (|bool|)
+			cpp_Wrapper JB_OutOfMemoryOccurred
+			
+		
+	iterator
+		|| curr_err = .errors.first
+		while (curr_err)
+			|| N = curr_err.next
+			yield curr_err
+			curr_err = N
+			
+	constants
+		NonFatal = "Internal Error"
+
+
+
+extend Object
+	syntax Expect
+		cpp_part Fail
+		app.CrashPrint
+		|| fs = FastString()
+		fs <~ errorreceiver.NonFatal
+		fs <~ ": "
+		.render(Fs)
+		fs.SyntaxExpect
+
+
+extend string
+	syntax Expect
+		cpp_part Fail
+		visible
+		errorreceiver.NewError(nil, self)
+
+	Syntax Problem
+		inlined
+		errorreceiver.NewProblem( nil, self )
+
+	Syntax Hint
+		inlined
+		errorreceiver.NewHint( nil, self )
+
+	Syntax Critical
+		inlined
+		errorreceiver.NewCritical( nil, self )
+
+
+extend File
+	Syntax Expect (|string| Error)
+		opt norefcounts
+		cpp_part Fail
+		inlined
+		errorreceiver.NewError( nil, Error, .path )
+
+	Syntax Problem (|string| Error)
+		opt norefcounts
+		inlined
+		errorreceiver.NewProblem( nil, Error, .path )
+
+
+extend faststring
+	syntax Expect
+		opt norefcounts
+		cpp_part Fail
+		inlined
+		.GetResult.SyntaxExpect
+
+
+datatype ErrorMarker (int)
+	syntax cast (|bool|)
+		inlined
+		return stderr.errorcount == self
+

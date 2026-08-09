@@ -1,0 +1,43 @@
+	
+
+datatype SCNodeType (byte)
+	linkage
+		numeric false
+	constants
+		|SCNodeType|
+		Module = 0	// not actually a type
+		DataType
+		Struct		// hasptr-ish
+		ProtoType	// hasptr
+		Object		// hasptr
+		Pointer		// hasptr
+	// carrays are on decls, not on types.
+	
+	syntax is (|SCNodetype| d, |bool|)
+		return self == d
+	
+	function HasPtrs (|bool|)
+		return self >= ProtoType
+	function HasASMPtrs (|bool|)
+		return self >= Struct
+
+
+extend scclass
+	function IsStruct (|bool|)
+		return .BaseType is struct
+	
+	function IsDataTypeOnly (|bool|)
+		return .BaseType is datatype
+	
+	function IsDataTypeOrFP (|bool|)
+		return .BaseType is datatype or ProtoType
+	
+	syntax equals (|string| name, |bool|)
+		cpp_part EqualsName
+		if self
+			return .name ~= name
+
+	syntax equals (|SCNodeType| d, |bool|)
+		cpp_part EqualsType
+		if self and d > SCNodeType.Module
+			return .BaseType == d

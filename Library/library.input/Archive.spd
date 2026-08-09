@@ -1,0 +1,111 @@
+
+//	archive
+//		+"/path/"
+//			data "abc"
+//			modified "123123123"
+//			mode 123
+
+role FileArchive (message)
+	linkage
+		cpp_part Arc
+		embedded
+	
+	constructor (|string| base)
+		opt norefcounts
+		super.Constructor(@tmp, "archive")
+		.msg(@arg).obj = base.PathDir
+
+
+	function Validate (|FileArchive|)
+		require self
+		|| argfn = @arg
+		|| arc = (self == argfn)(.first, self)
+		require .expect(@tmp, "archive")
+		for p in arc.last(@arg)
+			require p.expect(@tmp)
+			|| arg = p[@arg]
+			|| OK = (p.name.istext and arg["data"] and !(p.name contains "/../" or "/./"))
+			expect OK (p, "Invalid file in archive") 
+		return self
+
+
+	libinternal InstallItem (|message| item, |file| base, |bool| overwrite, |int64|)
+		|| path = item.name 
+			|| data = item["data"].value
+			|| chld = base.child(path)
+			if overwrite and chld.isdir
+				chld.DeleteAll
+			if chld.writeall(data)
+				|| it = item["mode"]
+					chld.mode = it.int
+				rz = data.length
+	
+	
+	iterator
+		|| l = .last.first
+		while l
+			yield l
+			l++
+
+	function InstallTo (|file| dest, |bool| overwrite=false, |int64|)
+		opt norefcounts
+		require self and dest.MakeEntirePath
+		for f in self
+			rz += .InstallItem(f, dest, overwrite)
+
+
+	inline FileCount (|int|)
+		opt norefcounts
+		return .last.Count
+
+	
+	function SaveTo (|file| dest)
+		require self
+		.renderjbin.stream.compressInto(dest.outputstream)
+	
+	
+	function StripFileContents (|FileArchive|)
+		// just keep meta...
+		opt norefcounts
+		rz = .copy
+		for file in rz
+			|| d = file["data"]
+				file["size"] = d.value.length
+				d.remove
+	
+	
+	function Size (|int|)
+		opt norefcounts
+		for file in self
+			rz += file["data"].value.length
+		
+
+	syntax append (|string| path, |string| data)
+		.msg(@tmp, path)["data"] = data
+
+
+	syntax append (|file| f)
+		cpp_part AppendFile
+		opt norefcounts
+		|| p = f.path
+		|| where = p.TrimStart(.base)
+		if where != p
+			|| item = .last.msg(@tmp, where)
+			item["data"] = f.readall
+			item["modified"] = f.modified.renderint
+			item["mode"] = f.mode.render
+
+
+	function Base (|string|)
+		opt norefcounts
+		|| l = .last
+			|| o = l.obj
+			if o isa string
+				return o
+
+
+function string.GetArchive (|int|lim, |FileArchive|)
+	embedded
+	return .decompress(lim).parse|FileArchive|.validate
+
+

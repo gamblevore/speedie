@@ -1,0 +1,696 @@
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class String
+	linkage
+		wrapper
+		cpp_class JB_String
+		cpp_part Str
+		visible true
+		stateless
+		
+
+	cpp_refs
+		Disturbs		nil
+
+	default			""
+	false			""				// is string.error better?
+	
+	|int|		Length
+	|&byte|		Addr
+
+
+// accessing
+	function Length (|int|)
+		nil safe
+		cpp_wrapper JB_Str_Length
+
+	inline Addr (|&byte|)
+		nil safe	 // never returns nil, even for a nil-self
+		return ._Addr
+
+	function _Addr (|&byte|)
+		nil safe	 // never returns nil, even for a nil-self
+		cpp_wrapper JB_Str_Address
+
+	function LengthUTF8 (|int|)
+		nil checker
+		cpp_wrapper JB_Str_LengthUTF8
+
+	autogen _InByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
+		cpp_wrapper JB_Str_InByte
+
+	autogen _OutByte ( |int| Start, |int| After=int.max, |Byte| find, |ind| )
+		nil checker
+		cpp_wrapper JB_Str_OutByte
+	
+	inline InWhite (|int|Start=0, |int|After=int.max, |ind|)
+		return .find(CharSet.white, start, after)
+
+	inline OutWhite (|int|Start=0, |int|After=int.max, |ind|)
+		return .find(~CharSet.white, start, after)
+	
+
+
+// searching
+	function Find ( |string| find, |int|Start=0, |int|After=int.max, |bool|CaseAware=false, |ind|)
+		nil checker
+		cpp_wrapper JB_Str_InStr
+
+	inline Find ( |Byte| find, |int| Start=0, |int| After=int.max, |ind| )
+		cpp_part FindByte
+		return ._inbyte(start, after, find)
+
+	inline OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
+		return ._outbyte(Start, after, find)
+	
+// comparing / analysing
+	function Last (|int| minus = 0, |Byte|)
+		return self[.length-(1+minus)]
+	
+	syntax access (|byte|)
+		cpp_wrapper JB_Str_First
+		
+	operator divide (|byte| sep, |[string]|)
+		inlined
+		return .split(sep)
+	
+	operator minus (|string|s, |int|)
+		inlined
+		return .length - s.length
+	
+	function Widen (|int| Width, |int| Mode=1, |byte| Char=' ', |string|)
+		if self >= Width
+			return  self
+		|| n = Width - .Length
+		|| fs = FastString(width)
+		if Mode <= 0
+			fs <~ (char, n >> !mode)
+		fs <~ self
+		if Mode >= 0
+			fs <~ (char, width-fs.length)
+		return fs
+		
+	function IsLower (|bool|)
+		if self
+			for s in self
+				require !s.isupper
+			return true
+
+	function IsUpper (|bool|)
+		if self
+			for s in self
+				require !s.islower
+			return true
+
+	inline IsInt (|bool|)
+		return .isint(0)
+	
+	function IsInt (|int|i, |bool|)
+		cpp_part IsIntFrom
+		require self
+		while i < .length
+			require self[i++].IsInt
+		return true
+	
+	function Unshare	(|string|)					{ cpp_wrapper }
+	function Copy		(|string|)					{ cpp_wrapper }
+
+// altering
+	function UpperCase	(|string|)					{ nil checker, cpp_wrapper JB_Str_UpperCase }
+	function LowerCase	(|string|)					{ nil checker, cpp_wrapper JB_Str_LowerCase }
+
+	render TitleCase
+		opt norefcounts
+		for (s in self) (i)
+			if i == 0
+				s = s.UpperCase
+			fs <~ s
+
+	render Remove (|CharSet| remove, |int| to=-1)
+		cpp_part RemoveProp
+		for c in self
+			if !remove[c]
+				fs <~ c
+			  elseif to >= 0
+				fs <~ to|byte|
+
+	render Wrap (|int| MaxWidth)
+		|| p = 0
+		while
+			|| i = p
+			p = .WrapSub(MaxWidth, false, p)
+			fs <~ self[i,p]
+			if self <= p
+				exit
+			fs <~ '\n'
+
+	
+	function ReplaceAll (|string| from, |string| to, |bool| CaseAware=false, |Faststring|fs_in=nil, |string|)
+		cpp_wrapper JB_Str_ReplaceAll
+
+	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)
+		cpp_wrapper JB_Str_Hex
+
+	function UnHex (|faststring| fs=nil, |string|)
+		cpp_wrapper JB_Str_UnHex
+
+	function ParseInt (|int| Start=0, |message?| where=nil, |int64|)
+		nil checker
+		// could be nice to add KB, MB, GB, TB suffixes to this
+		cpp_Wrapper JB_Str_TextIntegerSection
+	
+	function ParseHex (|int| Start=0, |message?| where=nil, |int64|)
+		nil checker
+		cpp_Wrapper JB_Str_HexIntegerSection
+	
+	inline Int (|int64|) // remove?
+		return .parseint(nil)
+	
+	inline Float (|bool| Suffixes = false, |Float64|) // rename?
+		nil checker
+		return .parsefloat(nil, suffixes)
+	
+	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
+		nil checker
+		cpp_Wrapper JB_Str_TextDouble
+
+	function UnicodeSync (|string|)
+		cpp_wrapper JB_Str_UnicodeSync
+
+	function LengthUTF8 (|int| Start, |int| After=int.max, |int|)
+		cpp_wrapper JB_Str_CharCount
+
+	function Preview (|int| N = 100, |string|)
+		visible class~file // file uses this
+		if (.Length <= N)
+			return self
+		return self[0, N].UnicodeSync + "..."
+	
+	function UpperFirst (|String|)
+		if self[].IsUpper
+			return self
+		Return self[].Uppercase.render + self[1...]
+	
+	inline Shorten (|int| n, |string|)
+		return self[0, .length-n]
+	
+	function TrimMiddle (|int| A, |int| B, |string|)
+		// The GUI uses this. Could probably be used more by the text-editor?
+		|| X = .length
+		|| Y = (B-A) max 0
+		|| fs = FastString(X - Y)
+		fs.AppendRange(self, 0, A)
+		fs.AppendRange(self, B, int.max)
+		return fs
+		
+		
+	function Trim (|CharSet| CS = ~CharSet.Trim, |string|)
+		nil self
+		if self
+			|| First = .find(CS)
+				|| Second = .find(CS, int.max, 0) // assume it must be found
+				return self[first, second+1]
+
+	
+	function TrimStart (|string| s, |string|)
+		|| i = 0
+		if self[i, s]
+			i += s.length
+		return self[i, int.max]
+
+
+	function Squeeze (|string|)
+		visible
+		|| fs		= faststring()
+		|| broken	= false
+		
+		for c in self
+			if c.iswhite
+				broken = fs.length
+			  else
+				if broken
+					fs <~ ' '
+				fs <~ c
+				broken = false
+		
+		return fs
+
+
+	function Yes (|message| where=nil, |bool|) // ispositive, isaffirmative, istrue
+		if !self
+			return false
+		if self ~= "no"  or "false" or "off" or "0" or "":	return false
+		if self ~= "yes" or "true"  or "on"  or "1": return true
+		error (where, "Not a boolean value: '" + self + "'")
+
+
+	inline Words (|[String]|)
+		return .Split(' ')
+
+
+	function Split (|Byte| sep = '\n', |[String]|)
+		opt norefcounts
+		|| Last = 0
+		while
+			|| Word = .NextField(sep, Last)
+			if Word == nil
+				exit
+			rz <~ Word
+
+	function Before (|string| s, |string|)
+		|| f = .find(s)
+			return self[0, f]
+		return self
+
+	function Count (|charset| CS, |int| From = 0, |int| After = int.max, |int|)
+		rz = 1
+		After = After min .Length
+		From = From max 0
+		while From < After
+			|| c = self[From++]
+			rz += c in cs
+	
+	operator Contains (|string| s, |bool|)
+		cpp_part ContainsString
+		return .find(s, 0, int.max, true)
+	
+	operator Contains (|Byte| b, |bool|)
+		cpp_part ContainsByte
+		inlined
+		return .find(b)
+	
+	operator EndsWith (|string| s, |bool|)
+		inlined
+		return .endswith(s, true)
+	
+	operator mul (|bool| b, |string|)
+		cpp_part MulBool
+		inlined
+		if self and b
+			return self
+	
+	operator Mul (|int| n, |string|)
+		if n <= 1
+			return .operatormul(n==1)
+		|| fs = faststring()
+		fs.Size = n*.length
+		fs <~ (self, n)
+		return fs
+
+	function IsASCII (|bool|)
+		cpp_wrapper JB_Str_IsASCII
+
+	render Reverse
+		cpp_wrapper
+	
+	function Rotate (|int| n, |string|)
+		if !n
+			return self
+		n = n mod (.length+1)
+		return self[n, int.max] + self[0, n]
+		
+	function FindBadUTF8 (|int| From=0, |ind|)
+		cpp_Wrapper JB_Str_BadUTF8
+
+	function IsBinary (|float| f = 512.0, |bool|)
+		|| badness = .UTF8Badness
+		return  (badness.y)|float|*f  >=  .length|float|
+	
+	inline IsText (|float| f = 512.0, |bool|)
+		return !.IsBinary(f)
+	
+	function UTF8Badness (|ivec2|)
+		description "Returns the validness of UTF-8 text, as: (FirstBadPosition, NumberOfBadBytesFound) as an ivec2" 
+		|| First = .FindBadUTF8
+		if First < 0
+			return (First, 0)
+		
+		|| Pos = First
+		|| Count = 1
+		while
+			pos = .FindBadUTF8(pos+1) #loop
+			Count++
+		return (First, Count)
+			
+	operator Plus (|string?| other, |string|)
+		nil checker
+		cpp_wrapper JB_Str_OperatorPlus
+			
+	autogen Append (|string?| b, |string?| c, |string?| d=nil, |string|)
+		nil checker
+		cpp_wrapper JB_Str_Append4
+
+	autogen Append (|string?| b, |string?| c, |string?| d, |string?| e, |string?| f=nil, |string|)
+		nil checker
+		cpp_wrapper JB_Str_Append6
+		
+	function Insert (|string| s, |ivec2| Range, |string|)
+		Description "Inserts one string within another. Useful for typing or text-editors." 
+		|| i = range.x
+		|| n = range.Width
+		if i < 0
+			n += i
+			i = 0
+		if n < 0
+			n = 0
+		|| fs = faststring(.length + s.length - n)
+		fs.appendRange(self, 0, i)
+		fs <~ s
+		fs.appendRange(self, i+n, int.max)
+		return fs
+
+		
+	operator in (|array of string| list, |ind|)
+		cpp_part OpInList
+		opt norefcounts
+		for (item in list) (i)
+			if item == self
+				return i
+	
+//	operator in (|string| s, |bool|)
+//		cpp_part OpInStr
+//		return s contains self
+			
+//	operator in (|dictionary| d, |bool|)
+//		cpp_part OpInDict
+//		return d[self]
+	
+	operator in (|byte| d, |bool|)
+		cpp_part OpInByte
+		if self
+			for c in self
+				if c != d
+					return false
+			return true
+	
+	function ZeroTerm (|StringZeroTerminated|)
+		nil self
+		cpp_Wrapper JB_Str_ZeroTerm
+	
+	inline CopyTo (|&byte| Where, |bool|)
+		cpp_Part CopyToHopeful
+		return .copyto(where, .length+1)
+		
+	function CopyTo (|&byte| Where, |int| Buff, |bool|)
+		|| n = .length
+		|| n2 = n min buff-1
+		where[n2] = 0
+		|| addr = .addr
+		for i in n2
+			where[i] = addr[i]
+		return n == n2
+
+
+	module
+		autogen New (|int| n, |string|)
+			description "Creates a new string containing garbage data."
+			cpp_Wrapper JB_Str_New
+
+		function New (|cstring| s, |StringZeroTerminated|)
+			description "Wraps an existing cstring into a Speedie string. Expects the cstring to last longer than us."
+			cpp_Wrapper JB_StrC
+
+		// could merge these two... give it a 0 length and see what you get?
+		function New (|cstring| s, |int| n, |StringZeroTerminated|)
+			description "Wraps existing memory into a Speedie string. Must be a c-string. The length is just for speed.  Expects the cstring to last longer than us."
+			cpp_Wrapper JB_StrCN
+
+		function Own (|&byte| addr,  |int| n, |string|)
+			cpp_wrapper JB_Str__Freeable
+
+		function Copy (|&nil| addr,  |int| n, |string|)
+			cpp_wrapper JB_Str_CopyFromPtr
+
+		function Copy (|cstring| str, |stringzeroterminated|)
+			cpp_wrapper JB_Str_CopyFromCString
+
+		inline Hex (|int64| i, |string|)
+			return i.hex!
+		
+		function FromPtr (|&nil| Addr,  |int| N,  |&nil| free = nil,  |&nil| obj = nil,  |string|)
+			cpp_wrapper JB_StrFromPtr
+			
+		function Hash (|[string]| r, |uint64|)
+			opt norefcounts
+			for s in r
+				(rz xor= s.hash)
+				
+		function Error (|string|)
+			cpp_wrapper JB_Str__Error
+		
+//		function Uniqify (|{string}| D)
+//			cpp_wrapper JB_Str__Uniqify
+
+		function Byte (|int| b, |string--|)
+			cpp_wrapper JB_Str__Byte
+		
+		function UTF8 (|codepoint| c, |string|)
+			cpp_wrapper JB_Str_ChrUTF8
+		
+/// disabled stuff	
+		function FromC (|cstring| str, |stringzeroterminated|)
+			disabled "use .copy"
+
+		syntax Access (|int|b, |string|)
+			disabled ".char or .byte?"
+
+	function rtrim (|int| n, |string|)
+		disabled "Use .shorten"
+
+
+// normal stuff
+	syntax cast ( |bool| )
+		cpp_wrapper JB_Str_Exists
+
+	syntax cast ( |&byte| )
+		cpp_part CastByte
+		inlined
+		return ._addr|&byte|
+	
+	syntax cast (|StringZeroTerminated|)
+		cpp_part CastZero
+		inlined
+		return .zeroterm
+
+	function Byte (|int| index, |int| Missing=-1, |int|)
+		description "Returns 'Missing' if the value can't be found. Negative numbers are treated as missing, unlike str[index]." 
+		cpp_wrapper JB_Str_ByteValue2
+		
+	syntax Access (|int| index, |Byte|)
+		nil checker
+		description "Returns 0 if the value can't be found. Pass negative index to read from the end, unlike str.byte(index)"
+		cpp_wrapper JB_Str_ByteValue
+	
+	syntax Access (|int| start, |int| after, |bool| ShareAlways=false, |string|)
+		cpp_wrapper JB_Str_Range
+		
+	function Right (|int| N, |string|)
+		inlined
+		|| L = .length
+		return self[L-N, L]
+	
+	function CodePoint (|bool| Loose=false, |CodePoint|)
+		cpp_wrapper JB_Str_UTF8Value
+		
+	syntax Access (|ivec2| r, |string|)
+		cpp_part RangeVec
+		opt noinline // I kinda prefer this... makes trimextandpath compile nicer
+		return self[r.x, r.x2]
+
+	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)
+		nil checker
+		cpp_wrapper JB_Str_MidEquals
+
+	syntax Compare (|string| Other, |bool| Aware=false, |int|)
+		cpp_wrapper JB_Str_Compare
+
+	syntax Compare (|int| Other, |int|)
+		cpp_part CompareInt
+		inlined
+		return .length - other
+	
+	syntax Equals (|string?| Other, |bool| Aware=false, |bool|)
+		nil self
+		cpp_wrapper JB_Str_Equals
+	
+	syntax Equals (|int| Other, |bool|)
+		cpp_part EqualsInt
+		inlined
+		return .length == other
+
+	libinternal MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
+		|| n	= .length
+		|| s0	= .addr
+		|| s	= s0 + pos
+		if Codepoints >= 0
+			|| s2 = s0 + n
+			while (--CodePoints >= 0) and (s < s2)
+				codepoint.utf8read(s)
+		  else
+			while (s > s0)
+				|| c = (--s)[0]
+				if (c < 0x80) or (c > 0xC0)
+					++Codepoints
+					if (CodePoints >= 0)
+						exit
+		return (s - s0)|ind|
+
+
+	operator starts (|string| s, |bool|)
+		inlined
+		return self[0, s, true]
+		
+	function EndsWith (|string| s, |bool| aware=false, |bool|)
+		|| n = s.length
+		|| L =  .length
+		for (i in 1 to n)
+			|| a = self[l-i]
+			|| b = s[n-i]
+			if aware
+				a = a.lowercase
+				b = b.lowercase
+			require a == b
+		return true
+
+
+	function Protocol (|string|)
+		for i in .length
+			if self[i, "://"]
+				return self[0, i]
+			require !self[i].iswhite
+		
+
+// basically we just want " " to match with multiple spaces or tabs
+// that is all. but also "  " must match with at least two.
+// also allows endofline if the search ends with a " "
+	libinternal StretchyFindSub (|string| find, |int| from, |int|)
+		|| i = 0
+		|| n = .length
+		while i < find and i+from < n
+			|| c = self[from + i]
+			|| f = find[i++]
+			if f != ' '
+				require c eq f
+			  else
+				|| EndOfFind = i >= find
+				|| extra = 0
+				|| found = 0
+				while (find[i+extra] == ' ')
+					++extra
+				// so now we need to find that many extra spaces
+				while (c == ' ' or '\t') or (EndOfFind and (c == '\n' or '\r'))
+					c = self[from + i + found]
+					++found
+				require found > extra
+				i += extra
+				from += found-(extra+1)
+		return i+from
+
+
+	function StretchyFind (|string| find, |int| from=0, |int| to=int.max, |intrange|) // findnospaces
+		|| n = self - find
+		to = to min n
+		from = from min n
+		if from < to
+			while from <= to
+				|| l = .StretchyFindSub(find, from)
+					return (from, l)
+				++from
+		  else
+			from--
+			// from -= find.length // already subtracted?
+			while from >= to
+				|| l = .StretchyFindSub(find, from)
+					return (from, l)
+				--from
+		return (-1, 0)
+
+
+	function Hash (|uint64| last=0, |uint64|)
+		cpp_Wrapper JB_Str_CRC
+
+
+	iterator
+		|| Start = ._Addr
+		|| End = Start + .Length
+		while (Start < End)
+			yield Start[0] (Start - .Addr)
+			++Start
+
+	
+	iterator Backwards
+		|| Start = .Addr
+		|| i = .Length-1
+		while (i >= 0)
+			yield Start[i] (i)
+			--i
+
+
+	iterator Lines
+		|| Prev = 0
+		while (self) {
+			|| Curr_ = .find( CharSet.Line, Prev )
+			yield  self[prev,curr_] (curr_)
+			Prev = Curr_ + 1
+		} (Curr_)
+
+
+	iterator FakeLines
+		|| Prev = 0
+		|VirtualJBString| Value
+		Value.RefCount = -1
+		while (self) {
+			|| Curr_ = .find( CharSet.Line, Prev )
+			|| Start_ = .addr + prev
+			Value.Addr = Start_
+			Value.Length = Start_ - curr_
+			yield  &Value
+			Prev = Curr_ + 1
+		} (Curr_)
+
+	
+	iterator CodePoints
+		|| Start	= .Addr
+		|| End		= Start + .Length
+		while (Start < End)
+			|| BeforeChar = Start
+			|| c = codepoint.UTF8Read(start)
+			yield (c) (BeforeChar)
+
+
+	iterator CodePoints2
+		|| First	= .Addr
+		|| Curr		= First
+		|| End		= first + .Length
+		while (Curr < End)
+			|| pos = (Curr - first)|int|
+			|| c = codepoint.UTF8Read(curr)
+			yield (c) (pos)
+
+
+
+libinternal array.join_sub (|array of string| self, |string| sep, |int| n, |string|)
+	flow off
+	|| fs = FastString(n)
+
+	for s in self
+		fs <~ sep
+		start
+		fs <~ s
+	return fs
+
+
+
+function array.join (|array of string| self, |string| sep = "", |string|)
+	opt norefcounts
+	flow off
+	|| sl = sep.Length
+	|| n = -sl
+	for s in self
+		n += s.length + sl
+	return .join_sub(sep, n)
+

@@ -1,0 +1,401 @@
+
+
+class Button (GUIControl)
+	linkage
+		cpp_part Btn
+		
+	|GUIAction?|				OnPress
+	|GUIAction?|				OnOver
+	|guiaction?|				OnRightClick
+	|date|						StepDuration
+	|date|						DelayTill
+	|guicontrol?|				SubControl
+	|listviewrow?|				CurrOverItem
+	|listviewrow?|				ButtonSource
+	|listviewrow?|				ClickedItem
+	|listview.columnfinder?|	ColumnFinder
+	|int|						ItemWidth
+	|int|						ItemGap
+	|byte|						_ClickCount
+	|byte|						_DuringSelectEvent
+	|bool|						_PressingDone
+	|bool|						PressMakesLighter
+	|bool|						CanReOrderButtons
+	|bool|						MouseDownDoesClick
+	|bool| 						DontDrawClicked
+	|ListViewState|				Align
+
+	constructor (|guicontrol| p,  |GUIAction| OnClicked,  |GUIAction| OnPress=nil,  |GUIListEvent| MenuAccept=nil, |guiaction| OnRightClick=nil)
+		super.constructor(p)
+		.onclicked = OnClicked
+		.OnPress = OnPress
+		.ItemGap = 4
+		.OnRightClick = OnRightClick
+		.StepDuration = 0.75s
+		.align = ListViewState.AlignCenter
+		.subcontrol = .InitMenu(MenuAccept, OnPress)
+
+	libinternal InitMenu (|GUIListEvent| ret, |guiaction| Pressing,   |menu|)
+		if ret
+			if !pressing
+				.MouseDownDoesClick = true
+			rz = menu(self, nil, ret)
+	
+	
+	function SubMenu (|menu|)
+		opt norefcounts
+		|| s = .SubControl
+		if s isa menu
+			return  s
+
+
+	function Click
+		opt norefcounts
+		.click((int.min, int.min))
+	
+	
+	function Click (|ivec2| p, |bool| Right=false)
+		cpp_part ClickXY
+		opt norefcounts
+
+		|| sub = .SubControl
+			|| w = .window
+				|| m = w.OpenedMenu
+				require m != sub
+
+		|| Always = p.x == int.min
+		require always or .lastrect contains p
+
+		if Always
+			.selected(Right) = nil
+		  else
+			.selected(Right) = .itemat(p.x)
+//		.selected(!left) = c
+
+
+	function Select (|listviewrow| r)
+		disabled "just set .selected"
+		
+	
+	function Selected (|bool| RightClick=false, assigns:|ListViewRow?|)
+		opt norefcounts
+		|| prev = .Selected
+		|| changed = 0
+		for i in .ButtonSource
+			|| x = (i == value)
+			if (i is selected)!=x
+				(i is selected) = x
+				changed++
+		
+		if !._DuringSelectEvent++
+			.Touch(2)
+			|| fn = (RightClick)(.onrightclick, .OnClicked)
+				(fn)(self, value, prev)
+		._DuringSelectEvent--
+
+
+	function Selected (|listviewrow|)
+		opt norefcounts
+		for i in .ButtonSource
+			if i is Selected
+				return i
+
+	behaviour MouseMove
+		opt NoRefCounts
+		if state isnt LEAVE
+			if self is Enabled
+				SystemCursor.hand.use
+			  else
+				SystemCursor.No.use
+			
+		if (state is enter or leave)
+			.touch
+		|| item = .ItemAt(P.x)
+		if .CurrOverItem != item
+			.CurrOverItem = item
+			.touch
+			(.onover)(self, state|int|, item)?
+
+
+	function XOfItem (|ListViewRow| row, |int|)
+		opt norefcounts
+		require row and row isnt hidden
+		|| W = .ItemWidth
+		|| r = .ButtonSource.first
+		while r
+			if r == row
+				exit
+			if r isnt hidden
+				rz += w + .ItemGap
+			r++
+
+
+	function ItemAt (|int| P, |ListViewRow|)
+		opt norefcounts
+		|| W = .ItemWidth
+		|| R = .lastrect.horz
+		R.x2 = R.x + W
+		for i in .ButtonSource
+			if i isnt hidden
+				if R contains P
+					return i
+				R += W + .itemgap
+
+
+	libinternal ClearMouse
+		.DelayTill = nil
+		.ClickedItem = nil
+	
+	
+	behaviour MouseUp
+		opt norefcounts
+		.clearmouse
+		if ._PressingDone
+			._PressingDone = false
+		  else
+			.click(p)
+
+
+	behaviour RightClick
+		opt norefcounts
+		.Click(p, .onrightclick!=nil)
+
+		
+	libinternal DoPressing (|listviewrow| D, |bool|)
+		.ClearMouse
+		return (.OnPress!)(self, 0, D)
+
+	
+	behaviour MouseDown
+		opt norefcounts
+		._clickcount = clicks
+		|| D = .ItemAt(P.x)
+			if (d isnt active)  and  .Decluttered
+				d = nil
+		
+		|| ret = MouseDragging.Ignored
+		if .CanReOrderButtons
+			|| cl = .ClickedItem
+			if cl and clicks == -1		// drag
+				if D and D != cl
+					cl.moveto(D)
+					.touch
+					._PressingDone = true
+				if !.OnPress or ._PressingDone
+					return mousedragging.DragBeyond
+				ret = mousedragging.DragEvenIfStill // ?
+		
+		if keys.option and .OnPress
+			.DoPressing(D)
+			return mousedragging.DragEvenIfStill
+
+		if !(D or !.ButtonSource)  or  (.ItemWidth and !D)
+			return ret
+		
+		if .MouseDownDoesClick
+			._pressingdone = true
+			.click(p)
+			return MouseDragging.handled
+
+		if D
+			.ClickedItem ?= d
+		
+		if !.OnPress
+			return (D!=nil)(mousedragging.DragBeyond, mousedragging.handled)
+		
+		|| n = gui.FrameStart
+		if !.DelayTill
+			.DelayTill = n + 0.7s
+		  elseif (D == .clickeditem) and (n >= .DelayTill)
+			.DelayTill = n + .StepDuration
+			._PressingDone = true
+			if !.DoPressing(D)
+				.delaytill = 0
+				return MouseDragging.handled
+		return mousedragging.DragEvenIfStill
+
+	
+	function ivec4.TextCorner (|drawstyle| g, |string| T, |ListViewState| C, |ivec2|)
+		|| MV = (.height - g.height(t))-3
+		if C & ListViewState.aligncenter
+			|| MH = .width - g.width(t)
+			|| vmid = .y+((mv-1)/2) + 2
+			return (.x+(mh/2), vmid)
+		ifn c & ListViewState.align
+			|| vmid = ((mv)/2) + 2
+			|| xy = .xy + (0, vmid)
+			ifn (C == ListViewState.alignright or ListViewState.aligncenter)
+				xy += (5, 0)
+			return xy 
+
+
+	libinternal DrawOneButton (|image| where, |ivec4| R, |ivec4| grow, |listviewrow--| Tab)
+		|| disabled = (tab and tab is disabled) or (self isnt enabled)
+			grow = nil
+		if .MenuIsOpen
+			grow = nil
+		
+		|| M = GUI.MouseXY
+		|| MouseXInside = R.x1x2 contains M.x
+		|| clicked = .MouseIsDown and mouseXinside and !.DontDrawClicked
+		|| strength = 1.0
+		
+		|| WillDrawFocus = clicked and tab and .ClickedItem
+		|| fader = 1.0
+		if tab is Preparing
+			strength += (GUI.cycle(1.25s)*0.95)-0.2
+			.Touch
+		  else
+			fader = .declutterer.strength
+			if (tab is Active) and !tab.IsOnlyChild
+				if tab is Selected
+					fader = 1
+
+			require fader or tab is active
+			
+		if WillDrawFocus or MouseXInside
+			grow += r
+		  else
+			grow = r
+		
+		where.ControlClip = grow
+
+		|drawstyle--| G = .GNormal
+		using G
+			G.strengthen(strength)
+			|| darker = (!Tab and clicked)
+
+			if tab is Active
+				|| amount = 0.3
+				if tab is Preparing
+					amount = 0.66
+				// this is a bit of a mess.
+				// just get the final colors and put them in
+				// also the final orange for unselected should be a little different
+				
+				G.overlay((1.0, 1.0, 0.5, amount), 0.25)
+				|| C = (1.2, 0.6, 0.0, 0.85)
+				if tab is Selected
+					c.g = 0.4
+				G.overlay(C)
+				
+			  elseif (tab is Selected) or darker
+				if (darker != .PressMakesLighter)
+					|| v = 0.25
+					G.Overlay(0.3~black, v)
+				  else
+					|| amount = 0.3
+					if tab is Preparing
+						amount = 0.66
+					G.overlay((1.0, 1.0, 0.5, amount), 0.25)
+			
+			if disabled
+				G.overlay(0.6~gray, 0.4)
+			if WillDrawFocus
+				g.edge = .FocusBorderStyle.edge
+				g.edge.Alpha = 1.0
+			if tab isnt active
+				g.Strengthen(fader)
+			Where.DrawRectStyled(Grow, G)
+		
+		if !Tab
+			Tab = .ListSource // allow these text to be added.
+
+		if fader > 0
+			|| t = .ButtonText(tab, .text)
+			|| Pn = R.TextCorner(g,  t,  .align) + (0, 1)
+			|| TextCol = colors.white
+			
+			textcol.a = fader
+			pn.x = where.DrawText(t,  Pn, TextCol, t.length <= 2) + 2
+			
+			|| MI = MouseXInside and  (R.y1y2 contains M.y)
+			require  mi and !disabled and .OnPress  and  r.Width > 19
+			
+			(pn.x min= r.x2-2)
+			|| ago = -.DelayTill.GuiAgo.Float
+				ago *= 4		// effect needs improving
+				if ago > 4		// perhaps something like soft-explode or at least half-pixels
+					ago = 4		// also the maths is wrong somehow...
+				  else
+					.Touch
+				pn.y -= (ago-4.0)|int|
+			  elseif .MenuIsOpen
+				pn.y += 4
+			where.DrawText("\03", pn, TextCol, false)
+		
+		
+	function ButtonText (|listviewrow| Tab, |string| Default, |string|)
+		if !tab
+			return default
+		rz = tab.CellValue(.ColumnFinder)
+		rz ?= Default
+		if tab is Broken
+			rz += " \17"
+		if tab is Modified
+			rz += "*"
+
+	
+	behaviour Draw
+		opt norefcounts
+		|| r = .LastRect
+		|| g = .ContainsMouse|int| * .ExpandOnMouseOver
+		|| grow = (-g,-g, g, g)
+		where.ControlClip += grow
+		|| w = .ItemWidth
+		if !w
+			return .DrawOneButton(where, r, grow, nil)
+		
+		|| rx1 = r.x
+		R.x2 = rx1 + W
+		for tab in .ButtonSource
+			if tab isnt hidden
+				.DrawOneButton(where, R, grow, tab)
+				R = R right W + .itemgap
+			loop r.x < where.width
+
+
+	function TrimWidth
+		|| n = .ButtonSource.Count max 1
+		|| w = n * (.ItemWidth + .ItemGap) - .ItemGap
+		.sizer.g(2, self)	= (w) ~ long
+
+			
+	function SearchMenu (|listviewrow| row=nil, |bool|)
+		|| sub = .OpenMenu(row)
+			sub.IsSearchMenu = true
+			// SlideMenuOpen(self, gui.FrameStart, 0.5s)
+			return sub.TypedString("")
+
+
+	function MenuIsOpen (|bool|)
+		opt norefcounts
+		return  .SubControl isa menu  and  .subcontrol is visible
+
+
+	function ListSource (|ListViewRow|)
+		opt norefcounts
+		|| m = .SubMenu
+			return m.ListSource
+
+
+	function OpenMenu (|listviewrow| row=nil, |menu|)
+		|| m = .SubMenu						#require
+		|| w = .Window
+		if w and .MouseIsDown
+			w.CurrMouseDown = m // right?
+		|| x = .XOfItem(row)
+		if !m.IsSearchMenu
+			m.StopFilter
+		m.ShowCmm(self, x, 0)
+		return m
+
+
+function Date.GuiAgo (|Duration|)
+	if self
+		return gui.framestart - self
+
+
+
+
+

@@ -1,0 +1,107 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+/*
+	There are two separate possible use cases. And they want to work differently:
+		* We want to test a file-path against many globs. Use globbed_by.
+		* A shell-script received a list of unexpanded globs (or perhaps loaded from a conf-file)
+
+	The main difference is that for a shell, passing: abc, abc, abc... should collect "abc" 3x
+	For example running a subprocess 3x.
+	
+	In addition, the paths are already inputpaths that want to be expanded.
+	
+	Whereas testing an already existing list, doesn't need expanding.
+*/
+
+
+
+function string.OperatorGlobs (|string?| txt, |bool|)
+	nil checker
+	require self and txt
+	description "Don't use this on a full-file path, but on path components"
+	|&byte| text_backup
+	|&byte| wild_backup
+	|| text = txt.addr
+	|| wild = .addr
+	|| textEnd = text + txt.length
+	|| wildEnd = wild + .length
+	
+	while text < textEnd and wild < wildend
+		|| w = (wild[]).lowercase
+		if w == '*'
+			text_backup = text
+			wild_backup = ++wild
+		  elseif (w == '?'  or  w == text[].lowercase)
+			text++
+			wild++
+		  else
+			wild = wild_backup
+			text = ++text_backup
+			require wild and text
+
+	////    abc***/
+	while (wild < wildEnd)
+		if (wild[] == '*')
+			wild++									// ignore trailing stars
+		  elseif (wildend[-1] == '/')
+			wildend--
+		  else
+			exit
+		
+	return wild == wildEnd
+
+
+function string.OperatorGlobbed_By (|[string]| globs, |bool|)
+	opt norefcounts
+	for g in globs
+		if g globs self
+			return true
+
+
+function string.GlobExpand (|[file]|)
+	description "Returns a list of files, that match the glob passed. Can send one glob per line."
+	return .split.GlobExpand
+
+
+function array.GlobExpand (|[string]| self, |[file]|)
+	description "Returns files existing on the file-system, matching any of the globs passed."
+
+	|| base = "/".file
+	for L in self
+		|| fixed = L.RegularPath
+		if Fixed contains "**"
+			error "Can't glob '**' in: " + Fixed
+		  else
+			base.FileGlobSub(fixed / '/', rz, 1)
+
+
+libinternal file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)
+	|string--| p = GlobParts[pi++]$
+	
+	|| Star = (p contains '*')
+	|| Names = (Star)(.list, nil)
+	|| n = 0
+	while
+		|string--| str = p
+		if names!=nil
+			str = names[n++]
+			loop str!=nil
+			ifn p globs str
+				continue
+
+		|| f = .child(str)
+		if names==nil
+			f.MustExist("globbing")
+		if f.exists
+			if GlobParts > pi
+				f.FileGlobSub(GlobParts, result, pi)
+			  else
+				result <~ f
+		
+		loop names!=nil
+	
+

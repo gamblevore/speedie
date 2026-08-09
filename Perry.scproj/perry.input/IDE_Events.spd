@@ -1,0 +1,646 @@
+
+
+function FileSepClicker (guiaction)
+	opt norefcounts
+	.ide.ViewTextModeSwap
+
+
+function PerryIDE.UnusedExtract (|message| stuff, |message|)
+	opt norefcounts
+	rz = Message()
+	|| arg = stuff.arg
+		rz.name = stuff.second.name
+		for tmp in arg
+			if (tmp ~!= "error") and (tmp.last!=@arg)
+				rz <~ tmp
+
+
+function PerryIDE.UnusedFuncsSub (|message| tmp, |string| where)
+	|| Level = ErrorSeverity.Hint
+	if tmp.name contains "() is unused"
+		Level = ErrorSeverity.warning
+	
+	|| err = error(nil, tmp.name, level, where)
+	err.position = tmp.first.int
+	.editme.AddErrorToLine(err)
+
+
+function perry.IdeAddProj (|string| Path, |PerryIDE!|) // initide
+	|| old = perry.FindProj(path)
+		|| o = old.ide
+			ClickedTabs(nil, old)
+			return o
+//	ide ?= PerryIDE.EmptyBase
+	return PerryIDE(path.file)
+
+
+function string.TrimCodeExt (|string|)
+	if .PathIsCode
+		return .TrimExtAndPath
+	return self
+
+
+function Perry.CreateProj (|string| path)
+	|| proj = path.file
+	|| Main = templates.EmptyMainFile(proj.trimextandpath)
+		
+	ifn path isa "scproj"
+		require path.file.CreateEmpty
+		if path isa "spd"
+			proj.writeall(main)
+	  else
+		expect (!path.FileExists) (path, "Can't create over existing project.")
+
+		require proj.child("input/main.spd").writeall(Main)
+
+		|| R = templates.Roots
+		|| T = templates.Todo
+		proj.child(".perry").writeall = R
+		proj.child("input/.todo").writeall = T
+	IdeAddProj(path)
+
+	
+function ClickedCompileTabs (Guiaction)
+	opt norefcounts
+	.ide.CompileTabSelect(row)
+
+	
+function PerryIDE.ShowCompileTab (|object| tab) // showtab
+	.ShowCompileCutely					// OOOP.
+	.CompileTabSelect(tab)
+
+
+function PerryIDE.CompileTabSelect (|object| Desired)	
+	opt norefcounts
+	for i in .CompileTabs.ButtonSource
+		|| obj = i.obj as textview
+			|| vis = (Desired == i or obj)
+			(i is selected)  = vis
+			(obj is visible) = vis
+
+
+function ClickedToolbar (GUIAction)
+	opt norefcounts
+	if self isa Button
+		if (._clickcount == 2)
+			.ide.ViewTextModeSwap
+
+
+function file.InputFol (|file|)
+	for c.files in self
+		if  c.name ~= "input"  or  c isa "input"
+			return c
+
+
+function file.FindProjectMain (|file|)
+	|| inp = .inputfol$
+	|| best = inp.child("main.spd")
+	ifn best.exists
+		best = inp.child("index.spd")
+		ifn best.exists
+			for c.files in inp
+				if c.isspd
+					best = c
+					exit
+	return best
+
+
+function PerryIDE.FindConfFile (|filerow|)
+	if .IsSingleFileProject
+		return .FileList[0]
+	return .LocateProjRoot("./index.spd")
+
+
+function PerryIDE.FindNotTodo (|bool|)
+	if .IsSingleFileProject
+		|| c = .CurrFileRow
+		|| root = .FileList[0]
+		if c != root
+			.NotTodo = c
+	if !.nottodo
+		.nottodo = .LocateProjRoot("./main.spd")
+		if !.nottodo
+			.nottodo = .LocateProjRoot("./index.spd")
+			if !.nottodo
+				.nottodo = .MainProjFol
+	return .nottodo
+
+
+function PerryIDE.ClickedTodo
+	|| fl	= .filelist
+	|| todo	= .MainProjFol ?? fl[0]
+	require .FindNotTodo // what? fl is nil? it happened tho?
+	if !todo
+		todo = fl[0]
+	|| Jumpback = (todo is selected) and .nottodo and (fl.listsource contains .nottodo) 
+		todo = .NotTodo
+		fl.show(todo)
+	  else
+		.nottodo = .CurrFileRow
+	fl.Select(todo, ListViewSelectMode.Noshow)
+
+		
+function PerryRecheckEvent (guilistevent)
+	opt norefcounts
+	.ide.Recheck
+
+
+function ReturnProjectPath (GUIListEvent)
+	if row isa filerow
+		row.FilePath.reveal
+	return true
+
+
+function ReturnRecents (GUIListEvent)
+	opt norefcounts
+	perry.IdeAddProj(row.name)
+	return true
+
+
+function ReturnAllFuncs (GUIListEvent)
+	opt norefcounts
+	|| e = .ide.EditMe
+	e.ShowAndSelect(row!.position, true)
+	e.SetFocus
+	return true
+
+	
+function OpenProjectPath (GUIaction)
+	opt norefcounts
+	|| f = .ide.filelist.FirstSelected as FileRow
+		if (self isa Button)
+			.FillMenuPath(f.FilePath)
+
+
+function ClickedStatus (GUIaction)
+	opt norefcounts
+	.ide.editme.ShowNextParseError
+
+
+function ClickedProjectInfo (GUIaction)
+	opt norefcounts
+	.ide.NextProjInfo
+
+
+function PerryIDE.SaveAndShowErrors (|bool|) // checkerrors recheckforerrors
+	opt norefcounts
+	if keys.Shift // maybe its ok? unsure what behaviour I want...
+		.SaveEditing(documentaction.ErrorChecking)
+		.ModifiedForCompile = true
+		.recheck
+		|| t = .IsTextMode
+		
+		.ViewAsProject
+		if t and .IsViewing(.errorlist)
+			return true
+	.ShowErrors
+	return true
+		
+
+
+function PerryIDE.ShowErrors (|bool|)
+	opt norefcounts
+	if !.isviewing(.errorlist)
+		.UseThisView(.ViewErrors)
+		return true
+	if .errorlist.hasany
+		.errorlist.selectatleastfirst
+		return true
+
+
+function ClickedAView (GUIaction)
+	opt norefcounts
+	if self isa Button
+		.ide.UseThisView(self, true)
+	return true
+
+
+function PerryIDE.UseThisView (|Button| btn, |bool| chng=false)
+	opt norefcounts
+	// merge into .view?
+	|| el = .errorlist
+	if (el is visible) and btn.tag == el
+		el.SelectAtleastFirst
+	.view(btn, chng)
+
+
+function ClickedNoNeed (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	i.view(i.viewfiles)
+
+
+function PerryIDE.ShowText (|textview| field, |string?| Text, |bool| Always, |bool|)
+	if text != nil
+		field.text = text
+	.CompileTabSelect(field)
+	.ShowCompileCutely(Always)
+	return true
+
+
+function perryIDE.FlipJeeboxField (|bool|)
+	if .flip(.JeeboxText)
+		return .UpdateJeeboxField
+	return true
+
+
+function PerryIDE.UpdateJeeboxField (|bool|)
+	|| e = .EditMe
+	|| sr = e.Selection
+	|| txt = e.SelText
+	if !sr.width
+		txt = e.FindTextLine(sr.x).text
+	
+	|| str = ""
+	|| msg = txt.Parse
+		str = msg.RenderAST
+	  else
+		str = stderr.pop!.render
+	.ShowText(.JeeboxText, str, true)	// OK... so... what about resel from drag?
+	
+	return true
+
+
+function perryide.UpdateFoundHeader
+	|| f = .FoundList
+	|| h = f.Columns.first
+		|| files = 0
+		|| matches = 0
+		for s.fast in f.ListSource
+			files ++
+			matches += s.Count
+		h.Name = (matches of "match") + " in " + (files of "file")
+
+
+function PerryIDE.BatchPhind (|string| text,  |bool| DoReplace, |uint| ID,  |bool|)
+	// The search ID... allows not being wasteful when searching across multiple projects
+	// which may then search the file twice. If something is already missed in one file
+	// theres no point re-searching it. Especially with 10 projects open. Thats 10 misses
+	// on the same damn file.
+	
+	opt norefcounts
+	.foundlist.clear
+	|| f = .FoundList.ListSource
+	f.name = "FoundList"
+	f.clear
+	.filelist.BatchFind(text, DoReplace, f, ID)
+	.UpdateFoundHeader
+	return f.HasAny
+
+
+function PressedLineInfo (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	|| q = i.filelist.quickopen
+	q.text = "line " + i.editme.SelectedLine.LineNumber
+	i.filelist.showquickopen
+
+
+function PressedCharInfo (GUIaction)
+	opt norefcounts
+	|| i = .ide
+	i.BytesInfoMode = !i.BytesInfoMode
+	i.ShowRightStats
+
+
+function PressedSearchWithin (Guiaction)
+	opt norefcounts
+	|| i = .ide
+	|| f = i.FileList
+	|filerow| r = nil
+	if !f.SearchWithin
+		r = f.FindSearchWithin
+	f.SearchWithin = r
+	i.ReTextSubFind
+
+
+
+function PerryIDE.MassSearch (|bool|)
+	opt norefcounts
+	(.MassReplaceField is Enabled)
+	.MassReplaceField.decluttered = false
+	|| t = .MassSearchField.Text
+	.ViewAsProject
+
+	// i forgot what the ID is about.
+	// some clever algorithm something that stops something bad happening?
+	// Just keep it... till i remmeber what it does.
+	// maybe something to do with searches across multiple projects.
+	// i think thats it. So theres no point finding something in another
+	// project if we already found it in ours.
+	
+	|| ID = (perry.findID+1)&255
+	ID = ID max 1
+	perry.FindID = ID
+	
+	.BatchPhind(t, true, ID)
+	
+	if t and !.FoundList.HasAnyRows
+		.NoNeed("The search text “${t}” wasn't found", nil)
+		perry.FindElseWhere(self, t, ID)
+	  else
+		.NoNeed
+	return true
+
+			
+	
+function PerryIDE.DoReplacement (|error| File, |string| r, |int|)
+	|| fs = faststring()
+	|| t = .EditMe.Text
+	|| First = file.first!.position
+	|| last = first
+	for curr.fast in file
+		fs.appendRange(t, last, curr.position)
+		last = curr.after
+		curr.position = fs.length
+		curr.rangelength = R.Length
+		fs <~ R
+		rz++
+
+	.editme.InsertText(fs, (first, last), false, false)
+
+
+function PerryIDE.DidReplace (|int| n, |string| dest)
+	Notifications <~ "Replaced $n matches with: $dest"
+
+
+function PerryIDE.CanReplace (|string| r,  |listviewrow| root,  |string| src,  |bool|)
+	|| n = 0
+	for f in root
+		n += f.Count
+	return "Replace $n matches of: \"$src\"\n\nWith: \"$r\" ?".Confirm
+
+
+function PerryIDE.DoReplacements (|bool|)
+	opt norefcounts
+	|| l = .FoundList.ListSource
+	require l.HasAny
+	|| r = .massreplacefield.text
+	|| f = l.first
+	|| src = .MassSearchField.text
+	require .CanReplace(r, l, src)
+
+	|| n = 0
+	while  f
+		|| fr = f.obj as FileRow
+		if f.HasAny and .EditFile(fr) and f isa error
+			n += .DoReplacement(f, r)
+		f++
+	
+	.DidReplace(n, r)
+	return true
+	
+
+
+function EditMeSelChange (GUITextSelectEvent)
+	opt norefcounts
+	|| i = .ide
+	|| proj = i.SharedProjectTabSource
+		proj["pos"] = self|textview|.Selection.x
+
+	i.TryReselectASM
+	if i.ProductSep.IsOpen and i.jeeboxtext is visible
+		i.UpdateJeeboxField
+	i.PopupHide
+	i.ShowRightStats
+	i.ShowLeftStats
+	i.EditMeTabRetryThing = 0
+	require !TextWasAltered and i.feedback.CommsOpen
+	|| e = self|textview|
+	|| s = e.Selection
+	if s.width
+		e.PerryTryAutoComplete(s.x2, "autocomplete_sel", PerryAutoCompleteReason.sel)
+
+
+function EditMeSelError (GUITextLineEvent)
+	opt norefcounts
+	|| i = .ide
+	|| el = i.errorlist
+	i.DuringMsgFB = true
+	el.select(line.lineerror)
+	i.DuringMsgFB = false
+
+	
+
+function PerryIDE.MoveError (|error| row,  |string| p,  |int| i,  |error|)
+	opt norefcounts
+	while row
+		|| nrow = row.step(i>0)
+		if !nrow or nrow.path != p
+			return row
+		row = nrow
+
+
+function PerryIDE.ClickedError (|error| row)
+	require !.DuringMsgFB
+	|| f = row.path.file
+	if (row.path != .path) and f.IsNicelyViewable
+		.EditPath(f, false)
+	.editme.ShowAndSelect(row.position, true)
+	.editme.MyError = row
+
+
+function file.IsNicelyViewable (|bool|)
+	if .isdir
+		return true
+	require .exists
+	require .size < 512KB
+	return !.readall.isbinary
+
+
+function PerryIDE.ClickedFind (|error| row)
+	opt norefcounts
+	.GotoIncludedFile(row.path)
+	if row.position >= 0
+		|| L = row.rangelength
+		L ?= .MassSearchField.text.length
+		.editme.ShowAndSelect(row.position, L, true)
+		return
+
+	|| curr = .MoveError(row.first, row.path, -1)
+		.editme.show(curr.position)
+
+
+function ErrorListPaste (guipasteevent)
+	require self
+	|| p = data.parse
+		|| errs = error.from(p)
+		|| i = .ide
+		|| L = i.errorlist.listsource
+		for e in errs
+			if e == @tmp
+				L <~ error.from(e)
+		i.UpdateErrorCount
+		i.NoNeed
+	  else
+		StdErr.pop
+	
+	
+function ClickedError (GUIListEvent)
+	opt norefcounts
+	|| ide = .ide
+	if row isa error
+		if self == ide.errorlist
+			ide.ClickedError(row)
+		  else
+			ide.ClickedFind(row)
+	  elseif GUI.event is mousedown
+		if !.listStart and ide.filelist isnt visible
+			ClickedAView(ide.ViewFiles)
+	return true
+
+
+function PerryIDE.AskClearLog (|int| Count, |string| name, |bool|)
+	return "Clear $name?\n\nContains $count items.".confirm
+	
+
+function listviewrow.PerryLogClear
+	.clear
+	.position = 0
+	gui.touch
+
+
+function LogAreaKeys (GuiKeyEvent)
+	opt norefcounts
+	|| Comms = .ide.CommsLogList
+	|| R = Comms.listsource
+	if key.IsDelete
+		|| l = Comms.FirstSelected // only 1 anyhow
+			if l.parent.isroot
+				|| Count = l.Count
+				if Count and .ide.AskClearLog(Count, l.name)
+					l.PerryLogClear
+			  else
+				comms.RemoveRow(l)
+		return true
+	
+	require key iscmd keys.k
+
+	|| Count = 0
+	for s in r
+		Count += s.Count
+	if Count and .ide.AskClearLog(Count, "All logs")
+		for s in r
+			s.PerryLogClear
+		return true
+
+
+function ReturnErrorList (GuiListEvent)
+	.select(row)
+	.ide.editme.setfocus
+	return true
+
+
+function PerryIDE.ReTextSubFind
+	|| r = .filelist.SearchWithin
+		.SubFindCheckBox.text = "Searches: " + r.Name
+	  else
+		.SubFindCheckBox.text = "Searches: All"
+
+
+function SelectedFile (GuiListevent)
+	if row isa FileRow
+		return .ide.EditFile(row)
+
+
+function perry.FindElseWhere (|perryide| ignore, |string| find, |byte| FindID)
+	for w in perry.OpenProj
+		if (w != ignore) and w.BatchPhind(find, false, FindID)
+			if "\"$find\" not found here, but was found in '${w.projname}'.\n\nTake a look?".confirm
+				w.showide
+				w.ShowFind
+			return
+
+
+function HideSomeStuffOnResize (guiaction)
+	opt norefcounts
+	if self isa guicontrol
+		.ide.PopupHide
+	
+
+function PerrySearchWithin (GUIListEvent)
+	opt NoRefCounts
+	.ide.SubFindCheckBox is visible
+	.ide.ShowFind
+
+
+function PerryFileViewRightClick (GuiListEvent)
+	|| RC = FileViewer.RightClickFileList|GuiListEvent|
+	require (RC)(self, row, mode)
+	if row isa filerow
+		|| m = .CMM									#require
+		|| menu = menuitem("Count Lines Of Code", FileViewerCountCode)
+		|| where = m.listsource[4]
+			where.prev = menu
+	return true
+
+
+function FileViewerCountCode (GuiMenuEvent)
+	|| row = clicked!.row as filerow				#require
+	|| CLOC = (0, 0)
+	|| FileCount = 0
+	|| Size = 0
+	for c.flat in row
+		|| L = c.ReadFrom
+		if l.isspd
+			|| f = l.file
+				|| p = f.parse
+					CLOC += p.LinesOfContent
+				size += f.size
+				FileCount++
+	
+	|| fstr = "file".pluralize(FileCount)
+	|| r = (size|float| / cloc[]|float|).Render
+	app.alert "${Cloc[]} lines of code and ${Cloc[1]} nodes in ${size.strsize} text ($r bytes per line)\n\n$fstr at: ${row.FilePath}"
+
+
+
+function perryide.ClearIDE (|keys| key, |bool|)
+	opt norefcounts
+	if super.KeyDown(key)
+		return true
+	
+	|| t = .OutText
+	if t and t.text
+		t.text = ""
+		return true
+	
+	if LogAreaKeys(.CommsLogList, key)
+		return true
+	
+	|| r = .RunningProd
+		if .IsViewing(.debugger) and !r.status.IsRunning
+			.DebugMode = 0
+			.SetAppInfo
+	return true
+
+
+function listview.PerryCopyComms (guicopyevent)
+	|| sel = .FirstSelected
+		if sel.HasAny
+			|| fs = faststring()
+			for s in sel
+				|| it = .copyid(s)
+				if fs.length
+					fs <~ '\n'
+				fs <~ it
+			return fs
+	
+	|| cp = listview.defaultcopy|guicopyevent|
+	return (cp)(self, item)
+
+
+// So... we are tired
+// we are sooo tired
+// not knowing what to do...
+// its a function
+// its a function of destruction
+// we are disconnected
+// i can't see... what to do.
+// yeah... callbacks, functions, tasks, overrides, whatever
+// it should be easy.
+// but its not.
+// in theory... just override PerryRenameFile. But not so easy.
+
+
+

@@ -1,0 +1,1501 @@
+
+
+module Interact { // module autocomplete
+cpp_part AC
+
+|scfunction|		AnonFn
+|scobject|			OrigFn
+|memorylayer|		ParseLayer
+|SCNode|			AnonParent
+|errorreceiver|		Errors
+|bool|				Cleaned
+|int|				Max_Total = 400
+|int|				Total
+||					func_tmp_src   = <(`return, require, "log <string>", while, for, if, else, elseif, expect, warn, error, cpp_refs, debugger, debugat, `description "<describe this function>"`, print, printline, zalgoline, printerror, beep, continue, cpp_part, cpp_name, cpp_wrapper, `self.`, `super.`, "exit", "opt norefcounts", "opt inline"
+ `)>.macro
+
+||					all_tmp_src	= <(`
+@RCM
+"function <name>"
+"helper <name>"
+"target <name>"
+@CM
+linkage
+"syntax <kind>"
+@C
+module
+render
+iterator
+"operator <name>"
+"behaviour <name>"
+"virtual <name>"
+constructor
+destructor
+@R
+"main\n\t<// code here>"
+"extend_module <name>"
+"class <name>"
+"role <name> (super_class)"
+"datatype <name> (super_class)"
+"extend <class_name>"
+"module <name>"
+"dispatch <name> (<Params>)"
+@L
+"cpp_part <name>"
+"cpp_class <name>"
+visible true
+"opt min <1-3>"
+wrapper
+noauto
+`)>.macro
+
+
+function ParserRestore
+	.errors = stderr
+	stderr = ErrorReceiver()
+	(message).Restore
+	parser.using.position = -1				// Sigh. I guess something slipped somewhere
+
+
+function EnterAutoComplete (|bool|)
+	|spdprocess--| perry = app.parent
+	
+	require stderr.ok and perry.CommsOpen
+	app.AllowInteruptCrash = false			// To debug perry, which runs debug speedie
+	"RespondingToCommands"					// Don't delete this... too annoying to miss.
+
+	|| Realm = pico.GlobalConfig
+	Realm.TimeOut = 30s
+	if !app.IsMainThread
+		"(AsLib)"
+		realm.timeout = 0					// No need timeout
+	if options.PrintLibraries
+		"(Noisy)"
+		perry.pico.config.noise = -1
+
+	compiler.InPerry = 1
+	.PerryTalk(perry)
+	"ExitingCommands"						// This also
+	return true
+
+
+function InitedOK (|bool|)
+	if compiler.InitedOK
+		return true
+	if .Errors.OK
+		error "Compiler did not initialise"
+
+
+function PerryTalk (|SpdProcess| perry)		// ReturnsWhenPerryClosesUs
+	Compiler.CompileAll
+	compiler.InPerry = 2
+	.ParserRestore
+	
+	for cmd in perry
+//		target debug
+//			printline "------------"
+//			printline cmd
+//		
+		loop .CmdWrap(cmd)
+
+	"StartExit"
+	perry.Disconnect						// calls close, which uses SO_LINGER, to allow sending.
+
+
+function WriteError (|string| name, |message|)
+	rz = @tmp + "error"
+	rz <~ name
+	if stderr.ok
+		rz <~ "error" // unknown error?
+	  else
+		rz <~ .MiniErrors(stderr, errorseverity.problem)
+
+
+function CmdCleanUp (|Message| arg, |message|) 
+	if arg != @arg // reclaim msg
+		"missing @arg"
+		|| tmp = @arg + "Perry"
+		tmp <~ arg 
+		arg = tmp
+	
+	|| date = arg.first
+	if date != @num
+		"missing date in @arg"
+		date = @num + 0
+		arg.first = date
+	
+	|| Cmd = arg.second
+	if Cmd != @tmp
+		"missing cmd in @arg"
+		Cmd = @tmp + "error"
+		date.next = cmd
+
+	cmd.removeafter
+	return cmd
+
+
+|| TestCrash = "__CrashSpd_" + "_"		// for crash-testing
+
+function CmdWrap (|Message| arg, |bool|)
+	if arg contains .TestCrash
+		app.crash
+	
+	|| cmd = .CmdCleanUp(arg)
+	|| IsOK = cmd != "error"
+	|| response =  (IsOK)(.docmd(cmd), nil)
+	response ?= .WriteError(cmd.name)
+
+	if cmd != response
+		cmd.ReplaceWith(response)
+	app.parent! <~ arg
+	stderr.clear						// super-important!!!
+	Compiler.InPerry = 3
+	
+	return true
+
+
+function MiniErrors (|errorreceiver| L, |errorseverity| sev = errorseverity.warning, |message|)
+	rz = compiler.RenderErrors(L, sev).parse
+	if rz and rz!=@arg
+		rz = rz.WrapWith(@arg)
+
+
+function ErrorsInAWayThatPerryLikes (|message|)
+	if !.Cleaned
+		.errors!.PrePrintErrors
+		.Cleaned = true
+	return .MiniErrors(.errors!)
+
+
+function UnusedStuff (|message| cmd, |string| OK)
+	opt norefcounts
+	|| path = cmd[@str]
+	if !path
+		path = cmd.msg(@str)
+	path.RemoveAfter
+	path.RemoveBefore
+	cmd <~ (@thg, OK)
+	path.prev = path.next
+	|| arg = cmd.GiveArg
+	
+	|| name = path.name									#require
+	|| scf = compiler.files.valuelower(name)			#expect ("No file at: " + name)
+
+	// Special feature to check if an important project uses all the functions of a library
+	// which is nice... so you know all your lib funcs are actually tested. Some might be...
+	// useless and better off removed if no one needs them. This is set somewhere in the conf I guess.
+	|| unused_libs = path.next
+		for lib in unused_libs
+			if lib.ExpectString
+				lib.HateUnusedFuncs
+	
+	if scf.Unfinished
+		return
+	
+	for fn in Compiler.FuncList
+		if fn.File == scf
+			fn.CheckUnused(arg)
+
+	for konst in Compiler.DeclConstants
+		if konst.file == scf
+			konst.CheckUnusedDecl(Arg, 'K')
+
+	for glob in PackMaker.PackGlobs
+		if glob.file == scf
+			glob.CheckUnusedDecl(arg, 'G')
+	
+	for c in scf.Types
+		c.CheckUnusedClass(arg)
+
+
+function SCDecl.LocalIsUsed (|bool|)
+	if self is CompilerCreated
+		return true						// whatever
+	if self is ReadFrom
+		return true
+	if self is Reference and SetTo
+		return true
+
+
+function SCClass.ConstructorUsed (|bool|)
+	opt norefcounts
+	|| c = .ConstructorFunc
+	while c
+		if c.LinkFrom.Length
+			return true
+		c = c.NextFunc
+
+
+function SCClass.CheckUnusedClass (|message| feedback)
+	opt norefcounts
+	require !.IsLibrary
+	if .IsObject
+		if !.ConstructorUsed
+			.MarkUnused(feedback, 'C')
+	  else
+		if .MyReacher == nil
+			.MarkUnused(feedback, 'S')
+		
+	for p in .Properties
+		p.CheckUnusedDecl(feedback, 'P')
+
+
+function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
+	opt norefcounts
+	require self isnt Library
+	if (self is ReadFrom) and ((self is SetTo or const) or .IsCarray or .isbarestruct)
+		return
+	if self is SetTo and Reference
+		return // no problem
+	require self isnt ClassObj
+	|| fn = .Func
+		require fn isnt Behaviour and VirtualCaller
+
+	.MarkUnused(feedback, dbg)
+
+
+function SCObject.MarkUnused (|message| feedback, |byte| debug, |string| Name="")
+	opt norefcounts
+	(debug) // remove later
+	|| s = .Source
+		if !name
+			name = .name
+		|| Str = .UnusedStr(name)
+			feedback.msg(@tmp, Str) <~ s.position
+
+
+function scfunction.CheckUnusedArgs (|message| feedback)
+	|| AllVars = faststring()
+	|scdecl--| Fail
+	for arg in .args
+		if !arg.LocalIsUsed
+			|| Src = arg.source
+			if src and src isnt Inserted
+				Fail = arg
+				if AllVars.Length
+					AllVars <~ ", "
+				AllVars <~ arg.name
+	if fail
+		fail.markunused(feedback, 'A', allvars)
+
+	
+function SCFunction.CheckUnused (|message| feedback)
+	opt norefcounts 
+	require self isnt Disabled
+	require self isnt InitFunc
+
+	if .IsUnused and Compiler.Successfulness
+		|| src = .source
+			|| str = "() is unused."
+			if .linkfrom != nil
+				str = "()'s callers are unused"
+			feedback.msg(@tmp, .name + str) <~ src.position
+	
+	require (self isnt cpp)
+	if !.HasProto
+		.CheckUnusedArgs(feedback)
+	
+	for s.flat in .Sourcearg
+		if s == @decl
+			|| d = s.obj as scdecl
+				if !d.LocalIsUsed
+					d.MarkUnused(feedback, 'D')
+
+	
+
+function scobject.AutoCompleteKind (|string|)
+	if self isa SCModule
+		return "module"
+	if self isa scclass
+		if .FuncProto
+			return "function prototype"
+		if .IsDataTypeOnly
+			return "datatype"
+		if .IsStruct
+			return "struct"
+		if .IsObject
+			return "class"
+	if self isa SCDecl
+		if self is Const
+			return "Constant"
+		if self is Global
+			return "Global"
+		if self is Property
+			return "Property"
+		if self is Param
+			return "Parameter"
+		return "Variable"
+
+	return "unknown"
+
+
+function scobject.UnusedStr (|string| name, |string|)
+	|| reason = .UnusedReason$
+	|| fs = FastString()
+	|| plural = name contains ','
+	.AutoCompleteKind.Pluralize(plural, fs)
+	fs <~ " "
+	if !plural
+		fs <~ "'"
+	fs <~ name
+	if plural
+		fs <~ " are "
+	  else
+		fs <~ "' is "
+	fs <~ reason
+	return fs
+
+
+function scobject.UnusedReason (|string|)
+	if self isa SCDecl
+		if (self is Const) and (.IsLookupOnly isa SCFunction)
+			return "" // this is better just NOT being a problem.
+		if self is SetTo
+			return "set to, but never read from."
+		if self is ReadFrom
+			return "read from, but never set to."
+	return "unused."
+
+
+function Check (|message| cmd, |message|)
+	|string--| OK = "?"
+	|| Check = cmd ~= "check"
+		OK = (!.errors.HasProblems).Render
+	.UnusedStuff(cmd, OK) // builds correct structure
+	if Check
+		|| Errors = Interact.ErrorsInAWayThatPerryLikes
+		cmd.GiveArg.AppendAll(errors)
+	return cmd
+
+
+function Message.SendPerryErrors (|message|)
+	.clear
+	self <~ Interact.ErrorsInAWayThatPerryLikes // appends an @arg to the @tmp
+	return self
+	
+
+function ReportMemory (|Message| cmd, |message|)
+	cmd.clear
+	|| arg = cmd.msg(@arg)
+	arg <~ app.ObjMemory
+	arg <~ app.stringmemory
+	return cmd
+	
+
+function DoCmd (|Message| cmd, |message|)
+	require cmd == @tmp
+	
+	if !.InitedOK:							return cmd.SendPerryErrors
+	if cmd ~= "check" or "unused":			return .Check(cmd)
+	if cmd ~= "mem":						return .ReportMemory(cmd)
+	if cmd == 1 or cmd.last == @name:		return .autoJump(cmd)
+
+	|| req = cmd[@str].name
+	|| my_file = compiler.files.valuelower(req)
+		rz = .MainAct(cmd, my_file)
+	  else
+		error "nofile"
+
+
+function compiler.FindModuleOrClass (|message| mod, |bool| retry, |SCNode|)
+	opt norefcounts
+	if mod == @name and "main"
+		return compiler.program
+	|| Module = .findmodulemsg(mod, SCNodeFindMode.noerrors)		#require
+	if (mod == @thg)
+		rz = module.cls
+		require rz or retry
+	rz ?= module
+
+
+function Define_Something (|SCFile| myfile,  |int| f,  |message| thg,  |string| purpose,  |message|)
+	opt norefcounts
+	thg ?= myfile.GetMsg(f)
+	expect thg "nomsg"
+	thg = thg.CmdImprove
+	return .DefineOrCall(thg, purpose, myfile)
+
+
+function message.CmdImprove (|message|)
+	opt norefcounts
+	if self != @rel		// Well rel is useless for defines
+		return self
+	|| ch = .first
+	if ch == @func
+		return ch		// Probably came from:    a >= b   -->   a.func(b) >= 1
+	return self
+
+
+function SCFunction.InsertIn (|SCNode| parent, |string| name, |SCObject|)
+	.name = name
+	if parent isa SCClass
+		.cls = parent
+		.parent = parent.modul
+	  else
+		.cls = nil
+		.parent = parent			// ooofffff
+	return parent[name]
+		
+
+function GetFunc2 (|scfile| myfile, |int| f, |int| n,  |scfunction|)
+	opt norefcounts
+	|| ast = myfile.ast
+		|| src = ast.findpos(f,n)
+			return src.InsideFunc
+
+	
+function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction|)
+	opt norefcounts
+	|| src = cmd.last
+	if src != @dot
+		return .GetFunc2(myfile, ff, n)
+	|| fn   = .AnonFn init scfunction()
+	|| layer = .ParseLayer init MemoryLayer(message)
+	|| prm  = src.second
+	|| mpos = prm.first
+	|| str  = prm.second
+	expect (mpos and str) "badinput"
+
+	|| f = src.first!
+	|| parent = compiler.FindModuleOrClass(f, false)
+	if !parent
+		f.func = @name
+		parent = compiler.FindModuleOrClass(f, true)
+	
+	expect parent "noparent"
+
+	if  (parent == .AnonParent)  and  (str == layer.obj2|string|)  and  (myfile == layer.obj)
+		return fn
+
+	|| Orig = fn.InsertIn(parent, src.name)
+		fn.ExportName = Orig.ExportName
+	.OrigFn = Orig
+	|| pos = mpos.int
+	parser._DotInsertAllow = true
+
+	layer.obj = myfile
+	layer.obj2 = str.name
+	layer.use
+
+	if fn.update_source(pos, str.name, myfile)
+		.AnonParent = parent
+		return fn
+	
+	layer.obj = nil
+	layer.obj2 = nil
+
+
+function SCFunction.Update_Source (|int| start, |string| text, |scfile| File,   |bool|)
+	parser.using.Position = -1
+	parser.using.Flags = 0
+	parser.using.Tag = file.FileNum << 5
+	
+	|| source = text.ParseClean
+	if source and source != @tmp
+		source = source[@tmp]
+	
+	if source
+		source.SlidePositions(start)
+		.source = source
+		.Cleanupfunc(Source)
+		parser.using.Flags = MessageFlags.Inserted
+		|[message]| list
+		rz = .UpdateSourceSub(source, list)
+		source.obj = interact.OrigFn.disambiguate(source)
+
+	(message).Restore
+	parser.using.Flags = 0
+	parser.using.Tag = 0
+
+
+function SCObject.Disambiguate (|message| src, |scfunction|)
+	opt norefcounts
+	if self isa scdecl
+		rz = .hiderfunc
+	if self isa scfunction
+		rz = self
+	rz = rz.disambiguate(src)
+
+
+function SCFunction.Disambiguate (|message| src, |scfunction|)
+	opt norefcounts
+	if !self or !.nextfunc
+		return self
+	for curr in self
+		|| s = curr.source!
+		if s.deepequals(Src)
+			return curr
+		|| ss = s.second
+			if ss.deepequals(Src.second)
+				return curr
+	return self // better than nothing?
+
+
+function AutoJump (|message| cmd, |message|)
+	opt norefcounts
+	|| c = cmd.last
+	if c == @name
+		if cmd starts "autocomplete"
+			return .AutoComplete(c.first, c.name, cmd.name)
+		return .DefineOrCall(c, cmd.name)
+			
+	if cmd starts "autocomplete"
+		return .RootTmpComplete(cmd)
+	
+	if c ~= "import"
+		return .JumpImport(cmd)
+
+
+function MainActAutoComplete (|Message| thg, |string| str, |message| cmd, |message|)
+	if thg == @tmp
+		return .TmpAutoComplete(thg, str, cmd.name)
+	return .AutoComplete(thg, str, cmd.name)
+
+
+function MainAct (|Message| cmd, |scfile| my_file, |message|)
+	opt norefcounts 
+	|| f = cmd[@num, 1].int|int|
+	|| n = cmd[@num, 2].int|int|					#expect "nolen"
+	my_file.use
+	|| fn = .GetFunc(cmd, my_file, f, n)
+	(message).restore
+	require fn
+	SCFunction.CurrFunc = fn
+	
+	|| thg = fn.source!.FindPos(f, n)
+	if cmd starts "asm"
+		return .CppASM(cmd, fn)
+	
+	if cmd starts  "define" or "display" or "callfrom"
+		if !thg and cmd == "callfrom" // "calledfrom"
+			thg = fn.source
+		if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
+			return .define_behaviour(fn, cmd.name)
+		return .Define_Something(my_file, f, thg, cmd.name)
+
+	expect (thg)                       ("nomsg")
+	expect (cmd starts "autocomplete") ("badcmd")
+	|| stuff = cmd[@str, 3]
+	|| Auto = MainActAutoComplete(thg, stuff.name, cmd)
+		rz = @arg + "result"
+		rz <~ stuff[0] // meta
+		rz <~ auto
+	
+
+
+
+helper Message.ACInIsa (|bool|)
+	opt norefcounts
+	require (self == @thg) and .islast
+	|| p = .parent$
+	if (p == @rel)
+		|| pr = .prev
+		if pr ~= "isa" or "as" or "mustbe"
+			return true
+	|| pfn = p.asfunc
+		if pfn.name ~= "isa"
+			return true
+
+
+function GetScope (|message| orig, |$int| types, |SCNode|)
+	if !orig
+		return compiler.program
+	if orig == @ask
+		types = 8
+		return compiler.program
+	|| f	= orig.CutifyCopy
+	|| arg	= orig.MsgArg
+	|| fn	= f.func
+	if arg and fn == @dot
+		|| decl = TypeOfExprModulesOK(f.first!, arg)
+		if !decl
+			error "notype"
+			return nil
+		if decl isa SCNode
+			return decl
+		if decl isa scdecl
+			return decl.type
+	
+	if orig.acInIsa
+		types = 1
+		return compiler.program
+	if arg
+		return arg
+	if orig.IsTypeOfDecl
+		types = 1
+		return compiler.program // right????
+	
+	return orig.msgarg #expect "noscope"
+
+
+function SCFunction.VisibleArgs (|int|)
+	opt NoRefCounts
+	for s in .args
+		if !s.default
+			rz++
+	rz -= (.cls!=nil)
+
+
+function SCObject.CanAuto (|string| search, |string|)
+	opt norefcounts
+	rz = .CanAutoSub(Search)
+	if rz
+		|| IsExact = rz ~= search
+		if self isa scfunction
+			if .VisibleArgs
+				rz += "(<>)"
+		
+		if !IsExact and .NoAutoComplete
+			rz = ""
+
+
+function SCObject.CanAutoSub (|string| search, |string|)
+	opt norefcounts
+	
+	if self isa scfunction
+		require !.noautocomplete or (.name ~= search) // is .noautocomplete == 1 allowed?
+		if (.name starts "operator")  and  !(search starts "oper")
+			return ""
+	  elseif self isa scdecl
+		return .realname
+		
+	  elseif self isa scmodule
+		|| cls = .cls
+			require !(cls.NoAutoComplete or cls.IsBehaviourTable)
+	return .name
+
+
+function SCDecl.RealName (|string|)
+	opt NoRefCounts
+	|| l = .IsLookupOnly
+	if (l isa SCObject) and !(l isa SCDecl)
+		return "" // oooff
+	|| s = .source
+	if s == @thg and s in @rel
+		s = s.parent
+	if s == @rel or @decl
+		return s.DeclName.name
+	return .name // sigh... 
+
+
+function SCObject.Auto_Type (|int|)
+	if self isa scdecl
+		if self is property
+			return -2
+		if self is const
+			return 5
+		return 0
+	if self isa scfunction
+		if self is VirtualCaller
+			return 4
+		return 1
+	if self isa scclass or SCModule
+		return 2
+	return 3
+
+
+function SCObject.BaseIcon (|string|)
+	if self isa SCModule
+		if .cls
+			return " \19 "
+		return " \0C "
+	if self isa scfunction
+		if .isbehaviour
+			return " b "
+		if self is VirtualCaller
+			return " v "
+		return " f "
+	if self isa scclass
+		return " \0E "
+	if self isa scdecl
+		if self is property
+			return " \1B "
+		if self is const
+			return " k "
+	if self isa sciterator
+		return " \0A "
+	return "   "
+
+
+function SCObject.CallFromName (|string|)
+	if self isa SCFunction
+		if self is InitFunc
+			return "(Initialiser)"	
+		return "" + self
+		
+	if self isa SCDecl
+		return .AutoCompleteName
+	
+	return .Name
+
+	
+function scdecl.AutoCompleteName (|string|)
+	|| n = .realname
+	|| fs = faststring()
+	fs <~ n
+	fs <~ (' ', (32-n.LengthUTF8) max 1)
+	fs <~ '|'
+	fs <~ .WriteType
+	fs <~ '|'
+	return fs
+
+
+function SCObject.Display (|bool| exact, |string|)
+	if self isa scfunction
+		if .IsAllocOrNew or (self is disabled)
+			return ""
+		return (Exact)(.RenderTitle(false), .name)
+	if self isa SCDecl
+		return .AutoCompleteName
+	if self isa sciterator
+		return ""
+	return .name
+
+
+function SCObject.NextDisplay (|bool| exact, |SCObject|)
+	if exact
+		if self isa scfunction
+			return .nextfunc
+		if self isa scdecl
+			return .hiderfunc
+			
+	
+function Active (|bool|)
+	return .total < .max_total
+
+
+function SCObject.AutoCompleteType (|int|)
+	if self isa scmodule
+		if .cls
+			|| r = 1
+			// probably better to copy the actual basetype-info over... but whatever.
+			if .cls == SCNodetype.ProtoType
+				r |= 8
+			return r
+		return 2
+	return 4
+
+
+
+function Object.AsDecl (|scdecl|)
+	opt norefcounts
+	if self isa SCClass
+		return .typenormal
+	  elseif self isa SCModule
+		|| c = .cls
+			return c.typenormal
+	  else
+		return .BaseAsDecl
+
+
+function Object.BaseAsDecl (|scdecl|)
+	if self isa SCDecl
+		return self
+	if self isa scfunction
+		return .returntype
+
+
+function AutoSub3 (|SCObject| value, |string| key, |[autoitem]| found, |string| SearchedName, |int| Types, |scdecl| TypeLimiter)
+	|| orig = value.canauto(SearchedName)
+	require orig and (!SearchedName or orig starts SearchedName)
+
+	|| Exact = SearchedName ~= orig
+	while value and .active
+		ifn (key ~= "self") and (value isa scmodule)
+			if types & value.AutoCompleteType
+				|| OK = true
+				if typelimiter
+					|| mine = value.AsDecl
+						OK = mine.minimatch(typelimiter)
+				
+				if OK
+					|| sub_name = value.display(exact)
+						.total++
+						sub_name = value.baseicon + " " + sub_name
+						found <~ autoitem(key, orig, value, sub_name, exact, value.auto_type)
+			 
+		value = value.nextdisplay(exact)
+
+			
+function AutoSub (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit) // autocompletesub
+	|| nav = scope.Access.Navigate
+	.autosub2(scope, name, found, types, needtypelimit, nav)
+
+
+function AutoSub2 (|SCNode| scope, |string| name, |[autoitem]| found, |int| Types, |message| NeedTypeLimit, |DictionaryReader of scobject| within)
+	opt norefcounts
+	|scdecl| TypeLimiter = nil
+	if NeedTypeLimit
+		TypeLimiter = TypeOfExpr(needtypelimit, scope) // >:P
+
+	while (|| value = within.NextValue)
+		|| key = within.Name
+		.autosub3(value, key, found, name, Types, typelimiter)
+			
+	if scope is AllowLinkedLists
+		|| value = scope.LocalVarList
+		while value
+			.autosub3(value, value.name, found, name, Types, typelimiter)
+			value = value.LocalVarList
+
+
+function @AutoItem.Sorter (sortercomparer of autoitem)
+	|| type = .type - b.type 
+		return type
+	|| depth = .depth - b.depth // doesnt seem to work just yet?
+		return depth
+	return b.sort.syntaxcompare(.sort, true)
+
+
+function FuncTmps (|message|)
+	if .func_tmp_src.cleaned
+		return .func_tmp_src.Source
+	.func_tmp_src.cleaned = true
+	rz = .func_tmp_src.Source
+	
+	for ch.fast in rz
+		if ch != @dot
+			ch <~ (@str, ch.name)
+		if ch != @str
+			|| f = ch.first
+				if f.name.last!='.'
+					f.name += " "
+		ch.func = @dot
+
+
+function message.Autocomplete_State (|int|)
+	opt norefcounts
+	|| s = .name
+	rz += (s contains 'R')<<0
+	rz += (s contains 'M')<<1
+	rz += (s contains 'C')<<2
+	rz += (s contains 'L')<<3
+	
+
+
+function AllTmps (|message|)
+	opt norefcounts
+	|| X = .all_tmp_src
+	if X.cleaned
+		return X.Source
+	X.cleaned = true
+	rz = X.Source
+	
+	|| state = 0
+	for ch in rz
+		if ch == @name
+			state = ch.autocomplete_state
+			ch.remove
+		  else
+			ch.tag = state
+
+
+function TmpAutoComplete (|message!| f, |string| name, |string| type, |message|)
+	rz = @tmp + type
+	|| arg = rz.msg(@arg, name)
+	if name ~!= "r" // too annoying.
+		for ch.fast in .functmps
+			if ch starts name
+				ifn ch.name > 2  and  ch.name ~= name
+					|| cf = ch.first
+						arg.msg(@tmp, cf.name) <~ (@str, cf.name)
+	
+	.AutoCompleteSub(f, name, arg)
+	  
+
+
+function JumpImport (|message| cmd, |message|)
+	|| f = cmd[@arg][0]
+		cmd.clear
+		|| proj = Compiler.FindProject(f.name)
+		require proj.exists
+		cmd <~ (@sstr, proj.path)
+		cmd <~ 0
+		return cmd
+
+
+function RootTmpComplete (|message| cmd, |message|)
+	opt norefcounts
+	|| f = cmd[0][0]
+	|| req = f.next.name
+	|| flags = 0
+	flags += f.IsModuleType  <<  1
+	flags += f.IsClassType   <<  2
+	flags += f.IsLinkageType <<  3
+	flags ?= 1
+	rz = @tmp.msg(cmd.name)
+	|| arg = rz.msg(@arg, req)
+	for ch in .alltmps
+		|| found = ch.name 
+		if (ch.tag & flags) and (found starts req)
+			|| tmp = arg.msg(@tmp, found)
+			tmp <~ (@str, found.Before("<"))
+
+
+function SCNode.UpClass (|message| f, |SCNode|)
+	opt norefcounts
+	rz = .parent
+	if  f == @dot  and  rz isa scmodule
+		require !rz.isimport
+
+
+helper message.GetTypeLimiter (|message|)
+	opt norefcounts
+	require self
+	|| rel = .parent
+	if (rel == @rel) and .islast and !(rel in @decl)
+		return rel
+
+
+function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
+	require ff
+	|| f = ff.func
+	// maybe better to restrict it to an allowed-list... than a banned-list
+	if f != @bra and @prm and @list and @arg and @arr and @acc and @decl and @rel
+		|| tmp = @tmp.msg(Purpose)
+		|| arg = tmp.msg(@arg, name)
+		.AutoCompleteSub(ff, name, arg)
+		return tmp
+
+
+function AutoCompleteSub (|message| ff, |string| name, |message| into)
+	.Total = 0
+	|| Types = -1
+	|| scope = .GetScope(ff, types)
+		|| NeedTypeLimit = ff.GetTypeLimiter
+		|[autoitem]| arr
+		while scope and .active
+			.AutoSub(scope, name, arr, Types, NeedTypeLimit)
+			if !name and scope isa scarg
+				exit
+			scope = scope.upclass(ff)
+			
+		arr.sort
+		|autoitem| Prev
+		for i in arr
+			if i.OKby(prev)
+				|| tmp = into.msg(@tmp, i.insert)
+				tmp <~ (@str, i.display)
+				prev = i
+
+
+function ActualDefine (|message| m, |message| s)
+	opt norefcounts
+	|| f = s.originalfilepath			#expect "nopath"
+	m <~ (@sstr, f)
+	m <~ s.position
+
+
+function SCNode.DiissplayObj (|message| m, |message|)
+	m <~ (@emb, .AutoCompleteKind + " " + .name)
+	return m
+
+
+function message.AutoCompleteDecl (|string|)
+	opt norefcounts
+	|| d = .MsgDecl
+		return d.RenderTypeAndName(1)
+	return .render // orig place for kkkkonstants???
+
+
+function CanUseName (|SCNode| l, |bool|)
+	if l isa scmodule
+		return !l.isimport
+	return true
+
+
+function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
+	rz = @arg.msg
+/	|| fn = s.Identifyfunc
+	if msg == @name
+		if purpose == "display"  and  s istmp "prototype"
+			return s
+		msg.func = @thg							// findmoduleorclass needs this
+		|| obj = compiler.findmoduleorclass(msg, true)
+			return obj.DiissplayObj(rz)
+	
+	if (s == @decl) and (!fn or msg.deepequals(s.DeclName))
+		rz <~ (@emb, s.AutoCompleteDecl)		// constants get written through here!!! >_> wew
+		return rz
+
+	if !fn
+		|| obj = s.obj
+		if obj isa SCNode
+			return obj.diissplayobj(rz)
+	
+	if purpose ~= "displayall"
+		if fn and !fn.nextfunc and !fn.args
+			return rz							// I guess we want empty result.
+	if !fn
+		return s.copy
+	
+	while fn
+		|| copy = fn.source!.cutifycopy 
+		rz <~ copy
+		|| desc = fn.description
+			rz <~ @emb
+			rz <~ (@back, desc)
+			if fn.nextfunc
+				rz <~ @emb
+		|| l = fn.parent
+			if .CanUseName(l)
+				.IdentifyBetter(copy, l.name)
+		  else
+			exit
+		ifn purpose starts "displayall"
+			exit
+		fn = fn.nextfunc
+
+
+function RespondDefine (|message| msg, |message| s, |string| purpose, |message|)
+	rz = @tmp.msg(purpose)
+	if purpose starts "define"
+		.ActualDefine(rz, s)
+	  else
+		rz <~ .Diissplay(msg, s, purpose) // on purpose
+
+
+function Message.AutoMsgFuncFn (|SCFunction|)
+	opt norefcounts
+	if self == @name
+		|| cls = compiler[self]
+			return cls.ConstructorFunc // what if there are multiple?
+	|| tmp = self
+	if tmp != @tmp
+		tmp = .parent
+		if tmp == @dot
+			tmp = tmp.parent
+	if tmp == @tmp
+		|| fn = tmp.asfunc
+			return fn
+	
+	rz = .MsgFunc
+	rz ?= .parent.MsgFunc
+
+
+function CallFromDefine (|message| msg, |scfunction| fn, |object| found, |message|)
+	rz = @tmp + "callfrom"
+	|| arg = rz.msg(@arg)
+	|| define = .Define(msg, "define", found)
+	define ?= @tmp + "nodefine"
+	define <~ fn.name
+	arg <~ define
+
+
+function CallFrom (|message| msg, |object| found=nil, |message|)
+	opt norefcounts
+	
+	|| fn = msg.AutoMsgFuncFn
+		rz = .CallFromDefine(msg, fn, found)
+		.CallFromSub(rz.first, fn)
+
+
+function CallFromSub (|message| arg, |scfunction| fn)
+	opt norefcounts
+	for call_point in fn.linkfrom
+		|| s = call_point.source
+			|| item = arg.msg(@tmp, "line")
+			|| pos = -1
+			|| f = s.FuncPos(fn, pos)
+			item <~ (@sstr, f)
+			item <~ call_point.CallFromName
+			item <~ pos
+			if call_point == .OrigFn
+				item.name = "curr"
+			
+
+function message.FoundFunc (|scfunction| f, |bool|)
+	opt norefcounts
+	|| o = .obj
+	if o == f
+		return true
+	if o isa SCDecl
+		return o.IsLookupOnly == f
+
+
+helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
+	opt norefcounts
+	rz = .originalfilepath
+	for ss.flat in self
+		if ss.foundfunc(fn)
+			rz ?= ss.originalfilepath
+			self = ss
+			exit
+	if rz
+		pos = .Position // oh well
+
+
+function Define (|message--!| msg,  |string| purpose,  |object| found=nil,  |message|)
+	|| IsDisplay = purpose starts "display"
+	|| IsDefine  = purpose starts "define"
+	expect (IsDisplay or IsDefine) ("badcmd")
+	ifn found isa SCObject
+		found = nil
+	if msg == @prm
+		msg = msg.parent!
+	|| s = .LocateDefinition(msg, found|SCObject|, IsDisplay)	
+		return .RespondDefine(msg, s, purpose)
+	error "nosource"
+
+
+
+function ASMFail (|scfunction| fn, |message?| ret,  |message|)
+	opt norefcounts
+	|| err = fn.SavedError
+		StdErr <~ err
+	  else
+		err = stderr.LastError
+
+	|| errtmp = @tmp + "check"
+	errtmp <~ Interact.MiniErrors(stderr)
+	app.parent! <~ errtmp
+	
+	return ret
+
+
+
+function CppASM (|message| msg,  |scfunction| fn,  |message|)
+	opt norefcounts
+	// Not safe to continue (At least in ASM) if theres an error
+	|| err = fn.savederror
+		StdErr <~ err
+		return nil
+	
+	|| src = fn.source				#expect (fn)
+	|| path = src.File				#expect (src)
+	
+	rz = @tmp.msg(msg.name)
+	rz.msg(@thg, fn.name)
+	|| rzarg = rz.msg(@arg)
+	if !.ASM(rzarg, fn)
+		rz = nil
+		.ASMFail(fn, rz)
+
+
+
+function Message.NextPath (|message| Before, |message?| path, |message|)
+	opt norefcounts
+	|string| sp = .file
+	if path.firstname != sp
+		path = .FileMark
+		Before.prev = path
+	return path
+
+
+function message.FileMark (|message|)
+	opt norefcounts
+	|| path = .File
+		rz = .msg(@tmp, "file")
+		rz <~ path
+	
+	
+//function Nothing (|message| out,  |SCFunction| fn)
+//	if fn.IsMacro
+//		out <~ "This is a macro, and has no real code"
+//	  elseif fn Is Wrapper
+//		out <~ "This is a cpp_wrapper function"
+//	  elseif fn is disabled
+//		out <~ "This function is disabled"
+//	  else
+//		out <~ "Could not compile this function."
+
+
+function ASM (|message| msg,  |SCFunction| fn, |bool|)
+	Assembler.Sh.ASMInit
+	Assembler.JSM.zero
+	Assembler.JSM.Length = 0
+	SourceMap.Clear
+
+	if Assembler.sh.FatterCompile(fn)
+		|| fs = FastString()
+		rz = .FeedBackViewASMSub(msg, fn, fs)
+
+
+function message.AsmIndent (|message| top, |int|)
+	opt norefcounts
+	while self and self != top
+		rz += (self == @arg)
+		self = .parent
+
+
+function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
+	opt norefcounts
+	|| bb = 0
+	|message| path
+	|| lp = 0
+	|| top = fn.SourceArg
+	|| Count = 0
+	|| Size = 0
+	
+	|| Fat = fn.FatFirst
+	|| Skinny = Fat + fn.µfatlength-1
+	while fat <= Skinny and fat isa asm.noop
+		fat++
+	while fat <= Skinny and skinny isa asm.noop
+		skinny--
+	
+	while Fat <= Skinny
+		if fat.WillRenderFat
+			|| hisss = fat.GuessSize
+			count += hisss > 0
+			size += hisss
+			
+			if RenderBlocks and (fat.BasicBlock != bb)
+				bb = fat.BasicBlock
+				out <~ bb
+			fs <~ (' ', fat.msg.asmindent(top)*2)
+			fat.RenderFat(fs, true)
+			|| tmp = out.msg(@tmp, fs)
+			|| msg = fat.msg
+			|| p =  (msg!=nil)(msg.Position, 0)//(msg?) // could be nil due to the length set wrongly...
+			if p <= 0
+				p = lp
+			tmp <~ p
+			lp = p
+			path = msg.NextPath(tmp, path)
+		fat++
+	
+	|| title = out.first // going into the wrong place :D
+	title <~ count
+	title <~ size * 4
+	
+	.CppView(out, fn)
+	return true
+
+
+function scfunction.RenderSheBless (|string|)
+	|message--| src = .source$
+	|message--| a = src.Last
+		|| b = src.copy
+		|| f = src.first
+			f.name = .ExportName
+		for s.fastflat in b
+			if s.func == @sheb
+				s.remove
+		rz = src.Render
+
+	
+function CppView (|message| out, |scfunction| fn)
+	out.msg(@tmp, "")						// separator
+//	out.msg(@tmp, "// " + fn.exportname)	// none exists! D:
+	for s.lines in fn.Rendershebless
+		if !s
+			s = " "
+		out.msg(@tmp, s)					// C-view
+
+		
+function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
+	if  purpose starts "callfrom"
+		return .Callfrom(msg, found)
+	return .define(msg, purpose, found)
+
+
+function Define_Behaviour (|SCFunction| fn,  |string| purpose,  |message|)
+	// behaviour abc --> .__abc__
+	|| cls = fn.cls
+		|| name = fn.name.moat
+		|| found = cls.UpCheck(name)
+		if found isa SCFunction
+			rz = .DefineOrCall(found.source!, purpose, found)
+
+	
+function message.CutifyCopy (|message!|)
+	rz = message(self)
+	for v.fast in self
+		if (v == @arg)
+			0 //
+		  elseif v.isreffer
+			|| vll = v.last.last
+				rz <~ vll.CutifyCopy
+		  else
+			rz <~ v.CutifyCopy
+
+	|| fn = rz.MsgFunc			// what about modules?
+		|scclass--| cls = fn.cls
+		|string--| modname = ""
+		|scnode--| space = fn.parent
+		if space isa scmodule
+			modname = space.name
+		if cls or modname // ok so...
+			|message--| name = rz.first
+			if name == @thg
+				|| prm = name.next!
+				rz.become( @dot, fn.name )
+				if cls
+					rz.first = prm.first
+				  elseif space != compiler.program
+					|| mod = @thg.msg(modname)
+					mod.obj = space //oop
+					rz.first = mod
+				if !prm.hasany
+					prm.func = @emb
+				name.remove
+
+
+function message.IdentifyFunc (|scfunction|)
+	opt NoRefCounts
+	if self == @tmp
+		require  self!="class"  and  self!="module"
+	|| obj = .obj
+	if obj isa scfunction
+		return obj
+
+
+function object.ClassOrModule (|SCNode|)
+	opt norefcounts
+	if self isa scmodule
+		|| c = .cls
+			return c
+		return self
+
+
+function IdentifyBetter (|message| node, |string| name) // p.firstname
+	opt NoRefCounts
+	node.become( @emb )
+	node = node.first!
+	node.func = @dot
+	node <~ (@thg, name)
+	node <~ @emb
+	
+
+function Message.ModuleSrc (|message|)
+	opt norefcounts
+	|| name = .name
+		|| found = compiler.program.FindModule(name, nil)
+			|| c = found.cls
+				|| fp = c.funcproto
+					return fp.source
+				return c.sourcearg
+			return found.source
+
+
+function FindAdj (|message| msg, |message|)
+	opt norefcounts
+	|| adj = msg
+	if msg in @adj
+		adj = msg.parent
+	ifn adj in @decl
+		|| found = compiler.FindAdj(adj)
+			return found.first // why not .source?
+	 
+
+function LocateDefinition (|message| msg, |SCObject| already_defined, |bool| DisplayOnly, |message|)
+	opt norefcounts
+	if (msg in @adj) or (msg == @adj)
+		rz = .FindAdj(msg)
+		if rz
+			return rz
+		
+	|| ty = TypeOfExpr(msg, msg.msgarg) // needs refcounts
+	rz = .LocateDefinitionSub(msg, already_defined, ty, DisplayOnly)
+	if rz == @arg
+		|| p = rz.parent
+			rz = p
+
+	if msg in @tmp
+		msg = msg.parent
+	if msg == @tmp
+		|| fn = msg.obj
+		if fn isa SCFunction
+			return fn.Source
+
+
+function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdecl| ty, |bool| DisplayOnly, |message|)
+	opt norefcounts
+	if already_defined
+		return already_defined.source
+	
+	if  msg == @thg  and  msg in @func
+		msg = msg.parent! // :)
+	|| fn = msg.msgfunc
+		|| it = fn.source
+			return it
+
+	if !ty
+		return msg.ModuleSrc
+	
+	if ty.type == SCNodetype.ProtoType
+		|| l = ty.Func
+			return l.source
+	
+	if !displayonly and msg == @decl
+		return ty.Type.Sourcearg
+	
+	|| src = ty.source
+		if  DisplayOnly  and  ty is const
+			ty.name = msg.name		// unimprove it
+			return ty.WriteDeclFull("", 1)
+		if src == @decl and src.last == @rel
+			src = src.copy
+			|| L = src.last!
+			L.replacewith(l.first!)
+		return src
+	
+	if DisplayOnly
+		|| t = ty.type
+		return t.typenormal.source ?? t.source
+	
+	|| found = msg.obj.ClassOrModule
+		return found.source
+		
+}
+
+
+class AutoItem
+	linkage
+		tighten false
+	|string|		Sort
+	|string|		Insert
+	|SCObject|		Value
+	|string|		Display
+	|bool|			Exact
+	|int|			Type
+		
+	function Depth (|int|)
+		opt norefcounts
+		|| v = .Value
+		if v isa SCClass
+			return v.Depth
+	
+	
+	function OKBy (|autoitem| prev, |bool|)
+		if !prev
+			return true
+		if .insert ~!= prev.insert
+			return true
+		if .exact != prev.exact
+			return true
+
+
+
+function message.IsClassType (|bool|)
+	return self ~= "class" or "datatype" or "struct" or "role"
+
+function message.IsLinkageType (|bool|)
+	return self ~= "linkage"
+
+function message.IsModuleType (|bool|)
+	return self ~= "module" or "extend_module" // don't need root. flags?=1 does it
+
+	
+function message.FindPos (|int| fr, |int| len, |message|)
+	opt norefcounts
+	return  .FindPosSub(fr, len, true)  ??  .FindPossub(fr, len, false)
+
+
+function message.FindPosSub (|int| fr, |int| len, |bool| Exact, |message|)
+	opt norefcounts	
+	|| Strength = 1
+	for ch.flat in self
+		if ch.position == fr
+			|| CurrStrength = (ch.RangeLength == len) + !Exact
+			if (CurrStrength >= Strength)
+				if ch isnt Inserted
+					return ch.unbra
+				Strength = CurrStrength
+				rz = ch
+
+
+
+
+

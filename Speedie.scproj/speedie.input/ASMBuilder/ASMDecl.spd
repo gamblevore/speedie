@@ -1,0 +1,59 @@
+
+
+
+struct SavedRegisters
+	|byte|					RegCount
+	|byte|					ReturnCount
+	|byte|					BasicDepth
+	|byte|					BreakRequest
+	|uint16|				BasicBlock
+	|uint16|				BasicParent
+	|bool|					ExpectOneMore
+	|DeclAlterable[32]|		Decls
+	|RegFile|				Regs
+
+	function Collect (|[scdecl]| args, |assembler| sh)
+		opt norefcounts
+		
+		.BreakRequest = sh.BreakRequest
+		.BasicDepth = sh.BasicDepth
+		.BasicBlock = sh.BasicBlock
+		.BasicParent = sh.BasicParent
+		.ExpectOneMore = sh.ExpectOneMore
+		.regs = sh.regs
+		expect args <= 32 - .RegCount
+		for p in args
+			.decls[.RegCount++] = p.mu
+
+
+	function Rewind	(|assembler| sh)
+		sh.BreakRequest = .BreakRequest
+		sh.BasicDepth = .BasicDepth
+		sh.BasicBlock = .BasicBlock
+		sh.basicparent = .basicparent
+		sh.ExpectOneMore = .ExpectOneMore
+		sh.regs = .regs
+
+
+	function Restore (|[scdecl]| args)
+		opt norefcounts
+
+		if args < .RegCount
+		for p.backwards in args
+			p.mu = .decls[--.RegCount]
+
+
+
+struct DeclAlterable
+	|uint64|			ExportPosition
+	|SCDeclInfo|		Info
+	|DataTypeCode|		DataType
+	|uint16| 			ModuleNum
+
+
+function assembler.DeclReset (|scdecl| D)
+	d.exportposition = 0
+	(d isnt const)
+	d.DepthOfBranch = .state.BranchDepth // ASM doesn't use .DepthOfBranch tho?
+
+

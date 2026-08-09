@@ -1,0 +1,974 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+insertion
+	bits	((1<<_0)-1)
+
+		
+datatype int
+	default 0
+
+	constants
+		|int|
+		Max = 0x7FFFffff
+		Min = 0x80000000
+
+	function AsFloat (|float|)
+		cpp_wrapper
+
+	inline IsPow2 (|bool|)
+		if self
+			return !(self&(self-1))
+
+	inline AlignUp (|int| To, |int|)
+		return self + (-self|uint| mod to)
+
+	inline AlignDown (|int| To, |int64|)
+		return self - (self mod to)
+	
+	operator Div (|int| D, |float|)
+		inlined
+		return self|float| / d|float|
+		
+	syntax compare (|string| s, |int|)
+		inlined
+		return self - s.length
+
+	syntax access (|bool|) // should be a bool?
+		cpp_part rnd // these random funcs need unifying their purpose / names
+		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
+
+	syntax access (|int| bit, |bool|)
+		inlined
+		return self&(1<<bit)
+
+	syntax access (|int| bit, assigns:|bool|, |int|)
+		|| mask = (1<<bit)
+		return (self &~ mask) ||| (value|int| << bit)
+
+	operator isa (|uint| n, |bool|)
+		inlined
+		return !(self mod n)
+
+	function Wrap (|int| N, |int|)
+		if self < 0 // returns -1 if N ==0
+			return N-1
+		if self >= N
+			return 0
+		return self
+
+
+	render
+		opt norefcounts
+		cpp_part RenderFS
+		fs <~ self
+	
+	function Render (|&byte| Addr, |int| N, |int|)
+		cpp_wrapper JB_int_Render
+		
+	render StrSize
+		cpp_part RenderSize
+		inlined
+		return self|int64|.strsize(fs_in)
+	
+	render (|int| zeros)
+		cpp_part RenderZeros
+		opt norefcounts
+		fs.AppendDecimal(self, zeros)
+	
+
+	operator Min (|int| other, |int|)
+		asm iclm(dest, p1, p1, p2, 1)
+		if self < other: return self
+		return other
+
+	operator Max (|int| other, |int|)
+		asm iclm(dest, p1, p2, p1, 1)
+		if self > other: return self ////
+		return other
+	
+	function CountBits (|int|)
+		asm BSTT(dest, p1, 1)
+		cpp_wrapper JB_Int_CountBits
+
+	function Log2 (|int|)
+		asm BSTT(dest, p1, 3)
+		cpp_wrapper JB_Int_Log2
+	
+	operator ± (|int| i, |int|)
+		cpp_part Shrink
+		if self > 0
+			return (self-i) max 0
+		if self < 0
+			return (self+i) min 0
+	
+	
+	operator InRange (|int| Length, |bool|)
+		opt inline
+		if Length >= 0 // can fail otherwise
+			return (self|uint| < Length|uint|)
+
+	
+	operator Align (|int| To, |int|)
+		if to
+			|| Missing = (self mod To)
+				return self + (To - Missing)
+			return self
+		debugger
+		return self
+
+	
+	iterator
+		|| i = 0
+		while (i < self)
+			yield i (i)
+			++i
+	
+	iterator down
+		|| i = self - 1
+		while (i >= 0)
+			yield i (i)
+			--i
+	
+	iterator bits		// Get 1 bit of the original per loop
+		|| curr = self|int|
+		while curr
+			|| lowest = curr.lowestbit
+			yield Lowest (Lowest.log2)
+			curr = curr &~ Lowest
+	
+	
+	operator to (|int| other, |IntRange|)
+		// for 5 to 10 // this should be inclusive
+		inlined
+		return (self, other+1)
+
+	
+	operator downto (|int| other, |IntDownRange|)
+		inlined
+		rz.From = self
+		rz.To = other
+
+
+datatype SizeInt (int)
+// how does this differ from a filesizeint?
+// is it just that this is int32?
+// also seems... unused?
+	syntax cast (|string|)
+		cpp_name JB_SSSSS_ARGH
+		visible
+		inlined
+		return .strsize
+
+
+datatype Ind (int) // an INDex. And an INT.
+	default -1
+	false -1
+	syntax cast (|bool|)
+		inlined
+		return self >= 0
+		
+	operator bitand (|int| x, |int|)
+		// shame we need this... but we do! or else (i&1) will be tested >= 0 rather than != 0
+		inlined // now we can't test if an index is even or odd
+		return self|int| & x
+//	operator bitor (|int| x, |int|) // might need these too. not sure.
+//		inlined
+//		return self|int|	||| x
+//	operator xor (|int| x, |int|)
+//		inlined
+//		return self|int| ^ x
+
+
+struct RetroFloat
+// for doing pixel-based animations that move smoothly for retro-games
+	|float|		Amount
+	|float|		Remain
+	
+	syntax Append (|float| n)
+		inlined
+		.Amount += n
+	
+	syntax Access (|int|)
+		|| A = .Amount // 1.1... every 10th frame returns 2
+		|| rem = A.fract + .remain
+		if rem >= 1.0
+			--rem
+			++A
+		.remain = rem
+		return A|int|
+
+	
+function float.Steps (|FloatRange|)
+	rz.from = -1
+	rz.to = 1
+	rz.Step = 2.0 / self
+
+
+struct IntDownRange   /// :3
+	|int| From
+	|int| To
+	
+	iterator
+		|| _c = .from
+		while (_c >= .To)
+			yield _c (_c)
+			--_c
+
+
+struct FloatRange	/// :3
+	|Float| From
+	|Float| To
+	|float| Step
+	
+	autogen float.LoopOK (|float| Final, |float| Step, |bool|)
+		opt inline
+		if Step >= 0.0
+			return self <= final
+		return self >= final
+		
+	iterator
+		|| _c = .from
+		while (_c.LoopOK(.To, .step))
+			yield _c (_c)
+			_c += .Step
+
+
+datatype uint
+	default 0
+
+	constants
+		|uint|
+		max = 0xffffFFFF_
+		min = 0
+
+	operator isa (|uint| n, |bool|)
+		inlined
+		return !(self mod n)
+
+	inline IsPow2 (|bool|)
+		if self
+			return !(self&(self-1))
+		
+	function Hash (|uint|)
+		cpp_wrapper JB_uint_hash
+	
+	function Unhash (|uint|)
+		cpp_wrapper JB_uint_unhash 
+	
+	function SwapEndian (|uint|)
+		cpp_wrapper (__builtin_bswap32)
+		asm BSTT(dest, p1, 5)
+
+	operator max (|uint| other, |uint|)
+		asm uclm(dest, p1, p2, p1, 1)
+		if (self > other) { return self }
+		return other
+	
+	operator Min (|uint| other, |uint|)
+		asm uclm(dest, p1, p1, p2, 1)
+		if self < other: return self
+		return other
+	
+	render
+		opt norefcounts
+		fs <~ self|int64|
+	
+	inline Log2 (|int|)
+		return self|int|.log2
+		
+		
+	iterator
+		|uint| i = 0
+		while i < self
+			yield i
+			++i
+
+	iterator bits
+		|| curr = self|uint|
+		while curr
+			|| lowest = curr.lowestbit
+			yield Lowest (Lowest.log2)
+			curr = curr &~ Lowest
+	
+	
+	
+	iterator flags
+		|| curr = self
+		while curr
+			|| value = curr & -curr|int|
+			yield value
+			curr = curr &~ value
+
+
+
+datatype uint16
+	linkage
+		cpp_class u16
+
+	default 0
+
+	constants
+		|uint16|
+		max = 0xffff_
+		min = 0
+
+
+
+
+datatype int16
+	default 0
+	
+	linkage 
+		cpp_class s16
+
+	constants
+		|int16|
+		max = 32767
+		min = -32K
+
+
+
+datatype float
+	linkage 
+		cpp_part f
+	default 0.0
+		
+	module
+		function Max (|float|)
+			cpp_wrapper JB_f__max
+		inline Min (|float|)
+			return -.max
+		function Nan (|float|)
+			cpp_wrapper JB_f__nan
+	
+	
+	Render RenderDuration (|bool| ms = false)
+		opt norefcounts
+		// perhaps just cast this to an ACTUAL duration
+		// AND THEN DO THE CAST!?
+		if self < 0
+			self = .length
+			fs <~ '-'
+		|| s = self mod 60.0
+		|| m = (.floor - s) / 60.0
+		if m > 0
+			fs <~ (m+0.5)|int|
+			fs <~ 'm'
+			fs <~ ' '
+		fs.AppendFloat(s, 1+2*ms, false)
+		fs <~ 's'
+	
+	
+	render (|int| dp=6)
+		cpp_part RenderDP
+		opt norefcounts
+		fs.AppendFloat(self, dp)
+
+
+	render Percent // operator percent, operator pc 
+		opt norefcounts
+		if !self
+			fs <~ "0"
+		  elseif self < 0.001
+			fs <~ "<0.1"
+		  else
+			fs.appendfloat(self*100.0, 1)
+		fs <~ "%"
+	
+	operator max (|float| other, |float|)
+		asm fmax(dest, p1, p2, r0, 1)
+		cpp_wrapper (fmaxf)
+
+	operator min (|float| other, |float|)
+		asm fmin(dest, p1, p2, r0, 1)
+		cpp_wrapper (fminf)
+
+	function Asin (|float|)
+		disabled "use UnSine"
+
+	function Acos (|float|)
+		disabled "use UnCos"
+
+	function ATan2 (|float| y, |float|)
+		disabled "use UnTan"
+
+	libinternal __sincospi (|$float| A, |$float| B)
+		cpp_wrapper (__sincospif)
+	
+	function Rotation (|mat2|)
+		|| O = .SinCos
+		return mat2(o.y, o.x, -o.x, o.y)
+
+	function SinCos (|vec2|)
+		|float| a
+		|float| b
+		self*=2
+		.__sincospi(a, b)
+		return (a, b)
+		
+	function Exponent (|ivec2|)
+		cpp_wrapper JB_f_Exponent
+			
+	function f64.Exponent (|ivec2|)
+		cpp_wrapper JB_F64_Exponent
+
+	function AsInt (|int|)
+		cpp_wrapper
+	
+	function Round (|float| to, |float|)
+		cpp_part RoundTo
+		return (self / to).round * to
+
+	inline Date (|date|)
+		return (self * 64.0K)|date|
+
+	function Sign (|float| sigma=0.0, |float|)
+		if self > sigma
+			return 1
+		if self < -sigma
+			return -1
+
+	inline SinBad (|float|)
+		return (self * math.iTau).sin
+
+	inline CosBad (|float|)
+		return (self * math.iTau).cos
+
+	inline TanBad (|float|)
+		return (self * math.iTau).tan
+	
+	function Minus0 (|float| B, |float|)
+		cpp_Wrapper (fdimf)
+
+	inline IsPow2 (|bool|)
+		return !.log2.Fract
+
+	function Ceil (|float|)
+		rz = .floor
+		if rz != self
+			++rz
+
+	operator ± (|float| i, |float|)
+		cpp_part Shrink
+		if self > 0
+			return self + i
+		return self - i
+	
+	function Bounce (|float|)
+		|| f = .fract
+		if self|int| isa 2
+			return f
+		return 1.0-f
+
+	operator longer (|float| other, |float|)
+		if .length > other.length
+			return self
+		return other
+
+	operator mod (|float| upon, |float|)
+		asm fmod(dest, p1, p2, r0, 1)
+		cpp_wrapper (fmodf)
+
+	function Fract (|float|)
+		trin (0, FRC)
+		return self - .floor
+
+	function Floor (|float|)
+		trin (1, FLR)
+		cpp_wrapper (floorf)
+
+	function Round (|float|)
+		trin (2, RND)
+		cpp_wrapper (roundf)
+
+	function Length (|float|) // for consistancy with length of vectors
+		trin (3, LNG)
+		return .abs
+	
+	function Abs (|float|)
+		trin (4, ABS)
+		cpp_wrapper (fabsf)
+
+	operator pow (|float| other, |float|)
+		trin (5, POW)
+		cpp_wrapper (powf)
+
+	function Sqrt (|float|)
+		trin (6, SQT)
+		cpp_wrapper (sqrtf)
+
+	function Exp (|float|)
+		description "Computes e to the power of (x)" 
+		trin (7, EXP)
+		cpp_wrapper (expf)
+
+	function Log (|float|)
+		trin (8, LOG)
+		cpp_wrapper (logf)
+
+	function Exp2 (|float|)
+		trin (9, XP2)
+		cpp_wrapper (exp2f)
+
+	function Log2 (|float|)
+		trin (10, LG2)
+		cpp_wrapper (log2f)
+	
+	function Log10 (|float64|)
+		cpp_wrapper (log10f)
+
+	function Unsin (|float|)
+		trin (12, NIS)
+		return math.unsinebad(self) * math.iTau
+
+	function Uncos (|float|)
+		trin (13, SOC)
+		return math.uncosbad(self) * math.iTau
+
+	function UnTan (|float| y, |float|)
+		trin (14, NAT)
+		rz = math.unTan2bad(self, y)			// our result is +-pi, but we want 0-1...
+		rz *= -math.iTau
+		if rz < 0.0
+			rz ++
+
+/*
+	// i think the trin numbers help to syncronise Vector and float ops.
+	// however... what if I don't want all of them intrinsic?
+	// I could sync it using more syntax... like trin 15
+
+	// I think it would be nicer to have sin/unsin be on the same instruction.
+	// that... doesn't sync up with Spd code AT ALL
+	// I could kinda work around it... make a helper func...
+	// i think either way... its a lot of work...
+	
+	// maybe nicer to just... manually line everything. seems easier?
+	// if its hard, make it more manual.
+	
+	libinternal SineTestSub (|bool| Reverse, |float|)
+		trin (15, SIN)
+		if !Reverse
+			return math.sinpihalf(self*2.0)
+		return math.unsinebad(self) * math.iTau
+	
+	function SineTest (|float|)
+		return .SineTestSub(false) // rely on inlines
+*/
+	
+	function Sin (|float|)
+//		trin (15, SIN)
+		asm fsin(dest, p1)
+		return math.sinpihalf(self*2.0)
+
+	function Cos (|float|)
+		trin (16, COS)
+		return math.cospihalf(self*2.0)
+
+	function Tan (|float|)
+		trin (17, TAN)
+		return math.TanPihalf(self*2.0)
+	
+	function CopySign (|float| from, |float|)
+		trin (18, SGN)
+		cpp_wrapper (copysignf)
+
+	function Clamp (|float| A, |float| B, |float|)
+//		trin (19, CLM)
+		cpp_wrapper JB_f_Clamp
+		asm fclm(dest, p1, p2, p3, 1)
+
+	function Mix (|float| A, |float| B, |float|)
+		cpp_Part FloatMix
+		trin (20, MIX)
+		description "0.0 means fully A,  1.0 means fully B,  0.5 means half-way between A and B." 
+		return A + (self * (B - A))
+
+	function SmoothStep (|float| low=0, |float| high=1, |float|)
+		trin (21, SMS)
+		|| t = ((self - low) / (high - low)).clamp
+		return t * t * (3.0 - 2.0 * t)
+	
+	function IsNan (|int|)	// perhaps these IsNan/IsInf can be merged? makes more sense
+							// than wasting opcodes.
+		trin (22, XNN)
+		cpp_wrapper (__isnanf)
+	
+	function IsInf (|int|)
+		trin (23, XNF)
+		cpp_wrapper (__isinff)
+
+	operator ShiftLeft (|int| x, |float|)
+		while --x >= 0	// there is a faster way, but this is good enough.
+			self *= 2.0	// mostly people wanna do x << 1 or x << 2
+		return self
+			
+	operator ShiftRight (|int| x, |float|)
+		while --x >= 0
+			self *= 0.5
+		return self
+	
+	function vec2.operatorby (|float| step, |FloatRange|)
+		rz.From = .x
+		rz.To = .y
+		rz.step = step
+	
+	operator to (|float| To, |floatrange|)
+		rz.from = self
+		rz.to = to
+		rz.step = 1.0
+
+	iterator
+		|| i = 0.0
+		while (i < self)
+			yield i (i)
+			++i
+
+
+
+
+datatype f64
+	linkage
+		cpp_class double
+		cpp_part dbl
+	
+	default 0.0
+	
+	function AsInt (|int64|)
+		cpp_wrapper
+
+	function Floor (|Float64|)
+		cpp_wrapper (floor)
+	
+	inline Fract (|Float64|)
+		return self - .floor
+	
+	operator Pow (|Float64| other, |Float64|)
+		cpp_wrapper (pow)
+	
+	function Log10 (|float64|)
+		cpp_wrapper (log10)
+
+	operator Mod (|float64| upon, |float|)
+		asm fmod(dest, p1, p2, r0, 0)
+		cpp_wrapper (fmod)
+
+	function Abs (|Float64|)
+		cpp_wrapper (fabs)
+
+	operator Max (|Float64| other, |Float64|)
+		asm fclm(dest, p1, p2, p1, 0)
+		cpp_wrapper (fmax)
+
+	operator Min (|Float64| other, |Float64|)
+		asm fclm(dest, p1, p1, p2, 0)
+		cpp_wrapper (fmin)
+
+	render (|int| dp=6)
+		opt norefcounts
+		fs.appenddouble(self, dp, true)
+
+	render RenderFloat
+		opt norefcounts
+		fs.appenddouble(self, 6, false)
+
+	inline Date (|date|)
+		return (self * 64.0K)|date|
+
+
+
+
+datatype hfloat
+	processas float
+	default 0.0
+	
+	linkage
+		cpp_class __fp16
+		cpp_part f16
+
+
+datatype Float64 (f64)		// should be the proper name...
+datatype Float16 (hfloat)	// also.
+	processas float			// should be inherited!
+
+
+datatype int64
+	default 0
+
+	constants
+		max = 0x7FFFffffFFFFffff_
+		min = max+1
+
+	render
+		opt norefcounts
+		fs <~ self
+
+	inline AlignUp (|int64| To, |int64|)
+		return self + (-self|uint64| mod to) // ???
+
+	operator InRange (|int64| Length, |bool|)
+		opt inline
+		if Length >= 0 // can fail otherwise
+			return (self|uint64| < Length|uint64|)
+
+	operator Div (|int64| D, |float64|)
+		inlined
+		return self|float64| / d|float64|
+
+	operator isa (|uint| n, |bool|)
+		inlined
+		return !(self mod n)
+
+	operator max (|int64| d, |int64|)
+		asm iclm(dest, p1, p2, p1, 0)
+		if d > self
+			return d
+		return self
+	
+	operator min (|int64| d, |int64|)
+		asm iclm(dest, p1, p1, p2, 0)
+		if d < self
+			return d
+		return self
+	
+	inline Abs (|int64|)
+		if self < 0
+			self = -self
+		return self
+
+	inline Log2 (|int|) // highestbit, highbit
+		return (self|uint64|).log2
+		
+	
+	inline IsPow2 (|bool|)
+		if self
+			return !(self&(self-1))
+
+	function AsFloat (|Float64|)
+		cpp_wrapper
+	
+	render Hex
+		opt norefcounts
+		fs.AppendHex(self)
+	
+	render StrSize
+		opt norefcounts
+		if self <= 512
+			fs <~ self
+		  else
+			|| part = 'T'
+			|| size = 1TB
+			if self <= 900KB
+				size = 1KB
+				part = 'K'
+			  elseif self < 900MB
+				size = 1MB
+				part = 'M'
+			  elseif self < 900GB
+				size = 1GB
+				part = 'G'
+			fs.AppendDouble(self div size, 1)
+			fs <~ part
+			fs <~ 'B'
+	
+	
+
+	iterator
+		|int64| i = 0
+		while (i < self)
+			yield i (i)
+			++i
+
+
+
+datatype uint64
+	default 0
+
+	constants
+		|uint64|
+		max = -1
+
+	operator isa (|uint| n, |bool|)
+		inlined
+		return !(self mod n)
+	
+//	function Exists (|int|)
+//		return (self|bool|)|int|
+	
+	operator max (|uint64| s, |uint64|)
+		asm uclm(dest, p1, p2, p1, 0)
+		if self > s: return self
+		return s
+		
+	operator min (|uint64| s, |uint64|)
+		asm uclm(dest, p1, p1, p2, 0)
+		if self < s: return self
+		return s
+	
+	function Log2 (|int|)
+		asm BSTT(dest, p1, 2)
+		cpp_wrapper JB_u64_Log2
+
+	function CountBits (|int|)
+		asm BSTT(dest, p1, 0)
+		cpp_Wrapper (__builtin_popcountll)
+
+	function ByteSwap (|uint64|)
+		asm BSTT(dest, p1, 4)
+		cpp_wrapper (__builtin_bswap64)
+
+	inline IsPow2 (|bool|)
+		if self
+			return !(self&(self-1))
+		
+	syntax access (|int| bit, |bool|)
+		inlined
+		return self&(1<<bit)
+
+	syntax access (|int| bit, assigns:|bool|, |uint64|)
+		|| mask = 1|uint64|<<bit
+		return (self &~ mask) ||| (value|uint64| << bit)
+	
+	
+	iterator bits				// Get 1 bit of the original per loop
+		|| curr = self|uint64|
+		while curr
+			|uint64| Lowest = curr.lowestbit
+			yield Lowest (lowest.log2)
+			curr = curr &~ Lowest
+
+	iterator
+		|uint64| i = 0
+		while (i < self)
+			yield i (i)
+			++i
+
+
+
+datatype MaybeBool (byte) // could just put these on int? do we need a whole new type?
+	linkage
+		numeric false
+	constants
+		|maybebool| 
+		True = 1
+		False = 0
+		MaybeFalse = 8 // unknown but will default to false
+		MaybeTrue = 9  // unknown but will default to true
+		
+	default 8|MaybeBool|
+	inline Default (|bool|)
+		return self|byte|&1
+	inline IsKnown (|bool|)
+		return self|byte| <= 1
+	inline KnownTrue (|bool|)
+		return self|byte| == 1
+	inline KnownFalse (|bool|)
+		return self|byte| == 0
+	inline Negate (|maybebool|)
+		return (self|byte| xor 1)|maybebool|
+	syntax cast (|bool|)
+		disabled "Do you mean .KnownTrue? Maybebools can have an unknown state."
+	module
+		inline Default (|bool| Default, |Maybebool|)
+			return (8+default)|Maybebool|
+		inline Known (|bool| As, |Maybebool|)
+			return (as)|Maybebool|
+	
+
+
+datatype bool
+	size 1
+	default false
+	
+	function Bool (|int| i, |int|)
+		disabled "use operator sign"
+	function Sign
+		disabled "use .dir"
+	
+//	syntax cast (|maybebool|) // bad. Many types seem to cast via this unintentionally.
+		
+	function Dir (|int|)
+		inlined
+		return (self|int|<<1)-1
+	
+	function String (|string|)
+		cpp_part Render0
+		return (self)("true", "false")
+
+	function Render (|string|)
+		opt norefcounts
+		inlined
+		return .string
+	
+	function Render (|faststring!| fs_in)
+		cpp_Part Append
+		opt norefcounts
+		inlined
+		fs_in <~ .string
+	
+	iterator
+		|| num = 1
+		while (num >= 0)
+			yield (num == 1)
+			--num
+
+
+
+datatype MoveCode (byte)
+	Flags
+		|movecode|
+		Right
+		Left
+		Up
+		Down
+		Forward
+		Backward
+		Open
+		Close
+		Positive = (Right + Up   + Forward  + Open)
+		Negative = (Left  + Down + Backward + Close)
+		Top    = Up
+		Bottom = Down
+		Front  = Forward
+		Back   = Backward
+		Vertical    = Up + Down
+		Horizontal  = Right + Left
+		MiddleLeft  = Left + Vertical
+		MiddleRight = Right + Vertical
+		AllCodes = 255
+		Edges = 63
+		Center = 63
+
+	function ivec2.MoveCode (|movecode|)
+		|| x = .x
+			rz |= movecode.right << (x < 0)
+		|| y = .y
+			rz |= movecode.Up << (y < 0)
+			
+	syntax is (|movecode| m, |bool|)
+		inlined
+		return (self & m) == m
+
+	syntax is (|movecode| m, assigns:|bool|, |movecode|)
+		inlined
+		self &= ~m
+		if value
+			self |= m
+		return self
+
+	function Field (|int|)
+		if self & Vertical
+			rz = 1
+		if self & Positive
+			rz |= 2
+	
+	function Flip (|bool| same=false, |movecode|)
+		if !same
+			|| m = 0b01010101
+			|| m2 = m << 1
+			return ((self & m) << 1) ||| ((self & m2) >> 1)
+		return self
+

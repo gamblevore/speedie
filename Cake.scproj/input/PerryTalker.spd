@@ -1,0 +1,469 @@
+
+
+prototype PerryResponse (|CakeVM| self, |message| m, |CakeStack| Stack, |uint| State,  |StepAction|)
+dispatch DebuggerActions (PerryResponse)
+	run				RunAction
+	stepincutely	StepOneAction
+	stepin			StepInAction
+	stepout			stepoutAction
+	stepover		stepoverAction
+	
+	edit			EditAction
+	expansion		ExpandAction
+	brkadd			BreakAction			// AddBrk
+	brkrem			BreakRemoveAction	// RemBrk
+	sendbreaks		SendAllBreaksAction
+
+	stop:			app.quit, return StepAction.donothing
+	pause:			return StepAction.SendVarsPause
+
+
+
+
+function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name, |int| ErrorCode)
+	opt norefcounts
+	if ErrorCode
+		name = "crash"
+	|| j = .StartStack(name, ErrorCode)
+	|| file = .StackToPerry(stack, j)
+	perry <~ j
+	if !ErrorCode and file
+		perry.SendBreaks(file)
+
+
+
+function cakevm.BreakOrNot (|cakestack| stack, |uint| Break, |uint|)
+	|| Mode = StepAction.curr
+		|| Deeper = stack.depth - debugger.StackOverDepth
+		if Mode is stepover
+			if (!Deeper)
+				0
+			  elseif (Deeper > 0) and (break&debugger.BreakReqBit)
+				0
+			  elseif (Stack > debugger.stacktrap)
+				break = 0 // no break.
+	
+		  elseif (mode is stepout)
+			ifn break&debugger.BreakReqBit
+				|| T = debugger.stacktrap
+				if !T or (Stack > T)
+					break = 0
+
+	return break & debugger.BreakRealBit
+
+
+
+function __PerryView__ (cakevm.CakeChef)
+	description "We just hit a breakpoint! (or crashed)"
+	target debug
+		|| ASMIndex = .Index(stack.code)
+	
+	Break = .BreakOrNot(stack, break)
+	
+	
+	|spdprocess--| p = cake.perry!					// Perry always exists by now
+	if break or ErrorCode
+		debugger.RestoreBreaks
+		.SendStack(stack, p, "break", ErrorCode)
+
+	Break |= (Break!=0)								// Bit 1 = needs run
+	
+	while p.CommsOpen
+		if !ErrorCode and Break.Runs and p.CantGet
+			if Break&1								// Needs run
+				p <~ "run"
+			return 0
+			
+		|| m = p.Get(5.0)
+			|| Action = .Respond(m, stack)
+			if Action is SendVars
+				.SendStack(stack, p, "stack", ErrorCode)
+			if Action is GoRun
+				StepAction.Curr = Action
+				Break &= ~debugger.BreakRealBit
+			p.SendErrors
+
+	app.Quit(-1)									// Stop runaways
+	
+
+
+
+function SendAllBreaksAction (perryresponse)
+	opt norefcounts
+	|| f = debugger.file(m)
+		cake.perry!.SendBreaks(f, true)
+	return StepAction.DoNothing
+
+
+
+function jbin.SendCode (|uint| Break, |int| Position)
+	opt norefcounts
+	|| name = "line"
+	if break & debugger.BreakReqBit
+		name = "break"
+	.Enter(@tmp, name)
+	.AddhInt(break & ~debugger.breakbits)
+	.AddhInt(position)
+	.exit
+	
+
+function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
+	opt norefcounts
+	|| CakeBreak = cake.ActiveBreaks
+	|| L = debugger.dbgLength
+	
+	|jbin| j = xvar.Printer
+	j.Start(@tmp, "breakpoint")
+	j.AddStr(f)
+	j.AddHint(all|int|)
+	j.Enter
+
+	|| ToFind = F.Index
+	|| Count = 0
+
+	|| Mask = ~debugger.BreakRealBit
+	|| LastP = -1
+	for raw in debugger.SrcToCode
+		|| Src = raw.Loc
+		if Src.FileNum == ToFind
+			|| Code = raw.code(L)
+			|| Break = CakeBreak[Code] & Mask
+			|| SP = Src.Position ||| Break
+			if (SP != LastP) and (Break or all)
+				LastP = SP
+				Count++
+				j.SendCode(Break, Src.Position)
+	j.exit(2)
+	if Count or all
+		self <~ j
+	j.Length = 0
+	
+
+
+function debugger.file (|message| m, |FileWithData|)
+	opt norefcounts
+	|| name = m.FirstName
+	|| f = .FileMap[name]
+		return f
+	
+	.SendError("MissingFile", name, 0)
+
+
+function debugger.NeedErrors (|faststring--|)
+	opt norefcounts
+	return .ErrorPrinter init faststring()
+
+
+function debugger.SendError (|string| kind, |string?| value=nil, |int| Number=0)
+	opt norefcounts
+	|| j = .NeedErrors|jbin|
+	j.Start(@tmp, "error")
+	j.AddStr(kind)
+	if value != nil
+		j.AddStr(value)
+	if Number != 0
+		j.AddhInt(Number)
+	j.exit
+	cake.perry! <~ j
+
+
+function cakevm.Func (|cakestack| stack, |spdfunc|)
+	|| index = .Index(Stack.Code)
+		return spdtable.Find(index)
+
+
+
+function CakeVM.GetReg (|cakestack| Stack, |message| Name, |xvar|)
+	opt norefcounts
+	|| index = .Index(Stack.Code)$
+	|| fn = spdtable.Find(index)$
+	index -= fn.Position
+	
+	|| Locals = fn.obj|&nil||[xvar]|
+		for v in Locals
+			if v contains index
+				if Name ~= v.Name
+					return v
+
+
+function CakeVM.GetProperty (|xvar| Var, |message| Name, |xvar|)
+	opt norefcounts
+	|| Type = var.type$
+	for v in type.Properties
+		if Name ~= v.Name
+			return v
+
+function cakevm.Prev (|CakeStack| Stack, |int| n, |&cakestack|)
+	while n > 0
+		n--
+		stack = .prev(stack)$
+	return stack
+	
+	
+
+function Cake.Readable (|&nil| Where, |int| n, |bool|)
+	if Memory.Readable(where, n)
+		return true
+	error "Unreadable memory at: " + ((Where|int64|<<1)>>1).hex
+	
+	
+function EditAction (PerryResponse)
+	opt norefcounts
+	|| path = m.second
+	stack = .prev(stack, path.int)$
+	path++
+	
+	|| v = .GetReg(stack, path)$
+	|| Where = stack + v
+	
+	while
+		xvar.Printer.Length = 0
+		path++
+		if !path
+			v.SetValue(Where, m.first)
+			return StepAction.SendVars
+		require cake.Readable(where, 8)
+		where = where|&&byte|[]
+
+		v = .GetProperty(v, path)							#loop
+		where = where|&byte| + v.Position
+
+	xvar.Printer.Length = 0
+	return StepAction.DoNothing
+
+
+function BreakAction (PerryResponse)
+	return debugger.SetBreaks(m, state|bool|, StepAction.DoNothing)
+
+
+function BreakRemoveAction (perryresponse)
+	return BreakAction(self, m, stack, state xor 1)
+
+
+function cakevm.Respond (|message| m, |cakestack| stack, |StepAction|)
+	opt norefcounts
+	if m == @tmp
+		|| fn = DebuggerActions[m.name]
+			return (fn[])(self, m, stack, 1)
+	printerror m.Name
+	return StepAction.DoNothing
+
+
+function cakevm.StartStack (|string| name, |int| ErrorCode,  |jbin--|)
+	|jbin--| j = XVar.printer
+	j.Start(@tmp, name)
+	{
+		j.Enter(@list)
+		{
+			j.Enter(@list)
+			j.AddhInt(app.ObjMemory)
+			j.AddhInt(app.StringMemory)
+			j.AddhInt(app.OtherMemory)
+			// in case we want to add more items without muddling things...
+			j.exit
+		}
+		{
+			|| PS = PicoGlobalStats()
+			j.Enter(@list)
+			j.AddhInt(PS.OpenSockets)
+			j.AddhInt(PS.OpenPicos)
+			j.exit
+		}
+		{
+			j.enter(@list)
+			j.AddHint(ErrorCode)
+			j.exit			
+		}
+		j.exit
+	}
+	j.Enter(@arg)
+	return j
+
+
+
+function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata?|)
+	opt norefcounts
+	|| Count = 0
+	while stack
+		|| err = .CheckStack(stack)
+		if err != nil
+			j.add(@tmp, err)
+			exit
+		|| File = .CollectStack(stack, j, Count)$
+		if ++count == 1
+			rz = file
+		Stack = .prev(stack)
+	
+
+
+function cakevm.CheckStack (|cakestack| stack, |string?|)
+	if !Memory.Readable(Stack, 16):			return "StackCorrupt!"
+	if stack < .basestack:					return "StackUnderflow!"
+	|| Depth = stack.Depth - 1
+	|| Down = stack.Down
+	if !Down or Down > 31:					return "BadStack!"
+	Stack -= Down + 1
+	if stack.Depth > Depth:					return "StackTripped!"
+	return nil
+
+
+
+function jbin.SyntaxExpect (|string| s, |int64| Code)
+	.enter(@tmp, "error")
+	.addstr(s)
+	.AddhInt(Code)
+	.exit
+
+
+
+function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData?|)
+	opt norefcounts
+	|| index = .Index(Stack.Code)				#expect (j, "Code pointer escaped",			stack.code|int64|)
+	|| fn = spdtable.Find(index)				#expect (j, "No function found at code: ",	index)
+	
+	|| vars = debugger.VariablePrinter!
+	{
+	if Count
+		index -= 2
+	|| Where = debugger.CodeToSrc(index)
+	rz = Where.File
+	if !rz.Length
+		if rz == nil
+			return nil			// error already made
+		return rz				// an internal file?
+	
+	vars.Length = 0
+	vars <~ stack.depth-1
+	vars <~ ")  "
+	vars <~ fn.name
+	
+	j.Enter(@tmp, vars|&nil||string|)
+	
+	vars.Length = 0
+	j.AddStr(rz)
+	j.AddHint(where.Position)
+	j.AddHint(fn.Position)
+	}
+	
+	|| xp = fn.IsExpanded(rz)
+	index -= fn.Position
+	|| Locals = fn.obj|&nil||[xvar]|
+		j.Enter
+		if xp or (count == 0)
+			for v in Locals
+				if v contains index
+					v.DescribeJBin(j, stack + v, xp)
+		j.exit
+	j.exit
+
+
+function cakestack.OperatorPlus (|xvar| v, |&nil|)
+	return .reg0 + v.reg
+
+
+function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp)
+	opt norefcounts
+	|| Sue = .Super
+		sue.ExpandSub(j, obj, xp)
+
+	for v in .Properties
+		v.DescribeJBin(j, Obj+v.position, xp)
+
+
+function xvar.ExpandVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp)
+	opt norefcounts
+	if obj and type
+		j.Enter(@arg)
+		xp = .IsExpanded(xp)
+		if xp
+			Type.ExpandSub(j, Obj, xp)
+		j.exit
+		
+
+
+function xvar.DescribeJBin (|jbin| j, |&nil| Where, |message?| xp)
+	opt norefcounts
+	j.Enter(@tmp, .name)
+	
+	|| Src = .SrcMap
+	|| AtRoot = !xp.parent.parent
+	j.AddStr(src.file * AtRoot)
+	j.Addhint(src.Position * AtRoot)
+	
+	|| vars = debugger.VariablePrinter!
+	|| OK = true
+	|| Type = .Type
+	if type and Type.IsObject
+		Type = .TestObjectType(type, Where)
+		if !type
+			OK = false
+	
+	if !.RenderType(vars, type)
+		OK = false
+	j.AddStr(vars)
+	
+	|| RefCount = int.min
+	if !.RenderValue(vars, Where, RefCount)
+		OK = false
+	j.AddStr(vars)
+	j.AddHint(.reg)
+	if RefCount != int.min
+		j.AddHint(refcount)
+		
+
+	if ok
+		.ExpandVar(j, where|&&byte|[], type, xp)
+	  else
+		j.add(@thg, "bad")
+
+	j.exit
+
+
+
+function ExpandAction (PerryResponse)
+	opt norefcounts
+	XVar.Expansion = m
+	return StepAction.SendVars
+
+
+function xvar.IsExpanded (|message?| xp, |message|)
+	opt norefcounts
+	|| arg = xp.last
+	if arg == @arg
+		for c_var.fast in arg
+			if c_var ~= .Name
+				return c_var
+
+
+function spdfunc.IsExpanded (|FileWithData| F, |message|)
+	opt norefcounts
+	|| arg = xvar.Expansion.last
+	for c.fast in arg
+		|| c_file = c.FirstName
+		if f ~= c_file							// files match
+			|| c_pos = c.Second.int
+			if c_pos == .Position				// id pos match
+				return c
+
+
+function uint.Runs (|bool|)
+	return !(self & debugger.BreakRealBit)
+
+
+function spdprocess.CantGet (|bool|)
+	return (.pico.CanGet <= 0)
+
+
+function SpdProcess.SendErrors (|bool|)
+	|| err = StdErr.pop
+		|faststring--| e = debugger.NeedErrors
+		err.Render(e)
+		self <~ e
+
+
+/*
+	* BreakOnObjID can be done by modifying the allocation system... to only preallocate x% objs
+	  in a block... so when we run out... we already have a hit-point to check... then we restore the
+	  other objects... right? :)
+		* What about calling back into the VM. Right away? Pause the VM? What if its an error during parse?
+*/

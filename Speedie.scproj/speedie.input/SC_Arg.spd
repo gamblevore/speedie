@@ -1,0 +1,67 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+ 
+
+class SCArg (SCNode)
+	linkage
+		cpp_part		Arg
+
+	|SCFunction?|	ParentFunc
+	|Message?|		TmpMovedOutFor
+	|bool|			IsClassArg
+	|bool|			IsStatementExpr
+	
+	constructor (|Message| node)
+	// shouldn't be necessary!
+		super.Constructor(node)
+		is AllowLinkedLists
+
+	render
+		fs <~ "SCArg: (\n"
+		fs <~ .source
+		fs <~ ")\n"
+
+
+
+function Message.SCArgNested (|message| base, |SCNode| p, |SCArg?|)
+	opt norefcounts
+	while 
+		|| cp = .Ancestor(@arg)
+		if cp == base
+			return .scarg(p)
+		self = cp$
+
+
+
+function Message.SCArg (|SCNode| p, |message| avoid=nil, |SCArg?|)
+	opt norefcounts
+	require self
+	if avoid and (avoid != @arg and @tmp)
+		if p isa scarg
+			return p
+		debugger
+		return nil
+	
+	|| R = .AsArg
+	p ?= .MsgArg
+	if (!R and p)
+		R = SCArg.new( self )
+		if (p isa SCArg)
+			R.ParentFunc = p.ParentFunc
+			r.IsClassArg = p.IsClassArg
+			R.parent = p
+
+		  elseif (p isa SCFunction)
+			R.ParentFunc = p
+			r.IsClassArg = p.cls
+			R.parent = p.parent // skip the function entirely.
+
+		.obj = R
+	if p and r
+		r.project = p.project // right?
+
+	Return R
+
+

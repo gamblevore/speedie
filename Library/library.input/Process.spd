@@ -1,0 +1,84 @@
+
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+class UnixProcess
+	linkage
+		wrapper
+		cpp_part Sh
+		cpp_class ShellStream
+		pragma noearlyfree
+	
+	|byte|					Mode
+	|&Pico|					Pico
+	|string|				Path
+	|[string]?|				Args
+    |int64|					UserFlags
+
+
+	constructor (|string| Path, |ProcessMode| Mode=processmode.CaptureAll, |[string]| Args=nil, |&pico| Pico = nil)
+		cpp_wrapper
+
+	destructor
+		cpp_wrapper
+	
+	function IsParent (|bool|)
+		return .pico.config.IsParent
+	
+	function DiedCount (|int|)
+		return .pico.config.deathcount
+		
+	function Status (|ExitCode|)
+		nil checker
+		cpp_wrapper
+
+	function Kill (|int| ExitCode)
+		cpp_wrapper
+
+	function Start (|ExitCode|)
+		cpp_Wrapper JB_Sh_StartProcess
+	
+	render
+		cpp_wrapper JB_Sh_Render
+	
+	function PID (|int|)
+		cpp_wrapper
+
+	function ReadStdOut (|string|)
+		cpp_wrapper
+
+	function ReadStdErr (|string|)
+		cpp_wrapper
+		
+	module
+		function Spawn (|String| app, |[string]| R=[], |processmode| Mode = nil, |UnixProcess?|)
+			opt norefcounts
+			rz = UnixProcess(app, mode, r)
+			if rz.start != 0
+				rz = nil
+
+
+
+datatype ProcessMode (byte)
+	linkage
+		cpp_part PIDM
+	
+	flags
+		|ProcessMode| 
+		CaptureAll = 0
+		MsgPassing = 1
+		StdOutSilence = 4
+		StdOutPassThru = 8
+		StdErrSilence = 16
+		StdErrPassThru = 32
+		Silence = StdOutSilence|||StdErrSilence
+		PassThru = StdOutPassThru|||StdErrPassThru
+		OwnGroup = 128 // has no effect right now.
+
+
+	syntax is (|ProcessMode| M, |bool|)
+		return self|int|&M|int|
+
+

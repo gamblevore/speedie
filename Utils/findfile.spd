@@ -1,0 +1,15 @@
+#!/usr/local/bin/spd
+
+main (|string| Name, |[file]| search_dir)
+	for f in  search_dir
+		if f.MustExist
+			.dofind(f, name)
+	"------"
+	
+	
+function app.DoFind (|file| D, |string| Name)
+	for f.files in d
+		if f.name contains name
+			printline f
+		if !f.IsSymLink and f.IsDir
+			.DoFind(f, name)

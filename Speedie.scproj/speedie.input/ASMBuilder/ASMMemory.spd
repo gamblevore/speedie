@@ -1,0 +1,199 @@
+
+extend Assembler {
+
+function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
+	|| dest = base
+	if base isnt temp
+		dest.reg = 0
+	
+	(base is NoScale)
+	return .AddToReg(exp, dest, base, Add)
+
+
+function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message| exp, |asmreg|)
+	base = base.HaveAddr
+	if !vara.reg
+		return base
+	dest = dest.HaveAddr
+	dest.µType = DataTypeCode._voidptr
+	if !dest.reg
+		dest.TryReg = Vara
+		dest.TryReg = Base
+		dest = .TempOnly(dest)
+	return .Plus(exp, dest, base, vara)
+
+
+function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |!&fatasm|)
+	if vara.reg
+		dest = .IncrPointerByVar(nil, dest, vara, exp)
+
+	|| Amount = D.SizeOfQuery max 1
+	// what about structs like 53 bytes long? What is their alignment?
+	
+	if index
+		dest = .AddConst(index*amount, exp, dest)
+	
+	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")
+	return exp.WCPY(Src, dest, Amount & 14~bits)		// VM treats 0 as the biggest num
+
+
+function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
+	(dest isnt AddrRequest)
+	|| T = dest.µtype
+	|| byte_shift = t.ByteCount.log2	
+	if  (byte_shift|uint| > 4)
+		error (exp, "Object to large to access")				// can we do struct-mem-copy?
+		byte_shift = 0
+	
+	index++
+	|| VInd = .Const(varadd, 7, false)
+		index += VInd
+		VarAdd = ASMReg()
+	
+	if decl isnt ClassObj
+		base = .MemOffsetFix(Base, byte_shift, index, 7, Decl, exp)
+	
+	|| pinc = .MemOpt(base, index, byte_shift)
+	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg)
+		|| bs = base.fat
+		if (bs isa asm.gtab) and  .iswithin(bs)
+			if bs.prms[1]		// This is lib, and is always in range.
+				|| GlobID = bs.prms[2]
+				|| gobj = exp.GOBJ(dest, 1, 0, GlobID)
+				if bs is temp
+					.AskNop(bs, gobj)
+				return gobj
+			
+			
+			|| K = bs.Const + ((index-1) << 3)
+			if K <= 20~bits
+				if Compiler is Hungry
+					decl! is ASMReached
+				.AskNop(bs)								// assume this works for now
+				return exp.GOBJ(dest, 0, 0, K>>3)
+	
+	|| op = ASMType.WriteASM[byte_shift]
+	if dest is set
+		// avoid setting ._output
+		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
+		rz.µrefcount = 1
+		if byte_shift <= 2
+			// vector opt... writing vec[0] can just write the actual thing itself.
+			// assuming we are writing 4 bytes or less.
+			|| destfat = dest.fat
+			if (destfat isa asm.vget) and (destfat is Temp)
+				if !destfat.regonly(2) and !destfat.prms[3]
+					|| input = destfat.prms[1]
+					rz.prms[0] = input
+					destfat.prms[1] = 0 // stop nop going mad.
+					.nop(destfat)
+			
+	  else
+		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
+		byte_shift = (byte_shift<<1) + t.issigned
+		op = ASMType.ReadASM[byte_shift]
+	
+	
+	rz._op = op
+	if pinc				// || y = (x++)[]
+		rz.µrefcount++
+		rz.Dest(1, base, self) // base is being written to, but it is still an input
+	if rz is const // what
+
+
+function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
+	|| bs = base.fat$
+	//if bs isa asm.gobj or asm.gtab
+	|| Before = bs isa asm.addk
+	require before or (bs isa asm.ADAK)
+	if base isnt temp
+		require  .last == bs
+		require  bs.RegOnly(0) == bs.RegOnly(1)
+	
+	rz = bs.prms[2]|int| >> bytes
+	
+	|| i = index
+	if before
+		i += rz
+		require i|uint| <= 127 // could go out of range!
+	
+	if before and (bs is temp)
+		rz = 0 // rz becomes unneeded?
+	  else
+		require rz >= -1 and rz <= 1
+
+	|| CanNop = base isnt BlockNop
+	index = i
+	base = bs.ASMReg(1)
+	if CanNop
+		.SoftNop(bs)
+
+
+function Assembler.InlineOffsetOpt (|asmreg| base, |int| bytes, |$int| index, |uint| MaxBits, |scdecl?| Decl, |message| exp, |asmreg|)
+	rz = .MemOffsetFix(Base, bytes, index, maxbits, Decl, exp)
+	.MemOpt(rz, index, bytes)
+
+
+function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBits, |scdecl?| Glob, |message| exp, ||)
+	opt norefcounts
+	
+	if base is AddrNoFiddle
+		return base asnt ASMReg.AddrNoFiddle
+	|uint| maximum = (1 << maxbits) - 1
+	|int64| LostBytes = 0
+	
+	if base is GlobalMemory
+		expect (glob)
+		if (glob is global) or (glob isnt property)			// not a property on a global struct
+			LostBytes = glob.ExportPosition - base.fat!.const
+			expect (LostBytes >= 0 and LostBytes < uint.max)
+
+	|| i = index
+	i += LostBytes >> pow2
+	if i <= maximum|int|
+		index = i
+		return base
+															// Too large to inline. increase via addtoreg				
+	i = (index << pow2) + LostBytes
+	index = 0
+
+	base = base as asmreg.NoScale
+	return .AddToReg(exp, nil, base, i, base)
+
+
+
+function Read (|| dest,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| ReadDecl,  |int| index=0,  |&fatasm|)
+	opt inline
+	(dest isnt set)
+	if 0: .Dummy(exp)
+	return .ReadOrWriteSub(dest, exp, ptr, VarAdd, ReadDecl, index)
+
+
+function Write (|| Value,  |message| exp,  || Ptr,  || VarAdd,  |scdecl| DestDecl,  |int| index=0, |&fatasm|)
+	opt inline
+	(Value is set)
+	return .ReadOrWriteSub(Value, exp, ptr, VarAdd, DestDecl, index)
+
+
+function ReadOrWrite (|| dest,  |message| exp,  || base,  || VarAdd,  |scdecl| Ty,  |int| index=0, ||)
+	if dest isnt set
+		dest = .TempTyped(exp, dest)
+	(dest isnt Const)
+	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)
+	if dest is set
+		dest = dest.zero
+	return fat*dest
+
+
+function Dummy (|message| exp)
+	if exp: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16, exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16, exp.KNSR, exp.KNST2, exp.KNST3
+
+}
+
+
+function scdecl.CanCopyNormally (|bool|)
+	opt norefcounts
+	|| i = .Internal
+	if !i or !i.IsBareStruct
+		return true
+

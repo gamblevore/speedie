@@ -1,0 +1,45 @@
+
+
+
+								// Additions Beta //
+* Stepbackwards in code! This will kick ass. (take breakcount at .compilepos, and ask for position of the new code...)
+* Step into func... ignoring param funcs
+* Compression use gz? make my compression experimental...
+
+
+								// Proper Release //
+* carrays :(
+	* structs work wierdly with carrays also. mat4 rows and stuff.
+	* my_mat4 *= somemat4() // should create tempstruct
+* To make "dispatch" clickable, we need to alter MoveToInitFunc, so we have an init func per module per file.
+
+
+					// Future ASM opts (more relaxing NOT do at release!) //
+* if ((self&M) == M)...  M = 1,2,4,8,etc  -->   if self&m
+* int.max seems to use knst2? isnt there a knsr or something that can do it?
+* a pixel instruction to convert floats/ints so don't need knst+div+conv to turn a float into an int? with clamping too!
+* vector building seems quite large, for simple vecs.
+	* imagepixel opts... 
+* x = {v[1], v[2], v[3]} should auto-swizzle.
+	* .xy = .vec4.zw					// wz is just a vec2, can be copied in MEMCPY(8) instruction
+	* v[1] = 1.0						// should be single op
+* vector equality ASM...
+* LUPU/LUPD mini-opt in "while"
+	* JTST use a bit more
+* EQUL: r5, r0, r5, 48  +  JBOR: r5, 1, 1	// turn into a simpler thing. Like "if compiler is hungry"
+* hoisting
+* x+=0.0111 x+=0.125 --> x+=0.1361
+* stuff like this:   function abcdef (|bool| x): printline (x)("a", "b") // Should flag the bool scdecl, that it can be any zero/non-zero value, even an object pointer or an int. So we don't need to do knst:1 all the time just to get a bool.
+
+
+							    // Additions Later //
+* new vars should "pop off" like wow-numbers like i = 1! i = 2! i = 3! glittering and stuff from the line they are on
+* Skinning support? .HelloKitty.spd or .emo.spd file endings could reskin the IDE dynamically.
+	* name.emo.scproj could tell speedie that to use .emo files.
+* tile-editor. For fonts/animations. Uses alpha for SDF edges.
+* 3D SDF textures for game hit-detection. (maybe import some assets from a 35 year old racing game also)
+* 3-instruction static allocator instruction... good for modding
+* Once we do OpenCL... make Perry more creative, more and more creative. Left-brain activation.
+	* maybe offer shader functions for various things?
+
+

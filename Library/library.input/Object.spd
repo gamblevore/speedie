@@ -1,0 +1,230 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Object
+	linkage
+		wrapper
+		cpp_class JB_Object
+	
+	destructor
+		cpp_wrapper JB_Obj_Destructor
+			
+	virtual Render (|FastString|fs_in=nil, |string|)
+		nil self
+		cpp_wrapper JB_Obj_Render
+
+	function Class (|&ClassData|)
+		cpp_wrapper JB_Obj_Class
+
+	autogen ClassBehaviours (|&byte|)
+		cpp_wrapper JB_Obj_ClassBehaviours
+
+	function MemoryLayer (|MemoryLayer|)
+		cpp_wrapper JB_Obj_Layer
+	
+	function RefCount (|int|)
+		cpp_Wrapper JB_RefCount
+	
+	function ObjectID (|int|)
+		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
+		nil checker
+		cpp_wrapper JB_Obj_ID
+	
+	operator isa (|ClassData| cls, |bool|)
+		cpp_part Isa
+		if (self)
+			|| P = .Class
+			while (P|bool|)
+				if (P == cls)
+					return true
+				P = P.Parent
+	
+	
+	operator MustBe (|ClassData| x, |bool|)  // perhaps mustbe should just be isa.
+		nil checker
+		inlined
+		return self.mustbe(x)
+	
+
+	autogen MustBe (|ClassData| x, |Message| ErrNode=nil, |bool|)
+		nil checker
+		if self isa x
+			return true
+		if self
+			.TypeFailed(x, errnode)
+
+	operator fast_isa (|ClassData| x, |bool|)
+		cpp_part FastIsa
+		inlined
+		return (self) and (.Class == x)
+
+	// perhaps... as and fast_as should just return nil and no errors
+	// and mustbe could do the typecast?
+	
+	operator as (|ClassData| x, |object|)
+		cpp_name JB_Object_As
+		if self isa x
+			return self
+		if self
+			return .TypeFailed(x, nil)
+	
+	operator fast_as (|ClassData| x, |object|)
+		cpp_part FastAs
+		if self
+			if .class == x
+				return self
+			return .TypeFailed(x, nil)
+	
+	libinternal TypeFailed (|ClassData| Cls, |message?| where, |object|)
+		|| name = .Class.name.wrap
+		error (where, name + " (object) is not a: " + cls.name )
+		debugger
+
+		
+	autogen SyntaxExpect ( |string| Error )
+		visible
+		cpp_part FailStr
+		
+		if self isa message
+			errorreceiver.NewError( self, Error )
+		  else
+			errorreceiver.NewError( Error )
+
+
+	inline string.SyntaxWarn
+		cpp_part Warn
+		errorreceiver.Newwarning( self )
+	
+	
+	module
+		function DebugAllMemory (assigns:|bool|)
+			cpp_wrapper JB_DebugAllMemory
+		
+		function TotalSanity (|bool| Force=true, |bool|)
+			cpp_wrapper JB_TotalSanity
+		
+		function New (|object|)
+			disabled "Subclass object to create one"
+
+
+
+struct ClassData
+	linkage
+		wrapper
+		cpp_class JB_Class
+	
+	|int|					RefCount
+	|int|					Index
+	|cstring|				Name
+	|?&ClassData|			Parent
+	|?&ClassData|			NextClass
+	|&&nil|					Virtuals
+	|int|					LeakCounter
+	|uint16|				Size
+
+	visible false
+	|byte|					ClassDepth
+	|bool|					HasSubClasses
+	|?&byte|				SaveInfo
+	|&nil|					DefaultBlock
+	visible true
+	
+	function AllocZeroed (|Object|)
+		cpp_Wrapper JB_Class_AllocZeroed
+		
+	function MemoryUsed (|int64|)
+		cpp_Wrapper JB_Class_MemoryUsed
+
+	function CreateLayerAndUse (|Object| obj, |object| obj2, |MemoryLayer!|)
+		opt norefcounts
+		rz = MemoryLayer(self, obj)
+		rz.obj2 = obj2
+		rz.use
+
+	function Layer (|MemoryLayer|)
+		cpp_Wrapper JB_Class_Layer
+
+	function DefaultLayer (|MemoryLayer|)
+		cpp_Wrapper JB_Class_DefaultLayer
+
+	inline Restore
+		opt norefcounts
+		.DefaultLayer.Use	
+	
+	module 
+		function First_ (|&classdata|)
+			cpp_wrapper JB_AllClasses
+	
+	iterator
+		|| curr = self
+		while (curr)
+			yield curr
+			curr = curr.nextclass
+
+
+function JB_DebugAt (|int| i=1)
+	cpp_nothing JB_DoAt
+
+
+cpp_nothing JB_SetRef				(|Object?| A,			|Object?| B)
+cpp_nothing JB_Incr2				(|Object?| A,			|Object?| B) // same as setref but doesn't decr
+cpp_nothing JB_Incr					(|Object?| Obj)
+cpp_nothing JB_FreeIfDead			(|Object?| Obj,			|&nil|)
+cpp_nothing JB_SafeDecr				(|Object?| Obj,			|Object?|)
+cpp_nothing JB_Decr					(|Object?| Obj)
+cpp_nothing JB_EarlyDecr			(|Object?| Obj)
+cpp_nothing JB_Clear				(|Object?| Obj)
+cpp_nothing JB_DecrMulti			(|Object| Obj,			|int| n)
+cpp_nothing JB_EarlyDecrMulti		(|Object| Obj,			|int| n)
+cpp_nothing JB_Ternary				(|Object| Obj,			|int|) // weird, only 1 param?
+cpp_nothing JB_Swap					(|Object| A,			|Object| B)
+cpp_nothing JB_New					(|ClassData|  Class,	|Object|)
+cpp_nothing JB_NewClass				(|ClassData|  Class,	|Object|)
+
+
+
+struct MemoryWorld
+	linkage
+		wrapper
+		cpp_class JB_MemoryWorld
+
+	|&Byte|			Name
+	|Byte|			SuperSize
+	|Byte|			BlockSize
+	|Byte|			Alignment
+
+
+
+class MemoryLayer
+	linkage
+		wrapper
+		cpp_class JB_MemoryLayer
+		cpp_part  Layer
+
+
+	|int|				Int
+	|Object?|			Obj
+	|Object?|			Obj2
+
+/*	
+	|uint16|			HiddenRefCount
+	|bool|				IsActive
+	|bool|				DummyBool
+	|&nil|				CurrBlock	
+	|&ClassData|		Class
+	|&nil|				SpareBlock
+	|&nil|				World
+*/
+
+	constructor (|&ClassData| Cls, |object?| obj=nil)
+		cpp_wrapper JB_Layer_Constructor
+
+	function Use
+		cpp_wrapper JB_Layer_Use
+	
+//	syntax Using (|memorylayer|) // need the default for this class... sigh
+		
+

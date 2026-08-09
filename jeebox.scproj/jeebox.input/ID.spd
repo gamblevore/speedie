@@ -1,0 +1,80 @@
+
+
+class StringShared (string)
+	linkage
+		wrapper
+		cpp_class JB_StringShared
+		cpp_part Str
+
+	cpp_refs
+		Disturbs		nil
+	
+	constructor (|string| data)
+		cpp_wrapper JB_Str_Clone
+
+	|string|		_Parent
+	default			""
+	false			""
+
+
+
+
+class MessageID (stringshared)
+	description "Allows replacing message.name with a messageID instead of a string. This allows you to associate extra information on the message.
+	
+Even better if you can share MessageIDs across all messages of the same .name and .func, saving memory. Then you can process the message by a function pointer on the MessageID. (You'll have to subclass MessageID to add the function-pointer.)
+
+This can speed up processing of messages, as each message has the function-pointer, or pointers, needed to process it.
+
+You can also count the number of times that this messageID was applied, via the .frequency property."
+
+	linkage
+		cpp_part ID
+	
+	default NIL
+	false	NIL
+	contains object
+	||					Obj
+	|int64|				ID
+	|int64|				Frequency	// user-value. system doesnt use it.
+	|int|				Position	// also
+	|Syntax|			Func
+	
+	render
+		fs <~ .func.name
+		fs <~ "@"
+		fs.AppendQuotedEscape(self)
+			
+	syntax cast (|bool|)
+		inlined
+		return self!=nil
+	
+	constructor (|string| Name, |Syntax| Fn=@str, |uint64| ID=0)
+		super.constructor(name)
+		.Func = fn
+		.obj = nil								// c++ generator fails otherwise
+		.ID = ID
+
+	constructor (|message| s, |uint64| ID=0)
+		cpp_part Msg
+		super.constructor(s.name)
+		.Func = s.func
+		.obj = nil
+		.ID = ID
+
+	constructor
+		cpp_part Empty
+		super.constructor("")
+		.Func = @arg
+		.ID = 0
+				
+
+
+	module
+		function ByID (SorterComparer of messageid)
+			opt norefcounts
+			return b.ID  -  .ID					// more frequent should have lower lengths
+		
+		function ByFreq (SorterComparer of messageid)
+			opt norefcounts
+			return .Frequency - b.Frequency

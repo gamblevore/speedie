@@ -1,0 +1,14 @@
+#!/usr/local/bin/spd
+
+// this is a speed test comparison vs C++
+main (|file.existing| Path)
+	time ("ReadFile", data.length)
+		|| Data = path.ReadAll$
+	time "Split"
+		|| Lines = data.Split 
+	time "Sort"
+		lines.sort
+	time "Sorted Sort"			// sorting already sorted data is very common!
+		lines.sort
+	time "Cleanup"
+		Lines = nil

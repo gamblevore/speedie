@@ -1,0 +1,68 @@
+
+
+extend_module ErrorReceiver
+	inline NewHint (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.Hint)
+
+	inline NewWarning (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.warning)
+	
+	inline NewProblem (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.problem)
+
+	inline NewError (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.Error)
+
+	inline NewCritical (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
+		.NewErrorSub(node, desc, path, ErrorSeverity.Critical)
+
+	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
+		opt norefcounts
+		if sev < ErrorSeverity.Critical // keep criticals...
+			|| Lower = stderr.LowerErrorsTo
+				sev = lower|int| min sev
+		if stderr.CanAddMore(sev)
+			if !desc
+				desc = node.MiniName("Unexpected ")
+			if path == nil
+				path = ""
+			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path)
+
+
+
+function Message.OriginalFilePath (|string|)
+	Opt NoRefCounts
+	|| O = .memorylayer.obj
+	if !__IS_LIBRARY__ and (O isa File)
+		return O.path
+	if O isa String
+		return O
+
+
+function Message.OriginalParseData (|string|)
+	Opt NoRefCounts
+	if self
+		|| D = .memorylayer.obj2
+		if D isa string
+			return D
+
+
+extend_module Error
+	function CantParseNum (|Message| Where, |string| num, |int| Pos, |bool| Overflow)
+		visible							// for lib
+		
+/		|| fs = FastString()
+		if Overflow
+			fs <~ "Overflowing number"
+		  else
+			fs <~ "Invalid number (found '"
+			fs.AppendRange(num, pos, pos+1)
+			fs <~ "')"
+		fs <~ " in: "
+		fs <~ num.Preview(32)
+		
+		|string--| str = fs.GetResult
+		|error--| err = error(where, str)
+		nil|errorreceiver| <~ err
+
+

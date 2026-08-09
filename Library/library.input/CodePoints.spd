@@ -1,0 +1,64 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+// ideally should merge with byte...
+// be a subclass of byte despite being a different datatype
+// seeing as it can do everything that byte can do!
+// at least for function calling, maybe not everything else.
+// maybe not "subclass" but more... "super-type" :)
+// also a lot of int/uint funcs should be shared.....
+datatype Codepoint (int)
+	linkage
+		cpp_part CP
+	function UTF8Size (|int|)	
+		cpp_wrapper JB_Str_UTF8Size
+	inline IsAscii (|bool|)
+		inlined
+		return self <= 127
+	inline IsLower (|bool|)
+		return .in('a', 'z')
+	inline IsUpper (|bool|)
+		return .in('A', 'Z')
+	inline IsInt (|bool|)
+		return .in('0', '9')
+	function IsLetter (|bool|)
+		return .isupper or .islower or .ishigher
+	inline IsHigher (|bool|)
+		return .in(128, 1114111)
+	function IsAlphaNum (|bool|)
+		return .isletter or .IsInt
+	function LowerCase (|codepoint|)
+		if .IsUpper
+			self += 32
+		return self
+	function IsWhite (|bool|)
+		return self == ' ' or '\n' or '\r' or '\t' 
+	inline In (|int| a, |int| b, |bool|)
+		return  (self - a)|uint| <= (b-a)|uint|
+	inline Str (|string|)
+		return string.UTF8(self)
+	syntax cast (|string|)
+		cpp_part AsString
+		inlined
+		return string.UTF8(self)
+	syntax cast (|bool|)
+		cpp_part Bool
+		inlined
+		return self > 0
+	render
+		if fs_in
+			fs_in.AppendUTF8(self)
+		  else
+			return self
+	module
+		function UTF8Read ( |$&byte| source, |Codepoint|)
+			cpp_wrapper JB_u8p_Read
+		
+	
+function string.ByteCountUTF8 (|int| N, |int|)
+	description "Returns the number of bytes used by a string for N codepoints"
+	cpp_wrapper JB_Str_ByteCount	
+				
+

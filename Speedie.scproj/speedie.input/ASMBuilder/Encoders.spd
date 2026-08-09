@@ -1,0 +1,20 @@
+
+
+function fatasm.Nop_Encoder (Asm_encoder)
+	return curr
+
+
+function fatasm.Halt_Encoder (Asm_encoder)
+	curr++[] = .prms[0]&0xFFFfff // a shame to waste this opcode.
+	curr++[] = 0				 // we'd have to move the 2/3 codes out of 0. Or up by 1.
+	return curr
+
+
+function fatasm.KNST_Encoder (Asm_encoder)
+	rz = ASM_ConstStretchy.Encode(self, curr, after)
+	|| op = .op
+	if op != asm.knst
+		rz++[] = .prms[4]
+		if op == asm.knst3
+			rz++[] = .prms[5]
+

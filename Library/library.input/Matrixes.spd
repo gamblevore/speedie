@@ -1,0 +1,69 @@
+
+
+struct Mat4
+	|vec4[4]| Rows
+	constructor
+		.reset
+	
+	function reset
+		for i in 4
+			|| r = vec4()
+			r[i] = 1.0
+			.rows[i] = r
+		
+	syntax access (|int| x, |int| y, |float|)
+		return .rows[y&3][x]
+		
+	syntax access (|int| x, |int| y, assigns:|float|)
+		.rows[y&3][x] = value
+	
+	syntax access (|int| y, |&vec4|)
+		cpp_part GetRow
+		return .rows[y&3]
+	
+	function Columns (|int| x, |vec4|)
+		x&=3
+		for i in 4
+			rz[i] = self[x, i]
+	
+	render
+		for i in 4
+			fs.AppendIndent
+			.rows[i].render(fs)
+			fs <~ '\n'
+	
+	function Transpose (|mat4|)
+		opt min 3
+		for i in 4
+			rz.rows[i] = .columns(i)
+
+	operator mul (|mat4| B, |mat4|)
+		opt min 3
+		|| tmp = b.Transpose
+		|| r0 = .rows[0] // avoid smash inputs
+		|| r1 = .rows[1]
+		|| r2 = .rows[2]
+		|| r3 = .rows[3]
+		for bc in 4
+			|| BCol = tmp.rows[bc]
+			rz.rows[0][bc] = bcol • r0
+			rz.rows[1][bc] = bcol • r1
+			rz.rows[2][bc] = bcol • r2
+			rz.rows[3][bc] = bcol • r3
+
+
+
+function vec4.OperatorMul (|mat4| M, |vec4|)
+	opt min 3
+	rz[0] = self • m.rows[0]
+	rz[1] = self • m.rows[1]
+	rz[2] = self • m.rows[2]
+	rz[3] = self • m.rows[3]
+
+
+function vec3.OperatorMul (|mat4| M, |vec3|)
+	opt min 3
+	|| s = (self, 1.0)
+	rz[0] = s • m.rows[0]
+	rz[1] = s • m.rows[1]
+	rz[2] = s • m.rows[2]

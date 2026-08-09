@@ -1,0 +1,51 @@
+#!/usr/local/bin/spd
+
+class Anagrams
+	|dictionary of string|		out
+	|string|					orig
+		
+	function Split (|string| v, |string| remain)
+		if v
+			v = " " + v
+		for i in 1 to remain.Length
+			|| sub = remain[0, i]
+			if Anagrams[sub]
+				|| v2 = v + sub
+				|| remain2 = remain[i...]
+					.split(v2, remain2)
+				  else
+					v2 = v2.sort(' ')
+					.out[v2] = v2
+		
+	
+	function Find (|string| progress, |string| inside, |int| depth)
+		for i in progress.Length + 1
+			|| Variant = progress.insert(inside, (i,i))
+			if depth < .orig
+				.find(Variant, string.byte(.orig[depth]), depth+1)
+			  else
+				.split("", variant)
+	
+	module
+		|dictionary| D
+		syntax access (|string| s, |bool|)
+			if s.length > 1: return .d[s]
+			return s == "i" or "a"
+			
+		function Find (|string| s, |dictionary of string|)
+			s = s.Remove(~charset.LettersOnly)
+			if !.d
+				|| data = ""
+				time "read":  data = file.words.ReadAll
+				time "lower": data = data.LowerCase
+				time "dict":    .d = data.dict
+			rz = Dictionary()
+			time "anagram"
+				Anagrams(rz, s).find("", "", 0)
+
+
+main (|string| word="hedgehog")
+	time "total"
+		|| d = Anagrams.find(word)
+		for v in d
+			printline v

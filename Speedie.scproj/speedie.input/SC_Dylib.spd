@@ -1,0 +1,155 @@
+
+
+// unfinished // still need to rework the functions to be callable.
+
+extend_module Macros
+	|| DylibConstructor = `
+module {
+function New (|?&_0| self=nil, |string--?| paths=nil, |int| Mode=DynamicLibrary.default,  |&_0|) {
+// consistant with speedie's object-constructor design.
+	|| Orig = self
+	if !self
+		self = Memory.zalloc(–sizeof _0)|&_0|
+	if paths == nil
+		paths = "_1"
+	if self
+		if .DyLibInit(paths, mode, "_2")
+			return self
+		|faststring--| reason = faststring.shared
+		.DyLibInit(paths, mode, "_2", reason)
+		error reason
+	if orig != self
+		Memory.free(self)
+}
+}`.macro
+
+
+	
+function message.DylibFuncs (|message|)
+	opt norefcounts
+	|| fs = FastString.shared
+
+	for ch in self
+		if ch istmp "cpp_func"
+			|| name = ch.firstname
+				if fs.Length
+					fs <~ '\n'
+				fs <~ name
+				
+				|| dcl = .msg(@decl)
+				dcl <~ (@ques, "dylib")
+				dcl <~ (@thg, name)
+	
+	return @str + fs.GetResult
+
+
+
+function @scclass.NewDylib (CollectFunc)
+	opt norefcounts
+	|| libname = node[@thg]$
+	|| arg = node.Last(@arg)$
+	require arg.Find(@tmp, "cpp_func", true)
+	using node
+	|| bra = @bra.msg
+	libname.next = bra
+	bra.Msg(@thg, "DynamicLibrary")
+	|| paths = bra.next
+
+	// For some reason... @thg is used directly, but strings are copied?
+	// well... that is awkward. we should use standard behaviour all over!
+	// i understand somethings shouldn't be put in directly. Like @dot stuff I guess?
+	// but even then... man IDK.
+	
+	|| tmp = macro.TmpPrms
+	tmp <~ @thg + libname.name
+	tmp <~ paths
+	tmp <~ arg.Dylibfuncs
+	arg.AppendMacro(macros.DylibConstructor, tmp)
+	tmp.Length = 0
+	if paths in node // oof
+		paths.remove // macro behaviour needs cleanup. (^^^ above note)
+	|| struct = NewStruct(node, name_space, errplace)
+	node.name = "struct"
+	return struct
+
+
+function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
+	// curl.func(1,2,3) --> (curl.func)(1,2,3)
+	opt norefcounts
+	expect (self) // should never fail
+
+	|| NewBra = @bra.msg
+	|| NewDot = NewBra.msg(@dot, .name)
+	newdot <~ .first
+	.first = NewBra
+	newdot <~ @emb
+	.Become(@func)
+
+	if F Is Killer
+		.LastInBlock(SCBlockage.Quit)
+		
+	NewBra.obj = D
+	NewDot.Obj = D
+	.Last!.obj = F
+	return f
+
+
+function scfunction.ProtectGlobals
+	// done after the nil-checker, so we know what this func returns.
+	opt norefcounts
+	|| tocopy = Compiler.AppInitGlobals.find("NilChecking")
+	tocopy = tocopy.first #require
+	
+	|| arg = .SourceArg
+	for rel.flat in arg
+		if (rel.func == @rel) and (rel in @arg) and rel.IsSetRel
+			.ProtectOneGlobal(rel, tocopy)
+
+
+function scfunction.ProtectOneGlobal (|message| Rel, |message| test)
+// make sure that dylibs are loaded properly (And other globs)
+	opt norefcounts
+	|| f = rel.first!
+	|| d = f.AsDecl
+	|| fn = f.func
+	
+	//
+	require d and (fn == @thg or @dot) and (d is global or property)
+	|| l = rel.last!
+	require l != @arr					// assume arrays are never nil
+//	|| input = l.AsDecl
+
+	require D.StatedReal and D.TypeSuffers
+	rel.ProtectOneSub(f, l, test)
+
+
+function message.ProtectOneSub (|message| F, |message| L,  |message| test)
+	opt norefcounts
+	|| fn = l.unwrap.MsgFunc$
+	require fn isnt Constructor			// constructors should never fail...
+	test = test.copy					// we really are just protecting from user-functions.
+	|| One = test.FindNested("1")				#require
+	one.ReplaceWith f.copy
+	.next = test
+
+
+
+// Could this make speedie code... embeddable, by speedie? Like... for game-scripts?
+// the idea is that speedie is meant to be good at everything. Game-engines, scripting, etc.
+// but sometimes games need scripts, even games made in speedie. So could... speedie be scripting speedie?
+// I know it sounds silly, but sometimes, at the least, you might want to hot-load code.
+// Or restart crashed systems. Easier if you are using a dylib.
+
+// So how to deal with object allocation? Each lib has it's own objects and libs. Would need its per-frame step.
+
+// Well what about loading normal lib code? Like loading libcurl or sql. I guess you just load it.
+// What about if some functions can't load? well... the lib does not get loaded. OR we have to load them individually.
+// i think both are good tactics. Depends on what you want to do.
+// I mean... you'd need to test each function before it is used. Even if it were loaded at startup,
+// unless the compiler treats it as always loaded, because the program exits if it can't be loaded.
+// could be a good time to make other globs kill the app if they can't be loaded. Like: || globx = message.new
+// if globx is nil, the entire app should not reach main.
+
+// Anyhow, I think this is a good design.
+
+

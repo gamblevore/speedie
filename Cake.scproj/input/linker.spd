@@ -1,0 +1,190 @@
+
+
+module SpdTable
+	|int|			LinksOK
+	|uint|			CodeLength
+	|[SpdFunc]|		Funcs
+	|spdfunc--|		CurrFunc
+	|string|		CallBack
+	|&&nil|			LibFuncs = cakerun.LibFuncs
+	
+	function Find (|int| index, |spdfunc|)
+		opt norefcounts
+		for f in .funcs
+			|| P = f.Position
+			if  index >= P  and  index < P + f.RangeLength
+				return f
+		
+	
+	function RunProgram (|int|)
+		opt inline
+		|| Err = .RunFunc(1)
+		if !err
+			err = .RunFunc(2)
+		return err
+	
+	
+	function RunFunc (|int| i, |int|)
+		opt norefcounts
+		|| fn = .funcs[i]					#EXPECT ("MissingFunc")
+		|| ExitReg = fn.Run
+			|| Err = ExitReg|&int64|[]
+			|uint| MiniErr = Err
+			if err and !MiniErr
+				MiniErr = -1 // sigh
+			return MiniErr
+		return Cake.vm.CakeFail&255 ?? -1
+
+	
+	function Message.PreLoadLength (|int|)
+		opt norefcounts
+		if .func != @tmp
+			return .Length
+		|| f = .first
+			return f.Length
+	
+	
+	function InitialiseFuncs (|message| code)
+		opt norefcounts
+		.funcs <~ SpdFunc()							// null func
+		|| CodeLength = 0
+				
+		for spd.fast in code
+			if spd == @num or @hint
+				for spd.int
+					.funcs <~ .funcs[0]
+			  else
+				spd.tag = .funcs.Length
+				spd.Position = CodeLength
+				.funcs <~ spd
+				CodeLength += spd.PreLoadLength>>2
+			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
+
+		.Funcs.Shrink		
+		check  (CodeLength < 1MB)					(code, "Oversized code: " + CodeLength)
+		check  (.funcs >= 3)						(code, "Missing 'main'")
+		
+		.CodeLength = CodeLength
+
+
+	function CopyCodeToVM (|message| code)
+		opt norefcounts
+		.InitialiseFuncs(code)
+		for spd.fast in code
+			|| fn = spd.func
+			if fn != @num and @hint
+				spd.CodeToVM
+	
+
+	function SpdFunc.ASMStart (|&ASM|)
+		|| i = .Position
+		if i >= 0
+			return cake.BeginCode + i
+	
+	
+	function spdfunc.length
+		disabled "Do you mean message.length or spdfunc.rangelength?"
+		
+	
+	function FillCallBacks (|string| Ang)
+		|| i = InputStream(ang)
+		|| g = Globals.PackGlobs!
+		|| gmax = Globals.PackGlobSize
+		|| fmax = .CodeLength
+		|| Code = cake.BeginCode|uint64| ||| (1|uint64|<<63)
+
+		while i.HasAny
+			|uint| D = i.HInt
+			|uint| Fn = i.HInt
+			ifn (d != 0  and  D+8 <=  gmax  and  Fn < fmax)
+				error "CallbackOutOfRange"
+				exit
+			|| where = (g+d)|&uint64|
+			where[] = Code + (Fn<<2)
+			
+			
+		
+	function LinkFunctions
+		opt norefcounts
+		for f in .funcs
+			f.Link❗
+		|| boomer = .CallBack
+			.FillCallBacks(boomer)
+
+
+	function spdfunc.Link❗
+		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
+		|| Code = .position
+		require code >= 0
+		spdtable.CurrFunc = self
+		|| Base = Cake.BeginCode + Code
+		|| after = base + .RangeLength
+
+		while base < after
+			|| µ = base[]
+			|| Op = µ.op
+			if op.IsSPDFunc
+				base.LightCandles(µ)
+			  elseif µ.IsLibGlob and op.IsGlob
+				base.LibGlob(µ, op == asm.GOBJ)
+			base += µ.size
+
+
+function asm.LightCandles (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
+	opt norefcounts
+	|| err = .MusicalSoaps(jumpandreg)
+		error (SpdTable.CurrFunc, err)
+
+
+function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
+	description "Yes I am bored... why else with these names?" 
+	opt norefcounts
+	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
+	
+	|| Op = JumpAndReg >> 24								// FNC or FNC3
+	|| Reg = 0
+	|| ID = JumpAndReg & (24~bits)
+	if Op!=asm.tail
+		Reg = (JumpAndReg >> 19) & 31
+		ID &= 19~bits
+		
+	ID -= 31
+	require  ID > 0	
+	|| fn = SpdTable.Funcs[id]
+		|| Pos = fn.ASMStart								// Fast-branch for speed.
+			|| Jump = (Pos - Self)|int|						// 19-bits
+			Jump -= 2
+			Jump -= op&1
+			if op == asm.tail
+				self[] = (Jump&24~bits) ||| (Op <<24)
+				return nil
+				
+			|| EncodedJump = Jump&19~bits
+			if  (EncodedJump<<13)>>13  ==  Jump
+				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op <<24)
+				return nil
+			return "Executable too large to link: " + fn.name
+		return "Function was trimmed: " + fn.name
+	return "Bad function ID: " + id
+
+
+
+function asm.LibGlob (|&asm| self, |asm| Old, |bool| GOBJ)				// Globlink, DoGlobs
+	opt norefcounts
+	|| Shift = 14 + GOBJ
+	|| ID = (Old << Shift) >> Shift
+	expect (ID > 0 and ID < globals.LibMax)					(SpdTable.Currfunc, "Bad LibGlob ID: " + ID )
+	
+	ID = globals.LibLink![ID-1]
+	expect (ID != 16~bits)									(SpdTable.currfunc, "Global missing in library")
+	
+	if (GOBJ)
+		old = (Old >> 17) << 17
+		old |= ID >> 3
+	  else													// GTAB
+		old = (Old >> 18) << 18
+		old |= ID
+	self[] = old
+
+
+

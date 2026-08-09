@@ -1,0 +1,87 @@
+
+
+function asm.VecIntMathPart (|asm|)
+	if self >= asm.add and self <= asm.mul		// div is a lil tricky. can do mod, and inputs in different order
+		return self + (asm.padd - asm.add)
+
+
+function asmreg.OptWithin (|&fatasm|)
+	|| Get = .within(asm.vget)
+	if get and !get.prms[2]
+		return get
+
+
+function message.OptVecMathTwo (|asmreg| Dest, |asmreg| A, |asmreg| B, |&fatasm|)
+	|| fatA = A.optwithin
+	|| fatB = B.optwithin
+	require fatA or fatb
+
+	|| Parts = 0
+	if fata
+		parts = fata.Prms[3]<<2
+		A = fata.asmreg(1)
+	if fatB
+		parts |= fatb.Prms[3]<<4
+		B = fatb.asmreg(1)
+
+	|| fat = .uadd(dest, A, B, parts&63)
+	// refcount before nopping!
+	Assembler.sh.AskNopTemp(fata)
+	Assembler.sh.AskNopTemp(fatb)
+	return fat
+
+function message.OptIntVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
+	if !Shift
+		|| fat = .OptVecMathTwo(dest, L, R)
+			fat._op = op.VecIntMathPart
+			return fat
+
+	|| fat = .ADD(dest, l, r, Shift)
+	fat._op = op
+	return fat
+
+
+function fatasm.IsPartyAble (|bool|)
+	|| op = ._op
+	if (op >= asm.PADD and op <= asm.PDIV) or (op >= asm.UADD and op <= asm.UDIV)
+		return true
+
+
+function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
+	if base is ContainsAddr
+		if dest is ContainsAddr // really what?
+		return .ReadOrWrite(dest, exp, base, vara, nil)
+
+	|| k = .Const(vara, 2, false)
+		vara = nil
+	  else
+		k = 0
+	
+	if dest isnt set
+		return exp.VGET(dest, base, vara, k) * dest
+
+	// Doesn't yet handle:   x[1] = a - b 
+	if  !vara  and  (dest is temp)
+		|| party = dest.fat
+			if party.IsPartyAble
+				party.prms[3] |= k
+				return .redest(party, base)
+		
+			|| op = party.op|asm|
+			|| vop = op.VecIntMathPart
+				if party.prms[3] == 0							// no shift or 3rd part in mul
+					party._op = vop
+					party.Prms[3] |= k
+					return .ReDest(party, base)
+			
+			if 0: exp.psub
+			if (op isa asm.VGET) and (party.prms[2] == 0)		// vset+vget...
+				k |= party.prms[3]<<2
+				|| v2 = exp.padd(base, party.asmreg(1), asmreg(), K)
+				.Nop(party)
+				return v2 * base
+					
+
+	return exp.VSET(base, dest, vara, k) * base
+
+

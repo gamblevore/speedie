@@ -1,0 +1,100 @@
+
+
+
+///// LEAF SORTING
+
+
+
+
+module CodeSorter
+	function LeafsFirst
+		opt norefcounts
+		for f in compiler.FuncList
+			f.FindDepths
+		compiler.FuncList.sort(Leafness)
+
+
+	helper PropertyOrder (sortercomparer of scdecl)
+		return .exportposition < b.exportposition
+	
+	
+	function PackID (|bool| IsFunc, |sortercomparer of scobject|)
+		if isfunc
+			return (&.fpackid)|sortercomparer|
+		return (&.gpackid)|sortercomparer|
+		
+	helper FPackID (sortercomparer of scobject)
+		|| fA = .fPackID|int|
+		|| fB = b.fPackID|int|
+		if !fa or !fb
+			if !fa and !fb
+				return .ExportName < b.ExportName // just to help compression
+			return !fb
+		
+		return fb - fa	  // we need init and main first
+	
+	
+	helper GPackID (sortercomparer of scdecl)
+		|| fA = .gPackID|int|
+		|| fB = b.gPackID|int|
+		if !fa or !fb
+			if !fa and !fb
+				return scdecl.sorter(self, b)
+			return !fb
+		
+		return fb - fa	  // we need init and main first
+
+
+	function Leafness (sortercomparer of scfunction)
+		opt norefcounts
+		|| x = .LinkDepth|int| - b.LinkDepth|int|
+		if x < 0
+			return 1
+		if x == 0
+			return .exportname < b.exportname
+		return 0
+	
+	
+function SCFunction.MarkRecursive (|scfunction| EndAt)
+	opt norefcounts
+	is DirectlyRecursive
+	|| s = self
+	while
+		(s is Recursive)
+		require s != endat
+		s = s.DepthFinder
+		require s != nil and s != EndAt
+
+
+
+function SCFunction.FindDepths (|int|)
+	opt norefcounts
+	flow off
+	// Orders the functions in terms of which ones need others.
+	// So we can process leaf functions first. Maybe easier to optimise
+
+	|| L = .LinkDepth
+		return L
+	
+	rz = 1
+
+	for f in .LinkTo
+		if (f isa SCFunction)
+			if (f == self) or f.DepthFinder
+				.MarkRecursive(f)
+				
+			  elseif f.iscppinbuilt
+				0 // do nothing. This affects nothing.
+
+			  elseif f isnt cpp
+				f.DepthFinder = self
+				|| D = f.FindDepths + ((1))
+				(rz max= D)
+				f.DepthFinder = nil
+
+			  else
+				(rz max= 2)
+
+	.LinkDepth = rz
+
+	

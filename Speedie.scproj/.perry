@@ -1,0 +1,15 @@
+
+roots
+	"@spd/Library/library.input/"
+	"@spd/jeebox.scproj/jeebox.input/"
+	"@spd/Image.scproj/image.input/"
+	"@spd/Net.scproj/net.input/"
+	"@spd/Library/stable_id_bank.txt"
+
+excludes 
+	"hidden"
+	"xcodeproj"
+
+unused_lib_funcs
+	"@spd/Library"
+	"@spd/jeebox.scproj/"

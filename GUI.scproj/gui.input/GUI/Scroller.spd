@@ -1,0 +1,143 @@
+
+
+
+module ScrollInfo	
+	|int|								InDrag_ = -1	// Wanna remove this, its annoying.
+	|bool|								JustClicked_	// This too.
+	
+	function EndDrag									// Its also not being called properly.
+		if .InDrag_ >= 0 
+			.InDrag_ = -1								// So it thinks its indrag when its not.
+
+	
+libinternal ListView.SLH (|vec3|)
+	opt norefcounts
+	|| Total = 0
+	|| Found = 0
+	|| ff = .scrollstart
+	for r.all in self
+		if r == ff
+			Found = Total
+		++Total
+	|| L = (1 + Total - .visiblerows) max 0
+	return (Found,  L,  .rowheight).vec3
+
+ 
+libinternal textview.SLH (|vec3|)
+	opt norefcounts
+	|| s = .ScrollStart
+	|| ll = .WrappedLines.last!
+	|| n = ll.vline - (.maxvisiblelines - 2)
+	return (s.vline,  n max 1,  .lineheight).vec3
+
+
+
+extend guicontrol {
+libinternal MyScroller (|taskgui|)
+	opt norefcounts
+	|| w = .window
+		|| x = w._Scroller
+			if (x.Upon == self) and (x in w.tasks)
+				return x
+		
+
+libinternal DrawScrollStrength (|float|)
+	opt norefcounts
+	|| Scroll = .MyScroller
+		rz = 1.0 - scroll.TaskProgress
+
+
+libinternal CanDrawScroll (|window| w, |bool|)
+	require w and .MouseDownOnSelfOrNil
+	require !._CanSeeAllLines
+	return (self contains .mousexy) or (w.CurrMouseDown==self)
+	
+	
+libinternal DrawScroll (|vec3| slh, |image| where)
+	opt NoRefCounts
+	if !.MouseDownOnSelfOrNil
+		.NoScroll
+		return
+	
+	.MouseMoveInScrollArea(.MouseXY)
+
+	require .CanDrawScroll(.window)
+	|| s = .DrawScrollStrength #require
+
+	|| scr = ¥.scroll
+	using scr 
+	scr.Strengthen(s)
+	where.DrawRectStyled(.ScrollRect(slh), scr)
+
+
+function InScrollArea (|ivec2| p, |bool|)
+	if self isa textview or listview
+		|| x  = .lastrect.x2
+		|| xr = (x-10, x)
+		return (xr contains p.x) and (self contains p)
+
+
+libinternal MouseMoveInScrollArea (|ivec2| p, |bool|)
+	if .HasFocus or !GUI.MouseButtons
+		if .InScrollArea(p)
+			return .TouchScrollBar
+
+
+libinternal ScrollBarMove (|vec3| slh, |int| shift)
+	if shift
+		|| t = .ScrollRect(slh, shift).x
+		if self isa ListView
+			.ScrollMoveTo(t) // this doesn't quite make sense?? moveto? but the other is moveby?
+		  elseif self isa textview
+			.ScrollStart() = .FirstLine.MoveCapped(t)
+
+
+libinternal ClickedScrollbar (|ivec2| P,  |int| Clicks,  |vec3| slh,  |bool|)
+	opt norefcounts
+	
+	|| r = .ScrollRect(slh)
+	|| y = (p.y - r.y)
+
+	if clicks == -1 // dragged
+		require (ScrollInfo.InDrag_ >= 0) 
+		.ScrollbarMove(slh, y - ScrollInfo.InDrag_)
+	  else
+		if r contains p
+			ScrollInfo.JustClicked_ = true
+			ScrollInfo.InDrag_ = y
+		  else
+			ScrollInfo.indrag_ = -1
+			return false
+	
+	return .TouchScrollBar
+
+
+libinternal ScrollRect (|vec3| slh, |int| shift=0, |ivec4|)
+	cpp_part ScrollRectSub
+	|| s  = slh[0]
+	|| l  = slh[1]
+	|| rh = slh[2]
+	|| f  = 1.0 - (s / l)
+	|| d  = 10
+	if l > 0
+		|| h = .height|float|
+		|| div = l * rh
+		div = div max h
+		|| porp = (h * h) / (div*4.0)
+		d = ((20.0 + porp) min (h * 0.375))|int|
+
+	|| si = .lastrect + (0,d,0,-1-d)
+	|| w = 10
+	|| p = f.mix(si.y1|float|, si.y2|float|)|int|
+	|| y = p - d
+	
+	if shift
+		y += shift
+		p = y + d
+		f = p|float|.unmix(si.y1|float|, si.y2|float|)
+		s = (1.0-f) * l
+		return (s, s, s, s).iVec4
+	
+	return (si.x2 - w,  y,  si.x2,  p + d+1)
+}
+

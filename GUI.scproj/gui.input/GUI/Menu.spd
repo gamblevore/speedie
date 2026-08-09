@@ -1,0 +1,193 @@
+
+
+
+class Menu (ListView)
+	|ListViewrow?|						EditingRow
+	|bool|								DelayedOpen
+	|bool|								NoCloseOnClick
+	|bool|								IsSearchMenu
+	
+	constructor (|guicontrol| p,  |GUIKeyEvent| Keys,  |GUIListEvent| Return)
+		super.constructor(p, nil, Return)
+		isnt visible
+		.Padding = 8
+		.MultiSelection = false
+		.OnKeyDown = Keys
+		.ClipMode = ControlClipMode.SlideBackInWindow
+		.gnormal = ¥.Menus
+		.gRowSel = ¥.MenuRowSel
+	
+	
+	behaviour RightClick
+		if .OnRightClick
+			super.rightclick(p)
+		  else
+			.mousedown(p, 2)
+
+
+	behaviour Draw
+		super.draw(Where)
+
+
+	behaviour MouseDown
+		if .ClickedScroll(P, clicks)
+			return mousedragging.DragWithin
+		|| L = .FindClicked(P.y) as listviewrow
+		if L isnt UnSelectable
+			if L isnt selected
+				.Select(L)
+			  else
+				.usemenu(l)
+		return mousedragging.handled
+	
+	
+	function UseMenu (|listviewrow| L)
+		|| e = .EditingRow
+		if !.NoCloseOnClick
+			.closemenu
+
+		require l and !.DelayedOpen
+		
+		if (L isa menuitem)
+			if (L.MenuEvent)
+				|| p = .parent
+					(L.MenuEvent!)(p,  l,  e.ascell)
+				return
+		(.onreturn)(self, L)?
+			
+	
+	behaviour MouseMove
+		require (gui.duringaction isnt resizing) // annoying
+		
+		if State is LEAVE or ENTER
+			return false // right? should have a different event for this
+		|| moved = super.mousemove(P, move, 0|SDL_WindowEventID|)
+		|| l = .FindClickedMenu(P.y)
+		if !l
+			return true
+		._SelJustChanged = false
+		.Select(l)
+		return moved or ._SelJustChanged
+	
+		
+	libinternal CmmWidth (|guicontrol?| owner, |int|)
+		|| mw = 0
+		if owner
+			mw = owner.width min 140
+		mw = .FindTextWidth + 14 max mw
+		return mw max 64
+	
+
+	libinternal FindTextWidth (|int|)
+		opt norefcounts
+		for row.all in self
+			|| t = row.CellOrRow(self, 0)
+			rz = rz max t.bounds.x
+		rz *= font.width
+	
+	
+	function ShowCmm (|GUIControl| Owner, |int| X, |int| Y)
+		opt norefcounts
+		|| mw = .CmmWidth(owner)
+		|| W = the~left for mw
+		if x >= 0
+			w = (x)~right for mw
+		  elseif .MouseXY.x > .Horz.mid
+			w = the~right back mw
+		|| CP = ControlPoint.low
+		if y
+			cp = (Y)~up
+		|| H = CP back .DesiredHeight
+		.size = w by h
+		.ShowMenu
+	
+	
+	function ShowMenu 
+		|| win = .window					#require
+		win.inline.clear
+		win.openedmenu = self
+		is visible
+		._Scrollstart = nil
+		.touch
+//		.SlideOpen(0.125s)
+		.SelectFirst(ListViewSelectMode.InitialSelection)
+	
+	
+	function IsCmm (|bool|)
+		|| p = .parent
+		if p isa listview
+			return p.cmm == self // idk really
+	
+	
+	function IsOpenedMenu (|bool|)
+		opt norefcounts
+		|| w = .window
+			return w.openedmenu == self
+	
+	
+	function CloseMenu
+		opt norefcounts
+		.SelectNone
+		if !.IsSearchMenu
+			.StopFilter
+		.UpdateFilter
+		isnt visible
+		.EditingRow = nil
+		if .IsOpenedMenu
+			|| w = .window
+				w.OpenedMenu = nil
+		|| p = .parent
+		if p isa Button
+			p.__MouseUp__((-1,-1))
+
+	
+	function DoReturn (|bool|)
+		|| f = .FirstSelected
+			.UseMenu(f)
+		return true
+
+	
+	behaviour KeyDown
+		if key.isaccept //or (keys.cmd and key.IsCmm)
+			return .doreturn
+		if key.iscancel or (key.iscmm and .iscmm)
+			.closemenu
+			return true
+		if super.keydown(key)
+			return true
+		if self is typethrough
+			|| w = .outerfocus
+				return w.__keydown__(key)
+
+
+	libinternal FindTypedRow (|string| input, |listviewrow|)
+		for s.all in self
+			if .Tablecell(s)[0, input, true]
+				return s
+
+
+	behaviour TypedString
+		opt norefcounts
+		if super.typedstring(input)
+			return true
+		|| r = .FindTypedRow(input)
+			.select(r)
+		return true
+			
+
+
+class MenuItem (ListViewrow)
+	|GUIMenuEvent?|		MenuEvent
+	
+	constructor (|string| name, |GUIMenuEvent?| ev, |object| obj=nil)
+		.name = name
+		.MenuEvent = ev
+		.obj = obj
+		isnt editable
+		(self is Separator) = (!name)
+		
+	render
+		fs <~ .name
+		fs <~ " "
+		super.render(Fs)
+

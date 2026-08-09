@@ -1,0 +1,120 @@
+      % % % % Do things just because its fun to do. % % % %
+
+ 
+		 				FEATURES TO DO
+
+
+* Reference Count improver
+	* Remove opt norefcounts... very bad source of bugs
+	* A single final block of decr code... "return" will goto a line within that.
+	* disturber implementation. No need to do most refcounts.
+	* just create a "Refcount2" system? Dont delete the old refcounter. Just compare the differences.
+	* Unified destructor? Subclass by "wrap", all objects go before refcount. Or 64-bit position marker?
+	* It can get bogged down... needing to handle all sorts of wierd issues
+
+
+* Static vars?
+
+* ability to create functions that own copies of vars from owning space.
+	* fn = % func (value, expr) // or fn = ∆ func val exp
+
+* auto-create float/int funcs for vecs? (on demand or explicit?)
+
+* vec/array param split?
+	* obj.func(P) --> obj.func(p.x, p.y, p.z)
+* Allow constants for array sizes!
+
+*		expect (obj isa SCDecl) // ideally the test below should be unnecessary
+		if (obj isa SCDecl) { use obj as a decl... }
+
+................................................................................
+
+
+
+							Actually already good:
+
+* Disable implicit bools object params? (but we wanna keep 1, 2, 3, etc? makes no sense. just allow all or none.)
+
+* int outputs ALWAYS 64bit-correct  (allows compare/add 64/32 bit without typecasts)	
+
+* obj.property().func --> obj.property.func... the () is superfluous, ignored.
+
+* "a:b" I need to change language?
+
+* syntactic comments... actually good! I know the code is a mess... bug that probably means it should be redesigned. It does exactly what it should do! There isn't a simpler way to do it. Just maybe a clearer way.
+
+* lack of #exit... it was buggy and the syntax SUCKED
+    "(item) #exit" all over. urgh.
+
+* 
+    class bla {
+        module {
+            |int| i
+            function bla {i++}
+            // disallow i++, use .i++ ?
+        }
+        // sure, except... what about accessing "i" from within the class?
+        function bla2 {
+            i++
+            // now it is inconsistant! unless we have MORE syntax like mod.i++
+            // it's fine as it is.
+            // maybe not?
+        }
+    }
+    
+    
+
+* units!!!! @num containing @unit was DUMB!!!! @UNIT should be the top!!!
+
+
+* "return{bla}" should be allowed? (its to differentiate return() from return ())
+		
+
+* tmp vars... do them local per func...
+	(seems actually quite hard... because they aren't just created in one spot. It's called from at least 3 widely separated points in the code. So I can’t just keep a global counter because the global counter needs resetting... Also means I need to "Start tmp vars" and then "stop tmp vars" PER FUNCTION in 3 points in the code... before actually doing anything... so now I have...
+		fn.StartTmpVars
+		DoRefs(fn)
+		fn.StopTmpVars
+		
+		which i s ugly.
+		
+		it would be better to design it properly, so it always takes a namespace? But that means redesigning a lot of my code...
+		* Why not each func just has a "tempvar" counter?
+	)
+	
+	Right now... the tempifier is messing up a lot of var names... seems WORSE after trying to fix this!
+
+
+* Lack of struct.new    (add "owned/borrowed/shared/virtual" objects instead!)
+
+* Constructors/new are already good! Because constructors inline in C anyhow...
+
+*	msg[0] was finding a func in message[(default params)] instead of list[(exact match)]
+	I think this actually is good behaviour... I should just create an error about "Shadowing"... rather than make my compiler awkward.
+	
+* a = b:c
+	BAD... Breaks my parser. In so many ways.
+
+* CNJ efficiency by putting it elsewhere...
+	BAD: Old design was better
+
+* a = b #require
+	ITS FINE! The only issue is this:
+	a = b + (c + D#require)
+
+	nested requires/expects are the issue.
+	
+* compiler needs to have some way for a datatype func to say "Actually, we need THE ADDRESS OF SELF"
+	* useful for saving...
+		function LoadProperties (blablabla) {
+			pragma AddressOfSelf // implied for structs
+		}
+		* Can mean I can get rid of value = loader.int or whatever it was...
+			.Value.LoadProperties(loader)
+			* what about our huge number of datatypes? fail?
+				* Yeah, basically...
+	* wait till need this anyhow for OTHER REASONS than saving.
+
+* @base... MAKES THINGS WORSE! what about -10? or -0x10?
+	where does the "-" go? now we need to do string append just to get the -10 with an "x" base!
+	And what about parsing? -10 or 0x10.parseint... works just fine. until we split it all off!

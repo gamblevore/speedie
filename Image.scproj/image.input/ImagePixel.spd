@@ -1,0 +1,208 @@
+
+
+struct ImagePixelStruct
+	linkage
+		cpp_part Pxst
+	|byte| R
+	|byte| G
+	|byte| B
+	|byte| A
+
+	function AppendVec4 (|vec4| V)
+		v = (v * 255.0) + 0.5
+		|| iv = v.iVec4.clamp(0,255)
+		.r = iv.r
+		.g = iv.g
+		.b = iv.b
+		.a = iv.a
+
+	libinternal AppendVec3 (|vec3| V)
+		v = (v * 255.0) + 0.5
+		|| iv = v|vec4|.iVec4.clamp(0,255)
+		.r = iv.r
+		.g = iv.g
+		.b = iv.b
+
+
+
+datatype ImagePixel (uint)
+	linkage
+		cpp_part Pxl
+		opt min 3
+
+	
+	function Alpha (|&imagepixel| self, assigns:|float| a)
+		cpp_part Alpha2
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255.0)|int|
+	
+	function Alpha (assigns:|float| a, |imagepixel|)
+		a = (a * 255.0) + 0.25
+		.a = a.clamp(255.0)|int|
+		return self
+	
+	inline Alpha (|float|)
+		return .a|float| * 255th
+
+	inline a (|int|):							return (self >> 24)
+	inline a (assigns:|int|, |imagepixel|): 	return ((self << 8) >> 8) ||| (value << 24)
+	function a (assigns:|float|, |imagepixel|)
+		disabled "use alpha"
+	inline a (|&imagepixel| self, assigns:|int|)
+		cpp_part A2
+		self|&ImagePixelStruct|.a = value
+
+//////
+	inline b (|int|):							return (self >> 16) & 255
+	inline b (assigns:|int|, |imagepixel|):		return (self &~ 0x00FF0000) ||| ((value&255) << 16)
+	function b (assigns:|float|, |imagepixel|)
+		cpp_part bf
+		return .b((value/255.0)|int|)
+	inline b (|&imagepixel| self, assigns:|int|)
+		cpp_part B2
+		self|&ImagePixelStruct|.b = value
+		
+//////
+	inline g (|int|):							return (self >> 8) & 255
+	inline g (assigns:|int|, |imagepixel|):		return (self &~ 0x0000FF00) ||| ((value&255) << 8)
+	function g (assigns:|float|, |imagepixel|)
+		cpp_part gf
+		return .g((value/255.0)|int|)
+	inline g (|&imagepixel| self, assigns:|int|)
+		cpp_part G2
+		self|&ImagePixelStruct|.g = value
+
+//////
+	inline r (|int|):							return (self >> 0) & 255
+	inline r (assigns:|int|, |imagepixel|):		return (self &~ 0x000000ff) ||| ((value&255) << 0)
+	function r (assigns:|float|, |imagepixel|)
+		cpp_part rf
+		return .r((value/255.0)|int|)
+	inline r (|&imagepixel| self, assigns:|int|)
+		cpp_part R2
+		self|&ImagePixelStruct|.r = value
+
+//////
+	render
+		opt norefcounts
+		fs <~ "0c"
+		fs.appendhex(.r)
+		fs.appendhex(.g)
+		fs.appendhex(.b)
+		fs.appendhex(.a)
+	
+	
+	function Load (|&imagepixel| self, |message| f)
+		opt norefcounts
+		cpp_Part LoadMsg
+		if f
+			.load(f.value)
+	
+	function Load (|&imagepixel| self, |string| s)
+		if s[0, "0c"]
+			s = s[2...]
+		|| parts = self|&byte|
+		for i in 4
+			|| v = 0
+			|| c = s[i*2, i*2+2]
+				v = c.parsehex|int|
+			  elseif i == 3
+				v = 255
+			parts[i] = v
+	
+//	function Lum (|float|)
+//		return .color.lum
+	
+	function HasColor (|bool|)
+		inlined
+		return (self << 8) != 0
+
+	syntax cast (|vec4|)
+		cpp_part CastVec4
+		inlined
+		return .color
+
+//	syntax cast (|PremultipliedColor|)
+//		cpp_part CastPremul
+//		inlined
+//		return .PreMul
+
+	function AddAlpha (|&imagepixel| self, |float| v)
+		v += .Alpha
+		.Alpha = v
+		
+	syntax append (|&imagepixel| self, |imagepixel| r)
+		inlined
+		self[] = r
+		
+	syntax append (|&imagepixel| self, |vec4| V)
+		cpp_part AppendVec
+		inlined
+		self|&imagepixelstruct|.AppendVec4(v)
+
+	syntax append (|&imagepixel| self, |int| r, |int| g, |int| b, |int| a=255)
+		cpp_part AppendInts
+		.R = r.clamp(255)
+		.g = g.clamp(255)
+		.b = b.clamp(255)
+		.a = a.clamp(255)
+	
+	inline CopyFrom (|&imagepixel| self, |&imagepixel| src, |int| N)
+		Memory.Copy(self, src, N*4)
+		
+	function Add (|&imagepixel| self, |vec4| c)
+		cpp_part AddVec
+		self <~ (c + .Color)
+		
+	function Overlay (|&imagepixel| self, |PreMultipliedColor| T)
+		|| R = .raw
+		|| D = ((R * t.a)>>16)+T
+		D.a = r.a
+		.raw = D
+
+	function Overlay (|&imagepixel| self, |vec4| T)
+		disabled "Call .Premul on this first for great speed boost!"
+
+	function Color (|vec4|)
+		return vec4(.r, .g, .b, .a) * (1.0/254.5)
+
+	function Color (|&imagepixel| self, |vec4|)
+		cpp_part ColorLoad
+		rz = vec4.load(self|&byte|)
+		rz *= (1.0/254.5)
+		
+	function Raw (|&imagepixel| self, |ivec4|)
+		inlined
+		return ivec4.load(self|&byte|)
+
+	function Raw (|&imagepixel| self, assigns:|ivec4|)
+		.r = value.r
+		.g = value.g
+		.b = value.b
+		.a = value.a
+		
+	syntax append (|&imagepixel| self, |float| r, |float| g=0, |float| b=0, |float| a=0)
+		cpp_part AppendFloats
+		disabled "Just append a vector instead."
+		
+
+	module 
+		inline New (|imagepixel|)
+			description "A black pixel at full opacity" 
+			rz = 255
+
+
+
+function vec3.syntaxcast (|imagepixel|)
+	disabled "use .px"
+		
+function vec4.syntaxcast (|imagepixel|)
+	disabled "Use .px"
+
+function ivec4.syntaxcast (|imagepixel|)
+	disabled "Use .px"
+
+
+inline vec4.Px (|imagepixel|)
+	(&rz)|&imagepixelstruct|.AppendVec4(self)
+

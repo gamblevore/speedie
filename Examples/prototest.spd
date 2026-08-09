@@ -1,0 +1,24 @@
+#!/usr/local/bin/spd
+
+
+main {
+	|| p = prototest("hey gurl")
+	|| dd1 = prototest.dd
+	|| dd2 = prototest.dd2
+	""
+	printline (dd1)(p, "hello ")
+	printline (dd2)(p, "hello ")
+}
+
+
+
+
+prototype def (|prototest| self, |string| A, |string|)
+
+class prototest
+	|string| 		Name
+	prototype def2 (|string| A, |string|)
+	function dd (def)
+		return .name + ": " + (A + A)
+	function dd2 (def2)
+		return .name + ": " + (A.uppercase + A.uppercase)

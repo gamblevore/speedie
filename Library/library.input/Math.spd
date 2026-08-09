@@ -1,0 +1,301 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+module Math
+	constants
+		// these should go into binary form...
+		E = 2.7182818284590452353602874713526
+		iTau = 0.15915494309
+		// Maths is just a place to put constants on...
+		// So autocomplete shows you constants.
+	
+	function Pi (|float|)
+		disabled "Use π for pi, or 2π for PI*2"
+
+	libinternal UnSineBad (|float| f, |float|)
+		cpp_wrapper (asinf)
+
+	libinternal UnCosBad (|float| f, |float|)
+		cpp_wrapper (acosf) // we don't want the half version!
+
+	libinternal UnTan2Bad (|float| f1, |float| f2, |float|)
+		cpp_wrapper (atan2f)
+	
+	libinternal SinPiHalf (|float| f, |float|)
+		cpp_wrapper (__sinpif)
+
+	libinternal CosPiHalf (|float| f, |float|)
+		cpp_wrapper (__cospif)
+
+	libinternal TanPiHalf (|float| f, |float|)
+		cpp_wrapper (__tanpif)
+	
+
+inline int64.Hash (|uint64|)
+	return self|uint64|.hash 
+
+inline int.Hash (|uint|)
+	return self|uint|.hash 
+
+function uint64.Hash (|uint64|)
+	cpp_wrapper JB_uint64_hash
+	
+inline uint64.LowestBit (|uint64|)
+	return self & -self 
+
+inline uint.LowestBit (|uint|)
+	return self & -self 
+
+inline uint64.RemoveOneBit (|uint64|)
+	return self & (self-1)
+
+
+
+extend int
+	inline CopySign (|int| From, |int|)
+		if (From xor Self)|uint| >> 31
+			self = -self
+		return self
+	
+	inline Abs (|int|)
+		if self < 0
+			self = -self
+		return self
+	
+	function Sqrt (|int|)
+		return (self|Float64|.sqrt)|int|
+	
+	operator pow (|int| a, |int|)
+		if (a==2)
+			return self*self
+		if self >= 0
+			rz = 1
+			for a
+				rz *= self
+
+	operator minus0 (|int| a, |int|)
+		inlined
+		|| r = self - a
+		if r < 0
+			r = 0
+		return r
+			
+	inline LowestBit (|int|)
+		return self & -self 
+	
+	inline RemoveOneBit (|int|)
+		return self & (self-1)
+	
+	function GetSign (|int|)
+		if self > 0
+			return 1
+		return -(self|uint|>>31)
+	
+	function Sign (|int|)
+		disabled "Do you mean setsign or getsign?"
+	
+	function Clamp (|int| low, |int| high, |int|)
+		cpp_part ClampRange
+		asm iclm(dest, p1, p2, p3, 1)
+		if self < low
+			self = low
+		  elseif self > high
+			self = high
+		return self
+	
+	function Clamp (|int| high, |int|)
+		asm iclm(dest, p1, r0, p2, 1)
+		if self < 0
+			self = 0
+		  elseif self > high
+			self = high
+		return self
+	
+	// seems to assume positive ints. No good. What if its negative?
+	function SetSign (|bool| IsNeg, |int|)
+		description "bool.dir is better. Try that?"
+		if (IsNeg)
+			self = -self
+		return self
+	
+	inline SignBit (|int|)
+		return self|uint| >> 31
+		
+//	function Reduce1 (|int|)
+//		disabled "seems buggy, doesnt work for 0"
+//		return self + (.signbit << 1) - 1
+//	
+//	function Reduce (|int| d=1, |int|)
+//		// what if this goes past 0?
+//		// why not use .towards(0)?
+//		
+//		if (self > d)
+//			return self - d
+//		  elseif (self < -d)
+//			return self + d
+//
+//
+//	function Towards (|int| Dest, |int| N, |int|)
+//		if (self >= dest)
+//			self -= N
+//			if (self <= dest)
+//				return dest 
+//		  else
+//			self += N
+//			if (self >= dest)
+//				return dest
+//		return self	
+
+
+
+			
+extend ivec2
+	operator minus0 (|ivec2| a, |ivec2|)
+		return (.x minus0 a.x, .y minus0 a.y)
+
+
+
+extend f64
+	function Clamp (|f64| Low, |f64| High, |f64|)
+		asm fclm(dest, p1, p2, p3, 0)
+		if self < low
+			self = low
+		  elseif self > high
+			self = high
+		return self
+		
+	inline Negate (|bool| b, |Float64|)
+		if (b)
+			self = -self
+		return self
+	
+	function Sqrt (|Float64|)
+		cpp_wrapper (sqrt)
+
+
+
+
+extend float	
+	function Saw (|float|)		 // just a saw-func
+		//   0-->0,  0.25-->1,  0.5-->0,  0.75--> -1,  1-->0
+		rz = .fract
+		rz *= 4
+		rz -= rz.minus0(1.0)
+	
+	function Gaussian (|float| v, |float|)
+		|| exp = self*self / v
+		|| factor = math.e pow -exp
+		|| mul = π|float| * v
+		|| sq = mul.Sqrt
+		return factor / sq
+	
+	inline Clamp (|float| H = 1.0, |float|)
+		return .clamp(0, h)
+		
+	function Cluster (|float|)
+		cpp_Wrapper	
+
+	inline Negate (|bool| b, |float|)
+		if (b)
+			self = -self
+		return self
+
+	function Reduce (|float| f, |float|)
+		return .length.minus0(f).copysign(self)
+	
+	inline Increase (|float| f, |float|)
+		return self + f.copysign(self)
+	
+	function IsNormal (|bool|)
+		disabled "Not a good function, as it flags zero and subnormals as 'bad'"
+		
+	function MakeSane (|float|)
+		if .isnan or .isinf
+			self = 0
+		return self
+	
+	function f64.IsNan (|bool|)
+		cpp_wrapper (__isnand)
+	
+	function f64.isInf (|bool|)
+		cpp_wrapper (__isinfd)
+	
+	function Pow (|int| n, |float|)
+		visible
+		rz = self
+		for n
+			rz *= self
+
+	inline Pow2 (|float|)
+		return self*self
+
+	inline Pow3 (|float|)
+		return self*self*self
+
+	inline Pow4 (|float|)
+		rz = self*self
+		rz *= rz
+
+	inline Pow6 (|float|)
+		rz = self*self
+		rz = rz*rz*rz
+
+	inline Pow8 (|float|)
+		rz = self * self
+		rz *= rz
+		rz *= rz
+
+
+
+inline float.UnMix (|float| X, |float| Y, |float|) // inbetweenness
+	return (self - x)/(Y - X)
+
+function float.Mix (|vec4| A, |vec4| B, |vec4|)
+	cpp_Part Vec4Mix
+	return A + (self * (B - A))
+
+function float.Mix (|vec3| A, |vec3| B, |vec3|)
+	cpp_Part Vec3Mix
+	return A + (self * (B - A))
+
+function float.Mix (|vec2| A, |vec2| B, |vec2|)
+	cpp_Part Vec2Mix
+	return A + (self * (B - A))
+
+
+
+
+function float.RangeConvert (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
+	|| range = hfrom - lfrom
+	// if its lfrom, return lto
+	// if its hfrom, return hto
+	|| inbetweenfromness = (self - lfrom) / range
+	return lto + (inbetweenfromness * (hto - lto))
+
+function float.RangeConvertClamped (|float| lfrom, |float| hfrom, |float| lto, |float| hto, |float| )
+	self = .RangeConvert(lfrom, lto, hfrom, hto)
+	return .clamp(lto, hto)
+
+function math.RangeConvert (|float| low_from, |float| high_from, |float| low_to, |float| high_to, |FloatRangeConverter|)
+	description "Converts numbers from one range, to another range. Turns something awkward into something simple" 
+	cpp_part RangeConv4
+	return (-low_from,  1.0 / (high_from - low_from),  low_to,  high_to)|FloatRangeConverter|
+
+function math.RangeConvert (|float| low, |float| high, |FloatRangeConverterBasic|)
+	description "Same as math.RangeConvert(low, high, 0, 1)" 
+	cpp_part RangeConv2
+	return (low,  1.0 / (high - low))|FloatRangeConverterBasic|
+
+datatype FloatRangeConverter (vec4)
+	function Convert (|float| x, |float|)
+		|| f = (x + .x) * .y
+		return f.mix(.z, .w)
+
+datatype FloatRangeConverterBasic (vec2)
+	inline Convert (|float| x, |float|)
+		return (x - .x) * .y
+
+

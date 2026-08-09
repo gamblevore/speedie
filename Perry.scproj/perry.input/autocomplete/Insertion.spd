@@ -1,0 +1,498 @@
+
+
+function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
+	|| l = func_name.position
+	|| a = func_name.after 
+	if prms and prms != @arg
+		a  = prms.after
+		a += !self[a].IsTextLine
+	return r >= l and r <= a // allow a little lee-way
+	
+
+function Message.IsTextFuncLike (|bool|)
+	opt norefcounts
+	|| fn = .owningfunc(true)
+		return false
+	|| a = .first
+	require a == @thg or @dot
+	|| b = a.next
+	require b == @bra or @list
+	|| c = b.next
+	return !c or c == @arg
+
+
+function TextView.CodeInsertion (|textviewline| D, |$int| s_end, |$bool| InRange, |$int| state, |message|)
+	visible
+	opt norefcounts
+	
+	|| i2 = s_end
+	while self[i2-1] == ' '
+		--i2
+	s_end = i2
+
+	|| msg	= d.message.FindTightest(s_End)
+	|| msg0 = msg
+	|| CanUsePrms = false
+	
+	while
+		require msg
+		if (msg == @prm) and !(keys.shift or keys.option)
+			canuseprms = true
+		loop msg != @tmp and @arg
+		msg = msg.parent
+	
+	ifn (msg == @tmp) and msg.name
+		if msg in @tmp
+			|| msg2 = msg.owningmodclass
+				if (msg0 in @decl) and msg0.isfirst
+					msg0 = msg0.parent
+				if msg0 == @decl
+					if msg0 in @arg
+						return nil // right?
+					inrange = true
+					state = 4
+					return msg0					// 4: function a.b (|*|)
+		if  msg0 == @thg  and  msg0 in @decl  and  msg0.prev == @emb
+			State = -2
+			return nil
+			
+		if CanUsePrms  // myfunc(a,b,c ^)
+			state = 3
+			return msg0
+			
+		return nil
+
+	require d.range.x2 >= msg.after
+
+	if !autocomplete.IsAFunc(msg)
+		if CanUsePrms  // myfunc(a,b,c ^)
+			state = 3
+			return msg0
+		
+		if msg.IsTextFuncLike
+			state = 3
+		  else
+			state = 10
+		return msg
+	
+	|| ConstructorLike = msg ~= "constructor" or "render"
+	|| func_name = msg.first
+	|message| prms
+	if ConstructorLike and (func_name == @bra or @list)
+		prms = func_name
+		func_name = nil							// 0: constructor (|int| x)
+		inrange = .RangeCheck(s_end, msg, prms)
+	  else
+		if !func_name or func_name == @arg
+			if msg == "main"
+				state = 0 // all is good
+			  else
+				state = 1 + ConstructorLike
+			return msg // i guess?
+		prms = func_name.next
+		inrange = .RangeCheck(s_end, func_name, prms)
+		if prms == nil							// 2: constructor *
+			state = 2
+			return func_name					// 2: function a.b*
+		if (func_name == @arg)
+			state = 1 + ConstructorLike		// 1: function *{}
+												// 2: constructor *{}
+			return msg
+		ifn prms == @list or @bra // great
+			state = 2
+			return func_name					// 2: function a.b*
+	
+	|| arg = prms.next
+	require (arg==nil or @arg)
+	|| decl = prms.first
+	if !decl
+		state = 7
+		return prms								// 2: function a.b ()
+		
+	s_end = prms.after
+	
+	|message| Name
+	while decl == @decl
+		|| Type = decl.first$
+		Name = Type.next
+		if name == "..."
+			state = -1
+			return nil
+		if !name
+			state = 4
+			return decl							// 4: function a.b (|*|)
+		decl = decl.next
+	
+	if Name
+		if i2 >= s_end
+			state = -2
+			return nil							//   function a.b (|type| name)*
+		
+		if func_name
+			if i2 >= func_name.after and i2 <= prms.position
+				state = -2
+				return nil						//   function a.b*(|type| name)
+		state = 5
+		return name								// 5:function a.b (|type| name*)
+	
+	state = 3
+	return prms
+
+
+
+// abc. --> abc.*			// problem is syncing.
+
+// abc.def
+// abc.def___
+
+module PerryAutoCompleteReason
+	constants
+		tab			= "Tab"
+		escape		= "Escape"
+		sel			= "Sel"
+		modified	= "Modified"
+
+
+function TextView.ParamDisplayPlace (|message| msg, |int| x, |message|)
+	opt norefcounts
+	while msg != @arg and nil
+		if msg == @prm
+			if msg.after <= x
+				return nil
+			return msg.parent
+		msg = msg.parent
+
+
+function TextView.DoTheParamDisplayThing (|int| x, |bool| Force, |bool|) // paramthing
+	opt norefcounts
+	|| i = .ide
+	|| msg = .MessageAt(x, true)
+	|| type = (force)("displayallforced", "displayall")
+	|| msg2 = .ParamDisplayPlace(msg, x)
+		i.MaybeSendMessage(type, msg2, msg2.name, "Sel")
+	  else
+		// say that it is "forced" here? (by sending "displayallforced" to showextrainfoatpos)?
+		// and if it IS forced... we need to send that across to maybesendmessage
+		// and react to that by instantly showing the popup.
+		.ShowExtraInfoAtPos(x, type, nil)
+	return true
+	// we now have a place for params but what func?
+
+
+function TextView.PerryTryAutoComplete (|int| x, |string| type, |string| Reason, |bool|)
+	|| before	= self[x-1]
+	|| after	= self[x]
+	|| IsDot	= (before == '.') 
+	if !keys.option
+		|| OK = IsDot  or  (charset.NameMid[before]) // or (before.iswhite and after.istextline)
+			OK = !charset.LettersUnderScore[after]
+		if !OK and reason ~= PerryAutoCompleteReason.escape or PerryAutoCompleteReason.sel
+			return .DoTheParamDisplayThing(x, reason ~= PerryAutoCompleteReason.escape)
+	
+	if (reason ~!= "Sel") and (type ~= "autocomplete") and (.AutoCompleteShowingDots_ >= 1)
+		.ide.ShowAutoBeep(true)
+		return true
+	
+	|| ok2 = false
+	|| i = .ide
+	if !before.IsWhite
+		|| msg = .MessageAt(x, true)
+			i.editme.CanAutoComplete = 1
+			ok2 = i.MaybeSendMessage(type, msg, msg.name, reason)
+			rz = true
+	if !ok2 or !GUI.IsTyping
+		i.AutoComplete.CloseMenu
+
+
+function PerryIDE.SetAutoPoint (|int| x)
+	.AutoPoint = .editme.XYOfChar(x) // - (0,.editme.lineheight)
+	.PopupDisplayCorner = .autopoint // wait why do I have two?
+
+
+function message.FindPrms (|int| p, |message|)
+	opt norefcounts
+	for ch.flat in self
+		require ch.position < p
+		|| fn = ch.func
+		if (fn == @bra or @list) and (ch.after > p)
+			return ch
+
+
+function string.CharMode (|int| x, |int|)
+	|| c = self[x] 
+	if c == ' ' or '\t'
+		return ' '
+	if (c == ',' or '(') or c.istextline
+		return ','
+	if (c == '|' or ')')
+		return '|'
+	if charset.NameMid[c]
+		return '_'
+	return c
+
+
+function textview.AfterComma (|int| p, |int| x, |int|)
+	opt norefcounts
+	|| s = .text
+	while x > p
+		|| c = s.charmode(--x) 
+		if c == ','
+			return x
+		require c == ' '
+
+
+function textview.BeforeDecl (|int| p, |int| x, |bool|)
+	opt norefcounts
+	|| s = .text
+	while x < p
+		|| c = s.charmode(x++) 
+		if (c == '|')
+			return true
+		require c == ' '
+
+
+function textview.InPrmsAndBetweenDecls (|message| msg, |int| x, |int|)
+	opt norefcounts
+	// just wanna find the msg that owns us!
+	|| list = msg.findprms(x)$
+	|| fn = list.owningfunc(true)$
+	if .text.charmode(x) == ','
+		return x
+	rz = .aftercomma(list.position, x)
+	if rz
+		require .beforedecl(list.after, x)
+
+
+	
+function PerryInsert7 (|textview| self, |int| A, |bool|)
+	.DontMergeUndo
+	.InsertText("||", (A,A))
+	.Selection = A+1
+	return true								// fn X () --> fn X (|*|) 
+function PerryInsert6 (|textview| self, |intrange| a, |bool|)
+	.DontMergeUndo
+	|| toInsert = "|| name"
+
+	|| sel = a.x+1
+	if self[a.x-1] == ','
+		toInsert = " " + toInsert
+		sel++
+
+	if self[a.x2] != ')'
+		toInsert += ", "
+		
+	.InsertText(toinsert , a)
+	.Selection = sel
+	return true								// f* --> fn *
+
+function PerryInsert5 (|textview| self, |intrange| A, |bool|)
+	.DontMergeUndo
+	.InsertText(", ||", A)
+	.Selection = A.x+3
+	return true								// fn X (|type| name*) --> fn X (|type| name, |*|) 
+function PerryInsert3And4 (|textview| self, |intrange| A, |bool|)
+	.DontMergeUndo
+	.InsertText(" ", A)
+	.Insert("...", true)
+	return true								// fn X (|T*|) -->fn X (|T| *)
+function PerryInsert2 (|textview| self, |intrange| A, |bool|)
+	.DontMergeUndo
+	|| decl = " (||)"
+	if self[a.x] == ' ' or '\t'
+		decl = decl[1...]
+		A += (1,1)
+		
+	.InsertText(decl, A)
+	.Selection = .Selection.x-2
+	return true								// fn X* --> fn X (|*|)
+function PerryInsert1 (|textview| self, |intrange| a, |bool|)
+	.DontMergeUndo
+	.InsertText(" name ", a)
+	.Selection = (a.x2+1, a.x2+5)
+	return true								// f* --> fn *
+
+
+function TextView.IsClearBackLine (|int| x, |bool|)
+	while x >= 0
+		|| c = self[x--]
+		if c.IsTextLine
+			exit
+		require c == ' ' or '\t'
+	return true
+
+
+function textview.IsInClass (|textviewline| d, |bool|)
+	opt norefcounts
+	while d
+		|| msg = d.message
+			return msg.owningmodclass
+		d--
+
+
+function textview.PerryDeclKey (|bool|)
+	opt norefcounts
+	|| s = .Selection
+	require !s.width
+
+	|| d = .FindTextLine(s.x)
+	|| m = d.message
+		|| com = .InPrmsAndBetweenDecls(m, s.x)
+			return PerryInsert6(self, (com,com)+1)
+	  else
+		require .parsedmessage
+	
+	// ASSUME by here, that this line parses properly.
+	
+	|| clearback = .IsClearBackLine(s.x-1)
+	|| endofline = ._SyntacticEndOfLine(s.x)
+	|| inclass = .IsInClass(d)
+	if clearback and !inclass
+		.insert("|| ")
+		return true
+	
+	if endofline or inclass
+		|| Before = .FindBackwardsIgnoringSpaces("||", s.x)
+			if before == '\n' or '\r' 
+				.insert(" ")
+			  else
+				.insert("|")
+			return true
+		if m
+			|| decl = m.at(s.x)
+			if decl == @decl and decl == 1
+				.insert(" ")
+				return true
+
+		.insert("||")
+		.Selection = .Selection.x-1 // :)
+		return true
+
+
+
+function String.DetectNoSpaces (|string| find, |int| start, |bool| Fwd=true,  |ind|)
+	while
+		if .CharMode(start) == ' '
+			0
+		  elseif self[start, find]
+			return start
+		  else
+			return -1
+		start += fwd.dir
+
+
+function message.IsInAProperTmp (|bool|)
+	opt norefcounts
+	real self
+	while
+		self = .parent
+		if !self
+			return false
+		|| fn = .func
+		if fn == @arg
+			return false
+		if fn == @tmp
+			return true
+
+
+function textview.PerryInsertSyntax (|keys| Key, |int| OrigKey, |int|)
+	opt norefcounts
+	|| ide = .ide
+	if  key is escape  and  ide.PopupDateOn.ago > 0.5s
+		ide.PopupHide
+		return 1
+	require  .JeeboxMode is Expect
+	
+	|| s = .Selection
+	|| i2 = s.x2
+	if  !s.width
+		if key is escape
+			return .PerryTryAutoComplete(i2, "autocomplete", PerryAutoCompleteReason.escape)|int|
+		|| back = .text.DetectNoSpaces("|", i2-1, false)
+		|| fwd  = .text.DetectNoSpaces("|", i2)
+		if back and fwd // OK we are inside ||
+			fwd++
+			while .text.CharMode(fwd) == ' '
+				fwd++
+			
+			s = (fwd, 0)
+			while .text.CharMode(fwd) == '_'
+				fwd++
+			s.x2 = fwd
+			.Selection = s
+			return 1
+	
+	require key isnt escape
+	|| dd = .FindTextLine(s.x)
+	require  (dd contains i2)
+	|| err = dd.lineerror
+		require err isnt parse
+	
+	|int| state
+	|| inrange = false
+	|| where = .CodeInsertion(dd, i2, inrange, state)
+	if state == -2
+		return 0
+	if state == -1
+		beep
+		return 1
+	
+	if key == '\n'
+		require state != 10
+		if (origkey < 0) and !(where and where.IsInAProperTmp)
+			return 0 // really... the special behaviour should be in here
+					 // we should just insert the text ourself, then tell the caller to NOT insert it.
+		if !s.width
+			require !self[s.x-1].istextline
+		if (state >= 3)  and  !s.width 
+			return (s.x <= i2)|int|
+		if (state == 2)
+			if s.width
+				.Selection = s.x2x2
+			return 1 // why not
+		return 0 // i think?
+	
+	|| after= (where!=nil)(where.after, 0)
+	|| A	= (after, after)
+	if state != 10  and  (!s.width or state == 5)
+		if state == 1
+			return PerryInsert1(self, A)|int|
+		if state == 2
+			return PerryInsert2(self, A)|int|
+		if state == 7
+			if where
+				return PerryInsert7(self, where.position+1)|int|
+		if inrange
+			if state == 4
+				return PerryInsert3And4(self, A)|int|
+			if state == 5
+				return PerryInsert5(self, A)|int|
+
+	|| prevchar = self[i2-1]
+	require (prevchar == '.') or charSet.NameMid[prevchar]
+	
+	if ide.EditMeTabRetryThing
+		return 0
+	if  !s.width  and  (key is tab)  and  self[s.x].istextline
+		|| C = .ide.autocomplete.listsource.Count
+		if C > 0 
+			if c == 1 and .AutoCompleteShowingDots_ == -1
+				return 0 // what?
+			if .PerryTryAutoComplete(s.x, "autocomplete", PerryAutoCompleteReason.tab)
+				ide.EditmeTabRetryThing = 1
+				return 2
+
+
+function PerryIDE.IsEditingSource (|bool|)
+	opt norefcounts
+	|| f = .CurrFileRow
+		return f.FilePath.isspd // or "jb" or "jbin"
+
+	
+function string.IsSpd (|bool|)
+	return self isa "uwu" or "spd" or "spd.jbin"
+
+
+function guicontrol.IDE (|perryide!|)
+	opt norefcounts
+	real self
+	return (.window as perryide)!

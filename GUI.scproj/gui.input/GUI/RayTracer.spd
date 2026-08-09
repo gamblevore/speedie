@@ -1,0 +1,555 @@
+	
+
+// todo whenever its fun?
+// * 4 threads, each can do one cell.
+// * default RayTracer constructor uses block positioning system to match 2D/3D closely
+// * Schlick's approximiation for materials? just hard-code a light somewhere
+// * anti-aliasing preserve average luminosity (gamma correction?)
+		// * Object-anti-aliasing best done by storing one row width of 32-bit ints.
+
+
+// Advancements: (do AFTER we have perry+speedie in an awesome state)
+// 1) Make SpaceTree work
+// 2) Optimisations around unmoving objects
+// 3) hit-detection (float pos becomes chunk relative)
+// 4) modelling system? or at least someway to construct better shapes.
+// 5) more shapes:
+	// * voxel  / sloped voxels
+	// * pipe   / half-pipes
+	// * sphere / block
+	// * SDFs
+		// * merge voxels, bend pipes, blobby spheres
+	// (All shapes: Provide raydist for drawing, nearest point for hit-detection)
+	
+
+
+
+class RayTracer
+	visible false
+	linkage:cpp_part Ray
+	|float|				MaxViewDist
+	//
+	|vec4|				Size
+	|vec2|				Scale
+	|vec2|				Adjust
+	|vec4[4]|			Planes
+	|byte|				RayAccuracy
+	
+	//
+	|vec3|				_HalfWay
+	|Vec3|				_CamDir
+	|vec2|				_XY
+	|vec3|				_iDir
+	|Mat4|				_LookAt
+	|vec4|				_RayHit
+	|vec3|				_Fwd
+
+	|Vec3|				MainLight
+	|Vec3|				Camera
+	|vec3|				_Rotation	// we can have yaw, pitch, and roll. I think roll (z) is mostly unused.
+	|byte|				_StillGood
+		
+	|&RayBoost|			RootNode	// make these not ?!
+	|&RayTraceNode|		EndNodes
+	|?&RayTraceCell|	Cells
+	|?&RayTraceNode|	StartNodes
+	|?&RayTraceNode|	CurrNode
+	//
+	|DistanceFunction|	Background
+
+	|?&pico[4]|			Workers //!!nice I guess we can send messages? or not?
+								// maybe easier to start/stop? or just spin on a value?
+								// we could reduce pico to "just a place to store a few data pointers"
+	visible true
+	|[vobject]|			Shapes
+	
+	
+	module
+		|float| AdjustmentFinder = 0.8
+		function New (|vec3| Camera, |int| Buff=8MB, |raytracer|)
+			|| root = memory.zalloc(Buff)|&rayboost|
+				return RayTracer(camera, buff, root)
+
+
+	constructor (|vec3| Camera, |int| Buff, |&rayboost| root)
+		// Default RayTracer constructor should use the block positioning system
+		// either by zpos or zoom
+		.Camera() = Camera
+		.RayAccuracy = 40
+		.RootNode = root
+		.MainLight = vec3(5, 20, -10).Normal
+		.Background = &vshapes.Black
+		.EndNodes = (root|&byte| + Buff)|&RayTraceNode|
+		.MaxViewDist = 1000.0
+	
+		
+	setter MainLight (|vec3|)
+		.MainLight = Value.normal|vec4|.makesane|vec3|
+	
+	setter Camera (|vec3|)
+		Value = Value|vec4|.MakeSane|vec3|
+		if .Camera != value
+			.Camera = Value
+			._StillGood = 0
+
+
+	function Rotation (|vec3|)
+		return ._Rotation
+	
+	
+	setter Rotation (|vec3|)
+		value = Value.Fract
+		if ._rotation != value
+			._Rotation = Value
+			._StillGood = 0
+	
+	
+	function ViewMat (|&mat4|)
+		ifn ._StillGood & 2
+			._StillGood |= 2
+			._LookAt = ._Rotation.y.SinCos.RotateAroundY
+			|| M = ._Rotation.x.SinCos.RotateAroundX
+			._LookAt *= M
+			._Fwd = (0.0, 0.0, 1.0) * ._LookAt
+		return ._LookAt
+	
+
+	libinternal BG (|vec4|)
+//(|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| D=vec4(), |rayinfo|)		
+		|| P = .Camera
+		p.w = 1.0
+		|vec2| D
+		D = (._xy + .adjust) * .scale
+		|| V = 0
+		return (.Background)(v|vobject!|, self, P, (D,D))
+	
+	
+	libinternal AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
+		opt min 3, opt norefcounts
+		|| C = pxl.color
+		for i in 4
+			|| sh = ((i&1, i>>1).Vec2 - 0.5) * 0.70711
+			.Prepare(xy + sh)
+			|| B = .FindBestObj(cell.obj)
+			C += .ObjColor(B, cell.obj)
+		pxl.AppendRGB((C*0.2)|vec3|)
+	
+
+	libinternal imagepixel.AppendRGB (|&imagepixel| self, |vec3| V)
+		self|&imagepixelstruct|.AppendVec3(v)
+	
+
+	libinternal Prepare (|vec2| XY)
+		._XY = XY
+		._CamDir = .Dir(xy)
+		._HalfWay = (._camdir - .MainLight).normal
+		._idir = (-1.0 / ._CamDir)//|vec4|.makesane|vec3|
+
+// How to stipple if inside the obj?  what if its right in front of us?
+// what about volumetrics?
+			
+// For transparent objects... if they are all the same material
+// and nothing inbetween... we can just... "add up the distance?"
+
+// I think the func should do the coloring too.
+// now, what if we passed the object? we need a maximum distance. like raydist+radius.
+
+	libinternal ColorSub (|vobject| B, |vec4|)
+		|| H = ._RayHit
+		|| P = .Camera + ._CamDir * H.x
+		p.w = 1.0
+		return (B.shape)(B, self, P, H)
+
+
+	libinternal ObjColor (|vobject?| B, |vobject| S, |vec4|)
+		opt min 3,   opt norefcounts
+		if B
+			|| C = .colorsub(b)
+			if c.a >= 0.996
+				return c
+			return c.a.mix(.BG, c)
+			// seems very slow. We will need opencl first.
+//			|| b2 = .FindBestObj(S, b)
+//			if !b2
+//				return mix(.BG, c, c.a)
+//
+//			|| C2 = .colorsub(b2)
+//			if c2.a < 0.996
+//				c2 = mix(.BG, c2, c2.a)
+
+//			return mix(C2, c, c.a)
+		return .bg
+
+		
+	libinternal FindBestObj (|vobject?| sp, |vobject?| ignore=nil,  |vobject|)
+		opt min 3,   opt norefcounts
+		|| Best = float.max
+		._RayHit = rayinfo.miss
+		while sp
+			if sp != ignore
+				|| Hit = .FindSub(sp)
+				if  hit.x < Best  and  hit.z <= 1024th
+					rz = sp
+					._Rayhit = hit
+					best = hit.x
+			sp = sp._CellNext
+	
+	
+	libinternal FindSub (|vobject| sp, |vec4|)
+		opt min 3
+		|| P = .Camera, p.w = 1.0
+		|| hit = (sp.Shape)(sp, self, P)
+		if hit.y or hit.x >= float.max // analytical shape.
+			hit.z = 0
+			return hit
+		
+		|| d = hit.x
+		for .RayAccuracy
+			P = .Camera + ._camdir*d,  P.w = 1.0	// Scaling factor
+			Hit = (sp.Shape)(sp, self, P)
+			d += (hit.x + 4096th)
+			if  hit.y  or  hit.x <= 1024th
+				hit.z = hit.x
+				hit.x = d
+				return hit
+			
+			if  d >= sp._MaxDist
+				exit
+		return rayinfo.miss
+		
+		
+	libinternal Dir (|vec2| XY, |vec3|)
+		|| XY2 = (xy + .adjust) * .scale // -0.5 to +0.5
+		rz = (xy2, 1.0).Normal * ._LookAt
+	
+	
+	libinternal Plane (|vec4| P, |vec4|)
+		|| D1 = .Dir(P.xy)
+		|| D2 = .Dir(p.x2y2)
+		return Plane3D.normals(d1, d2, .Camera)
+
+
+	libinternal PlaneOK (|vec4| R, |vec4| Pos, |int| i, |bool|)
+		opt inline
+		return .Planes[i].BoxVsPlane(r, pos) > 0
+
+
+	libinternal RemakeNodes (|int| S)
+		.InitAllCells
+		for C in self
+			C.Node = nil
+			C.Stride = S
+		ifn ._StillGood & 1
+			._StillGood |= 1
+			.Planes[0] = -.plane(.size.x1y1x1y2) // 0001 // left
+			.Planes[1] =  .plane(.size.x2y1x2y2) // 1011 // right
+			.Planes[2] =  .plane(.size.x1y1x2y1) // 0010 // bottom
+			.Planes[3] = -.plane(.size.x1y2x2y2) // 0111 // top
+			.RootNode.Divide(self)
+	
+		
+	libinternal FindCameraDist (|vobject| obj, |float| Max)
+		// lets us find out the max/min SDF distance.
+		|| V = obj.adjustpos(1) - .Camera
+		|| DMin = V.Length
+		|| DMax = DMin
+		|| R = obj.ActualRadius
+
+		if V • ._Fwd < 0
+			dmax = R-Dmax
+			dmin = -r-dmin
+		  else
+			Dmax += R
+			Dmin -= R
+		
+		obj._MinDist = 0
+		obj._MaxDist = 0
+		if  (Dmax > 128th)  and  (Dmin < Max)
+			obj._MinDist = Dmin
+			obj._MaxDist = Dmax
+	
+	
+	libinternal InPlanes (|VObject| b, |bool|)
+		opt min 3
+		if b._maxdist
+			|| R = (b.radius, 0.0)
+			|| P = (b.Pos,  1.0)
+			return .PlaneOK(r,p,0) and .PlaneOK(r,p,1) and .PlaneOK(r,p,2) and .PlaneOK(r,p,3)
+		// Could also (later) check if the nearest frustrum point is in the box.
+		// Need points[8] and a way to find which is the nearest to the box, or just check all?
+
+	
+	function @raytracer.DistanceSorter (SorterComparer of vobject)
+		return b._MinDist  <  ._MinDist // biggest dist first. We also store in reverse. So we store nearest first.
+		
+		
+	libinternal PlayQuidditch (|int| Stride)
+		opt norefcounts
+		.RemakeNodes(stride)
+		for s in .Shapes
+			.FindCameraDist(s, .MaxViewDist)
+
+		.Shapes.Sort(DistanceSorter)
+		
+		|| id = 1
+		for s in .shapes
+			if .InPlanes(s)   // Todo: if shape covers cell, mark cell as covered
+				if id >= 256
+					id = 1 
+				s._DrawID = id++
+				
+				.Quadditch(.rootnode, s)
+
+	 
+	function RayTrace (|image| where)
+		opt min 3
+		.ViewMat
+		.size = where.size.__xy.vec4
+		.scale = 1.0/.size.x2x2
+		.adjust = .size.x2y2 * -0.5
+		.PlayQuidditch(where.width)
+		for C in self
+			.TraceCell(C, where[c.xy.ivec2])
+		for s in .Shapes
+			s.AdjustPos(-1)
+
+	
+	
+	iterator
+		|| C = .Cells!
+		|| C2 = C + .rootnode.area
+		while C < C2
+			yield C
+			C++
+			
+		
+	libinternal TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
+		// making it look easy
+		opt min 3, opt norefcounts
+		cell.Link
+		|| P = cell.xy
+		|| pxl3 = pxl - cell.stride * cell.h
+		
+		while pxl > pxl3
+			|| pxl2 = pxl + cell.w
+			while pxl < pxl2
+				#! Main pixel color
+				cell.Aliased = false
+				.Prepare(p)
+				pxl.a = 0
+				|| b = .FindBestObj(cell.obj)
+					pxl.a = b._DrawID
+				pxl.appendrgb(.ObjColor(B, cell.obj)|vec3|)
+				
+				if !keys.l[]
+					|| LeftAA = pxl-1
+					if  p.x  and  pxl.a != leftaa.a
+						.AntiAlias(p-(1.0,0), cell, leftAA)
+						.AntiAlias(p, cell, pxl)
+						cell.Aliased = true
+					
+					if p.y
+						|| belowAA = pxl + cell.stride
+						if pxl.a != belowAA.a
+							.AntiAlias(p-(0,1.0), cell, belowAA)
+							if !cell.Aliased
+								.AntiAlias(p, cell, pxl)
+				pxl++
+				p.x++
+			pxl -= (cell.stride + cell.w)
+			p.y++
+			p.x = cell.xy.x
+		cell.node = nil
+	
+	
+	libinternal int._Log2P (|int|)
+		description "Same as log2, except it rounds up.  So (17).log2p == 5, because 4 won't be enough but 5 will!"
+		|| p = .log2
+		return p + (self!=1<<p)
+
+	
+	libinternal InitAllCells (|&RayBoost|)
+		|| s2 = (0, 0, gui.Screen.Width, gui.Screen.height)
+		rz = .RootNode
+		if rz.size != s2
+			rz.size = s2
+	
+			|| px = 5
+			rz.cellswide = (s2.x2+((px)~bits)) >> px
+			rz.cellshigh = (s2.y2+((px)~bits)) >> px
+			
+			|| Last = rz.InitialCreation(rz+1, s2.x2._Log2P-1, px)
+			._StillGood = 0
+			.cells = last|&Raytracecell|
+			.StartNodes = (.cells+rz.area+1)|&RayTraceNode| // +1 for fakecell
+			while last-- > rz
+				if !last.depth and last.px
+					last.Init(self)
+		.CurrNode = .StartNodes
+
+
+
+struct RayBoost
+	|vec4|					XDiv
+	|vec4|					YDiv			
+	|ivec4|					Size
+	|!(&RayBoost)[4]|		Quad			// rather shrink Quad
+	|byte|					Depth	
+	|byte|					PX
+	|byte|					CellsWide		// shared with root
+	|byte|					CellsHigh		// shared with root
+	|byte|					ThreadLock		// In case I want to multi-thread
+
+	function Area (|int|)
+		return .CellsWide|int| * .CellsHigh|int|
+
+
+	libinternal Init (|raytracer| T)
+		for i in 4
+			.quad[i] = .InitCell(T, i&1, i>>1)|&rayboost|
+			
+	
+	libinternal InitCell (|raytracer| T, |int| x, |int| y, |&RayTraceCell|)
+		|| sz = .size
+		|| CellStart = sz.xy + ((x,y) << .px)
+		|| CellEnd = (CellStart + (1<<.px)) min sz.x2y2
+		|| D = CellEnd - CellStart
+		rz = T.Cells!
+		if d.x > 0 and d.y > 0
+			|| i = (CellStart>>.px)  fma  .CellsWide
+			rz  +=  i
+			rz.xy = CellStart.vec2
+			rz.w = d.x
+			rz.h = d.y
+		  else
+			rz  +=  .area // fake cell. should never be reached? but might be?
+	
+
+	libinternal raytracer.Quadditch (|RayBoost| ff, |VObject| v, |int| i=-1)
+		real self,  opt min 3
+		if i >= 0
+			|| D = ff.depth
+			ff = ff.quad[i]!
+			if !D
+				|| Cell = ff|&raytracecell|
+				|| RT = .currNode!++
+				if RT < .EndNodes	
+					|| Old = cell.node
+					cell.node = RT
+					RT.next = old
+					RT.Draw = V
+				return				
+			require ff.PX
+		
+		// for big chunks, we should also test that the quad corners are in the object.
+		// inigo quilez has a good article on this.
+		|| Rd = (v.radius, 0.0)
+		|| RX = Rd sign ff.xdiv
+		|| RY = Rd sign ff.ydiv
+		|| VP = (v.Pos, 1.0)
+		|| L = ff.xdiv • (VP + RX) > 0
+		|| R = ff.xdiv • (VP - RX) < 0
+		|| B = ff.ydiv • (VP + RY) > 0
+		|| T = ff.ydiv • (VP - RY) < 0
+		
+		if (b|||t) & (l|||r)
+			if (L+R)+(B+T) == 2
+				return .Quadditch(ff, V, R + (T<<1)) // tailcall
+			
+			if B
+				if L
+					.Quadditch(ff, V, 0)
+				if R
+					.Quadditch(ff, V, 1)
+			if T	
+				if L
+					.Quadditch(ff, V, 2)
+				if R
+					return .Quadditch(ff, V, 3)
+
+	
+	function Divide (|raytracer| T)
+		opt min 3
+		|| S = .size.vec4
+		require s.IsPositive            			// do nothing
+		|| Sh = .px+.depth
+		|| mid = s.xy+(1 << sh)|float|
+		.yDiv = t.plane((  s.x2, mid.y,   s.x, mid.y)).MakeSane
+		.xDiv = t.plane((mid.x,    s.y, mid.x,   s.y2)).MakeSane
+		
+		if .Depth
+			for i in 4
+				.quad[i].Divide(t)
+	
+	
+	libinternal InitialCreation (|!&RayBoost| Last, |int| H, |int| px, |!&RayBoost|)
+		.depth = H-px
+		.px = px
+
+		if h <= px
+			return last
+
+		for i in 4
+			.quad[i] = last++
+		
+		|| bounds = .Size
+		|| xy = bounds.xy
+		|| hh = 1<<H
+		|| LB = (xy, xy+hh)
+		for y in 2	
+			for x in 2
+				|| S = lb + hh * (x,y,x,y)
+				|| Q = .Quad[x + y<<1]!
+				Q.depth = 0
+				Q.size = s.clip(bounds)
+				q.CellsWide = .CellsWide
+				q.CellsHigh = .CellsHigh
+				if q.size.ispositive
+					last = Q.InitialCreation(last, H-1, px)
+				  else
+					q.px = 0 // unreachable
+		
+		return last
+
+
+
+struct RayTraceNode
+	|?vobject--|				Draw
+	|?&RayTraceNode|			Next
+	// Could be nice to put 3 items on here.
+	// This makes it cache nicely! faster memory :)
+
+
+struct RayTraceCell
+// if we thread this, the idir/dir has to go here.
+// or at least on some per-thread info.
+	|vec2|						XY
+	|?&RayTraceNode|			Node
+	|uint16|					Stride
+	|byte|						H
+	|byte|						W
+	|bool|						Aliased
+
+	libinternal Obj (|vobject|)
+		|| n = .node
+			return n.draw
+			
+	libinternal Link
+		opt min 3, opt norefcounts
+		|| curr = .Node
+		while curr
+			|| obj = curr.Draw$
+			|| nxt = curr.Next
+				obj._CellNext = nxt.draw
+			  else
+				obj._CellNext = nil
+			curr = nxt
+	
+ 
+function Vec4.BoxVsPlane (|vec4| R, |vec4| Pos, |float|)
+	description "Pos.w must be 1.0,  r.w must be 0.0"
+	|| RB = R sign self
+	return self • (pos + RB)
+
+
+

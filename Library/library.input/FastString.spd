@@ -1,0 +1,339 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class FastString {
+	linkage
+		wrapper
+		cpp_part FS
+		stateful
+
+// Fast appends and tools for building data formats
+
+	|int|			Length
+	|&Byte|			_Addr
+	|?object|		_Result
+	|?File|			File
+	|int64|			_WrittenLength
+	|int|			_Size
+	|uint16|		Indent
+	|Byte|			IndentChar
+	
+/////
+
+	constructor							{ cpp_wrapper JB_FS_Constructor }
+	constructor (|int| BufferSize)		{ cpp_wrapper JB_FS_ConstructorSize }
+	destructor							{ cpp_wrapper JB_FS_Destructor }
+
+	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
+	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
+	setter _Result (|int|)				{ disabled }
+	setter _Addr (|int|)				{ disabled }
+	
+	function AppendLower (|string| data)
+		cpp_wrapper JB_FS_AppendLower
+	function FreeSize (|int|)			{ cpp_wrapper JB_FS_FreeSize }
+	function FreeSize (assigns:|int|, |&byte|) {cpp_wrapper JB_FS_NeedSpare}
+
+	setter File (|File?|)
+		cpp_wrapper JB_FS_FileSet
+
+	function StreamLength (|int|) {
+		cpp_wrapper JB_FS_StreamLength
+		description "This is the-written-to-disk-length + the-length-current in the faststring. If the faststring did not flush anything to disk (maybe it has no file), then .StreamLength == .length"
+	}
+
+	function Size (|int|)				{ cpp_wrapper JB_FS_Size }
+	function Size (assigns:|int|)		{ cpp_wrapper JB_FS_SizeSet }
+	function AppendMultiReplace (|string| s, |{string}| m, |ErrorReceiver| Rec=stderr) { cpp_wrapper JB_FS_AppendMultiReplace }
+		
+	function AppendHex (|int64| Num, |int|RoundTo=2)
+		cpp_wrapper JB_FS_AppendHex
+	
+	function AppendHexData (|string| Data)
+		cpp_part AppendHexStr
+		if data
+			.AppendHexData(Data.addr, data.length)
+	
+	function AppendHexData (|&byte| Data, |int| N, |int| Spaces=0)
+		cpp_wrapper JB_FS_AppendHexData
+
+	function AppendRange (|String| Data, |ivec2| Range)
+		cpp_part AppendIvec2
+		.AppendRange(data, range[0], range[1])
+		
+	function AppendRange (|String| Data, |int| Start, |int| After=int.max)
+		// would be nice if speedie can optimise
+		// fs <~ a[b,c]				// into
+		// fs.appendrange(a,b,c)
+		// perhaps it could do this for all classes? like Syntax AppendRange
+		// i guess only faststring needs it though. perhaps other things want string ranges
+		// fastbuff or whatever.
+		cpp_wrapper JB_FS_AppendRange
+
+	function AppendSection
+		disabled "use .AppendRange"
+
+	autogen AppendHex3 (|int| Num)
+		cpp_wrapper JB_FS_AppendHex3 // not really needed. remove this later. Only my obj-saver needs this.
+	
+	function AppendUTF8 (|codepoint| Num)	{ cpp_wrapper JB_FS_AppendUTF8Char }
+	function IndentLine						{ cpp_wrapper JB_FS_LineIndent }
+	function AppendIndent					{ cpp_wrapper JB_FS_AppendIndent }
+	function Flush	(|bool|)				{ cpp_wrapper JB_FS_Flush }
+	function Remove (|Byte| b)				{ cpp_wrapper JB_FS_RemoveByte }
+	function GetResult (|string|)
+		nil self
+		cpp_wrapper JB_FS_GetResult
+	function GetResult (|object?| other, |string|)
+		nil self
+		cpp_wrapper JB_FS_SmartResult
+	
+	function Reserve (|int| N, |&byte|)
+		cpp_wrapper JB_FS_WriteAlloc_
+
+	function AppendHInt (|int64| n)
+		|| s = (n>=0)(n, -n)				// what about int.min?
+		while s >= 128
+			.AppendByte(s ||| 128)
+			s >>= 7
+		if n >= 0
+			return .AppendByte(s)
+			
+		.AppendByte(s ||| 128)
+		.AppendByte(0) // signbyte!
+		
+	render
+		opt norefcounts
+		if !fs_in
+			return self|string|.Copy // don't wanna clear this FS! we are still appending on it!
+		fs_in <~ self
+
+	syntax Append (|Byte| data, |int| count)
+		cpp_wrapper JB_FS_AppendMultiByte
+
+	syntax Append (|[string]| data, |string| sep)
+		cpp_part AppendJoin
+		opt norefcounts
+		self <~ data[]
+		|| i = 0
+		while 
+			|| s = data[++i]
+			loop s != nil
+			self <~ sep
+			self <~ s
+
+	syntax Append (|string| data, |int| count)
+		cpp_part AppendMultiStr
+		|| needed = data.Length * count
+		if .FreeSize < needed
+			.FreeSize = needed
+		for count
+			self <~ data
+
+	function AppendQuotedEscape (|string| s, |byte| Quote = 0)
+		if !Quote
+			quote = '"'
+		self <~ Quote
+		.appendescape(s)
+		self <~ Quote
+	
+	function AppendEscape (|string| s)
+		.AppendMultiReplace( s, jeebox.EscapeStr )
+
+	inline LengthUTF8 (|int|)
+		return self|string|.LengthUTF8
+
+	module
+		function UseAsOutput (|object| other, |FastString|)
+			opt norefcounts
+			if other
+				if other isa FastString
+					return other
+				if other isa file
+					return faststring(other)
+				if other isa string
+					return other.OutputStream
+				error (other, "FastString can't use this object.")
+			return faststring.new(nil|faststring|)
+		
+		function New (|FastString?| other, |FastString|)
+			cpp_wrapper JB_FS__FastNew
+		
+		autogen Shared (|faststring|)
+			inlined
+			description "Don't use this :] Only I know how to use it properly"
+			return faststring(nil|faststring|)
+
+		inline New (|file!| F, |FastString|)
+			cpp_part NewFile
+			opt norefcounts
+			|| fs = FastString()
+			fs.file = F
+			return fs
+		
+
+	syntax Access (|int| Offset, |Byte|)
+		cpp_wrapper JB_FS_Byte
+	
+	syntax Access (|int| Offset, assigns:|Byte|)
+		cpp_wrapper JB_FS_ByteSet
+	
+	function Last (|int| off=0, |int|)
+		cpp_wrapper JB_FS_Last
+	
+	syntax Append (|string?| data)
+		cpp_wrapper JB_FS_AppendString
+	
+	syntax Append (|FastString| fs)
+		cpp_part AppendFastString
+		inlined
+		.Syntaxappend(fs|string|)
+		
+	function AppendByte (|Byte| data)
+		cpp_wrapper JB_FS_AppendByte
+	
+	syntax Append (|Byte| data)
+		cpp_part AppendByte2
+		inlined
+		.appendbyte(data)
+		
+	syntax Append (|vec3| data)
+		cpp_part AppendVec3 // shouldn't be necessay, .render(fs) should be called
+		opt norefcounts
+		real self
+		inlined
+		data.Render(self)
+		
+	syntax Append (|vec4| data) // same
+		cpp_part AppendVec4
+		opt norefcounts
+		real self
+		inlined
+		data.Render(self)
+
+	function AppendDecimal (|int64| data, |int| PadTo = 1)
+		// less confuseable with appendinteger!
+		cpp_wrapper JB_FS_AppendIntegerAsText
+
+	function AppendInteger (|int64| data, |int|RoundTo=1)
+		disabled "AppendDecimal or AppendInt?"
+	
+	function AppendIntegerAsText (|int64| data, |int|RoundTo=1)
+		disabled "use .AppendDecimal"
+	
+	function AppendInt (|int| data)
+		cpp_Wrapper JB_FS_AppendInteger
+	
+	function AppendInt64 (|int64| data)
+		cpp_Wrapper JB_FS_AppendInteger64
+			
+	function AppendShort (|uint16| data)
+		cpp_wrapper JB_FS_AppendShort
+
+	syntax Append (|int64| data)
+		inlined // disambiguation
+		cpp_part AppendInt64
+		.AppendDecimal(data, 1)
+	
+	syntax Append (|uint64| data)
+		inlined // disambiguation
+		cpp_part AppendUInt64
+		.AppendDecimal(data, 1)
+	
+	syntax Append (|uint| data)
+		inlined // disambiguation
+		cpp_part AppendUint
+		.AppendDecimal(data, 1)
+
+	syntax Append (|uint16| data)
+		inlined // disambiguation
+		cpp_part AppendUint16
+		.AppendDecimal(data, 1)
+
+	syntax Append (|int| data)
+		inlined // disambiguation
+		cpp_part AppendInt32
+		.AppendDecimal(data, 1)
+	
+	syntax cast (|string|)
+		inlined
+		return .getresult
+
+	
+	syntax Append (|cstring| Str)
+		cpp_wrapper JB_FS_AppendCString
+
+	
+	function Field (|string| name, |string| data)
+		cpp_part AppendInfo
+		if data
+			.fieldstart(name)
+			.AppendQuotedEscape(data)
+	
+	inline PadTo (|int| n, |byte| b=' ')
+		self <~ (b, n-.length)
+	
+	function FieldStart (|string| name)
+		.IndentLine
+		if name
+			self <~ name
+			self <~ ' '
+
+	inline FieldEnter (|string| name)
+		.fieldstart(name)
+		++.indent
+
+	function FieldFloat (|string| name, |Float64| data)
+		cpp_part AppendInfoFloat
+		if data
+			.fieldstart(name)
+			self <~ data
+
+	function Field (|string| name, |int64| data)
+		cpp_part AppendInfoNum
+		if data
+			.fieldstart(name)
+			self <~ data
+
+	function AppendMemory (|&byte| Str, |int| N)
+		cpp_wrapper JB_FS_AppendMem_
+	
+	function AppendDurr (|Date| D)
+		cpp_wrapper JB_FS_AppendDurr
+
+	function AppendLocalTime (|Date| D)
+		cpp_wrapper JB_FS_AppendLocalTime
+
+	syntax Append (|Float| F)
+		cpp_name JB_FS_AppendFloatAsText
+		inlined
+		self <~ F|Float64|
+
+	syntax Append (|Float64| D)
+		cpp_wrapper JB_FS_AppendDoubleAsText0
+	
+	function AppendDouble (|Float64| D, |int| dp=1, |bool| CanExp=false)
+		cpp_wrapper JB_FS_AppendDoubleAsText
+	
+	function AppendFloat (|float| D, |int| dp=1, |bool| CanExp=false)
+		inlined
+		.AppendDouble(D|Float64|, dp, canexp)
+	
+	syntax Append (|bool| B)
+		cpp_name JB_FS_AppendBool
+		inlined
+		opt norefcounts
+		self <~ b.string
+		
+	macro SyntaxAppend
+		_1.render(_0)
+		
+
+	syntax Compare (|int| n, |int|)
+		inlined
+		return .streamlength - n
+}
+

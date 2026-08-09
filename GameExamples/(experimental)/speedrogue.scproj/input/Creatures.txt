@@ -1,0 +1,89 @@
+//jb
+classes
+	Warrior "!"
+		color white
+		health 20
+		strength 5
+	Monk "!"
+		color yellow
+		health 15
+		strength 4
+		speed 2
+
+weapons
+	knife "slash" (5)
+		strength 5
+		
+	stave "swing" (5)
+		strength 5
+		
+	steel_whip "swipe at" (3)
+		strength 2
+		range 3
+		
+	sword "slice" (5)
+		strength 7
+		range 2
+	claws "slice" (4)
+		strength 9
+
+
+armor
+	padded
+		`(aka "gambisson"). This tough armour absorbs most except the strongest of blows`
+		strength 6
+	
+	leather
+		"Typical leather armour"
+		strength 3
+	
+	fine_cloth
+		"magical threads"
+		strength 1
+	
+	plate
+		"Weighty. But tank-like. You don't want to be facing this."
+		strength 12
+	
+
+monsters	
+	Rat "r" (1-3)
+		"Eek eek!"
+		health 8
+		strength 1
+		gear (0.5.knife)
+		
+	Jelly "j" (1-3)
+		"glob glob!"
+		health 15
+		strength 2
+		gear (0.05.leather)
+		
+	Jelly "J" (4-4)
+		"glob glob!"
+		health 15
+		strength 2
+		items (0.05.plate)
+		
+	Orc "O" (4-5)
+		"A tough mean brute dedicated on destruction."
+		health 30
+		strength 2
+		gear (leather, padded)
+		gear (sword)
+		items (health_potion)
+
+	Goblin "g" (4-5)
+		"You no take candle!"
+		health 20
+		strength 2
+		gear (leather)
+		gear (knife)
+
+	Peridot_Warrior "P" (4-5)
+		"Warrior dressed in peridot studded armour"
+		health 40
+		strength 5
+		gear (plate, leather)
+		gear (steel_whip)
+

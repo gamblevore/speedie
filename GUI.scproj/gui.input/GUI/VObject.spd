@@ -1,0 +1,190 @@
+
+
+
+
+class VObject (list)
+	|vec3|			Pos				// .w = graphical aura size
+	|vec3|			Radius			// .w = rounding
+	|vec3|			Velocity		// .w = vibration, for struck objects
+	|vec4|			Color			// image pixel?
+	|float|			Health
+	|int|			ID
+	|DistanceFunction| Shape
+
+	visible false
+	// ray acceleration
+	|byte|			_DrawID
+	|float|			_MaxDist
+	|float|			_MinDist
+	|?VObject--|	_CellNext
+	
+	visible true
+	
+
+	constructor (|vec3| Pos,  |vec3| Rad, |DistanceFunction| shape,  |vec4| Color=colors.white)
+		cpp_part ConstructorShape
+		.pos = pos
+		.Shape = shape
+		.Radius = rad
+		.Color = color
+		.Health = 256
+		.id = ++ObjID
+	
+	inline BigR (|float|)
+		return .radius.max
+		
+	function Towards (|vec3| P, |float| Speed)
+		.Velocity = (P - .pos).Normal * Speed
+	
+	inline y (|float|)
+		return .pos.y
+
+	inline x (|float|)
+		return .pos.x
+
+	inline left (|float|)
+		return .pos.x - .Radius.x
+
+	inline right (|float|)
+		return .pos.x + .Radius.x
+	
+	setter Size	(|vec3|)
+		.Radius = value*0.5
+		
+	function Box2D (|vec4|)
+		|| rad = .Radius.xy
+		|| p = .pos.xy
+		return (P-rad, P+rad)
+
+	inline Step
+		.pos += .Velocity
+
+	function OverlapsBlock (|VObject| B, |vec4|)
+		return .OverlapsRect(b.box2d)
+	
+	function OverlapsRect (|vec4| B, |vec4|)
+		return B.Clip(.box2d)
+	
+	inline Screen (|ivec4|)
+		return .box2d.Screen
+	
+	syntax cast (|ivec4|)
+		inlined
+		return .Screen
+		
+	syntax is (|vobjectinfo| i, |bool|)
+		inlined
+		return (.position & i) == i
+	
+	syntax is (|vobjectinfo| i, assigns:|bool| value)
+		|| p = .Position &~ i
+		p |= i *value
+		.position = p
+	
+	function AdjustPos (|float| scale, |vec3|)
+		rz = .pos
+		|| w = .Velocity.w
+			scale *= w * 0.125
+			rz.x += (gui.Cycle(0.07s)-0.5)*scale
+			.pos = rz
+	
+	
+	inline ActualRadius (|float|)
+		return .Radius.Length
+	
+	module
+		function Box (|vec2| Pos,  |vec2| Size,  |vec4| Color=colors.white, |vobject|)
+			rz = VObject((pos, 0.0), vec3(size,1.0), &VShapes.Box, color)
+		libinternal NewParticle (|vobject|)
+			visible
+			// This will us let ALL drawn objects be vobjects, even particles
+			// we could pre-allocate 1000 or something, or just allocate on demand and keep them.
+			// then reset per-frame. Then we can send all vobjects to the GPU.
+			return ._Particles.Next
+		
+		|[vobject]| 	_Particles
+		|float|			DrawScale
+		|vec2|			DrawMovement
+		|int|			ObjID
+		
+					
+		function Size2D (|float| X, |float| Width, |float| Y, |float| Height, |controlrect|)
+			if Width < 0
+				x += Width
+				Width = Width.length
+			if height < 0
+				y += height
+				height = height.length
+			|| V = (x, y, x+width, y+height)*16.0
+			return V.iVec4|controlrect|
+
+
+
+
+datatype VObjectInfo (uint)
+	constants
+		Pellet
+		Dead			// to remove
+
+
+function controlsize.CalculateBlocks (|ivec4|)
+	|| V = .gsize.vec4 * 16th
+	return V.Screen
+
+
+function vec4.ScreenFloat (|vec4|)
+	return (self + VObject.Drawmovement.xyxy) * VObject.DrawScale
+
+
+inline ivec4.Screen (|ivec4|)
+	return .Vec4.Screen
+
+
+function vec4.Screen (|ivec4|)
+	|| p = .ScreenFloat
+	|| w = p.Width
+	|| h = p.Height
+	p = p.floor
+	p.x2 = p.x + w
+	p.y2 = p.y + h
+	return p.iVec4
+
+
+extend Window
+	libinternal _ReadjustBlock2D
+		description "Readjusts current draw-matrix. This converts object coords to screen coords." 
+		|| Sc = .BlockScale$
+		|| LR = .lastrect
+		|| W = LR.width|float|
+		|| H = LR.Height|float|
+		|| Size = W
+		if Sc < 0 
+			sc = -sc
+			Size = H
+		
+		Size /= sc
+		Size = size.round(2)
+		VObject.DrawScale = Size
+		|| M = .BlockMove
+		if .BlockMode&1
+			M.x = ((W*0.5) + (Size * M.x))/Size
+		if .BlockMode&2
+			M.y = ((H*0.5) + (Size * M.y))/Size
+		VObject.DrawMovement = M
+
+	function BlockX (|bool| Middle=false, assigns:|float|)
+		.BlockMove.x = Value
+		.BlockMode = (.BlockMode &~1) ||| Middle
+	
+	function BlockY (|bool| Middle=false, assigns:|float|)
+		.BlockMove.y = Value
+		.BlockMode = (.BlockMode &~2) ||| (Middle<<1)
+		
+	setter BlockHeight (|float|)
+		inlined
+		.Blockscale = -Value.length
+	
+	setter BlockWidth (|float|)
+		inlined
+		.Blockscale = Value.length
+

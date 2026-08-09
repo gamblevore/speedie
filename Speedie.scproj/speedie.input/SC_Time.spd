@@ -1,0 +1,126 @@
+
+
+function compiler.PrintCompileTime (|date| durr) 
+	require StdErr.OK and !options.silent
+	|| fs = faststring()
+	fs.normal  "Stages",	fs <~ Compiler.CurrStage
+	fs.normal  "Classes",	fs <~ compiler.ReachedClassCount
+	fs.normal  "Funcs",		fs <~ "${compiler.streachedfunc} / ${compiler.funclist.length}  // (${compiler.stLibFuncs} lib)"
+	fs.normal  "Strings"
+
+	|| N = StringCorrector.CppStrings.length
+	|| avg = StringCorrector.TotalSize div N
+	fs <~ "$N from "
+	StringCorrector.TotalSize.strsize(fs)
+	fs <~ " // (avg "
+	fs.appendfloat(avg, 1)
+	fs <~ ")"
+	fs.Normal  "Globals"
+	fs <~ "lib "
+	
+	packmaker.LibGlobSize.strsize(fs)
+	|| G = packmaker.PackGlobs
+		fs <~ ", app "
+		packmaker.PackGlobSize.StrSize(fs)
+	
+	|| vm_ops = VM_Builder.InstructionCount
+		fs.normal  "vm_ops",    fs <~ vm_ops
+	
+	|| ASM_Ops = compiler.stTotalASMOps
+		fs.Normal  "ASM",    (ASM_Ops*4).strsize(fs)
+		if PackMaker.PackSaved.Savings
+			fs.Normal  "PackFuncs_Trimmed", packmaker.PackSaved.Churn(fs)
+		if .stDebugInfo
+			fs.normal  "DebugInfo",  .stdebuginfo.strsize(fs)
+
+	fs.normal  "Total_Elapsed",	durr.renderdurr(fs), fs <~ "s"
+	fs.normal  "Input_Src",		Compiler.stTotalSourceSize.strsize(fs)
+	if options.color
+		fs <~ TerminalColor.normal
+	
+	if Options.PrintMemoryUsage
+		fs <~ "\n"
+		app.MemoryUsage(32KB, fs)
+	printline fs
+
+
+
+function compiler.PrintCompileErrors
+	if Options.Warnings
+		require stderr.HasAnything
+	  else
+		require StdErr.HasProblems
+	stderr.PrePrintErrors
+	
+	|| MinSev = ErrorSeverity.problem
+	if (Options.Warnings): MinSev = ErrorSeverity.Warning
+	if Compiler.Successfulness >= 2
+		MinSev = ErrorSeverity.Error
+	.PrintErrors(MinSev)
+	stderr.clear
+
+
+
+function compiler.TimeTest (|date| elapsed, |bool|)
+	flow off
+
+	|| CanInstall = true
+	FlowLog.DisabledIncr
+	if (Options.SelfReplacement) and (Options.Variant ~= "Test") and (platform.release)
+		|| ReliableTime = (64.0*1024.0*2.5)|int| // in case my date creation code has a bug... which did happen a few times
+		CanInstall = elapsed < ReliableTime
+		check (CanInstall) ("Not installing as compile duration was over 2.5s. Perhaps this speedie has a bug leading to excessively slow compiles?")
+	
+	FlowLog.DisabledIncr(-1)
+	return CanInstall
+
+
+function compiler.CompileTime
+	if !options.output_path and options.HideawayScripts
+		options.output_path = .originalinputpath.ScriptLocation
+	
+	if !options.scripting
+		if options.SelfReplacement	// avoid failing needlessly
+			.FileSanityTests		// sometimes this fails due to lack of permissions in xcode...
+									// xcode gives lower perms to it's builder scripts, strangely.
+		.VariousSelfTests
+//		SC_Saver.TestSaver~quietly
+
+	|| elapsed = .CompileAll~timeit
+	.PrintCompileTime(elapsed)
+
+	require stderr.ok
+	TransCompiler.ExportAndInstall(elapsed)
+
+
+
+function compiler.VariousSelfTests
+	target cpp
+		Jeebox.test // bug if put into compiler.run!. Wierd!
+		if (options.perryoutput < 2) and !options.scripting and !app.Parent
+			if options.PrintLibraries
+				if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
+					"Compression: OK"
+	mzlab.FreeNow
+
+
+target cpp {
+function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
+	if which & 1
+		require .CompressTestSub_(mzlab.strong, report)
+	if which & 2
+		require .CompressTestSub_(mzlab.strongest, report)
+	return true
+
+
+function string.CompressTestSub_ (|int| Strength, |bool| report, |bool|)
+	|compressionstats| stats
+	|| c = .compress(Strength, stats)
+	if report // remove? compression is good for now.
+		stats.Print
+	|| decomp = c.Decompress(int.max, nil)
+	rz = self == decomp
+	if !rz
+		error "Decompression failed on: " + self
+		decomp = c.Decompress(int.max)
+}

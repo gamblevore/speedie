@@ -1,0 +1,194 @@
+
+
+datatype InlineEditorMode (byte)
+	constants
+		Nothing = 0
+		Searching
+		Editing
+		
+		
+struct InlineEditor
+	linkage
+		cpp_part inl
+	|ListViewCell?|		Cell
+	|Textview?|			Editor
+	|Guicontrol?|		EditingFor
+	|bool|				NeedsHide
+	|InlineEditorMode|	Mode
+	
+	libinternal Init (|Window| w)
+		.editor = textview(w)
+		with .editor
+			//.clipmode		= controlclipmode.debug
+			.id				= "inline_editor"
+			.visible		= false
+			.SingleLine		= TextView.SingleLine
+			(self.editor! is editable)
+			&.gnormal.bg	<~ (0, 0, 0, 255)
+	
+	syntax Is (|InlineEditorMode| Mode, |bool|)
+		nil checker
+		if self
+			return .mode==Mode
+	syntax Is (|InlineEditorMode| Mode, assigns:|bool|)
+		if value and self
+			.mode=Mode
+	
+	libinternal NextSearch
+		opt norefcounts
+		|| L = .EditingFor
+		if L and !L.__Search__(GUI.LastSearch, false)
+			beep
+
+	
+	libinternal AcceptSearch (|string| s, |bool| hide=false)
+		GUI.LastSearch = s
+		.NextSearch
+		if hide
+			.clear
+	
+	
+	libinternal UpdateSearch (|string| s)
+		|| l = .editingfor
+		if l isa listview
+			GUI.LastSearch = s
+			l.__Search__(s, true)
+	
+	
+	libinternal FinishAndClear (|bool| focus = true)
+		opt norefcounts
+		|| e = .editor
+		|| c = .cell
+		|| l = .editingfor
+		if  e and c  and  l isa listview
+			if e.text != .getlistvalue(c,l)
+				l.TryRenameCellTo(c, e.text)
+		.Clear(focus)
+		
+	
+	libinternal Clear (|bool| Focus = true)
+		.NeedsHide = false
+		.cell = nil
+		|| s = .EditingFor
+		if s isa listview
+			GUI.LastSearch = .editor!.text
+		with .editor
+			.visible = false
+			.text = ""      // wants new
+		if s isa listview
+			.mode = 0
+			if focus
+				s.setfocus
+		.EditingFor = nil
+	
+
+	libinternal GetListValue (|listviewcell| C, |listview| L, |string?|)
+		opt norefcounts
+		|| ed = l.OnEditCell
+			|| t = (ed)(l, c, nil)
+			if t!=nil
+				return t
+			.editor.CancelEditing
+			return nil
+		return l.TableCell(c)
+
+	
+	libinternal ListView.CanEdit (|listviewrow| row, |bool|)
+		return row is editable and row isnt UnSelectable and self is editable
+	
+	
+	function Edit (|ListViewCell| r, |ListView| l, |bool|)
+		opt norefcounts
+		
+		l ?= .editingfor as ListView
+		
+		|| row = r.row
+		require l.canedit(row)
+		with .editor
+			.FinishEditing(false)
+			|| t = self.getlistvalue(r, l)
+			if t == nil
+				return false
+			.text = t
+			.Selection = t.length
+			.visible = true
+			.setfocus
+		
+		l.Select(r.row)
+		l <~ .editor
+		is editing
+		l.Show(r.row)
+		.cell = r
+		.EditingFor = l
+		return true
+	
+
+function window.Inline (|&InlineEditor|) // avoid getting the struct itself
+	opt norefcounts
+	return &.InlineEditorPlace
+
+
+libinternal window.InlineEditor (|guicontrol|)
+	opt norefcounts
+	return .InlineEditorPlace.Editor
+
+
+libinternal GuiControl.CanSearch (|int|)
+	if self is unsearchable
+		return 0
+	if self isa textview
+		if .IsInline
+			return -1
+		if .SingleLine
+			return 0
+		if self isnt editable
+			require .hasfocus
+	return 1
+
+
+function GuiControl.OpenSearch (|bool|)
+	opt norefcounts
+	debug_require !(self isa window)
+	require self isnt NoSearch
+	|| cs = .CanSearch
+	if cs > 0
+		return .OpenSearchSub
+	if cs < 0
+		return false	
+	
+	|| f = self
+	while {
+		if f.CanSearch > 0
+			return f.opensearchsub
+		f = f.NextFocus(true, false)
+	} (f and f != self)
+
+
+libinternal GuiControl.OpenSearchSub (|bool|)
+	opt norefcounts
+	|| e	= .window!.inline
+	|| FOR	= e.editingfor
+	require for != self
+	
+	if for
+		e.FinishAndClear(False)
+	if self isa textview
+		if .isinline
+			return for$.opensearch
+		GUI.LastSearch ?= .seltext
+	
+	|| f = e.editor!
+	e.editingfor = self
+	(e is Searching)
+	self <~ f
+	debug_require !(self isa window)
+	f.size = 115~left  by  15~down to the~top
+	f.text = GUI.LastSearch
+	f.visible = true
+	.setfocus // makes sense
+	f.setfocus
+	f.selectall
+	|| Search = GUI.LastSearch
+		e.UpdateSearch(Search)
+	return true
+

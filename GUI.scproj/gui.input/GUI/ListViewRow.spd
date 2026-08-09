@@ -1,0 +1,316 @@
+
+
+
+role ListViewRow (message)
+	linkage
+		cpp_part Row
+	contains ListViewRow
+	constructor
+		super.Constructor(@arg, "")
+		is editable
+		
+	constructor (|string| name, |ListViewState| state = ListViewState.editable)
+		cpp_part Named
+		super.Constructor(@arg, name)
+		.tag = state
+
+	function State (|ListViewState|)
+		inlined
+		return .tag
+
+	function State (assigns:|ListViewState|)
+		inlined
+		.tag = value
+
+	syntax is (|ListViewState| s, |bool|)
+		inlined
+		if self
+			return .tag & s
+
+	syntax is (|ListViewState| s, assigns:|bool| b)
+		|| t = .tag
+		|| t2 = (t &~ s) ||| (s*b)
+		if t2 != t
+			.tag = t2
+			gui.touch
+
+
+	libinternal NotDeclutteredCell (|int| i, |bool|)
+		if !self
+			return true
+		return !((.Indent)&(1<<i))
+		
+
+	libinternal AllExpandState (|int|)
+		opt norefcounts
+		for r in self
+			if (r is expanded) and r.hasany
+				rz |= 2
+			  else
+				rz |= 1
+
+
+	libinternal HierEnd (|listviewrow| root, |listviewhierarchy| H, ||)
+		opt norefcounts
+		rz = self
+		while (rz is expanded) or (rz == root)
+			|| try = rz.last
+			if (h is last) and (rz!=root)
+				try = try.last
+			loop try
+			rz = try
+			
+
+
+	libinternal HierPrev (|listviewrow| root, |listviewhierarchy| H, ||)
+		opt norefcounts
+		|| p = .Prev
+			return p.hierend(root, H)
+		if h is last
+			self = .parent
+			if self == root
+				return nil
+		p = .parent
+		if p == root
+			p = nil
+		return p
+
+
+	libinternal HierNext (|listviewrow| root, |listviewhierarchy| H, ||)
+		opt norefcounts
+		// listviewhierarchy isnt so easy to get working...
+		if (self is expanded) or (self == root)
+			if h is Last
+				self = .last
+			return .flatnext
+		return .next ?? .flatafter
+	
+
+	function NextSelected (||)
+		opt norefcounts
+		|| f = .next
+		while f
+			if f is selected
+				return f
+			f = f.next
+
+
+	libinternal DrawSep (|ivec4| rect, |image| Where, |float| Str=1)
+		opt norefcounts
+		|| y = (rect.y + rect.y2+1)/2
+		rect = (rect.x+1, y, rect.x2, y+1)
+		|| v = (1.0, 1.0, 1.0, 0.25*str)
+		|| A = v.px
+		where.DrawRect(Rect, A) 
+	
+	
+	libinternal DrawDividerH (|ivec4| z2, |image| Where, |int| i)
+		opt NoRefCounts
+		require (self isnt disabled) and (.prev isnt disabled)
+		|| Vis	= .NotDeclutteredCell(i)
+			Where.MarkLineH(z2.x1y2, z2.width, 1)
+
+
+	libinternal DrawDividerV (|ivec4| z2, |image| Where)
+		Where.MarkLineV(z2.x1y2, 		z2.height, 1)
+		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
+
+	
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| indent_depth, |int| N)
+		opt NoRefCounts
+		|| w	= p.window	
+		|| z2	= rect
+		|| str = 1.0
+
+		for i in n
+			rect.horz	= p.ColumnBounds(i, z2, self)
+			rect.x		+= indent_depth
+			where.ControlClip = rect.clip(p.lastrect)
+			.DrawRowColumn(rect, where,  p, i, str)
+		
+		where.controlclip = z2
+		
+		if self is active
+			where.horz	= z2.h
+			where.DrawCircleStyled( z2 + (4,0,-4,0), ¥.WhiteStyle, 1.0)
+		
+		if self is Error
+			|| c = vec4(1.0, 0.25, 0.125, 0.2)
+			where.DrawRect(z2, c)
+
+		if (self is Disabled) and !.Name
+			|| c = vec4(0.5)
+			c.a = 0.25
+			|| z3 = z2
+			|| y = (z3.y + z3.y2)/2
+			z3.y = y - 1
+			z3.y2 = y
+			where.DrawRect(z3, c)
+		
+		if self is found
+			z2 += (0, 1, 0, 0)
+			z2.y2 = z2.y + 2
+			|| edge = ¥.textselection.edge
+			edge.Alpha *= str
+			where.DrawRect(z2, edge)
+	
+	
+	libinternal CellOrRow (|ListView| Parent, |int| Column, |string|)
+		opt norefcounts
+
+		|| Cols = parent.columns
+		if cols == self
+			return self[column].name
+		if (Cols == nil) or (parent._Hierarchical is Hierarchical)
+			column = -1
+		return parent.TableCell(self, column)
+	
+	
+	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Column, |float| str)
+		opt NoRefCounts
+
+		|| CanDraw = .NotDeclutteredCell(column)
+		require CanDraw or parent.OnDrawRow
+		
+		|| CellText = .CellOrRow(parent, column)
+		if !CellText and (self is Separator)
+			.DrawSep(Rect, where, str)
+			return
+		
+		|| R		= Rect.TextCorner(parent.GNormal, CellText, .state)
+		|| sighy	= ((rect.y + rect.y2)/2) - 3
+		|| TextCol	= parent.GNormal.TextColor
+		
+		|| Shader = parent.OnDrawRow
+			|| Shading = (Shader)(self, Rect.y1, sighy, where, parent, column, str) // why would y get adjusted??
+			r.x += shading.x
+			|imagepixel| Col = Shading.y
+				textcol = Col
+		
+		  elseif (Column==0) and parent.Istree and (self!=parent.Columns)
+			if parent.CanExpand(self)
+				|| exp = (self isnt expanded)("\02", "\03")
+				|| VCol = vec4(1, 0.5)
+				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
+			r.x += font.width + 2
+		
+		if CanDraw
+			if parent.MultiLineDraw
+				r.y = rect.y2 - 10
+			if self is Disabled
+				str *= 0.375
+			TextCol.alpha *= str
+			font.small!.DrawTextWrap(CellText, Where, R, Textcol, parent.rowheight)
+	
+
+	libinternal listview.CanExpand (|listviewrow| Row, |bool|)
+		opt norefcounts
+		if row.last == @arg
+			return true // Right? even if its empty.
+						// Cos we need some way to ask a server/process for open a folder
+		if .listchild(row)
+			return true // also
+		
+	
+	module
+		function NewSeparator (|int| Pos = 0, |listviewrow|)
+			opt norefcounts
+			rz = @str + ""
+			rz.Position = Pos
+			(rz is separator)
+			
+
+
+
+datatype ListViewState (uint16)
+	flags
+		|ListViewState|
+		AlignLeft	= 0
+		Align		= [AlignCenter, AlignRight]
+		Selected
+		Modified
+
+		UnSelectable = [Separator, Disabled]
+		Broken		// we tried to use the item but it failed. maybe replace with "Missing"?
+		Error		// something is definitely wrong
+		Preparing
+		Active
+
+		Editable
+		Expanded
+		Found
+		
+		Hidden
+		
+	syntax is (|ListViewState| s, |bool|)
+		(Hidden)
+		inlined
+		return self & s
+
+
+
+datatype ListViewSelectMode (uint)
+	linkage
+		numeric false
+	flags
+		|ListViewSelectMode|
+		InitialSelection
+		NoShow
+		NoEvent
+		SendEvent
+		
+		Normal = 0
+		Expanded = 1
+
+	
+	syntax is (|ListViewSelectMode| s, |bool|)
+		inlined
+		return (self|uint| & s|uint|) == s
+
+
+
+datatype ListViewHierarchy (int8)
+	constants
+		Flat = 0
+		Hierarchical = -1		// a normal tree, we are the container.
+		Last = -2				// our last item is used as the container
+		First = 1
+		Second = 2
+								
+
+	syntax is (|ListViewHierarchy| s, |bool|)
+		inlined
+		return self == s
+
+
+
+extend ListView
+	inline IsTree (|bool|)
+		return ._Hierarchical
+	
+	setter Hierarchical (|bool|)
+		inlined
+		cpp_part HierBool
+		._Hierarchical = -value|int|
+
+	setter Hierarchical (|listviewhierarchy|)
+		inlined
+		._Hierarchical = value
+	
+	libinternal HierStep (|ListViewrow| l, |bool| Forward, |ListViewrow|)
+		opt norefcounts
+		if L
+			|| H = ._Hierarchical
+				|| root = .ListSource
+				if Forward
+					return l.hiernext(root, H)
+				  else
+					return l.hierprev(root, H)
+			  else
+				if Forward
+					return l.next
+				  else
+					return l.prev
+
+
+

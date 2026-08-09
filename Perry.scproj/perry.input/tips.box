@@ -1,0 +1,44 @@
+
+// just some handy tips :)
+// Want more tips? Suggest some and I might add them!
+
+// ----- //
+
+"Shift-delete will delete forward. Option-Shift-delete will delete more forward."
+
+"To disable unused code warnings, add 'unfinished' at the top of your file."
+
+"You can delete entries from search-results and error-lists."
+
+"\1F\04R opens the run-argument editor"
+
+"\1F\04C copies text and converts tabs-to-spaces. \1FC copies normally."
+
+"\1F\\ To add or remove breakpoints!"
+
+"Hold esc to bring up the application menu"
+
+"\1F7 opens up the Jeebox viewer"
+
+`Click the lower-left of the IDE window (--) to see more information!`
+
+"\1F\04. cancels the current compile"
+
+"Press the section-key (underneath esc) to open a CMM!"
+
+"\1F0-\1F9 can show or hide, various IDE sections. \1F0 can expand the text-editor to full-size."
+
+"\1F0-\1F9 (holding option key) flips between various open projects"
+
+"Press your project button, to flip between a todo-list and your current file."
+
+"\1FD opens the quick file-finder! Just type a file name!"
+
+"\1F; or \1F' moves next or prev thru a side-list (errors, found text, files)"
+
+"\1F, or \1F. moves next or prev through the file history."
+
+"Use perry from the terminal! Just type: perry <path to file> (needs link to perry in /usr/local/bin)"
+
+"\1FK can clear your build-log, or other logs in the log-area."
+

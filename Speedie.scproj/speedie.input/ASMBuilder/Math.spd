@@ -1,0 +1,1057 @@
+
+
+prototype fn_OpASM			(|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+prototype fn_ASMConstifier	(|asmreg| L, |asmreg| R, |int64|)
+
+
+
+extend asmreg
+	function BoolNegateAnswer (|asmreg|)
+		opt inline
+		.µtype = DataTypeCode.bool
+		if self is negate
+			is AlreadyNegated
+			isnt negate
+		return self
+		
+	function BoolCondAnswer (|asmreg|)
+		opt inline
+		if self is CondRequest
+			isnt condrequest
+			is CondAnswer
+		return self
+		
+	function BoolAnswerOK (|asmreg|)
+		return .boolcondanswer.BoolNegateAnswer
+
+	function BoolAnswerMaybeBugged (|asmreg|)
+		// not sure this is being used properly
+		// the issue is negate. BoolNegateAnswer is used to say that something is already negated...
+		// but only works if it really gets negated.
+		// And Im not sure the callers of boolanswer are doing that.
+		// boolconst1 does, but boolconst2 doesnt seem to!
+		
+		// unless µBoolInto does it, via .µ and .Exists which might do it internally?
+		// if they DO... wouldn't THEY clear the negatedness? So the call is not needed still?	
+
+		// I think lets wait for bugs to happen... if none do... this is probably correct.	
+		// otherwise we need to investigate every boolanswer.
+		// well... previously boolanswer would say that its already negated...
+		
+		// ConstCompareInt is similar... its calling .ConstCompareIntSub and .NumToReg
+		// so are one of them doing the negation?
+		// well, numtoreg cant cos its already done. And ConstCompareIntSub doesnt
+		// so... i guess its wrong? it is NOT negating?
+
+		return .boolcondanswer.BoolNegateAnswer
+
+	
+	
+extend Assembler
+	function DoMath (fn_asm)
+		opt norefcounts
+		|| op = exp.second!
+		|| scop = op.obj|scoperator|!
+		if scop is AndOr
+			return .ASMBoolMaker(exp, dest, scop.Kind)
+		|| fn = scop.OpASM
+			return .DoMathSub(exp, dest, fn)
+		error (exp, errorreceiver.nonfatal)
+
+
+	helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
+		opt norefcounts
+		|| ml = ASMReg()
+		|| mr = ASMReg()
+		|| First = exp.first!
+		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
+
+		|| Closer = .OpenVars
+		
+		if First.islast
+			ml = .µGetASM(first, dest)
+		  else
+			if dest isnt NewlyDeclared
+				ml = .µGetPrms(First, ml)
+			  else
+				ml = .µgetasm(first, dest.µtype(0))
+				ifn ml iz dest
+					mr = dest.µtype(0)
+			mr = .µGetASM(exp.last!, mr)
+
+
+		if dest is Discard
+			.AskNopTemp(ml)
+			.AskNopTemp(mr)
+			return dest // returning from inline, into func that discards result.
+	
+		
+		if (!first.IsLast) and (ml.IsVec != mr.IsVec)
+			if ml.IsVec
+				mr = .VectorUpgrade(mr, exp)
+			  else
+				ml = .VectorUpgrade(ml, exp)
+		
+		.CloseVars(Closer)
+		
+		dest = .TempTyped(exp, dest)
+		(dest is Const) = (ml&mr is Const)
+		
+		|| op = exp.second ?? exp.first!
+		target debug: || MathTrap2 = ++ASMTrapper, if MathTrap2 == -1
+		rz = (fn)(self, op, dest, ml, mr)
+		
+		target debug: if rz.IsVec != ml.IsVec			// argh?
+		
+		rz = rz.ExpectSameType(dest)
+
+
+	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
+		require Zero.IsZero
+		|| B = L.Fat
+			if .IsCurr(b, asm.bflg)
+				if b.prms[4] == 0  and  b.prms[3] == 63
+					L.µType = DataTypeCode.bool
+					B.info = L
+					return L
+		
+
+	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+		|| negate = dest is negate
+		|| Res = dest.BoolAnswerOK						// Hmmm... so what should it be?
+		if  L is Const  and  R is Const
+			.Nop2Consts(r, l)
+			|| num = ((l.const==r.const) != negate)|int|
+			return .NumToReg(exp, res, num, DataTypeCode.bool)
+		
+		if dest isnt CondRequest
+			if negate
+				|| B = .AlreadyABool(l, R)
+					return B
+				|| B2 = .AlreadyABool(R, L)
+					return B2
+			dest = .TempTyped(TypeBool!.TypeNormal, dest)
+			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
+			|| fat = exp.EQUL(dest, L, R, Mode)
+			if negate
+				fat._op = asm.NQUL
+			return fat * dest
+
+		if  r is Const  and  l isnt Const
+			swap (l) (r)
+		
+		negate = !negate // jmp/cond are used oppositely
+		|| RS = r.issmall|int|
+		|&fatasm| fat
+		if !l.IsZero
+			|| LS = L.isSmall|int|
+			if RS
+				|| K = .Const(L, 9, L.signed)
+					fat = exp.JMKE(R, K, 0)
+					if negate
+						fat._op = asm.JMKN
+			if !fat
+				fat = exp.JMPN(l, r, LS, RS, 0)
+				if !negate
+					fat._op = asm.jmpe
+		  else
+			fat = exp.JBAN(r, RS, 0)
+			if negate
+				fat._op = asm.JBOR
+		if 0: exp.JMKN, exp.JMPE, exp.JBOR
+		return fat * res
+	
+
+	function Exists (|message| exp, |ASMReg| dest, |ASMReg| L, |ASMReg|)
+		opt inline
+		// if we already wanted to negate the result...
+		// well... we are comparing this vs 0, so we negate some that was already negated.
+		// so negate is cleared.
+		// and then we DON'T set alreadynegated
+		// so we lose it.
+		// seems either way... we should return alreadynegated???
+		
+		// i mean... if its negate, we want already negated
+		// if its NOT negate, we negate it, so it will be alreadynegated
+		
+		return .Equals(exp, dest.negate, l, ASMReg())
+	
+	
+	function NotEq  (fn_opasm)
+		return .Equals(exp, dest.negate, l, r)
+
+	
+	function Equals (fn_opasm)
+		|| rr = r.reg,  || ll = l.reg
+		if !rr  and  ll
+			swap (l) (r) // put reg 0 into the left... more convenient.
+		(Dest  as=  l & r & asmreg.Const)
+		
+		if rr == ll
+			|| One = (dest isnt negate)|int|
+			rz = .NumToReg(exp, dest, One, DataTypeCode.bool)
+		
+		  elseif dest.IsInt
+			rz = .EqualsInt(exp, dest, l, r)
+		  else
+			rz = .CompareFloat(dest, l, r, exp, 2)						
+			
+		rz = rz.boolanswerok		// all of these handle negate!
+		(rz is alreadynegated)		// in case of double negation but the original wants to check that it is negated
+									// I'd need to add a "really tell us that we want negation" flag otherwise.
+	
+
+	function JumpIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
+		require  l is Const  or  r is Const
+		|| swapped = l is Const
+			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
+			mode ^= 1						// 10 <= x  -->  x >= 10  -->  x >  9
+		|| f = r.fat$
+
+		|| k = f.const - swapped
+		require l.issmall and k.fits(9, true)	
+		.NopConst(R)
+		k = k|uint64|.trim(9)
+		|| J = exp.JMKM(l, k)
+		if 0: exp.JMKL
+		j._op += (mode&1)						// .JMPL
+		return J * dest
+	
+	
+	function UInt64.Trim (|int| B, |uint64|)
+		B = 64-B
+		return (self << B) >> B
+
+
+	function CompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+//		CmpSub(0,  A >   B)
+//		CmpSub(1,  A <=  B)
+		if mode > 1 // wat?
+
+		mode |= !r.signed<<1
+		mode ^= dest is Negate
+
+		dest = dest.BoolNegateAnswer
+		if l is Const and r is Const
+			return .ConstCompareInt(dest, L, R, exp, Mode)
+
+		mode |= l.issmall << 2
+		mode |= R.issmall << 3		
+
+		if Dest isnt CondRequest
+			return exp.CMPI(dest, L, R, mode) * dest
+
+		dest = dest.BoolCondAnswer
+		mode ^= 1										// more convenient for the ASM to use 1 == jump
+		|| kk = .JumpIntK(dest, l, r, exp, mode)		// but for if-branches that means false. So we negate.
+			return kk
+		
+		return exp.JMPI(L, R, mode, 0) * dest
+
+
+	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		.Nop2Consts(r, l)
+		|| Result = .ConstCompareFloatSub(l, r, mode)
+		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
+		
+		
+	function ConstCompareFloatSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
+		ifn mode & 4
+			|| A = L.f32
+			|| B = R.f32
+			if mode <= 1
+				if mode == 0
+					return A >  B
+				return A <= B
+			if mode == 2
+				return A == B
+			return A != B
+
+		|| A = L.f64
+		|| B = R.f64
+		mode -= 4
+		if mode <= 1
+			if mode == 0
+				return A >  B
+			return A <= B
+		if mode == 2
+			return A == B
+		return A != B
+
+
+	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		.Nop2Consts(r, l)
+		|| Result = .ConstCompareIntSub(l, r, mode)
+		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
+		
+		
+	function ConstCompareIntSub (|asmreg| L, |asmreg| R, |int| Mode, |bool|)
+		|| A = L.Const
+		|| B = R.Const
+		if mode <= 1
+			if mode == 0
+				return A >  B
+			return A <= B
+		if mode == 2
+			return A == B
+		return A != B
+
+
+	function CompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
+		mode |= r.IsBig<<2
+		// if dest is negate
+		mode ^= dest is Negate
+		dest = dest.BoolNegateAnswer
+
+		if (l is Const and r is Const) // needs to handle this!
+			return .ConstCompareFloat(dest, L, R, exp, Mode)
+
+		if dest isnt CondRequest
+			return exp.CMPF(dest, L, R, Mode) * dest
+
+		dest = dest.boolcondanswer
+		mode ^= 1									// More graceful ASM design. Or else we need to change the VM.
+		return exp.JMPF(L, R, Mode, 0) * dest		// Allows cmpf+jmpf to share code, and the VM is more natural.
+
+		
+	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
+		if L.fat(asm.vget) or R.fat(asm.vget)
+			|| subdest = dest.µType(L.µtype)		// sub-part is a float/int not a bool!
+			L = .Subtract(exp, subdest, R, L)
+			R = asmreg()
+		
+		if l.IsInt
+			return .CompareInt(dest, l, r, exp, mode)
+		return .CompareFloat(dest, l, r, exp, mode)
+	
+	
+	function More   (fn_opasm)
+		return .compare(dest, l, r, exp, 0)
+
+	function LessEq (fn_opasm)
+		return .compare(dest, l, r, exp, 1)
+
+	function Less   (fn_opasm)
+		return .compare(dest, r, l, exp, 0)
+
+	function MoreEq (fn_opasm)
+		return .compare(dest, r, l, exp, 1)
+
+
+
+	// MATH 
+	function QuickFloat32Plus	(fn_OpASM)
+		if  r is Const								// a + 1,   a - 1
+			|| QQ = .QuickFloatPlusConstSub(exp, dest, l, r)
+				return qq
+		if  l is Const  and  l isnt Alternate		// 1 + a --> a + 1
+			return .QuickFloatPlusConstSub(exp, dest, r asnt asmreg.alternate, l)
+	
+			
+	function QuickFloatPlusConstSub	(fn_OpASM)
+		|| k = r.Const|uint64|
+		k ^= (l is Subtract)<<31
+		require (k >> 18) << 18 == k
+		.NopConst(r)
+		if 0: exp.VADK
+		return exp.FADK(dest, l, k>>18).Vectorise(dest, asm.vadk)
+
+
+	function message.DivByZero
+		.CallChainError("Divide by zero???")
+
+
+	function QuickFloatDiv	(fn_OpASM)
+		require r is Const
+		|| v = r.float
+		|| v2 = v.abs
+		// could use exp.FEXK to do powers of 2
+		if v2 == 1.0 or 0.0
+			if v2 == 0.0
+				Exp.DivByZero
+			.nopconst(r)
+			return .Quick1Or1Sub(dest, l, v|int|, exp)
+
+
+	// from 1 to -1
+	function Quick1Or1Sub (|&Assembler| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
+		if ptoi == -1										//   x * -1  -->  0-x
+			return .Subtract(exp, dest, ASMReg(), l)
+		if ptoi == 1										//   x * 1   -->  x
+			return l.µtype(dest)
+		return dest.µtype.zero								//   x * 0   -->  0
+	
+	
+	function QuickIntMul	(fn_OpASM)
+		require r is Const
+		|| Pow2 = .IntPowerOfTwo(r)
+			if Pow2 <= 1
+				return .Quick1Or1Sub(dest, l, Pow2, exp)
+			if 0: exp.QFLG
+			return .BFLG_Sub(Exp, dest, L,  Pow2-1, 0, false) // y = x * 4  -->  y = x << 2
+			
+		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
+			if 0: exp.QADD, exp.QSUB
+			return exp.ADD(Dest, L, L, five-1).Vectorise(dest, asm.QADD)
+
+		|| RR = r.const
+		if !dest.isvec and .CanAddK(r, RR)								// a - 1,  a + 1
+			return exp.MULK(dest, L, RR) * dest
+
+
+	function QuickFloatMul	(fn_OpASM)
+		require r is Const	
+		|| v = r.float
+		if  v == 1.0 or 0.0 or -1.0
+			.nopconst(r)
+			return .Quick1Or1Sub(dest, l, v|int|, exp)
+		if  v == 2.0
+			.nopconst(r)
+			return .plus(exp, dest, l, l)
+		
+		if r.Fourbytes
+			|| x = r.const
+			|| y = x >> 18
+			if x == y << 18
+				.Nopconst(r)
+				if 0: exp.VMLK
+				return exp.FMLK(dest, l, x).Vectorise(dest, asm.VMLK)
+
+	
+	function ASMReg.SomePointer (|bool|)
+		return  (self is containsaddr)  or  (.µtype is pointer)
+
+
+	function ASMReg.LeftScore (|int|) // we want pointers on the left, and consts on the right
+		rz += .SomePointer << 2				// pointers on left
+		rz += (self isnt Const) << 1		// consts on right
+		rz += self isnt temp				// temps on right
+	
+	
+	function asmreg.PointerMul (|message| exp, |bool| swapped, |int|)
+		opt norefcounts
+		|| d = .PointerMulSub(exp, swapped)
+			return d.CArraySize
+		debugger // hmmmm. its not a pointer after all?
+
+
+	function asmreg.PointerMulSub (|message| exp, |bool| swapped, |scdecl|)
+		opt norefcounts
+		|| fn = exp.Func
+		if fn == @opp
+			exp = exp.step(swapped)!
+			
+		  elseif fn == @arel or @brel or @acc
+			exp = exp.first!
+			
+		  else
+			if fn == @dot // obj.Prop // requires pointermul on .prop cos of prev props
+				return exp.asmdecl
+			error "aaargh"
+			debugger
+		
+		return exp.ASMDecl.Internal
+
+
+	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |bool|)
+//		x = y + 1
+//		x = x + 1
+//			-->
+//		x = y + 2
+
+
+//		t = y + 1 // t is a temp.
+//		x = t + 1
+//			-->
+//		x = y + 2
+
+		|| XY1 = .Last(asm.addk)			#require
+		if XOut.IsVec // now what?
+		|| xinreg = XIn.reg
+		require xinreg == XY1.RegOnly
+		|| Changed = xinreg != xout.reg
+			require (xin is temp)
+		|| add2 = XY1.prms[2] + add		
+		if add2.CanStoreAsAddK
+			xy1.p2 = add2
+			if Changed
+				.ReDest(xy1, xout)
+			return true
+		
+		
+	function IntPlus     (fn_opasm)
+		if dest is Const									// perhaps we can do this in domathsub?
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntPlus)
+		
+		|| swapped = false
+		if l isnt alternate
+			|| LS = l.LeftScore
+			|| RS = r.LeftScore
+			if LS < RS
+				swap (l) (r) // a+b == b+a
+				swapped = true
+	
+		if r.iszero // add or subtract zero
+			return l
+
+		|| LMul = 1
+		if (l isnt noscale) and l.SomePointer
+			lmul = l.PointerMul(exp, swapped)
+		if r is Const
+			|| RR = r.const
+			if l is Subtract
+				RR = -RR
+			rr *= lmul
+			if .CanAddK(r, RR)											// a - 1,  a + 1
+				if .InlineAddK(l, rr, dest)
+					return dest
+				if 0: exp.QADK
+				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
+
+		if LMul.IsPow2													// x = int1 + int2
+			return exp.AddInt(dest, L, R, LMul.log2) * dest				// x = lptr + r<<3
+		
+		// L is now a POINTER.
+		|| v = .NumToReg(exp,  ASMReg(),  LMul,  DataTypeCode.uint)
+		if l is Subtract												// x = (lptr - rptr)/12
+			exp.AddInt(dest, L, R, 0)!
+			debugger
+			return .DivInt(exp, dest, dest, v)
+
+		// L is still a pointer.										// x = lptr + r*12
+		return .MUL_(dest, R, V, L, exp) * dest
+	
+	
+	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
+		if src.issmall and cmp.IsBig
+			cmp.reg = 0
+			|| dest = .TempOnly(cmp)
+			return .BFLG_Sub(exp, dest, src, 32, 32, false)
+		return src
+		
+
+	function FloatPlus (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatPlus)
+
+		|| IsF32 = dest.FourBytes|int|
+			|| qq = .QuickFloat32Plus(exp, dest, l, r)
+				return qq
+			if !dest.isvec
+				|| Fat = exp.OptVecMathTwo(dest, L, R)
+					fat._op = asm.uadd + (l is Subtract)
+					return fat*dest
+
+		if 0: exp.VADD
+		|&fatasm| Fat
+		if l isnt Subtract
+			|| mul = .OptFMUL(dest, l, r)
+				return mul
+			mul = .OptFMUL(dest, r, l)
+			if mul
+				return mul
+			fat = exp.FADD(dest, l, r, asmreg(), IsF32)
+		  else
+			fat = exp.FADD(dest, l, asmreg(), r, IsF32)
+		return fat.Vectorise(dest, asm.vadd)
+	
+	
+	function OptFMul (|asmreg| dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
+		|| fat = mul.FAT!
+		require .IsCurr(fat, asm.fmul)
+		require (fat is temp) or (dest iz fat.info)
+		|| P3 = fat.p3
+		if !p3.reg
+			fat.reginput(3) = add
+			return fat * dest
+	
+	
+	function Plus (fn_opasm)
+		rz = .Plussub(exp, dest, l, r)
+		rz = rz asnt asmreg.subtract
+
+
+	function PlusSub (fn_opasm)
+		if r.iszero								// allow a = a ± 0
+			dest.reg = l
+			return dest
+		
+		if l isnt Subtract						// 0 + a
+			if l.iszero
+				dest.reg = r
+				return dest
+		  else
+			if (r iz l)
+				return dest.zero
+		
+		if l.IsFloat
+			return .FloatPlus(exp, dest, l, r)
+		return .IntPlus(exp, dest, l, r)
+
+
+	function Subtract (fn_opasm)				// x = a - b
+		(l is Subtract)							// the logic ismostly shared...
+		return .Plus(exp, dest, l, r)
+
+
+	function Minus (fn_opasm)					// x = -b
+		// not the same as negative, which is an fn_asm... that means it works on the exp
+		if r != asmreg()
+		(r is Subtract)
+		return .plus(exp, dest, r, l) asnt asmreg.Alternate
+
+
+	function FloatMul (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatMul)
+		|| Q = .QuickFloatMul(exp, dest, R, L)
+			return Q
+		|| Q2 = .QuickFloatMul(exp, dest, L, R)
+			return Q2
+
+		if !dest.IsVec and l.IsSmall
+			|| Fat = exp.OptVecMathTwo(dest, L, R)
+				fat._op = asm.UMUL
+				return fat*Dest
+
+		if 0: exp.VMUL
+		return exp.FMUL(dest, L, R, asmreg(), l.IsSmall|int|).Vectorise(dest, asm.vmul)
+
+
+	function IntMul (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntMul)
+		rz = .QuickIntMul(exp, dest, R, L)
+		if rz == nil
+			rz = .QuickIntMul(exp, dest, L, R)
+			if rz == nil
+				if 0: exp.qmul, exp.muls
+				rz = .MUL_(dest, L, R, asmreg(), exp).Vectorisesmall(dest, asm.qmul, asm.muls)
+
+
+	function BoolMul (|asmreg| dest, |asmreg| Bule, |asmreg| V, |message| exp, |asmreg|)		
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, Bule, V, ConstifyBoolMul)
+		rz = .QuickIntMul(exp, dest, Bule, V)
+		if !rz
+			rz = exp.TERN(dest, Bule, V, asmreg(), bule.issmall|int|) * Dest				// TERN
+
+
+	function Multiply (fn_opasm)
+		if l isa DataTypeCode.bool
+			return .BoolMul(dest, l, r, exp)
+		if r isa DataTypeCode.bool
+			return .BoolMul(dest, r, l, exp)
+
+		if l is Const
+			swap (l) (r)
+		if l.isint
+			return .IntMul(exp, dest, r, l)
+		return .floatmul(exp, Dest, l, r)
+	
+
+	function Divide (fn_opasm)
+		if r iz l												// return 1
+			return .SelfDivide(dest, exp)
+		if dest.isint
+			return .DivInt(exp, dest, l, r)
+		return .DivFloat(exp, dest, l, r, )
+
+
+	function DivFloat	(fn_opasm)
+		if (dest is Const) and (l isnt alternate)
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyFloatDiv)
+		|| Q = .QuickFloatDiv(exp, dest, L, R)
+			return Q
+		if 0: exp.VDIV
+
+		|| Small = dest.IsSmall|int|
+			if !dest.isvec
+				|| Fat = exp.OptVecMathTwo(dest, L, R)
+					fat._op = asm.udiv
+					return fat * dest
+		
+		return exp.FDIV(dest,  L,  R, Small).Vectorise(dest, asm.VDIV)
+
+
+	function SelfDivide (|asmreg| dest, |message| exp, |asmreg|)
+		if dest.IsInt
+			return .NumToReg(exp, dest, 1, datatypecode.int) // x/x=1
+		if dest.issmall
+			return .NumToReg(exp, dest, 0x3f800000 /*1.0*/, DataTypeCode.float)
+		return .NumToReg(exp, dest, 0x3ff0000000000000 /*1.0 double*/, DataTypeCode.f64)
+
+
+	function QuickIntDiv (fn_opasm)
+		require r is Const
+		|| PToi = .IntPowerOftwo(r)$
+		if ptoi <= 1																	//   x/1  x/0  x/-1
+			if ptoi == 0
+				exp.DivByZero
+			return .Quick1Or1Sub(dest, l, ptoi, exp)
+		if !l.Signed
+			return .BFLG_Sub(exp, dest, l, 0, ptoi-1, false)							// u / 2 --> u >> 1
+		return exp.DIV2(dest, l, l.Bitloss, ptoi-1) * Dest		// nice
+
+
+	function DivInt    (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntDiv)
+		|| q = .QuickIntDiv(exp, dest, l, r)
+			return q
+
+		// Dividing a big one by a small one, then?     bad.   We use 64-bit divide. But the small has garbage
+
+		if l.reg and l.isbig and dest.issmall		// what?		
+		if l.IsBig and r.issmall         // Sigh.  Small has garbage, but were doing a 64-bit divide.
+			r = .SmallToBig(r, l, exp)
+		
+		if 0
+			exp.DIVS
+			exp.QDIV
+		|| fat = exp.DIV(dest, nil, l, r, dest.signed|int|)
+		fat._Outputs &= ~2 // clear this output
+		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
+
+
+	function ModInt    (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
+		|| fat = exp.DIV(nil, dest, L, R, dest.signed|int|)
+		fat._Outputs &= ~1 // clear unused output 
+		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
+
+
+	function ModFloat    (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, L, R, Constifyfloatmod)
+		|| small = dest.IsSmall|int|
+		return exp.fmod(dest, L, R, small).Vectorise(dest, asm.VMOD)
+
+	
+	function Mod    (fn_opasm)
+		if dest.isint
+			return .ModInt(exp, dest, l, r)
+		return .ModFloat(exp, dest, l, r)
+
+
+	// BITS
+	function BitNot (fn_opasm)
+		if r.reg // what?
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, asmreg(), ConstifyBitNot)
+		if 0: exp.qnot
+		return exp.bnot(dest, l, asmreg(), -1).Vectorise(dest, asm.qnot)
+
+
+	function BitXor (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitXor)
+		if (l iz r)
+			return dest.Zero
+		if l.iszero
+			return r
+		if r.iszero
+			return l
+		if (l is Const)
+			swap (l) (r)
+		if 0: exp.BXOR, exp.qxor
+		return .BitMaker(dest, l, r, exp, asm.bxor, asm.qxor)
+
+
+
+	function MiniBOR (|asmreg| l, |asmreg| r, |asmreg| Dest, |asmreg|)
+		|| F = .MiniBORSub(l, r)
+			return f.µtype(Dest)
+	
+	
+	function MiniBORSub (|asmreg| l, |asmreg| r, |asmreg|)
+		if (l iz r)
+			return l
+		if r is Const
+			|| K = r.const
+			if k == 0
+				return l
+			if k == -1
+				return r
+
+
+	function BitOr (fn_opasm) 
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r,  ConstifyBitOr)
+
+		if (l is Const)
+			swap (l) (r)
+
+		if dest isnt Textual
+			|| F = .MiniBOR(l, r, dest)
+				return F
+		
+		if 0: exp.BORR, exp.qorr
+		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
+
+	
+	function BitAndOpt (|assembler| self, |message| exp,  |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
+		if l is Const
+			|| k = l.const
+			if .NopConst(l, -1)
+				return r
+			if k == 0
+				return dest.zero
+		|| f = l.fat
+		if  f  and  (f isa asm.bnot or asm.qnot)  and  (f.prms[3]==-1)
+			// D = ~L & R
+			if .IsWithin(f)
+				|| bnot = exp.bnot(dest, f.asmreg(1), R, 0)
+				.AskNop(f, bnot)
+				return bnot.Vectorise(dest, asm.qnot)
+
+
+	function BitAnd (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitAnd)
+		if (l iz r)
+			return l
+		|| k = .BitAndOpt(exp, dest, l, r) ?? .BitAndOpt(exp, dest, r, l)
+			return k
+		if (l is Const)
+			swap (l) (r)
+		if 0: exp.qand
+		return .BitMaker(dest, l, r, exp, asm.band, asm.QAND)
+	
+
+	function CanBAND_BFLG (|asmreg| R, |int|)
+		if R is Const
+			|| k = R.const
+			if k and (++k).IsPow2
+				.NopConst(R)
+				return 64 - k.Log2
+
+		
+	function BitMaker (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |asm| Opp, |asm| VOpp, |asmreg|)
+		if asm.BORK!=asm.borr+4 // what?
+
+		if (r.reg) and (!dest.IsVec)
+			if (opp == asm.BAND)
+				|| B = .CanBAND_BFLG(R)
+					return .BFLG_Sub(exp, dest, L, B, B, false)
+			
+			|| k = .Const(R, 14, true)
+				if 0:  exp.BORK,  exp.BXRK
+				|| fat = exp.BANK(Dest, L, K)
+				fat._op = opp+4
+				return fat * Dest
+
+				
+		|| Clear = l.BitCount - r.BitCount
+		if Clear < 0
+			swap (l) (r)
+			clear = -clear
+		
+		if Clear and r.signed and !l.IsBitCorrect
+			r = exp.ExpandBits(r, l.µtype)			// wat a shame.
+			clear = 0
+			
+		|| fat = exp.BAND(dest, L, R, Clear)
+		fat._op = opp
+		return fat.Vectorise(dest, vopp)
+
+	
+	function SHR  (fn_opasm)
+		if dest is Const
+			|| Signed = l.signed
+			|| fn = (signed)(ConstifyBitSHS, ConstifyBitSHR)
+			return .MakeConstFromTwo(exp, dest, l, r, fn)
+		|| K = .const(R, 6, false)
+			if k == 0
+				return L
+			return .BFLG(exp, dest, l, 0, k)
+		
+		|| fat = exp.BRSH(dest, L, R, l.bitloss)
+		fat.Vectorise(dest, asm.QRSS)
+		if l.Signed
+			if 0: exp.brss, exp.QRSS, exp.QRSH
+			fat._op--
+		return fat * dest	
+
+
+	function SHL  (fn_opasm)
+		if dest is Const
+			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitSHL)
+		|| K = .const(R, 6, false)
+			return .BFLG(exp, dest, l,  K, 0)
+		
+		if 0: exp.QLSH
+		return exp.BLSH(dest, L, R, l.bitloss).Vectorise(Dest, asm.QLSH)
+
+
+	function MergeBFLG (|message| exp, |asmreg| dest, |asmreg| Src, |uint| upB, |uint| downB, |int| SignB,  |asmreg|)
+		// y = (x << a) >> b
+		// z = (y << c) >> d
+		// -->
+		// z = (x << e) >> f // the question is what is E and F.
+		// can it be done, even. The maths is too complex for me to figure out.
+		// So I gave up and brute-forced it.
+		
+		|| bflg = .Register(src.reg)
+		require bflg and .iscurr(bflg, asm.bflg)
+		|| PrevInput = bflg.ASMReg(1)
+		if (.last != bflg)
+			|| Intefere = .register(previnput.reg)
+			require Intefere <= bflg
+		
+		|| UpA = bflg.prms[2]							// check sign!
+		|| DownA = bflg.prms[3]
+		|| SignA = bflg.prms[4]
+		if signA != signB
+			if downa and downb
+				return nil
+			if downa
+				signb = signa
+		
+		|| Total = (UpA+UpB) - (DownA+DownB)			// check that it can even be done
+		|| Up = .CanMergeBits(upa, downa, upb, downb, total)
+			if  src is temp  or  dest iz src
+				src = PrevInput
+				.SoftNop(bflg)							// write over the old
+			  else
+				if PrevInput iz src
+					return nil							// self-replace will fail. Dont have the old version!
+			return exp.BFLG(dest, PrevInput, up, up-total, signb) * dest
+
+
+	function CanMergeBits (|int| UpA,  |int| DownA,  |int| UpB,  |int| DownB, |int| Total, |ind|)
+		if DownA > UpA
+			require (upb <= downb) // i think this test isn't needed but I can't figure out why.
+		|uint64| MaxB = -1								// Assume 100% filled
+		|| Target = (MaxB << UpA) >> DownA
+		Target    = (Target << UpB) >> DownB
+		
+		for up in 64
+			|| down = up - Total
+			if down|uint| < 64
+				|| C = MaxB << Up
+				|| D = C >> Down
+				if D == Target
+					return up			
+		
+
+	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+		if !up and !down
+			return src.µtype(Dest)
+
+		|| SrcBits = src.BitCount
+		if srcbits == 1							// bool
+			if down > up
+				problem (exp, "Bool shifted into nothing")
+			if down == up
+				return src.µtype(Dest)
+			srcbits = (up+1) min 64
+			
+		if (up > srcbits) or (down > SrcBits)
+			problem (exp, "Shift too far")
+			
+		|| Extra = 64 - SrcBits
+		up += Extra
+		down += Extra
+		return .BFLG_Sub(Exp, dest, src, up, down, src.signed)
+
+
+	function BFLG_Sub (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
+		if !up and !down and dest iz src // oof
+			return dest
+		
+		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
+			return dest.zero
+
+		if down >= 64
+			down = 63
+		
+		|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign|int|)
+			return Merge
+		
+		if (up == down) and !dest.IsVec and (!src.Signed or sign)
+			// converting a byte to an int, ok
+			// byte to uint, also ok
+			// int8 to int, also ok
+			// int8 to uint... bad
+			|| mem = src.fat
+			if mem and mem.IsRead and .IsCurr(mem)
+				|| size = 64-src.BitCount // already bit correct!
+				if size == up
+					// why not set dest.reg to src.reg?, and return dest? to be more consistant?
+					// because its creating lowreg-marked temps?
+					// then why aren't the others considered temp??
+					// sigh
+					src.µType = dest.µType
+					return src
+		
+		|| fat = exp.BFLG(dest,  src,  up,  down,  Sign|int|)
+		return fat.Vectorise(dest, asm.QFLG)
+
+	
+	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
+		opt inline
+		|| f = src.fat$
+		
+		if src isnt temp
+			require .iscurr(f) and (dest is exitatall)
+			|| vdecls = .state.parentvars|uint|
+			|| find = 1<<src.reg
+			require (vdecls & find) // the decl is out of range! IE... it won't be missed.
+									// we can fuck around with it as much as we like >:3
+		
+		return .redest(f, dest)
+	
+	
+	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |asmreg|)  // assigns (
+		if src iz dest
+			return src													// return src makes more sense? type-wise?
+		
+		if src isnt const
+			if !src.reg
+				(src is const)
+			(Dest is const) = (src is const)
+			
+		
+		target debug: if (dest.IsVec != src.IsVec) and src.reg
+		|| improve = .ImproveAssign(dest, src)
+			return improve
+		
+		if dest.IsVec
+			return exp.VMOV(dest, src) * dest
+
+		if src is Const													// setting a const
+			|| K = src.const
+			return .LoadNumber(exp, K, src.µtype.SpecialReg, dest)		// Consts are the most optimisable thing we have
+
+		if src.IsFloat
+			return exp.FADD(dest, src, asmreg(), asmreg(), src.FourBytes|int|) * dest
+		// BFLG is VERY optimisable :] (but consts are even more)
+		
+		|| sh = src.BitCount - dest.BitCount
+		if sh >= 0
+			// leave as is
+		  elseif src.signed
+			sh = 64 - src.bitcount
+		  else
+			sh = 0 // no point otherwise. just make the asm simpler.
+				
+		(dest isnt Const)
+
+		|| Sign = src.signed|int|
+		|| Merge = .MergeBFLG(exp, dest, src, sh, sh, Sign)
+			return Merge
+		
+		return exp.BFLG(dest, src, sh, sh, sign) * Dest
+	
+	
+function int64.Fits (|int| amount, |bool| signed=true, |bool|)
+	|int64| sh = 64 - amount
+	|| x = self << sh
+	if signed
+		x >>= sh
+	  else
+		x = X|uint64| >> sh
+	return x == self
+

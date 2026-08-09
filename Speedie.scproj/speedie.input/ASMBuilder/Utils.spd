@@ -1,0 +1,216 @@
+
+
+
+|| ExportPosFails = 0
+function message.ASMDecl (|SCDecl!|)
+	opt norefcounts
+	rz = .fastdecl
+	if (rz is Global) and !rz.ExportPosition
+		while .func == @arel
+			self = .first!
+		rz = .FastDecl
+		if rz.exportposition
+			.parent!.obj = rz // fix it up.
+		  else
+			if ++ExportPosFails <= 2
+				error (self, "ASM Glob lacks pos: " + .locate)
+	
+	if rz.typeonly == 0
+		|| T = rz.wholetype
+		T.µtype = rz.CalculateASMType
+		rz.wholetype = T
+	target debug: rz.ASMSanity
+
+
+function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
+	|| p = .Curr
+	if p < .End
+		.curr_ = p + 1
+		p[0] = nil
+		|| Info = p.index|uint64|<<48
+		p.info = Info|asmreg|				// no need to call fat*reg now
+		p.ASMIndex = .BreakRequest
+		p._op = op
+		p.FatMap = exp						// could remove this?
+		.breakrequest = nil
+		.ExpectOneMore = false
+		p.BasicBlock = .BasicBlock
+		return p
+
+	error (exp, "Function too large (over 64K)")
+	return .start
+
+
+function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
+	|| dt = dest.µType
+	|| st = .µType
+	target debug
+		if dt is floating and st is floating
+			|| stb = st.bytecount
+			|| dtb = dt.bytecount
+			if (stb != dtb) and !(stb == 16 and dtb == 12)
+		if dt isnt floating and st is bool			// allow
+			0
+		  else
+			if (dt is Floating != st Is Floating)
+
+	if dt.isfloat
+		return self									// can't change anything about it...
+
+													// returning more bits seems safe
+	if dt is bool and st isnt bool
+		return self									// |bool| x = a & b
+
+	if dt
+		if (dt.bytecount <= st.bytecount)
+			.µtype = dt								// correct sign/whatever
+	return self
+
+
+target debug
+	function scdecl.ASMSanity 
+		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
+			|| size = .type.ClsSize
+			|| T = .TypeOnly
+			if T == DataTypeCode.Vec3 or DataTypeCode.ivec3
+				size = 12
+			if size != T.bytecount // sigh. what?
+				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
+				#!"We could change it if it is only 112."
+				debugger
+				t.DebugPrint
+
+
+function Assembler.OpenVars (|uint64|)
+	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
+
+
+function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |asmreg|)
+	opt NoRefCounts
+	
+	|| OrigTemps = (Orig >> 32)
+	|| OrigDecls = (Orig << 32) >> 32
+	|| Missing = ~(OrigTemps ||| OrigDecls)
+
+	while .CloseOneVar(exp, Missing)
+		0
+
+	Missing = OrigDecls &~ .VDecls
+	if !exp or !missing
+		return return
+	
+	.VDecls |= Missing	
+	
+	return return
+
+
+
+function Assembler.ClearAllStructs (|message!| exp,  |bool|)
+	for i in 32
+		|| fat = .Register(i)
+			.ClearStruct(exp, fat, i)
+
+
+function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|)
+	opt norefcounts
+	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
+		|asmreg| vreg
+		vreg.reg = v
+		ASMType.AllocBearStruct(-1, exp.FlatLast, vreg, fat.RegOnly(1)<<4)
+		.SetRegister(v, nil, nil)
+	return true
+
+
+function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
+	opt norefcounts
+	// we have a missing value. but is it missing from one, or the other? lets do it on that basis.
+	|| Curr = .vdecls
+	|| T = .vtemps
+	|| Extra = Curr & Missing
+	|| IsReal = true
+	if !Extra
+		Curr = T
+		Extra = Curr & Missing				#require
+		IsReal = false
+
+	|| v = extra.Log2
+	|| v_bits = 1<<v
+	|| Result = Curr &~ v_bits
+	.Regs.KnownMap &=~ v_bits
+	
+	if IsReal
+		.vdecls = Result
+		if .RegDebugInfo & v_bits
+			.MarkVarClosed(v_bits)
+	  else
+		.vtemps = Result // 🔥🔥🔥🔥🔥
+
+	|| fat = .register(v)
+		// why do I do this?
+		// Clearstruct also does nothing if exp==nil
+		if exp
+			.SetRegister(v, nil, nil) // no reason to want to nop anything here.
+		return .ClearStruct(exp, fat, v)
+
+	return true
+
+
+
+function scdecl.CalculateDataType (|datatypecode|)
+	rz = .CalculateDataTypeSub
+	.mu.datatype = rz
+
+
+function scdecl.CalculateDataTypeSub (|datatypecode|)
+	opt norefcounts
+	if .pointercount or .iscarray
+		// carrays must be allocated. So this reg will store a pointer to the carray.
+		return datatypecode._voidptr
+
+	|| t = .type
+	|| b = t.BaseType
+	if b > scnodetype.DataType
+		return datatypecode._voidptr
+	
+	return t.typeinfo
+
+
+function scdecl.CalculateASMType (|asmreg|)
+	return .CalculateDataTypeSub|asmreg|
+
+
+function SCFunction.ASMReturn (|scdecl|)
+	opt norefcounts
+	|| T = .returntype
+	if t isnt ReturnedStruct
+		return T
+
+
+function SCFunction.ASMReturn (|ASMReg| Dest, |asmreg|)
+	opt norefcounts
+	dest.µtype = .ASMReturn.ASMRegType
+	return dest
+
+
+function asmreg.incr (|asmreg|)
+	|| f = .fat
+		f.µrefcount++
+		return self
+	target debug
+		if .reg and self is Const  // sigh
+	return self
+
+
+function message.CallChainError (|string| name)
+	opt norefcounts
+	problem (self, name)
+	|| sh = assembler.sh
+	|| i = sh.inlinedepth|int|
+	while --i >= 0
+		|| st = sh.inlinestate[i]
+		|| fn = st.fn
+		|| src = fn.source
+			problem (src, "\tInlined from here.")
+
+
+

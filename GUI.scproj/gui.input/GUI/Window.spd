@@ -1,0 +1,646 @@
+
+
+class Window (GUIControl)
+	linkage
+		cpp_part Win
+	|byte|								SimulationFPS
+	|bool|								IsDialog
+	|bool|								IsMainWindow
+	|GUIControl?|						Focus
+	|Guicontrol?|						InnerFocus
+	|GUIControl?|						CurrMouseDown
+	|guicontrol?|						ToolTipControl
+	|guicontrol?|						DroppingInto
+	|guicontrol?|						CurrMouseOver
+	|InlineEditor|						InlineEditorPlace
+	|GUIMouseMoveEvent?|				OnMouseMove
+	|list of TaskGUI|					Tasks
+	|object?|							ReturnValue
+	|date|								CreatedDate
+	|uint64|							FrameCount
+
+	visible false
+	|date|								_AlphaFader
+	|bool|								_FocusWasSet
+	|float|								BlockScale
+	|vec2|								BlockMove
+	|byte|								BlockMode
+	|guicontrol?|						_FocusAttempt
+	|byte|								_FrameNum
+	|uint16|							_FrameNext
+	|date|								_LastTimeSeen
+	|byte|								_FlashSelf
+	|bool|								_NeedsResize
+	|bool|								_BlockRecurseKeyDown
+	|bool|								_PostLoaded
+	|TaskGUI?|							_Scroller
+	|GuiControl?|						_SelBeforeMouseDown
+
+	
+	constructor
+		super.constructor(window.all)
+		.Tasks = list()
+		.subconstructor(the~area, true)
+		
+
+	constructor (|ControlRect| Size, |bool| Show=true)
+		cpp_part ConstructorSize
+		super.constructor(window.all)
+		.Tasks = list()
+		.subconstructor(size, show)
+	
+	
+	libinternal SubConstructor (|ControlRect| Size, |bool| show)
+		._NeedsResize = true
+		.size = Size
+		.createddate = gui.FrameStart
+		if .CreatedDate < 16
+			.CreatedDate = date.now
+		.InlineEditorPlace.Init(self)
+		gui.CalculateWindowSize(self, true, true)
+		if show
+			.show
+
+	
+	destructor
+		.ClearTree
+
+
+	virtual FrameStep (|bool| WindowActive)
+		0
+
+//	virtual TryClose (|GUIActivity| Reason=GUIActivity.windowclose, |bool|)
+//		return true
+
+	virtual CancelClose (|GUIActivity| Reason, |bool|)
+		// Better to have CanceClose==false mean close, than TryClose==true
+		// Using TryClose, many programmers (me) would forget to return true,
+		// and their program refuses to quit.
+		return false
+
+
+	virtual DrawBackground (|image| where)
+		|| a = .GNormal.bg.Alpha()
+		if .UsesEntireScreen and (a < 1.0)
+			¥.DrawIntoBackground(where)
+		
+		if a > 0
+			where.DrawRectStyled(.lastrect.soothe, .GNormal, movecode.open)
+	
+	
+	behaviour AppForeGroundChange
+		opt norefcounts
+		for c in self
+			c.__AppForegroundChange__(isforeground)
+	
+	virtual Tickle
+		description "Called when an mouse or keyboard event arrives. Can be used to wakeup sleeping threads for greater responsivity." 
+	
+
+	function RealFocus (|guicontrol?|)
+		opt norefcounts
+		return .innerfocus ?? .focus
+
+
+	libinternal OpenedMenu (assigns:|menu|)
+		.SetInnerFocus(value)
+
+
+	function OpenedMenu (|menu|)
+		opt norefcounts
+		|| f = .InnerFocus
+		if f isa menu
+			return f
+		f = f.parent
+		if f isa menu
+			return f
+		
+
+	function RunAsMain (|float| Scaling = 1.0, |int| SimulationFPS=0, |ErrorInt|)
+		.show
+		.IsMainWindow = true
+		.SimulationFPS = SimulationFPS
+		if SimulationFPS > 0
+			(fpsView(self))
+		if !gui.init(scaling)
+			return -1
+		
+		gui.CenterCursor
+		.BlockScale ?= 20
+		gui.CalculateWindowSize(self, true, true)
+		if gui.SingleFrameDepth // just make it a normal window
+			return 0
+		
+		rz = gui.run
+		if rz
+			gui.NukeCursor
+
+		
+	syntax call (|ConfirmCanceller| Cancel=nil, |object?|)
+		require !(Cancel)() and self isnt visible // recursive... sigh
+		.OpenDialog
+		.returnvalue = nil
+		while GUI.SingleFrameNested
+			rz = .returnvalue
+			if rz or (Cancel)()
+				exit
+		.ReturnValue = nil
+		if rz == self
+			rz = nil
+		.Close
+	
+
+	libinternal SetInnerFocus (|guicontrol| Focus)
+		|| old = .InnerFocus
+		require old != Focus
+		|| menu = .OpenedMenu // shares innerfocus
+			ifn focus in menu
+				(menu isnt visible) // makes sense?
+		.InnerFocus = focus
+		.finishfocus(focus)
+		if focus
+			focus.__GotFocus__
+		if old
+			old.__LostFocus__
+//		.InnerLostFocus = old
+
+
+	libinternal FinishFocus (|guicontrol| focus)
+		if focus and .parent and focus isnt drawsfocus
+			._alphafader = gui.FrameStart
+		  else
+			._alphafader = 0
+		
+		._FocusWasSet = true // for stop mousedown bug
+		GUI.UpdateTextFocus(self)
+		GUI.touch(Self)
+
+
+	function SetFocus (|guicontrol| Focus)
+		._FocusAttempt = Focus
+		if focus
+			require focus.Takesfocus.able	// and (focus is visible) // fixfocus will fix it.
+											// besides, important events could be missed, like a task
+											// that makes the control visible and slides it open.
+		if focus == .inlineeditor
+			.setInnerFocus(focus)
+			return
+		
+		ifn .InnerFocus isa menu
+			.setinnerfocus(nil)
+		require (.focus != focus)
+		.setinnerfocus(nil)
+		
+		|| old = .focus
+		.focus = focus
+
+		if focus
+			focus.__GotFocus__
+		if old
+			old.__LostFocus__
+		
+		.FinishFocus(focus)
+
+
+	syntax is (|guicontrolflags| F, assigns:|bool|)
+		require self
+		|| n = GUI.nativewindow
+			if (f == guicontrolflags.Modified) and ((self is modified) != value)
+				GUI.JB_SDL_SetModified(n, value)
+		super.syntaxis(f) = value
+
+
+	behaviour Gesture
+		opt norefcounts
+		|| XY = GUI.MouseXY
+		|| it = .OpenedMenu()
+		if it and it.lastrect.Contains(xy)
+			return it.__Gesture__(wheel, rotate, pinch)
+		|| R = self[xy]
+			R.__Gesture__(wheel, rotate, pinch)
+		return true
+
+
+	behaviour TypedString
+		opt norefcounts
+		|| f = .realFocus
+			|| o = f
+			if (f isa menu) and (f != .focus) and (f is typethrough)
+				o = .focus$
+			if o.__TypedString__(input)
+				return true
+		if Input.LengthUTF8 == 1
+			if .__KeyDown__(input.codepoint(false))
+				return true
+		beep
+	
+	libinternal DoListViewNext (|bool| fwd, |bool|)
+		opt norefcounts
+		|| l = .MainlistView
+		if !l
+			return true
+
+		|| Item = l.FirstSelected
+		if keys.shift
+			fwd = !fwd
+		if !Item
+			item = (fwd)(L.liststart, l.Listend)
+		  else
+			item = l.SearchStep(item, fwd)
+		if item
+			L.select(item)
+		return L.PressReturnKey
+	
+	
+	libinternal MainlistView (|listview|)
+		opt norefcounts
+		|| s = .flatnext
+		|| e = .flatafter
+		while s and s != e
+			if !s.isviewable
+				s = s.flatafter
+				continue
+			if (s isa listview) and !(s isa menu)
+				if s.IsMainListView
+					rz = s
+				
+			s = s.flatnext
+			
+	
+	behaviour KeyDown
+		debug_require !._BlockRecurseKeyDown
+		._BlockRecurseKeyDown = true
+		rz = .KeyDownWin(key)
+		._BlockRecurseKeyDown = false
+
+
+	libinternal KeyDownWin (|keys| key, |bool|)
+		opt norefcounts
+		
+		|| F = .realfocus
+			|| menu = .openedmenu
+			if !menu
+				if f.__keydown__(key)
+					return true
+			  elseif (key is tab)
+				if menu isnt typethrough
+					menu.closemenu
+					return true
+			  elseif key is escape
+				menu.closemenu
+				return true
+			  else
+				if menu.__keydown__(key)
+					return true
+				return (menu is typethrough or f in menu) and f.__keydown__(key)
+		
+		if key is tab
+			f ?= .first
+			if f
+				f = f.NextFocus(!keys.shift, keys.option)
+			if f
+				if f isnt opensmenu
+					f.setfocus
+				  else
+					(f.onclicked)(f)?
+			return true
+		if (key is escape) and .IsDialog
+			if !.ReturnValue and !.__CancelClose__(GUIActivity.windowclose)
+				.CancelReturn
+			return true
+	
+		
+	function Show
+		opt norefcounts
+		keys.Reset
+		is visible
+		is NewlyShown
+		window.all <~ self // why not?
+
+
+	inline IsFront (|bool|)
+		return .islast
+
+
+	inline UsesEntireScreen (|bool|)
+		return .LastRect == All.lastrect
+
+
+	libinternal DrawWindow (|image| where)
+		where.window = self
+		._ReadjustBlock2D
+		.__drawbackground__(where)
+		.DrawContents(where)
+		.__draw__(where)
+		|| gd = .GNormal.PixelShader
+			(gd)(where, .LastRect, .GNormal, MoveCode.Edges)
+		.RunWindowTasks(true)
+
+
+	behaviour Draw
+		// do nothing... let children override
+
+
+	libinternal DrawContents (|image| where)
+		opt norefcounts
+		where.window = self
+		|| inner = .InnerFocus
+		|| lim = .LastRect.Soothe
+		
+		.DrawChildren(where, lim, inner)
+
+		|| m = .openedmenu
+			inner = m
+		ifn inner and inner.DrawInner(where)
+			|| f = .Focus
+				f.drawfocus(where, 1.0)
+		
+		where.ResetBoundsToSize
+		if ._AlphaFader and ._FlashSelf
+			.DrawFocusRect(Where, .LastRect, .FaintingEdgeSub)
+
+	
+	libinternal guicontrol.DrawInner (|image| where, |bool|)
+		opt norefcounts
+		|| R = .LastRect
+		if R.ispositive and .window.isviewable
+			where.ControlClip = self
+			.__Draw__(Where)
+			.DrawChildren(where, R)
+			where.ControlClip = self
+			.DrawFocus(where, 0.7)
+			return true
+
+
+	libinternal FixFocus
+		opt norefcounts
+		|| f = .innerfocus
+			if f isnt visible or Enabled
+				.SetInnerFocus(nil)
+		|| f2 = .focus
+			if f2 isnt visible or Enabled
+				.SetFocus(nil)
+
+
+	libinternal guicontrol.CanPasteInto (|guicontrol|dest, |guicontrol|)
+		require dest != nil  and  dest != self
+		require dest is editable and enabled
+		|| copies = .Copypaste.CanCopy
+		if copies.CanPasteInto(dest.CopyPaste)
+			return dest
+	
+	
+	libinternal ClearDrops
+		GUI.candrag = 0
+		GUI.drawdrag = nil
+		.DroppingInto = nil
+		.currmousedown = nil
+
+
+	libinternal DoDragAcrossControls (|ivec2| P, |guicontrol| r, |bool|)
+		GUI.drawdrag ?= r.DragList
+		if GUI.drawdrag
+			|| dest = r.CanPasteInto(self[p, true])
+			.DroppingInto = dest
+			if dest
+				dest.setfocus
+				dest.__mousedown__(p, -1)
+				return true
+
+
+	libinternal DoMouseDrag (|ivec2| P, |bool| Beyond)
+		opt norefcounts
+		|| r = .CurrMouseDown$
+		require (r is visible) or (r == .openedmenu)
+		
+		if keys.cancel
+			.ClearDrops
+			return
+		
+		if r contains p
+			.DroppingInto = nil
+		  elseif beyond and .DoDragAcrossControls(p,r)
+			return
+		
+		if !Beyond
+			require (r.lastrect ± -20) contains p
+		GUI.CanDrag = R.__mousedown__(p, -1) & ~MouseDragging.flags
+
+	
+	syntax access (|ivec2| P, |bool| ForDrag=false, |guicontrol|)
+		opt NoRefCounts
+		cpp_part ControlAtXY
+		rz = .ControlAt(p)
+		if ForDrag
+			rz ?= .ControlAt(p, 10)
+		if rz isnt Enabled
+			rz = nil
+
+
+	function guicontrol.ControlAt (|ivec2| P, |int| Pad=0, |Guicontrol?|)
+		opt norefcounts
+		description "Returns a control at the position P. To ignore disabled controls use syntaxaccess"
+		for R.backwards in self
+			if (r is visible) and !r.decluttering
+				|| rr = r.lastrect ± -pad
+				if rr contains P
+					if r.HasAny
+						|| it = r.controlat(p, pad)
+							return it
+					if r isnt PassThru
+						return r
+						
+	
+	libinternal OpenDialog
+		.isdialog = true
+		window.all <~ self
+		is visible
+		GUI.StartResize // sigh
+
+
+	libinternal GUI.AskAllQuit (|bool|)
+		|| m = window.all.array										// so we can call .show
+		rz = true
+		for w in m
+			if !w.IsDialog
+				w.show
+				.QuitReason = GUIActivity.questioning				// in case of wierd events
+				rz = !w.__CancelClose__(GUIActivity.questioning|||GUIActivity.exiting)
+				loop rz			
+		
+		
+	libinternal GUI.AskQuit (|GUIActivity|)
+		opt norefcounts
+		
+		require .AskAllQuit
+		rz = GUIActivity.Terminating
+		for w in Window.all
+			gui.QuitReason |= rz
+			w.Close(rz)
+
+		.QuitReason = rz
+		
+	
+	function Close (|GUIActivity| Reason = GUIActivity.windowclose, |GUIActivity|)
+		if !self
+			return 0
+			
+		if .IsDialog
+			isnt visible
+			.ReturnValue ?= self
+			.remove
+			return reason
+		
+		require !.__CancelClose__(reason) or (reason is terminating)
+		.ClearTree
+		.remove
+		return reason
+	
+	
+	libinternal DoMouseDown (|ivec2| P, |int| Clicks, |guicontrol|)
+		._SelBeforeMouseDown = .focus
+		|| M = .openedmenu 
+			|| O = .focus
+			if (m contains p) and (m is enabled)
+				GUI.CanDrag = M.__mousedown__(p, clicks) & ~MouseDragging.flags
+				return m
+			
+			m.CloseMenu
+			|| R = self[p]
+			require  r  and  r is opensmenu  and  r != O
+		
+		._FocusWasSet = false
+		|| Found = .ControlAt(p)
+		if found is Enabled
+			|| clicks2 = Found.__MouseDown__(p, clicks)
+				GUI.CanDrag = (clicks2 * (clicks2 > mousedragging.handled)) & ~MouseDragging.flags
+				ifn clicks2 & MouseDragging.Eaten
+					if !._FocusWasSet and (found != .innerfocus)
+						.setfocus(Found)
+				rz = Found
+
+
+	libinternal RunWindowTasks (|bool| WantAnims)
+		// not sure why but somehow soemthing is being destroyed here
+		// i guess any code could do anything at any point so...
+		// lets not make assumptions
+		// wait, WantAnims (animated) isnt used? 
+		// does that mean this is being called more than it should?
+		for p in .Tasks
+			|| IsAnim = p is animation 
+			if IsAnim == WantAnims
+				if !.SmartRunTask(p, WantAnims)
+					p.Remove
+
+
+	libinternal SmartRunTask (|taskgui| P,  |bool| Animated, |bool|)
+		|| s = p.StartTime
+		|| e = s + p.duration
+		|| now = GUI.FrameStart
+		if now >= s
+			if now > e
+				require p isnt finished
+				(p is Finished)
+			(p is started)
+		  elseif P is WaitStillStart
+			return true
+		
+		|| Prog = p.TaskProgress(now)
+		|| ok = (p)(self, Prog)
+		if p isnt Finished
+			return ok
+			 
+	
+	iterator
+		|| ctrl = .first|guicontrol|
+		while ctrl
+			|| nxt = ctrl.flatnext
+			yield ctrl
+			ctrl = nxt
+	
+
+	module
+		|object|					LeakedTestObj
+		|GUIControl|				ActiveControl
+		|guicontrol of Window|		All = guicontrol(nil)
+		
+		inline Front (|Window|)
+			return  .all.last
+		
+
+
+struct SDL_Window
+	linkage:wrapper
+	destructor
+		cpp_wrapper SDL_DestroyWindow
+	cpp_func SDL_GetWindowWMInfo (|&SDL_SysWMinfo| info, |bool|)
+
+	constants
+		OCCLUDED	=	4
+		HIDDEN		=	8	/* Not mapped to desktop or taskbar/dock/window list; use SDL_ShowWindow() to make visible */
+	
+
+
+
+struct SDL_SysWMinfo
+	|int|		A
+	|int|		B
+	|&nil|		window //actually a "datatype ObjCID:"
+	|byte[56]|	Buffer
+
+
+
+struct SDL_DisplayMode
+	linkage: wrapper
+	|uint|	format
+	|int|	w 
+	|int|	h
+	|int|	refresh_rate
+	|&nil|	driverdata
+
+
+
+struct SDL_Renderer
+	linkage: wrapper
+	destructor
+		cpp_wrapper SDL_DestroyRenderer
+
+
+
+struct SDL_Texture
+	linkage: wrapper
+	function Dispose
+		cpp_wrapper SDL_DestroyTexture
+
+	function UnlockThatCopiesEvenThoughItShouldnt
+		cpp_wrapper SDL_UnlockTexture
+	
+	function LockThatZerosEvenThoughItShouldnt (|?&nil| rect, |$(?&nil)| p, |$int| n)
+		cpp_wrapper SDL_LockTexture
+		
+	destructor
+		.dispose
+
+
+
+function window.MouseXY (|ivec2|)
+	return GUI.MouseXY - .LastRect.xy
+
+
+function guicontrol.MouseXY (|ivec2|)
+	opt norefcounts
+	|| w = .window
+		return w.MouseXY
+
+
+
+
+/*
+// your the best... you know that! ooop-
+folder1/
+	file
+		data
+	folder2/
+	file2
+*/
+

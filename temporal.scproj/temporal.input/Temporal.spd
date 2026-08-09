@@ -1,0 +1,27 @@
+
+
+
+// goddamn this thing isnt working right right now..... !!! ;_; :O : O  D: 
+// maybe a simpler approach? put all the code in speedie?
+module Temporal	
+	|temporal.EngineState|	Desired
+	|SteveMachine|			Generator
+	
+	function Start (|&TemporalGenerator| T, |int| size=16KB)
+		.generator = T.Create(5, size)
+		// needs a thread... just look at whatever jb_pipe.cpp does
+		// i think it just... doesnt need to do memory management
+		// we could make our thread just copy stuff... that way
+		// the user can work with the length/capacity properties?
+
+	function Refresh
+		.Generator.refresh
+	
+	datatype EngineState (int)
+		constants
+			|Temporal.EngineState| 
+			Stopped = 0
+			Active = 1
+			Paused = 2
+	
+	

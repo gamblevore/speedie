@@ -1,0 +1,157 @@
+
+
+extern "C" {
+
+#define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
+
+JB_String* JB_Platform();
+bool JB_Platform__OSX();
+bool JB_Platform__Win();
+bool JB_Platform__Lin();
+int JB_Platform__CPU();
+bool JB_IsLibrary();
+Array* JB_App__Args();
+JB_StringC*	JB_App__CallPath(const char*);
+JB_String* JB_App__Readline();
+bool JB_App__ShouldDie();
+int JB_App__LostChild();
+int JB_App__ParentID();
+int JB_App__ID();
+Dictionary* JB_App__Env();
+void JB_App__Quit (JB_String* Err, int Code);
+byte* JB_App__ErrorNumber ();
+void JB_Flow__DisabledIncr(int i);
+void JB_Flow__DisabledSet(int i);
+bool JB_Flow__IsDisabled();
+JB_String* JB_App__Path();
+int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
+int JB_Rec__PrintErrors();
+JB_String* JB_App__LibInfo();   
+void** JB_App__LibFuncs();
+JB_StringC* JB_App__LibDebug();
+void** JB_App__LibGlobs();
+u16* JB_App__GlobTable();
+JB_String* JB_App__LibClasses(); 
+
+
+// Startup
+void JB_LibShutdown();
+bool JB_LibIsThreaded();
+
+
+// APP
+void JB_App__Beep ();
+void JB_App__GUIMode(bool Die);
+void JB_App__SetIcon (const char* Path);
+void JB_App__InitStuff ();
+void JB_SDL_RemoveWindowBorder (void* window);
+void JB_SDL_FullScreenToggle (void* w);
+void JB_SDL_FullScreen (void* w, bool On);
+void JB_SDL_SetModified (void* w, bool b);
+void JB_App__ShowURL (const char* Path);
+JB_String* JB_App__DocumentOpened (bool Clear);
+
+
+// Sub process
+int* JB_SP_ErrorNumber ();
+int	 JB_SP_Run (const char** R, int Mode);
+int	 JB_SP_Init (const char** R, bool IsThread);
+
+
+// dylib
+#include <dlfcn.h>
+
+struct JB_Dylib {
+	void* _handle;
+};
+
+void* JB_dylib_Load (JB_Dylib* Self, JB_String* Path);
+bool JB_dylib_Open (JB_Dylib* Self, JB_String* Path, int Mode);
+void JB_dylib_Close (JB_Dylib* Self);
+const char* JB_dylib_Error (JB_Dylib* Self);
+
+
+// VM 
+struct CakeVM; struct CakeStack;
+typedef int64 (*JB_ASM_Break)(CakeVM* VM, CakeStack* Stack, int Error, uint Break);
+typedef u64 (*Fn0 )();
+
+struct CakeStack {
+	u32*		Code;
+	uint		SFlags;			
+	byte		Up;
+	byte		Down;
+	u16			Depth;
+};
+
+
+struct CakeRegister {
+	union {
+		CakeStack		Stack;
+		JB_Object*		Obj;
+		s64				Int;
+		u64				Uint;
+		float			Float;
+		double			Double;
+		ivec4			Ivec;
+		uvec4			Uvec;
+		vec4			Vec;
+		int				Int32;
+		uint			Uint32;
+	};
+};
+
+
+struct CakeVM {
+    int				CakeFail;
+    int				UserFlags;
+    JB_ASM_Break	__VIEW__;
+    CakeStack*		ProposedStack;
+    byte*			LibGlobs;
+    byte*			PackGlobs;
+    Fn0*			CppFuncs;
+    byte*			AllocBase;
+    PicoAction		Pico;
+	void* const*	OriginalJumpTable;
+	void*			JumpTable[514];
+    
+    u16				VFlags;
+std::atomic<bool>	Lock;
+	u8				BreakState;
+    u32				ExitGuard;
+	CakeRegister	Registers[];
+};
+
+
+typedef void (*SaverLoadClass)(JB_Class* cls, int8* Data);
+void		JB_InitClassList	(SaverLoadClass fn);
+
+CakeVM*		JB_ASM__VM			(int Flags);
+u32*		JB_ASM_Code			(CakeVM* V, int Length);
+int			JB_ASM_Index		(CakeVM* V, u32* Code);
+int			JB_ASM_StackCode	(CakeVM* V, ivec4* Reg0);
+void		JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
+ivec4*		JB_ASM_Run			(CakeVM* V, int CodeIndex);
+void**		JB_ASM_InitTable	(CakeVM* V, int n, int g);
+ivec4*		JB_ASM_Registers	(CakeVM* V, bool Clear);
+uint*		JB_ASM_SetDebug		(CakeVM* V, int Level);
+void		JB_ASM_LinkPico		(CakeVM* V, PicoComms* P, PicoActionFn Fn);
+void		JB_ASM_Pause		(CakeVM* V);
+ivec4*		JB_ASM_CallBack		(CakeVM* V, u32* Code);
+bool		JB_Cake__Prepare	(int N, int B);
+JB_Class*	JB_Cake__Class		(const char* Name, int Size, JB_Class* Parent, int VCount);
+void		JB_Cake__Tester		();
+void**		JB_Cake_Virtuals	(JB_Class* C);
+ivec4*		__CAKE_VM__			(CakeVM& vm, u32* Code, CakeRegister* r);
+
+extern CakeVM*	JB_GlobalVM;
+inline CakeVM* JB_ASM_GlobalVM	() {return JB_GlobalVM;}
+
+
+inline CakeStack* JB_ASM_BaseStack (CakeVM* V) {
+	V = VMClearHigh(V);
+	return (CakeStack*)(V->Registers+2);
+}
+
+} // ExternCEnd
+

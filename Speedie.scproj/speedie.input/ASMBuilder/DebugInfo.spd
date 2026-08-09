@@ -1,0 +1,176 @@
+
+
+function SCDecl.MiniName (|faststring| fs)
+	|| Bra = self is ClassObj
+	.name.MiniName(fs, Bra)
+
+
+
+function string.MiniName (|faststring| fs, |bool| IsClass)
+	opt norefcounts
+	|| n = .name
+	|| after = int.max
+	if IsClass and  n.EndsWith("data", true)
+		after = n.Length - 4							// ErrorData
+	
+	|| i = n[0, "JB_", true]
+	fs.AppendRange(n, i * 3, after)
+
+
+
+function SCDecl.DumpFlags (|byte|)
+	opt norefcounts
+	rz = (self is Param)|byte|
+	rz |= .IsBareStruct << 1
+	
+	if self is Local
+		rz |= .TypeSuffers << 2
+	  else
+		rz |= (.NilDeclared is Nilish) << 2
+	
+	if .IsNormal
+		|| t = .Type
+		rz |= (t.BaseType is ProtoType) << 3
+		rz |= (t == TypeCString) << 4
+
+
+function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true) // decldump, debugdump
+	opt norefcounts
+	|| Mark = dd.Length
+	dd <~ '\0'											// range-length
+	dd.AppendHInt(pos)
+	reg *= IsLocal
+	dd.AppendHInt(Reg)
+	dd <~ .DumpFlags
+	
+	|| s = .source
+	|| SrcMap = (s!=nil)(s.SrcMap, 0)
+//	|| SrcMap = (s.SrcMap, 0)(s) // I guess the original was cleaner.
+	dd.AppendHInt(SrcMap)
+	.MiniName(dd)
+	dd <~ '\0'
+	dd.AppendHInt(.DumpCls)
+	
+	|| PB = DataTypeCode.PossibleBits
+	|| T = .Type.TypeInfo  &  PB
+	dd.AppendHInt(T)
+	.DumpWierdness(dd)
+	
+	dd[mark] = dd.length - (mark + 1)
+
+
+
+function jbin.DumpDeclClose (|int| Pos, |int| Reg)
+	|| Mark = .Length
+	self <~ '\0'					// range-length states that theres no name/type. So it must be a close!
+	.AppendHInt(pos)
+	.AppendHInt(Reg)
+	self[mark] = .length - (mark + 1)
+
+
+
+function FATASM.OutputDebugVars (|int| Next)
+	opt norefcounts
+	|| dd = Assembler.DebugDecls!
+	|| Index = .ASMIndex
+	if self is DebugVarClose
+		if self isa asm.mark
+			index = (self-1).ASMIndex
+		
+		for i.bits in ._Const
+			dd.DumpDeclClose(index, i.log2)
+
+	  else
+		ifn self isa asm.mark
+			index = Next
+		|| ty = .msg.NilDecl
+		|| reg = .Output.reg
+		if ty and reg
+			ty.DumpDeclOpen(dd, index, reg)
+
+
+
+function scdecl.DumpCls (|int|)
+	opt norefcounts
+	|| t = .type.RealClass
+	if t.isobject or t.isstruct
+		return (t.tableid<<1) + t.isobject
+
+
+
+function SCDecl.Wierdness (|int|)
+	rz = (.IsBareStruct or (self is reference)) << 1
+	// bare structs are still pointerlike...
+	rz |= .pointercount > 0
+	rz |= .C_Array<<2
+
+
+
+function SCDecl.DumpWierdness (|jbin| j)
+	opt norefcounts
+	|| Count = 0
+	while (|| W = .Wierdness)
+		expect (++Count < 5) (.source, "Too much wierdness")
+		j.AppendHInt(W)
+		self = .Internal$
+	
+
+
+function FatASM.CanCloseRegs (|int| R, |bool|)
+	if .Index|int| <= 0 // oof
+	|| op = ._Op
+	if op == asm.ret or asm.RFRT
+		return true
+	if  (op == asm.MARK) and (self isnt debugvaropen)
+		return true
+		
+	if (op == asm.rfun) and (R&(R-1) == 0)
+		|| v = R.log2
+		if  .RegOnly(0) == v  and  .regonly(1) == v  and  .regonly(2) == 0
+			return true
+
+
+	
+function Assembler.MarkVarClosed (|int| RegBits)
+	.RegDebugInfo &= ~RegBits
+	|| Mark = .last
+	if !mark.CanCloseRegs(RegBits)
+		mark = mark.Msg.MARK()
+		mark.µrefcount = 1
+		
+	(mark is DebugVarClose)
+	mark._Const |= RegBits
+
+
+
+function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
+	opt norefcounts
+	require (self isnt DebugVarOpen) or (self isa asm.mark)
+	require self isnt DebugVarClose			// for cleanlyness
+	if (.Output iz Declared)
+		|| msg = .msg
+		if (msg.NilDecl == ty)
+			return true
+		if msg.func != @func				// fatrenderer needs @func
+			.msg = exp
+			return true
+
+
+
+function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
+	|| Last = .Last
+	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
+		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
+	
+	while Start <= Last
+		if Last.CanMarkOpen(exp, Declared, ty)
+			(Last is DebugVarOpen)
+			return declared
+		Last--
+
+	last = exp.mark()
+	last._Outputs = 1,  last.µrefcount = 1,  last.prms[0] = Declared.reg
+	(Last is DebugVarOpen)	
+	return Declared
+
+

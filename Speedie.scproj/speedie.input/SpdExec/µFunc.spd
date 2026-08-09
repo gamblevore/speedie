@@ -1,0 +1,189 @@
+
+
+extend SCFunction
+	function µTest (|memory of asm|)
+		description "Generate some code (only for testing)."
+		rz = asm[.µfatlength|int|*3]!
+		|| p = rz.ptr
+		|| after = .ASMBake(P, P+rz.Size, nil)
+		rz.Size = after-p
+		rz.length = rz.Size		// ::::::]]]]]]]
+
+
+	function FatFirst (|&fatasm|)
+		return Assembler.sh.start + .µstart
+	
+	
+	function Message.SrcMap (|uint|)
+		opt inline
+		return .SrcMap2(.position)
+
+	
+	function Message.SrcMap2 (|int| Fake, |uint|)
+		// 11-bits for the file num, 21-bits for the position
+		// 2K files and 2MB per-file max
+		// File Num goes at the top, to make it more significant
+
+		|| FileNum = .tag|uint|>>5
+		return (FileNum << 21) ||| (Fake&(21~bits))
+	
+	
+	function FatBetterPos (|fatasm| fat, |uint|)
+		|| prev = fat-1
+		if prev >= .FatFirst
+			|| pos = prev.FatMap
+			fat.FatMap = pos							// chain it across
+			return pos
+		return 0										// just remove the whole thing...
+	
+	
+	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
+		opt norefcounts
+		rz = where
+		assembler.sh.funcstart_ = .fatfirst - 1			// for debug
+		
+		|byte| HasLabel
+		for fat.fat in self
+			HasLabel |= fat.JumpPrm
+			if (rz - where) > 63K
+				error (.source, "Function too large (over 63K)")
+			|| Break = fat.ASMIndex
+			fat.ASMIndex = rz - where
+			fat.CheckHasOutput
+			
+			|| Curr = rz
+			rz = fat.µBakeInto(rz, after)
+			
+			if Positions
+				|| pos = fat.FatMap
+				if pos >> 21 == 0						// init code... has no file
+					pos = .FatBetterPos(fat)
+				if curr < rz
+					Positions[] = pos
+					while (Curr++ < rz)
+						Positions++
+					if break
+						fat.BakeBreak(Pos, break)
+				if fat.info is DebugVars
+					fat.OutputDebugVars(rz-where)
+
+		if HasLabel
+			for fat.fat in self
+				|| r = fat.JumpPrm
+					fat.FillLabelRequest(where, rz, r-1)	
+	
+	
+	target debug
+		render µRender (|bool| RenderBlocks = false)
+			fs <~ "asm ${.exportname}   ${.µASMLength*4}\n"
+			|| bb = 0
+			for µ.fat in self
+				if RenderBlocks and µ.BasicBlock != bb
+					bb = µ.BasicBlock
+					fs <~ "//$bb\n"
+				µ.RenderFat(fs)
+				fs <~ '\n'
+
+
+	function µPrint 
+		target debug
+			printline self
+			printline .µRender
+
+
+	iterator fat
+		|| FirstInst = .FatFirst
+		|| CurrInst = FirstInst
+		|| AfterInst = Currinst + .µfatlength
+		while currinst < Afterinst
+			yield currinst (CurrInst - FirstInst)
+			++currinst
+
+
+
+function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
+	(after)
+	|| SelfOut = start + .ASMIndex
+	target debug: debug_require  SelfOut >= start  and  SelfOut < after
+
+	// this needs fixing.
+	|int| J = .prms[reg]
+	|| OldDest = self + J + 1
+	|| DestOut = OldDest.asmindex
+	|| dest = start + DestOut
+
+	target debug: debug_require dest >= start and dest <= after
+	|| J2 = (dest - SelfOut) -1
+	check (J2 != -1) (self, "Infinite loop")
+	.prms[reg] = J2
+	.µBakeInto(SelfOut, SelfOut+1)			// rerender
+	.prms[reg] = J							// restore!
+	
+
+	
+function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
+	opt norefcounts
+	for fn in .PackFuncs
+		if .PackSaved.AddOrShrink(j, fn)
+			SCFunction.CurrFunc = fn
+			|| Start = sourcemap.ASMTotal
+			require j.BakeFunc(fn)
+			|| glob = fn.HasProto
+				if !glob.type.IsInterface
+					bmr.appendhint(glob.ExportPosition)
+					bmr.appendhint(Start)
+			fn.µprint
+	return true
+
+
+function JBin.BakeASMSub (|SCFunction| fn, |int| T, |bool|)
+	opt norefcounts
+	|| Start = .StartAdd
+	|| Positions = SourceMap.Reserve(t*4)
+	|| Addr = .reserve(t*4)|&asm|
+	|| after = fn.ASMBake(Addr, Addr+t, Positions)
+	sourcemap.ASMTotal += t
+	.FinishAdd(@bin, Start)
+	expect (after-addr == T)									(fn, "ASM length corrupt")
+	return sourcemap.check(fn, T*4)
+
+
+function JBin.BakeFunc (|SCFunction| fn, |bool|)
+	opt norefcounts
+	|| t = fn.µASMLength
+	Compiler.stTotalASMOps += t
+	
+	if !Options.StripNames // never true if dd
+		.BakeFuncName(fn)
+
+	|| dd = assembler.DebugDecls
+		for a in fn.args
+			a.DumpDeclOpen(dd, 0, a.reg)
+	
+	rz = .BakeASMSub(fn, t)
+	
+	if dd
+		.add(@bin, dd)
+		dd.Length = 0
+		
+		|| R = fn.ASMRange
+		for i in 3
+			dd.AppendHInt(r[i])
+		.add(@bin, dd)
+		dd.Length = 0
+		
+	if !Options.StripNames
+		.exit
+
+
+function jbin.BakeFuncName (|SCFunction| fn)
+	opt norefcounts
+	|| fs = FastString.new(nil|faststring|)
+	|| cls = fn.cls
+		fs <~ cls.name
+		fs <~ '.'
+	fs <~ fn.name
+	.add(@tmp, fs, true)
+	self <~ '\0'
+	
+

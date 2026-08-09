@@ -1,0 +1,30 @@
+
+
+// Super 🎂cake🎂 running program!
+
+main
+	opt NoRefCounts	
+	target debug
+		stderr.PrintNewErrors = ErrorFlags.PrintFirst
+		cakerun.TestOffsets
+
+	require Globals.VerifyGlobs
+	|| p = cake.perry
+		p <~ "`hoi :3`"
+
+	require CakeRun.GetStructure
+	SpdTable.LinkFunctions
+	if debugger.LoadDebugger
+		return SpdTable.RunProgram
+
+
+
+api Cake_Main (spdprocess.MicroProcess)
+	// to debug Cake from Perry
+	cpp_name Cake_Main
+	SpdProcess._ForceParent = Comms
+	rz = app.sp_run(args, mode&4)
+	if rz == 0
+		rz = app.sp_run(args, mode)
+	memory.Free(args) // no need anymore!
+

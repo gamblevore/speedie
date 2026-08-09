@@ -1,0 +1,110 @@
+
+
+datatype CopyPasteFlags (uint16)
+	// how to totally inline this class?
+	linkage
+		cpp_part CPF
+	Flags
+		|CopyPasteFlags|
+		// Important to have copyfile and pastefile being separate.
+		// We might want to copy a file but not being able to paste a file
+		Copy  = [CopyFile,  CopyText,  CopyImage,  CopyNode]
+		Paste = [PasteFile, PasteText, PasteImage, PasteNode]
+		PasteTextLike = (PasteText|||PasteFile)
+		CreateFile
+	inline CanCopy (|CopyPasteFlags|)
+		return self&Copy
+	inline CanPaste (|CopyPasteFlags|)
+		return self&Paste
+	inline CanPasteInto (|CopyPasteFlags| dest, |bool|)
+		return (dest >> 4) & (self&copy)
+	syntax is (|CopyPasteFlags| v, |bool|)
+		inlined
+		return self & v
+
+
+
+datatype TakesFocusFlag (byte)
+	linkage
+		cpp_part TFF
+	flags
+		CanFocus
+		CanTabInto
+		None = 0
+		On = CanTabInto ||| CanFocus
+
+	inline Able (|bool|)
+		return (self&canfocus) != 0
+	
+	syntax cast (|bool|)
+		disabled "What?"
+		
+	function Tab (|bool| force=false, |bool|)
+		if (self&CanTabInto) != 0
+			return true
+		if force and self != 0
+			return true
+
+
+datatype GuiControlFlags (uint)
+	linkage
+		cpp_part GCF
+	flags
+		|GuiControlFlags|
+		Visible
+		Enabled
+		Editable
+		UnSearchable
+		CodeEditor
+		NoSearch
+		TypeThrough
+		PassThru
+		Spacer
+		AlwaysScrollable
+		Modified
+		NeverDrawModified
+		OpensMenu
+		NewlyShown
+		TrapVisibleChange
+		BlockSized
+		HasBeenSized
+		DrawsFocus // showborder, showsborder, hasborder, drawborder
+
+
+struct TimeFader
+	linkage: cpp_part Fade
+	|date|		Final
+	|float|		Scale
+	
+	function Strength (|float|)
+		|| f = .final
+		if !f
+			return 1.0
+		if f == -1
+			return 0
+		GUI.touch
+		|| remain = f - gui.framestart
+		if remain <= 0
+			.final = -1
+			return 0
+		return (remain.float * .Scale).clamp
+	
+	inline Finished (|bool|)
+		return .final == -1
+
+	function Hide
+		GUI.touch
+		.final = -1
+		.scale = 0
+
+	function Fire (|float| Seconds, |float| Delay = 0.0,  assigns:|bool|)
+		GUI.touch
+		if value
+			|| next = gui.framestart + (seconds+delay).date
+			if !.final or next < .final
+				.final = next
+				.scale = 1.0 / seconds
+		  else
+			.final = 0
+			.scale = 0
+		

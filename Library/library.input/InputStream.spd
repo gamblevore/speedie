@@ -1,0 +1,258 @@
+
+
+class InputStream
+	|int|						Length
+	|FastBuff|					Data
+	|file?|						File
+	|ParserCallBack?|			CallBack
+	|object--?|					_Object
+	|int|						ChunkSize
+	|int|						StartFrom
+	|bool|						_NoMoreChunks
+	|bool|						TryRecoverBadData
+
+	linkage
+		cpp_part SS
+	
+	
+	constructor (|string| Data)
+		.reset(Data)
+	
+	
+	constructor (|file!| file, |int| ChunkSize=4MB)
+		cpp_part ConstructorFile
+		file.close
+		.file = file
+		.ChunkSize = chunksize
+		.length = file.size
+		.ReadChunk(file)
+
+	
+	function Reset (|string| Data)
+		.data.readfrom = Data
+		.length = Data.length
+		._NoMoreChunks = true
+
+
+	function ReadAll (|string|)
+		return .str(.length - .startfrom)
+
+
+	function Parse (|syntax| owner = @arg, |bool| AllowDecomp=true, |message|)
+		return .ReadAll.parse(owner, allowdecomp)
+
+	
+	libinternal ReadChunk (|file| f, |bool|)
+		.data.readfrom = f.read(.chunksize)		// for now
+		if .data.readfrom.length < .chunksize
+			._NoMoreChunks = true // not technically true for pipes... but this will do for now!
+		return .data.readfrom
+	
+	
+	function Skip (|int| p = 1)
+		if p < 0								// end
+			.position = .length
+		  else
+			.position += p
+	
+		
+	function Remaining (|int|)
+		return .length - .position
+
+
+	function HasAny (|bool|)
+		nil checker
+		require (self != nil)
+		if .data.hasany
+			return true
+		return .NextChunk
+
+
+	libinternal NextChunk (|bool|)
+		opt norefcounts
+		|| f = .file
+			.startfrom += .data.size
+			if .ReadChunk(f)
+				return true
+			.file = nil							// why not
+	
+	
+	function NonZeroByte (|int|)
+		while 
+			|| b = .byte
+			if b != 0							// -1 means end
+				return b
+
+
+	function Find (|byte| c, |int|)
+		|| n = 0
+		while 
+			|| b = .byte
+			if b < 0
+				return -1
+			n++
+			if b == c
+				return n
+
+	
+	function Byte (|ind|)
+		if .data.HasAny or .NextChunk
+			return .data.byte
+		return -1
+	
+	
+	syntax Compare (|int| n, |int|)
+		inlined
+		return .length - n
+	
+	
+	function Position (|int|)					// cant be int64 without making remaining/length/startfrom also.
+		return .data.position + .StartFrom		// and data.position
+
+	setter Position (|int|)
+		.data.position = value - .StartFrom
+
+
+	function HInt (|int|)
+		|uint| v = .byte
+		if v <= 127
+			return v
+		v = v & 127
+		|| sh = 7
+		while
+			|uint| b = .byte
+			v |= (b&127) << sh
+			if b <= 127
+				return v
+			// should really cap this to 31-bits.
+			sh += 7
+			expect (sh <= 28) (self, "Bad Length")
+
+	
+	function DelimitedString (|byte| split, |string|)
+		// this function doesn't work with streaming...
+		// its not ideal. but none of my code needs this streamed!
+		// they just read the entire file in. So I don't need it!
+		|| p = .position
+		|| zpos = .data.find(split, p, int.max)
+			.position = zpos+1
+			return .data[p, zpos] // don't call .section, seeing as its not streaming.
+
+	inline CString (|string|)
+		return .DelimitedString(0)
+	
+	inline UpTo (|int| end, |int|)
+		return end - .position
+	
+	inline Int32BE (|int|)
+		return .uintbe(4)
+
+	function UIntBE (|int| Size, |uint64|)
+		for Size
+			rz <<= 8
+			rz += .byte max 0
+
+	function UInt (|int| size, |uint64|)
+		for i in size
+			|| b = .byte max 0
+			rz += b << (i<<3)
+	
+	function Trim (|int| n, |string|)
+		return .str(n).Trim
+	
+	function Eat (|string| s, |int|)
+		for c in s
+			|| p = .Position
+			if .Byte != c
+				.Position = p
+				exit
+			rz++
+		
+	function StrNoAdvance (|int| n, |string|)
+		|| p = .Position
+		rz = .str(n)
+		.Position = p
+	
+	function NoMoreChunksToRead (|bool|)
+		if ._NoMoreChunks
+			return true
+		if .data.Remaining <= 0
+			if !.file
+				return true
+			if .length <= .startfrom
+				return true
+				
+	function Str (|int| n, |int| skip = 0, |string|)
+		ifn n > 0 and skip < n
+			return ""
+		
+		// Normal path
+		if (.data.has(n)) or (.NoMoreChunksToRead)
+			(n min= .remaining)
+			|| pos = .data.position		// no need use the .startfrom
+			n += pos
+			.data.position = n
+			return .data.syntaxaccess(pos + skip, n)
+
+		// Failed, lets try to stitch new data together
+		|| Remaining = n - skip
+		|| r = string(Remaining)				#require
+		|| Dest = r.addr
+		while
+			|| Copied = .data.CopyTo(dest, .data.Remaining min Remaining)
+			Remaining -= Copied
+			dest += copied
+			loop Remaining > 0
+			if !.NextChunk
+				r = r[0, r.length - remaining].copy
+				exit
+		return r
+	
+	function HasHeader (|string| Header, |bool|)
+		if !Header
+			return true
+		return Header == .str(Header.length)
+	
+
+	iterator
+		while
+			|| _b = .byte
+			if (_b < 0): exit
+			yield (_b) (.Position)
+		
+	syntax expect (|string| Error)
+		opt norefcounts
+		cpp_part Fail
+		._Object = nil
+		require !.data.WentBad
+		.data.WentBad = true
+		
+		if !error
+			if (.file)	
+				error = "Error decoding file: "
+			  else
+				error = "Error decoding data."
+				
+		errorreceiver.NewError(nil, error, .file)
+
+
+	task ParserCallBack (|InputStream| Upon)
+		constructor
+			libinternal
+		run (|message| msg)
+			libinternal
+
+
+
+	
+function string.Stream (|string| Header, |InputStream?|)
+	cpp_part StreamWithHeader
+	rz = InputStream(self)
+	if header and !rz.HasHeader(Header)
+		rz = nil
+
+// can't be unified with above.	The above returns optional.
+inline string.Stream (|InputStream!|)
+	return InputStream(self)
+
+

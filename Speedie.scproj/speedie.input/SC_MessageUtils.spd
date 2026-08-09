@@ -1,0 +1,611 @@
+
+
+
+///////////// ///////////// ///////////// FINDING ///////////// ///////////// ///////////// 
+
+
+function Message.FindAndRemove (|String| name,  |bool| NothingOK,  |bool| IsClass,  |string|)
+	opt norefcounts
+	return .FindAndRemoveSub(name, NothingOK, isclass)$.name
+
+
+
+function Message.DeprecatedClassOption (|String| name,  |string| Kind="!",  |int|)
+	// this is a wasteful way to do stuff.
+	// better to find them as we go through the code... not search for each at the start.
+	|| place = .find( @Tmp, name )		#require
+	|| num = 1
+	if Kind != "!"
+		|| ch = place.first
+		require ch and ch.expect(@thg) and ch ~= Kind
+		|| num_msg = ch.next 
+			num_msg.expect(@num)
+			num = num_msg.int
+	
+	place.Remove
+	Return num
+
+
+
+///////////// ///////////// ///////////// SYNTAX ///////////// ///////////// ///////////// 
+
+
+function Message.MsgOwningFunc (|SCFunction|)
+	opt norefcounts
+	nil self
+	for ch.up in self
+		|| O = ch.obj
+		if O isa SCArg
+			|| pf = o.ParentFunc
+				Return pf
+		  elseif (O isa SCFunction) and (ch != @prm)
+			// could be a func associated with the lst on "obj.func".
+			Return o
+
+
+function message.MakeComment // ignorenode ()  makeignored ()
+	.ASMType = ASMType.kIgnore
+	.func = @Sheb
+	.clear
+
+
+function Message.NegateThg (|Message|)
+	opt norefcounts
+	if .name == "true"
+		.name = "false"
+		.obj = FalseBool
+		return self
+	if .name == "false"
+		.name = "true"
+		.obj = TrueBool
+		return self
+	return .WrapWith(@BRel, "!")
+
+
+function Message.Negate (|Message!|)
+	opt norefcounts
+	real self
+	|| upon = self
+	|| f = .func
+	if f == @thg
+		return .negatethg
+	
+	if f == @bra
+		upon = .unbra
+		if upon.func == @thg
+			upon.negatethg
+			.obj = upon.obj
+			return self
+	
+	if upon isbrel "!"
+		upon.become(@bra)
+		return self
+	
+	if upon.func == @rel
+		|| opmsg = upon.second!
+		|| op = scoperator.dict[opmsg.name]
+			|| nega = op.opposite
+				opmsg.become(nega)
+				return self
+
+	if f == @bra
+		.Become(@brel, "!")					// the negator!
+		return self
+
+	using self
+	rz = .WrapWith(@BRel,  "!")			// also the negator!
+
+
+function Message.IsAssignable (|bool|)
+	opt norefcounts
+	self = .unbra
+	|| f = .func
+	if f == @acc // hmmmmm
+		|| L = .first!.unbra
+		|| fn = l.MsgFunc
+			|| t = fn.ReturnType
+				if t.IsNumeric // hmmm not possible. even for a temp-vector.
+					return false
+			
+	return f != @Func and @type and @num
+
+
+function message.IsInt (|bool|)
+	return (self == @num) and !.name.find('.')
+
+
+function Message.UpToArg (|Message|)
+	opt norefcounts
+	while
+		|| p = .parent!
+		if p.func == @arg
+			return self
+		self = p 
+
+
+function Message.IsVarUseableInLoop (|String| name, |bool|)
+	if name == "self"
+		return false
+	return .IsVarAltered(name)
+
+
+function Message.IsVarAltered (|String| name, |bool|)
+	opt norefcounts
+	for msg.flat in self
+		if (msg == @Rel) and (msg in @arg) and (msg.first IsThing name)
+			Return true
+
+
+function Message.MsgArg (|SCArg|)
+	opt norefcounts
+	for ch.up in self
+		|| O = ch.obj
+		if O isa SCArg
+			Return O
+
+
+function Message.MsgFunc (|SCFunction|)
+	opt norefcounts
+	if self
+		|| s = .func
+		if s == @Dot or @Func
+			|| sc = .second
+				|| fnc = sc.obj
+				if (fnc isa SCFunction)
+					return fnc
+
+
+function Message.DclExp (|Message|)
+	opt norefcounts
+	if self == @decl // oof
+		return .second
+	return self
+
+
+function Message.MsgDecl (|SCDecl|)
+	opt norefcounts
+	|| d = .DclExp
+		return d.AsDecl
+
+
+function Message.DeclName (|Message|)
+	opt norefcounts
+	|| name = .DclExp
+	if name == @Rel
+		Return name[@thg]
+	if name == @Thg
+		Return name
+	expect !(name == @Emb) (self)
+
+
+function Message.VarName (|string|)
+	opt norefcounts
+	|| ch = self[@nil, 1]
+		|| f = ch.func
+		if f == @rel
+			ch = ch.first!
+			f = ch.func
+		if f == @thg
+			return ch.name
+		error (ch)
+
+
+
+// same as above?
+function Message.GetDclName (|bool| IsConstructor=false, |Message|)
+	opt norefcounts
+	if isconstructor
+		expect (self == 2) (self, "Constructors can't return things")
+	rz = self[@Nil, 1]
+	if rz == @Rel
+		rz = rz[@thg]
+	if !rz
+		error (self, "No decl name found")
+
+
+function Message.CollectDclName (|Message|)
+	opt norefcounts
+	if self
+		|| thg = self
+		if thg == @Rel
+			thg = thg.first
+		if thg == @thg
+			return thg
+		error self
+
+
+function Message.WithinLoop (|Message| stop, |bool|)
+	opt norefcounts
+	while (self != stop) and self
+		if (self IsTmp "while" or "for")
+			return true // seems OK, its within a loop.
+		self = .parent
+
+
+function Message.UnBra (|Message|)
+	opt norefcounts
+	real self
+	While self == @bra and .first != @arg
+		self = .first!
+	return self
+
+
+function Message.UnBraType (|Message|)
+	opt norefcounts
+	real self
+	While (self == @type) or (self == @bra and .first != @arg)
+		self = .first!
+	return self
+
+
+function Message.UpToType (|Message|) // updecl, finddecl
+	opt norefcounts
+	|| c = self
+	while c
+		|| p = c.parent
+		if p == @type
+			require c.islast
+			return p
+		c = p
+
+	
+function Message.CastedParent (|Message|)
+	opt norefcounts
+	rz = .unbra.Parent
+	if rz == @prm
+		rz = rz.parent
+
+
+
+
+///////////// ///////////// ///////////// MOVING ///////////// ///////////// ///////////// 
+
+function Message.ReplaceWith (|message!| j, |Message!|)
+	.Prev = j
+	.Remove
+	return j
+	
+
+function Message.ReplaceWithChild (||)
+	rz = .First
+	.Prev = rz
+	.Remove
+
+
+function message.SpdFunc (assigns:|syntax|)
+	.func = value
+	.asmtype = 0
+
+
+function Message.SafeRemove (|syntax| T=@sheb)
+	if self
+		.SpdFunc = t
+		.name = ""
+		is inserted // stop issues with autocomplete :)
+		for (c in self)
+			c.remove
+
+
+function Message.SafeReplaceWith (|message| Incoming)
+	.saferemove @bra
+	self <~ incoming
+
+
+function Message.AddBefore (|Message| before, |Message| NewItem)
+	if before
+		before.Prev = NewItem
+	  else
+		self <~ NewItem
+
+
+function Message.InsertBefore (|Message| j, |Message?| ch)
+	opt norefcounts
+	real self
+	if ch in self
+		ch!.Prev = j
+	  else
+		.Last = j
+
+
+function scfunction.DeclAfter (|message| after, |scdecl| Orig, |scdecl| D, |message|)
+	opt norefcounts
+	|| src = orig.source!
+	using src
+
+	// carrays can't be set normally. We could just memzero it?
+	|| Prop = orig.DeclToDot(.self)
+	if d.IsCArray
+		rz = @dot.msg("zero")
+		rz.msg(@thg, "memory")
+		|| prms = rz.msg(@prm)
+		|| brel = prms.msg(@brel, "&")
+		|| acc = brel.msg(@acc)
+		acc <~ prop
+		|| arr = acc.msg(@arr)
+		arr.msg(@num, "0")
+		prms <~ d.CArraySize
+	  elseif orig != d
+		rz = @rel.msg
+		|| acc = rz.msg(@acc)
+		|| type = acc.msg(@type)
+		|| bra = type.msg(@bra)
+		bra.msg(@brel, "&") <~ prop
+		|| brel = type.msg(@brel, "&")
+		brel <~ d.WriteVerySimpleType
+		|| arr = acc.msg(@arr)
+		arr.msg(@num, "0")
+		rz.msg(@opp, "=")
+		rz <~ src.CreateNil // seems ok?
+	  else
+		|| def = d.Default
+		if (d.NilDeclared is Nilish)
+			def = «thg "nil"» // this doesn't quite seem right? why not just use the default?
+			def.obj = TypeNil // i guess lets just comment it out later
+		  else
+			def ?= d.CreateDefault(src)
+		rz = NewEqRel( Prop, def )
+	after.next = rz
+
+
+function Message.Move (|Message| last, |Message| into)
+	opt norefcounts
+	|| curr = self
+	while (curr != last)
+		|| next_ = curr.Next
+		into.First = curr
+		curr = next_
+
+
+function Message.AppendAllInto (|Message| Dest)
+	opt norefcounts
+	dest.Appendall(self)
+
+
+function Message.MoveAllAfter (|Message| after)
+	opt norefcounts
+	While .hasany
+		after.Next = .Last
+
+
+function Message.NeedMarker (|String| s, |bool| b, |Message|)
+	opt norefcounts
+	|| f = .find( @tmp, s )
+		return f
+	rz = @tmp.msg(s)
+	if b
+		.Last = rz
+	  else
+		.First = rz
+
+
+
+function Message.CopyAllAfterBefore (|Message| Before, |message| copylayer)
+	opt norefcounts
+	|| exp = .Next
+	While exp
+		before.Prev = exp.Copy(copylayer)
+		exp++
+
+
+function Message.CopyAllBefore (|Message| Before, |message| copylayer)
+	opt norefcounts
+	|| curr = .Prev
+	while curr
+		|| cpy = curr.Copy(copylayer)
+		Before.Prev = cpy
+		Before = cpy
+		curr--
+
+
+function Message.CopyAllAfter (|Message| after, |message| copylayer)
+	opt norefcounts
+	|| curr = .next
+	While curr
+		|| cpy = curr.Copy(copylayer)
+		after.Next = cpy
+		after = cpy
+		curr++
+
+
+// all these copyintos need to clear position
+function Message.CopyAllBeforeInto (|Message| into, |Message| copylayer)
+	opt norefcounts
+	|| curr = .Prev
+	while curr
+		into.first = curr.Copy(copylayer)	// was .WipeCopy. why did I do that?
+		curr--
+
+
+function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
+	opt norefcounts
+	|| curr = .Next
+	While curr
+		into <~ curr.Copy(copylayer) // was .wipecopy. why did I do that?
+		curr++
+
+
+
+///////////// ///////////// ///////////// CREATING ///////////// ///////////// ///////////// 
+
+function Message.GetMarker (|String| s, |Message|)
+	opt norefcounts
+	for a in self
+		if a isTmp s
+			return a
+
+
+function NewEqRel (|Message| L, |Message| R, |Message|)
+	opt norefcounts
+	rz = @rel.msg
+	rz <~ L
+	|| op = rz.msg(@Opp, "=")
+	op.obj = scoperator.assigns
+	rz <~ R
+
+	rz.ASMType = ASMType.kSetRel
+
+
+function NewEqRel (|string| L, |String| R, |Message|)
+	opt norefcounts
+	return neweqrel(@thg+l, @thg+r)
+
+
+
+function NewRejoin (|message|)
+	rz = @tmp + "rejoin"
+	rz.ASMType = ASMType.kRejoin
+
+
+//function NewDecl (|string| type, |string| name="", |message|)
+//	opt norefcounts
+//	|| msg = (@thg+name, nil)(name)
+//	return newdecl(type, msg)
+
+
+function NewDecl (|string| type, |message| RelOrName, |message|)
+	opt norefcounts
+	rz = @decl.msg
+	if type
+		rz <~ (@thg, type)
+	  else
+		rz <~ @emb
+	
+	rz <~ relOrName
+
+
+function NewRel (|Message| L, |Message| R, |string| op, |Message|)
+	opt norefcounts
+	rz = @rel.msg
+	rz <~ L
+	rz <~ (@Opp, op)
+	rz <~ R
+	
+
+function message.WrapWith (|syntax| f, |string| s="", |message!|)
+	opt norefcounts
+	rz = f + s
+	.prev = rz
+	rz <~ self
+
+
+function message.ReplaceInto (|message| w, |message|)
+	.prev = w
+	w <~ self
+	return w
+
+
+function Message.NeedBra (|Message|)
+	if (self == @Bra or self in @bra)
+		return self
+	
+	return .wrapwith(@bra)
+
+
+function NewFunc (|string| name, |Message|)
+	opt norefcounts
+	rz = @func.msg
+	rz <~ (@thg, name)
+	rz <~ @prm
+	
+	
+function message.ExpectEmpty
+	opt norefcounts
+	|| f = .first
+		error f
+
+
+function message.InFile (|int| file, |bool|)
+	return .tag>>5 == file
+
+
+function message.FrenchSpyReturn (|int| file=0, |int|) // naturally!
+	opt norefcounts
+	|| text = .OriginalParseData
+	|| Last = .FlatLast
+	|| after = last.After
+	while (after <= 0) or (file and !last.infile(file))
+		last = last.parent
+		if !last // welp
+			return -1
+		after = last.after
+
+	|| position = text.find(charset.Line, after)
+	if !position
+		position = after
+	return position + 1
+	// aka "invisible return"
+	
+	
+function message.AddReturn (|bool| NoSet=false, |message|)
+	opt norefcounts
+	parser.using.position = .FrenchSpyReturn
+	|| ret = .msg(@tmp, "return")
+	(ret is inserted)
+	if !NoSet
+		ret.ASMType = ASMType.kReturn
+	return ret	
+
+
+function message.IsAlwaysBool (|maybebool|)
+	opt norefcounts
+	|| d = .obj as SCDecl
+		if d.IsConstOf(falsebool)
+			return false|maybebool|
+		if d.IsConstOf(truebool)
+			return true|maybebool|
+
+
+function message.IsAlwaysFalse (|bool|)
+	return .IsAlwaysBool.Knownfalse
+
+
+function Message.StartUsingAfter // for "return" debugging.
+	opt norefcounts
+	|| biggest = -1
+	|| L = .MemoryLayer
+	|| d = .OriginalParseData
+		for s.flat in self
+			if s.position >= 0 and s.memorylayer == l 
+				(biggest max= s.after)
+		|| b2 = d.find("\n", biggest)
+			biggest = b2
+		biggest++
+	parser.Using.Position = biggest
+	parser.Using.Flags = MessageFlags.Inserted
+	.MemoryLayer.use
+
+
+function message.WipePos (|int| v=0, |message|)
+	opt norefcounts
+	for s.flat in self
+		s.Position = v
+	return self
+	
+	
+function Message.PrmFunc (|scfunction|)
+	opt norefcounts
+	if self
+		|| s = .Second
+			return s.obj as SCFunction
+		
+
+function Message.PrmFuncStructMsg (|message|)
+	opt norefcounts
+	|| list_fn = .PrmFunc
+		return .last[list_fn.structreturnpos-1]
+
+
+function Message.find (|syntax| P, |syntax| Ch, |string| name, |message|)
+	opt norefcounts
+	for s in self
+		if s.func == P
+			|| f = s.first
+				if f.func == ch and f.name ~= name
+					return f
+
+
+function message.Returns (|bool|)
+	opt norefcounts
+	return (.blocks is return) or (.last istmp "return")
+	
+

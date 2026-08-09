@@ -1,0 +1,47 @@
+
+
+role SpdFunc (message)
+	constructor
+		super.constructor
+		.tag = -1
+		.RangeLength = 0
+		.name = "(unused code)"
+		.func = @tmp
+		.Position = -1			// Position in the compiled code.
+
+	
+	function message.CodeToVM
+		opt norefcounts
+		|| Code = .name
+		if .func == @tmp
+			|| first = self[@nil]$
+			Code = first.name
+
+		|| n = Code.length >> 2
+		.RangeLength = n
+		
+		if (n-1)|uint| < (16~bits)|uint|
+			|| dest = cake.BeginCode + .Position
+			memory.Copy(dest, Code.addr, n<<2)
+			if .func != @tmp
+				.func = @tmp
+				.name = "(unnamed)"
+		  elseif n
+			error										(Code, "ASM oversized")
+		  else
+			error										(Code, "Empty function")
+	
+
+	function Run (|?&ivec4|)
+		cake.VM.Registers
+		|| Code = .Position
+		if code >= 0
+			return cake.VM.Run(Code)
+
+
+	function DebugSuccess (|int| id)
+		SpdTable.LinksOK++
+		printline "${spdtable.LinksOK}: ${SpdTable.CurrFunc!.Name} linked to $.name ($id)"
+
+		
+

@@ -1,0 +1,103 @@
+
+
+// vm.box
+
+
+class µForm
+	|int|			Count
+	|string|		Name
+	|µParam[6]|		Params
+	|message| 		src
+	|int|			TotalBits
+	|int| 			RegsAltered
+	|int|			Index
+	|int|			RegForJump // remove RegForJump and use forms count
+	
+	
+	render
+		fs <~ .name
+		for i in .count
+			fs <~ " "
+			fs <~ .params[i].BitSize
+		
+	
+	constructor (|message!| tmp)
+		opt norefcounts
+		.src = tmp
+		.name = tmp.name
+		for line in tmp.last(@arg)
+			|| f = line.NeedFirst
+			.loadparam(f.name, f)
+		
+		.index = ++µform.count
+
+
+	target debug
+		function AAA
+			visible
+			.index = ++µform.count
+
+
+	function AddP (|int| Size, |µParam| P=0)
+		if size <= 0 or size > 32 // hmm??
+		|| i = .count++
+		.totalbits += size
+		expect (i < –count .params) ("Defined too many ASM params")
+		p |= size - 1
+		.params[i] = p
+		if p is jump
+			if .RegForJump // what?
+			.RegForJump = i+1
+			
+
+	syntax Access (|int| i, |µParam|)
+		cpp_part AccessInt
+		return .params[i]
+	
+	
+	iterator
+		|| i = 0
+		while (i < .count)
+			yield self[i] (i)
+			++i
+
+	function AddRemainder (|int| U)
+		.addp( 24 - .TotalBits, µparam.Number ||| U)
+	
+	function LoadParam (|string| pl, |message| place)
+		if (pl.isint)
+			|| i = pl.int
+			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
+			.addp(i, µparam.Number)
+			return
+		expect (pl == 1) (self)
+		|| p = pl[]
+		if  p == 'r'
+			.AddP(5, µParam.Input)
+		  elseif p == 'R'
+			.AddP(5, µparam.Output)
+			.RegsAltered++
+		  elseif p == 'P'
+			.addP(5, µparam.Output + µParam.input)
+			.RegsAltered++
+		  elseif p == 'x' // for 64/96/128 sized instructions
+			.AddP(32, µparam.Number)
+		  elseif p == 'l'
+			.addremainder(0)
+		  elseif p == 'j'
+			.addremainder( µparam.signed + µparam.jump )
+		  elseif place
+			error (place)
+		  else
+		    error (self)
+	
+
+	module
+		|{µForm}|				Forms = dictionary()
+		|int| Count
+		function NeedForm (|string| Form, |message| m=nil, |µform|)
+			opt norefcounts
+			rz = .forms.valuelower(form)
+			if !rz
+				error (m, "Missing form: " + form)
+				rz = µform(@arg.msg)

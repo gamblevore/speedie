@@ -1,0 +1,2075 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+//datatype DotUseType (int) // replace entire thing with a bool?
+//	flags					// sigh. i wish i had made this unused stuff earlier
+//		|DotUseType|
+//		Property
+//		
+//	syntax is (|DotUseType| d, |bool|)
+//		return self == d
+
+
+datatype FunctionType (uint)
+	flags
+		|FunctionType|
+		Constructor
+		Destructor
+		Reffer
+		NotRefCounted
+		NewStruct
+		NumberCreator
+		TypeTest
+		InitFunc
+		Recursive
+		DirectlyRecursive
+		EmptyConstructor
+		VirtualCaller
+		Behaviour
+		ExpectsRealVars
+		AlreadyExported
+		Render
+		FlowDisabled
+		ExternalLib
+		CantInline
+		OptInline
+		LinkInline
+		Killer
+		Disabled
+		API
+		Stateless
+		HidesProperties
+		StoresSelf
+		Cpp
+		UsedByASM
+		Dylib
+		
+		
+		NoExport = LinkInline + Disabled + InitFunc
+		DontCheckInCakeLib = Disabled + InitFunc
+		ConOrDes = Constructor + Destructor
+		NoInline = CantInline + cpp + DirectlyRecursive
+		
+//	syntax is (|functiontype| t, |bool|)
+//		return self&t
+	function TestParts
+		|| P = UsedByASM
+
+
+
+class SCFunction (SCBetterNode) {
+linkage
+	cpp_part		Func
+
+|array? of SCNode|		LinkTo
+|[SCDecl]|				Args
+|SCClass?|				Cls
+|CppRefs?|				Refs
+|error?|				SavedError
+|Message?|				Intrinsic
+|SCFunction?|			NextFunc
+|SCDecl?|				HasProto
+|SCClass?|				ProtoType
+|SCDecl?|				ReturnType
+|scfunction--?|			DepthFinder
+|macro?|				IsMacro
+|FunctionType|			FuncInfo
+|uint16|				LinkDepth
+|uint16|				TmpCounter
+|uint16|				LinkID
+|nilstate|				NilSelf
+|byte|					ReturnedVars
+|byte|					FSOpt
+|byte|					MinOpt
+|Byte|					MaxASM
+|Byte|					IsAssigns
+|byte|					IsCppInBuilt
+|ErrorSeverity|			BlindCasts
+|byte|					IsNilChecker
+|byte|					Badness
+|byte|					IntPrmCount
+|byte|					StructReturnPos
+|byte|					ASMAndCpp
+|uint16|				µASMLength
+|uint|					µStart
+|uint|					µFATLength
+
+
+constructor (|Message?| msg = nil)
+	Super.Constructor( msg )
+
+
+syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", then a or b is enuf
+	if self
+		return .FuncInfo & k
+
+
+syntax is (|FunctionType| k, assigns:|bool|)
+	if value
+		.FuncInfo |= k
+	  else
+		.FuncInfo &= ~k
+
+
+
+function IsReal (|bool|)
+	return (self != nil) and !.isMacro
+
+
+function Last (|SCFunction|)
+	opt norefcounts
+	rz = self
+	while
+		rz = rz.NextFunc #loop
+
+
+function ParentName (|string|)
+	opt norefcounts
+	|| c = .cls
+		return c.name
+	|| Mod = .parent
+	if mod isa SCModule
+		if !mod.isimport
+			return mod.name
+
+
+render RenderParams (|bool| ForErrors=true)
+	opt norefcounts
+	fs <~ '('
+	|| sep = ""
+	for a in .args
+		if (a.source)
+			fs <~ sep
+			sep = ", "
+			if a.Source contains "..."
+				a.RenderTypeAndName(1, fs)			
+			  else
+				fs <~ a.source
+	
+	if !ForErrors and .ReturnType
+		fs <~ sep
+		.returntype.render(fs)
+	fs <~ ')'
+
+
+render RenderTitle (|bool| ForErrors=true)
+	opt norefcounts
+	fs <~ .Name
+	if .args or (!forerrors and .ReturnType)
+		fs <~ " "
+		.RenderParams(ForErrors, fs)
+
+
+render Describe 
+	opt norefcounts
+	fs <~ "function "
+	fs <~ .Name
+	fs <~ " "
+	fs <~ .Source.second
+
+
+Render
+	opt norefcounts
+	|| it = .source
+		return it.Render(fs_in)
+	return .describe(fs_in)
+
+
+function Message.TestFuncName (|bool|)
+	opt norefcounts
+	|| fn = .func
+	expect (fn != @Func and @prm and @list)	(self, "Need space between bracket and name.")
+	expect (fn == @Thg)						(self, "Doesn't follow 'function name (|Type| Name)'")
+	return true
+
+	
+function ParseName (|Message| node, |bool|)
+	opt norefcounts
+	|| fType = node.name
+	|| cname = node.first	#require
+	cname.func = @thg
+	.Name = cname.name
+	
+	if ftype == "libinternal"
+		.MakeLibInternal(node)
+	  elseif ftype == "autogen"
+		.NoAutoComplete = 2
+	  elseif fType == "helper"
+		.NoAutoComplete = 2
+	  elseif ftype == "inline"
+		.MakeLinkInline
+	  elseif fType == "api"
+		is api
+	  elseif fType == "setter"
+		.isassigns = 2
+		is HidesProperties
+	  elseif ftype == "getter"
+		is HidesProperties
+
+	if !.cls
+		0	
+	  elseif cname ~= "constructor"
+		.makeconstructor
+	  elseif cname ~= "destructor"
+		is Destructor
+	
+	Return cname.TestFuncName
+
+
+function MakeConstructor
+	is Constructor
+	if (self isnt OptInline) and .islibrary		// Disabled for lib classes, in case the classes change.
+		is CantInline							// No good to inline old lib code. Can be overridden by OptInline.
+
+
+function ApparantArgCount (|int|)
+	|| a = .args.length
+	a -= .cls|bool|
+	a -= .isassigns
+	return a
+
+
+function CheckNotBadName
+	if (!.ApparantArgCount and .cls)
+		|| W = .cls.NumericCount 
+		if (W > 1) and .name.isswizzle(w)
+			error (.source, "Can't use a swizzle-name (xyzw/rgba) on a vector-type!")
+
+
+function CollectStats
+	FuncStats[.args.length min 11]++ 
+//	|| i = (self is HasInt) ||| ((self is hasfloat)<<1) ||| (self is hasvector) << 2
+	// what about simds? :O
+//	FuncArgAndReturnTypes[i]++
+//	if (self has hasvfloat) or (self is hasvint)
+//		FuncArgAndReturnTypes[4]++
+	
+
+function FuncParamsLoad 
+	opt norefcounts
+	scfunction.CurrFunc = self // perhaps this should set the curr proj along with it.
+	|| old = scimport.curr
+	.project.use
+	.returntype = nil
+	.args.clear
+	|| P = .Source.second
+		.SubFuncParamsLoad(P)
+	scimport.curr = old
+
+
+function SubFuncParamsLoad (|message| P)
+	if self is constructor
+		.AddConstructorReturn(p)
+	
+	|| fc = p.first
+		if (fc.func == @thg or @dot or @rel)
+			.DeclsProtoTypeClass( fc )
+	
+	|| A = .SourceArg
+	|| space = a.SCArg(self)
+
+	if P.isparams
+		p.Func = @prm
+		.CollectDeclsParams( P, space )
+	
+	.CollectStats
+
+	if space and !.cls
+		|| L = .parent
+		if L isa SCModule
+			if l.IsProperModule
+				L.AddModuleToFunc( space )
+
+	if .FuncInfo
+		|| r = .ReturnType
+			if r == r.Type.TypeNormal	// why do we copy?
+				r = r.copydecl		 	// is it for nilchecking?
+				.ReturnType = r
+			r.AllocSource = .FuncInfo
+	
+
+function @scfunction.NameList (|string|) 
+	|| fs = faststring()
+	for fn in compiler.FuncList
+		fs <~ fn.exportname
+		fs <~ '\n'
+	return fs
+
+
+function @scfunction.TransformAll 
+	opt norefcounts
+	|| globinits = compiler.AppInitGlobals
+	if !globinits.HasActualCode 
+		|| fn = compiler.AppInitCode.find(@func, @thg, "AppInitSub_")
+			fn.parent.remove
+	(Compiler is Transforming)
+	for f in compiler.FuncList
+		require !stderr.TooMany
+		f.Transform
+
+
+
+function message.MacroFixSub (|SCDecl?| contains)
+	opt norefcounts
+	for s.flat in self
+		if (s == @sthg) and s.WithinType
+			expect (contains) (self, "Container type needed for macro")
+			s.replacewith(contains.writetype)			// cast to contained type!
+
+
+function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
+	|| Orig = incoming.exp
+		|| R = incoming.MacroCopyArgs
+		orig.BecomeMacro(.ismacro!, r) // just use .run?
+		orig.MacroFixSub(contains) 
+		rz = TypeOfExpr(orig, name_space) 
+		rz ?= typevoid!
+	  else
+		debugger 
+
+
+function message.FailOrCopy (|message| p, |message|)
+	opt norefcounts
+	|| f = .func
+	if f == @Thg
+		return .copy
+	|| ch = .first
+		if ch == @thg
+			if (self isbrel "&") or (f == @acc)
+				return .copy
+	
+	error (p, "Please simplify this expression")
+
+
+function message.AssignsFix (|scfunction| f)
+	opt norefcounts
+	|| RP   = .NiceParent
+	|| RightSide = rp.Last!
+	|| List = .last!
+	|| Upon = .first!
+	List <~ RightSide
+	// a.b(c) = c
+
+	list.func = @prm
+	
+	|| L = rp.last!
+	|| c = f.cls
+	if f.returntype and c and c.IsDataTypeOrFP
+		using (self)
+		rp.first = L // put it back
+		upon = upon.FailOrCopy(rp)
+		if upon
+			rp.first = upon
+			|| d = upon.obj|scdecl|
+				d.MarkAsAltered(self)
+	  else
+		rp.SpdFunc = @Bra
+		L.remove
+
+
+function ArgsMatch (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Failed=0, |SCFunction|)
+	opt norefcounts
+	rz = .argsmatch1(base, name_Space, incoming, Failed)
+	rz ?= .argsmatch1(base, name_Space, incoming, kTypeCastAssigns ||| Failed)
+	
+	if Failed and !incoming.MadeError // backup
+		error ( incoming.exp, "Wrong params to " + .RenderTitle )
+	  elseif rz
+		return rz.MatchImprove(incoming)
+
+
+function ArgsMatch1 (|SCDecl| base, |SCNode| name_space, |SCParamArray| Incoming, |int| Cast, |SCFunction|)
+	opt norefcounts
+	|| f = .ArgsMatch2( base, kTypeCastFalse ||| Cast, name_space, Incoming )
+	|| macro = f			
+	if !f.IsReal
+		f = .ArgsMatch2( base, kTypeCastNumbers ||| Cast, name_space, Incoming )
+		if f
+			macro = f
+		if !f.IsReal
+			f = .ArgsMatch2( base, kTypeCastTrue ||| Cast, name_space, Incoming )
+
+	if (f.IsReal and Incoming.HasSide)		// a.b = c --> (a.b(c))
+		incoming.exp!.AssignsFix(f)
+	if f
+		Return f
+	return macro
+
+
+function int.IsNormalMatch (|bool|)
+	return (self == kSimpleMatch or kNumericMatch or kSuperClassMatch)
+
+
+function ArgsMatch3 (|int| TypeCast,  |SCDecl| base,  |bool| ThisAlter,  |SCNode| name_space,  |SCParamArray| Incoming,  |int|)
+	if  .IsAssigns  and  .ReturnType
+		|scdecl--| a = .args[0]
+		|message--| inc = Incoming[0]
+		|scdecl--| i = TypeOfExpr(inc, name_space)
+		require i and a
+		
+		require  (TypeCast & kTypeCastassigns) or (!a.pointercount and i is local) // allow for tighter code
+		// Local.b = c --> local = local.breturn(c)...  structptr.b = c --> structptr.bset(C)
+	
+	if (.IsAssigns!=0) != Incoming.HasSide
+		require (TypeCast & kTypeCastassigns) and (!Incoming.HasSide)
+	
+	|| Pos = (self is Dylib)|int|
+	|| Result = kSimpleMatch
+	
+	|| SelfCast = Incoming.IgnoreSelfContain
+	TypeCast |= kNoBoolTypeCast ||| kTypeCastWantSuperDistance ||| kTypeCastForParams
+	if self is NumberCreator
+		TypeCast |= kTypeCastFromSmallInt
+	
+	|| fin = .Args.Length
+	|| fi = ((self is constructor)  and  !Incoming.AllowSelfToConstructor)|int|
+	fi += (fi+1 == .structreturnpos)
+	
+	while fi < fin
+		|scdecl--| FuncArg = .Args[fi++]!
+		|| PArg_Ch = Incoming[Pos]!
+		|scdecl--| PArg_Type = TypeOfExpr( PArg_Ch, name_Space )
+		if funcarg is reference
+			if PArg_Type is Local
+				PArg_Type.MarkAsAltered(nil)
+			
+		if Base
+			FuncArg = FuncArg.ContainedReplace(base, false)
+
+		|| Cast = TypeCast ||| SelfCast
+		SelfCast = 0
+		Cast |= PArg_ch.IntSmallness(parg_type)
+		if incoming.HasSide and (fi == fin)
+			cast &= ~kNoBoolTypeCast
+
+		|| Matched = kNoMatch
+		|| CanGetReference = (funcarg isnt reference) or (PArg_Type is Referable) or parg_ch.RefFallback
+														// passing x+1, to a reference param should not work.
+			|message--| LArg_ch = (ThisAlter)(PArg_Ch, nil)
+			matched = FuncArg.TypeMatch( PArg_Type, Cast, LArg_ch )
+		
+		if (Matched != kNoMatch) and !((matched == kUseDefaultParams) and ThisAlter)
+			if  result > kSimpleMatch  and  matched != kUseDefaultParams  and  matched != ksimplematch
+				result |= kMultipleErrors
+				matched |= kMultipleErrors
+			if Matched > result
+				result = matched						// don't replace better matches with worse ones.
+			pos++
+			Incoming.FailedAt = 0
+			
+		  elseif (!FuncArg.Default)
+			if TypeCast & kTypeCastDescribeErrors
+				.DescribeParamFail(incoming, fi)			
+
+			Return kNoMatch
+			
+		  elseif (ThisAlter)							// we need to put something in exp
+			|message--| prms = Incoming.exp.last!
+			|message--| def = FuncArg.Default!.Copy(prms)
+			def.DefaultPrmFix(base)
+			prms.InsertBefore( def, PArg_Ch )
+			PArg_Type = TypeOfExpr( def, Name_Space )
+			if PArg_Type
+				if PArg_Type.IsBareStruct				// oof
+					TypeOfExpr( def.wrapwith(@brel + "&"), name_space )
+				FuncArg.TypeMatch( PArg_Type, Cast|||kTypeCastTrue, def )
+
+		  else
+			Incoming.FailedAt ?= fi		
+			Result = kUseDefaultParams
+		fi += (fi+1 == .StructReturnPos)
+	
+	if Pos >= Incoming.Size
+		Return result
+
+	if (TypeCast & ktypeCastDescribeErrors) and !incoming.MadeError
+		|| first = Incoming.FailedAt
+			.DescribeParamFail(incoming, first)
+		  else
+			error (incoming.exp, "Too many params sent to " + .RenderTitle)
+			.ErrorIsHere
+
+
+
+function ErrorIsHere
+	opt norefcounts
+	|| n = .name
+	problem (.source, "Function $n() here:")
+
+
+function message.DefaultPrmFix (|scdecl?| Base)
+	opt norefcounts
+	for s.flat in self
+		if (s.func == @sthg) and (s in @bra)
+			expect (base) (s, "Can't use this here.")
+			s = s.parent!
+			s.func = @thg
+			s.name = base.type.Name
+			s.clear
+			
+
+
+function message.IntSmallness (|scdecl| T, |int|)
+	if self and T and (.func == @num)
+		if .name contains "."
+			if .name.iszero
+				return kTypeCastFromZero
+			return 0
+		|| i = .int
+		if i <= 16M and i >= -16M
+			rz |= kTypeCastFromSmallInt
+		if !i
+			rz |= kTypeCastFromZero
+		
+		
+function HiderMatch (|bool| IsAssigns, |bool|)
+	if self and .IsAssigns
+		return IsAssigns
+
+
+function DescribeParamFail (|SCParamArray| params, |int| bad)
+	// if bad == 0, then its good. so bad == 1 means the first arg.
+	require !params.MadeError
+	|| UsesSelf = params.isdot and params.IsNotModule
+	|| Num = bad - UsesSelf
+	|| fs = FastString()
+	|| badarg = .args[bad-1]
+	|| RefToFail = 0
+	|| P = params[bad-1]
+		if UsesSelf and bad==1
+			fs <~ "Wrong self: "
+		  else
+			fs <~ "Wrong param ($num): Got "
+		|| Type = TypeOfExpr(P, nil)
+			Type.RenderTypeName(fs)
+			if type.name and type.name != "nil"
+				fs <~ " "
+				fs <~ type.Name
+		  else
+			fs <~ "(Unknown Type)"
+		if badarg
+			RefToFail = (badarg.pointercount and (type is Reference))|int|
+			if (badarg is reference) and (type isnt Referable)		// aren't consts always not referable?
+				RefToFail = 2
+	  else
+		p = params.exp
+		fs <~ "Missing param $num (${badarg.name})"
+	if !RefToFail
+		fs <~ ". Expected: "
+		badarg.rendertypename(fs)
+	  elseif RefToFail == 1
+		fs <~ " (Pointer params can't accept references)"			// is this error no longer possible?
+	  elseif reftofail == 2
+		fs <~ " (Can't pass this as a reference)"
+	error ( P, fs )
+	fs <~ "to "
+	.RenderTitle(fs)
+	problem ( .Source, fs )
+
+
+function int.IsSimpleOrPointerCast (|bool|)
+	return (self == kSimpleMatch) or (self == kNumericMatch) or (self == kNeedsAddressOf)
+
+
+function TryKeepBetter (|int| OldMatch, |SCFunction| f, |int| Match, |SCFunction|)
+	if (f is disabled) != (self is disabled)
+		if self is disabled
+			return f
+		return self
+	
+	if (OldMatch & kSuperClassMatch) and (Match.issimpleOrPointerCast)
+		return f
+	if (Match & kSuperClassMatch) and (OldMatch.issimpleOrPointerCast)
+		return self
+	if (OldMatch & kTypeCastBothWays) and !(Match & kTypeCastBothWays)
+		return self
+	if (Match & kTypeCastBothWays) and !(OldMatch & kTypeCastBothWays)
+		return f
+	if (OldMatch == kSimpleMatch) and (Match != kSimpleMatch)
+		return self
+	
+	if (Match == kSimpleMatch) and (OldMatch != kSimpleMatch)
+		return f
+	
+	if (OldMatch < Match)
+		return self
+	if (Match < OldMatch)
+		return f
+
+
+function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCParamArray| Incoming, |SCFunction|)
+	opt norefcounts
+	|| BestMatch = 0
+	|| Missing 
+	
+	for f in self
+		if f.isMacro
+			Missing = f
+			continue
+		
+		|| Match = f.ArgsMatch3( TypeCast, base, false, name_space, Incoming )
+			|| Better = f 
+			if rz
+				Better = rz.TryKeepBetter(BestMatch, f, Match)
+				if !Better
+					return incoming.MultipleMatchingFunctions(TypeCast, f, rz)
+			if rz != Better
+				rz = Better
+				BestMatch = Match
+
+	if !rz
+		return missing
+
+	if BestMatch  &  (kNeeds|||kUseDefaultParams)
+		Incoming.Exp.Last!.Func = @prm
+		rz.Argsmatch3( TypeCast, base, true, name_space, Incoming )
+
+
+function FLookup (assigns:|SCNode|)
+	opt norefcounts
+	if Value isa SCClass
+		.Cls = Value
+		.parent = value.Modul
+	  else
+		.parent = Value.ProjectFix
+	
+	if scimport.curr
+		.Project = SCImport.Curr
+		return 
+
+	|| S = .Source
+		|| f = S.File
+			.Project = f.Proj
+
+
+function CreateTypeCast (|SCDecl| MyType, |Message| exp, |int| Loss=kCastedMatch, |int|)
+	if !exp
+		Return kNeedsTypeCast ||| loss
+	expect  (self isnt disabled)  (exp, .description)
+
+	while (exp == @bra)
+		exp.obj = .ReturnType
+		exp = exp.first!
+		if exp == @arg									// unbra fail.
+			exp = exp.parent!
+			exit										// we really want args to be statement-exprs by themself
+
+	|| Using = exp.SyntaxUsing
+	|| cst = .IsSimpleCast
+		// if (s)
+		// ->
+		// if (s|bool|)
+		
+		cst = cst.Copy
+		exp.ReplaceWith( cst )
+		cst.First!.ReplaceWith( exp )
+
+	  else
+		cst = (@thg + .ExportName).wrapwith(@func)		// JB_Str_Exists(obj)
+		exp.Next = cst
+		cst.msg(@prm) <~ exp
+		if MyType.IsBareStruct
+			exp.GetAddressOf(MyType)
+		cst.Last!.Obj = self
+
+	cst.obj = .ReturnType
+
+	Return loss
+
+
+function DeclsPrototypeClass (|Message!| ch0)
+	opt norefcounts
+	|| Ty = ch0
+	if ty == @rel
+		ty = ty.first!
+	|| p = .parent as scmodule											#require
+	|| fpType = p.FindClassMsg(Ty)										#require
+
+	|message| Route
+	if !fptype.funcproto
+		|| task = fptype.modul.FindClass("interface", nil, scnode.DontGoUp)
+			fpType = task
+			route = fptype.modul.parent.Route("interface")
+		
+		|| task_proto = fptype.modul.findclass("prototype", nil, scnode.DontGoUp)
+			fptype = task_proto
+	
+	.DeclsProtoCleanup(fpType, ch0, false, false, Route)
+
+	|| dcl = .DeclsProtoTypeAdd(fpType)
+	(dcl is Global)
+//	if (.islibrary) and (self|scnode| is LibInternal)
+//		dcl.exportposition = 64K-8 // sigh. just mark it somehow.
+
+
+function scnode.Route (|string| name, |message|)
+	opt norefcounts
+	rz = @dot.msg(name)
+	|| curr = rz
+	while self
+		|| next = .parent|scmodule|
+		if !next or (next == compiler.program) or next.IsImport
+			curr <~ (@thg, .name)
+			exit
+		
+		curr = curr.msg(@dot, .name)
+		self = next
+	
+
+/*
+dot "d"
+	dot "c"
+		dot "b"
+			thg "a"
+*/
+
+
+function ReturnsObject (|bool|)
+	opt norefcounts
+	|| r = .returntype
+		return r.isobject
+
+
+function scdecl.CouldUpgradeToReal (|bool|)
+	return .typesuffers and !.nilstated
+
+
+function MakeParamsReal // for cpp funcs...
+	opt norefcounts
+	for (a in .args) (i)
+		if a.CouldUpgradeToReal
+			.args[i] = a.MakeExistance(nilstate.real)
+	|| r = .ReturnType
+		if r.CouldUpgradeToReal
+			.returntype = r.MakeExistance(nilstate.real)
+
+
+function CollectReturnAsReal (|bool|)
+	if .IsAllocOrNew and Options.NilTestAllocNeverFails
+		return true
+
+
+function AddTypeInfo (|scdecl| dcl)
+	|| T = dcl.CalculateDataType
+	if !T.SpecialReg
+		.IntPrmCount++
+
+
+setter IsCppInBuilt (|int|)
+	if value and !.IsCppInBuilt
+		.MakeParamsReal
+	.IsCppInBuilt = Value
+
+
+function DeclsPrototypeInterface (|Message| ch0, |SCClass| fpType, |bool| late)
+	opt norefcounts
+	.DeclsProtoCleanup(fpType, ch0, true, late)
+	if !Late
+		.DeclsProtoTypeAdd(fpType)
+
+
+function DeclsProtoTypeAdd (|SCClass| fpType,  |scdecl|)
+	opt norefcounts
+	|| Dcl = SCDecl(fpType)
+	dcl.source = .source
+	dcl.IsLookupOnly = self
+	compiler.newconst(Dcl)					// lets kill da hoe		// kill! kill!
+	(Dcl is compilercreated)
+	.HasProto = dcl
+	dcl.Name = .Name
+	if .Cls
+		.parent!.TryAdd( .Source, Dcl, .Name )
+	|| orig = fpType.FuncProto
+		|| Cpp = .HasCVersion
+		if orig|scnode| is LibInternal
+			check (cpp) (self, fptype.name + " is libinternal.")
+		orig.ASMAndCpp |= 1 << Cpp
+	return dcl
+
+
+function DeclsProtoCleanUpContainedness (|message| P, |message| ch0, |scclass!| fpType)
+	opt norefcounts
+	for s in p
+		if s == @decl
+			|| ty = s.first!
+			if ty.func == @sthg
+				using s
+				if ch0 == @rel
+					ty.becomecopy(ch0.last!)
+				  else
+					|| ty2 = fptype.RequireContained(s)
+						ty.prev = ty2.writetype(0, false)
+						ty.remove
+	ch0.Remove
+
+
+
+function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, |bool| late, |message| Route=nil)
+	|| Proto = fpType.FuncProto									#expect (ch0, "This isn't a prototype!")
+	|| fParams = Proto.Source[ @prm, 1 ]						#require
+	|| p = ch0.Parent!
+	p.Func = @prm
+
+	using (ch0)
+		fParams.CopyAllInto( p )
+	
+	if Route
+		|| nxt = ch0.next
+		|| first = nxt.first
+		if first.next isthing "self"
+			first.replacewith(route)
+	
+	.DeclsProtoCleanUpContainedness(p, ch0, fptype)
+	
+	|| c = .cls													#require
+	if late
+		p.first.remove // ooof
+	
+	if !AssumeSelf
+		|| d = p[@decl]
+			|| decl = ExtractDecl( d, nil, declmode.ProtoParam )
+				check (decl matches c.TypeNormal)    (self, "Receiver must be same class as first param in function prototype.")
+				check (decl.name ~= "self") (self, "This prototyped function should be in module scope. (Not class).")
+				decl.name = ""
+				d.Remove
+
+
+function IsSimpleCast (|Message|)
+	opt norefcounts
+	expect .Source
+	
+	|| found = .Source.last(@arg).first
+	require found and found.IsLast and (found IsTmp "return")
+
+	found = found.first
+	require (found.IsLast) and (found == @Type) and (found.first isThing "self")
+
+	Return found
+
+
+
+function EqualOrMoreSpecific (|SCFunction| f, |bool|)
+	opt norefcounts
+	require self and f
+	require ((f.ReturnType)|bool| == (.ReturnType)|bool|)
+	require (f.args.length == .args.length)
+
+	|| r = f.ReturnType
+		require r matches .ReturnType!
+	
+	for (a in .args) (i)
+		require (f.args[i]! matches a)
+	
+	Return true
+
+
+
+function CheckReturnValue (|Message| msg, |scnode| name_space)
+	|| c = msg.first
+	
+	if (!c)
+		|| t = .ReturnType
+			check (t is returnedstruct) (msg, "Missing return value")
+		return
+
+	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
+	
+	if !.ReturnType and (c == "nil") and (c==@thg or @ques) // auto-generated in many places :)
+		c.Remove
+		return
+	
+	|| FoundReturnType = TypeOfExpr( c, name_space )
+	if (FoundReturnType == TypeVoid)
+		FoundReturnType = nil
+
+	|| r = .ReturnType
+		expect FoundReturnType (msg, "Has no return type.")
+		
+		if (FoundReturnType == TypeNil) and (r.CantBeNilInCpp)  // OK so what if we can’t return nil?
+			|| def = r.CreateDefault(c)
+				c.ReplaceWith(def)
+			  else
+				error (msg, "Can't return this")
+		  else
+			r.ExpectMatch( FoundReturnType, kTypeCastTrue, c )
+	  else
+		check (!FoundReturnType) ( msg, "This function has no return value." )
+
+
+
+function Message.SelfUsedForProperty (|int|)
+	opt norefcounts
+	|| R = .parent
+	require r and .func == @dot  and  r.func == @rel
+	if .first IsThing "self"
+		if .IsProperty
+			|| op = r.second
+			return 1 + !(.isfirst and op == "=")
+
+
+
+function CheckConstructorAndDestructor (|Message| root, |bool| IsConstructor)
+	opt norefcounts
+	require !.Badness
+	|| GotSuperConstructor = false
+	|| Sooper = .cls$.super // will this fix it?
+		GotSuperConstructor  =  Sooper == typeobject  or  (typetask == Sooper.parent or Sooper)
+	|| NoNesting = "This should be at the function root. (not nested)."
+	
+	for dot.flat in root
+		if dot == @func
+			|| prms = dot.last
+				|| fn = prms.obj as scfunction
+				|| pf = prms.first
+					|| pfdecl = pf.obj as SCDecl
+					if  fn is constructor  and  pfdecl is self // super.constructor...
+						GotSuperConstructor = true
+						if fn is StoresSelf
+							is StoresSelf
+						check (dot in root) (dot, NoNesting)
+		
+		|| UsedAtAll = dot.SelfUsedForProperty
+			|| t = TypeOfExpr(dot, nil)
+				|| IsSet = UsedAtAll == 1
+				if !t.IsNormalObject
+					ifn dot.parent in root
+						continue
+				  elseif (IsConstructor)
+					check (GotSuperConstructor)				(dot, "Can't access properties before calling super.constructor")
+					ifn dot.isfirst and IsSet				// failed:  .obj = value
+						check (t is PropertyWasConstructed)	(dot, "Object property was read before set")
+					if isset
+						dot.SelfUsedForProperty
+						check (t isnt PropertyWasConstructed)	(dot, "Can’t set object property twice during a constructor.")
+						check (dot.parent in root)				(dot, NoNesting)
+				  else
+					check (dot.islast or !IsSet)			(dot, "Can’t set object properties during a destructor.")
+				if (IsConstructor)
+					(t is PropertyWasConstructed)
+	
+
+
+
+function FillInMissingConstructorDefaults (|Message!| After)
+	// aka: FillInDefaultConstructor, fillconstructordefaults, defaultconstructors, fillinconstructor
+	opt norefcounts
+	|| cls = .cls$
+	|| oof = .ConstructorLinePlace$
+	|| p = cls.Properties
+//	.SetZeroProperties(After, P) // not working yet
+	Compiler.DuringConstructorFillIn = true
+	
+	for (d.backwards in P)
+		if d isnt ASMReached
+			if d isnt PropertyWasConstructed
+				.DeclAfter( after, d, d )
+			  else
+				(d is SetTo) // nice
+	
+	while cls
+		for (d in cls.Properties)
+			(d isnt ASMReached)
+			(d isnt PropertyWasConstructed)
+		cls = cls.super
+
+	Compiler.DuringConstructorFillIn = false
+	
+
+
+function ConstructorLinePlace (|message|)
+	opt norefcounts
+	|| s = .Source
+		if s.Position >= 0
+			return s
+	|| c = .cls
+		return c.source
+
+
+function ParamlessConstructor (|SCFunction|)
+	opt norefcounts
+	for (f in self)
+		|| prm = f.source[@prm, 1]
+		|| last = prm.last
+		if !last
+			return f
+		if last == @decl and last == 1
+			return f
+
+
+function TranStrings
+	|| S = .SourceArg
+		if self Isnt cpp
+			SCFunction.Tran_Strings( S.parent!, self )
+
+
+function message.IsParentConCall (|scfunction|)
+	opt norefcounts
+	require (self == @func)
+	|| f = .MsgFunc
+	if f and f is ConOrDes
+		return f
+
+
+function scclass.RealSuper (|scclass|)
+	opt norefcounts
+	|| s = .super
+		return s.realclass
+
+
+function scclass.RealClass (|scclass|)
+	opt norefcounts
+	real self
+	|| s = self
+	while s and s.IsRole
+		s = s.super
+	return s! // roles always come from real classes
+
+
+
+function scfunction.IsOKConstructorCall (|scclass| c, |bool|)
+	opt norefcounts
+	|| fc = .cls
+	if fc == c.super
+		return true
+	if fc == c.realsuper
+		return true
+	if self is cpp
+		return true				// OK?
+
+
+function CountCallsToParentAlloc (|Message| root, |message|)
+	opt norefcounts
+	|| FoundCount = 0
+	|| c = .cls$
+	for (curr in root)
+		|| f = curr.IsParentConCall
+			expect  (f.IsOKConstructorCall(c))		(curr, "Function should belong to parent class, but doesn't.")
+			rz ?= curr
+			FoundCount++
+			expect  (FoundCount < 2)				(curr, "Multiple calls to parent constructor/destructor not allowed.")		
+	if rz and self is Destructor
+		expect (rz.IsLast)							(rz,   "Destructor must come last")
+		// could be relaxed so that self cant come after, but other stuff can.
+
+/*
+	So how to do this thing?
+	
+	We want to change how destructors are called, and work.
+
+	So how to do it?
+	
+	Each destructor must call a parent destructor, which can be JB_Obj_Destructor
+*/
+
+function Borked (|bool|)
+	return .Badness & 128
+
+
+
+function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Type = "", |Message|)
+	using (errnode)
+	nil self
+	|| L = self
+	|| On = L
+	if Type != "warn"
+		Type = "expect"
+	
+	if (!L)
+		On = @thg + "nil"
+	  elseif L.isparams
+		L.Func = @prm
+		on = L.first
+	  else
+		L = nil
+
+
+	|| l2 = L
+	if (L != @prm)
+		l2 = @prm.msg
+		l2 <~ L
+	|| tmp = @dot + ("syntax" + Type)
+	tmp <~ on
+	tmp <~ l2
+	
+	L = tmp 
+	L.Position = P
+	return L
+
+
+function FixCnj (|Message| exp)
+	using (exp)
+	.FixCnjSub(exp)
+
+
+function FixCnjSub (|Message| exp)
+	if exp == @ARel					// x$ --> x#require
+		exp.become(@TRel)
+		exp <~ (@opp, "require")
+	
+	// get the name (it's important)
+	|| ch = exp.first!
+	|| name = ch.Next!.Name
+	|| CreatesError = (name == "expect" or "check")
+	|| DoesReturn =   (name != "loop" and "check" and "quit")
+	
+	ifn (CreatesError or (name == "debug_require" or "require" or "continue" or "loop" or "quit"))
+		error (exp, "Must be: 'require/expect/continue/loop' .")
+		ch.name = "require"
+		name = "require"		// just make autocomplete more reliable.
+		// or else we leave dangling @trels
+	
+	// lets fix it, if its in a rel, (it shouldn't be)
+	// || x = a #require   -->   || x = (a #require)
+	|| nxt = ch.next!
+	
+	if (ch == @Rel) and (exp in @arg or @Decl) and (ch.second!.name == "=")
+		expect  (ch.first!.IsAssignable)   (exp, "Use brackets here, like this: “($ch) #${name}”")
+		
+		exp.ReplaceWith( ch )
+		
+		|| RightSide = ch.Last!
+		|| bra = @bra.msg
+		RightSide.ReplaceWith( bra )
+		bra <~ RightSide
+		bra.WrapWith( exp )
+		bra.ReplaceWith( bra.first! )
+	
+	if name == "require" // unneeded? "cant" doesnt seem to need it?
+		nxt.Name = "return"
+		name = "return"
+		
+	// helpfully replace the exp.
+	ch = exp.first!
+	ch.Remove
+	exp.ReplaceWith( ch )
+	
+	// x = (a #require)			-->		x = a, if (!x) {return}
+	//
+	//  (a #require)			-->		if (!a)   {return}
+	//  (!a #require)			-->		if (a)	  {return}
+	//
+	// if (a() #require) {code}	-->		|| tmp = a(), if (!tmp) {return}, {code}
+	// (a() #require).Func		-->		|| tmp = a(), if (!tmp) {return}, tmp.Func
+	// if (a #require) {code}	-->		if (!a) {return}, {code}
+	// (a #require).Func		-->		if (!a) {return}, a.Func
+	
+	|Message|	Thg
+	|Message|	pp
+	|Message|	RemoveMe
+	|bool|		UsePrev
+	if (ch isbrel "++") and (ch in @arg) and (ch.first == @thg)
+		// ++ch #require // just an opt.
+		// Actually I didn't implement the general case yet :) haha.
+		Thg = @thg + ch.first!.name
+		pp = ch
+		
+	  else
+		pp = ch.NiceParent!
+		|| Done = false
+		
+		if (pp.IsSetRel and pp.first == @thg)			
+			// || word = (a.b[c] #require)
+			|| IsDecl = (pp in @Decl)
+			if isdecl or (name != "loop")
+				Done = 1
+				Thg = @Thg + pp.first!.name
+				if IsDecl
+					pp = pp.Parent!
+		  elseif ((ch.UnBra == @thg)) or ((pp == @arg) and !CreatesError)
+			thg = ch.copy!
+			if (pp == @arg)
+				RemoveMe = ch // i think so...
+			pp = ch.UpToArg!
+			UsePrev = true
+			Done = 1
+			
+		if !Done
+			// func( item isa SyxItem #require ) -->
+			// || tmp_318 = (item isa SyxItem)
+			// if !tmp_318 { return }
+			// func( tmp_318 )
+			
+			pp = SCFunction.TempMoveOut( ch )!
+			Thg = @thg + pp.DeclName!.Name
+	
+	
+	|| arg = @arg.msg
+	if (CreatesError)
+		|| L = exp.first.Next!
+		if (name != "expected")
+			L = L.ExpectParamsTransform( exp.Position, exp )
+		  else
+			error (exp)
+		arg <~ L
+
+	
+	if (name == "debug_require")
+		arg <~ (@tmp, "debugger")
+
+	if (name == "continue")
+		if pp.WithinLoop( .SourceArg )
+			arg <~ (@tmp, "continue")
+		
+	  elseif (name == "loop")
+		if pp.WithinLoop( .SourceArg )
+			arg <~ (@tmp, "exit")
+
+	  elseif name == "quit"
+		|| Q = arg.msg(@dot, "quit") 
+		Q <~ (@thg, "app")
+		Q <~ @prm
+		
+	  elseif (DoesReturn)
+		arg.msg(@tmp, "return") <~ (@ques,"nil")
+	
+	thg = thg!.Negate	
+	|| if_ = @tmp + "if"
+	if_ <~ thg
+	if_ <~ arg
+	
+	if (UsePrev)
+		pp.Prev = if_
+	  else
+		pp.Next = if_
+
+	RemoveMe.Remove
+
+
+
+function SCDecl.MarkAsAltered (|message| Exp)	// markaltered
+	opt norefcounts
+	if exp isnt inserted
+		(self is setto)
+
+	require self is local
+	is altered
+	// //                 ////////////////////                 //////////////////
+	/////////////////// //////////// / / /    ///////// // /  /  / /  /////////
+	
+	///// IT LOOKS COOL... but..,. it could be sooo much more.
+	
+	if SCFunction.InBranch > .DepthOfBranch
+		is AlteredInIf
+	if SCFunction.InLoop > .DepthOfLoop
+		is AlteredInLoop
+	if .IsNormalObject and self is param
+		is AlteredParamObject
+
+	require self is TypeImprove
+	|| orig = .IsLookupOnly
+	if orig isa SCDecl
+		(orig is setto)
+		orig.mu.info |= .mu.info & scdeclinfo.AlteredCopy
+
+
+
+function Self (|scdecl|)
+	opt norefcounts
+	return .args[]
+
+
+
+iterator
+	|| F = self
+	while (F)
+		yield F
+		F = F.NextFunc
+
+
+
+
+module {
+||				InBranch	= 0
+||				InLoop		= 0
+||				OnceCount	= 0
+|SCFunction|	_CurrFunc
+|FunctionType|	_Info
+|int[12]|		FuncStats
+
+
+function CurrFunc (assigns:|scfunction?|)
+	opt norefcounts
+	._currfunc = value
+
+	._Info = (value!=nil)(value.FuncInfo, 0)
+		
+	if FlowLog.active
+		FlowLog.inputline("function: ", value.name)
+		FlowLog.inputline("stage: ", compiler.stagename)
+
+
+function CurrFunc (|scfunction|)
+	return ._currfunc
+
+
+function NewMacro (CollectFunc)
+	return SCFunction.NewFunc( node, name_space, errplace )
+
+
+function SCFunction.MakeProtoClassName (|string| start, |string|)
+	rz = start	
+	|scnode--| p = .parent
+	while p
+		if p isa SCModule
+			|scclass--| CurrCls = p.cls			#loop
+			rz = currcls.name + "_" + rz
+		p = p.parent
+	
+	if !.prototype!.iswrapper
+		if !rz.find('_')
+			rz = "FP_" + rz
+
+
+function SCFunction.ProtoExportName
+	opt norefcounts
+	|| cls = .prototype$
+	
+	if !cls.cppclass
+		cls.cppclass = .MakeProtoClassName(cls.name)
+
+	
+function NewProtoType (CollectFunc)
+	return NewProtoTypeSub(node, name_space, ErrPlace)
+
+
+function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, |string| ForInterface="", |SCModule|)
+	if parent isa scclass
+		if !ForInterface
+			node.NormaliseFunc(parent)
+		parent = parent.modul|scclass|
+	  else
+		require parent.ExpectModule(node)
+		
+	|| f = NewFunc( node, parent, ErrPlace )|SCFunction|
+	expect (f isa scfunction) (node, "Can't extend a class with a prototype. (in this version)") // not yet anyhow.
+	// we'd have to process this later... not too bad, though? its just on compiler.ExtendList!
+		
+	Compiler.FuncList.Pop
+	
+	|| Using = node.SyntaxUsing
+	|| tmp = @tmp + "datatype"
+	tmp <~ (@thg, f.Name)
+	tmp <~ node.last
+	
+	|| modul = SCClass.DataTypeSub( tmp, parent, node, ForInterface, SCNodetype.ProtoType )
+		|| clss = modul.Cls!
+		clss.BaseType = SCNodeType.ProtoType
+		(clss isnt Builtin)		// datatype sets it to true.
+		clss.FuncProto = f
+		clss.clssize = platform.pointerbytes
+		f.ProtoType = clss
+		Compiler.ProtoTypes <~ f
+	
+		parent.TryAdd(node, modul, modul.Name)		
+	
+		if !ForInterface
+			modul = compiler.program
+	
+	Return modul
+
+
+
+function NeuSyx (CollectFunc)
+	|| Using = node.syntaxusing
+	|| NewNode = Tran_Syx( node )
+		rz = SCFunction.NewHelper( NewNode, name_space, ErrPlace )
+
+
+
+function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SCDecl|)
+	|| exp = msg.first!
+	if msg == "!"
+		|| ty = TypeOfExpr( exp, name_space, side )				#require
+		return ty.MakeReal
+
+	expect (msg == "--" or "++") (msg)
+	
+	Using (exp)
+	|message| exp_copy
+	if exp != @thg
+		exp_copy = exp.copy				// needed before get type :(
+										// or else we can't do array.size++
+
+	|| Type = TypeOfExpr( exp, name_space )						#require
+	(type is readfrom)
+	check (type isnt const) (msg, "Not assignable.")
+	if type.PointerCount > 0
+		check (!side) (msg, "Not assignable.")
+		type.MarkAsAltered(msg)
+		return type.CheckMath(msg)
+
+	check (!Type.IsBool) (msg, "Can't do ++ or -- on bools. (use '!' instead")
+
+	|| numc = Type.type.NumericCount
+	if !Type.type.IsObject  and  !type.hiderfunc  and  numc <= 1
+		type.MarkAsAltered(nil)
+		check (!side) (msg, "Not assignable.")
+		return type
+
+
+	|message| R
+	if numc or type.hiderfunc
+		R = NewRel(exp, @num + "1", msg.name[0, 1])
+	  else
+		|| IsPlusplus = msg == "++"
+		|| name = (IsPlusPlus)("next", "prev")
+		R = @dot + name
+		r <~ exp
+		r <~ @emb
+
+
+// X++ --> X = X.next,  ("arl" "++" ("thg" "x")) -> rel(thg("x")  opp("=")  dot("next" thg("x") lst() ))
+	if !exp_copy
+		exp_copy = exp.copy
+	msg.become(@rel)
+	msg <~ exp_copy
+	msg <~ (@opp, "=")
+	msg <~ R
+	msg.obj = nil
+	
+	return TypeOfExpr( msg, name_space ) // why aren't i returning this? :/
+	// y = x++
+	// y = x
+	// y = ++x --> x = x.next, y = x
+
+
+
+function message.FixMultiArr
+	opt norefcounts
+	for item in self
+		|| kkey = item.first			//   [(a,b,c):x]  -->  [a:x, b:x, c:x]
+		if kkey == @list
+			|| val = kkey.next
+				while (|| c = kkey.first)
+					|| i2 = @item.msg
+					i2 <~ c
+					i2 <~ val.copy
+					item.prev = i2
+			item.remove
+
+
+
+function AlterPostCond (|Message?| PostCond, |Message?| IterPostCond, |message| NodeSrc, |Message|)
+	opt norefcounts
+	if !IterPostCond
+		Return PostCond
+	
+	IterPostCond = IterPostCond.copy(nodesrc)
+	if (!PostCond)
+		Return IterPostCond
+
+	|| a = @bra.msg
+	a <~ PostCond
+	|| b = @bra.msg
+	b <~ IterPostCond
+	return NewRel( a, b, "or" )
+
+
+function ArgToFunc (|string| NewName, |Message| Params, |Message| arg,  |Message|)
+	rz = @tmp + "function"
+	rz <~ (@thg, newname)
+
+	if (params == @prm)
+		rz <~ params
+
+	  elseif (params == @thg)	// prototype
+		rz.msg(@bra) <~ params 
+
+	  else
+		debugger// whatever...
+
+	rz <~ arg
+	rz.position = arg.position
+
+
+function Tran_NotAllowed (TranFunc) // "continue"
+	opt norefcounts
+	if !node.ASMType
+		error (node)
+
+
+function message.BackTrackCC (|message|)
+	opt norefcounts // goes before compiler-created stuff.
+	|| pos = .position
+	|| f = .file
+	while (|| p = .prev)
+		if  (p isnt Inserted)  or  (p.file != f) or (p.position < pos)
+			exit
+		self = p
+		
+	return self
+	
+
+function Tran_BreakPoint (TranFunc)
+	opt norefcounts
+	if (node is inserted and breakpoint) and (node == @tmp)
+		return compiler.program	// done already!
+	
+	(node isnt BreakPoint)
+	using node
+		|| trap = @tmp.msg("breakpoint")
+		(trap is breakpoint) // hehe
+		trap.asmtype = asmtype.kdebugger
+		
+		node.BackTrackCC.prev = trap // go before compiler-created stuff too!
+		if options.modecpp
+			Tran_DebugAt( fn, trap, name_space )
+	return compiler.program
+		
+
+
+function Tran_DebugAt (TranFunc)
+	opt norefcounts
+	(node isnt breakpoint)
+	|| ch = node.first
+	using (node)
+		node.become(@func)
+		node.msg(@thg, "JB_DebugAt")
+		|| prm = node.msg(@prm)
+		if !ch
+			ch = 1.msg
+		prm <~ ch
+	TypeOfExpr(node, name_Space)
+	node.asmtype = asmtype.kdebugger
+	
+
+function Tran_Debugger (TranFunc)
+	if !Options.shouldBuildTrap
+		node.remove
+		return false
+	|| ch = node.first
+	if !ch
+		node.name = "debugger"
+		node.ASMType = ASMType.kdebugger
+		return false
+	
+	expect ((node == "debugger") and (!ch.next)) (node)
+
+	using (node)
+		ch.ExpandToBool(name_space)
+		// why cant I use negate?
+		node.first!.Negate
+		node.Name = "if"
+		|| trap = node.msg(@arg).msg(@tmp, "debugger")
+		trap.ASMType = ASMType.kdebugger
+	
+	Tran_If(fn, node, name_space)
+
+
+
+function Tran_Ifn (TranFunc)
+	opt norefcounts
+	|| f = node.NeedFirst
+		node.name = "if"
+		f.Negate
+		tran_if(fn, node, name_space)
+
+
+function SCNode.LateAddTemporary (|string| type, |string| name1, |message| Value, |message| err, |string|)
+	|| name = UniqueTmpVar(compiler.program, name1)
+	TypeOfExpr(Value, self)
+	|| msg = MakeDecl(type, name, Value, scdeclinfo.temp)
+	|| D = TypeOfExpr(msg, self)$
+	(d is NumberConst) = false
+	.Source! <~ msg
+	.TryAdd( err, D, name )
+	return name
+
+
+function scdecl.IsConstOf (|scdecl| b, |bool|)
+	opt norefcounts
+	
+	// Needs a "constant preservation" system.
+	// basically... takes: (kPositiveInt==1) and return "the false-bool".
+	// (typeofbrel is already altered!)
+
+	require self is const
+	if self == b
+		return true
+	return .default$.Obj==b
+
+
+function Tran_Once (TranFunc)
+	// once: "abc" --> if !globaltmp: "abc"
+	opt norefcounts
+	|| arg = node[@arg]$ // needs arg... don't embed statements! cozz it sucksssss
+	require arg.expectlast
+	
+	using (node)
+		node.name = "if"
+		|| name = "once" + (++.OnceCount)
+		|| obj = compiler.program.lateAddTemporary( "bool", name, @thg + "false", node )
+
+		|| rel = @rel+""
+		rel <~ (@thg, obj)
+		rel <~ (@opp, "=")
+		rel <~ (@thg, "true")
+		arg.first = rel
+		|| brel = @brel + "!"
+		brel <~ (@thg, obj)
+		node.first = brel
+		
+	tran_if(fn, node, name_space)
+  
+
+
+function message.Blocks (|SCBlockage|)
+	if self
+		return .TAG & SCBlockage.Bits
+
+
+function message.Blocks (assigns:|int|)
+	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
+
+
+function Tran_IfSub (|message| node, |SCNode| name_space)
+	opt norefcounts
+	|| cond = node.NeedFirst						#require
+	|| arg = cond.next
+		require arg.expect(@arg)
+	  else
+		using node
+		arg = @arg.msg
+		if node == "if"
+			arg <~ (@tmp, "debugger")				// better than debugat
+		cond.next = arg
+	
+	|| SubTest = arg.next
+		expect (SubTest isTmp "elseif" or "else")  ( SubTest )
+		SubTest.ExpectLast
+		
+		if SubTest == "elseif"
+			subtest.ASMType = ASMType.kIf			// for the ASM
+			Tran_IfSub(SubTest, name_Space)
+		  else // "else" branch
+			|| ElseArg = SubTest.first
+				check (ElseArg ~!= "if")			(ElseArg, "Use 'elseif' instead.")
+				elsearg.expect(@arg)
+			  else
+				SubTest.msg(@arg)
+	
+	name_space = arg.scarg(name_space) #require
+	using (node)	
+	cond = cond.ExpandToBool( name_space )
+	if !cond
+		0 //
+	  elseif cond.IsAlwaysFalse
+		cond.ElseNeverFires
+	  else
+		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
+			cond.wrapwith(@bra).obj = cond.obj 
+		Tran_Isa(node, name_space)
+
+
+function message.ElseNeverFires // self == cond
+	opt norefcounts
+	|| arg = .next
+	|| after = arg.next
+		
+	if !after
+		|| p = .parent
+			p.saferemove
+		return
+	if arg == @arg
+		arg.clear
+		arg.TAG |= SCBlockage.Return // blocks!
+	.NeedBra
+
+
+function Tran_Else (TranFunc) 
+	opt norefcounts
+	
+	|| p = node.parent
+	expect (p == @tmp and "if" or "elseif") (node, "This must be in an 'if' block.")
+
+
+function Tran_TestProblem (TranFunc)
+	|| str = "This code is bad somehow"
+	|| msg = node[@str, @nil]
+		msg.ExpectLast
+		str = msg.name
+	problem (node, str)
+	node.MakeComment
+	return true
+
+
+function Tran_Problem (TranFunc)
+	// problem (msg, "error")
+				// -->
+	// msg.SyntaxProblem((test), "error")
+	
+	|| stuff = node.needfirst						#require
+	require stuff.expectlast
+
+	if stuff != @list and @bra
+		stuff = stuff.wrapwith(@list)
+
+	using (node)
+		stuff.func = @prm
+		|| Dot = node.msg(@dot, "Syntax" + node.name)
+		node.become(@bra)
+		Dot <~ stuff.first
+		Dot <~ stuff
+
+	TypeOfExpr(node, name_space)
+
+
+function Tran_Fails (TranFunc)
+	expect (fn) (node, "Only use this on functions")
+	node.ASMType = ASMType.kFail
+	fn.Badness |= 128
+	expect (!node.islast) (node, "Put 'borks' before some code.") 
+
+
+function Tran_Visible (TranFunc)
+	expect (fn) (node, "Only use this on functions")
+	fn.LoadVisibility( node )
+
+
+function Tran_Return (TranFunc)  // exitter
+	opt norefcounts
+	require node.ASMType != ASMType.kreturn
+	node.ASMType = ASMType.kreturn
+	
+	expect (fn) (node, "Only use this on functions")
+
+	fn.ReturnedVars++
+	node.obj = fn.returntype
+	ifn node.islast and (node in fn.sourcearg)
+		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
+
+	if fn.StructReturnPos // we can't return anything
+		node.StructReturnCleanup(fn, name_space)
+
+	fn.CheckReturnValue( node, name_space )
+
+ // this is where an "if" can become an exitter
+	node.LastInBlock(SCBlockage.Return)
+	node.CheckNotInStatExpr(fn.SourceArg)
+
+
+function message.IsParams (|bool|)
+	|| fn = .func
+	return fn == @prm or @list or @bra
+
+function NewCppWrapper (CollectFunc)
+	opt norefcounts
+	// This doesn't code-autocomplete so well in perry...
+
+	|| name = node[@thg]$
+	|| prm = name.next
+	using name
+	if !prm or !prm.IsParams
+		name.next = @prm.msg
+	
+	|| IsNothing = node == "cpp_nothing" // speedie will turn these into ASM instructions
+	|| IsLib	 = node == "cpp_libwrapper"
+	node.givearg.msg(@Tmp, "cpp_wrapper") <~ (@thg, name.name)
+
+	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
+	if rz isa SCFunction
+		rz.NoAutoComplete = 1
+		if isnothing
+			rz.IsCppInBuilt = 2
+		(rz Is ExternalLib) = islib
+		(rz is cpp)
+		|| cls = rz.cls
+			if cls is Dylib
+				(rz is dylib)
+		rz.MakeParamsReal
+	node.name = "function"
+				
+
+function NewHider (CollectFunc)
+	expect (name_space isa SCClass) (errplace, "Must go in a class") // move this to where sets .hidesproperties
+	return SCFunction.NewFunc( node, name_space, ErrPlace )
+
+
+function NewHelper (CollectFunc)
+	opt norefcounts
+	rz = SCFunction.NewFunc( node, name_space, ErrPlace )
+	if rz
+		(rz isnt visible)
+
+
+function message.InDecl (|bool|)
+	opt norefcounts
+	while
+		self = .parent$
+		|| fn = .func
+		if fn == @decl
+			return true
+		if fn != @bra
+			return false
+
+
+function message.NeedsPreprocess (|bool|)
+	opt norefcounts
+	|| fn = .func
+	if fn == @TRel
+		return true
+	if fn == @arel and self == "$"
+		return !.InDecl
+	if fn == @tmp
+		if .name == "using" or "expect" or "require" or "debug_require" or "warn" or "error" or "check" or "loop"
+			|| p = .parent
+			return !(p in @decl or @type)
+
+	require (fn == @rel)
+	|| L = .first
+	if (L == @rel) and (L.next == "or")
+		return (L.second == "=") and (.last.second == "=")
+
+
+
+function SCFunction.PreProcessExpects
+	|[Message]| list = nil
+	
+	for ch.flat in .SourceArg
+		if ch.NeedsPreprocess
+			list ?= array.new
+			list <~ ch
+	require list != nil
+	
+	for ch in list
+		if ch == @Trel or @Arel
+			.FixCnj( ch )
+		  elseif ch == @rel
+			RelSetOrExpansion(ch)
+		  elseif ch != "using"
+			Tran_Expect(self, ch, nil)
+		
+	for ch in list
+		if ch=="using"
+			tran_using(self, ch, nil)
+
+
+
+function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
+	opt norefcounts
+	|| name = self[@thg]$
+	using (name)
+	|| prm = name.next
+	if prm == @arg
+		prm = @prm.msg
+		name.next = prm
+	  elseif !prm
+		prm = .msg(@prm)
+	  else
+		expect (prm.isparams) (prm)
+		prm.Func = @prm
+	if (addself)
+		|| d = prm.first
+		ifn (d == @decl) and (d.second isthing "self")
+			d = @decl.msg
+			d <~ (@thg, addself.name)
+			d <~ (@thg, "self")
+			prm.first = d
+	rz = prm.next
+	if rz
+		rz.expect(@arg)
+	  else
+		rz = .msg(@arg)
+	
+
+function message.SlidePositions (|int| add)
+	opt norefcounts
+	for s.flat in self
+		if s.position >= 0
+			s.position += add
+
+
+function SCFunction.Cleanupfunc (|message| s)
+	|| n = s.name
+	
+	using s
+	|| cls = .cls!.isnormalobject
+	if s ~= "constructor" or "destructor"
+		s.name = "function"
+		s.first = @thg + n
+	  elseif s ~= "render"
+		if Tran_Render(s, cls)
+			s.name = "behaviour"
+	if s.isbehaviour and cls
+		scbehaviour.Tran_Behaviour(s, cls)
+		cls.FillInterFaceIn(self, true)
+
+
+function message.MainFix2
+	opt norefcounts
+	|| m = .MainFix
+		.become(m)
+
+
+function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
+	opt norefcounts
+	if src == @tmp and src ~= "main"
+		src.MainFix2
+
+	|| f = src.first$
+	if f == @dot
+		f.func = @thg
+		f.clear
+	|| StillOK = StdErr.Mark
+	.IntPrmCount = 0
+	.FuncInfo = 0
+	.TmpCounter = 0
+	.Description = ""	
+	.Init_Sub(src, nil)
+	require StillOK
+
+	.FuncParamsLoad
+	.BeforeTransform
+	.Transform
+	archonpurger.ExterminateZergBugs(self)
+	.AnalyseRefs(list)
+//	stderr.clear // causes problems...
+	return true
+
+
+function SCFunction.SetBlindCasts (|SCNode| name_space)
+	opt norefcounts
+	if name_space
+		|| p = name_space.project
+			.BlindCasts	= p.blindcast
+	  else
+		|| c = scimport.curr
+			.BlindCasts	= c.blindcast
+
+
+function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
+	|| arg = node.NormaliseFunc
+
+	node.obj = self
+	SCFunction.currfunc = self
+
+	if name_space
+		if node != "iterator"
+			Compiler.FuncList <~ self
+		.FLookup = name_space				// Sets as a module even if parent is a class
+		.refs = name_space.SpaceModule$.defaultrefs
+
+	.ParseName( node )
+
+	if name_space
+		if name_space is EmbeddedOnly
+			self|scnode| is EmbeddedOnly
+		if name_space is LibInternalAll
+			.MakeLibInternal(node)
+
+	using ErrorDelayer						// Not a terrible error but still an error 
+		.PreProcessExpects
+		.TranStrings
+	.PreRead(arg)
+	.SetBlindCasts(name_space)
+	
+	if (node == "macro")
+		.MakeMacro(arg)
+	
+			
+
+
+function SCFunction.MakeMacro (|message| arg)
+	opt norefcounts
+	|| C = arg.first
+	check (C and !C.next)					(self, "Macros must be one line!")
+	check !(arg.prev.HasAny)				("Macros don't directly state arguments.")
+	.ismacro = macro(C, true)				// x = "abc"~parse
+
+
+
+function NewFuncSub (|message| node, |SCNode| name_space, |scfunction|)
+	opt norefcounts
+	|| fn = SCFunction(node)
+	fn.init_sub(node, name_space)
+	return fn
+
+
+function NewFunc (CollectFunc)
+	opt norefcounts
+	require node
+	|| name = node.first								#expect (node, "No function name found.")
+	if name == @Dot
+		return SCClass.ExtendOneFunc(node)
+	return NewFuncSub(node, name_Space)	
+
+
+function NewConstructor (CollectFunc)
+	node.name = "function"
+	using (node)
+	node.first = @Thg + "Constructor"
+	return SCFunction.NewFunc( node, name_space, ErrPlace )
+
+
+function NewDestructor (CollectFunc)
+	if name_space isa scclass
+		expect !(name_space.IsRole) (node, "destructors aren't allowed on roles")
+		node.name = "function"
+		using node
+			node.first = @Thg + "Destructor"
+		return SCFunction.NewFunc( node, name_space, ErrPlace )
+
+
+function message.MainFix (|message|)
+	using self
+	|| prms = .first
+	if !prms
+		prms = .GiveArg
+		prms <~ "hello world"
+
+	.name = "function"
+	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean
+		|| src_arg = fn_src.Last!
+		
+		|| fn = prms.func
+		|message| inc_arg
+		if fn == @list or @bra
+			inc_arg = prms.next(@arg)
+			fn = @prm
+		  else
+			inc_arg = self[@arg]
+	
+		if inc_arg
+			if (fn == @prm) and prms.HasAny
+				src_arg.InsertMainArgs(prms)
+	
+			fn_src <~ inc_arg
+			inc_Arg.expectlast
+	
+			src_arg.Remove
+			inc_arg.prependall( src_arg )
+		  else
+			fn_src = nil
+	return fn_Src
+
+
+function NeuMain (CollectFunc)
+	opt norefcounts
+	
+	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
+	if scimport.CurrIsManuallyImported
+		return Compiler.program			// ignore imported mains
+	
+	|| fn_src = node.MainFix
+		|| app = fn_src.first.first!
+		|| m = compiler.FindModuleMsg(app)
+		
+		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
+		if rz isa scmodule // sigh. Not ideal.
+			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)
+			fn_src.remove
+
+
+function NeuLibrary (CollectFunc)
+	error (node, "Can’t use this")
+	Options.ProjectisLibrary = true // better than omitting main. more... specific.
+									// but what if someone includes a library?
+	return NeuMain(node, name_space, errplace)
+	// library {} -->
+
+}
+
+}
+

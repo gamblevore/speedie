@@ -1,0 +1,52 @@
+
+// syntactic replace
+// needs proper-testing
+// better to print the data out
+main (|file.existing| folder, |string| Func, |string| From, |String| To)
+	app.Replace(folder)
+
+
+function app.Replace (|file| p, |bool|)
+	if p.isfile and (p isa "spd")
+		return p.SyntacticReplace
+		
+	for f.files in p
+		.replace(f)
+
+
+function file.SyntacticReplace (|bool|)
+	|| str = .Readall		#require
+	|| ch = str.Parse		#require
+	|| fs = faststring()
+	rep.ReplaceAll(ch, fs, str)
+	printline fs
+	return true //	return .Data(fs) not sure this is safe yet
+		
+
+
+
+module rep
+	|string?|	From  = app.args[2]
+	|string?|	To    = app.args[3]
+	|syntax?|	Func  = syntax.Func(app.args[1])
+	|int|		Where = 0
+	|bool|		Aware = app["caseaware"].yes
+	
+	function Match (|message| msg, |bool|)
+		return (msg == .func)  and  msg.syntaxequals(.from, .aware)
+		
+
+	function DoReplace (|message| msg, |faststring| out, |string| str)
+		out <~ str[.where, msg.position]
+		out <~ rep.to
+		.where = msg.after
+	
+	
+	function ReplaceAll (|message| msg, |faststring| out, |string| str)
+		if .match(msg)
+			.DoReplace(msg, out, str)
+		for ch in msg
+			.replaceall(ch, out, str)
+		if !msg.parent
+			out <~ str[.where...]
+		

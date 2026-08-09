@@ -1,0 +1,297 @@
+
+
+
+macro Print
+	StrPrint_(_0.render)
+
+macro PrintLine
+	StrPrintLine_(_0.render)				// not self-referential anymore.
+
+autogen StrPrint_ (|string?| data)
+	cpp_wrapper JB_Str_Print
+
+autogen StrPrintLine_ (|string?| data)		// ideally move this to string._printline
+	cpp_wrapper JB_Str_PrintLine			// AND... make printline x use this.
+
+inline Print (|string?| data)
+	StrPrint_(data)
+
+inline PrintLine (|string?| data=nil)
+	StrPrintLine_(Data)						// to disambiguate vs macro
+
+
+
+inline PrintLine (|Faststring!| data)
+	cpp_part PrintFS
+	StrPrintLine_(Data|string|)
+	data.Length = 0
+
+
+function Print (|cstring?| data)
+	cpp_wrapper JB_PrintCString
+
+
+function ZalgoLine (|string| data, |float| Wierdness=8)
+	printline data.zalgo(wierdness)
+
+macro ZalgoLine
+	Printline _0.render.zalgo
+
+
+function Print (|object| o)
+	cpp_name JB_Obj_Print
+	print o.render
+
+
+function PrintError (|string| data)
+	cpp_wrapper JB_Str_PrintError
+
+
+function byte.IsConso (|bool|)
+	return .isletter and !.isvowel
+
+
+function byte.IsVowel (|bool|)
+	|| b = .lowercase
+	return (b == 'a' or 'i' or 'e' or 'o' or 'u')
+
+
+inline int.operatorof (|string| type, |string| nothing="", |string|)
+	return type.Pluralize(self, nothing)
+
+
+function string.Pluralize (|faststring| fs_in=nil, |int| amount, |string| nothing="", |string|)
+	cpp_part PluraliseAmount
+	opt norefcounts
+	if !amount and nothing
+		if fs_in
+			fs_in <~ nothing
+		return nothing
+		
+	|| fs = FastString(fs_in)
+	if amount
+		fs <~ amount
+	  else
+		fs <~ "no"
+	fs <~ " "
+	if amount == 1
+		fs <~ self
+	  else
+		.Pluralize(fs)
+	return fs.getresult(fs_in)
+
+
+extend string
+	render Pluralize (|bool| Plural=true)
+		opt norefcounts
+		fs <~ self
+		if Plural
+			|| l = .last
+			|| l2 = .last(1)
+			//	'ch', 'sh', 'x', 's', 'z'
+			if (l == 's' or 'x' or 'z') or (l == 'h'  and  l2 == 'c' or 's')
+				fs <~ "e"
+			fs <~ "s"
+
+
+function string.Moat (|string?| Prepend=nil, |string|)
+	opt norefcounts
+	|| fs = faststring()
+	fs.size = .length + 4 + Prepend.Length
+	fs <~ "__"
+	if Prepend!=nil
+		fs <~ prepend
+	fs <~ self
+	fs <~ "__"
+	return fs
+
+
+function string.IsFileLike (|bool|)
+    || c = self[]
+    || c2 = self[1]
+	if (c == '/') or ((c == '.' or c == '~') and ((c2 == '.') or (c2 == '/')))
+		return true
+	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
+	
+inline byte.IsTextLine (|bool|)
+	if self == '\n' or '\r'
+		return true
+
+inline codepoint.IsTextLine (|bool|)
+	if self == '\n' or '\r'
+		return true
+
+inline int.TabsWidth (|int|)
+	return 4-(self & 3)
+
+
+function String.UTF16To8 (|faststring|fs=nil, |int|BigEndian=1, |string|)
+	cpp_wrapper JB_Str_UTF16To8
+
+
+function String.UTF8 (|string|)
+	if !.FindBadUTF8(0)
+		return self
+	return .UTF16To8
+
+
+/*function string.Appender7 (|string| a, |string| b, |string| c, |string| d, |string| e=nil, |string| f=nil, |string|)
+	cpp_wrapper JB_Str_Appender7
+*/ // do later. compiler can use this :)
+
+
+function string.OperatorPlus (|cstring| c, |string|)
+	if self
+		|| tmp = c.temp
+		return self + (&tmp)|string|
+	return c.wrap
+
+
+function cstring.OperatorPlus (|string| s, |string|)
+	if s
+		|| tmp = .temp
+		return (&tmp)|string| + s
+	return .wrap
+
+
+function string.OperatorPlus (|int64| i, |string|)
+	opt norefcounts
+	|| fs = faststring.shared
+	|| n = (i < 0)|int|
+	|| i2 = i
+	while
+		n++
+		i2 /= 10
+		loop i2
+	
+	fs.size = .length + n
+	fs <~ self
+	fs <~ i
+	return fs
+	
+
+struct VirtualJBString // fakejbstring
+	linkage
+		noauto // no need for people to see this.
+	|int|		RefCount
+	|int|		Length
+	|&byte|		Addr
+
+
+libinternal cstring.Temp (|VirtualJBString|)
+	rz.refcount = 0
+	rz.length = .length
+	rz.addr = self|&byte|
+
+
+
+function String.ExtractPathAndLine (|message|)
+	|message--| msg = Message()
+	
+	if charset.line in self
+		|| parsed = .Parse
+			|message--| p2 = parsed.first
+			if p2 == @arg
+			if (p2 == @arg) and p2.IsLast
+				parsed = p2							// to read: error {file abc, line 123}
+
+			|message--| path = parsed["file"]
+				msg.name = path.name
+				|message--| pos = parsed["pos"]
+					msg.Position = pos.int
+				|message--| line = parsed["line"]
+					msg.RangeLength = line.int
+				|message--| Sub = parsed["view"]|message|
+				msg <~ Sub
+				return msg
+
+	|| parts = self / ':'
+	msg.name = parts[0].trim.AbsolutePath
+	msg.rangelength = parts[1].int
+	msg.position = parts[2].int
+	return msg
+
+
+libinternal string.WrapSub (|int| MaxWidth, |bool| IsInline, |int| p, |int|)
+	|| i		= p
+	|| ParaMax	= 1K
+	MaxWidth	= MaxWidth min Paramax
+	|| Orig		= MaxWidth
+	paramax += p
+
+	while
+		|| c = .Byte(i, -1)
+		if c < 0
+			return i
+		if c|byte|.IsTextLine
+			if !isinline
+				return i + 1
+			c = ' '
+		if i >= ParaMax or MaxWidth <= 0
+			return i
+
+		if c == '\t'
+			i++
+			MaxWidth -= (Orig-MaxWidth).TabsWidth
+		  elseif isinline
+			i++
+		  elseif CharSet.EditorSplitter[c]
+			i++
+			MaxWidth--
+		  else									 // so where does the word end?
+			|| WordEnd = .Find(CharSet.EditorSplitter, i, ParaMax)
+				WordEnd += (self[WordEnd] > 32)
+			  else
+				WordEnd = .length min paramax
+			|| MW2 = MaxWidth - .lengthutf8(i, WordEnd)
+			if MW2 < 0
+				if i == p
+					i = p + MaxWidth
+				return i
+			MaxWidth = MW2
+			i = WordEnd
+
+
+libinternal String.TabsToSpacesSub (|faststring| fs)
+	|| i = 0 
+	for (c in self)
+		if c == '\t'
+			|| remain = 4 - (i mod 4)
+			fs <~ (' ', remain)
+			i += remain
+	// what about line-endings?
+		  else
+			fs <~ c
+			i++
+
+
+function String.TabsToSpaces (|string|)
+	|| fs = FastString()
+	for (l.lines in self) (p)
+		l.TabsToSpacesSub(fs)
+		if p
+			fs <~ self[p] // match line-ending
+	return fs
+
+
+function String.SpacesToTabs (|string|)
+	|| fs = faststring()
+	|| n = 0
+	for line.lines in self
+		if n++
+			fs <~ '\n'
+		|| SpaceCount = line.OutByte(' ') ?? line.Length
+		if spacecount > 0
+			fs <~ ('\t', SpaceCount >> 2)
+			fs <~ (' ', spacecount&3)
+		fs.AppendRange(line, spacecount, int.max)
+	return fs
+//	if rz == self // nice opt // i wonder if we could do that as a helper func?
+//		rz = self
+
+	
+
+//inline String.Spin (|int| f, |byte|)
+//	return `|/-\`[f&3] // useful for printing "processing" spinning line to stdout
+	
+

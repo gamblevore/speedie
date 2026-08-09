@@ -1,0 +1,205 @@
+
+
+// new task system
+
+module SCTasks {
+constants
+	AlreadyDone = 12345
+	
+|| tmp = message()
+function CollectAll
+	opt norefcounts
+	|| T = typetask
+	require T
+	for ch in compiler.TasksTodo
+		|| P = ch.obj|SCNode|!
+		if P == Compiler.program
+			P = T.Modul
+		  elseif p isa SCClass
+			p = p.modul|SCClass|
+		NewTaskActual(ch, P)
+
+
+function NewTaskActual (|Message| node, |SCNode| name_space)
+	opt norefcounts
+	
+	|| name = node[@thg, @dot]$
+	|| fields = name.Next
+	if fields == @bra or @list
+		fields.func = @bra
+	  else
+		fields = @bra.msg
+		name.next = fields
+	
+	|| arg = fields.next
+	if !arg.expect(@arg)
+		arg = node.msg(@arg)
+
+	|| With = arg.next
+		|| NewRunArg = With[@arg]
+		require with.expect(@tmp, "with") and With.ExpectLast and NewRunArg.ExpectLast
+		
+		arg <~ with
+		With.name = "run"
+		NewRunArg.MoveAllAfter(With)
+		while
+			|| F = arg.first
+			loop F and F != With
+			NewRunArg <~ f
+
+
+	|| Supper = fields.first
+	while (|| L = fields.Last)
+		(l.RangeLength = AlreadyDone)
+		.tmp.First = L
+	
+	
+	|| level = 2
+	using node
+
+	if Supper == @thg or @dot
+		fields <~ Supper
+		level = 3
+	  else
+		fields <~ (@sdot, "interface")
+	arg.BuildTask(fields, level)
+	arg.prependall(.tmp)
+	node.name = "role"
+	
+	
+	if name == @dot
+		|| P = name_space.FindModuleMsg(name.first!)
+			name_Space = p // hmmm
+
+	
+	name_Space.use
+	|| task = SCClass.NeuRole(node, name_space, node)|SCModule|
+		compiler.taskslist <~ task.cls
+		task.cls!.IsRole = level
+		task.parent = name_space
+		name_space.TryAdd(node, task, task.name)
+	scimport.curr = nil
+
+
+function NewTask (CollectFunc)
+	node.obj = name_space
+	compiler.taskstodo <~ node
+	return compiler.program
+
+
+function scclass.FillTaskConstructor (|scfunction| con)
+	opt norefcounts
+	|| src = con.source!
+	using src
+	.FillTaskConstructorSub(src, src.last.TaskConBefore, 0)
+	|| p = .modul.parent as scmodule
+		|| c = p.cls
+			c.tryadd(src, con, .name)
+	
+
+function message.TaskConBefore (|message!|)
+	opt norefcounts
+	|| marker = .find(@dot, "constructor")
+		marker++
+	  else
+		marker = .first
+	if marker
+		return marker
+	
+	return .msg(@sheb, "task")
+
+
+function scclass.FillTaskConstructorSub (|message| con, |message| before, |int| depth)
+	opt norefcounts
+	expect (depth <= 16) // what?
+	|| pr = .super
+	if pr.istask
+		pr.FillTaskConstructorSub(con, before, depth+1)
+	
+	for p in .properties
+		|| S = p.source
+			if s.RangeLength == sctasks.AlreadyDone
+				S.MakeTaskVar(con, before, depth==0)
+
+
+function Message.MakeTaskVar  (|message!| con, |message| before, |bool| First)
+	opt norefcounts
+	|| prm = con.second!
+	|| name = .VarName
+		if first
+			before.prev = NewEqRel(@sdot + name, @thg + name)
+		prm <~ .copy // :)
+
+
+function Message.BuildRunTask (|message| fields, |int| level, |bool|)
+	opt norefcounts
+	|| prms = .first
+	|| NoPrms = !prms or prms == @arg
+		prms = @list.msg
+		.first = prms
+		if level == 3
+			|| ss = fields.first
+				prms <~ ss.copy
+	  else
+		|| pf = prms.func
+		expect (pf == @bra or @list) (prms)
+	
+	|| arg = prms.next
+		arg.expect(@arg)
+		require arg.ExpectLast
+	  else
+		arg = .msg(@arg)
+	
+	|| p1 = prms.first
+	|| ff = fields.first
+	if (p1 == @thg or @dot) and ff == @sdot
+		ff.name = "task"
+		ff.func = @thg
+			
+	|| f = p1.func
+	if !(f == @thg or @dot)
+		|| brah = @bra.msg
+		brah <~ (@thg, "interface")
+		.first = brah
+		|| pr = .parent!
+		pr.AppendMacro(SCTasks.TaskMacro, [prms])
+		|| CallPrms = pr.FlatLast
+		callprms <~ (@thg, "self")
+		for p in prms
+			|| ty = p.second
+				callprms <~ ty.copy
+	
+	.name = "function"
+	.first = @thg + "run"
+	return true
+
+
+
+function message.FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
+	opt norefcounts
+	nil self // remove once we improve the nil-checker to "link" variables
+	for s.fast in self
+		if s.func == fn and s.name == name
+			rz <~ s
+
+
+function Message.BuildTask (|message| fields, |int| level)
+	|| Runs = .FindAll("run")
+	|| run = runs[0]
+	check (runs <= 1) (run, "Multiple run statements")
+	expect (run) (self, "Missing 'run' statement")
+
+	if run.BuildRunTask(fields, level) and !.findall("constructor")
+		run.prev = "constructor () {}"~parse
+
+
+	
+|| TaskMacro = `
+	role interface (task)
+		prototype prototype (^"_0")			// wierd syntax to give the list a name of _0
+		syntax call (^"_0")					// this helps the macro system to find the list by name.
+			return (._func|prototype|)()
+`.macro
+
+}
+

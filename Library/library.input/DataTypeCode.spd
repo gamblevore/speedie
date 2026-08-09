@@ -1,0 +1,188 @@
+
+
+datatype DataTypeCode (uint16)
+	linkage
+		cpp_part TC
+
+	default 0	
+	constants Types
+		|DataTypeCode|
+		Numeric = 8
+		Unsigned = 64
+		Floating = 128
+		byte	= 0 + 0  + 64 + 0	+ 8
+		char	= 0 + 0  + 0  + 0	+ 8
+		Byte2	= 1 + 0  + 64 + 0	+ 8
+		Byte3	= 2 + 0  + 64 + 0	+ 8
+		Byte4	= 3 + 0  + 64 + 0	+ 8
+		SByte	= 0 + 0  + 0  + 0	+ 8
+		SByte2	= 1 + 0  + 0  + 0	+ 8
+		SByte3	= 2 + 0  + 0  + 0	+ 8
+		SByte4	= 3 + 0  + 0  + 0	+ 8
+		uint16	= 0 + 16 + 64 + 0	+ 8
+		int16	= 0 + 16 + 0  + 0	+ 8
+		s16x2	= 1 + 16 + 0  + 0	+ 8
+		s16x3	= 2 + 16 + 0  + 0	+ 8
+		s16x4	= 3 + 16 + 0  + 0	+ 8
+		int64	= 0 + 48 + 0  + 0	+ 8
+		uint64	= 0 + 48 + 64 + 0	+ 8
+		iVec2	= 1 + 32 + 0  + 0	+ 8
+		iVec3	= 2 + 32 + 0  + 0	+ 8
+		iVec4	= 3 + 32 + 0  + 0	+ 8
+		Float16 = 0 + 16 + 0  + 128 + 8
+		Float	= 0 + 32 + 0  + 128 + 8
+		Double  = 0 + 48 + 0  + 128 + 8
+		Vec2	= 1 + 32 + 0  + 128 + 8
+		Vec3	= 2 + 32 + 0  + 128 + 8		// vec3 sucks kinda
+		Vec4	= 3 + 32 + 0  + 128 + 8
+		Int		= 0 + 32 + 0  + 0	+ 8
+		UInt	= 0 + 32 + 64 + 0	+ 8
+		bool	= 256
+		Pointer = 512
+		u32	 = uint
+
+		HFloat = Float16
+		s64	 = int64
+		u64	 = uint64
+		f64	 = double
+		f16	 = hfloat
+		int8 = char
+		uint8 = byte
+		u16	 = uint16
+		s16	 = int16
+		
+		_voidptr = 112 + 512 // unsigned 64-bit non-numeric value. // need use pointer!
+		cstring = _voidptr	// + 512 // same! // only exists to allow speedie to create a cstring type
+		Failed = Floating + unsigned
+		// we really need a pointer-bit...
+		// not just "not numeric" cos we say "bools are kinda numeric"
+		// but what about a non-numeric asmreg or non-numeric @syntax?
+		// are they pointers?
+		// having a bit-count instead of byte-count is better
+		// then we can represent bools.
+		PossibleBits = 1023
+	
+	
+	target debug
+		inline DebugPrint
+			printline .Render
+	
+	
+	render
+		visible
+		opt norefcounts
+		self = self&PossibleBits
+		if self isnt numeric
+			if self is bool
+				fs <~ "bool"
+			  elseif self is Pointer
+				fs <~ "pointer"
+			  else
+				fs <~ "ptr?"
+				fs <~ .bytecount
+		  elseif self == byte
+			fs <~ "byte"
+		  else
+			|| vc = .veccount
+			if vc > 1
+				if .isint
+					fs <~ "i"
+				fs <~ "vec"
+				fs <~ vc
+			  else
+				if !.IsSigned
+					fs <~ "u"
+				|| b = .ByteCount
+				if !.IsInt
+					fs <~ "float"
+					if b != 4
+						fs <~ b*8
+				  elseif b == 1
+					fs <~ "int8"
+				  elseif b == 2
+					fs <~ "int16"
+				  elseif b == 4
+					fs <~ "int"
+				  elseif b == 8
+					fs <~ "int64"
+	
+	// Can replace datatype code with this, eventually.
+	// this makes more sense, with the bitcount.
+	inline DebugCode (|uint|)
+		if self is bool
+			return 64			// bools are unsigned
+		
+		rz = self|int|&48
+		if rz == 48
+			rz = 64
+		if rz == 0
+			rz = 8
+		rz = rz.log2			// 1,2,4	// bits
+		rz |= (self&3)<<3		// 8,16		// vector
+		rz |= (self&128)>>2		// 32		// float
+		rz |= (self&64) 		// 64		// unsigned
+		rz |= (self&pointer)>>2 // 128		// pointer		
+		
+	inline Basictype (|DataTypeCode|) // compares floatness, vector-size, and "IsNumericness"
+		return self & (128 + 8 + 3)		// ignores bit-size and signedness.
+		
+	syntax is (|datatypecode| M, |bool|)
+		inlined
+		return self&M == M
+	
+	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
+		opt inline
+		if value
+			return self|||m
+		return self&~M
+	
+	inline Floatness (|int|)
+		return .isfloat*.bytecount // makes sense
+
+	inline IsFloat (|bool|)
+		return (self >> 7) & 1
+	
+	function SpecialReg (|bool|)
+		if self is pointer // pointers, bascially, are ints
+			return false
+		if .isint and .VecCount <= 1
+			return false
+		return true
+
+	inline IsInt (|bool|)
+		return !.IsFloat
+	
+	inline IsSigned (|bool|)
+		return !(self & unsigned)
+	
+	function SetSigned (|bool| HasSign, |DataTypeCode|)
+		if hasSign
+			return self  &~ unsigned
+		return self ||| unsigned
+	
+	function NumericCount (|int|)
+		if (self is numeric)
+			return .VecCount
+	
+	inline ItemBitCount (|int|)
+		return 8 << .ByteShift
+	
+	inline ByteShift (|uint|)
+		return (self >> 4) & 3
+
+	inline ByteCount (|int|)
+		return .VecCount << .ByteShift
+
+	function BitCount (|int|)
+		// not sure I actually WANT VecCount for most things?
+		// we don't have boolvecs anyhow :)
+		if self is bool
+			return 1
+		return (.VecCount << .ByteShift) << 3
+
+	inline VecCount (assigns:|int|, |datatypecode|)
+		return (self &~ 3) ||| (Value-1)
+	
+	inline VecCount (|int|)
+		return (self & 0x03) + 1
+	

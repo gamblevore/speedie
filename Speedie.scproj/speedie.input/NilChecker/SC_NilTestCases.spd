@@ -1,0 +1,35 @@
+
+
+target debug
+	function compiler.NilBug2 (|Message!| Output,  |message?|)
+		Opt NoRefCounts
+		Output.Position++
+		if 0.5[]
+			return output	
+	
+	/*
+	function compiler.NilBug (|Message| Output, |int|)
+		Opt NoRefCounts
+		while 0.5[]
+			
+			borks									// nil checker fail	
+			output = .NilBug2(output)				// confusing the nil checker?
+		if output
+	*/
+
+	function @ArchonPurger.ndb4
+		cpp_name ndb4
+		visible
+		(.t.Neel[]).ndb5()
+
+	function NilRecord.ndb5 
+		cpp_name ndb5
+		visible
+		
+		|| n = .DepthOfVars + 1
+		for i in n
+			// item 0 is nil
+			|| D = ArchonPurger.T.decls[i]
+				|| Name = D.name
+				|| V = self[i].RawName
+				"$Name:  $V"

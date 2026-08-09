@@ -1,0 +1,230 @@
+
+
+/*
+	Idea is to make sure your code works identical when porting from one system to another!
+	Smashing all bugs!
+	However... I should remove this. Speedie is already too large.
+*/
+
+		
+class FlowLog
+	linkage: cpp_part Flow
+	|FastBuff|				Buff
+	|InputStream?|			ReadInput
+	|faststring?|			Write
+	|bool|					CanDoErrors
+
+	constructor (|string| OutPath, |string| InPath)
+		flow off
+		.CanDoErrors = true
+		.buff.needAlloc(1MB)
+		.write = outpath.OutputStream
+		print "Logging flow to "
+		printline OutPath
+		|InputStream| s
+		if inpath
+			print "Validating flow against "
+			printline InPath
+			s = inpath.InputStream
+		.ReadInput = s
+		FlowLog.disabled = 0
+
+	
+	libinternal Flush
+		flow off
+		|| w = .Write
+			w <~ .buff
+		.buff.Curr = .buff.start
+	
+
+	destructor
+		flow off
+		FlowLog.Disabled = int.max
+		
+		.flush
+		if .ReadInput!=nil
+			"Flow: Occurred equally."
+
+	
+	libinternal AddByte (|byte| value)
+		flow off
+		if .buff <~ value
+			.Flush
+	
+	
+	libinternal TestByte (|byte| value, |bool|)
+		flow off, opt norefcounts, visible
+
+		.AddByte(value)
+		|| r = .ReadInput
+		if r == nil
+			return true
+		|| b = r.byte
+		if b == value
+			return true
+		debugger
+		.fail(string.byte(value), string.byte(b), "")
+
+
+	function Fail (|string| found, |string| expected, |string| InputName)
+		flow off
+		.readinput = .readinput
+		require .CanDoErrors
+		|| fs = FastString()
+		if InputName 
+			fs <~ "Different input for: ${InputName}. "			
+		if !.ReadInput.HasAny
+			fs <~ "New-stream longer than old-stream."
+		  else
+			fs <~ "Expected: "
+			fs.FlowPrintNicely(expected)
+			fs <~ " but found: "
+			fs.FlowPrintNicely(found)
+		fs <~ "\n"
+		
+		app.StackTrace(3, fs)
+		printline fs.GetResult
+		.CanDoErrors = false
+		.ReadInput = nil
+		if FlowLog.BreakOnFail
+			debugger
+
+
+	libinternal faststring.FlowPrintNicely (|string| s)
+		|| Cause = s.FlowUnPrintable
+		if Cause < 0
+			self <~ "#(${s.hex})#"
+		  elseif cause == '\n'
+			s.ReplaceAll("\n", `\n`, self)
+		  else
+			self <~ s
+
+	
+	libinternal string.FlowUnPrintable (|int|)
+		if .FindBadUTF8
+			return -1
+		
+		for c in self
+			ifn (c >= ' ' or c == 9)
+				if c.IsTextLine
+					return '\n' // This makes it not generic...
+				return -2
+	
+	
+	module
+		|FlowLog|			Flow			// DONT directly alter this 
+		|bool|					AlwaysMove		= true
+		|bool|					BreakOnFail
+		|byte|					Active
+		.GetActiveFlow
+		
+		constants
+			Validate			= 2
+			Log					= 1
+			Off					= 0
+		
+		function Disabled (assigns:|int| value)
+			cpp_wrapper 
+		function DisabledIncr (|int| value=1)
+			cpp_wrapper 
+		function IsDisabled (|bool|)
+			cpp_wrapper 
+			
+		function GetActiveFlow
+			opt norefcounts
+			|| str = app["flowmode"]
+			if str ~= "validate"
+				.Active = Validate
+			  elseif str ~= "log"
+				.Active = log
+			
+		libinternal Bool (|bool| value, |bool|)
+			cpp_name JB_Flow__Cond,  visible,  flow off
+			self <~ ('A'+value)|byte|
+			return value
+		
+		libinternal While (|bool| value, |bool|)
+			cpp_name JB_Flow__Cond2,  visible,  flow off
+			if value
+				return true
+			self <~ 'W'
+		
+		syntax append (|byte| value)
+			visible,  flow off
+			if !.isdisabled
+				.disabled = 1
+				.flow!.TestByte(value)
+				.disabled = 0
+				
+		function HashData  (|string| Data, |string| name)
+			cpp_wrapper JB_Flow__Report
+
+		function Input (|[string]| lines, |string| name)
+			cpp_part InputStrings
+			flow off
+			.InputLine(lines.join("\n"), name)
+
+		function InputLine (|string| data, |string| name)
+			.Input(data, name)
+			self <~ '\n'
+		
+		function Input (|string| data, |string| name)
+			visible
+			flow off
+			require !.isdisabled
+
+			.disabled = 1
+			|FlowLog--| f = .flow!
+			|InputStream--| r = f.ReadInput
+			if r != nil
+				|| str = r.str(data.length)
+				if str != data
+					f.Fail(str, data, name)
+				
+			for c in data
+				f.AddByte(c)
+			.disabled = 0
+		
+		function Stop
+			flow off
+			.Disabled = int.max
+			.Flow = nil
+
+		libinternal AskPath (|string| name, |bool| WantValidate, |string|)
+			if WantValidate
+				require .Active >= Validate
+				print "validation at: "
+			  else
+				if .Active >= Validate
+					name += "debug"
+				print "logging at: "
+			rz = "/tmp/Speedie/FlowLog".child( name + ".txt" )
+			printline
+
+		function Activate (|string| name,  |FlowLogStopper|)
+			flow off
+			if !.Active
+				"#!Use --flowmode=log or --flowmode=validate to activate FlowLog"
+				return nil
+
+			print "#!FlowLog "
+			.Disabled = int.max			// in case its set badly
+			.flow = FlowLog(.askpath(name,false), .askpath(name,true))
+
+		function Attempt (|string| name, |FlowLogStopper|)
+			flow off
+			(name)
+			target flow
+				return .Activate(name)
+
+
+
+datatype FlowLogStopper (int)
+	linkage: cpp_part flow
+	syntax UsingComplete (|object| dummy=nil)
+		flow off
+		FlowLog.stop
+
+	syntax Using (|FlowLogStopper|)
+		flow off
+

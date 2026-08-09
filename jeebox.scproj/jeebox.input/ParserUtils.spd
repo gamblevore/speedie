@@ -1,0 +1,327 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+function parser.New (|Message| Parent, |Syntax| Func, |int| Start, |string| name, |Message|)
+	Opt NoRefCounts
+	cpp_part NewParentName
+	// Callers create the messageIDs themself.
+	return Message.new(parent, func, Start, name, .nextstart - start)
+
+
+function parser.NewEmpty ( |Message| P, |Syntax| F, |int| Start, |int| After, |Message|)
+	Opt NoRefCounts
+	|| NoName = parser[start, start, F] // use messageID even if empty.
+	return message.new(P, F, start, NoName, after - start)
+
+
+function parser.New (|Message| Parent, |Syntax| F, |int| Start, |Message|)
+	Opt NoRefCounts
+	cpp_part NewAt
+	|| NoName = parser[start, start, F]
+	return Message.new(parent, F, Start, NoName, .nextstart - start)
+
+
+function parser.New (|Message| Parent, |Syntax| F, |int| Start, |int| End, |Message|)
+	Opt NoRefCounts
+	cpp_part NewParent
+	|| name = parser[start, end, F]
+	return Message.new(Parent, F, Start, name, end - start)
+
+
+function parser.NewWord ( |Message| P, |Syntax| F, |int| Start, |int| SearchFrom, |Message|)
+	Opt NoRefCounts
+	|| after = parser.WordAfter( SearchFrom )
+	|| name = parser[searchfrom, after, f]
+	return message.New( P, F, start, name, after - start )
+
+
+function parser.NewSkip ( |Message| P, |Syntax| F, |int| Start, |int| NameStart, |int| NameEnd, |Message|)
+	Opt NoRefCounts
+	|| name = parser[namestart, nameend, f]
+	return message.New( P, F, start, name, parser.nextstart - start )
+
+
+
+//////////////////////////////////////////////////
+
+function String.ParseJSON (|Messageroot|)
+	|| tmp = Jeebox.UnEscapeStr
+	jeebox.UnEscapeStr = Jeebox.JS_UnEscapeStr
+	rz = .parse
+	jeebox.UnEscapeStr = tmp
+	if rz
+		rz.ConvertJSONToJB
+	
+
+function String.IsJbin (|ind|)
+	|| length = .length
+	|| Start = 0
+	if length >= 4
+		|| A = .addr
+		if  A|&uint16|[] == 0x2123				// #!
+			Start = .find('\n', 2) + 1
+			if start <= 2
+				return -1
+		if (length-start>=4) and ((.addr+start)|&uint|[] == jbin.JBinHeader)
+			return 0
+	return -1
+
+
+
+function String.Parse (|syntax| owner = @nil, |bool| AllowDecomp=true,  |MessageRoot|)
+	description `Use this to parse jeebox text into a message. Full explanation at file:///usr/local/speedie/Documentation/Jeebox.md and file:///usr/local/speedie/Documentation/Message.md
+
+Single-line strings with single-node output, will take that node as the root.
+
+For example parsing "hello you" will return:
+
+	@tmp "hello"
+		@thg "you"
+
+But parsing "hello you\n" will return:
+
+	@arg
+		@tmp "hello"
+			@thg "you"
+
+This is actually very useful for technical data. Where you want to allow direct control over the output, and not have to deal with annoying @args.
+
+However, this doesn't work so well for user-facing data, like config-files. In this case, a config-file will expect to be in an @arg.
+
+To get around this, just do:  x = str.parse(@arg)
+`
+	|| J1 = .IsJbin
+	|| data = self[J1 max 0, int.max]
+	if AllowDecomp and data.iscompressed
+		data = data.decompress(int.max)
+		J1 = data.IsJbin
+	|MessageRoot--| Doc
+	if J1
+		doc = data.ParseJbin
+	  else
+		doc = data.ParseSub(owner)
+	return doc
+		
+
+
+libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
+	description "My language-parsing idea uses Owner as @list"
+	if !Parser.CppInited
+		Parser.Init
+
+	parser.StartParse( self )
+	parser._StopBars = 0
+	parser._ErrorFlags = ErrorFlags.dontstrip ||| ErrorFlags.parse
+	
+	|| OK		= StdErr.mark
+	|| Flags	= parser.kTemporal
+	|| Func		= Owner
+	Func		?= @arg
+	|| into		= message.new(nil, Func, 0, "", 0)
+	if func == @arg
+		(into is style2)
+	
+	// actual parse here.
+	|| lines	= parser.ParseLoopFlags(into, "", Flags)
+	
+	if (owner == @nil) and (Lines == false) and into.HasOneChild
+		into = into.first // don't do this if owner was specified.
+
+	parser.CleanSpaces
+	if parser.Running
+		parser.Expect( 0 )
+	
+	parser.startparse(nil) // clear error message
+	if !OK
+		into = nil
+
+	parser._ErrorFlags = 0
+	return into|MessageRoot|
+
+
+
+extend Parser
+	function fError (ParseHandler)
+		return nil // seems OK... doesn't need to do more
+
+	function fError2 (ParseHandler)
+		return .erroradd("Unexpected syntax", start)
+	
+
+	function ErrorAlwaysAdd (|String| s, |ind| Start, |Message?|)
+		.ErrorStart = start
+		
+		// create msg to store the current memory-layer
+		|| MemLayer			= Message()
+		|| err				= Error.new(memlayer)
+		MemLayer.Position	= Start
+		err.Position		= Start
+		err.name			= s
+		|| d = .data
+		if d.IsBinary
+			err.name += " (It seems this is not plain-text)"
+		  else
+			err.originaldata	= d
+		
+		nil|errorreceiver| <~ err
+	
+	
+	function ErrorAdd (|String| s, |ind|Start = parser.NextStart, |Message|)
+		if .OK //  multiple errors... per parse gets STUPID.
+			return .ErrorAlwaysAdd(s, start)
+	
+
+	function OK (|bool|)
+		Return !.ErrorStart
+
+
+	function ErrorEvent (|int|Start, |int| ExpectedBits, |int| RealBits)
+		visible true					// called directly by the tokeniser... sorry :PPPP
+
+		|| Err = FastString.new
+		ifn RealBits & kIllegalChar
+			ifn ExpectedBits and Realbits and FindError(expectedbits)
+				err <~ "Unexpected "
+			  else
+				for (5) {				// 5, in case there is a bug causing infinite loop.
+					ExpectedBits = MessageErrorSub( err, ExpectedBits )
+				} (ExpectedBits)
+				err <~ " but found "
+
+		if (RealBits == kEndOfLine)
+			err <~ "end-of-line"
+
+		  elseif !RealBits
+			err <~ "end-of-data"
+
+		  else
+			if parser.NextStart <= start
+				parser.NextStart = start + 1
+
+			if (RealBits & kIllegalChar)
+				err <~ "Found illegal-character "
+				|| illegal = parser[start]
+				if (illegal < 127 and Illegal >= 32)
+					err <~ '\''
+					err <~ parser[start]
+					err <~ '\''
+				  else
+					err <~ "0x"
+					err.AppendHex( illegal )
+					err <~ ' '
+			  else
+				err <~ '\''
+				|ind| N = parser.NextStart min (start + 100)
+				err <~ parser.range( start, N ).escape
+				err <~ '\''
+
+		Parser.ErrorAdd( err, start )
+
+
+	function FindError (|int| num, |int|)
+		if num == kThing: return kThing
+		for (._ErrorNames) (Key)
+			|| i = key.parseint|int|
+			if (num & i) == i
+				return i
+
+
+	function MessageErrorSub (|FastString| fs, |int| num, |int|)
+		|| e = ._ErrorNames
+		if !e
+			e = Dictionary()
+			._ErrorNames = e
+			e[kTemporal]			= "Temporal"
+			e[kTemporalSyx]			= "Declaration"
+			e[kTemporalWord]		= "Statement"
+			e[kEndOfLine]			= "End-Of-Line"
+			E[kColon]				= "':'"
+			E[kOppSyx]				= "Operator"
+			E[kOppWord]				= "Operator"
+			E[kOpp]					= "Operator"
+			E[kOppTemporal]			= "Temporal-operator"
+			E[kThing]				= "A name"
+			E[kThingWord]			= "A name"
+			E[kThingSyx]			= "Something"
+			E[kIllegalChar]			= "Illegal-character"
+		
+		if fs.length
+			fs <~ " / "
+		  else
+			fs <~ "Expected "
+		
+		|| BestValue = FindError(num)
+			|| s = e[ BestValue ]
+				fs <~ s
+			  else
+				fs <~ "something"
+			return num &~ BestValue
+		
+		fs <~ "something else"
+
+
+
+struct MessagePosition 
+	linkage
+		cpp_part MsgPos
+		noauto
+	
+	|MemoryLayer--|		Layer
+	|int|				Position
+	|int|				Length
+	|MessageFlags|		Flags
+	|uint16|			Tag
+	
+	destructor
+		parser.using = self[0]
+		.Layer.use
+	
+	function SyntaxUsingComplete (|object| idk=nil)
+		inlined
+
+
+prototype ParseHandler			(|int| Start, |message| Parent=nil, |Message?|)
+	libinternal
+
+prototype fnIDGenerator			(|int| Start, |int| End, |syntax| f, |string| Data, |String|)
+	description "Could be used to turn messages into MessageIDs during parse, for faster later processing."
+
+
+	function id (|string| Str, |syntax| F, |string|)
+		libinternal
+		if self
+			return (self)(0, str.length, F, Str)
+		return str
+	
+
+struct ParserLineAndIndent
+	linkage
+		libinternal
+
+	|int|		Lines
+	|int|		PzLine
+	|uint16|	Dentine
+	|uint16|	IsDebug
+	|int|		FirstLine
+	|int|		TotalLines
+	
+	function ArgPos (|Int|)
+		|| p = .FirstLine
+		if p >= 0
+			return p
+		return .PzLine
+	
+	function NextLine
+		Memory.zero(self, 4*4)				// oof. Need to leave TotalLines unset.
+
+
+role MessageRoot (Message)
+	contains Message
+	linkage
+		noauto
+		pragma noearlyfree
+
+

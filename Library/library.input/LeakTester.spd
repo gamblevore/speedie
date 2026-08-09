@@ -1,0 +1,47 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+struct LeakTester
+	linkage
+		cpp_part		Lk
+
+	|int|		MemUsedStart
+	|string|	Name
+
+	function Test
+		if .MemUsedStart
+			|int| NewAmount = app.objmemory
+			|| Diff = NewAmount - .MemUsedStart
+			if Diff > 0
+				"Leaked $Diff bytes in ${.Name}. New Count $NewAmount."
+			.MemUsedStart = 0
+		app.LeakUnMarkMemory
+	
+	module
+		function New (|string| name, |Leaktester|)
+			rz.MemUsedStart = app.objmemory
+			rz.Name = name
+			app.LeakMarkMemory
+
+	
+libinternal object.FindReferences
+	|| r = []
+	JB_FindLeakedObject(self, r)
+	printline r
+	debugger
+
+
+libinternal object.MarkRefCount (|bool| Active=true)
+	cpp_wrapper JB_MarkRefCount
+
+
+libinternal object.RefCountMark (|int|)
+	|| S = self|&int|
+	return S[] & 1
+
+
+cpp_func JB_FindLeakedObject		(|object| Obj,	|array| dest)
+cpp_func JB_Mem_ClassLeakCounter	()

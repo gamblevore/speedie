@@ -1,0 +1,707 @@
+
+// Copyright, Theodore H. Smith 2019.
+// Released under jeebox-licence http://jeebox.org/licence.txt
+
+
+
+
+        /* InLines and useful */
+
+
+#include "JB_Umbrella.hpp"
+#include <time.h>
+#include <cfloat>
+
+extern "C" {
+
+#define kDefaultSize (1024*2)
+#define Min(a, b) (((a) < (b)) ? (a) : (b))
+
+
+inline uint8 NumToHex(u32 Num) {
+	if ( Num <= 9 )
+		return Num + '0';
+	return Num + ('A'-10);
+}
+
+
+void JB_FS_AppendMem_(FastString* fs, const u8* Read, int Length) {
+	FS_SanityCheck_(fs);
+	dbgexpect(fs);
+	dbgexpect(Length >= 0);
+
+    uint8* Write = JB_FS_WriteAlloc_Inline_(fs, Length);
+    if_usual (Write) {
+		if (Length < 8) {
+			while ( Length-- > 0 )
+				*Write++ = *Read++;
+		} else {
+			CopyBytes(Read, Write, Length);
+		}
+	}
+    
+	FS_SanityCheck_(fs);
+}
+
+
+// oofington
+JB_String* JB_FS_AppendVArg (FastString* fs_in, JB_String* Fmt, ...) {
+// awesome new system to make appending to a faststring use less code
+// or else string formatting code can tend to become quite... bloated.
+// can replace jb_str_append6 also...
+	FastString* fs = JB_FS__FastNew(fs_in);
+    va_list Vargs; va_start(Vargs, Fmt);
+    u8* Addr = Fmt->Addr;
+    int Length = Fmt->Length;
+    for (int i = 0; i < Length; i++) {
+		int Ty = Addr[i];
+        switch (Ty) {
+            case 0: {
+                Date d = va_arg(Vargs, Date);
+                JB_FS_AppendLocalTime(fs, d);
+                break;
+            } case 1: {
+                const char* c = va_arg(Vargs, const char*);
+                JB_FS_AppendCString(fs, c);
+                break;
+            } case 2: {
+                int b = va_arg(Vargs, int); // byte
+                JB_FS_AppendByte(fs, b);
+                break;
+            } case 3: {
+                int64 hex = va_arg(Vargs, int64);
+                JB_FS_AppendHex(fs, hex, 2);
+                break;
+            } case 4: {
+                int64 i = va_arg(Vargs, int64);
+                JB_FS_AppendIntegerAsText(fs, i, 1);
+                break;
+            } case 5: {
+                JB_String* s = va_arg(Vargs, JB_String*);
+                JB_FS_AppendString(fs, s);
+                break;
+            } case 6: {
+                int s = va_arg(Vargs, int);
+                JB_FS_AppendUTF8Char(fs, s);
+                break;
+            } case 7: {
+                double d = va_arg(Vargs, double);
+                JB_FS_AppendDoubleAsText(fs, d, 7, 0);
+                break;
+			} case 8: {
+                JB_Object* Obj = va_arg(Vargs, JB_Object*);
+                JB_Obj_Render(Obj, fs);
+                break;
+				
+            } default: {
+				Ty -= 32; // space for up to 32 cases.
+				if (i+Ty > Length)
+					Ty = Length - i;
+                JB_FS_AppendMem_(fs, Addr+i+1, Ty);
+                i += Ty;
+			}
+		}
+	}
+    
+    va_end(Vargs);
+    if (fs_in)
+		return nil;
+	return JB_FS_GetResult(fs);
+}
+
+
+uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
+	return JB_FS_WriteAlloc_Inline_(fs, GrowBy);
+}
+
+int JB_FS_FreeSize(FastString* fs) {
+	return fs->_Size - fs->Length;
+}
+
+uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
+    int Spare = JB_FS_FreeSize(fs);
+    if (Spare < Extra)
+        if (!JB_FS_ResizeTo_(fs, fs->_Size + Extra))
+			return 0;
+    return fs->_Addr + fs->Length;
+}
+
+void JB_FS_AppendLocalTime (FastString* fs, Date self) {
+    time_t t = self >> 16; // lol
+    tm TimeSpec;
+    if (localtime_r( &t, &TimeSpec )) {
+		char* write = (char*)JB_FS_WriteAlloc_(fs, 26);
+		if (write) {
+			asctime_r(&TimeSpec, write);
+			fs->Length -= 2; // sigh
+		}
+    }
+}
+
+JB_String* JB_FS_Copy (FastString* fs) {
+    FS_SanityCheck_(fs);
+    return JB_Str_CopyFromPtr(fs->_Addr, fs->Length);
+}
+
+
+static byte DummySpace[4];
+
+bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
+    FS_SanityCheck_(fs);
+    if (NewLength == fs->_Size)
+        return true;
+    
+
+	auto S = fs->_Result;
+	if (!S) {
+		auto Old = fs->_Addr;
+		if (Old and Old!=DummySpace) return false; // direct memory write.
+		S = JB_Incr(JB_New( JB_String ));
+		S->Addr = 0;
+		S->Length = 0;
+		fs->_Result = S;
+	}
+	// So what if the size is lower than the current? AND if the current is... shared?
+
+	require (JB_BA_Realloc_(S, NewLength));
+    
+    fs->_Size = (int)JB_msize(S->Addr);
+    fs->_Addr = S->Addr;
+	fs->Length = Min(NewLength, fs->Length);
+
+    return true;
+}
+
+
+uint8* JB_FS_GrowBy (FastString* fs, int Needs) {
+    if ( JB_FS_Flush( fs ) and fs->_Size >= Needs ) {
+        fs->Length = Needs;
+        return fs->_Addr;
+    }
+
+    int NewLength = fs->Length + Needs;
+    if ( NewLength < kDefaultSize ) {
+        NewLength = fs->File ? 32*1024 : kDefaultSize;
+    }
+
+    for (  int i = 2;   i >= 1;   i = i / 2  ) {
+        if (NewLength*i  >=  NewLength) {
+            if (JB_FS_ResizeTo_(fs, (NewLength*i)-1)) { // -1 to zeroterm
+                int L = fs->Length;
+                fs->Length = L + Needs;
+                return fs->_Addr + L;
+            }
+        }
+    }
+
+    return 0;
+}
+
+
+
+	/* Appends */
+
+void JB_FS_AppendString( FastString* self, JB_String* u ) {
+	if ( u ) {
+		JB_FS_AppendMem_( self, u->Addr, u->Length );
+	}
+}
+
+void JB_FS_AppendRange(FastString* self, JB_String* Data, int Start, int After) {
+	if (Data) {
+		if (Start < 0)
+			Start = 0;
+		if (After > Data->Length)
+			After = Data->Length;
+		if (After > Start)
+			JB_FS_AppendMem_(self, Data->Addr + Start, After - Start );
+	}
+}
+
+void JB_FS_AppendCString(FastString* self, const char* c) {
+    if ( c ) {
+        int Length = (int)strlen( c );
+        if (Length) {
+            JB_FS_AppendMem_(self, (uint8*)c, Length);
+        }
+    }
+}
+
+
+void JB_FS_AppendByte(FastString* self, int byte) {
+	uint8* Write = JB_FS_WriteAlloc_Inline_(self, 1);
+	if ( Write ) {
+		*Write = (uint8)byte;
+	}
+	FS_SanityCheck_(self);
+}
+
+
+int JB_FS_Last (FastString* self, int off) {
+	int N = self->Length; 
+	int i = N-(1+off);
+	if ((uint)i < N)
+		return self->_Addr[i];
+	return -1;
+}
+
+    
+void JB_FS_RemoveByte(FastString* self, byte B) {
+    uint8* Addr = self->_Addr;
+    if (Addr) {
+        int Len_m_1 = self->Length - 1;
+        if (Addr[Len_m_1] == B) {
+            self->Length = Len_m_1;
+        }
+    }
+}
+
+
+void JB_FS_AppendMultiByte(FastString* self, int byte, int Count) {
+	if ( Count > 0 ) {
+		uint8* Write = JB_FS_WriteAlloc_(self, Count);
+		if (Write) {
+			for ( ; Count > 0; Count-- ) {
+				*Write++ = (uint8)byte;
+			}
+		}
+	}
+	FS_SanityCheck_(self);
+}
+
+
+void JB_FS_AppendIndent( FastString* self ) {
+    if (self->IndentChar) {
+        JB_FS_AppendMultiByte( self, self->IndentChar, self->Indent );
+    }
+}
+
+void JB_FS_LineIndent( FastString* self ) {
+	JB_FS_AppendByte( self, '\n' );
+	JB_FS_AppendIndent(self);
+}
+
+
+void JB_FS_AppendUTF8Char(FastString* self, int Char) {
+    uint8* WritePos = JB_FS_WriteAlloc_Inline_(self, 4);
+    if (WritePos) {
+        int WroteLen = (int)(u8Write_( WritePos, Char ) - WritePos);
+        JB_FS_AdjustLength_( self, 4, WroteLen );
+    }
+}
+
+
+// this function must be able to write hex, in varying outputs.
+
+void JB_FS_AppendHexSub(FastString* fs, int64 tVal, int RoundTo, uint8* CharMap) {
+	RoundTo = std::min(RoundTo, 8);
+	RoundTo = std::max(RoundTo, 1);
+	int Bytes = 1;
+	if (tVal)
+		Bytes += ((int)JB_u64_Log2(tVal)>>2);
+	int pd = Bytes % RoundTo;
+	if (pd) while (pd++ < RoundTo)
+		JB_FS_AppendByte(fs, '0');
+	while ( Bytes-- > 0 ) {
+		int64 oof = tVal >> (Bytes*4);
+		oof &= 15;
+		JB_FS_AppendByte(fs, CharMap[oof] );
+	}
+}
+
+
+void JB_FS_AppendMultiReplace(FastString* self, JB_String* Data, Dictionary* MSR, JB_ErrorReceiver* Rec) {
+	if ( MSR and Data )
+		JB_MSR_ReplaceAll( MSR, Data, self, Rec );
+	  else
+		JB_FS_AppendString( self, Data );
+}
+
+
+void JB_WriteCase_ (u8* Src, u8* Dest, int N, bool Upper) {
+	while ( N-- > 0 ) {
+		auto C = *Src++;
+		if (Upper)
+			C -= (C>='a' and C <= 'z')<<5;
+		  else
+			C += (C>='A' and C <= 'Z')<<5;
+		*Dest++ = C;
+	}
+}
+
+
+void JB_FS_AppendCase(FastString* fs, JB_String* Data, bool Upper) {
+	require0 ( Data );	
+	int Length = Data->Length;
+	uint8* wp = JB_FS_WriteAlloc_(fs, Length);
+	if (wp)
+		JB_WriteCase_(Data->Addr, wp, Length, Upper);
+}
+
+
+void JB_FS_AppendLower(FastString* fs, JB_String* Data) {
+    JB_FS_AppendCase(fs, Data, false);
+}
+
+
+void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To) {
+	JB_Str_ReplaceBytesSub_( Data, From, To, self );
+}
+
+
+// "2 000 000 000" is 10 int!
+
+static uint8* WriteIntToBuffer (uint8* wp, uint64 LeftOver) {
+    do {
+		uint64 Prev = LeftOver;
+		LeftOver = LeftOver / 10;
+		uint64 Missing = Prev - (LeftOver*10);
+        *--wp = (uint8)(Missing + '0');
+    } while (LeftOver);
+    return wp;
+}
+
+
+int JB_int_Render(int self, byte* Addr, int N) {
+	return snprintf((char*)Addr, N, "%i", self);
+}
+
+
+
+void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
+	if (Value >= 0 and Value <= 9)
+		if (RoundTo <= 1 or Value == 0)
+			return JB_FS_AppendMultiByte( self, (int)('0' + Value), RoundTo );
+
+	// the simplest way of writing digits... is to "just write it". No pre-guessing.
+	// of course we don't know how long it is until its already done.
+	// Thats why we need a buffer space.
+	
+	u8 Space[24]; // 19 digits rounds up to 24 if roundto is 8
+	uint8* wp = Space+sizeof(Space)-1;
+	uint64 LeftOver = (Value < 0) ? (uint64)(-Value) : Value;	
+	uint8* wp2 = WriteIntToBuffer(wp, LeftOver);
+	
+	if (RoundTo > 1) {
+		if (RoundTo > 8) RoundTo = 8;
+		int PadCount = ((int)(wp - wp2) + (Value < 0)) % RoundTo;
+		while ( PadCount and PadCount++ < RoundTo )
+			*--wp2 = '0';
+	}
+	
+    if (Value < 0)
+        *--wp2 = '-';
+
+	JB_FS_AppendMem_(self, wp2, (int)(wp-wp2));
+}
+
+
+void JB_FS_AppendDurr(FastString* self, Date D) {
+	auto Amount = ((double)D) / ((double)0x10000);
+	if (floor(Amount)!=Amount)
+		JB_FS_AppendDoubleAsText(self, Amount, 3, false);
+	  else
+		JB_FS_AppendIntegerAsText(self, Amount, 1);
+}
+
+void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
+    JB_FS_AppendDoubleAsText(self, D, 9, true);
+}
+
+bool HasDot (uint8* self, int Used) {
+	for_ (Used) {
+		if (self[i] == '.')
+			return true;
+	}
+	return false;
+}
+
+static bool DoubleIsNormal (double D) {
+	return  D <= DBL_MAX  &&  D >= -DBL_MAX;
+}
+
+
+// ActualExp is passed as a boolean. However, we re-use this var for an integer value!
+// 1 Reg saved!
+void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp) {
+	if (!D or !DoubleIsNormal(D))
+		return JB_FS_AppendCString(self, "0.0");
+
+	if (dp < 1) dp = 1;
+    dp = Min(dp, 16);
+    
+    if (D < 0)
+		JB_FS_AppendByte(self, '-');
+
+    D = fabs(D) + JB_Pow10(0.5001, -dp); // round off last digit!
+	// Why 0.5001? Well... we need at least 1dp. (Add at least 0.05)
+	// However, 0.05 is NOT STORABLE as a float. Either more, or less.
+	// I guess I could add more 0s, but sometimes floating point errors
+	// often end up with numbers like 0.499994, when really you wanted
+	// 0.5. After multiplying by 0.00000000000000001, this could happen.
+	// Someone better at float-math could help me :)
+
+    if (ActualExp) {
+		auto e = log10(D);
+		if (fabs(e) > 7) {
+			ActualExp = (int)floor(e);
+			D = JB_Pow10(D, -ActualExp);
+		} else {
+			ActualExp = 0;
+		}
+	}
+    
+	auto F = floor(D);
+	JB_FS_AppendIntegerAsText(self, F, 1);
+
+	auto Write = JB_FS_WriteAlloc_(self, 64);  self->Length -= 64;
+	auto Start = Write;
+	*Write++ = '.';
+
+	auto Frac = D - F;
+	while (Frac and dp-- > 0) {
+		Frac *= 10;
+		auto Whole = floor(Frac);
+		*Write++ = (int)Whole + '0';
+		Frac -= Whole;
+	}
+		
+	while (*--Write == '0')
+		*Write = 0;
+	
+	if (*Write == '.')
+		*++Write = '0';
+	
+	if (ActualExp) {
+		*++Write = 'e';
+		if (ActualExp < 0) {
+			ActualExp = -ActualExp;
+			*++Write = '-';
+		}
+		bool Active = false;
+		for (int i = 100; i >= 1; i /= 10) {
+			Active |= (ActualExp >= i  ||  i == 1);
+			if (Active) {
+				*++Write = '0' + (ActualExp / i);
+				ActualExp = ActualExp % i;
+			}
+		}
+	}
+		
+	self->Length += 1 + Write - Start;
+}
+
+
+
+void JB_FS_AppendShort(FastString* self, int s) {
+	short* wp = (short*)JB_FS_WriteAlloc_( self, 2 );
+	if (wp)
+		*wp = (short)s;
+	FS_SanityCheck_(self);
+}
+
+
+void JB_FS_AppendInteger(FastString* self, int l) {
+	auto wp = (int*)JB_FS_WriteAlloc_Inline_( self, 4 );
+	if (wp)
+		*wp = l;
+	FS_SanityCheck_(self);
+}
+
+
+void JB_FS_AppendInteger64(FastString* self, int64 l) {
+	auto wp = (int64*)JB_FS_WriteAlloc_Inline_( self, 8 );
+	if (wp)
+		*wp = l;
+	FS_SanityCheck_(self);
+}
+
+
+void JB_FS_AppendDouble(FastString* self, double d) {
+	auto fp = (double*)JB_FS_WriteAlloc_( self, 8 );
+	if (fp)
+		*fp = d;
+	FS_SanityCheck_(self);
+}
+
+
+
+               /* Utilities */
+
+int64 JB_FS_Mark(FastString* self) {
+	return self->_WrittenLength + self->Length;
+}
+
+
+bool JB_FS_Grew(FastString* self, int Old) {
+	return (Old < JB_FS_Mark(self)); 
+}
+
+
+int JB_FS_Byte(FastString* fs, int offset) {
+	if ((u32)offset < fs->_Size)
+		return fs->_Addr[offset];
+	return -1;
+}
+
+void JB_FS_ByteSet(FastString* fs, int offset, byte B) {
+	if ((u32)offset < fs->_Size)
+		fs->_Addr[offset] = B;
+}
+
+
+
+
+static void ClearFS (FastString* self);
+
+               /* Properties */
+
+int JB_FS_Size(FastString* fs) {
+	FS_SanityCheck_(fs);
+	return fs->_Size;
+}
+
+void JB_FS_SizeSet(FastString* fs, int NewSize) {
+	if (NewSize < 1)
+		ClearFS( fs );
+	  else
+		JB_FS_ResizeTo_( fs, NewSize );
+}
+
+int JB_FS_Length(FastString* self) {
+	if (self) 
+		return self->Length;
+	return 0;
+}
+
+int64 JB_FS_StreamLength(FastString* self) {
+	if (self)
+		return self->Length + self->_WrittenLength;
+	return 0;
+}
+
+void JB_FS_LengthSet(FastString* fs, int NewLength) {
+    if ((u32)NewLength < (u32)fs->_Size) {
+        fs->Length = NewLength;
+    }
+	FS_SanityCheck_(fs);
+}
+
+bool JB_FS_Flush(FastString* fs) {
+    JB_File* File = fs->File;
+    if ( File ) {
+        int N = fs->Length;
+        if ( N ) {
+            N = (int)JB_File_WriteRaw_( File, fs->_Addr, N );
+            fs->_WrittenLength += N;
+            fs->Length = 0;
+        }
+		JB_File_Flush(File);
+		return true;
+    }
+    return false;
+}
+
+
+void JB_FS_FileSet(FastString* fs, JB_File* F) {
+    JB_SetRef( fs->File, F );
+    if (F and F->Descriptor < 0) {
+        JB_File_OpenEmpty(F);
+    }
+}
+
+
+
+            /* Constructors */
+
+FastString* JB_FS_Constructor(FastString* self) {
+	JB_New2(FastString);
+    JB_Zero(self);
+    self->IndentChar = '\t';
+    self->_Addr = DummySpace;
+	return self;
+}
+
+
+FastString* JB_FS_ConstructorSize(FastString* Self, int Size) {
+	Self = JB_FS_Constructor(Self);
+	if ( Size )
+		JB_FS_SizeSet( Self, Size );
+	return Self;
+}
+
+
+
+static void ClearFS (FastString* self) {
+    JB_FS_Flush( self );
+    JB_Decr( self->_Result );
+	JB_Decr( self->File );
+    JB_Zero(self);
+    self->IndentChar = '\t';
+    self->_Addr = DummySpace;
+}
+
+
+void JB_FS_Destructor (FastString* self) {
+// object.dispose() doesn't exist anymore :]
+    JB_FS_Flush( self );
+    JB_Decr( self->_Result );
+	JB_Decr( self->File );
+	JB_Obj_Destructor(self);
+}
+
+FastString* TheSharedFastString;
+
+JB_String* JB_FS_GetResult(FastString* self) {
+	if (!self)
+		return JB_Str__Empty();
+	
+	int Length = self->Length;
+	int Actual = self->_Size;
+	JB_String* Result = self->_Result;
+	
+	self->Length = 0;
+    self->_WrittenLength = 0;
+    self->Indent = 0;
+    self->IndentChar = '\t';
+
+    if (Result) {
+		if (Actual >= Length*4 and self == TheSharedFastString)
+			return JB_Str_CopyFromPtr(self->_Addr, Length);
+		JB_SafeDecr(Result);
+	} else {
+		Result = JB_Str__Empty();
+	}
+    
+	self->_Size = 0;
+    self->_Result = 0;
+    self->_Addr = DummySpace;
+
+	return Str_Shrink(Result, Length); // calls freeifdead
+}
+
+
+
+FastString* JB_FS__FastNew(FastString* other) {
+    if (other)
+        return other;
+    
+	FastString* fs = TheSharedFastString; 
+	if (fs and JB_RefCount(fs) > 100) debugger;
+
+
+	if ( !fs or (JB_RefCount(fs) > 1)) {
+        JB_SetRef(fs, JB_FS_Constructor(0));
+		TheSharedFastString=fs;
+    } else {
+        fs->Length = 0;
+    }
+    
+    return fs;
+}
+
+
+
+} // 
+
+

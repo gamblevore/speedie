@@ -1,0 +1,250 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Error (Message)
+	linkage
+		cpp_part	Err
+		cpp_class	JB_Error
+	
+	contains	Error
+	
+	|String|				Path
+	|String|				OriginalData
+	|String|				StackTrace
+	|message?|				Node
+	|date|					When
+	|ErrorSeverity|			Severity
+	|ErrorFlags|			ErrorFlags
+
+	constructor (|message?| node, |string| desc = "", |errorseverity| level=errorseverity.error, |string| path="" )
+		visible
+		super.constructor
+		.position = -1
+		.node = node
+		.severity = level
+		.name = desc
+		.path = path
+		.when = date.now
+		.func = @sstr
+		.ErrorFlags = parser._ErrorFlags
+		.UpgradeWithNode
+	
+	
+	constructor
+		cpp_part Nothing								// Not an error actually.
+		super.constructor
+		.position = -1
+		.severity = ErrorSeverity.ok
+		.when = date.now
+		.func = @arg
+
+
+	constructor (|error| orig)
+		description "Error Copier"
+		cpp_Part Copy
+		super.constructor
+		.position = orig.position
+		.node = orig.node
+		.severity = orig.severity
+		.name = orig.name
+		.path = orig.path
+		.OriginalData = orig.OriginalData
+		.when = orig.when
+		.func = @sstr
+	
+	
+	function UpgradeWithNode
+		opt norefcounts
+		|| node = .node
+		if !node
+			node = BackupErrorSource
+			require node
+		.position = node.position
+
+		if !.path
+			.path = node.originalfilepath
+		.OriginalData = node.OriginalParseData
+		
+		
+	syntax is (|ErrorFlags| F, |bool|)
+		return self and .ErrorFlags&F
+		
+	syntax is (|ErrorFlags|F, assigns:|bool|)
+		.ErrorFlags = (.ErrorFlags & ~F) ||| (F * value)
+	
+	function LinePos (|string| data, |int|)
+		if (.HasPosition)
+			return data.Count(charset.line, 0, .Position)
+
+	inline HasPosition (|bool|)
+		return .Position >= 0 
+		
+	function ShiftPosition (|int| i)
+		opt norefcounts
+		.position += i
+		|| node = .node
+			node.position += i
+	
+	
+	inline IsWarning (|bool|)
+		return (.severity <= errorseverity.Warning)
+
+	inline IsBad (|bool|)
+		return (.severity >= errorseverity.problem)
+
+	inline IsError (|bool|)
+		return (.severity >= errorseverity.error)
+
+	
+	function Fill (|string| path, |string| desc)
+		visible					// for lib
+		.Path = path
+		(self is PreferNoRenderPath) = desc contains path
+		.name = desc
+	
+	
+	function GrabLine (|faststring| fs, |bool| Usecolor=false)
+		if Usecolor
+			fs <~ TerminalColor.Normal
+
+		|| d = .OriginalData
+		require d and .HasPosition
+
+		fs <~ "\n"
+		|| Start  = d.find( CharSet.Line, .Position, 0  ) + 1
+		|| Finish = d.find( CharSet.Line, .Position...  )
+		if (Finish == -1)
+			Finish = D.Length + 1
+		
+		fs <~ d[Start, Finish].ReplaceAll("\t", " ")
+
+		|| Spaces = (.Position - Start)
+		if spaces > 200: spaces = 0 // stop bugs.
+		
+		fs <~ '\n'
+		if Usecolor: fs <~ TerminalColor.Underline
+		fs <~ (' ', Spaces)
+		fs <~ '^'
+
+
+	function LineIdentifiers (|faststring| fs, |string| path, |bool|)
+		require (.HasPosition)
+		|| d = .OriginalData								#require
+
+		if !path: fs <~ "line "
+		fs <~ .LinePos( d )
+		fs <~ ':'
+
+		|| Start = d.find( CharSet.Line, .Position, 0 )
+		fs <~ .Position - Start
+		fs <~ ':'
+		return true
+
+
+	render Render
+		opt norefcounts
+		fs <~ "error"
+		++fs.indent
+		fs.field( "", .name )
+		if .position >= 0
+			fs.field( "pos", .position )
+		fs.field( "file", .path )
+		fs.field( "severity", .severity )
+		if .StackTrace
+			fs.field( "stack", .stacktrace )
+		fs <~ "\n"
+		--fs.indent
+
+
+	render RenderUnix
+		|| M = fs.StreamLength
+		|| p = .path
+			if self isnt PreferNoRenderPath
+				fs <~ .path
+				fs <~ ":"
+		
+		if (!.LineIdentifiers(fs, P) and .node)
+			.node.render(fs)
+		
+		if fs.streamlength > m
+			fs <~ " "
+		.severity.render(fs)
+		fs <~ ": "
+		fs <~ .name
+		.GrabLine(fs)
+		if .StackTrace
+			fs <~ "\n"
+			fs <~ .StackTrace
+
+
+	module
+		|message|		BackupErrorSource
+		|bool|			KeepStackTrace
+
+
+
+datatype ErrorFlags (Byte)
+	flags
+		|ErrorFlags|
+		DontStrip
+		PreferNoRenderPath
+		Parse
+	constants
+		Silent = 0
+		PrintFirst = 1
+		PrintAll = 2
+
+
+
+datatype ErrorSeverity (Byte)
+	render
+		if (self < IgnoreAllErrors)
+			|| name = errorseverity.ErrorNames[self|int|]
+			if !fs_in
+				if name != nil
+					return name
+				return ""
+			if name
+				fs_in <~ name
+	
+	syntax is (|ErrorSeverity| e, |bool|)
+		inlined
+		return self == e
+		
+	syntax Using (|ErrorSeverity|)
+		rz = StdErr.LowerErrorsTo
+		StdErr.LowerErrorsTo = self
+
+	syntax UsingComplete (|object| idk=nil)
+		inlined
+		StdErr.LowerErrorsTo = self
+
+	constants
+		|ErrorSeverity|
+		OK = 0
+		Hint				// We can't tell if its wrong, just letting you know if you want it fixed
+		Warning				// Its probably bad, and probably better corrected. 
+		Problem				// Always print these, but still continue
+		Error				// Parse errors, file not exists, etc.
+		Critical			// Severe errors.
+		IgnoreAllErrors		// Undocumented :]
+	
+	
+	module
+		|[string]| _ErrorNames = nil
+	
+		libinternal ErrorNames (|[string]|)
+			opt norefcounts
+			return ._ErrorNames init "OK note warning problem error critical".words
+		
+		function Find (|string| name, |message| err=nil, |errorseverity|)
+			opt norefcounts
+			for (n in .ErrorNames) (i)
+				if n ~= name
+					return i
+			if err
+				error err
+

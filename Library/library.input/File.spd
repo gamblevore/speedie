@@ -1,0 +1,560 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class File (StringShared)
+	linkage
+		cpp_class JB_File
+		wrapper
+	default			nil
+	false			nil
+	|filedes|		Descriptor
+
+	constants
+		AllowMissing	= true
+		ExpectExists	= false
+		CreateMode		= 0x200			/* create if nonexistant */
+		TruncateMode	= 0x400			/* truncate to zero length */
+		ExclusiveMode	= 0x800			/* error if already exists */
+		AppendMode		= 0x008			/* set append mode */
+		ReadMode		= 0x000			/* open for reading only */
+		WriteMode		= 0x001			/* open for writing only */
+		ReadWriteMode	= 0x002			/* open for reading and writing */
+
+	flags
+		AllowInvisible
+		AllowSymLinks
+		WantFileObjects
+
+////////////////////////////////////////////////////////////////////////////
+
+	constructor (|string?| path = "" )
+		cpp_wrapper JB_File_Constructor
+		description `The file constructor does a few things:
+		
+* Creates an error, if the length is over PATH_MAX (1024 on OSX)
+* Replaces paths starting with ~/ , with the user's home folder.
+* Turns relative paths (paths not starting with / or ~/) into full-paths
+* Removes garbage from the file path:   /////usr///./././local/bin///// --> /usr/local/bin
+* Trims newlines from both ends of the path. (This was done to make Perry more reliable when copy/pasting filepaths in, for example someone presses Cmd-D and pastes in /my/path/to/File\n which just happened to contain an accidental line not in the actual filepath, because the text he copied it from had multiple lines.)
+`
+	
+	destructor
+		cpp_wrapper JB_File_Destructor
+
+	function Mode (|FileMode|)
+		nil checker
+		cpp_Wrapper JB_File_Mode
+	
+	function Path (|string|)
+		nil checker
+		cpp_Wrapper JB_File_Path
+
+	function Mode (assigns:|FileMode|)
+		cpp_Wrapper JB_File_ModeSet
+
+	function LinksTo (|string|)
+		cpp_wrapper JB_File_LinkToGet
+
+	libinternal String.SymLink (assigns:|string|, |errorint|)
+		cpp_wrapper JB_Str_SymLink
+
+	function LinkTo (assigns:|string|, |errorint|)
+		// reverses the order to something I can understand more easily.
+		return Value.SymLink(self)
+
+	function HardLinkTo (assigns:|string|, |bool|)
+		cpp_wrapper JB_File_HardLinkTo
+
+	function IsOpen (|bool|)
+		disabled "use .opened"
+	
+	function Opened (|bool|) // isopen
+		inlined
+		return .descriptor >= 0
+
+	function Name (assigns:|string|Name, |errorint|)
+		return .MoveTo( super.Parent[Name] )
+	
+	syntax cast (|bool|)
+		opt norefcounts // what? why is this necessary?
+		inlined
+		return self|bool|
+
+//	syntax cast (|faststring|)
+//		cpp_part CastToStream
+//		return .out
+
+	syntax equals (|string?| s, |bool| aware=false, |bool|)
+		inlined
+		return super.SyntaxEquals(s, aware)
+			
+	function Length (|int|)
+		disabled "Do you mean the file's size or the file's path length?" 
+	
+	function Size (|int64|)
+		description "Return the file-size."
+		nil checker
+		cpp_wrapper JB_File_Size
+
+	function Length (assigns:|int|)	
+		disabled "Use .size"
+
+	function Size (assigns:|int|N)
+		cpp_wrapper JB_File_SizeSet
+
+	function Flush (|ErrorInt|)
+		cpp_wrapper JB_File_Flush
+		
+	function Close
+		cpp_wrapper JB_File_Close
+	
+	Syntax Access (assigns:|string| data, |FileSizeInt|)
+		description "Writes to the file. Clears old data."
+		inlined
+		return .WriteAll(data)
+		
+	function String.WriteAll (|string| Data, |FileSizeInt|)
+		description "Writes to the file. Clears old data. Errors-out if some data isn't written"
+		|| f = .file // may be self
+		return f.writeall(data)
+	
+	function WriteAll (assigns:|String|Data, |FileSizeInt|)
+		description "Sets the entire file to this string. If you want to only append to the file call .Write() instead. Errors-out if some data is not written."
+		cpp_wrapper JB_File_DataSet
+
+	function Write (|string| Data, |FileSizeInt|)
+		description "Appends this string to the file. If we are not at the end of the file, this will overwrite existing file data. If you want to set the entire file, use .WriteAll instead.  Errors-out if some data is not written."
+		cpp_wrapper JB_File_Write	
+
+	function SmartData (assigns:|String| nieu, |bool|)
+		if (.size != nieu.length) or (.readall(true) != nieu)
+			return .WriteAll(Nieu)
+
+	Syntax Append (|string| data)
+		disabled "Use file[] = data, to set the entire file's data."
+
+	Syntax Append (|message| msg)
+		// note to self in case I ever re-add this.	
+		disabled "You can't just append messages blindly. how do they get separated? lines, spaces, commas? nothing?"
+	
+	function string.Visible (|bool|)
+		return .name[] != '.'
+		
+	inline Hidden (|bool|)
+		return !.visible
+
+	function File (|file|)
+		disabled "This is already a file."
+	
+	function Parse (|int| lim = 16MB, |bool| AllowMissing=false, |syntax| Owner=@nil,  |messageroot|)
+		// normally allowmissing is good, but here it is bad.
+		// file.parse keeps track of the source+path
+		|| S = .readall(lim, allowmissing)
+		if s.iscompressed
+			s = s.Decompress(lim, nil)
+		if s
+			(Message).CreateLayerAndUse(self, s)
+			rz = S.parse(owner, false) // already decompressed.
+			(message).restore
+
+	
+	function Created (|Date|)
+		cpp_wrapper JB_File_Created
+
+	function Accessed (|Date|)
+		nil checker
+		cpp_wrapper JB_File_Accessed
+
+	function Modified (|Date|)
+		nil checker
+		cpp_wrapper JB_File_Modified
+	
+	function Modified (assigns:|Date|)
+		cpp_wrapper JB_File_ModifiedSet
+			
+	function IsPipe (|bool|)
+		cpp_wrapper JB_File_IsPipe
+
+//	function Peek (|int| n, |string|)
+//		|| i = .offset
+//		rz = .read(n)
+//		.offset = i
+	
+
+	render 
+		cpp_wrapper
+
+
+	function Child (|string| name, |File!|)
+		check (name) (Self, "No name specified for sub-file of directory: " + self)
+		return File( self|string|.child(name) )
+	
+	function ChildExisting (|string| name, |File|)
+		rz = .child(name)
+		expect (rz.exists) (Self, "Can't find file/folder: " + rz)
+	
+	
+	inline Parent (|File|)
+		opt norefcounts
+		return File.new( super.Parent )
+	
+	target !minilib {
+	function Touch (|ExitCode|)
+		return "/usr/bin/touch".SilentExecute([self])
+	}
+		
+	function ReadAll (|int| Limit = 128MB, |bool| AllowMissing = true, |stringthatwasreadsafely|)
+		description "Attempts to read the entire file. If .offset > 0, it will try to read from the start.
+
+Creates an error, if the file is bigger than the 'Limit' param."
+		cpp_wrapper JB_File_ReadAll
+	
+	
+	function MustExist (|string| operation = "", |bool|)
+		if .exists
+			return true
+		|| fs = faststring()
+		fs <~ "File does not exist"
+		if super[] != '/'
+			fs <~ " at "
+			fs <~ app.cwd
+		if operation
+			fs <~ ", trying to "
+			fs <~ operation
+		fs <~ " "
+		fs <~ super
+		error (self, fs)
+
+	
+	inline Exists (|bool|)
+		cpp_part FileExistance
+		return self|string|.fileexists
+	
+	syntax access (|string| name, |File!|)
+		inlined
+		return .Child(name)
+
+	autogen ListStart (|DirectoryReader|)
+		cpp_wrapper
+
+	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |filedes|)
+		cpp_wrapper
+
+	function OpenForRead (|bool| AllowMissing = false, |filedes|)
+		inlined
+		return .open(0, AllowMissing)
+	
+	function OpenEmpty (|ErrorInt|)
+		nil checker
+		cpp_wrapper JB_File_OpenEmpty
+	
+	function IsDir (|bool|)
+		cpp_wrapper JB_File_IsDir
+
+	function IsLink (|bool|)
+		disabled "use .IsSymLink"
+		
+	function IsSymLink (|bool|)
+		cpp_wrapper JB_File_IsLink
+
+	inline IsTerminal (|bool|)
+		return .descriptor.IsTerminal
+		
+	function Offset (|int64|)
+		cpp_wrapper JB_File_Offset
+	
+	function Offset (assigns:|int64|)
+		cpp_wrapper JB_File_OffsetSet
+	
+	function Delete (|ErrorInt|)
+		cpp_wrapper JB_File_Delete
+		
+	function MoveToTrash (|ErrorInt|)
+		|| ch = file.trash(.name)
+			.moveto(ch)
+	
+	function string.UniqueFile (|file|)
+		|| f = .file
+		if !f.exists
+			return f
+		return f.Parent.UniqueChild(.name)
+			
+	function UniqueChild (|string| name, |file|)
+		|| test = name
+		for 1000
+			|| ch = .child(test)
+			if !ch.exists
+				return ch
+			test = name + (0xFFFFFF())
+		error (self, "Unable to find unique child name.")
+			
+	function Relax (|bool| NeedsMode=true, |errorint|)
+		description "Alters file permissions. If this process is in sudo mode, it makes this file not need sudo to access it"
+		cpp_Wrapper JB_File_RelaxPath
+	
+	function DeleteAll (|bool| KeepSelf=false, |ErrorInt|)
+		if super == "/" or ""
+			return -1
+		if .IsDir
+			for c.files in self
+				if c.IsSymLink
+					c.Delete
+				  else
+					|| tmp = C.DeleteAll
+					if rz == 0
+						rz = tmp
+		if !KeepSelf and rz == 0
+			rz = .Delete
+
+	function IsFile (|bool|)
+		inlined
+		return !.isdir
+
+//	operator isdir (|string| ext, |bool|)
+//		inlined
+//		return .isdir and self isa ext
+		
+	function DirectoryContains (|string| path, |bool|)
+		return path.AbsolutePath starts .PathDir
+	
+	operator IsNewerThan (|File| F, |bool|)
+		cpp_Part NewerThanFile
+		return self isnewerthan f.modified
+	
+	operator IsNewerThan (|date| F, |bool|)
+		inlined
+		return (.Modified > F)
+	
+	operator IsOlderThan (|File| F, |bool|)
+		inlined
+		return (.Modified < F.Modified)
+
+	function string.Out (|bool| Clear=true, |Faststring|)
+		disabled "Use .outputstream"
+	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
+		disabled "Use .inputstream"
+	
+	function string.OutputStream (|Faststring|)
+		description "Lets you write to a file, via a faststring object." 
+		|| f = .file
+		if !f.ispipe
+			f.close
+			require f.openempty
+		return faststring(f)
+
+
+	function string.InputStream (|string| Header="", |int| ChunkSize=4MB, |InputStream|)
+		description "InputStream can read from files and strings. Write code once and use it on multiple input-sources." 
+		if self isa file
+			if .mustexist("stream")
+				rz = InputStream(self, chunkSize)
+		  else
+			rz = InputStream(self)
+		if rz and !rz.HasHeader(Header)
+			rz = nil
+	
+	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
+		disabled "Use .CopyTo"
+	
+	function CopyTo (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
+		cpp_wrapper JB_File_Copy
+	
+	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
+		if !.isdir
+			return .copyto(dest.file, AttrOnly)
+
+		for n in self
+			|| s = self[n]
+			|| d = dest[n]
+			rz = s.copyall(d) 
+			if !rz
+				exit
+	
+	
+	inline ListFiles (|int| Mode=file.AllowSymLinks, |[file]|)
+		return .list(mode|||WantFileObjects)|[file]|
+	
+	
+	function List (|int| Mode=file.AllowSymLinks, |[string]|)
+		flow off
+		
+		for name in self
+			if (Mode&AllowInvisible) or (name[] != '.')
+				|file| ch
+				ifn mode&AllowSymLinks
+					ch = self[name]
+					if ch.IsSymLink
+						continue
+				if mode&WantFileObjects
+					if !ch
+						ch = self[name]
+					rz <~ ch
+				  else
+					rz <~ name
+		
+		rz.sort
+		if !FlowLog.isdisabled
+			FlowLog.input(rz, self)
+		
+	
+	function MoveTo (|string| Path, |ErrorInt|)
+		cpp_wrapper JB_File_MoveTo
+		
+	function Read (|int| Length, |bool| AllowMissing=true, |string|)
+		cpp_wrapper JB_File_Read
+
+	inline Skip (|int| n=1)
+		.offset += n
+
+
+	iterator
+		|| reader = .ListStart
+		while ( reader.MoveNext )
+			yield reader.CurrChild
+		reader.listend
+
+
+	iterator Files
+		|| reader = .ListStart
+		while ( reader.MoveNext )
+			yield self.child(reader.CurrChild)
+		reader.listend
+	
+
+	module
+		|string| _Speedie
+				
+		function SpeedieDir (|string|)
+			if !._speedie
+				|| paths = app.exepath.parent
+				|| srch = "/speedie/"
+				|| found = paths.find(srch, 0, int.max, true)
+					._speedie = paths[0, found + srch.length]
+				  else
+					._speedie = "/usr/local/speedie/"
+			return ._speedie
+		
+		function Sorter (SorterComparer of file)
+			|| aa = .size
+			|| bb = b.size
+			return bb - aa
+			
+		function string.NeatenPath (|string|)
+			if self starts file.HomePath
+				return "~" + self[file.HomePath.length ...]
+
+		function NewPipe (|filedes| Pipe, |file|)
+			cpp_wrapper JB_File__NewPipe
+		
+// can rename these from path into files :)
+		function TrashPath (|string|)
+			inlined
+			target OSX
+				return "~/.Trash/"
+			target win
+				return `C:\$Recycle.Bin`
+			target lin
+				return "~/.local/share/Trash"
+		
+		function SystemDrive (|string|)
+			inlined
+			target win
+				return getenv("%ProgramFiles%")
+			  else
+				return "/"
+		
+		function Applications (|string|)
+			inlined
+			target OSX
+				return "/Applications/"
+			target win
+				return `C:\$Recycle.Bin`
+			target lin
+				return "~/.local/share/Trash"
+
+		function HomePath (|string|)
+			cpp_wrapper JB_File__Home
+
+		function Trash (|string|name="", |file|)
+			rz = .TrashPath.AbsolutePath.file
+			if name
+				rz = rz.uniquechild(name)
+
+		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
+			cpp_wrapper JB_CPath_ReadAll
+
+		function Documents (|file|)
+			inlined
+			return "~/Documents/".file			// .file calls pathfix already
+ 
+		function Desktop (|file|)
+			inlined
+			return "~/Desktop/".file
+
+		function Logs (|file|)
+			inlined
+			return "/tmp/logs/".file
+
+		function Prefs (|string?| name=nil, |file|)
+			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
+			target osx
+				|string--| P = "~/Library/Preferences"
+			  elseif win
+				|string--| P = "~\AppData\Roaming" // whatever
+			  else
+				|string--| P = "~/.config"
+			if name
+				return P.child(Name).file
+			return P.file
+		
+		module Existing
+			autogen MainArg (|int| Pos, |string| name, |file|)
+				|| f = file.MainArg(pos, name)
+				if f and !f.Mustexist
+					f = nil
+				return f
+		module Jeebox
+			autogen MainArg (|int| Pos, |string| name, |messageroot|)
+				return File.existing.MainArg(pos, name)$.parse
+		module Output
+			autogen MainArg   (|int| Pos, |string| name, |faststring|)
+				return file.MainArg(pos, name)$.Outputstream
+
+
+//	function AnyDate (|date|)
+//		return .created ?? .modified
+
+
+
+struct DirectoryReader
+	linkage
+		wrapper
+		cpp_class JB_DirReader
+	size 24
+
+	autogen ListEnd
+		cpp_wrapper JB_File_ListEnd
+
+	autogen MoveNext (|bool|)
+		cpp_wrapper JB_File_MoveNext
+
+	autogen CurrChild (|int| MakeDirsObvious=0, |String|)
+		cpp_wrapper JB_File_CurrChild
+	
+
+
+
+datatype FileMode (int)
+	constants
+		|FileMode|
+		Owner   = 7<<6
+		Group   = 7<<3
+		Other   = 7<<0
+		CanExec = 1<<6  + 1<<3 + 1<<0
+		Process = Owner + 5<<3 + 5<<0
+		Data    = 6<<6  + 4<<2 + 4<<2
+
+

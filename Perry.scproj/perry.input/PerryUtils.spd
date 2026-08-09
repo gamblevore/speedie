@@ -1,0 +1,134 @@
+
+
+function App.GoddamnXcodeBugs
+	opt norefcounts
+	target debug
+		if app.CWD == "/"
+			for (s.backwards in .args) (ind)
+				if s ~= "YES"
+					.args.remove(ind)
+
+
+function ClickedEditPrefs (GUIMenuEvent)
+	opt norefcounts
+	|| p = app._prefs
+		|| F = p.path
+			PerryIDE.New(F)
+
+
+function string.IsProj (|bool|)
+	return self isa "scproj" or "uwuz"
+
+
+function string.PathIsCode (|bool|)
+	return .IsProj or .IsSpd
+
+
+function @string.ASCII_Chart (|int| StartAt=32, |string|)
+	|| fs = FastString()
+	|| remain = 128-StartAt
+	|| mul = remain/4
+	for y in mul
+		for x in 4
+			|| c = StartAt+y+x*mul
+			
+			fs.AppendDecimal(c, 3)
+			fs <~ '\1E'
+			fs <~ "x"
+			fs.AppendHex(c, 2)
+			fs <~ '\1E'
+
+			|| l = 2
+			if c == '\t' 
+				fs <~ `TB`
+			  elseif c == '\n'
+				fs <~ `NL`
+			  elseif c == '\r'
+				fs <~ `CR`
+			  elseif c == ' '
+				fs <~ `SP`
+			  else
+				if c <= 32
+					c = '\1E'
+				fs <~ c|byte|
+				l = 1
+			if x < 3
+				fs <~ ('\1E', 7-l)
+				
+		fs <~ '\n'
+	return fs
+
+	
+function message.DebugArgNames (|[string]| out, |bool|)
+	opt norefcounts
+	if !self
+		return true
+	rz = .Expect(@arg)
+	for s in self
+		|| i = s.GoodArgName
+		if i != string.error
+			out <~ i
+		  else
+			rz = false
+
+
+function message.GoodArgName (|bool| NeedName=false, |string|)
+	opt norefcounts
+	|| name = .GoodArgNameSub
+		return name
+	if name.IsOK and needname
+		error (self, "No name found")
+		return string.Error
+	return name
+	
+
+//function message.SmartName (assigns:|string|)
+//	if .name != value
+//		.name = value // save memory for often generated strings
+	
+	
+function message.GoodArgNameSub (|string|)
+	opt norefcounts
+	|| f = .func
+	if f.IsString or f == @thg or @num
+		return .name
+	if (f == @tmp) and !.IsFirst
+		return .name
+	error (self, "Make sure this item is a string or a proper-name.")
+	return string.Error
+
+
+function @error.From (|message?| self, |error|)
+	opt norefcounts
+	require self
+	if self != @arg
+		return .AsError
+	rz = error()
+	for s in self
+		rz <~ s.AsError
+	
+	
+function message.AsError (|error|)
+	opt norefcounts
+	rz = error(nil|message|)
+	|| arg = .Last
+	if arg == @arg
+		rz.position = arg["pos"].int|int|
+		rz.path	= arg["file"].value
+		rz.severity = arg["severity"].int|errorseverity|
+		rz.name	= arg[@str].name
+	  else
+		rz.name = .name
+		rz.path = ""
+
+
+function message.ask
+	opt norefcounts
+	for a in self
+		if a == @arel
+			expect (a == "?") (a)
+			|| str = a.firstname.Ask				#require
+			a.Become(@str, str)
+			a.clear
+
+

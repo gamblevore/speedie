@@ -1,0 +1,861 @@
+
+
+
+struct InlineState
+	|scfunction!--|	Fn
+	|asmreg|		Return
+	|uint64|		ParentVars
+	|byte|			BranchDepth
+	|byte|			RealBranchDepth
+	|bool|			TailInlineable
+
+
+
+struct RegFile
+	|uint16[32]|				Setters
+	|int|						KnownMap
+
+
+
+struct Assembler
+	contains asmreg
+	linkage: cpp_part Pac
+
+	|uint16|					BasicBlock
+	|uint16|					BasicParent
+	|bool|						ExpectOneMore
+	|byte|						BreakRequest
+	|byte|						BasicDepth
+	|byte|						LoopDepth
+	|byte|						InlineDepth
+	|byte|						DeepestInline
+	|byte|						InlineDepthLimit
+	|byte|						EntireInlineFailed
+	|byte|						CurrFuncGrab
+	|bool|						NeedsRework				// hoisting
+	|uint|						RegDebugInfo
+	|uint|						VDecls_
+	|uint|						VTemps_
+	target debug
+		|byte|					StackSize
+	|InlineState[8]|			InlineState
+	|scfunction--|				Out
+
+	|?&FatASM|					InlineEnd
+	|&FatASM|					FuncStart_
+	|&FatASM|					Start
+	|&FatASM|					Curr_
+	|&FatASM|					End
+
+//	|FatASM|					Zero
+	|RegFile|					Regs
+
+	constants
+		kContinue		= 254
+		kExit			= 255
+		Breakable		= 1
+		BreakPoint		= 2
+
+	module
+		|Assembler|					Sh
+		|memory of fatasm|			JSM = FatASM[0]!
+		|memory of fatasm|			HoistSpace = FatASM[0]!
+		|uint16|					StringsOutOfRange
+		|jbin?|						DebugDecls
+		|uint16[16K]|				BlockParents
+
+	
+	function State (|&InlineState|)
+		return .inlinestate[.inlinedepth]
+	
+	function fn (|scfunction!--|)
+		return .state.fn
+	
+	function Curr (|&fatasm|)
+		return .curr_
+
+	function FuncStart (|&fatasm|)
+		return .FuncStart_ + 1
+		
+	function FnLength (|int|)
+		return .curr_ - .funcstart
+
+	function Index (|int|)
+		return .curr_ - .start
+	
+	function Last (|&FatASM|)
+		return .curr_ - 1
+
+	function AddFuncParams (|SCFunction| fn)
+		opt NoRefCounts
+		for a in fn.Args
+			.DeclReset(a)
+			.DeclareVar(a.source, a)
+
+	function Last (|asm| type, |&FatASM|)
+		|| L = .curr_ - 1
+		if .IsCurr(L, type)
+			return L
+
+	function Last (|asm| type, |asm| type2, |&FatASM|)
+		|| L = .curr_ - 1
+		if (l isa type or type2) and .IsCurr(L)
+			return L
+	
+	
+	function IsWithin (|&fatasm| f, |bool|)
+		// loops could still fail...
+		// we need to mark vars as set in loops... in the asm, right?
+		// we'd have to not mark as fat as CONST even if it came from a const...
+		// I guess... the y=2 thing would have to clear the const bits...
+		// perhaps we shouldn't "pre-lookup" the var its going into...
+		// but instead just GET IT... then... clear bits or whatever
+		// in setrel or whatever it is.
+		
+		/*
+			y = 1
+			while x
+				z = y+1
+				y++
+		*/
+		
+		|| B = f.basicblock
+		|| ToFind = .ParentBlock(B)
+		|| Us = .BasicParent
+		while
+			if Us == ToFind
+				return true
+			if !Us
+				return false
+			Us = .ParentBlock(Us)
+			
+
+	function IsCurrBranch (|&fatasm| f, |bool|)
+		return .BasicParent == .ParentBlock(f.basicblock)
+
+
+	function ParentSanity 
+		target debug
+			|| PP = .BasicParent
+			|| BB = .basicblock
+			|| BP = .parentblock(BB)
+			if BP != PP 
+
+
+	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
+		if (f isa type)
+			return (.basicblock == f.basicblock)
+
+
+	function IsCurr (|&fatasm| f, |bool|)
+		// can these use .within?
+		return .basicblock == f.basicblock
+
+	
+	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
+		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
+		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
+		|| v = r.const
+		if v == -1
+			if sub
+			.NopConst(r)
+			return v
+		v -= Sub
+		if !v or v.IsPow2
+			.NopConst(r)
+			if !v
+				return 0
+			return v.Log2+1
+
+
+	function AddToReg (|message| exp, |asmreg| Dest, |asmreg| Orig, |int64| Amount, |asmreg| Stronger=nil, |asmreg|) // addnum
+		|| T = orig.µtype
+		if t is pointer // makes no sense
+			T = DataTypeCode.int
+		if !dest.reg
+			dest.µtype = T
+		dest = .TempOnly(dest)
+
+		|| Where = orig • dest
+		(where is Const)
+		(where isnt ContainsAddr)
+		where.µType = T // why so much fiddling?
+
+		|| K = .NumToReg(exp, where, amount, T)
+		rz = .Plus(exp, dest, Orig, K)
+		if Stronger and !(rz iz dest) // Took a shortcut: adding 1 to 0, it returned the 1 in the available constants
+			rz = .assign(exp, dest, rz) // but we don't want that here.
+			
+	
+	
+	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+//		if !dest.reg // more about keeping the type, I guess.
+//			dest = src
+		return .AddToReg(exp, src, src, value, src)
+
+
+	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
+		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
+			return exp.ADAK(dest, Src, Value) * Dest
+		rz = .Assign(exp,  .temponly(dest),  Src)
+		if !dest.reg
+			dest = src
+		.AddToReg(exp, dest, src, value, src)
+
+
+//	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
+//		// A param/body var, that we return.
+//		// .DeclareMe is also called from inlines. What does it do there, then?
+//		// does it still make sense?
+//		
+//		// VarThatGotReturned isnt set anywhere?
+//		// remove this?
+//		|| st = .state
+//		|| ret = st.return
+//		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
+//			ret.µtype = rz|DataTypeCode|
+//			D.wholetype = ret
+//			return ret
+
+	
+	function DeclareBody (|Message| where,  |scdecl| Type,  |asmreg|)
+		return .DeclareVar(where, type) // as asmreg.Declaration	// this makes AddAK_K and others bigger?
+		// Generally this uses less registers tho! Needs marked as temp+decl sometimes!
+
+							
+	function DeclareMe (|Message| where, |asmreg| V=nil, |asmreg|)
+		|| d = .VDecls
+		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
+		d |= FreeBit
+		v.reg = freeBit.log2
+
+		.Vdecls = d
+		check (freebit and !(d & .VTemps)) (where, "No free local variables.")	// entirely full
+		return v
+	
+
+	function DeclareVar (|Message| where,  |scdecl| Type,  |asmreg|)
+		rz = Type.CalculateASMType
+//		|| ret = .IsOnlyVarThatWeReturn(type)
+//			return ret
+		
+		rz = .DeclareMe(where, rz)
+		Type.WholeType = rz
+		type.DepthOfLoop = .LoopDepth
+		
+		target debug: Type.ASMSanity
+
+
+	function vdecls (|uint|)
+		return .vdecls_
+
+
+	function vtemps (|uint|)
+		return .vtemps_
+
+
+	setter vdecls (|uint|)
+		if value & .vtemps_ // huh?
+		.vdecls_ = value
+
+
+	setter vtemps (|uint|)
+		if value & .vdecls_ // huh?
+		.vtemps_ = value
+
+
+	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
+		if type
+			t.µtype = type.mu.DataType
+		return .TempOnly(t)
+	
+	
+	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)		// .needreg
+		opt norefcounts
+		if t isnt textual
+			// what if there is a type and its different?
+			// and if its NEVER different... why add it?
+			t.µtype = where.asmdecl.mu.DataType
+		return .TempOnly(t)
+
+
+	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)						// .needreg
+		opt norefcounts
+		if t.reg
+			return t
+
+		|| r = .VTemps
+		target debug: if r&1: r&=~1 // how?
+		
+		|| Free = (~r).Log2		// Find lowest free bit.
+		r |= 1<<Free
+		t.reg = Free
+		.VTemps = r
+		(t isnt Const) // why would it be?
+		(t is temp)
+		t.fatindex = 0
+		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
+		return t
+	
+	
+	function AskNopTemp (|asmreg| R)
+		if R is temp
+			|| f = r.fat
+				return .AskNop(f)
+	
+
+	function AskNopTemp (|?&Fatasm| Fat)
+		if fat is temp
+			return .AskNop(fat)
+	
+
+	function NopReg (|asmreg| R)
+		|| f = r.fat
+			return .Nop(f)
+		target debug
+			if r.reg and r isnt param
+				debugat						// we don't know what made it, but we should!!
+	
+	
+	function Nop2Consts (|asmreg| A, |asmreg| B)
+		|| Further = a.FatIndex > b.FatIndex
+			.NopConst(A)
+		.NopConst(B)
+		if !Further
+			.NopConst(A)					// in case of swapped order
+	
+	
+	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
+		if r.reg == 0
+			return 0						// sigh. I DIE.
+		
+		require R is Const
+
+		|| RF = R.fat
+		if rf and .IsWithin(RF)
+			|| k = RF.const
+			if k.fits(bits, signed)
+				.NopConst(R)
+				return k|uint64|.trim(bits)
+	
+	
+	function NopConst (|asmreg| R, |int64| K, |bool|)
+		if r.Const == K
+			.NopConst(R)
+			return true
+	
+	
+	function NopConst (|asmreg| R)
+		require r.reg
+		target debug: if r isnt Const		// hah
+
+		if  R is temp  and  r isnt blocknop	// don't think we can do better. not easily. 
+			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
+	
+	
+	function Nop (|FATASM| ToNop)
+		return .nop_sub(ToNop, fatnopmode.hard, 0)
+	
+	
+	function SoftNop (|FATASM| ToNop)
+		return .nop_sub(ToNop, fatnopmode.soft, 0)
+	
+
+	function ParentBlock (|uint16| B, |uint16|)
+		if B >= 16K // argh
+		return BlockParents[B&(16K-1)]
+	
+	
+	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
+		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
+		if  info is temp  and  nopmode is CanClose
+			.CloseOneVar(nil, 1<<info.reg)
+
+		|| Type = asm.noop
+		if NopMode isnt Rewind
+			|| Break = fat.ASMIndex
+				if .IsCurrBranch(fat)
+					.BreakRequest |= Break
+				if (break & BreakPoint)
+					type = asm.ADDB
+					.BreakRequest = 0
+
+		if type == asm.noop
+			|| C = .curr - 1
+			if fat == C
+				.curr_ = C					// do it before both kinds of nop...
+				Type = nil
+
+		depth++
+		if depth > 7
+		
+		for f.FatInputs in fat
+			.Decr(f, NopMode, depth)
+		
+		for v.RegOutputs in fat
+			v &= 31
+			if .Register(v) == fat
+				.SetRegister(v, nil, fat.FindOlder)
+		
+		fat.setop = Type
+		if type == asm.ADDB
+			fat.ASMIndex = breakpoint ||| Breakable
+			
+		
+	function Register (|int| i, |?&FATASM|)
+// If a var is altered in a loop, and we're in a loop, its not a known value.
+		|| r = .Regs.Setters[i]
+			return .funcstart_ + r
+
+	
+	function KnownValues (|int| changed, assigns:|bool|)
+		|| M = .regs.KnownMap
+		changed = 1 << changed
+		if Value
+			m |=  changed
+		  else
+			m &=~ changed
+		.regs.KnownMap = M
+			
+
+	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Value, |asmreg|)
+		|| n = 0
+		|| start = .FuncStart_
+		if value
+			n = value - start
+			
+		.KnownValues(changed) = value is Const
+		|| where = &sh.regs.Setters[changed]
+		|| oldi = where[]
+		where[] = n										// set value
+		target debug
+			if .Register(changed) != value				// huh?
+		
+		if oldi and (NopDest is AllowNopDest)
+			|| old = start + oldi
+			if (old.µRefCount <= 0) and .iscurr(old)
+				sh.nop_sub(old, fatnopmode.hard)
+		(NopDest isnt AllowNopDest)
+		return NopDest
+
+
+	target debug
+		function byte.FatConst (|bool|)
+			return self == asm.KNSR or asm.KNST or asm.KNST2 or asm.KNST3
+	
+	
+	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
+		|| Changed = info.prm
+		.prms[a] = changed
+		changed &= 31
+		info.FatIndex = self - sh.funcstart_
+
+		if info
+			target debug
+				|| OpIsConst = .op.FatConst
+				|| InfoConst = info is const
+				if InfoConst != OpIsConst
+					if a
+			.info = info
+
+		if !changed
+			return info
+		
+		._Outputs |= 1 << a
+		if info
+			(info is AllowNopDest)
+		return sh.SetRegister(changed, info, self)
+	
+	
+	function RegIsConst (|asmreg| R, |int64| k, |bool|)
+		|| f = .register(r.reg)
+		if f is Const
+			return f.const == k
+	
+	
+	function Decr (|?&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
+		if f
+			|| C = f.µrefcount
+			C -= (C > 0)
+			f.µrefcount = C
+			if (mode isnt soft) and C <= 0
+				.nop_sub(f, mode, depth)
+	
+	
+	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
+		if ToNop.µRefCount <= 0
+			|| br = ToNop.ASMIndex
+			.nop(ToNop)
+			replace.ASMIndex = br
+
+	
+	function AskNop (|fatasm| ToNop)
+		if ToNop.µRefCount <= 0
+			.nop(ToNop)
+	
+	
+	function Rewind (|fatasm| Start, |fatasm| After)
+		|| Mode = fatnopmode.soft|||fatnopmode.rewind
+		while start < After
+			.nop_sub(--After, mode, 0)
+	
+	
+///////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		dest.µType = DataTypeCode.bool
+//		(dest as= asmreg.PreferEqul)						// easier to optimise.
+// unused?
+		|| x = .µ(exp, dest)
+		if x.IsBool
+			return x
+		return .Exists(exp, dest, X)
+	
+	
+	function message.FoundFunc (|bool|)
+		opt norefcounts
+		
+		while self
+			if (.func == @prm)
+				target debug: ifn .obj isa scfunction		// it must be, right?
+				return true
+			|| c = .first
+				|| r = c.FoundFunc
+					return r
+			self++
+	
+	
+	function message.AllowsTemp (|asmreg|)
+		return ASMReg.temp * (!.FoundFunc)
+	
+	
+	function message.ContainsFunc (|bool|)
+		opt norefcounts
+		if .func == @prm // what the?
+		|| f = .first
+			return f.FoundFunc
+			
+
+	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+	/*
+		possible inline param cases. int A is a normal reg. int B is altered
+		theres also references...
+		
+		A+B: nil
+		A:	reg1
+		B:	asmreg.into	// can't pass B, so pass a copy?
+		0:	asmreg.into	// if altered or ref
+		0:	nil			// otherwise
+	*/
+
+		if exp is BreakPoint
+			.Breakrequest |= BreakPoint
+		|| OV = .OpenVars
+		Dest = .DeclareBody(exp, a) as dest
+		|| r = .µGetASM(Exp, dest)
+		if r iz dest
+			return r
+		if (dest isnt ForceInto) and !(a is alteredorref and r.reg == 0)
+			return .CloseVars(ov, nil, r)
+		(dest isnt forceinto)
+		return .Assign(exp, dest, r)
+
+
+	function uint64.AddReg (|asmreg| V, |uint64|)
+		|| r = v.reg
+		|| One = 1|uint64|
+		|| T = One << (r+32)
+		|| D = One << (r)
+		|| Srch = D ||| T
+		|| IsTemp = v is temp
+		if Self & Srch					// i guess its already OK.
+			T = 0
+		  elseif !IsTemp
+			T = D
+		return self ||| T
+			
+
+	function µGetPrms (|message| exp,  |asmreg| Dest,  |asmreg|)
+		// Returns a var that will remain alive, as vdecl or vtemp.
+		// This is used for passing params to funcs, or to anything func-like.
+		target debug
+			|| trap = ++ASMTrapper
+			if trap == -1
+			Dest.TmpCheck(true)
+
+		|| OV = .OpenVars
+		if exp is BreakPoint
+			.BreakRequest |= assembler.Breakable
+
+		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
+			Dest = Dest asnt ASMReg.NewlyDeclared
+		  elseif Dest is temp										//	x = (y + 1) + (z + 1)
+			Dest = .TempOnly(Dest)
+		  else
+			// when compiling:		x()[y()] = z()
+			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
+			// but these are functionally temps.
+			Dest = .DeclareMe(exp, Dest)
+			(dest isnt const)										// :3
+			(Dest is Temp)
+			(Dest is OKAsTemp)
+		
+		target debug
+			Dest.TmpCheck
+
+		|| r = .µGetASM(Exp, Dest)
+		ov = ov.AddReg(R)
+		// this will close all vars, except the one we just got back!
+		return .CloseVars(ov, nil, r)
+		
+		
+	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+		description "Same as µGetASM, except this closes temp vars for reuse."
+		|| Closer = .OpenVars
+		|| v = .µGetASM(exp, dest)
+		return .CloseVars(Closer, nil, v)
+
+
+	function µFuncPrms (|message| exp, |scdecl!| A, |asmreg|)
+		|asmreg| Mode = nil //exp.AllowsTemp
+		(Mode is AddrNeed) = (a is Reference)
+
+		|| r = .µGetPrms(exp, Mode)
+		if (a is reference  and  r isnt containsaddr)
+			error (exp, errorreceiver.nonfatal)
+		return r.incr
+
+
+	function µTrin (|message| exp, |asmreg|)
+		opt norefcounts
+		return .µGetPrms(exp, exp.AllowsTemp) as asmreg.Textual
+
+
+	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
+		|| Closer = .OpenVars
+		|| v = .µGetASM(Exp, dest)
+		ifn v iz dest
+			v = .Assign(exp, dest, v)
+		return .CloseVars(Closer, nil, v)
+		
+	
+	target debug
+		function µDebug (|message| exp, |asmreg| dest)
+			|| fn = fn_asm_table[exp.ASMType]!
+			dest.DebugPrint
+			PrintProgress()
+			debugger
+			|| m = (fn)(self, exp, dest)
+			m.debugprint
+			debugger
+
+		
+	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
+		opt norefcounts
+		cpp_part GetASM
+		
+		target debug
+			dest.TmpCheck
+			|| StackSize = ++.stacksize
+			|| trap = ++ASMTrapper
+			if trap == -1 or stacksize > 30 // ugh
+				
+		  else
+			opt inline
+		
+		|| fn = fn_asm_table[exp.ASMType]!
+		|| ss = (fn)(self, exp, dest)
+
+		target debug
+			.StackSize--
+			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
+				"!Const has no fat!"
+				.µdebug(exp, dest)
+			if !ss.tmpcheck
+				.µdebug(exp, dest)
+			// dest discard means "we are telling you that we don't need the result"
+			// return discard means "the result is unused, so reg0 isn't actually being set to"
+			if !ss  or  (dest is set)  or  (ss is set or discard)
+				return ss // no need test.
+			if !ss.reg and (ss isnt condanswer)
+				if !(ss & asmreg.exit) and (ss isnt Const)
+					"!Zero Reg!"
+					.µdebug(exp, dest)
+		return ss
+	
+	
+	function scclass.ListLayout (|jbin| j)
+		opt norefcounts
+		|| s = .super
+		|| sid = (s!=nil)(s.tableid<<1, 0)
+		j.AddhInt(sid + .isobject)
+		j.PropertyLayout(.Properties)
+			
+			
+	function jbin.PropertyLayout (|[scdecl]| List)
+		opt norefcounts
+		|| S = .Startadd
+		for p in list
+			p.DumpDeclOpen(self, p.exportposition, p.reg, false)
+		.FinishAdd(@bin, S)
+
+		
+	function FillDebugInfo 
+		opt norefcounts
+		if Options.TargetDebug
+			SourceMap.Positions = FastString()
+	
+	
+	function ASMInit 
+		opt norefcounts
+		require !asmtype.ReadASM[0] // set in ASMType.InitAccess
+		if options.TargetDebug
+			if Options.StripNames
+				problem "Can't use --strip and --targetdebug"
+				Options.StripNames = false
+			DebugDecls = FastString()
+		
+		VM_Builder.JustDefineInstructions
+		instruction.InstructionInit
+		ASMType.InitAccess
+
+		Instruction[asm.KNSR].Const
+		asm.encoders[asm.halt] = fatasm.Halt_Encoder
+		asm.encoders[asm.noop] = fatasm.Nop_Encoder
+		asm.encoders[asm.mark] = fatasm.Nop_Encoder
+
+		.Knst(asm.KNST)
+		.Knst(asm.KNST2)
+		.Knst(asm.KNST3)
+
+		return 
+
+		TextAssembler.Requests		?= dictionary()
+		TextAssembler.RequestTable	?= array()
+
+	
+	function Knst (|asm| op)
+		Instruction[op].Const
+		asm.encoders[op] = fatasm.KNST_Encoder
+		
+	
+	function InitAndStartFunc (|scfunction| fn)			// init
+		opt norefcounts
+		
+		target debug
+			asm.NoisyASM = 3
+		{
+			|| BB = .BasicBlock
+			|| N = (BB+1)*2  min  –sizeof BlockParents
+			Memory.Zero(&BlockParents[0], N)
+		}
+		self[0] = nil // CLEAR!
+		
+		|| j = Assembler.jsm
+		.end = j.NeedSpare(64K, 64K)
+		.start = j.ptr
+		.curr_ = .start + j.Length
+		.FuncStart_ = .curr
+		
+		HoistSpace.Length = 0
+		
+		.inlinestate[0].TailInlineable = true
+		.out = fn
+		.state.fn = fn
+		SCFunction.CurrFunc = fn
+		.InlineDepthLimit = 3
+		.BasicBlock = 1							// good to start these at 1.
+		.Guard
+		fn.µstart = .Index
+		.VDecls = 1								// set after .FuncStart
+		.AddFuncParams(fn)
+
+
+	function CapASM 
+		opt norefcounts
+		|| fn = .out
+		|| n = .fnlength
+		fn.µfatlength = n
+		jsm!.length = .curr - .start
+		
+	
+	function MissingReturn 
+		opt norefcounts
+		debugger !.fn.ASMReturn
+		|| arg = .fn.source!
+		|| Faked = arg.FrenchSpyReturn
+		|| old = arg.position
+		arg.Position = Faked
+		.CloseVars(1, arg)
+		ASMType.ReturnOpt(self, nil)
+		|| FatRat = arg.ret
+		fatrat.µRefCount = 1
+		fatrat.ASMIndex = Breakable
+		arg.Position = old		
+
+
+	function Guard
+		opt norefcounts
+		|| arg = .fn.SourceArg!
+		target debug
+			if arg.position < 0
+				arg.position = 0 // skip error detection
+		Arg.HALT.BasicBlock = -1
+
+/* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
+
+
+	iterator Known
+		|| h = .regs.KnownMap
+		while h
+			|| h2 = h.LowestBit
+			yield .Register(h2.log2)!
+			h &= ~h2
+
+
+target debug
+	|| ASMTrapper = 0
+// Speedie's function histogram:  0:410, 1:1656, 2:1464, 3:713, 4:167, 5:61, 6:10, 7:4, 8:0
+// There are only 4 above 6!, only 14 above 5, 75 above 4
+// almost all lib functions have 4 or less. 5 is for proj funcs.
+	
+
+
+function assembler.RootGen (|scfunction| fn)
+	opt norefcounts
+	asmtype.ArgumentSub(self, fn.SourceArg!, nil)
+
+
+function Assembler.Rework (|SCFunction| fn)
+	HoistSpace.NeedSpare(.FnLength)
+	HoistSpace.CopyFrom(.FuncStart, .FnLength)
+
+	.InitAndStartFunc(fn)
+	.RootGen(fn)
+	.FinishASM
+
+
+function Assembler.FatterCompile (|SCFunction| fn, |bool|)
+// AsmGenerate, ASMRender, GenerateASM, ASMCompile, RenderASM, genasm
+	opt norefcounts
+	scfunction.currfunc = fn
+	
+	.InitAndStartFunc(fn)
+	.RootGen(fn)
+	.FinishASM
+	if .NeedsRework
+		.Rework(fn)
+	.CapASM
+	
+	target false
+		ifn options.silent or compiler.InPerry or options.perryoutput
+			.PrintASM(fn, packmaker.PackFuncIndex)
+	
+	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
+	require err.ok
+	|| max = fn.MaxASM
+		check (fn.µasmlength <= max) (fn.SourceArg, "ASM too large")
+	return true
+
+
+

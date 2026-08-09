@@ -1,0 +1,20 @@
+#!/usr/local/bin/spd
+
+|| ConfData = `
+date 109638486383396 // actually this is jan 5 2023
+theme "hello_kitty"
+irrelevant "this isnt used by the code below"
+curropen "/Users/jojosiwa/HowILostMySiwa"
+`
+
+main
+	|| conf = ConfData.parse		#require
+	"Theme:       ${conf[`theme`]}"
+	"Last Opened: ${conf[`date`].humandate}" // a human readable date
+	"Curr File:   ${conf[`curropen`]}"
+
+	if 0.5[] // just added this for fun
+		error "failed half the time (on purpose!) Rerun a few times to see this work."
+	  else
+		"Everything worked great!"
+

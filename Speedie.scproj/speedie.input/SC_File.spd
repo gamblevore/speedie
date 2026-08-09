@@ -1,0 +1,229 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+class SCFile (file)
+	linkage:cpp_part File
+	|string|		ExportName
+	|SCImport|		Proj
+	|string|		FData
+	|Message?|		LiveAST
+	|Message?|		OrigAST
+	|uint16|		FileNum
+	|bool|			IsInternal
+	|bool|			Unfinished
+	|bool|			UsedByASM
+	|[scclass]?|	Types
+
+
+	constructor (|File| f, |scimport| p)
+		flow off // dates shouldn't matter ///
+		FlowLog.DisabledIncr
+		
+		|string--| x = (f != nil)(f.path, string.error) 	// just feel like doing this.
+		super.constructor(x)
+		.Proj = p
+		.Types = nil
+		.FileNum = -1										// Set later in sort()
+		.IsInternal = f == nil
+		.LiveAST = .start_ast
+		Compiler.stTotalFileCount += .isinternal
+		(SCImport.Recent max= f.modified) 
+		FlowLog.DisabledIncr(-1)
+		
+	
+	
+	function Start_AST (|message|)
+		if .IsInternal
+			memorylayer(Message, self).use
+			rz = message(@arg, "")
+			(message).restore
+	
+	
+	function Stop
+		if curr == self
+			curr = nil
+		scimport.curr = nil // whatever.
+		scimport.CurrIsManuallyImported = 0
+
+
+	function Use
+		opt norefcounts
+		curr = self
+		scimport.curr = .proj
+		scimport.CurrIsManuallyImported = .Proj.Depth
+		|| l = .LiveAst
+			l.memoryLayer.Use
+	
+	syntax Append (|scclass| C)
+		opt norefcounts
+		if self
+			(.Types init []) <~ c
+	
+	function CollectGlobals (|SCModule| p)
+		CollectDeclsGlobals( .LiveAST, p )
+	
+		
+	function GetMsg (|int| pos, |message|)
+		opt norefcounts
+		for f.flat in .orig
+			if f.name and f.range contains pos
+				return f
+	
+	
+	function Orig (|message|)
+		if !.OrigAST							// or .OrigDate < .Modified
+			.OrigAST = .ASTSub(true)
+		return .OrigAST
+	
+	
+	function AST (|Message|)
+		opt norefcounts
+		return .LiveAST init .ASTSub(false)
+	
+	
+	function DetectInsecureWords
+		opt norefcounts
+		require options.perryoutput
+		|| words = compiler.InsecureWords$
+		|| where = (0,0)
+		|| found = words.Find(.fdata, where)
+			|| place = @thg + ""
+			place.range = where
+			errorreceiver.newerror(place, "Insecure word found", .path)
+		
+		
+	function ASTSub (|bool| Orig, |Message|)
+		FlowLog.input(self, "AST")
+		
+		FlowLog.DisabledIncr		// i want it a bit less sensitive to random file-cleanups
+		|| str = .Readall(true).decompress // like: x() --> x() // comment
+		FlowLog.DisabledIncr(-1)	// also... parse/parseclean will find REAL differences.
+		
+		if str
+			curr = self
+			(Message).CreateLayerAndUse(self, str)
+			.fData = str
+			StdErr.source = .path
+			parser._DotInsertallow = true		// more consistant with IDE
+			
+			|| oldimp = scimport.CurrIsManuallyImported
+			scimport.CurrIsManuallyImported = .proj.depth
+			parser.Using.Tag = .FileNum << 5	// kinda useless, we sort the things later.
+												// so remove?
+			if !orig
+				rz = .fData.ParseClean			// should parseclean not set tags?
+			  else
+				rz = .fdata.parse
+			scimport.CurrIsManuallyImported = oldimp
+			.DetectInsecureWords
+			
+			parser.using.tag = 0				// remove too
+			parser._DotInsertallow = false
+			StdErr.source = ""
+		(Message).restore
+	
+	
+	module
+		|scfile--|	Curr
+		
+		function Sorter (SorterComparer of scfile)
+			opt norefcounts
+			|| lib = .Proj.IsLibraryImp - b.Proj.IsLibraryImp
+				return lib
+			|| asm = .UsedByASM - b.UsedByASM
+				return asm
+			return self < b
+
+
+
+function file.CodeSign (|string| sign, |ExitCode|)
+	target osx
+		if !platform.osx
+			return 45 // ENOSUPPORT
+		using ErrorSeverity.Warning
+		|[string]| args = []
+		args <~ "--deep"
+		args <~ "--force"
+		if options.PrintCompileString
+			args <~ "--verbose"
+		args <~ "-s"
+		args <~ sign
+		args <~ self
+
+		|| errs = FastString()
+		|| f = "/usr/bin/codesign".file
+		rz = f.Execute(args, nil, errs)
+
+		// Seems we are getting rz.successful and yet errs contains useless results.
+
+		args = []
+		args <~ "--verify"
+		if options.PrintCompileString
+			args <~ "--verbose"
+		args <~ self
+		
+		if rz.Successful
+			rz = "/usr/bin/codesign".Execute(args, nil, errs)
+		if rz.Successful
+			args[0] = "-a"
+			rz = "/usr/sbin/spctl".Execute(args, nil, errs)
+		  else
+			error (f, errs.GetResult)
+
+
+
+function file.CompareFile (|File| A, |string| Error="", |bool|)
+	cpp_part FileCompare
+	FlowLog.DisabledIncr()
+	|| code = .CompareSub(a)
+	.Close
+	A.Close
+	rz = .CompareMsg(code, Error)
+	FlowLog.DisabledIncr(-1)
+
+
+function file.CompareMsg (|errorint| code, |string| Error, |bool|)
+	flow off
+	if (code==0) or !error
+		return code == 0
+
+	|string| msg = self
+	if code == 1
+		msg += " has different length to "
+	  else
+		msg += " has different contents to "
+	msg += Error
+	error msg
+	
+	
+function file.CompareSub (|File| A, |ErrorInt|)
+	cpp_part FileCompareSub
+	flow off
+	if (.Size != A.Size)
+		return 1
+	A.close
+	.close
+	.Open(readmode)
+	A.Open(readmode)
+	
+	while {
+		|| S_ = .Read(64K)
+		|| SA = A.Read(64K)
+		if S_ != SA
+			rz = 2
+			exit
+	} (S_)
+
+
+function file.CompareData (|String| A, |string| Error="", |bool|)
+	flow off
+	|| code = 0
+	if (.Size != A.length)
+		code = 1
+	  elseif (.readall(true) != A)
+		code = 2
+	return .CompareMsg(code, error)
+

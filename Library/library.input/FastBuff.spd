@@ -1,0 +1,176 @@
+
+
+struct FastBuff
+	|&byte|		Curr
+	|&byte|		Start
+	|&byte|		End
+	|?string|	ReadFrom
+	|bool|		Owns
+	|bool|		WentBad
+	
+	destructor
+		if .owns
+			Memory.Free(.start)
+	
+	function TmpStr (|string|)
+		return string.FromPtr(.Start, .Length)
+	
+	function Divide (|fastbuff| buff, |int| length)
+		length = length min .Remaining
+		require length > 0
+		|| c = .curr
+		buff.curr = c
+		buff.Start = c
+		c += length
+		buff.end = c
+		.curr = c
+
+	function Reset
+		inlined
+		.curr = .start
+	
+	function String (|string|)
+		opt norefcounts
+		|| s = .ReadFrom
+		if s!=nil
+			return s
+		return string.copy(.start, .length)
+	
+	syntax Compare (|int| n,  |int|)
+		inlined
+		return .Length - n
+	
+	syntax Append (|byte| v, |bool|)
+		cpp_part AppendU8
+		opt inline
+		.curr++[] = v
+		return .curr >= .end
+
+	syntax Append (|uint16| v, |bool|)
+		cpp_part AppendU16
+		opt inline
+		|| c = .curr|&uint16|,  c++[] = v,  .curr = c|&byte|
+		return c|&byte| >= .end
+
+	syntax Append (|uint| v, |bool|)
+		cpp_part AppendU32
+		opt inline
+		|| c = .curr|&uint|,  c++[] = v,  .curr = c|&byte|
+		return c|&byte| >= .end
+	
+	syntax access (|int| pos, |byte|)
+		cpp_part AccessByte
+		return .start[pos]
+	
+	syntax access (|int| pos, |int| after,  |string|)
+		opt norefcounts
+		cpp_part AccessStr
+		|| r = .ReadFrom
+		if r != nil
+			return r[pos, after, true] // better
+		|| A = .clip(pos)
+		|| B = .clip(after, 0)
+		if B >= A
+			return string.Copy(A, B-A)
+	
+	function Clip (|int| v, |int| reduce=1, |&byte|)
+		if v <= 0
+			return .start
+		v = v min (.size-reduce)
+		return .start + v
+		
+	function CopyTo (|&byte| Dest, |int| Length, |int|)
+		|| A = .curr
+		require (A < .end and length > 0)
+		|| B = A + Length
+		if b > .end
+			b = .end
+		rz = B - A
+		.curr = b
+		Memory.Copy(Dest, A, rz)
+		
+	function Byte (|byte|)
+		inlined
+		return .curr++[]
+	
+	syntax Expect (|string| s)
+		if !.WentBad
+			error s
+		.WentBad = true
+		
+	function UInt16 (|uint16|)
+		|| c = .curr|&uint16|,  rz = c++[],  .curr = c|&byte|
+		
+	function Find (|byte| b, |int| from, |int| After, |ind|)
+		|| Pos = .clip(from)
+		|| End = .clip(after, 0)
+		while Pos < End
+			if Pos[] == b
+				return pos - .Start
+			++Pos
+		
+	function Has (|int| n, |bool|)
+		return .end - .curr >= n
+	
+	function HasAny (|bool|)
+		cpp_Part HasAny
+		inlined
+		return .end > .curr
+	
+	setter ReadFrom (|string|)
+		.ReadFrom = Value
+		.start = Value.Addr
+		.end = .start + Value.length
+		.curr = .start
+	
+	function NeedAlloc (|int| n, |bool|)
+		if .Alloc(n)
+			return true
+		error ("Can't allocate memory.")
+	
+	function Alloc (|int| n, |bool|)
+		|| mem = Memory.Zalloc(n)$
+		.start = mem
+		.curr = mem
+		.end = mem+n
+		.owns = true
+		.ReadFrom = nil
+		return .start
+	
+	function Length (|int|)
+		description "Returns the actual filled length of the data." 
+		if self
+			return .position // hmmm
+	
+	function Size (|int|)
+		description "Returns the buffer-size including both used and unused data." 
+		if self
+			return .end - .start
+
+	function Remaining (|int|)
+		inlined
+		return (.end - .curr)|int|
+
+	function Position (|int|)
+		inlined
+		return (.curr - .start)|int|
+	
+	setter Position (|int|)
+		|| c = .start + value
+		if c < .start or c > .end
+			error (self, "Stream read too far")
+			c = .end
+		.curr = c
+	
+	function Faststring.SyntaxAppend (|&fastbuff| b)
+		cpp_part AppendBuff
+		.AppendMemory(b.start, b.length)
+
+
+	iterator
+		|| c = .start
+		|| e = .curr
+		while c < e
+			yield c[]
+			c++
+

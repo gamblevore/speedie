@@ -1,0 +1,52 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+function FatASM.AddRegParam (|message| src, |int| write)
+	opt norefcounts
+	if write|uint| <= 6
+		.prms[write] = src.RegOrNum // what if it's the last one...
+	  else
+		debugger
+
+
+
+datatype µParam (uint16)
+	linkage: cpp_class MuParam
+	
+	syntax is (|µparam| p, |bool|)
+		return (self & p)
+	
+	flags
+		|µparam|
+		(32)		// Starting point
+		NonReg = [Jump, Number]
+		Signed
+		NoExpect
+//		PositionBits
+		Input
+		Output // we need something thats both output and input?
+	
+	function BitSize (|int|)
+		return (self & 31) + 1
+	
+	function IsReg (|bool|)
+		return self isnt NonReg
+
+
+
+function message.Reg (|int|)
+	|| reg = .Int(1)
+	if (reg <= 31)
+		return reg|int|
+	error (self, "Expected register between r0 and r31")
+
+
+function message.RegOrNum (|int|)
+	if .name[].LowerCase != 'r'
+		return .int
+	return .reg
+

@@ -1,0 +1,9 @@
+#!/usr/local/bin/spd
+
+main
+	while
+		"Please enter a number:"
+		|| s = app.input #loop
+		|| input = s.Float
+		require StdErr.ok
+		"$input * π = ${input*π}" 

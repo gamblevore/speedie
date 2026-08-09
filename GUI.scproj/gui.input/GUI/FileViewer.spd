@@ -1,0 +1,761 @@
+
+
+class FileViewer (ListView)
+	linkage
+		cpp_part FV
+	|dictionary?|					Excludes
+	|dictionary?|					NoFind
+	|TextView|						QuickOpen
+	|ListView|						ListOpen
+	|textView|						EditMe
+	|filerow?|						Extra
+	|filerow?|						SearchWithin
+	|[string]|						SizeCheckers
+	|GUIListEvent?|					OnSearchWithin
+
+	constructor (|window| p, |GUIListEvent| select, |GUIListEvent| return, |TextView| EditMe)
+		super.constructor(p, select, return)
+//		.MultiSelection		= true
+		.editme				= editme
+		.OnReturn			= ReturnFileList|GUIListEvent|		// c++ work around
+		.OnRightClick		= RightClickFileList|GUIListEvent|
+		.quickopen			= textview(nil,		nil,		QuickOpenKey)
+		.Listopen			= ListView(nil,		nil,		ClickedOpenList)
+		.ondrawrow			= InsideFileViewRowDraw
+		.Oneditcell			= FileRowRenamer
+		.listsource			= filerow("", "root")
+		.ColumnFinder		= FileRowCell
+		.gnormal.textcolor	= 0xFF6FB6D7
+		
+		.quickopen.obj = self
+		.listopen.obj = self
+	
+	
+	destructor
+		.quickopen.ClearTree
+		.listopen.ClearTree
+		.editme.ClearTree
+
+
+	function Init
+		.Hierarchical = true
+		.gnormal.Separator = 0
+		with .quickopen
+			is enabled
+			is editable
+			isnt visible
+			.clipmode		= ControlClipMode.SlideBackInWindow
+			.ID				= "quickopen"
+			.size			= 400~wide by 15~high
+//			.OnKeyDown		= QuickOpenKey // set in constructor
+			.OnTextChanged	= QuickOpenModified
+			.onfocus		= QuickOpenFocus
+			.SingleLine		= TextView.SingleLine
+			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
+
+		|| l = .listsource as filerow
+			l.AsDir = true
+			
+		with .Listopen
+			is enabled
+			is unsearchable
+			isnt editable
+			isnt visible
+			.clipmode		= ControlClipMode.SlideBackInWindow
+			.KeepOneSelected = true
+			.ID				= "listopen"
+			.gnormal.solid	= (0.0, 0.1, 0.0, 0.90)
+			.takesfocus 	= 0
+	
+	
+	behaviour MouseDown
+		rz = super.MouseDown(p, clicks)
+		if clicks == 1 or 0
+			.TryReloadPath
+
+
+	function TryReloadPath
+		opt norefcounts
+		for s.up in .FirstSelected
+			if s isa filerow
+				s.TryReload(self)
+	
+	
+	behaviour AppForeGroundChange
+		.TryReloadPath
+	
+	
+	behaviour KeyDown
+		opt norefcounts
+		if key.isdelete
+			|| r = .FirstSelected
+			if r isa filerow
+				r.AskDelete(self)
+				return true
+		rz = super.keydown(key)
+		.TryReloadPath
+
+
+	function filerow.DirSize (|[string]|sc, |ivec2|)
+		opt norefcounts
+		require .asdir
+		for f.fast in self
+			for ext in sc
+				if f isa ext
+					rz += (f.lastsize|int|, 1)
+					exit
+			if f.asdir
+				rz += f.dirsize(Sc)
+		.lastsize = rz[0]
+		.lastfilecount = rz[1]
+	
+	
+	function CheckSize
+		opt norefcounts
+		|| f = .listsource
+		if f isa filerow
+			f.DirSize(.SizeCheckers)
+	
+		
+	function ShowQuickOpen (|bool|)
+		opt norefcounts
+		|| w = .window
+			|| q = .quickopen
+			q.text ?= .editme.seltext.before("\n").trim
+			w <~ q
+			w <~ .listopen
+			if q is visible
+				.HideOpenList
+				return true
+			(q is visible)
+			q.SetFocus
+			q.SelectAll
+			.OpenQuickRelist(q.text)
+		return true
+
+			
+	function AddRoot (|file| fol, |bool| IsMainProj = false, |filerow|)
+		|| C = 3000
+		rz = .AddRootSub(fol, IsMainProj, C)
+		(rz isnt editable)
+		self <~ rz
+
+
+	libinternal AddRootSub (|file| fol, |bool| IsMainProj, |$int| C, |filerow|)
+		|| p = fol.path
+		if !fol.isdir
+			return FileRow(p, p.name)
+		|| F = FileRow(p, p.TrimExtAndPath, .listsource.name)
+		f.InMainProj = IsMainProj
+		(f is expanded) = IsMainProj
+		f.FillFilesSub(fol, .excludes, .listsource.name, c)
+		return f
+
+	
+	inline FolFile (assigns:|string|)
+		.listsource.name = value
+
+
+	function ErrorAt (|error| e)
+		opt norefcounts
+		|| f = self[e.path]
+		while f and f != .ListSource
+			f.HasError = true
+			f = f.Parent
+
+			
+	function ClearErrors
+		opt norefcounts
+		for s.fast in self
+			s.HasError = false
+
+
+	iterator
+		|| _curr = .NextFileRow(.listsource, true)
+		while _curr
+			|| N_ = .NextFileRow(_curr)
+			yield _curr
+			_curr = N_
+		(self)
+
+
+	iterator fast
+		|| _curr = .NextFileRow(.listsource, true)
+		while _curr
+			yield _curr
+			_curr = .NextFileRow(_curr)
+		(self)
+
+
+	libinternal NextFileRow (|listviewrow| Upon, |bool| First=false, |filerow|)
+		opt norefcounts
+		|| n = (first)(Upon.first, Upon.flatnext)
+		|| n2 = n as filerow
+			return n2
+		n.remove
+	
+	
+	function SaveAll (|DocumentAction| Purpose, |filerow| ForceSave=nil,  |bool|)
+		cpp_part SaveAllAlways
+		opt norefcounts
+		// what if like 100 are invalid? THEN? ask for all?
+		for f.fast in self
+			if (ForceSave == f) or f.ismodified
+				require .Save(f, purpose)
+		return true
+
+
+	function Save (|filerow| f, |DocumentAction| Purpose=documentaction.saving, |bool|)
+		opt norefcounts
+		require .CanSave(purpose, f)
+		
+		|| d = f._Document
+			|| tSize = D.save//(purpose)
+				f.lastsize = tsize
+		return true
+
+
+	libinternal CanSave (|DocumentAction| Purpose, |filerow| f, |bool|)
+		opt norefcounts
+		|| d = f._Document						#require
+		if !d.InvalidJeebox
+			return true
+
+		// some kinda error. We'll save anyhow. but alert them.
+		.editme.LoadDocument(d, false)
+		d.ShowErrorInViewers
+		require Purpose isnt ErrorChecking
+
+		if (purpose is Saving)
+			Notifications <~ "Invalid jeebox saved to: " + f.FilePath
+		return true
+
+
+	function AskSaveAll (|bool|)
+		|[filerow]| m
+		for r.fast in self
+			if r.ismodified
+				m <~ r
+
+		|| first = m.first
+		if !first
+			return true
+		
+		.FocusOn(first)
+
+		|| fs = faststring()
+		fs <~ "Save "
+		|| n = m.Length
+		if n > 1
+			fs <~ n
+			fs <~ " files in project "
+			fs <~ .liststart!.name
+		  else
+			fs <~ first.readname
+		if gui.quitreason
+			fs <~ ", before quitting"
+		fs <~ "?"
+		
+		if n > 1
+			fs <~ "\n"
+			for m0 in m
+				fs <~ "\n"
+				fs <~ m0.readname
+		
+		|| answer = fs|&nil||string|.AskSaveOrCancel
+		fs = nil
+		if answer >= 1			// save
+			return .saveall(DocumentAction.saving)
+		return answer == 0		// don't
+
+
+	syntax access (|int| i, |filerow|)
+		opt norefcounts
+		return .listsource[i] as filerow
+
+
+	syntax access (|string| path, |filerow|)
+		cpp_part AccessPath
+		require path
+
+		if path.file.IsDir
+			path = path.PathDir // standardise
+		for f.fast in self
+			if path ~= f.FilePath or f.ReadFrom
+				return f
+
+
+	libinternal string.name (|bool| YeahReally, |string|)
+		cpp_part NameMaybe
+		if YeahReally
+			return .name
+		return self
+
+
+	libinternal string.FileViewMatch (|string| ToFind, |int|)
+		if ToFind[0] == '/'
+			require (self ~= ToFind)
+			return 10
+
+		if Tofind globs self
+			return 8
+		
+		if (ToFind[0] == '.' and ToFind[1] != '/') and .endswith(ToFind, true)
+			return 1
+
+		if ToFind.length < 2
+			return 0
+			
+		|| HasSlash = ToFind contains '/'
+		|| which = (HasSlash)(self, .name)
+		if which contains ToFind
+			rz = 2
+			if .endswith(ToFind) and self[(self-ToFind)-1] == '.'
+				rz = 1 // sigh
+
+	
+	function FindAPath (|string| path,  |filerow| within=nil, |bool| Copy=false, |filerow|)
+		return .FindPaths(path, within, copy)[0]
+
+
+	function FindPaths (|string| path,  |listviewrow| within=nil, |bool| Copy=false, |[filerow]|)
+		require path
+		|| NameOnly = path[0, "./"]
+			path = path[2...]
+
+		within ?= .listsource
+		for f.flat in within
+			if f isa filerow
+				|| it = f.match(path, NameOnly)
+					f.rangelength = it
+					if Copy
+						f = FileRow(f)
+						if f.FilePath.file.IsDir
+							f.name = f.name.PathDir
+					rz <~ f
+		
+		if rz
+			rz.sort(FileRowScoreSorter)
+			|{filerow}| D = dictionary.new
+			for f in rz
+				f.SameNameAsPrev = false
+				|| old = D[f.name]
+					old.SameNameAsPrev = true
+					f.SameNameAsPrev = true
+				d[f.name] = f
+		
+		for (f.backwards in rz) (i)
+			if f.SameNameAsPrev
+				if copy
+					|| name = f.name + "  --  " + f.FilePath.neatenpath
+					f = filerow(f)
+					f.name = name
+					rz[i] = f
+				  else
+					rz.remove(i)
+		
+	
+	function Listviewrow.FileSort
+		.sort(&fileviewer.FileRowNameSorter)
+	
+	
+	libinternal CanFind (|filerow| f, |uint| id, |bool|)
+		opt norefcounts
+		if id
+			require f.findid != id
+		f.findID = ID
+		
+		|| s = .SearchWithin
+			|| Restrict = s.FilePath
+			if !f.FilePath[0,Restrict]
+				return false
+		
+		return !.nofind.valuelower(f.name)
+	
+	
+	libinternal BatchFindSub (|string| S, |bool| R, |message| L, |uint| ID, |$int| N, |FileRow| F)
+		opt norefcounts
+		
+		|| folf = .listsource.name
+		while F
+			if .CanFind(F, ID)
+				f.findinfile(S, L, N, R)
+			if (f.DirFile ~!= folf) or !f.MatchField("search", "false")
+				|| Ch = F.First
+					.BatchFindSub(S, R, L, ID, N, Ch)
+			F = F.next
+		
+		
+	function BatchFind (|string| str,  |bool| ForReplace,  |message| FoundList,  |uint| FindID=0)
+		opt norefcounts
+		require str
+		
+		|| Remain = 6K
+		|| First = .ListSource.first as filerow
+		.BatchFindSub(str, ForReplace, FoundList, FindID, Remain, first)
+		FoundList.sort(&filerow.BatchFindSorter)
+	
+
+	libinternal HideOpenList (|bool|)
+		.ListOpen.clear
+		.QuickOpen.hide
+		.ListOpen.hide
+		return true
+
+
+	libinternal OpenQuickRelist (|string| path, |bool| Improve=false)
+		opt norefcounts
+		|| b = .OpenQuickRelistsub(path, improve)
+			.QuickOpen.text = b
+		
+		
+	libinternal OpenQuickRelistSub (|string| path,  |bool| Improve,  |string?|)
+		if path < 2
+			.listopen.clear
+			return nil
+		
+		|| before = path.Before(":")
+		ifn path[0, "/"] or path[0, "~/"]
+			|| r = .FindPaths(before, nil, true)
+			.ListOpen.QuickOpenFill(r)
+			return nil
+		
+		|| f = before.file
+		|| filter = ""
+		if !f.Exists
+			f = f.Parent
+			if !f.exists
+				Notifications <~ f + " doesn't exist"
+				beep
+				return nil
+			filter = path.name
+			Improve = false
+		.OpenQuickRelistDir(f, filter)
+
+		if Improve
+			return path.PathDir
+		return nil
+
+
+	libinternal ListView.QuickOpenFill (|[filerow]| Items)
+		|| HasSel = .FirstSelected != nil
+		.clear
+		for p in items
+			|| m = message(@str, p.name)
+			|| dir = p.FilePath.file.isdir
+			m.name = (dir)("\10 ", "\11 ") + m.name
+			
+			if HasSel and p isnt UnSelectable
+				(p is selected)
+				HasSel = false
+			m.tag = p.tag
+			self <~ m
+			m.obj = p
+		(self is visible) = items > 0
+		|| d = .DesiredHeight
+		|| d2 = d.clamp(100, 250)
+		.size = the~same by 0~before back d2
+
+
+	libinternal OpenQuickRelistDir (|file| path, |string| filter)
+		|| invis = filter starts "."
+		|[filerow]| items
+		for ch in path
+			if invis or ch.visible
+				|| s = path[ch]!
+				if s.IsDir
+					ch += "/"
+				|| ffr = filerow(s, ch)
+				if filter and !(ch.name starts filter)
+					(ffr is Disabled)
+				items <~ ffr
+		items.sort(FileRowScoreSorter)
+		.listopen.QuickOpenFill(items)
+	
+	
+	function OpenQuick (|string| s)
+		if  !s.OutWhite
+			.editme.SetFocus
+			return
+
+		|| cuter = s.trim.TrimStart("line ")
+		if cuter.isint								// "line 1234"
+			|| Line = cuter.ParseInt
+				.editme.ShowLine(line)
+				return
+		
+		|| Path = s.ExtractPathAndLine
+		|| n = path.name
+			|| r = .FindAPath(n) ?? .AddExtra(n)
+				.Select(r)
+		
+		|| Pos = path.Position
+		|| Line = path.rangelength
+			.editme.ShowLine(Line)
+			if pos > 0								// surely... its a position ON a line?
+				pos += .editme.Selection.x
+		if pos > 0
+			.editme.ShowAndSelect(Pos, true)
+
+
+	function AddExtra (|string| path, |filerow|)
+		require path[0] == '/' or '~'
+		|| f = path.file
+		require f.MustExist
+		|| x = .extra
+		if !x
+			x = filerow("", "(Extra)", ".")
+			.extra = x
+			self <~ x
+		
+		|| C = 3000
+		rz = .AddRootSub(path.file, false, C) 
+		x <~ rz
+		.Select(rz)
+
+
+	module
+		libinternal FileRowCell (listview.columnfinder)
+			if Value == nil
+				if (Column < -1) and (self isa FileRow)
+					return .FilePath
+				return .name
+		
+		
+		libinternal FileRowRenamer (guilisteditevent)
+			opt norefcounts
+			|| fr = cell.row as filerow		#require
+			if value == nil
+				return FileRowCell(fr, cell.column)		// getting the value for edit.
+			fr.MoveTo(value)
+		
+		
+		libinternal FileRowScoreSorter (SorterComparer of FileRow)
+			opt norefcounts
+			if b.rangelength == .rangelength
+				|| aprj = .InMainProj
+				|| bprj = b.InMainProj
+				if aprj == bprj
+					return FileRowNameSorter(self, b)
+				return bprj - aprj
+				
+			return b.rangelength - .rangelength
+
+
+		libinternal FileRowNameSorter (SorterComparerFileRow)
+			opt norefcounts
+			|| c = b.asdir - a.asdir
+				return c
+			return A.name.syntaxcompare(b.name, true)
+
+
+		libinternal QuickOpenModified (GUITextChangeEvent)
+			opt norefcounts
+			|| fv = .tag as fileviewer
+				fv.OpenQuickRelist(.text)
+
+
+		libinternal QuickOpenKey (guikeyevent)
+			opt norefcounts
+			|| fv = .tag as fileviewer				#require
+			|| l = fv.listopen
+			if key.IsAccept
+				|| row = l.FirstSelected
+					ClickedOpenList(l, row)
+				  else
+					fv.OpenQuick(.text)
+					fv.HideOpenList
+				rz = true
+			  elseif (key is escape)
+				rz = fv.HideOpenList
+			  elseif key is up or down
+				rz = l.KeyDown(key)
+
+
+		libinternal QuickOpenFocus (guiaction)
+			opt norefcounts
+			require state == 0
+			|| fv = .tag as FileViewer
+				rz = fv.hideopenlist
+
+
+		libinternal ClickedOpenList (GuiListevent)
+			opt norefcounts
+			|| V = .tag as FileViewer
+			|| r = row!.obj as filerow
+			require r and v
+
+			|| loc = r.FilePath
+			if loc.file.isdir
+				V.OpenQuickRelist(loc, true)
+				return true
+			
+			|| t = v.quickopen.text
+			|| LineNum = t.find(':')
+				LineNum = t.parseint(LineNum+1)
+			v.OpenQuick(loc)
+			if LineNum > 0
+				v.editme.ShowLine(linenum)
+				
+			V.HideOpenList
+			return true
+			
+
+		libinternal InsideFileViewRowDraw (ListViewRowDraw)
+			opt norefcounts
+			if self isa filerow
+				|| z	= parent.lastrect
+				|| v	= (6 + parent.IndentDepth(self), texty)
+				|| D	= ._Document
+				|| mod	= (D!=nil)(D.ismodified, nil)
+				|| ddd	= (mod)(Colors.black(0.5), Colors.clear)
+				ddd.a *= strength // sigh...
+				font.small!.drawicon(.Modifier, where, V, ddd)
+
+				if .HasError and (!.hasany or self isnt expanded)
+					v.x = z.x2-font.width*2
+					font.small!.drawicon('\17', where, V, ddd) // not sure???
+				return (font.width*2, 0)
+
+
+libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
+	require self[0] != '.'
+	if !AtRoot
+		return true
+	if platform.osx
+		return (self > 3) and !.islower
+	return true
+
+
+function FileRow.Modifier (|byte|)
+	if .DoesntExist
+		return '?'
+	return FileIcon(.FilePath, "", self is expanded, !.asdir)
+
+
+extend_module filerow
+	function FileIcon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |CodePoint|)
+		|| n = .name
+		|| ext = n.ext
+		if (.last == '/') and !notdir
+			if types and types.TypeContains(ext + "/")
+				rz = '\19'
+			  elseif expanded
+				rz = '\1A'
+			  else
+				rz = '\10'
+		  elseif (ext == "app" or "scproj" or "uwuz")
+			rz = '\19'
+		  else
+			rz = '\11'
+
+
+
+function fileviewer.FindSearchWithin (|filerow|)
+	opt norefcounts
+	|| s = .FirstSelected as filerow
+		while (s isa filerow) and !s.AsDir
+			s = s.parent
+	return s
+
+
+libinternal fileviewer.ReturnFileList (GUIListEvent)
+	if self isa FileViewer
+		.Editme.SetFocus
+		return true
+
+
+function fileviewer.RightClickFileList (GUIListEvent)
+	opt NoRefCounts
+	if self isa fileviewer
+		|| m = .NewCmm
+		m <~ ("Show In Desktop",	FileViewerCMMShow)
+		m <~ ("Copy File Path",		FileViewerCopyPath)
+		m <~ ("Rename File",		FileViewerRenameFile)
+		m.AddSep
+		|| within = .FindSearchWithin
+			m <~ ("Search Within: " + within.name, FileViewerSearchWithin, within)
+		
+		|| rem = .FirstSelected as filerow
+			if (.extra contains rem) and rem != .extra
+				m <~ ("Remove From Project",	FileViewerRemove)
+
+		m.AddSep
+		m <~ ("Create New File",	FileViewerCreateFile)
+		m <~ ("Delete File",		FileViewerTrash)
+	return true
+
+
+libinternal FileViewerCMMShow (GuiMenuEvent)
+	opt norefcounts
+	|| row = clicked!.row
+	if row isa FileRow
+		row.FilePath.Reveal
+
+
+libinternal FileViewerRenameFile (GuiMenuEvent)
+	if clicked and self isa FileViewer
+		.editcell(clicked)
+	
+
+libinternal FileViewerCreateFile (GuiMenuEvent)
+	|| row = clicked!.row as filerow					#require
+	if !row.asdir
+		row = row.parent!
+	|| l = row.FilePath
+	|| f = l.file.UniqueChild("untitled")
+	if f and f.CreateEmpty and self isa FileViewer
+		|| created = filerow(f.path, f.name)
+		row <~ created
+		row.filesort
+		.editrow(created)
+		.checksize
+		.SomethingChanged(row)
+
+
+libinternal FileViewer.SomethingChanged (|filerow?| row)
+	.TryReloadPath
+	(.OnChange)(self, row)?
+
+
+function File.CreateEmpty (|bool|)
+	expect (!.exists) (self, "File already exists, can't create empty file here.")
+	return .writeall("")
+
+
+libinternal FileViewerCopyPath (GuiMenuEvent)
+	opt norefcounts
+	if Clicked
+		|| row = clicked.row as FileRow
+			clipboard.NotifiedText = row.FilePath
+
+
+libinternal FileViewerTrash (GuiMenuEvent)
+	opt norefcounts
+	|| row = clicked!.row
+	if  row isa FileRow  and  self isa fileviewer
+		row.AskDelete(self)
+		.SomethingChanged(nil)
+
+
+libinternal FileViewerRemove (GuiMenuEvent) // just removes knowledge of the item
+	opt norefcounts
+	|| row = clicked!.row
+	if row isa FileRow and self isa FileViewer
+		row.remove
+		.SomethingChanged(nil)
+
+
+libinternal FileViewerSearchWithin (GuiMenuEvent)
+	opt norefcounts
+	|| row = menu.obj as filerow
+	if self isa FileViewer
+		if row == .listsource
+			row = nil
+		if row != .Searchwithin
+			.SearchWithin = row
+			(.OnSearchWithin)(self, row)?
+		
+	
+
+prototype SorterComparerFileRow (|filerow| a, |filerow| b, |int|)

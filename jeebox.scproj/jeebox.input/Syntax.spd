@@ -1,0 +1,130 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+prototype fpMsgRender (|Message| self, |FastString| fs)
+	libinternal // shouldn't be changed, ever. jeebox should render as jeebox.
+prototype fpMsgExport (|Message| self, |FastString| fs)
+		
+
+datatype Syntax (Byte)
+	default nil
+	linkage
+		cpp_Part Syx
+		numeric false // disallow implicit (syntax <--> int) conversion
+
+	inline Translateable (|bool|)
+		if self <= @Thg and self >= @tmp
+			return true
+
+	inline IsString (|bool|)
+		if self >= @sstr and self <= @str
+			return true
+
+// relies on me having cleverly ordered all my syntax :> to group them up.
+	inline NoChildren (|bool|)
+		return self >= @Cnj	and self <= @Bin
+
+	inline IsRel (|bool|)
+		return self >= @rel and self <= @yoda
+
+	inline IsAdj (|bool|)
+		return self >= @adj and self <= @badj
+
+	inline IsList (|bool|)
+		return self >= @bra and self <= @Arr
+
+	inline Message.Translateable (|bool|)
+		return .Func.Translateable
+			
+	operator plus (|string| m, |message|)
+		inlined
+		opt norefcounts
+		return .msg(m)
+	
+	operator plus (|int64| m, |message|)
+		opt norefcounts
+		inlined
+		cpp_Part PlusNum
+		return .msg(m.render)
+		
+	function Name (|string|)
+		Opt NoRefCounts
+		if self
+			|| o = .obj
+				return o.name
+		return "child"
+	
+	function LongName (|string|)
+		Opt NoRefCounts
+		if self
+			|| o = .obj
+				return o.longname
+		return "child"
+	
+	inline Obj (|syntaxobj|)
+		return jeebox._FuncArray[self|int|]
+	
+	
+	inline Msg ( |string?| name=nil, |Message| )
+		return Message( nil, self, name )
+	
+	inline message.Msg ( |syntax| fn, |string?| name=nil, |Message| )
+		return Message( self, fn, name )
+	
+	
+	// replace with int64.msg? seems better.
+	function Msg ( |int64| name, |Message| )
+		disabled "Use int64.msg instead"
+	
+	
+	module 
+		|int|		CurrFuncID_
+		
+		function Func (|string?| name, |message| where=nil, |syntax|)
+			visible
+			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax: " + name)
+			return obj.id
+			
+		function StdNew (|fpMsgRender| Render, |string| Name, |String| LongName, |int| ID, |Syntax|)
+			opt norefcounts
+			|| result = Syntaxobj.new(Render, name, ID)
+			jeebox._syxdict[name] = result
+			jeebox._Funcarray[ID] = result
+			if (LongName)
+				jeebox._syxdict[LongName] = result
+				result.LongName = LongName
+			  else
+				result.LongName = Name
+			return ID|syntax|
+
+
+
+class SyntaxObj
+	linkage
+		cpp_part Fn
+	visible			true
+
+	|fpMsgRender|			RenderAddr // shouldn't change after creation
+	|fpMsgExport|			ExportAddr
+	|String|				Name
+	|String|				LongName
+	|Syntax|				ID
+
+
+	constructor (|fpMsgRender| msg, |string| name, |int| ID)
+		.RenderAddr = msg
+		.Name		= Name
+		.ID			= ID|syntax|
+		.ExportAddr = Message.Dummy!
+	
+	
+	render 
+		if !fs_in
+			return .LongName.lowercase
+		fs_in.appendlower(.LongName)
+	
+
+

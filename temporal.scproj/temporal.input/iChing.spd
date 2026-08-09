@@ -1,0 +1,100 @@
+
+
+role YingYang (message)
+	function Opposite (|string|)
+		return .firstName
+	
+	module
+		|[yingyang]| _Items = nil
+		function States (|[yingyang]|)
+			opt norefcounts
+			return ._items init (–digest file://yingyang.jb ).parse.array
+
+
+
+role Hexagram (message)
+	render Describe (|bool| Long=false)
+		if self
+			|| meaning = self["meaning"]
+			|| judgement = self["judgement"]
+			|| image = self["image"]
+
+			fs <~ "\t\t --- "
+			fs <~ .name
+			fs <~ " ("
+			fs <~ meaning.name
+			fs <~ ", "
+			.first.first.render(fs)
+			fs <~ ") ---\n"
+			if long
+				fs <~ "Meaning: "
+				fs <~ meaning.next.firstname
+				fs <~ "\n\n"
+				fs <~ "Judgement: "
+			fs <~ judgement.name
+			fs <~ "\n\n"
+			if long
+				fs <~ "\tExplanation: "
+				fs <~ judgement.next.firstname
+				fs <~ "\n\n"
+				fs <~ "Image: "
+			fs <~ image.name
+			if long
+				fs <~ "\n\n"
+				fs <~ "\tExplanation: "
+				fs <~ image.next.firstname
+				// only the marked lines left!
+		  else
+			fs <~ "(nil)"
+		fs <~ "\n"
+
+	function Render (|FastString| fs=nil, |string|)
+		return .describe(fs)
+	
+		
+		
+module iChing
+	|message| _DatabankMsg
+	function Tome (|message of hexagram|)
+		|| d = ._DatabankMsg
+			return d
+		d = ( –digest file://iching.jb ).parse // what about compress? D:
+		if d
+			d = d["hexagrams"]
+		
+		d ?= StdErr.LastError
+		d ?= .ClosedBook
+		._DatabankMsg = d
+		return d
+		
+	function ClosedBook (|message|)
+		return Message(@str, "Tome remains closed.")
+	
+	function hexagram.Clean (|hexagram|)
+		rz = .copy
+		rz.arg.first.remove
+		
+	function Divination (|stevemachine| machine=nil, |Hexagram|)
+		machine ?= SteveMachine.create(9,64K)
+		if !machine
+			return .ClosedBook
+		machine.Hash_
+		|| Coins = machine.DivineBitPool(6)
+		|| hex = .Tome[coins]
+		if !hex
+			return .ClosedBook
+		rz = hex.clean
+		|| Marks = machine.Walk(6, 9*9)
+		|| lines = rz["markedlines"]
+		for (i.bits in marks) (x)
+			lines[x].Remove
+
+	function New (|int| num, |Hexagram|)
+		cpp_part Select
+		|| t = .Tome[num-1]
+			return t.Clean
+		return .ClosedBook
+	
+	function New (|stevemachine| machine=nil, |Hexagram|)
+		return .Divination(machine)
+

@@ -1,0 +1,267 @@
+
+
+
+extend Assembler {
+
+
+function IsASMConst (|message| exp, |bool|)
+	|| fn = exp.func
+	if fn == @num
+		return true
+	if fn == @thg
+		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
+
+
+function PrmCollectSpd (|&int64| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
+	opt norefcounts
+	|int64| sh
+	|| i = 0
+	|| n = fn.args.Length
+	while i < n
+		|| v = prms[i++]
+		sh += 5
+		rz |= v << sh
+	rz |= i
+
+
+function CollectParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Regs,  |uint64|)
+	opt norefcounts
+	if !Cpp
+		rz = .PrmCollectSpd(regs, fn)
+		if !prms.AsFunc
+			rz |= 16 // mark this as being a function callback
+		return rz
+	
+	|int64| sh = 64
+	|| fc = 0
+	|| ic = 0
+	|| args = fn.args
+	|| n = args.Length
+
+	for Floats in 2
+		|| i = 0
+		for p.fast in prms
+			|| ty = p.ASMDecl
+			if ty.SpecialReg|int| == floats
+				|| v = regs[i]
+				sh -= 5
+				rz  |=  v << sh
+				ic += !floats
+				fc += floats
+			i++
+	
+	rz >>= 64-((n*5)+12)
+	if fc>8 or ic>8			// hmmm
+	if fc
+		rz |= (8-fc) << 6
+		rz |= (8-ic) << 0
+	  else
+		rz |= (17-ic) << 6
+
+	|| v = 1|uint64| << ((n*5)+12)			// uint64 cos C++ sucks
+	if rz & ~(v-1) // oof?
+	if fn.ASMReturn.SpecialReg
+		rz |= v
+											// I'd need to update my compiler to add ull to this...
+											// do later.
+
+
+function message.RegCheck (|int| Bad)
+	if bad
+		error (self, "Too many registers in use. No space for result.")
+
+
+function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+	opt norefcounts
+	.CurrFuncGrab++
+	.ASMReach(fn)
+	|uint| v = 0
+	
+	|| ret = .state.return
+	if ret and (dest is ExitAtAll)
+		v = ret.reg
+		v ?= .state.parentvars|uint|.log2 + 1
+		dest = dest.Temp(ret)
+	  else
+		|| vd = .VDecls
+		v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
+		if v == 0 or dest.reg != v
+			v++
+		vd |= 1<<v
+		.Vdecls = vd
+		dest &=~ asmreg.tempflags
+		exp.RegCheck(vd & .vtemps)
+	
+	exp.RegCheck((v >= 32)|int|)
+	dest.reg = v
+	
+	|| ty = fn.ASMReturn(dest)
+	return ty.Simplify
+
+
+function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
+	opt norefcounts
+	dest = .TempTyped(d, dest)
+	
+	|| fat = exp.GRAB(dest, t)
+	fat.CurrGrabID = .CurrFuncGrab
+	return fat * dest.HaveAddr
+
+
+
+function GrabbedRegisters (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
+	opt norefcounts
+	if 0: AllPrms.FNC3, AllPrms.FNCX3			// MARK USED
+
+	.CurrFuncGrab--
+	|| c = .Last - 1
+	while C >= Start
+		if c isa asm.GRAB
+			if c.CurrGrabID == .CurrFuncGrab
+				.SetRegister(c.regonly(1), nil, fn)
+		c--
+		
+}
+
+
+
+
+function SCFunction.HasCVersion (|bool|)
+	if .IsCppInBuilt == 2						// cpp_nothing: For JB_Decr, JB_Ternary, etc
+		return false
+
+	if .IsLibrary
+		return true
+
+	return self is cpp
+
+
+
+function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
+	opt norefcounts
+	if !.InlineDepth
+		|| unable = (.EntireInlineFailed<2)
+		debugger 
+		|| reason =  (unable!=nil)("Unable to inline function: ", "Inlined too deep on function: ")
+		error (exp, reason + fn)
+	.EntireInlineFailed = 1 + !DepthOK
+	return asmreg()
+
+
+function string.operatorplus (|scfunction| fn, |string|)
+	opt norefcounts
+	|| fs = FastString.shared
+	fs <~ self
+	|| pname = fn.parentname
+		fs <~ pname
+		fs <~ '.'
+	fs <~ fn.Name
+	return fs
+
+
+function assembler.DepthOK (|scfunction| fn, |bool|)
+	opt inline
+	return .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
+
+
+function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
+	rz = fn.FPackID + 31
+	if rz <= 31										// failed!
+		if !Compiler.InPerry						// shut the compiler up
+			if !fn.islibrary or !.state.fn.islibrary
+				error (exp, "Missing PackID[1]")
+		rz = 0xFFFF	
+
+
+
+function @ASMType.ASMFunction (fn_asm)				// dofunction
+	opt norefcounts
+	|| prms = exp.last!
+	|| TableID = 0
+	
+	.ParentSanity
+	
+	|| fn = prms.AsFunc
+		|| intrin = fn.Intrinsic
+			return .DoIntrinsic(exp, dest, fn, intrin)
+			
+		if  fn isnt NoInline
+			|| DepthOK = .DepthOK(fn)
+				|| MiniDest = .AskForInline(prms, dest, fn)
+					return MiniDest
+			
+			if fn is LinkInline
+				return .CantLinkInline(exp, depthok, fn)
+		
+		TableID = .ASMTableID(exp, fn)
+		
+	  else // function pointers
+		|| f = exp.first!
+		TableID = .µ(f).Reg
+		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
+	
+	dest = .CallFunc(exp, dest, fn)
+	(dest isnt Const)								// why would it be?
+	|| Start = .curr
+	|int64[8]| Regs
+
+	{
+		|| Closer = .OpenVars
+		|| i = 0
+		|| args = fn.args
+		for	p.fast in prms
+			regs[i] = .µFuncPrms(p!, args[i]!).reg
+			i++
+		.CloseVars(Closer)
+	}
+
+	|| C = fn.HasCVersion
+	if !fn.ProtoType or (fn.ASMAndCpp != 3)
+		|| fat = .Whatever(exp, dest, fn, tableid, regs, C)
+		.GrabbedRegisters(exp, Start, fat)
+		return fat * dest
+
+	|| HighBit = .TempOnly(datatypecode.uint64|asmreg|)
+	|| branch = exp.JTST(asmreg(tableid), 63)
+	branch.OperatorMul(highbit)
+	.Whatever(exp, dest, fn, tableid, regs, false)
+	|| J = exp.jump
+	
+	|| fn2 = .Whatever(exp, dest, fn, tableid, regs, true)
+	j.Jumpto(.curr)
+	branch.JumpTo(fn2)
+	
+	.GrabbedRegisters(exp, Start,  fn2)
+	return fn2 * dest
+
+
+function assembler.Whatever (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&int64| Regs, |bool| Cpp, |&fatasm|)
+	opt norefcounts
+	|| P = .CollectParams(exp.last!, fn, Cpp, regs)
+	|| PExt = P >> 32
+	|| fat = exp.FNC(dest, TableID, P, PExt)
+	if Cpp
+		fat._op = asm.FNCX
+		if PExt > 0
+			fat._op = asm.fncx3
+	  elseif PExt > 0
+		fat._op = asm.fnc3
+	
+	fat.µRefCount += fn isnt STATELESS				// NOICE!
+	if fn is Killer
+		dest = asmreg.exit
+		fat.µrefcount++
+	return fat
+
+
+function assembler.ASMReach (|SCFunction| fn)
+	opt norefcounts
+	|| orig = .out
+	if Orig.MyReacher and !orig.IsLibrary
+		(fn is usedbyasm)
+		if fn is Constructor // gotta reach the destructor also
+			fn = fn.cls!.DestructorFunc
+			if fn
+				(fn is UsedByASM)
+
+

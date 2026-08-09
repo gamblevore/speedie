@@ -1,0 +1,1271 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+
+class Message (list)
+	linkage
+		cpp_part Msg
+		visible true
+
+	description "Usage: Call string.parse to receive a tree of nodes. Each node is a Message object.
+
+The tree represents your data, and acts as a super-set of many formats:  XML,  JSON, source-code,  data-files,  network messages,  executable files,  media-wrappers,  etc.
+
+The Message class is versatile enough to good at all of these. Like a universal data-format. Like the UTF-8 of data.
+
+Message is also:
+	* Memory tight (64-bytes per-node, excluding string-name).
+	* More expressive (leading to less nodes needed).
+	* Saveable as text (jeebox) or binary (jbin).
+	* Elegant due to a simple model, and many utility functions.
+	* Reliable via it's error-reporting system.
+"
+	contains Message
+
+////////////////////////////////
+	|string|				Name		// Decides the meaning of the node
+	|Syntax|				Func		// Decides the meaning of the node
+
+	|Byte|					Indent		// Re-purposeable.  Output only
+	|uint16|				RangeLength // Re-purposeable.  Output only
+	|MessageFlags|			Flags		// Re-purposeable.  Input and output. Affects render-style only. Some bits unused.
+	|uint16|				Tag			// Freely-useable.  Not input or output
+//	|Object|				Obj			// Freely-useable.  Not input or output (inherited from List)
+//	|int|					Position	// Re-purposeable.  Output only			(inherited from List)
+////////////////////////////////		
+	
+	
+	constructor (|Message!| other)
+		cpp_part ConstructorCopy
+		super.constructor
+
+//		parser.CountStats++ // better to put in the memory manager itself... right?
+		.Position	= other.Position
+		.Name		= other.Name
+		.func		= other.func
+		.Obj		= other.obj
+		.indent		= other.indent
+		.flags		= other.flags ||| parser.using.flags // copies global insertedness flags over
+		.RangeLength= other.RangeLength
+		.Tag		= other.Tag
+		
+		._trap
+		
+
+	constructor
+		cpp_part ConstructorEmpty
+		
+		.func = @arg
+		.Position	= parser.Using.position
+		.flags		= parser.using.Flags
+		.RangeLength= parser.Using.Length
+		.tag		= parser.Using.Tag
+
+		._trap
+
+			
+	constructor (|Message| Parent=nil, |Syntax| Func,  |string?| name=nil)
+		description "Default message constructor function. Intended for general-use"
+		opt norefcounts
+		super.constructor(Parent)
+		if name==nil
+			name = ""
+		.name		= name
+		.Position	= parser.using.Position
+		.func		= func
+		.RangeLength= parser.using.Length
+		.flags		= parser.using.Flags
+		.tag		= parser.Using.Tag
+		
+		._trap
+
+
+	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength)
+		cpp_part ConstructorParser
+		description "Intended for use by the parser only, not other code." 
+
+		super.constructor(Parent)
+		.name		= name
+		.Position	= BytePos
+		.func		= func
+		.RangeLength= RangeLength
+		.flags		= 0 // not set, because parsing shouldn't have default flags! These are parse-variables!
+		.tag		= parser.Using.Tag
+		
+		._trap
+
+
+	libinternal _Trap
+		inlined
+		target __PROJECT_SPEEDIE__
+			0 // if "App_abc_Constructor".trap
+
+///////////////////////////////////////////////////////////////////////////////
+	
+/*	setter Obj (|object|)
+		if .objectid == 1234
+		super.obj = value
+*/
+		
+
+	function Copy (|message| pos_msg=nil, |Message!|)
+		opt norefcounts
+		rz = pos_msg
+		if !rz
+			rz = self
+		using rz
+			rz = .CopyWithoutUsing(pos_msg)
+	
+	
+	function CopyWithoutUsing (|message?| P = nil, |Message!|)
+		description "Same as message.copy, except that it doesn't use self's position as the default one." 
+		opt norefcounts
+		rz = message(self)
+		if P
+			rz.position = P.position
+			rz.rangelength = P.rangelength
+			rz.tag = p.Tag
+		for v.fast in self
+			rz <~ v.CopyWithoutUsing(P)
+
+
+	operator Starts (|string| s, |bool|)
+		inlined
+		return .name[0, s, true]
+
+
+////////////////////////////////////////////////////////////////////////////////	
+	
+	syx Nil (WildCard)
+		Opt NoRefCounts
+		debugat
+	
+	
+	syx Arg (Argument)
+		Opt NoRefCounts
+		|| Braces = (.parent and self isnt style2)  or  !.hasany  or .name or  (self in @arg)
+			fs <~ '{'
+		.FSListArg( fs, braces ) // the name is already rendered by this!!
+		if Braces
+			fs.AppendIndent
+			fs <~ '}'
+			if .parent == @tmp
+				fs <~ '\n'
+		  elseif !.parent
+			fs <~ "\n" // make sure it will reparse as an arg
+		
+
+	syx Emb (Embedded_Value)
+		fs <~ .Name
+		require .hasany
+		.RenderWithSpaces(fs)
+
+
+	syx Type (Typecast)					// obj|type|
+		opt norefcounts
+		|| obj = .First					#require
+		|| type = obj.next
+		fs <~ obj
+		fs <~ '|'
+		if type: fs <~ type
+		fs <~ '|'
+	
+
+	syx Decl (Declaration)				// |x| a = b
+		opt norefcounts
+		|| ch = .First					#require
+		fs <~ '|'
+		fs <~ ch
+		fs <~ '|'
+		ch++
+		while ch
+			fs <~ ' '
+			fs <~ ch
+			ch++
+	
+	
+	syx Tmp (Statement)
+		Opt NoRefCounts
+		|| n = .name
+		if n and (CharSet.NameMid contains n) and !(n[].IsInt)
+			fs <~ n // a lot of fuss for one tmp.
+		  else
+			fs <~ '+'
+			fs.AppendQuotedEscape(.name, '\'')
+
+		|| ch = .First$
+		|| HasArg = false
+		while (ch)
+			if HasArg // hanging args
+				fs.IndentLine
+			|| spaces = 1
+			|| fn = ch.func
+			if fn == @arg
+				spaces = (ch isnt Style2)|int|
+			  elseif fn == @tmp
+				spaces = 2
+			
+			fs <~ (' ', spaces)
+			fs <~ ch
+			if fn == @arg
+				hasarg = true
+			ch++
+
+
+	syx Oat (Operator_As_Thing)
+		fs <~ '%'
+		.renderwithspaces(fs)
+
+
+	syx Ques (Question)
+		opt norefcounts
+		fs <~ "–"
+		fs <~ .name
+
+		|| n = .first
+			fs <~ ' '
+			fs <~ n
+
+	
+	syx Cnj (conj)					// I eat cheese #when I feel hungry
+		fs <~ '#'
+		fs <~ .Name
+
+	syx Opp (Operator)
+		return .Thg__(fs)
+	
+	syx Thg (Thing)
+		fs <~ .Name
+
+	syx Sheb (Shebang)
+		fs <~ "#!"
+		fs <~ .Name
+		fs <~ '\n'
+
+	syx SCnj (Syntactic_conj)
+		return .Thg__(fs)			// a - b --> b + -a
+
+	syx SThg (Syntactic_Thing)
+		return .Thg__(fs)
+
+	syx Num (Number)
+		return .Thg__(fs)			// 123
+	
+	syx SStr (Super_String)			// <(`abc`)>
+		fs <~ "<(`"
+		fs <~ .Name
+		fs <~ "`)>"
+
+
+	syx Back (Backtick)				//  `abc`
+		if .name.find('`')
+			.str__(fs)
+		  else
+			fs <~ '`'
+			fs <~ .Name
+			fs <~ '`'
+	
+	
+	syx Char (Character)			//  'x'
+		fs <~ '\''
+		fs <~ .Name.EscapeChr
+		fs <~ '\''
+
+
+	syx Bin (Hex)
+		fs <~ "#("
+		fs.appendhexdata(.name)
+		fs <~ ")#"
+	
+	
+	syx Str (String)
+		opt norefcounts
+		fs <~ '"'
+		fs.appendescape(.name)
+
+		for (ch.fast in self)
+			if (ch == @Emb)
+				fs.appendescape(ch.Name)
+			  else
+				fs <~ '$'
+				fs <~ '{'
+				fs <~ ch
+				fs <~ '}'
+		fs <~ '"'
+
+
+	syx Unit											// 20cm
+		opt norefcounts
+		|| num = .FirstName
+		fs <~ num
+		if (num.ishexlike) and (num.last != '_')		// 0xFF
+			fs <~ '_'
+		fs <~ .name  // 20cm, 0xFF_cm
+	
+
+	syx ARel (Decorator) // after relationship
+		opt norefcounts
+		fs <~ .First
+		fs <~ .Name
+
+	
+	syx Name
+		opt norefcounts
+		|| ch = .First
+			fs <~ .Name									// sonic
+			fs <~ " @ "			
+			fs <~ ch									// the~hedgehog
+		  else
+			fs <~ '@'
+			fs <~ .Name
+
+
+	syx Dot (Dot)										// x.fn(a)
+		opt norefcounts
+		|| ch = .First
+			fs <~ ch
+		fs <~ '.'
+		fs <~ .Name
+		if ch
+			fs <~ ch.Next
+		
+
+	syx SDot (Self_Dot)
+		opt norefcounts
+		// .fn
+		// .fn(a)
+
+		fs <~ '.'
+		fs <~ .name
+		fs <~ .First
+
+
+	syx Func (Function)									// fn(a)
+		opt norefcounts
+		|| ch = .First					#require
+		fs <~ ch
+		fs <~ ch.Next
+	
+	
+	syx BRel (PreDecorator)
+		opt norefcounts
+		fs <~ .name
+		fs <~ .First
+	
+	
+	syx Adj (Adjective)
+		opt norefcounts
+		|| f = .first
+			|| l = f.next
+				fs <~ f
+				fs <~ " ~ "
+				fs <~ l
+
+
+	syx Badj (Backwards_Adjective)
+		opt norefcounts
+		|| f = .first
+			|| l = f.next
+				fs <~ l
+				fs <~ " ≈ "
+				fs <~ f
+
+
+	syx Acc (Access)				// b[2]
+		opt norefcounts
+		|| f = .first
+			fs <~ f
+			f = f.next
+			if f
+				f.RenderPrm(fs, '[', ']')
+	
+	syx Item
+//                                   a: b
+// if we can use a name... we can avoid needing two items?
+// problem with that is its very non-standard. Saves 1/3 nodes for XML->jb, though?
+		opt norefcounts
+		|| ch = .First	#require
+		fs <~ ch
+		fs <~ ": "
+		fs <~ ch.Next
+
+	
+	syx Bra (Bracket) // don't reorder these... @bra, @list, @prm, @arr is used in iscontainer.
+		opt norefcounts
+		fs <~ '('
+		fs <~ .First
+		fs <~ ')'
+	
+	syx List
+		Opt NoRefCounts
+		fs <~ '('
+		|| count = 0
+		|| sep = ", "
+		if (self is style2)
+			sep = "\n"
+			fs <~ sep
+		for ch.fast in self
+			if ++count > 1
+				fs <~ sep
+			fs <~ ch
+			if ch == @item
+				count++
+		if (count == 1  or  self is style2)
+			fs <~ sep
+		fs <~ ')'
+
+	
+	syx Prm (Parameter_List)
+		Opt NoRefCounts // much simpler!
+		fs <~ '('
+		for ch.fast in self
+			fs <~ ", "
+			start
+			fs <~ ch
+		fs <~ ')'
+
+	
+	syx Arr (Array)					// [b, c]
+		fs <~ '['
+		.FSListSep( fs, ", " )
+		fs <~ ']'
+	
+
+	syx File (File_List)
+		Opt NoRefCounts // much simpler!
+		fs <~ .name
+		.indent++
+		for ch.fast in self
+			fs.IndentLine
+			fs <~ ch
+		.indent--
+
+
+	syx Quot (Quotation)
+		Opt NoRefCounts
+		fs <~ "“"
+		for ch.fast in self
+			fs <~ ch
+			if (ch.next)
+				fs <~ ", "
+		
+		fs <~ " ”"
+	
+////////////////////////////////////////////////////////////////////////////////		
+	
+	libinternal RenderWithSpaces (|FastString| fs, |Message|ch=nil)
+		Opt NoRefCounts
+		ch ?= .First
+
+		while (ch)
+			fs <~ ch
+			ch = ch.next #require
+			fs <~ ' '
+	
+	syx Rel (Relationship)
+		.RenderWithSpaces(fs)
+		
+	
+	syx ERel (Equals_Relationship)
+		opt norefcounts
+		|| ch = .First					#require
+		fs <~ ch
+		fs <~ ' '
+		
+		++ch							#require
+		fs <~ ch
+		fs <~ "= "
+
+		++ch
+		fs <~ ch$
+
+	
+	syx TRel (Temporal_Relationship)
+		.RenderWithSpaces(fs)
+	
+
+	syx Tril (Temporal_Relationship2)
+		opt norefcounts
+		|| f = .first			#require
+		fs <~ '#'
+		fs <~ f
+
+		|| s = f.next			#require
+		fs <~ ' '
+		fs <~ s
+		
+		|| l = s.next			#require
+		fs <~ ' '
+		fs <~ l
+
+
+	syx pinn (Post_InnerAdj)
+		// I slowly~ran home --> i ran home <≈ slowly
+		opt norefcounts
+
+		|| f	= .first
+		|| opp	= f.next
+		|| l	= opp.next
+		
+		fs <~ f
+		fs <~ ' '
+		fs <~ opp.last
+		fs <~ ' '
+		fs <~ l
+		fs <~ " <≈ "
+		fs <~ opp.first
+
+	
+	function BinnRender (|faststring| fs, |string| sepa)
+		opt norefcounts
+
+		// i can				>~ can i 
+		// i can~run			>~ can i run
+		// i can~run home		>~ can i run home
+		// i run home			>~ run i home // NOpE!
+		|| f = .first$
+		|| opp = f.next$
+		|| l = opp.next
+		|| OF = opp.first
+
+		fs <~ SepA
+		fs <~ (of!=nil)(of, opp)
+		fs <~ ' '
+		fs <~ f
+
+		if (!of)
+			debugger !l
+			return
+		
+		|| ON = OF.Next
+			fs <~ ' '
+			fs <~ ON
+		
+		if (L)
+			fs <~ ' '
+			fs <~ l
+
+
+	syx binn (InnerAdj)
+		// I slowly~ran home --> >~ slowly i ran home 
+		.BinnRender(fs, ">~ ")
+
+
+	syx Ask
+		.BinnRender(fs, "∆")
+
+
+	syx Yoda (Yoda_Relationship)
+		// thing, thing, op, always three!
+		// you have~become powerful ==  ¬ powerful you have~become
+		opt norefcounts
+		|| f = .first
+		|| s = f.next
+		|| l = s.next
+		fs <~ "¬ "
+		fs <~ l
+		fs <~ ' '
+		fs <~ f
+		fs <~ ' '
+		fs <~ s
+
+	
+	syx SCom (Syntactic_Comment)
+		opt norefcounts
+		|| ch = .first
+		if !ch
+			fs <~ " /# "
+			return
+
+		fs <~ ch.next
+		fs <~ " /# "
+		if ch.HasOneChild
+			fs <~ ch.First
+		  else
+			ch.FSListArg( fs )
+			fs <~ '\n'
+		fs <~ " #/"
+
+	
+	syx Msg (Message_List)
+		opt norefcounts
+		fs <~ "«"
+		|| n = .name
+			fs <~ n
+		  else
+			fs <~ ('"', 2)
+		
+		|| ch = .first
+		if !ch
+			fs <~ " "
+		  elseif !ch.next and ch != @msg
+			fs <~ " "
+			fs <~ ch
+			if !ch.IsString // should always be.
+				fs <~ " "
+		  else
+			fs.indent += 1
+			while ch
+				if (!ch.prev and ch.isstring)
+					if !ch.name
+						ch++
+						continue
+					fs <~ " "
+				  else
+					fs.indentline
+				fs <~ ch
+				ch++
+			fs.indent -= 1
+			fs.indentline
+		fs <~ "»"
+
+		
+	syx Todo (To_Do_List)
+		fs <~ .name
+		.FSListSep(fs, " ")
+
+	
+	syx URL (URL)
+		opt norefcounts
+		fs <~ .Name
+		fs <~ "://"
+		|| f = .first
+			fs <~ f.name
+			
+
+	syx HInt (BitInteger)
+		opt norefcounts
+		|| Curr = 0
+		while
+			fs <~ '\\'
+			fs <~ .name.parsehint(Curr, self)
+			loop .name > Curr
+	
+	
+	libinternal RenderPrm (|FastString| fs, |Byte| b1, |Byte| b2)
+		fs <~ b1
+		.FSListSep( fs, ", " )
+		fs <~ b2
+
+
+	libinternal Dummy (fpMsgExport)
+		// Dummy function used by .ExportAddr. Stops crashes if someone calls export but hasn't set his own function yet.
+
+	
+	function ConvertJSONToJB
+		Opt NoRefCounts
+		for m.fast in self
+			if m == @item
+				|| Tmp = m[@nil] // a string
+					m.prev = Tmp
+					Tmp.Func = @tmp
+					|| value = m.first
+					Tmp <~ value
+					m.remove
+					value.ConvertJSONToJB
+			  else
+				m.ConvertJSONToJB
+
+
+	render
+		opt norefcounts
+		fs <~ self
+	
+	
+	render RenderAST (|bool| RenderRoot=false)		//  function ast,  message.ast
+		opt norefcounts
+		if !RenderRoot
+			RenderRoot = !((.func == @arg) and (.parent == nil) and !.name)
+		if RenderRoot
+			fs <~ "«"
+			fs <~ .Func.name
+			fs <~ ' '
+			fs.indent ++
+
+		|| name = .name
+			fs.AppendQuotedEscape(name)
+		
+		if .HasAny
+			for ch.fast in self
+				fs.IndentLine
+				ch.RenderAST(fs)
+			fs.Indent -= RenderRoot
+			fs.IndentLine
+		  else
+			fs.Indent -= RenderRoot
+
+		if RenderRoot
+			fs <~ "»"
+		
+	
+	function ParseAST (|message| into=nil, |message?|)
+		opt norefcounts
+		|| Curr = .first
+		if self == @arg
+			rz = Message(into, @arg, .name)
+		  else
+			require .Expect(@msg)
+			|| fn = Syntax.Func(.name, self)
+			rz = Message(into, fn, curr.name)
+			curr++
+		while curr
+			curr.ParseAST(rz)
+			curr++
+	
+	
+	function UnEmbedStr
+		|| s1 = .First
+		if (s1 == @Emb) and !s1.Next
+			s1.Remove
+			.Name = s1.Name
+
+
+	function FSListSep (|FastString| fs, |String| sep)
+		opt norefcounts
+		for (ch.fast in self)
+			fs <~ sep
+			start
+			fs <~ ch
+	
+
+	function FSListArg (|FastString| fs, |bool| AddLine=false)
+		opt NoRefCounts
+		|| hasp = .parent!=nil
+		fs.indent += hasp
+		
+		AddLine |= hasp
+		if .name
+			AddLine = true
+			fs.IndentLine
+			fs <~ "^"
+			fs.AppendQuotedEscape(.name)
+		for ch.fast in self
+			if AddLine
+				fs.IndentLine
+			fs <~ ch
+			AddLine = true
+
+		fs.indent -= hasp
+		if hasp and fs.last != '\n'
+			fs <~ '\n'
+
+
+	function FuncName (|string|)
+		opt norefcounts
+		return .Func.LongName.lowercase
+	
+	
+	inline Length (|int|)
+		return .name.length
+	
+
+	function ShallowEquals (|message| B, |bool| Aware=false, |bool|)
+		if !self
+			return !B
+		if B
+			return (.func == b.func) and .name.syntaxequals(b.name, aware)
+
+	
+	function DeepEquals (|message?| B, |bool| Aware=false, |bool|)
+		opt norefcounts
+		nil self
+		|| A = self
+		|| A2 = .FlatAfter
+		|| B2 = b.FlatAfter
+		while
+			if A==A2 and B==B2
+				return true
+
+			require a.ShallowEquals(b, aware)
+				
+			A = A.flatnext
+			b = b.flatnext
+
+	
+	inline Name (|string|)
+		nil safe
+		if self
+			return .Name
+
+
+	inline Func (|Syntax|)
+		nil safe
+		if self
+			return .func
+
+
+	function FirstName (|string|)
+		nil checker
+		opt norefcounts
+		|| f = .first
+			return f.name
+
+
+	function Ancestor (|Syntax| syx, |Message|)
+		Opt NoRefCounts
+		for ch.Up in .parent
+			if ch == syx
+				return ch
+
+
+	inline Find (|Syntax| syx, |Message|)
+		return .find(syx, nil, false)		
+	
+	function Find (|Syntax| syx=@nil, |string?| name=nil, |bool| Err = false, |Message|)
+		cpp_part FindSyxName
+		opt norefcounts
+		for curr.fast in self
+			if curr == syx or syx == nil
+				if (name == nil) or (curr ~= name)
+					return curr
+
+		if Err
+			return .ReportFailiure(syx, name, nil)
+	
+
+	function FindNested (|Syntax| syx=@nil, |string?| name = nil, |bool| Err = false, |Message|)
+		Opt NoRefCounts
+		nil self
+		for curr.flat in self
+			if curr == syx or syx == nil
+				if (name == nil) or (curr ~= name)
+					return curr
+		if err
+			return .ReportFailiure(syx, name, nil)
+	
+	
+	function FastString.MsgErrorName (|string?| name)
+		if (name)
+			self <~ " '"
+			self <~ name
+			self <~ "' "
+
+
+	function ReportFailiure (|syntax| s, |string?| name = nil, |message?| found = nil, |message|)
+		cpp_part CantFind
+		opt norefcounts
+		if !self and !found
+			jb_api.NilHandler
+			return nil
+		
+		|| fs = faststring.shared
+		if found
+			fs <~ "Expected "
+			fs.MsgErrorName(name)
+			fs <~ s.longName
+			fs <~ " but found "
+			fs <~ found.Func.longName
+		  else
+			if s
+				fs <~ "Missing "
+				fs <~ s.longName
+			  else
+				/fs <~ "Missing syntax"
+			fs.MsgErrorName(name)
+			found = self
+
+		errorreceiver.NewError( found, fs.getresult )
+		return nil
+
+
+	function ExpectLast (|string?| Err=nil, |bool|)
+		opt NoRefCounts
+		if self
+			|| N = .next
+			if !N
+				return true
+			N.SyntaxExpect(err)
+
+
+	function ExpectString (|bool|)
+		if .IsString
+			return true
+		error (self, "Not a string")
+		
+
+	function Expect (|syntax| type, |string?| name=nil, |bool|)
+		nil checker
+		require self
+		if (!type or (.Func == type))
+			if (name == nil) or (.name ~= name)
+				return true
+		
+		|| fs = faststring.new
+		fs <~ "Expected "
+		if (type)
+			fs <~ Type.longname
+		fs.MsgErrorName(name)
+		fs <~ ", but found "//@"
+		fs <~ .Func.longname
+		fs.MsgErrorName(.name)
+		error (self, fs)
+	
+
+	syntax Call (|string| key, |Message|)
+		Opt NoRefCounts
+		if self
+			for item.fast in self
+				if item ~= key
+					return item.GiveArg
+			return .msg(@tmp, key).GiveArg
+		return message() // sigh
+
+
+	syntax Append (|string| key)
+		cpp_part AppendString
+		inlined
+		self <~ (@str, key)
+
+
+	inline Arg (|message|)
+		return .last(@arg)
+
+
+	function GiveArg (|message|)
+		Opt NoRefCounts
+		|| r = .last
+		if r == @arg
+			return r
+		return .msg(@arg)
+
+
+	Syntax Access (|Syntax| Need, |syntax| OK, |Message|)
+		cpp_Part NeedSyxOK
+		Opt NoRefCounts
+		if self
+			|| found = .first
+				if found == OK or found == need or (OK == @nil)
+					return found
+			if OK!=@nil
+				return .ReportFailiure(need, nil, found)
+	
+	
+	inline NeedFirst (|message|) // needa needa needa needa
+		return self[@nil]
+
+
+	Syntax Access (|Syntax| s, |Message|)
+		cpp_Part NeedSyx
+		Opt NoRefCounts
+		|| found = .first
+			if s == nil or found.func == s
+				return found
+		if self
+			return .ReportFailiure(s, "", found)
+
+
+	Syntax Access (|syntax| s, |int| n, |message|)
+		cpp_Part NeedSyxInt
+		Opt NoRefCounts
+		|| Ch = self[n]
+			if !s or ch.func==s
+				return ch
+		return .ReportFailiure(s, Nil, ch)
+	
+	
+	Syntax Access (|Syntax| s, |string?| name, |Message|)
+		cpp_Part NeedSyxName
+		Opt NoRefCounts
+		|| f = self[s]
+		if f.expect(@nil, name)
+			return f
+	
+		
+	Syntax Access (|string| key, assigns:|string|)
+		cpp_part SetStr
+		self[key] = @str.msg(Value)
+
+
+	Syntax Access (|string| key, assigns:|int64|)
+		cpp_part SetInt
+		self[key] = value.msg
+
+	
+	Syntax Access (|string| key, assigns:|message|)
+		cpp_part SetMsg
+		opt norefcounts
+		.AccessAdd(key) <~ Value		
+	
+	
+	libinternal AccessAdd (|string| key, |message|)
+		opt norefcounts
+		|| l = self
+		if self == @tmp
+			l = .last
+			if l != @arg
+				l = .msg(@arg)
+		for tmp in l
+			if tmp ~= key
+				|| TL = tmp.last
+					TL.remove
+				return tmp
+		return l.msg(@tmp, key)
+
+	
+	inline Become (|syntax| fn, |string| name="")
+		cpp_part BecomeStr
+		.func = fn
+		.name = name
+
+
+	function Become (|message| src)
+		cpp_part BecomeMsg
+		.func = src.func
+		.name = src.name
+		.clear
+		.PrependAll(src)
+	
+
+	function BecomeCopy (|message| src)
+		.func = src.func
+		.name = src.name
+		.clear
+		src.CopyAllInto(self)
+
+
+	function CopyAllInto (|Message| j)
+		opt norefcounts
+		for c.fast in self
+			j <~ c.Copy(j)
+
+
+	function Last (|syntax| Need, |Message|)
+		Opt NoRefCounts
+		|| ch = .last
+		if ch and (!need or ch==Need)
+			return ch
+		return .ReportFailiure(Need, nil, ch)
+
+	
+	function Next (|syntax| Need, |string?| name=nil,  |Message|)
+		Opt NoRefCounts
+		cpp_part NextOf
+		nil checker
+		if (self)
+			|| ch = .next
+				if (!need or ch.func==Need)  and  (name == nil or ch.name ~= name)
+					return ch
+			return .ReportFailiure(Need, nil, ch)
+
+
+	syntax Equals (|string?| name, |bool| Aware=false, |bool|)
+		return self and .name.SyntaxEquals( name, aware )
+
+
+	syntax Equals (|Syntax| X, |bool|)
+		cpp_part EqualsSyx
+		return self and (.Func == X)
+
+//	syntax equals (|byte| B, |bool|Aware, |bool|)
+	//	sadly... this would mess up anything that tests msg == 1. bytes aren't really numbers...
+
+	function Export (|FastString| fs)
+		opt norefcounts
+		|| fn = (.func.obj!.exportaddr)
+		(fn)( self, fs )
+
+	function MiniName (|string|prefix="", |string|)
+		require self
+		return "$prefix$.FuncName “${.name[0,64].UnicodeSync}”"
+
+	// would be nicer if SyntaxExpect becomes a function named "fail"
+	Syntax Expect (|string?| Error = nil)
+		cpp_part Fail
+		inlined
+		errorreceiver.NewError( self, Error )
+
+	Syntax Problem ( |string?| Error = nil )
+		inlined
+		errorreceiver.NewProblem( self, Error )
+	
+	Syntax Warn ( |string?| Error = nil ) // i think "warn" was removed. So this is unreachable.
+		inlined
+		errorreceiver.NewWarning( self, Error )
+	
+	inline SyntaxAppend (|syntax| Fn, |string| name="")
+		opt norefcounts
+		cpp_part AppendSyx
+		.msg(fn, name)
+
+	Syntax SendTo (|syntax| Fn, |string| name="", |message|)
+		inlined
+		cpp_part SendSyx
+		opt norefcounts
+		.msg(fn, name)
+		return self
+
+	inline SyntaxSendTo (|syntax| Fn, |int64| name, |message|)
+		cpp_part SendSyxNum
+		opt norefcounts
+		.msg(fn, name.render)
+		return self
+
+	inline SyntaxSendTo (|message| msg, |message|)
+		cpp_part SendMsg
+		opt norefcounts
+		self <~ msg
+		return self
+	
+	Syntax Append (|int64| Num)
+		cpp_part AppendNum
+		opt norefcounts
+		.syntaxappend(@num, num.render)
+
+	Syntax Using (|MessagePosition|)
+		Opt NoRefCounts
+		rz = parser.Using
+		rz.Layer = (Message).layer
+		
+		parser.Using.Position = .position
+		parser.Using.Length = .RangeLength
+		parser.Using.Tag = .Tag
+		parser.Using.Flags = MessageFlags.Inserted // right?
+		.MemoryLayer.use
+
+
+	Syntax UsingComplete { }
+	
+	
+	function Int (|int| StrStart=0, |int64| low, |int64| high, |int64|)
+		cpp_part IntRange
+		|| i = .int(StrStart)
+		if i >= low and i <= high
+			return i
+		error (self, "Value out of range")
+	
+	
+	function string.ParseHInt (|$int| StrStart, |message| Error=nil, |int64|)
+		// Actually... dont need two hints! Can just read the entire thing in...
+		opt norefcounts
+		|| n = .Length
+		|| i = StrStart
+		require n or i
+		expect (i|uint| < n|uint|) (Error, "Bad Length")
+
+		// size-oriented, not speed. HInt is great at this.
+		// speed-orient needs final-app-specific knowledge
+		
+		|| a = .Addr
+		|| sh = 0
+		|int64| v
+		while i < n
+			|uint| b = a[i++]
+			v |= (b&127) << sh
+			sh += 7
+			if b <= 127
+				StrStart = i
+				if b == 0
+					v = -v
+				return v
+		StrStart = int.max
+		error (Error, "HInt ended early.")
+	
+	
+	function Int (|int| StrStart = 0, |int64|)
+		opt norefcounts
+		if self
+			|| fn = .func
+			if fn == @hint
+				return .name.ParseHInt(StrStart, self)
+			|| f = .First
+			if !f or fn != @unit
+				expect ((fn == @num) or fn.IsString or (strstart > 0)) (self)   // parsing p123, from index 1
+				return .name.ParseInt(StrStart, self)
+			
+			if self == "x"
+				return F.name.ParseHex(StrStart, F)
+			
+			|| Value = f.name.ParseFloat // 1.5MB
+			|| Mul = f.Name.SuffixSize						#expect (self, "Invalid unit")
+			return (Value * Mul|float64|)|int64|
+			
+	
+	function string.SuffixSize (|int64|)			// 10GB, 10G, 4KB, 4K
+		|| n = .Length
+		if (n == 1) or (n == 2 and self[1] == 'B')
+			return self[].SuffixSize
+
+	libinternal byte.SuffixSize (|int64|)			//  K=1024,  M=1024^2,  G=1024^3,  T=1024^4
+		cpp_wrapper
+		
+	function Float (|Float64|)
+		if self
+			return .name.ParseFloat(self)
+
+	function Float32 (|float|)
+		|| d = .float|float|
+		if d < 0: d = -d
+		expect (d <= float.max) ("Number won't fit in a float32")
+		return d
+
+	function Range (|intrange|)
+		return (.position, .position+.RangeLength)
+	function Range (assigns:|intrange|r)
+		.position = r.x
+		.RangeLength = r.width
+
+
+	function Yes (|bool| Default=false, |bool|)
+		if self
+			return .name.yes(self)
+		return Default
+			
+
+	inline After (|int|)
+		return .position + .RangeLength
+	inline After (assigns:|int|)
+		.RangeLength = Value - .position
+
+	
+	operator Contains (|string| s, |bool|)
+		opt norefcounts
+		cpp_part ContainsStr
+		inlined
+		return .FindNested(@nil, s, false)
+
+
+	function Contains (|ind| p, |bool| AllowJustAfter=false, |bool|)
+		cpp_part ContainsInd
+		opt norefcounts	// we want to put textview's insertion after a name and still find it
+						// like: abc      // abc is found still.
+						//			^
+		return .position <= p and (.after+AllowJustAfter) > p
+		
+	operator In (|syntax| f, |bool|)
+		opt norefcounts
+		|| p = .parent
+			return p.func == f
+
+	function IsContainer (|bool|)
+		|| f = .func
+		if (f >= @bra and f <= @arr) or (f == @arg) or (f == @msg)
+			return true
+
+	inline IsString (|bool|) // use .expectstring if you need this to be a string
+		if self
+			|| fn = .func
+			if fn >= @sstr and fn <= @str
+				return true
+
+
+
+////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\
+// pretty cool pattern I wrote. very beautiful.
+// you know what? it reminds me of herringbone gears. This is a super-advanced gear-system
+// that produces cooler-running, quieter and more powerful gears for machinery.
+// less vibrations and noise. And vibrations tend to destroy machinery overtime with
+// loosening bolts and stuff like that. I guess appreciating beauty has a kind of
+// deeper meaning in itself before you realise what it really is.
+// or perhaps it just looks nice. But look into herringbone gears. Interesting stuff.
+////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\////\\\\
+
+
+
+function FastString.SyntaxAppend (|Message| msg)
+	Opt NoRefCounts
+	if (msg)
+		(msg.Func.obj!.RenderAddr)( msg, self )
+

@@ -1,0 +1,356 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+class SCImport
+	linkage
+		cpp_part		Imp
+	
+	|bool|					IsLibraryImp
+	|bool|					WarnUnusedFuncs
+	|errorseverity|			BlindCast
+	|int|					Depth
+	|file?|					Where
+	|[SCFile]|				Files
+	|MemoryLayer|			DeclLayer
+	|SCModule|				Mod
+	|{file}|				Resources
+	
+
+	constructor ( |File?| F, |bool| Builtin )
+		.IsLibraryImp = SCImport.STDLibTime or f==nil
+		.WarnUnusedFuncs = !.IsLibraryImp 
+		.Resources = Dictionary()
+		.BlindCast = (builtin)(0, errorseverity.error)
+		.DeclLayer = MemoryLayer(scdecl, self)
+		|| M = SCModule.NeuModule( nil, compiler.program, nil )|SCModule|!
+		.Mod = M
+		M.Project = self
+		M.IsImport = true
+		.Where = f
+		if (F != nil)
+			M.name = f.name
+			(SCImport.Recent max= f.modified)
+	
+	
+	render
+		fs <~ .mod.name
+	
+	
+	function Use
+		if self
+			.decllayer.use
+			scimport.curr = self
+		
+		
+	function ImportMsg (|Message| j)
+		opt norefcounts
+		|| l	= J.last(@str)$
+		|| Name = l.name
+		|| P	= Compiler.FindProject(Name)
+		if !P
+			if name[0] != '/'
+				P = compiler.Projects[name].FileThatExists
+			  else
+				P = name.FileThatExists
+		expect P ( J, "Can’t find import: '$name'" )
+
+		scimport.CurrIsManuallyImported++
+		SCImport.Importpath( name, P, .Depth + 1, false )
+		scimport.CurrIsManuallyImported--
+	
+	
+	function PrepareAll
+		opt norefcounts
+		for f in .files
+			f.AST
+
+
+	function ReloadImports (|scfile| index)
+		opt norefcounts
+		for j in index.AST
+			if J IsTmp "import"
+				.ImportMsg(j)
+
+
+	function CanBan (|scfile| scf, |bool|)
+		if !SCImport.STDLibTime
+			return true
+		if options.ProjectIsMiniLib
+			|| p = compiler.BaseProjectPath
+				rz = p.DirectoryContains(scf.path)
+		// we also need something else to be the same.
+		// scf needs to be inside the thing...
+	
+	
+	function LoadConf (|SCFile| scf)
+		opt norefcounts
+		.Mod.ExportName = "App" // make it simple
+		require scf
+		for s in scf.AST
+			if s != @tmp
+				0
+			  elseif s ~= "linkage"
+				.IndexLinkage(s, scf)
+			  elseif s ~= "compile_linking"
+				Linkage.CompilerCollect(s)
+			  elseif s ~= "conf"
+				using s
+				compiler.SetConf(self, s)
+			  elseif s ~= "targets"
+				.IndexTargets(s)
+	
+	
+	function IndexTargets (|message| tar)
+		opt norefcounts
+		for t in tar.arg
+			if t.expect(@tmp)
+				|| ch = t.first
+					error ch
+				  else
+					SC_Targets[t.name] = true
+		tar.remove
+		
+	
+	function compiler.SetConf (|scimport| Proj, |message| conf)
+		opt norefcounts
+		|| arg = conf[@arg]
+			compiler.ConfMsg = arg
+			conf.MakeComment
+
+	
+	function  IndexLinkage (|message| link, |scfile| scf)
+		if link["type"] ~= "library"
+			.IsLibraryImp = true
+			.WarnUnusedFuncs = false 
+		if link["apps_folder"].yes and options.modecpp
+			Options.output_path = file.Applications[compiler.Productpath.name]
+		if .canBan(scf)
+			.LoadBanned(link["bannedclasses"])
+		|| arg = link[@arg]
+		|| name = arg["cpp_part"]
+			scf.ExportName = name.name
+			.Mod.ExportName = name.name
+		
+		|| blind = arg["blindcast"]
+			.BlindCast = blind.blind
+		  elseif Options.SelfReplacement
+			.BlindCast = 0
+
+	
+	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
+	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
+
+		link.remove
+		
+
+	function message.Blind (|errorseverity|)
+		return ErrorSeverity.find(.name, self)
+
+
+	function IncludeCHeaders (|file| f, |[string]| output)
+		for c in f.ListFiles
+			if (!c.isDir) and (c isa "h")
+				output <~ c
+	
+	
+	function LoadBanned (|Message| list)
+		opt norefcounts
+		require list.expect(@list)
+
+		|| x = options.BannedClasses init Dictionary()
+		for item in list
+			item.expect(@thg)
+			x.valuelower(item.name) = "x"
+	
+
+	function ImportSpd (|File| c, |SCFile|)
+		expect (scimport.allfiles < 64K) (c, "Too many files included")
+		|| path = c.LowerCase
+		check !compiler.files[ path ] (c, "File included twice")
+		rz = SCFile( c, self )
+		.files <~ rz
+
+		compiler.files![ path ] = rz
+		scimport.allfiles <~ rz
+	
+	
+	function ImportDir (|File| f,  |SCFile?|)
+		|| flist = f.list
+		for cName in flist
+			|| c		= f[cName]!
+			|| ext		= cName.ext
+
+			if cname contains "(disabled)"
+				0 //
+			  elseif (c.IsDir)
+				.ImportDir( c )
+			
+			  elseif cname isa "conf"
+				rz = .ImportSpd(c)
+			
+			  elseif cname.IsSpeedieSrc
+				|| B = .ImportSpd(c)
+				if cName ~= "index.spd"
+					rz = B
+				
+			  elseif ext == "vert" or "frag" or "shad" or "sdf"
+				Shaders ?= dictionary.new
+				shaders![ cName ] = c
+
+			  elseif (ext.isclike)
+				Cpp_Export.Cpp_Input <~ c.path
+			  else
+				.Resources.valuelower(cname) = c
+				
+	
+	function string.IsOKForImport (|bool|)
+		|| X = self
+		while X[] == '/'
+			X = X[1...]
+		
+		|| x0 = x[]
+		if (X0 == 0) or (x0 == '.') or CharSet.LettersUnderScore[x0]
+			rz = true
+		  else
+			error  (x, "Invalid path")
+
+
+	module
+		|[SCFile]|			AllFiles
+		|dictionary|		Shaders // name per shader, storing file or string
+		|scimport--?|		Curr
+		|date|				Recent
+		|bool|				STDLibTime
+		|byte|				CurrIsManuallyImported
+		
+		
+		function PleaseDoConfsDifferently (|message| s, |int| t)
+			// Confs shouldn't preload stuff... not before sort!
+			opt norefcounts
+			for ch.flat in s
+				ch.tag = t
+		
+		
+		function Neaten 
+			opt norefcounts
+			.AllFiles.sort			// or else file-dates can mess things up.
+		
+			|| TooMany = .allfiles[2K]
+				if options.modecake		// only 11 bits free in SourceLocation type.
+					problem (TooMany, "Too many files included, debugging will misreport some file-positions")
+
+			for (f in .allfiles) (i)
+				f.filenum = i
+				|| s = f.liveast
+					.PleaseDoConfsDifferently(s, i<<5)
+									
+				
+		function DoImport (CollectFunc)
+			|| C = .curr
+				C.ImportMsg(node)
+			  else
+				error (node, "No current import")
+			return compiler.program
+				
+		
+		function FindImport (|string| s, |scimport|)
+			opt norefcounts
+			for imp in compiler.importedlist
+				if s ~= imp.where
+					return imp
+		
+		
+		function IsInputName (|string| name, |bool|)
+			if  name ~= "input"  or  name isa "input"
+				return true
+		
+		
+		function NoProj
+			.curr = nil
+			(SCDecl).restore
+
+
+		function FindInputFolder (|file| f, |file|)
+			|| FirstName = ""
+			for name in f.list
+				if IsInputName(name)
+					if !FirstName
+						FirstName = name
+					  else
+						error ( nil, "Multiple input folders found! '$Name' and '$FirstName'" )
+			
+			expect (Firstname) (f, "Can't find folder '$f/input/'.")
+			return f[FirstName]
+		
+		
+		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
+			require f.MustExist and path.IsOKForImport
+	
+			|| fpl = f.Path.lowercase
+			|| old = Compiler.ImportedNames[fpl]
+				return old
+			
+			rz = SCImport(f, builtin)
+			rz.Depth = ImportDepth
+			.ImportPathSub(path, f, rz, fpl)
+			
+			
+		function ImportPathSub (|string| path, |file!| f, |SCImport| upon, |string| fpl, |bool|)
+			Compiler.ImportedList <~ upon
+			Compiler.ImportedNames[fpl] = upon
+			|| subname = fpl.TrimExtAndPath
+			SC_Targets["__IMPORT_" + subname + "__"] = true
+			
+			|SCFile| conf
+			if (options.SingleFileInput and !path)
+				conf = upon.ImportSpd( options.SingleFileInput.file )
+			  elseif !f.isdir
+				conf = upon.ImportSpd( f )
+			  else
+				ifn (path contains "/") and (path[0] != '/')   // import "lib/items"
+					f = FindInputFolder(f)
+					require f and f.MustExist
+				conf = upon.ImportDir( f )
+			
+			upon.LoadConf(conf)
+			upon.IncludeCHeaders( f["c_includes"]!,	  Cpp_Export.H_Input )
+			upon.IncludeCHeaders( f["c_postincludes"]!, Cpp_Export.H_PostInput )
+						
+			if conf
+				upon.ReloadImports(conf)
+			return true
+
+// desired
+// per proj
+	// per import
+		// load prefix and targets
+			// apply target to prefix AST
+			// per import <-- loop to above
+// per all files
+	// clean AST
+		// apply target to prefix AST
+
+
+		function ExportShaders
+			require .shaders
+			
+			Compiler.stage( "Copying_Shaders" )
+			compiler.Timer( "Copying_Shaders" )
+			
+			|| P = compiler.BuildFolder["Resources/Shaders"]
+			P.MakeAndGoInto
+			
+			for (f in .shaders) (sh_name)
+				if (f isa File)
+					|| name = f.name
+					|| Dest = P[name]!
+					dest.writeall("\n// (Copy of original)\n" + f.readall)
+				  elseif (f isa string)
+					|| Dest = P[sh_name]!
+					debugger /// what?
+					Dest.writeall(f)
+

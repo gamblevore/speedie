@@ -1,0 +1,47 @@
+
+
+module EightBall
+// Default answers are weighted towards positive answers
+	|| Src = `
+							// 10 positive
+"It is certain"
+"It is decidedly so"
+"Without a doubt"
+"Yes definitely"
+"You may rely on it"
+"As I see it, yes"
+"Most likely"
+"Outlook good"
+"Yes"
+"Signs point to yes"
+
+							// 5 neutral
+"Reply hazy, try again"
+"Ask again later"
+"Better not tell you now"
+"Cannot predict now"
+"Concentrate and try again"
+
+							// 5 negative
+"Dont count on it"
+"My reply is no"
+"My sources say no"
+"Outlook not so good"
+"Very doubtful"
+`
+	|[message]| Items = nil
+	function SleepAndAsk (|uint64| Question, |uint64|)
+		for 1000
+			app.Sleep(1 + (Question&3))
+			(Question xor= date.Now)
+		return Question
+	
+		
+	function Ask (|String| Question, |string|)
+		|| X = .items init .src.parse.Array
+			|| Q = .SleepAndAsk(Question.hash)
+			|| n = Q mod X.Length
+			return X[n].name!
+			
+
+

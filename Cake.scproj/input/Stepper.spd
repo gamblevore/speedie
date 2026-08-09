@@ -1,0 +1,80 @@
+
+
+datatype StepAction (uint)
+	default 0
+	flags
+		|StepAction|
+		DoNothing = 0
+		SendVars
+		Pause
+		GoRun				// run will already send the vars, after we hit the next break.
+		StepOver
+		StepIn
+		StepOut
+//		StepBack
+		SendVarsPause = SendVars+Pause
+	
+	syntax is (|stepaction| k, |bool|)
+		return self|uint|&k|uint|
+	
+	module
+		|stepaction| Curr
+
+
+
+
+function RunAction (perryresponse)
+	opt norefcounts
+	|| Level = cakevm.kBreakStated
+	if m.firstname=="fast"
+		Level = cakevm.kBreakNever
+	.SetBreakLevel(Level)
+	return StepAction.gorun
+
+
+function StepOneAction (PerryResponse)
+	debugger.RestoreBreaks
+	.SetBreakLevel(cakevm.kBreakAlways)
+	return StepAction.GoRun
+
+
+function StepInAction (PerryResponse)
+	opt norefcounts
+	debugger.SetAllBreaks
+	return debugger.GoRunClearBreaks(m, .func(stack), stepaction.stepin)		// CLEAR those in this range.
+
+
+function StepOverAction (PerryResponse)
+	opt norefcounts
+	|| fn = .func(stack)
+	debugger.SetAllBreaks(fn)
+	rz = debugger.GoRunClearBreaks(m, fn, StepAction.StepOver)
+	debugger.StackOverDepth = stack.Depth
+	.BreakParentStack(Stack)
+	
+
+function StepOutAction (PerryResponse)
+	debugger.RestoreBreaks
+	.BreakParentStack(stack)
+	.SetBreakLevel(cakevm.kBreakStated)
+	return StepAction.GoRun ||| StepAction.StepOut
+
+
+function cakevm.BreakParentStack (|cakestack| stack)
+	debugger.StackTrap = nil
+	|| P = .prev(stack)
+		|| I = .index(p.code)
+		|| Bits = debugger.BreakRealBit
+		|| break = cake.ActiveBreaks
+		if I and !(break[I] & Bits)
+			break[I] |= Bits
+			debugger.StackTrap = P
+	
+
+function cakevm.SetBreakLevel (|int| level, |&uint|)
+//	debugger.UserBreakLevel = level
+	while
+		|| B = .SetDebug(level)
+			return B
+
+

@@ -1,0 +1,67 @@
+
+
+module SourceMap
+	|faststring|		Positions
+	|int|				LastLength
+	|int|				ASMTotal
+	|FastString|		BreakPoints
+	|FastString|		Breakable
+
+	
+	function Clear
+		opt norefcounts
+		|| p = .Positions
+			p.Length = 0
+		|| bp = .BreakPoints
+			bp.Length = 0
+		|| b = .Breakable
+			b.Length = 0
+		.ASMTotal = 0
+		.LastLength = 0
+	
+	
+	function Check (|scfunction| fn, |int| T, |bool|)
+		opt norefcounts
+		|| p = .positions
+			|| Dbg = p.length - .LastLength
+			expect (dbg == T)								(fn, "Debug length corrupt")
+		return true
+		
+
+	function Reserve (|int| T, |&uint|)
+		opt norefcounts
+		|| p = .positions
+			.breakpoints ?= faststring()
+			.breakable ?= faststring()
+			.lastlength = p.length
+			rz = p.Reserve(T)|&uint|
+			for i in t
+				rz[i] = 0
+
+
+	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
+
+	function BreakableSorter (SourceSorter)
+		return A - B
+
+
+	function SortBreaks (|FastString| B)
+		|| Start = B._Addr
+		|| Last = (Start + B.length)|&object| - 1
+		memory.sort((&BreakableSorter)|&nil|, Start|&object|, Last)
+
+
+	////	////	////	////	////	////	////	////	////	////	////	////	////	////
+
+
+datatype SourceLocation (uint64)
+
+function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
+	|| i = .ASMIndex + sourcemap.ASMTotal
+	if break & Assembler.BreakPoint
+		SourceMap.BreakPoints!.AppendInt(I)
+	
+	|| value = (SrcMap|uint64| << 32) ||| I
+	SourceMap.Breakable!.AppendInt64(Value)
+
+

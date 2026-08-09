@@ -1,0 +1,179 @@
+
+
+module Intrinsics
+	|[message]| Floats
+	|[message]| Vectors									// both q and v
+
+	function PullOutVecs (|bool|)
+		opt norefcounts
+		require stderr.ok
+		|| f = .floats
+		|| i = f.length
+		while i > 0
+			|| s = f[--i]
+			|| fn = s.MsgOwningFunc #expect (s)
+			|| input = fn.args[]!
+			if input.IsNumeric > 1
+				.Vectors <~ s
+				f.FastRemove(i+1)
+			fn.PostTrin(s!)
+		return true
+
+
+	function Process
+		require .PullOutVecs
+		require !compiler.InPerry
+		|| vm = FastString()
+		|| cpp = FastString()
+		cpp <~ `extern "C" {
+
+`
+		.ProcessTrin(vm, cpp, .Floats,  'F')
+		.ProcessTrin(vm, cpp, .Vectors, 'V')
+
+		VM_Builder.VMFile("vmtrin_gen.box").writeall(vm)
+
+		cpp <~ `}`
+		VM_Builder.SafeWrite("vmtrin.h", cpp)
+
+		// put into vmtrin_gen.box, so we can manually fix vmtrin.box if needed.
+		// Otherwise unfixable compile situations can happen, blocking future development.
+	
+
+	function scdecl.Trin (|byte|)
+		|| Ty = .TypeInfo
+		|| ReturnVec = Ty.NumericCount > 1
+		rz = (ReturnVec)('v', 'f')
+		if ty is bool
+			rz = 'u' // isnan
+	
+	
+	function ProcessTrin (|faststring| vm, |faststring| cpp,  |[message]| codes, |byte| T)
+		// the numbers in the map, mean nothing except for relative ordering.
+		opt norefcounts
+		codes.sort(TrinSort)
+		
+		|uint64| map
+		for list in codes
+			|| fn = list.MsgOwningFunc!
+			|| num = list.first
+			|| fn_name = fn.exportname				
+			|| id = num.int
+			|| AsmName = num.next.name
+			|| RetType = fn.ReturnType!.trin
+			
+			check  !(ID &~63)		(num, "ID out of range")
+			check  !((1<<ID) & map)	(num, "ID already used")
+			map |= 1<<id
+			|| C = fn.Args.Length
+			|| T2 = t.LowerCase
+			vm <~ "
+/**/ $T$AsmName  (U${C+1})
+	${RetType}1 = $fn_name("
+			
+			for i in C
+				if i > 0
+					vm <~ ", "
+				vm <~ T2
+				vm <~ (i+2)
+			vm <~ ");\n"
+			
+			if !fn.IsCppInBuilt
+				cpp_Export.WriteFuncSub(fn, fn.exportname, cpp)
+				cpp <~ ";\n\n"
+
+
+	function Message.TrinInt (|int|)
+		opt norefcounts
+		return .first.int
+	
+	
+	function TrinSort (SorterComparer of Message)
+		return  b.trinint - .trinint
+
+
+function assembler.DoIntrinsic (|Message| where, |ASMReg| dest, |scfunction| fn, |message| trin,  |ASMReg|)
+	opt norefcounts
+	|| name = Trin[@thg]
+	trin = name.next(@prm)$
+	|| op = instruction[name!]$
+	
+	dest = fn.ASMReturn(dest)
+	return .TheTrinity(where.last, trin, dest, op.opcode)
+	
+
+
+function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| dest, |byte| OpCode, |asmreg|)
+	opt norefcounts
+	|| n = 0
+	|asmreg[6]| Collection
+	|| Closer = .OpenVars
+	for s.fast in SrcPrms
+		Collection[n++] = .µTrin(s)
+	.CloseVars(Closer, SrcPrms, nil)
+	
+	|| fat = .RequestOp(OpCode, SrcPrms.parent!)
+	if opcode == asm.halt
+		(Dest is exit)
+	|| DestPos = .FillTheFat(collection, fat, ASMPrms, n)
+		dest = .TempOnly(dest)
+		fat.Dest(destpos, dest, self)
+	return fat*dest
+	
+
+function assembler.FillTheFat (|&asmreg| Collection, |fatasm| fat, |message| Prms, |int| n, |ind|)
+	opt norefcounts
+	|| i = 0
+	for s.fast in prms
+		if s ~= "dest"
+			s.expect(@thg)
+			rz = i
+		  else
+			.Fries(Collection, fat, s, i, n)
+		i++
+	
+
+function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int| i, |int| MaxParam)
+	opt norefcounts
+	if s.IsInt
+		fat.NumInput(i) = s.int
+		return
+	require s.expect(@thg)
+
+	|| name = s.name
+	if name ~= "p0"
+		error (fat, "Use r0")
+	if name ~= "r0"
+		fat.RegInput(i) = asmreg()
+		return
+	
+	expect (name[] eq 'p') (s)
+	
+	|int| l = s.Int(1, 1, MaxParam)
+		fat.RegInput(i) = collection[l-1] asnt asmreg.Textual
+
+
+
+function scfunction.AddTrin (|message| msg)
+	opt norefcounts
+	|| L = msg[@bra, @list]
+		intrinsics.floats <~ l
+		l.obj = self		
+		msg.next = @tmp + "visible"
+
+
+function scfunction.PostTrin (|message| s)
+	opt norefcounts
+	using s
+	|| src = "vmod(dest)"~parse
+	.intrinsic = src
+	|| fn_name = src.first!
+	|| T = .args[]!.trin
+	fn_name.name = (T.Render + s.last.name).UpperCase
+	|| list = src.second
+	
+	for i in .args.Length
+		list! <~ @thg + ("p" + (i+1))
+	
+
+

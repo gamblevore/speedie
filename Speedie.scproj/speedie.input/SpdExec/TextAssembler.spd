@@ -1,0 +1,31 @@
+
+
+module TextAssembler
+	|{uint64}|			Labels
+		
+	
+	function TextFunc (|message| msg, |bool|) // assemble a function from text
+		|| fn = SCFunction.new
+		fn.source = msg
+		Assembler.Sh.InitAndStartfunc(fn)
+		Assembler.Sh.TextFuncSub(msg)
+		compiler.exportnames[fn.exportname] = fn
+		Assembler.Sh.CapASM
+		Assembler.Sh.LoadLabelJumps
+		|| l = .Labels
+			l.dispose
+
+
+	function TextData (|message| msg) // assemble a function from text
+		// how?
+
+
+	function Assemble (|message| msg)
+		opt norefcounts
+		(compiler is TextAssembling)
+		for ch.fast in msg
+			if ch istmp "asm"
+				.textfunc(ch)
+			  elseif ch istmp "data"
+				.textdata(ch)
+

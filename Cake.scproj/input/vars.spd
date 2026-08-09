@@ -1,0 +1,607 @@
+
+
+datatype XVarFlags (byte)
+	flags
+		Parameter
+		BareStruct
+		CanBeNil
+		Prototype
+		CString
+	syntax is (|xvarflags| F, |bool|)
+		return self & F
+	
+
+
+class XVar (list)
+	|Wierdness[5]|		Weirdness			// pointers, references, carrays
+	|int|				CodeEnd
+	|SourceLocation|	SrcMap
+	|byte|				ViewStrength
+	|XVarFlags|			Flags
+	|uint16|			Reg
+	|DataTypeCode|		DataType
+	|string|			Name
+	
+	contains xvar
+	
+	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
+		.Flags = s.Byte
+		.SrcMap = s.hint
+		.ViewStrength = 0
+		.position = pos
+		.reg = reg
+		.name = s.CString
+		.obj = xtype.GetType(s.hint, nil) // doesn't need to exist, .datatype is used for ints/etc.
+		.DataType = s.HInt
+		.CodeEnd = int.max
+
+		for i in –count .Weirdness
+			|| x = 0
+			if s.Position < After
+				x = s.hint
+			.Weirdness[i] = x
+	
+	function Type (|xtype|)
+		opt norefcounts
+		return .obj|&nil||xtype|
+	
+	syntax is (|xvarflags| V, |bool|)
+		return .flags&V
+		
+	operator contains (|int| P, |bool|)
+		return P >= .Position and P < .codeend
+
+	function Print (|!&CakeStack| Stack, |int| TabTo=0)
+		opt norefcounts
+		.RenderForPrint(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
+		printline Printer|&nil||string|
+		printer.Length = 0
+	
+	
+	module
+		|| Printer = faststring()
+		|| Expansion = message()
+	
+	
+	render // for debug
+		opt norefcounts
+		.RenderForPrint(fs, nil, true, 0, false)
+	
+
+	function Wierdness
+		Disabled "Spelt wrong!"
+	
+	
+	function PointerOK (|&nil| Ptr, |bool|)
+		if (Ptr|uint64| >= debugger.MinPointer)
+			return true
+		return !Ptr and (self is canbenil)
+	
+	
+	function NilOK (|faststring!| fs, |!&nil| Where, |bool|)
+		ifn (where|uint64| >= debugger.MinPointer) and fs.TestMem(Where, 8)
+		// both should never happen. Its like a register being nil, or an object being nil.
+		// Despite that we should have tested it for nil and not come here.
+			debugger
+			error (ErrorReceiver.nonfatal)
+
+		|| Ptr = (Where|&?&nil|)[]
+		if .PointerOK(ptr)
+			return true
+
+		if !ptr
+			fs <~ "nil"
+		  else
+			fs <~ "0x"
+			fs.AppendHex(Ptr|uint64|)
+	
+	
+	function TestObjectType (|xtype| Type, |&nil| Where, |xtype|)
+		opt norefcounts
+		require cake.Readable(Where, 8)
+		|| obj = Where|&object|[]
+			require Memory.TestObject(obj)
+			|| Mine = obj.Class
+			|| ind = mine.Index
+			if ind > 0
+				|| T = xtype.types[ind-1]
+					// if the type is string, and it starts with string... its still a string
+					// otherwise we get stringzeroterminated as the typical string type. no fun.
+					ifn T.name[0, "String", true] and (T in type)
+						return T
+		return type
+
+		
+	function SetValue (|!&nil| where, |message| Value)
+		opt norefcounts
+		require value
+		if .Reg
+			require cake.Readable(Where, 16)
+
+		expect (self isnt BareStruct)							(value, "Unalterable")
+
+		if .weirdness[0] is reference
+			where = where|&&nil|[]
+
+		|| C = .Type
+		if c and c.IsObject
+			return .SetObjectValue(Where|&object|, value)
+		return .SetDataValue(Where, value)
+	
+
+	function RenderForPrint (|faststring| fs, |?&ivec4| Reg0, |bool| Full, |int| TabTo, |bool| Color)
+		opt norefcounts
+		if full
+			if color
+				fs <~ terminalcolor.yellow
+			
+			|| M = fs.StreamLength
+			fs <~ "|"
+			.RenderType(fs, nil)
+			fs <~ "|"
+			fs <~ " "
+			fs <~ .name
+			fs <~ ": "
+			if color
+				fs <~ terminalcolor.normal
+			if TabTo
+				|| Missing = TabTo - (fs.streamlength - M)
+				fs <~ (' ', missing)
+		
+		if reg0
+			if color
+				fs <~ terminalcolor.red
+			|| RefCount = 0
+			.RenderValue(fs, reg0 + .reg, RefCount)
+			if color
+				fs <~ terminalcolor.normal
+	
+	
+	function DisplayString (|faststring| fs, |?&byte| Addr, |int| n, |bool|)
+		if n < 0
+			fs <~ "InvalidLength: "
+			fs <~ N
+			return false
+		if !addr												// testmem allows nil addr...
+			fs <~ "nil!"
+			return false
+		if !n
+			fs <~ `""`
+			return true
+		
+		require fs.TestMem(addr, n, "BadString")				// check string
+		
+		|VirtualJBString| Skkrt
+		Skkrt.Addr = Addr
+		Skkrt.Length = n
+		if n > 50
+			Skkrt.length = (&skkrt)|string|.ByteCountUTF8(50)	// shrink string
+		fs.AppendQuotedEscape((&Skkrt)|string|)
+		if n > Skkrt.Length
+			fs <~ ('.', 3)
+		
+		return true
+	
+
+	function message.DebugRender (|faststring| fs, |bool|)
+		opt norefcounts
+		fs <~ .func.name
+		fs <~ "@"
+		
+		|| name = .name
+		require fs.testobj(name)
+		if name isa string
+			fs.AppendQuotedEscape(name)
+			return true
+
+		fs <~ name.class.name
+		fs <~ "!"
+
+
+	function ParseObj (|object| Old, |string| Value, |object?|)
+		|| msg = Value.parse
+			|| fn = msg.func
+			if fn.IsString and !msg.HasAny
+				rz = msg.name
+			  elseif fn == @name
+				|| NewType = Syntax.Func(msg.name, msg)
+					|message--| ch = msg.first
+					if !ch.IsString or ch.HasAny
+						ch = nil
+					|string--| NewName = ch.Name
+					if old isa Message
+						old.func = NewType
+						old.name = NewName
+						rz = old
+					  else
+						rz = NewType + NewName
+			  elseif (old isa Message)
+				if msg.iscontainer and msg == 1 // like (@str) incase i wanna set it to @str
+					rz = msg.first
+
+
+	function SetObjectValue (|!&object| Where, |message| Value)
+		opt norefcounts
+		|| OldObj = Where[]
+			require Memory.TestObject(OldObj)
+		
+		if value ~= "nil" or "0" or "0x0"
+			require self is CanBeNil
+			Where[] = nil
+			return
+	
+		|object| NewObj
+		if value.name.IsInt
+			NewObj = Value.int|object|!
+		  else
+			NewObj = .ParseObj(OldObj, value.name)$
+		
+		expect (Memory.TestObject(NewObj)) (value, "Invalid address")
+		Where[] = NewObj
+	
+	
+	function SetDataValue (|!&nil| Where, |message| Msg)
+		opt norefcounts
+		expect (msg.length < 60)						(msg, "SizeOverflow")
+
+		|| W = .Weirdness[0]
+		expect (W isnt CArray)							(msg, "Unwriteable") // surely it should be expanded first?
+			
+		// pointers can be altered... im sure of it
+		// and references just need to be dereferenced...
+		// i guess its a pointer TO data. So... just alter the value?
+		
+		
+		
+
+		|| T = .DataType
+		|| V = t.VecCount
+		|| BC = t.ByteCount
+		if (bc > 8): bc = 16		
+
+		if w is Pointer
+/			bc = 8 // is it not already?
+
+		expect (memory.Writeable(Where, BC))			(msg, "Unwriteable")
+
+		if w is Pointer
+			|| mark = StdErr.Mark
+			|| addr = msg.int|&byte|							// 0x1234
+			require mark == stderr.mark
+			require cake.Readable(addr, 8)
+			(where|&&byte|)[] = addr
+			return
+		
+		|| value = msg.name
+
+		if v > 1
+			|| items = value.parse
+				|| fn = items.func
+				expect (fn == @arg or @list or @arr)	(msg)
+				|| i = 0
+				|| ch = items.first
+				while i < v
+					if t is Float
+						(where|&float|)[i] = ch.Float
+					  else
+						(where|&int|)[i] = ch.int
+					i++
+					ch++
+					if (i == 3) and (v == 3) and ch
+						v = 4							// allow setting last in vec3.
+			return
+	
+
+		if t is bool
+			(Where|&bool|)[] = value.Yes
+			
+		  elseif t isnt Floating
+			if !t.IsSigned and (bc == 1) and !value.IsInt
+				if value[] == '\'' and value.Last == '\''
+					|| c = value[1]
+					(Where|&int8|)[] = c
+					return
+
+			|uint64| IntValue = msg.int
+			if BC > 4
+				(Where|&int64|)[] = intvalue
+			  elseif bc == 4
+				(Where|&int|)[] = IntValue
+			  elseif bc == 2
+				(Where|&int16|)[] = IntValue
+			  else
+				(Where|&int8|)[] = IntValue
+				
+		  else
+			|| ValueFloat = msg.float
+			if BC <= 4
+				(Where|&float|)[] = ValueFloat
+			  else
+				(Where|&f64|)[] = ValueFloat
+	
+
+	function RenderObject (|faststring| fs, |!&nil| Addr, |$int| RefCount,  |bool|)
+		opt norefcounts
+		require .NilOK(fs, Addr)
+		|| obj = Addr|&object|[]
+		if !obj
+			fs <~ "nil"
+			return true
+		
+		require fs.TestObj(obj)									// check object is readable and sane
+
+		RefCount = obj.RefCount
+		
+		if obj isa string or faststring
+			|| str = obj|&nil||string|
+			return .DisplayString(fs, str.addr, str.length)
+
+		if (obj.class == Message) and (obj isa message)			// avoid rendering error as a message
+			if .ViewStrength == 0
+				return obj.DebugRender(fs)
+			
+			if .ViewStrength == 1					// What if crash in here? ooof
+				obj.render(Fs)						// How to quote so looks distinct? «abc » is used .renderAST
+			  else
+				obj.RenderAST(Fs)
+			return true
+
+		if obj isa Array
+			fs <~ "("
+			fs <~ obj.length						// Could be expandable... I guess?
+			fs <~ ") "
+
+		fs <~ "0x"
+		fs <~ obj.objectid
+		return true
+	
+	
+	function RenderType (|faststring| fs, |xtype?| type, |bool|)
+		opt norefcounts
+		for W in .Weirdness
+			loop W
+			if (w is Reference) and (self isnt barestruct)
+				fs <~ "$"
+			if w is Pointer
+				fs <~ "&"
+			w >>= 2
+			if w
+				fs <~ "[$w]"
+		
+		if .flags is CString
+			fs <~ "CString"
+			return true
+		if .flags is Prototype
+			fs <~ "(function)"
+			return true
+
+		|| C = .type
+		if !C and !type
+			|| T = .DataType ||| datatypecode.Numeric
+			T.Render(Fs)
+			return true
+		
+		if C
+			if type and type.IsObject
+				|| Good = type in C
+				if !good
+					fs <~ "!"
+				fs <~ type.name
+				if !good
+					fs <~ "!"
+			  else
+				fs <~ C.Name
+			
+		return true
+		
+	
+	function faststring.TestObj (|object| Obj, |bool|)
+		return .TestMem(obj|&nil|, -1, "BadObject")
+	
+	
+	function faststring.TestMem (|!&nil| Mem,  |int| N,  |string| ErrName="Unreadable",  |bool|)
+		|| Err = memory.Readable(Mem, N)
+			return true
+		
+		if self
+			self <~ ErrName
+			self <~ ": 0x"
+			.AppendHex(Mem|int64|)
+	
+	
+	function RenderValue (|faststring| fs, |!&nil| Where, |$int| RefCount,  |bool|)
+		opt norefcounts
+		if .Reg
+			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
+		
+		|| C = .type
+		if c and c.IsObject
+			return .RenderObject(fs, Where, RefCount)
+		
+		if self is BareStruct
+			return .RenderBareStruct(Fs, where)				// what about structs in general?
+
+		return .RenderData(fs, Where)
+
+		
+	function RenderBareStruct (|faststring| fs, |!&nil| Ptr, |bool|)
+		opt norefcounts
+		require .NilOK(fs, Ptr)
+		|| Where = Ptr|&&nil|[]
+		rz = true
+		|| Ty = .type
+			fs <~ "<"
+			|| n = fs.Length
+			for (v in ty.Properties) (i)
+				loop (n - fs.Length) < 100
+				if i > 0
+					fs <~ ", "
+				|| Prop = Where|&byte| + v.position
+				|| Ref = 0
+				if !v.RenderValue(fs, prop, ref)
+					rz = false
+			fs <~ ">"
+
+
+	function RenderData (|faststring| fs, |!&nil| Addr, |bool|)
+		opt norefcounts
+		|| T = .DataType
+		|| V = t.VecCount
+		|| BC = t.ByteCount
+		if (bc >= 12): bc = 16		
+		|| W = .weirdness[0]
+		|| F = .flags
+
+		if (W is pointer or reference) or (F is prototype or f is cstring)
+			require .NilOK(fs, addr)
+
+			|| Ptr = addr|&&nil|[]|int64|
+			if (w is Reference)										// barestructs already handled in rendervalue
+				expect (Ptr) (ErrorReceiver.NonFatal)
+				Addr = ((ptr>>1)<<1)|&nil|
+				
+			  else
+				if !ptr
+					fs <~ "nil"
+					return true
+				if f is CString
+					|| len = ptr|cstring|.Length(256)
+					if fs.TestMem(ptr|&byte|, len)
+						fs <~ '"'
+						fs.AppendMemory(ptr|&byte|, len)
+						fs <~ '"'
+						return true
+					return false
+				fs <~ "0x"
+				fs.AppendHex(ptr, 2)
+				
+				if .Weirdness[1]
+					return fs.TestMem(addr, bc)		// dont render pointer to a pointer
+				
+				if f is Prototype
+					return true
+				addr = ptr|&ivec4|
+				fs <~ ": "
+		
+		require fs.TestMem(addr, bc)
+				
+		if t is bool
+			fs <~ (addr|&bool|)[].string
+		  elseif t isnt Floating
+			if v <= 1
+				|uint64| Value
+				if BC > 4
+					value = (addr|&int64|)[]
+				  elseif bc == 4
+					value = (addr|&int|)[]
+				  elseif bc == 2
+					value = (addr|&int16|)[]
+				  else
+					value = (addr|&int8|)[]
+				
+				|| sh = 64 - (bc*8)
+				if !t.IsSigned and (sh > 0)							// unnecessary??
+					value = (value << sh) >> sh						// remove later
+
+				ifn value and (bc == 1) and !t.IsSigned
+					fs.AppendDecimal(value)
+
+				  else
+					fs <~ "0x"
+					fs.AppendHex(value)
+					fs <~ " "
+
+					if Value|byte|.isprintable
+						|| Container = '\''
+						if value == Container
+							Container = '"'
+						fs <~ Container
+						fs <~ value|byte|
+						fs <~ Container
+									
+			  elseif v == 2
+				fs <~ (addr|&ivec2|)[]
+			  elseif v == 3
+				fs <~ (addr|&ivec3|)[]
+			  elseif v == 4
+				fs <~ (addr|&ivec4|)[]
+		  else
+			if v <= 1
+				if BC <= 4
+					fs <~ (addr|&float|)[]
+				  else
+					fs <~ (addr|&f64|)[]
+			  elseif v == 2
+				fs <~ (addr|&vec2|)[]
+			  elseif v == 3
+				fs <~ (addr|&vec3|)[]
+			  elseif v == 4
+				(addr|&vec4|)[].SmallerVec4Render(fs)
+
+		return true
+	
+	
+	function vec4.SmallerVec4Render (|Faststring| fs)
+		if self == vec4()
+			fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell
+		  else
+			fs <~ "("
+			for i in 4
+				|| v = self[i]
+					fs <~ v
+				  else
+					fs <~ "0"
+				if i < 3
+					fs <~ ", "
+			fs <~ ")"
+	
+
+	function faststring.EscapeByte (|byte| value)
+		opt norefcounts
+		if  value > 32  and  value != 9 and 10 and 13
+			|| str = jeebox.EscapeStr[value|byte|.render]
+				self <~ str
+				return
+		self <~ value|byte|
+	
+
+
+function message.xvariables (|[xvar]|)
+	opt norefcounts
+	cpp_part xvar0
+	if self
+		|xvar[32]| Regs
+		.LoadXVars(Regs, rz)
+
+
+function message.LoadXVars (|?&xvar| Registers, |[xvar]| out)
+	opt norefcounts
+	cpp_part xvar
+	|| input = xtype.shared
+	input.Reset(.name)
+
+	while (|| Section = input.byte)
+		|| StartPos = input.Position
+		|| ReadEnd = StartPos + Section
+		|| Pos = Input.hint
+		|| Reg = Input.hint
+		|| OK = !Reg
+		if registers
+			OK = (reg-1)|uint| < 31
+		
+		
+		if input.Position >= ReadEnd					// Close
+			expect (OK)									(self, "CloseOutRange: "	+ reg)
+			expect (Registers)							(self, "BadRegClose: "		+ reg)
+			|| r = Registers[reg]			#expect		(self, "BadRegClose: "		+ reg)
+			R.CodeEnd = pos
+		  else
+			expect (OK) (self, "OpenOutRange: " + reg)
+			|| var = xvar(input, pos, reg, ReadEnd)
+			if Registers
+				Registers[reg] = var
+			out <~ var
+
+		expect (input.position == ReadEnd)				(self, "Corrupted debug vars")
+	
+

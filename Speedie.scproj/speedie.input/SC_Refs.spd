@@ -1,0 +1,894 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+	
+module SCRefs {
+
+linkage
+	cpp_part Refs
+
+
+
+flags
+	kBasisObj
+	kBasisDeSTRUCTable
+	kBasisTempStruct
+	kBasisCArray
+
+	kSufferedNoise
+	kIsNoisy
+	kIsDisowner
+	kHoldsDisowned
+	kNotDisturbed = 0 // must be 0, for #require
+
+
+function Message.FindRef (|SCFunction| fn, |string| name, |Message|)
+	opt norefcounts
+	for (curr.forward in self)
+		if (curr == @func)
+			|| prms = curr.last
+			if (prms) and (prms.obj == fn) and (prms.first isthing name)
+				return Curr
+
+
+function Message.LastUsedFix (|Message|)
+	opt norefcounts
+	if (self == @Decl)
+		|| Ch = .second.first
+		expect (Ch == @thg)
+		if SCRefs.RefBasis(ch, true) == SCRefs.kBasisObj
+			// we returning an object. need to scan for the first incr of that object...
+			|| it = .FindRef(Compiler.RefIncr, Ch.name)
+				return it.Next
+	
+	return .Next
+
+
+function DeclInit (|SCFunction| fn, |Message| dcl, |bool| IsJustAnArg)
+	opt norefcounts
+	|| Basis = RefBasis( dcl, true )
+	if fn.dorefs
+		require basis
+	  else
+		require basis & kBasisDestructable
+	
+	|| arg = Dcl.Parent!
+	|| name = Dcl.DeclName!
+	|Message| LastPlace
+	if (Basis & kBasisObj)	// could be a struct?
+		LastPlace = LastUsedRefPlace( name, arg )
+	
+	|| Blocker = arg.CausesUnReachable( arg, dcl, LastPlace )
+	
+	if (Basis == kBasisObj)								// we want == not & here
+		if IsJustAnArg
+			RefIncr( name, dcl, IsJustAnArg )
+		  else
+			RealRefIncr(name, dcl)
+
+	Blocker ?= LastPlace
+	ReturnHandle( Blocker, arg, name, basis )
+	
+	|| Curr  = dcl
+	|| After = arg.FlatAfter
+	while  (Curr != After)  and  (Curr != LastPlace)
+		if (Curr == @Arg)
+			|| Block2 = Curr.CausesUnReachable( arg )
+				ReturnHandle( Block2, nil, name, basis )
+		Curr = Curr.FlatNext
+
+
+function SCFunction.DoRefs (|bool|)
+	return self isnt NotRefCounted
+
+
+function RefBasis (|Message| msg, |bool| SetOnly, |int|)
+	return RefBasisStruct(msg, SetOnly) &~ kBasisTempStruct
+
+
+function RefBasisStruct (|Message| msg, |bool| SetOnly, |int|)
+	opt norefcounts
+
+	|| type = msg.asdecl
+	ifn type isa SCDecl
+		type = TypeOfExpr( msg, nil )$
+	
+	if type.IsRefCountable(SetOnly)
+		if type.IsCArray
+			return kBasisCArray ||| kBasisObj
+		if  type is self  and  scfunction.CurrFunc is Constructor
+			return 0
+		Return kBasisObj
+	
+	if type.HasStruct and type isnt returnedstruct // doesnt that just disable struct destructors?
+		|| fn = type.type.destructorfunc
+			return kBasisDestructable
+		|| p = msg.NiceParent
+		if p isbrel "&"
+			return kBasisTempStruct
+
+
+function RC_Rel (|Message| rel)
+	// a = b.c   ->   || tmp = b.c, jb_incr(tmp), jb_decr(a), a = tmp
+	opt norefcounts
+	
+	|| First = rel.first!.unbra
+	require RelNeedsRef( first )
+	
+	|| last = rel.last!
+	if first.func == @thg and first.obj == last.obj // oof
+		return // do nothing!
+	
+	using rel
+	|| result = RefMsg0( "JB_SetRef", Compiler.RefSetRef! )
+	|| lst = result.Last!
+	lst <~ first
+	lst <~ Last
+
+	rel.ReplaceWith( result )
+
+
+function scdecl.CanGetAddressSafely (|bool|)
+	if self == typenil
+		return true
+	return .iscarray or (self is global)
+
+
+function RC_CheckNoObjPms (|message| msg)
+	opt norefcounts
+	|| fn = msg.MsgFunc
+		|| p = msg.last.first
+		for i in fn.args
+			|| ty = typeofexpr(p, nil)
+				if i.PointerCount and !ty.CanGetAddressSafely
+					expect (!i.Type.IsObject) (p, p.name + "'s address can't be passed, within 'opt norefcounts'.")
+			p++
+
+
+function RC_IgnoreReturn (|scfunction| self, |Message| msg)
+	opt norefcounts
+	require RefBasis( msg, false ) == kBasisObj
+	require msg.func == @func
+	
+	|| Prm = msg.last!
+	|| fn = Prm.obj|scfunction|
+	if fn is constructor
+		if self is Constructor					// calling a super, I hope.
+			|| first = prm.first
+			check (first isthing "self") (first)
+			return
+		if (fn isnt StoresSelf) and !.Unfinished
+			problem (msg, "Object just evaporates here. (Into the clouds)")
+	
+	using msg		
+		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
+		msg.FuncWrap( free_if_dead )
+	parser.using.position = -1
+
+
+function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
+	// a = nil   ->   JB_decr(a),  a = nil 
+	opt norefcounts
+	
+	|| OldPrev = place.Prev
+	if (OldPrev) and (OldPrev == @Func) and (OldPrev.first ~= "JB_SafeDecr")
+		place = OldPrev // safedecr always comes last
+	
+	|| ToUse = place
+	if place == @arg
+		Touse = ToUse.FlatLast
+	using ToUse
+	if place == @arg
+		parser.using.position = touse.FrenchSpyReturn
+		
+	|message| what
+	if basis & kBasisCArray
+		what = DecrMulti( msg.parent!.asdecl!, msg.copy, IsReturn )
+	  else
+		what = RefDecrMsg( msg, IsReturn )
+	if place == @arg
+		place <~ what
+	  else
+		place.Prev = what
+
+
+function DecrMulti (|scdecl| d, |message| m, |bool| IsReturn,  |message|)
+	opt norefcounts
+	|| Int = d.c_array.msg
+	int.obj = typeint!.typenormal // nice
+	if IsReturn
+		rz = macros.MultiEarlyDecr.run(m, Int)
+	  else
+		rz = macros.MultiDecr.run(m, Int)
+	rz.ASMType = ASMType.kRefCount
+	|| prm = rz.second
+		if IsReturn
+			prm.obj = Compiler.RefEarlyDecrMulti
+		  else
+			prm.obj = Compiler.RefDecrMulti
+		rz.obj = typevoid
+
+
+function RefDecrMsg (|Message| msg, |bool| IsReturn, |Message|)
+	if IsReturn
+		return RefMsg( msg, "JB_EarlyDecr", Compiler.RefEarlyDecr! )
+	return RefMsg( msg, "JB_Decr", Compiler.RefDecr! )
+
+
+function RefClearMsg (|Message| msg, |Message|)
+	return RefMsg( msg, "JB_Clear", Compiler.RefClear! )
+
+
+function RefMsg (|Message| msg, |String| name, |SCFunction| func, |Message|)
+	opt norefcounts
+	if parser.using.position < 0
+	rz = SCRefs.RefMsg0(name, func)
+	rz.Last! <~ msg.CopyWithoutUsing(rz)
+	rz.obj = func.returntype ?? typevoid
+
+
+function SCFunction.RefFunc (|message| prm, |message!| after)
+	opt norefcounts
+	using after
+		|| ref = SCRefs.RefMsg0(.ExportName, Compiler.RefIncr!)
+		after.next = ref
+		ref.last! <~ prm
+		ref.obj = prm.obj
+	parser.using.position = -1
+
+
+function RefIncr (|Message!| msg, |Message| Place, |bool| IsJustAnArg=false)
+	opt norefcounts
+	if (IsJustAnArg)
+		Place = msg.parent.parent!
+	  else
+		if (Place == @decl)
+			msg = Place.last!
+			if (msg == @rel)
+				msg = msg.last!
+				if msg.IsStatementExpr
+					return msg.AvoidSafeDecr
+		require !(msg.unbra isthing "nil")
+		Place = msg
+
+	Compiler.RefIncr!.RefFunc(msg, place)
+
+
+function Message.AvoidSafeDecr
+	opt norefcounts
+	|| arg = .first
+	|| decr = arg.last.prev
+	|| prms = decr.Last
+		if prms.obj == Compiler.RefSafeDecr
+			|| f = prms.first
+				f.becomenil  // remove it without, removing it. cos its still tested for in RefDecr!
+
+
+function message.BecomeNil
+	.name = "nil"
+	.obj = TypeNil
+	.clear
+
+	
+function RefDestructorMsg (|Message| msg, |SCFunction| fn, |Message|)
+	return RefMsg( msg, fn.exportname, fn )
+
+
+function message.IsReturnOrRejoin (|bool|)
+	return (self == @tmp) and (self == "return" or "rejoin")
+
+
+function Message.UnReachable (|Message|)
+	return .CausesUnReachable(self)
+
+
+function Message.CausesUnReachable (|Message| arg, |Message?| Dcl=nil, |Message?| LastPlace=nil, |Message|)
+	opt norefcounts
+	|| Curr = dcl ?? .First
+
+	while (curr and curr != LastPlace)
+		if (Curr == @Tmp)
+			|| s = Curr.name
+			if (s == "return")
+				Return Curr
+
+			if (s == "exit" or "continue")
+				if SCRefs.ExitHitsOrGoesPast( Curr, arg )
+					Return Curr
+			  elseif (s == "rejoin") and (self == arg)
+				Return Curr
+		Curr++
+
+
+function ExitHitsOrGoesPast (|Message!| curr, |Message!| arg, |bool|)
+	opt norefcounts
+	// while {||A, exit}				// true
+	// while {||A, if(true){exit}}		// true
+	// while {if(true){||A, exit}}		// true
+	// while {while {||A, exit}}		// false
+	while
+		curr = curr.Parent
+		if curr == arg
+			Return true
+		if curr IsTmp "while"
+			return false
+
+
+function RelNeedsRef (|Message| first, |bool|)
+	// only objects
+	require (RefBasis( first, true ) == kBasisObj)
+	
+	// if left side is a property, do it regardless.
+	if (first == @Dot)
+		return true
+	
+	Return true // for now
+	
+	Return first.VarOptFlag(kSufferedNoise)
+
+
+function Message.IsProperty (|bool|)
+	opt norefcounts
+	if .func == @Dot
+		|| d = .obj
+		if d isa scdecl
+			Return (d is property)
+
+
+function RefSafeDecr (|Message| msg, |Message| place)
+	// a = nil   ->   a = nil, JB_decr(a)
+	using msg
+	if (place == @Arg)
+		place <~ SafeDecrMsg( msg )
+	  else
+		place.Prev = SafeDecrMsg( msg )
+
+
+function ExprNeedsTemping (|Message| child, |Message| name, |bool|)
+	opt norefcounts
+	require RefBasis( name, false ) == kBasisObj
+	
+	for s.flat in child
+		if (s isthing name.name)// and !(s in @dot) 
+			Return true
+
+
+function Destructable (|Message?| Blocker, |Message?| arg, |Message| name)
+	opt norefcounts	
+	|| type = TypeOfExpr(name, nil, nil)
+		(type is Readfrom)
+		|| src = blocker ?? arg!.FlatLast
+		using src
+		|| fn		= type.type.destructorfunc!
+		|| FnMsg	= RefMsg0(fn.exportname, fn)
+		|| brel = fnmsg.last.msg(@brel, "&")
+		|| NewThg = brel.msg(@thg, name.name)
+
+		brel.obj = type.getaddress
+		newthg.obj = name.obj // needed
+		if (Blocker)
+			Blocker.Prev = Fnmsg
+		  else
+			arg! <~ Fnmsg
+
+
+function ReturnTempMoveOut (|Message| Child, |Message| blocker)
+	|| Temp = SCFunction.TempMoveOut( child, blocker ) // still need to ref it.
+	ReturnTempMoveOutSub(child, blocker, temp)
+
+
+function RealRefIncr (|message| name, |message| dcl)
+	opt norefcounts
+	Compiler.RefIncr!.RefFunc(name.copy, dcl)
+
+
+function ReturnTempMoveOutSub (|Message| Child, |Message| blocker, |message| temp)
+	if RefBasis(child, false) == kBasisObj	
+		|| dcl = child.parent.parent!
+		Compiler.RefIncr!.RefFunc(temp.copy, dcl)
+		RefSafeDecr( temp, blocker )
+
+
+function message.DoesAnything (|bool|)
+	if self
+		require self != @thg and @num and @str and @char
+		return true
+
+
+function ReturnHandle (|Message| Blocker, |Message?| arg, |Message| name, |int| Basis)
+	if (Basis & kBasisDestructable)
+		if (!Blocker)
+			return .DeStructable(Blocker, arg, name)
+		
+		|| ch = Blocker.first
+		if (Blocker.isReturnOrRejoin  and  ch isThing name.name) or (blocker isthing name.name)
+			return
+		if (blocker == "return") and (ch.DoesAnything)
+			|| NeedsMoreTemping = SCFunction.TempMoveOut( ch, blocker ) // still need to ref it.
+			.DeStructable(Blocker, arg, name)
+			ReturnTempMoveOutSub(ch!, blocker, NeedsMoreTemping)
+		  else
+			.DeStructable(Blocker, arg, name)
+		return
+
+	if (basis & kBasisTempStruct)
+		return // no need?
+
+	if (!Blocker)
+		RefDecr( name, arg!, basis, false )
+		Return
+
+	|| Child = Blocker.first
+		|| IsReturn = Blocker.IsReturnOrRejoin
+			if (child.unbratype isThing name.name)
+				RefSafeDecr( name, blocker ) // needs to come after any decr!
+				return
+			if ExprNeedsTemping( Child, name )
+				ReturnTempMoveOut(Child, blocker)
+	RefDecr( name, blocker, basis, blocker.asmtype.IsBlocker )
+
+
+function RC_RelInit (|Message| rel)
+	opt norefcounts
+	using rel
+		|| func = rel.WrapWith(@func)
+		func.first = @thg + "JB_Incr2"
+		rel.second.remove
+		rel.func = @prm
+		func.become(compiler.RefIncr2!)
+
+
+function RC_RelConstructor (|Message| rel)
+	// a = b.c   -->   jb_incr2(a, b.c)
+	if RelNeedsRef( rel.first! )
+		ifn  rel.last! IsThing "nil"
+			.RC_RelInit(rel)
+
+
+
+function Message.FuncWrap (|Message| fnc)
+	opt norefcounts
+	.Prev = fnc
+	fnc.Last! <~ self
+
+
+function RefMsg0 (|String| name, |SCFunction| func, |Message|)
+	opt norefcounts
+	rz = NewFunc( name )
+	rz.become(func)
+
+
+function message.Become (|scfunction| func)
+	opt norefcounts
+	// clearing .position loses good positions that we set in the refcounter
+	.first!.name = func.ExportName
+	.second!.obj = func
+	.obj = func.ReturnType
+	if func is Reffer
+		.ASMType = ASMType.kRefCount
+
+
+function Message.NiceParent (|Message|)
+	return .UseNonRefChangers(true)
+
+
+function message.RefTransparent (|bool|)
+	opt norefcounts
+	|| f = .func
+	if f == @bra
+		return true
+	if f == @type
+		return true
+	if f == @arel
+		|| n = .name[]
+		return n == '?' or '!'
+	if f == @brel
+		return .name[] == '?'
+
+
+function Message.Unwrap (|Message!|)
+	opt norefcounts
+	rz = self
+	while rz.RefTransparent
+		|| f = rz.first				#loop
+		rz = f
+
+
+function Message.UseNonRefChangers (|bool| parent=false, |Message|)
+	opt norefcounts
+	real self
+	|| Last = self
+	|| Curr = self
+	
+	while
+		curr = curr.parent
+		if !curr : return last
+
+		|| f = curr.func
+		if f == @type
+			|| D = Curr.Obj
+			if (D isa SCDecl)
+				if !D.IsNormalObject
+					return  (parent)(curr, last)
+		  elseif !curr.reftransparent
+			return  (parent)(curr, Last)
+		
+		Last = Curr // Make sure it's not a (bracket) or obj|typecast|
+
+
+
+function Message.IsSettablePlace (|bool|)
+	opt norefcounts
+	real self
+	|| p = .parent
+	while p == @bra
+		self = p
+		p = p.parent
+	return .IsFirstOfSetRel
+
+
+function Message.IsSetRel (|bool|)
+	opt norefcounts
+	require (self == @Rel)
+	|| s = .second
+		return (s.name == "=")
+
+
+function Message.IsFirstOfSetRel (|bool|)
+	opt norefcounts
+	return .isfirst and .parent.issetrel
+
+
+function Message.IsSetIntoPlace (|message|)
+	opt norefcounts
+	|| p = .NiceParent
+	if p.IsSetRel
+		Return p.first
+
+
+function Message.IsSetIntoVar (|message|)
+	opt norefcounts
+	|| thg = .IsSetIntoPlace
+	if (thg == @thg)
+		return thg
+
+
+function message.IsInDeclInBlock (|message|)
+	opt norefcounts
+	if (self == @rel)
+		|| P = .niceparent
+		if (P == @decl) and (P in @arg)
+			return P
+
+
+function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
+	// This function has good and bad sides to it.
+	// Good: It makes dealing with tempvars very simple. user created or compiler created
+	// Bad: Possible obscure destructor bug, fired before you expect.
+	// Maybe ordering issues with writing to stdout, files, etc.
+	opt norefcounts
+	|| d = name.AsDecl						#expect
+	|| Type = d.Type
+	require Type isnt NoEarlyFree 
+	
+	|| s = name.name
+	|| found = name
+	
+	for c.Flat in arg
+		if c IsThing s
+			found = c
+	
+	// scan up until we hit the arg. return item's position in the arg.
+	|| curr = found
+	while (found != arg)
+		curr = found
+		found = found.Parent
+	
+	return curr.LastUsedFix
+
+
+function SafeDecrMsg (|Message| msg, |Message|)
+	return RefMsg( msg, "JB_SafeDecr", Compiler.RefSafeDecr! )
+
+
+function RC_DeclArg (|scdecl| AR, |scfunction| fn)
+	opt norefcounts
+	|| src = ar.source
+	|| arg = fn.sourcearg!
+	if !src
+		src = arg
+	using src
+	|| dcl = AR.WriteNilDecl
+	arg.First = dcl
+	.DeclInit( fn, dcl, true )
+	dcl.remove
+
+
+function Message.RefDisappears (|bool|)
+	opt norefcounts
+	if .func == @func
+		self = .parent // sigh
+	for (P.up in self)
+		|| f = p.func
+		if (f == @Type)
+			|| D = P.AsDecl
+			if !D
+				debugger, return nil
+			if !D.IsNormalObject
+				return true
+		  elseif p.RefTransparent
+			0 // go up
+		  elseif f == @prm
+			return false
+		  elseif f == @brel
+			return true			// !obj
+		  elseif f == @tmp		// if/while
+			|| T = p.asmtype
+			return T != asmtype.kreturn and asmtype.krejoin 
+		  elseif (F == @arg)
+			return true // right?
+		  elseif (f == @rel)
+			|| comp = P.second!.obj
+			if (comp isa SCOperator)
+				return (comp Is Compare and comp isnt custom)
+			return false
+		  else
+			return false
+
+
+function message.IsStatementExpr (|bool|)
+	opt norefcounts
+	return .ASMType == ASMType.kStatExpr
+
+
+function message.RC_HasTemporary (|int|)
+	if (self == @func) or (.IsStatementExpr)
+		return screfs.RefBasisStruct(self, false)
+
+
+function RC_NeedsOwnBlock (|message| msg, |message| pp, |bool|)
+	opt norefcounts
+	// Test if exists within and/or
+
+	|| HitArg = false
+	for ch.up in msg
+		if  ch == @arg
+			hitarg = true
+		  elseif  ch == @rel
+			|| opp = ch.second
+			if (opp == @opp) and (opp == "or" or "and")
+				return true
+		  elseif  ch istmp "while"
+			if !hitarg
+				return true
+		if ch == pp
+			exit
+
+	
+function RC_HandleDisappearing (|Message| msg, |int| Basis)
+	using msg
+		.RC_HandleDisappearingSub(msg, basis)
+	parser.using.position = -1
+
+
+function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
+	|| ch = msg.UseNonRefChangers
+	if Basis & kBasisDestructable or kBasisTempStruct
+		if msg != @func
+		ifn msg.IsSetIntoPlace or ch.parent.IsReturnOrRejoin
+			scfunction.TempMoveOut(Msg)
+		return 
+	
+	require (Basis == kBasisObj) and (!msg.IsProperty)
+	|| parent = ch.NiceParent
+	require  (Parent != @Arg)  and  !(parent.IsReturnOrRejoin and ch.IsOnlyChild)  and  !ch.IsSetIntoPlace
+	
+	if ch.RefDisappears
+		|| fnc = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
+		msg.Prev = fnc
+		fnc.Last! <~ msg
+		return
+	
+	if (parent == @prm)
+		if (parent.obj == compiler.TernaryFunc)
+			require ch.UseNonRefChangers == parent.first	//	(a,b)(c)-->(c,a,b)
+		if (parent.obj == Compiler.RefFreeIfDead)
+			return nil										// already done!!!
+	
+	|| pp = ch.UpToArg!
+	if RC_NeedsOwnBlock(ch, pp)
+		ch.TempIntoBlock(pp)
+	  else
+		scfunction.TempMoveOut(Msg)
+
+
+
+function SCFunction.CallSuperMem (|SCFunction| fn)
+	opt norefcounts
+	|| root = .sourcearg $
+	|| fnargs = fn.args
+	expect ((fnargs == 1) or .cls.istask) (root, "Unable to auto-call super-class constructor.")
+	
+	using root
+	|| PCon = NewFunc(fn.exportName)
+	|| lst = PCon.last!
+	lst.obj = fn
+	
+	for (a in fnargs) (i)
+		|| msg = lst.msg(@thg, a.name)
+		msg.obj = .args[i]
+
+	if (self is Constructor)
+		PCon.obj = fn.ReturnType
+		|| f = root.first
+			f.next = PCon
+		  else
+			root <~ pcon
+	  else 
+		PCon.obj = typevoid
+		root <~ PCon
+
+
+
+	
+function SCFunction.FillInDestructor // filldestructor
+	opt norefcounts
+	|| s = .SourceArg$
+	|| c = .Cls$
+	|| first = s.FindDestructor
+	using s
+	for d in c.Properties
+		if d.IsRefCountable(true)
+			s.AddBefore( first, d.RefDestructor )
+		  else
+			|| Destr = d.HasStructDestructor
+				|| Addr = d.DeclToAddr(.self)
+				s.AddBefore( first, SCRefs.RefDestructorMsg( Addr, destr ) )
+
+
+function SCFunction.FindCallParents (|message|)
+	opt norefcounts
+	|| s = .SourceArg
+		rz = .CountCallsToParentAlloc( s )
+
+
+function SCFunction.CallParents 
+	opt norefcounts
+	require !.FindCallParents
+	|| c = .cls					#require
+	|| parent = c.realsuper		#require
+	
+	|| t = c.isrole
+	require t != 2
+
+	|| fn = .ConOrDesForCall(c, self is constructor, t)
+		.CallSuperMem( fn )
+
+
+function SCFunction.ConOrDesForCall (|scclass| c, |bool| IsConstructor, |int| Task,  |scfunction|)
+	opt norefcounts
+	|| parent = c.super										#require	
+	|| fn = parent.ConOrDesForCall(IsConstructor, task)
+		return fn
+
+	if self is Constructor
+		expect (.cls == TypeObject) or (.cls!.super == TypeObject) (self, "Need call to superclass's constructor, but can't auto-create one.")
+
+
+function SCClass.ConOrDesForCall (|bool| IsConstructor, |int| Task, |scfunction|)
+	if !IsConstructor
+		return .FirstDestructor
+	if task <= 1
+		return .ConstructorFunc!.ParamlessConstructor
+	return .ConstructorFunc
+
+
+function message.MakeAfter (|message|)
+	opt norefcounts
+	|| f = .first
+		return f
+	return .msg(@sheb, "")
+
+
+function SCFunction.BuildConstructorDestructor
+	opt norefcounts
+	require self
+	// we need to log stuff here... if in perry?
+	|| TheCall = .FindCallParents
+	|| IsConstructor = self is Constructor
+	|| root = .SourceArg$
+	.CheckConstructorAndDestructor( root, IsConstructor )
+	if IsConstructor
+		thecall ?= root.MakeAfter
+		.FillInMissingConstructorDefaults( TheCall )
+	require StdErr.OK and !IsConstructor
+	
+	|| c = .cls$
+	if !c.HasStuffToHandleInDestructor
+		if !Root.HasAny
+			c.DestructorFunc = nil
+	  elseif !c.IsWrapper
+		.FillInDestructor
+
+
+function SCFunction.AnalyseRefs (|[message]| list)
+	|| root				= .SourceArg
+	|| IsConstructor	= self is Constructor
+	for (msg.flat in root)
+		|| it = msg.RC_HasTemporary							// need to always do this?
+			if .dorefs or (it != screfs.kBasisObj)
+				SCRefs.RC_HandleDisappearing( msg, it )
+	
+	// avoid reading same thing that we alter.
+	for (msg.ScanArg in root)
+		list <~ msg
+	// can we remove this ^^^ at some point?
+		
+	if .dorefs
+		for (ar in .args)
+			if (Ar is altered) and (ar.IsNormalObject)
+				SCRefs.RC_DeclArg(ar, self)
+
+	for (msg.backwards in list)
+		parser.using.position = -1
+		|| f = msg.func
+		if (f == @Rel)
+			if (IsConstructor and SettingSelfProperty( msg ))
+				SCRefs.RC_RelConstructor( msg )
+			  elseif (.dorefs or SettingMemory(msg))
+				SCRefs.RC_Rel( msg )
+			
+		  elseif (f == @Dot)
+			SCRefs.RC_IgnoreReturn( self, msg )
+			
+		  elseif (f == @Func)
+			if !.DoRefs
+				SCRefs.RC_CheckNoObjPms(msg)
+			SCRefs.RC_CheckFuncAllocOK( self, msg )
+			SCRefs.RC_IgnoreReturn( self, msg )				// func(a,b,c)
+			
+		  elseif (msg.IsStatementExpr)
+			SCRefs.RC_IgnoreReturn( self, msg )
+			
+		  elseif (f == @Decl)
+			SCRefs.DeclInit( self, msg, false )				// || a = b, incr(b)
+
+
+
+function RC_CheckFuncAllocOK (|SCFunction| self, |Message| dot)
+	// calling a constructor is only allowed... within a constructor.
+	// calling a destructor is only allowed within a destructor.
+	opt norefcounts
+	ifn dot in @bra and dot.parent in @bra // allow
+		|| fn = dot.MsgFunc
+			if (fn is Destructor) and self isnt Destructor
+				error (dot, "Can only call destructors from within a destructor.")
+}
+
+
+
+function scdecl.DeclToAddr (|SCDecl| P0, |Message|)
+	opt norefcounts
+	rz = @brel + "&"
+	rz <~ .DeclToDot(p0)
+	rz.obj = .GetAddress
+
+
+function scdecl.DeclToDot (|SCDecl| P0, |Message|)
+	opt norefcounts
+	rz = @dot + .Name
+	|| thg = rz.msg(@thg, "self")
+	thg.obj = p0
+	rz <~ @emb
+	rz.obj = self
+	
+
+function scdecl.RefDestructor (|message|)
+	opt norefcounts
+	|| m = .DeclToDot(scfunction.currfunc!.self)
+	if .IsCArray
+		return screfs.DecrMulti(self, m, false)
+	return SCRefs.RefClearMsg( m )
+

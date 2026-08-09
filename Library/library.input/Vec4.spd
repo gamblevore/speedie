@@ -1,0 +1,259 @@
+
+datatype vec4 
+	inline syntaxcast (|bool|)
+		cpp_part Bool
+		return self != vec4()	
+	
+	syntax Equals (|vec4| v, |bool|)
+		return ((.x == v.x) & (.y == v.y)) & ((.z == v.z) & (.w == v.w))
+
+	syntax Compare (|float| Other, |float|)
+		// this function is sooo nice. avoids doing a sqrt on both sides!
+		|| LSq = .lengthsq
+		|| Osq = other*other
+		return lsq - Osq
+
+	syntax Compare (|vec4| Other, |float|)
+		cpp_part CompareVec4
+		|| LSq = .lengthsq
+		|| Osq = other.Lengthsq
+		return lsq - Osq
+
+	operator mod (|vec4| upon, |vec4|)
+		asm vmod(dest, p1, p2)
+		cpp_wrapper JB_vec4_Mod
+
+	function Fract (|vec4|)
+		trin (0, FRC)
+		cpp_wrapper
+
+	function Floor (|vec4|)
+		trin (1, FLR)
+		cpp_wrapper
+
+	function Round (|vec4|)
+		trin (2, RND)
+		cpp_wrapper
+
+	function Length (|float|)
+		trin (3, LNG)
+		cpp_wrapper
+
+	function Abs (|vec4|)
+		trin (4, ABS)
+		cpp_wrapper
+
+	operator Pow (|vec4| other, |vec4|)
+		trin (5, POW)
+		cpp_wrapper JB_vec4_Pow
+
+	function Sqrt (|vec4|)
+		trin (6, SQT)
+		cpp_wrapper
+
+	function Exp (|vec4|)
+		trin (7, EXP)
+		description "Computes e to the power of (x)"
+		cpp_wrapper
+
+	function Log (|vec4|)
+		trin (8, LOG)
+		cpp_wrapper
+
+	function Exp2 (|vec4|)
+		trin (9, XP2)
+		cpp_wrapper
+
+	function Log2 (|vec4|)
+		trin (10, LG2)
+		cpp_wrapper
+
+	function Unsin (|vec4|)
+		trin (12, NIS) // unsin
+		cpp_wrapper
+
+	function Uncos (|vec4|)
+		trin (13, SOC) // uncos
+		cpp_wrapper
+
+	function UnTan (|vec4| y, |vec4|)
+		trin (14, NAT) // untan
+		cpp_wrapper
+
+	function Sin (|vec4|)
+		trin (15, SIN)
+		cpp_wrapper
+
+	function Cos (|vec4|)
+		trin (16, COS)
+		cpp_wrapper
+
+	function Tan (|vec4|)
+		trin (17, TAN)
+		cpp_wrapper
+	
+	operator Sign (|vec4| from, |vec4|)
+		trin (18, SGN)
+		cpp_wrapper JB_vec4_CopySign
+	
+	+'f\75nction' Clamp (|vec4| Low, |vec4| High, |vec4|)
+		trin (19, CLM)	// clamp	
+		cpp_wrapper JB_vec4_Clamp
+
+	function Mix (|vec4| A, |vec4| B, |vec4|)
+		trin (20, MIX)	// mix
+		cpp_wrapper
+
+	function SmoothStep (|vec4| low=0, |vec4| high=1, |vec4|)
+		trin (21, SMS)	// smoothstep
+		cpp_wrapper
+
+	operator • (|vec4| other, |float|)
+		trin (22, DOT)	// dot
+		cpp_wrapper JB_vec4_Dot
+
+	operator Cross (|vec4| other, |vec4|) // move this to vec3?
+		trin (23, CRS)	// cross
+		cpp_wrapper JB_vec4_Cross
+
+	function Reflect (|vec4| plane, |vec4|)
+		trin (24, RFL)	// cross
+		cpp_wrapper JB_vec4_Reflect
+
+	function Sum (|int| Which=0, |float|)
+		trin (25, SUM)
+		cpp_wrapper
+	
+	operator max (|vec4| M, |vec4|)
+		asm vmax(dest, p1, p2)
+		cpp_wrapper JB_vec4_Max
+	
+	operator min (|vec4| M, |vec4|)
+		asm vmin(dest, p1, p2)
+		cpp_wrapper JB_vec4_Min
+
+	function LengthSq (|float|)
+		return self • self
+
+	function Ceil (|vec4|)
+		return (self + 0.5).floor
+
+	function Clamp (|float| max=1.0, |vec4|)
+		cpp_part MiniClamp
+		return .clamp(0, max)
+
+	function Clamp (|float| A, |float| B, |vec4|)
+		cpp_wrapper JB_vec4_ClampFloat	
+		
+	operator ± (|float| i, |vec4|)
+		cpp_part Shrink
+		return (.x+i, .y+i, .z-i, .w-i)
+
+	function IsPositive (|bool|)
+		return (.x2 > .x) & (.y2 > .y)
+	
+	function IsNegative (|bool|)
+		return (.x2 < .x) ||| (.y2 < .y)
+
+	function Size (|vec2|)
+		return (.x2 - .x, .y2 - .y)
+	
+	function Up (|float| X, |vec4|)
+		return self + (0,x,0,x)
+
+	function Right (|float| X, |vec4|)
+		return self + (x,0,x,0)
+
+	operator absmax (|vec4| M, |vec4|)
+		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
+
+	function CosR (|vec4|)
+		return (self * math.iTau).cos
+
+	function iVec4 (|ivec4|)
+		return (.x|int|, .y|int|, .z|int|, .w|int|)	
+
+	inline Lum (|float|)
+		return self|vec3|.lum
+
+	inline  Width (|float|)
+		return .x2 - .x1			// not quite true but the GUI uses it this way :(
+
+	inline  Height (|float|)
+		return .y2 - .y1			// same
+
+	inline  Area (|float|)
+		return .width*.Height
+
+	inline  Aspect (|float|)
+		return .width / .height
+		
+	function Overlap (|vec4| R, |vec4|)
+		disabled "Use .clip"
+	
+	function Clip (|vec4| R, |vec4|)
+		r.x  = r.x  max .x
+		r.y  = r.y  max .y
+		r.x2 = r.x2 min .x2
+		r.y2 = r.y2 min .y2
+		return r
+
+
+	function Sign (|float| sigma=0.0, |vec4|)
+		.x = .x.sign(sigma)
+		.y = .y.sign(sigma)
+		.z = .z.sign(sigma)
+		.w = .w.sign(sigma)
+		return self
+	
+	
+	function MakeSane (|vec4|)
+		.x = .x.MakeSane
+		.y = .y.MakeSane
+		.z = .z.MakeSane
+		.w = .w.MakeSane
+		return self
+
+
+	function Exists (|bool|)
+		return .width > 0 and .Height > 0
+
+	
+	function Posify (|vec4|)
+		description "Make this vector have positive area. (4, 4, 1, 1) --> (1, 1, 4, 4)"
+		return (.x1 min .x2, .y1 min .y2, .x1 max .x2, .y1 max .y2)
+
+		
+	render
+		opt norefcounts
+		fs <~ "("
+		for i in 4
+			if i 
+				fs <~ ", "
+			fs <~ self[i]
+		fs <~ ")"
+
+	
+	module
+		inline  New (|vec4|)
+			cpp_part New0
+			return nil
+		inline  New (|vec3| a, |float| b, |vec4|)
+			cpp_part New31
+			numeric
+			return (a, b)
+		inline  New (|float| f, |vec4|)
+			cpp_part New1
+			numeric
+			return (f,f,f,f)
+		inline  New (|float| gray, |float| a, |vec4|)
+			cpp_part Gray
+			numeric
+			return (gray,gray,gray,a)
+		inline  New (|float| a, |float| b, |float| c, |float| d, |vec4|)
+			cpp_part New4
+			numeric
+			return (a,b,c,d)
+		function Load (|&byte| B, |vec4|)
+			cpp_wrapper JB_vec4_Load
+

@@ -1,0 +1,77 @@
+
+
+// Demonstrates loading a dynamic library, and using it, from within speedie
+// Most features work, however this is still a new feature and will change.
+// Variadic parameters won't be added soon.
+
+
+dylib libxml2 `libxml2`
+	cpp_func xmlReadFile			(|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument| )
+	cpp_func xmlDocGetRootElement	(|&xmlDocument| doc, |&xmlNode|)
+	cpp_func xmlFreeDoc				(|&xmlDocument| doc)
+	cpp_func xmlCleanupParser
+
+|| libxml = libxml2.new!
+
+
+datatype xmlNodeType (Byte)
+	constants
+		ELEMENT = 1
+		ATTRIBUTE
+		TEXT
+		CDATA_SECTION
+		ENTITY_REF
+		ENTITY
+		PI
+		COMMENT
+
+
+struct xmlDocument
+
+
+struct xmlNode
+	|&nil|			_private
+	|xmlNodeType|	Type		/* type number, must be second ! */
+	|cstring|		Name		/* the name of the node, or the entity */
+	|&xmlnode|		Children	/* parent->childs link */
+	|&xmlnode|		Last
+	|&xmlnode|		Parent
+	|&xmlnode|		Next
+	|&xmlnode|		Prev
+	|&xmldocument|	Doc
+
+	syntax is (|xmlNodeType| t, |bool|)
+		return .type == t
+
+
+function print_element_names (|&xmlNode| cur_node)
+	while (cur_node) 
+		if (cur_node is ELEMENT)
+			"Element name: ${cur_node.name}"
+		print_element_names(cur_node.children)
+		cur_node = cur_node.next
+
+
+
+main  (|file.existing| xml_file)
+	|| doc = libxml.xmlReadFile(xml_file.ZeroTerm, nil, 0)			#expect "Could not parse file $xml_file"
+	|| root_element = libxml.xmlDocGetRootElement(doc)
+
+	print_element_names(root_element)
+
+	libxml.xmlFreeDoc(doc)
+	libxml.xmlCleanupParser()
+
+
+
+// One feature that won't be added soon, is variadic parameters. This rules out
+// libcurl, sadly. Unless they add a curl_easy_setopt_generic() feature
+// that takes a void* instead of a variadic param. The difficulty is that
+// I want ALL of speedie to work the same via C++ or Cake. But making variadic
+// params work in Cake is not easy, because I have to make it work on:
+// (Win32 + Linux + Mac) * (ARM64 + x86), which is up to 6 versions of variadic
+// ASM code I have to write. And in the past, such things have taken up to 2
+// weeks per ASM function.
+
+// I'll need help on those, if anyone wants to add variadic ASM for Cake's VM.
+

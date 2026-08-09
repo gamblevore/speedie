@@ -1,0 +1,216 @@
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+class SCParamArray
+	linkage
+		cpp_part		PA
+	contains message
+
+	|Message--?[8]|		Items
+	|Message--?|		Exp
+	|SCClass--?|		Cls
+	|string|			LookupName
+	|int16|				Size
+	|int16|				ErrCount
+	|int8|				FailedAt
+	|bool|				HasSide
+	|bool|				HasProperParams
+	|bool|				IsDot
+	|bool|				IsAddress
+	|bool|				IsNotModule
+	|bool|				IsSelf
+	|bool|				IsSuper
+	|bool|				Found
+	|bool|				AllowSelfToConstructor
+	
+
+	constructor (|Message?| exp, |string| Name)
+		opt norefcounts
+		.LookupName = name.LowerCase
+		.Exp = exp
+		.IsDot = (exp == @dot)
+		.IsAddress = (exp and exp.niceparent Isbrel "&")
+		.ErrCount = stderr.errorcount
+
+
+	function CheckDot (|scobject| D, |scobject|)
+		if d isa SCDecl
+			|| d2 = d|scdecl|
+			d2 = d2
+			// how to tell that this shouldn't happen? the current function is not a class.
+			// so... where did we find this thign?
+		return d
+	
+	function AddSub (|| m)
+		require .size < 8
+		|| i = .size++
+		.items[i] = m
+	
+	syntax access (|int| i, ||)
+		if (i < .size)
+			return .items[i]
+			
+	render
+		for i in .size|int|
+			fs <~ ','
+			fs <~ ' '
+			start
+			|| obj = .items[i] 
+			obj.render(fs)
+			|| ty = typeofexpr(obj, nil)
+				ty.render(fs)
+	
+	function MacroCopyArgs (|[message]|)
+		opt norefcounts
+		|| n2 = .size-1
+		for (s in self) (i)
+			if (i == n2) and .hasside
+				0 // do nothing
+			  else
+				rz <~ s
+	
+	function IsModule (|bool|)
+		return !.IsNotModule
+		
+	function MadeError (|bool|)
+		return StdErr.ErrorCount > .errcount
+	
+	function IsSelfCon (|bool|)
+		return (.isself or .issuper) and (scfunction.currfunc is constructor)
+	
+	function IgnoreSelfContain (|int|)
+	// need to allow addressofcasting on self struct
+		opt norefcounts
+		|| cls = .cls
+			if (.IsDot and .IsNotModule)
+				if cls.isstruct
+					rz |= kTypeCastIgnoreAddressOf
+				if cls is IgnoreContainedSelf
+					rz |= kTypeCastIgnoreContained
+
+	function RenderKind (|string|)
+		if (!.IsNotModule)
+			return "module"
+		|| c = .cls
+			return c.AutoCompleteKind
+		return "class"
+	
+	function ModuleName (|string|)
+		|| p = self[0] 
+		if !.IsNotModule
+			p = .exp.first
+		
+		if p
+			rz = p.RenderType.nicerclassname
+
+	function String.ArgsMatchError (|bool| TypeCast, |string|)
+		if !TypeCast
+			return self
+	// Useful hint
+		return self + " (But none matched exactly. All needed a type-cast.)"
+	
+	
+	function MultipleMatchingFunctions (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
+		if !.madeerror
+			error   (.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
+			error   (f.Source, "Candidate 1")
+			error   (R.Source, "Candidate 2")
+	
+	
+	function string.NicerClassName (|string|)
+		if self ~= "StringZeroTerminated"
+			return "string"
+		return self
+		
+
+	function PreReadTypes (|SCNode| Name_Space, |Message?| P, |message?| side, |bool|)
+		if p and !.exp
+			.exp = p
+		|| item = p.first
+
+		while item
+			item = .AddTestedParam(item, name_space)
+
+		.side = side
+		return true
+
+
+	function SCNode.IsModuleFunc (|bool|)
+		opt norefcounts
+		if (self isa scarg)
+			return !.IsClassArg
+		return (self isa SCModule)
+
+
+	function DetectDotSuper (|SCNode| curr, |SCNode| arg_space, |SCNode|)
+		opt norefcounts
+		.IsNotModule = !Curr.IsModuleFunc
+		if .IsDot
+			|| Exp0 = .exp.first
+				.isself = (exp0 ~= "self")
+				if .IsNotModule
+					|| ty = typeofexpr(exp0, arg_space)
+						.cls = ty.type
+					.addsub(exp0)
+					if (exp0 IsThing "super")
+						.IsSuper = true
+						exp0.name = "self"
+						// setting isself would change property setters.
+						return Curr.parent
+		return Curr
+
+
+	syntax cast (|bool|)
+		return (self != nil) and .HasProperParams
+
+
+	function AddParam (|message| item)
+		.addsub(item)
+		.HasProperParams = true
+
+
+	function AddTestedParam (|message| item, |SCNode| name_space, |message|)
+		opt norefcounts
+		|| nxt = item.next
+		|| pr = item.parent
+		expect TypeOfExpr( item, name_space ) ( item, "Can’t find type." )
+
+		if item in pr // in case "..." adds a param
+			.AddParam(Item)
+			return item.next
+
+		/// temped out! ouch!
+		if nxt
+			.AddParam(nxt.prev)
+		  else
+			.addparam(pr.last)
+		return nxt
+
+
+	function MacroSize (|int|)
+		return .size - .HasSide
+
+
+	function Side (assigns:|Message|)
+		if Value
+			.addsub(Value)
+			.HasSide = true
+	
+	
+	function message.SecondIs (|syntax| fn, |string| name, |bool|)
+		opt norefcounts
+		|| s = .second
+			return s == fn and name
+		
+		
+
+	
+	iterator
+		|int| n = .size
+		|int| i = 0
+		while i < n
+			yield .items[i] (i)
+			++i

@@ -1,0 +1,29 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+extend_module App
+	// ._conf is auto-filled, but only if you have a config file in your project.
+	// the config file should be named "app.conf" and be within the main source input folder
+	// For example see: /usr/local/speedie/Perry.scproj/Perry.input/app.conf
+	
+	function Conf (|string| name, |string|)
+		opt norefcounts
+		return ._conf[name].value
+	
+	function Prefs (|config|)
+		opt norefcounts
+		|config--| P = ._prefs
+		if !P
+			|| Path = .conf("prefs")
+			if !path
+				path = .FileName.lowercase + ".box.pref"
+			if path[] != '/'
+				path = file.Prefs(path)
+			P = config.Create(path)
+			._Prefs = P
+		return P
+
+

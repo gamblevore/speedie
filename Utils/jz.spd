@@ -1,0 +1,376 @@
+#!/usr/local/bin/spd
+
+
+// todo: Add archiving of multiple files. Makes sense
+
+
+app.Usage = "Usage: jz File1 [File2...]
+Convert files between jbin, box, xml, json formats. Additionally can compress or decompress.
+
+	-box -b			Convert to jeebox
+	-bin -n			Convert to jbin
+	-c				Compress (c=0 to c=6)
+	-d				Decompress (even if not a .mz file)
+	-s				Replace file in-place
+	-json			Source is json
+	-p				Print file to stdout (not to disk)
+	-r				Just report types, otherwise do nothing
+	-o=name			Sets the output filename
+
+examples:
+	jz -box A.xml						// xml to jeebox
+	jz -b   A.xml						// same
+	jz -c   A.xml						// compress A.xml into A.xml.mz
+	jz      A.txt.mz					// decompress A.txt.mz to A.txt
+	jz -bin A.box						// jeebox to jbin
+".TabsToSpaces
+
+	
+main
+	if !app.args
+		print app.usage
+		return 0
+
+	conv.Dest = app.GetActions$
+	expect (conv.Dest.Format.CountBits <= 1) ("Error: Multiple formats specified.")
+	
+	|| GotAll = false
+	for r in app.args
+		if r == "**"
+			expect (!GotAll) ("Can't use '**' twice.")
+			app.useall(app.cwd.file)
+			GotAll = true
+		  else
+			app.UseOne(r.file)
+	
+	if (StdErr.ok) and (!conv.done) and (conv.dest isnt report)
+		"Nothing to do. All files already in destination format."
+
+
+
+datatype Type (int)
+	flags
+		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=[Box, Jbin, Report], StdOut, SelfReplace
+	
+	syntax is (|Type| test, |bool|)
+		return self & test
+
+	function Format (|Type|)
+		return self & (Box ||| jbin ||| xml ||| json)
+	
+	render
+		if self is Compressed
+			fs <~ "compressed "
+		if self is jbin
+			fs <~ "jbin"
+		  elseif self is box
+			fs <~ "jeebox"
+		  elseif self is json
+			fs <~ "json"
+		  elseif self is xml
+			fs <~ "xml"
+		  else // speedie can't put this on a single line. C++ compile-error!
+			fs <~ "plain"
+
+
+function app.UseOne (|file| f)
+	conv.in = f
+	|| op = conv.OutPath
+	conv.out = op
+	conv.RealOut = op
+	if conv.Dest is selfreplace
+		conv.realout = op.AddExt("jztmp").file
+	if f.IsDir
+		if app.args == 1
+			"${conv.in} is a folder"
+	  else
+		conv.Process(f)
+	conv.End
+
+
+function app.UseAll (|file| start)
+	for c.files in start
+		if !c.isdir
+			.UseOne(c)
+		  elseif c.IsSymLink
+			printline "Can't recursively enter link: " + c
+		  elseif c.visible
+			.UseAll(c) 
+
+
+function App.Singlefile (|string| sw)
+	check (app.args == 1) ("Can't write multiple files with switch: " + sw)
+
+
+function App.GetActions (|Type|)
+	for s in app.Switches
+		|| name = s.ArgName
+		|| v = s.ArgValue
+		if name ~= "r"
+			rz |= type.report
+		  elseif name ~= "b" or "box" or "jeebox"
+			rz |= type.box
+		  elseif name ~= "n" or "bin" or "jbin"
+			rz |= type.jbin
+			if v=="2"
+				rz |= type.precomp
+				v = "true"
+		  elseif name ~= "s"
+			rz |= type.selfreplace
+		  elseif name ~= "p"
+			rz |= type.stdout
+			.SingleFile(name)
+		  elseif name ~= "d"
+			conv.Detected |= type.compressed
+		  elseif name ~= "c"
+			rz |= type.compressed
+			if v!="true"
+				conv.DefaultStrength = v.int|int| max MZLab.Strong
+				v="true"
+		  elseif name ~= "json"
+			conv.detected |= type.json
+		  elseif name ~= "o"
+			Conv.destpath = v
+			.SingleFile(name)
+			check (v) "Add a value, eg: --f=value"
+			v="true"
+		  else
+			error "Unknown switch $s"
+		check (v=="true") ("This switch '$name' does not allow a value of '$v'.")
+
+	rz |= type.plain
+	check ((rz & type.actions).CountBits <= 1) ("Too many actions.")
+
+
+
+module Conv
+	|string|		Data
+	|file|			In
+	|file|			RealOut
+	|file|			Out
+	|date|			Start
+	|type|			Dest
+	|type|			Detected
+	|float|			Size
+	|message|		AST
+	|int|			Done
+	|string|		DestPath
+	||				DefaultStrength = mzlab.strong
+	||				Speed = faststring()
+
+	function End
+		|| s = .speed.GetResult
+			printline s
+		.in = nil
+		|| o = .realout
+			o.close
+		.realout = nil
+		.out = nil // same
+		.data = ""
+		.start = nil
+		.ast = nil
+		.Detected = nil
+		CompressionStats.all.Clear
+
+
+	function Time (|string| Name, |bool| compress=false)
+		require .dest isnt stdout // would ruin output
+		
+		conv.speed <~ (' ', 4)
+		if !compress
+			if .data
+				.size = .data.Length|float|
+			name.RenderSpeed( conv.speed, .size|int|, .Start.ago)
+		  else
+			CompressionStats.all.report(conv.speed)
+			CompressionStats.all.Clear
+		conv.speed <~ '\n'
+
+		
+	function CompressOnly (|bool| Decomp)
+		printline .out!|string|
+		|| d = .RealOut!.outputstream
+		|| src = .in!.inputstream
+		require src!=nil and d != nil
+		.start = date.now 
+		if Decomp
+			.size = d.File.size|float|
+			src.Decompress(d)
+			.Time("Decompress", true)
+		  else 
+			.size = .in!.size|float|
+			src.CompressInto(d, .DefaultStrength)
+			.time("Compress", true)
+		if .dest is selfreplace
+			.RealOut!.MoveTo(.out!)
+	
+
+	function Read (|bool|)
+		|| OrigSize = 0
+		|| CmpFormat = .FormatInfo(OrigSize)
+		
+		ifn .Dest&type.Actions
+			if (CmpFormat.length > 0) != (.dest is compressed)
+				.done++
+				.CompressOnly(CmpFormat!="")
+			return 0
+		.done++
+		
+		if (.Dest is report) and CmpFormat
+			"$.in! is: ${OrigSize.strsize} compressed to ${.in!.size.strsize} ($CmpFormat)"
+			return 0
+				
+		.start = date.now
+		.data = .in!.ReadAll(int.max, false)
+		if .data != string.error
+			.Detected |= type.ReadOK
+		if (.Dest is report) and (.data == "")
+			if StdErr.OK
+				"$.in is empty"
+			return 0
+		.Time("Read ")
+		
+		if CmpFormat
+			.start = date.now
+			.data = .data.Decompress(int.max)
+			.time("Decompress", true)
+		
+		if .Dest is report
+			"$.in is: ${.Detected.render}"
+			return 0
+		return true
+
+	
+	function Detect (|bool|)
+		require .detected
+
+		.start = date.now
+		.AST = .data.Parse
+		if .AST
+			.time("Parse")
+		  elseif (.dest is box or jbin) or .data.IsJbin
+			|| err = StdErr.Errors.Last
+				err.name += "\nUnable to parse input file for conversion to jeebox"
+		  else
+			stderr.pop				// otherwise no.
+		.done++
+		
+		if !.AST
+			.detected |= type.plain
+		  elseif .data.IsJbin
+			.detected |= type.jbin
+		  elseif .in isa "json"
+			.detected |= type.json
+			if .dest isnt report
+				.start = date.now
+				.AST.ConvertJSONToJB
+				.time("Convert JSON")
+		  elseif .AST.Find(@xml)
+			.detected |= type.xml
+			if .dest isnt report
+				.start = date.now
+				require .AST.XMLToJeebox
+				.time("Convert XML")
+		  else
+			.detected |= type.box
+
+		return StdErr.ok
+
+
+	function ConvertDataFormat (|faststring| fs)
+		if .AST
+			.Start = date.now
+			if .dest is jbin
+				.data = .AST.renderjbin(fs)
+			  else
+				.data = .AST.Render(fs)
+			.time("Render")
+
+		
+	function Transform
+		|| FmtSame  = .Detected.format == .Dest.format
+		|| PathSame = .in.path == .out.path
+		if (FmtSame and PathSame)
+			"Nothing to do for: $.out"
+			return
+		
+		|| fs = .realout!.Outputstream					#require
+		if .dest isnt compressed 
+			.ConvertDataFormat(fs)
+		  else
+			.start = date.now
+			.ConvertDataFormat(nil)
+			.data.stream.Compressinto(fs, .DefaultStrength)
+			.time("Compress")
+		
+		fs = nil
+		
+		if .dest is selfreplace
+			.RealOut!.moveto(.out!)
+		
+		if .dest isnt stdout
+			printline .out.path
+
+
+	function Process (|file| f)
+		f.MustExist$
+		.Read$
+		.Detect$
+		.Transform
+
+
+	function Ext (|string|)
+		if .dest is box
+			return "box"
+		if .dest is jbin
+			return "jbin"
+	
+	
+	function OutPath (|file|)
+		if .dest is stdout
+			return app.StdOut
+		if .DestPath
+			return .destpath.file
+		if .dest is SelfReplace
+			return .in!
+		|| str = .in!.path
+		if str isa "mz"
+			str = str.TrimExt
+		
+		|| x = .ext
+			if str isa "box" or "jbin" or "xml"			
+				str = str.SetExt(x)
+			  else
+				str = str.AddExt(x) 
+		if .dest is compressed
+			str = str.AddExt("mz")
+		  elseif ((.in isa "mz") and str.FileExists) or (str == .in)
+			str += ".back"
+		return str.file
+	
+	
+	function FormatInfo (|$int| Size, |string|)
+		|| str = .in!.Section(0, 64) // just read 64 bytes? why this helper?
+			if str == string.error
+				return str
+		
+		if str.IsCompressed
+			|| addr = str.addr|&uint|
+			size = addr[1]
+			check (size < 16MB) (.in, "Corrupt mz. Too much data.")
+			.Detected |= type.compressed
+			return "µz"
+
+		if str.IsJbin
+			.Detected |= type.jbin
+
+
+function file.Section (|int| a, |int| b, |string|)
+	cpp_part AccessPeek
+	|| WasClosed = .descriptor < 0
+	if .open(File.readmode)
+		.offset = a
+		rz = .read(b-a)
+		if WasClosed
+			.close
+

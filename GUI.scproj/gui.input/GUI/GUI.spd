@@ -1,0 +1,1458 @@
+
+
+module GUI
+	linkage
+		cpp_part App
+	|image|						Screen = image("read")
+	|error|						ToolTip = error()
+	|date|						OpenedTime
+	|GUIPasteEvent|				AppDocumentOpen
+	|string|					LastSearch
+	|uint|						EventCount
+
+	visible false
+	|SDL_Event|					Event
+	|[string]|					PendingAlerts
+	|array?|					DrawDrag = nil
+	|&SDL_Window|				ScreenWindow
+	|&SDL_Renderer|				Renderer
+	|&SDL_Texture|				Raw
+	|ivec2|						NewSize
+	|ivec2|						CurrMouseXY
+	|ivec2|						TryResizeLater
+
+	|date|						DrawFinish
+	|date|						FrameStart = 1
+	|date|						FrameLastDelay = 1
+	|byte|						DrawState
+	|uint16|					DrawFrameLength
+
+	|date|						BlurBackgroundStart
+	|float|						Scale
+	|bool|						MouseMoveInited
+	|bool|						StartedProperly
+	|bool|						BlockTextInput
+	|date|						ForeGroundTime
+	|bool|						FlashSelector
+	|GUIActivity|				QuitReason
+	|GUIActivity|				DuringAction
+	|date|						FastToolTipDate
+	|date|						ChangeSelFlash
+	|bool|						NeedMouseMove
+	|bool|						ControlResizedSafely
+	|bool|						AControlWasResized
+	|bool|						TextInputEnabled
+	|bool|						TextInputEnabledAtStart
+	|byte|						TouchCount=3		// draw the first few frames always
+													// helps with startup events! at least on osx
+	|byte|						SingleFrameDepth
+	|byte|						TouchFingersDown
+	|MouseDragging|				CanDrag
+	|byte|						ResizedCounter		// for resize bug fix
+	
+	visible true
+	
+	cpp_func SDL_Init				(|uint| c)
+	cpp_func SDL_Quit				()
+
+	cpp_func SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
+	cpp_func SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
+	cpp_func SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
+	cpp_func SDL_RaiseWindow			(|&SDL_Window| win) 
+	cpp_func SDL_GetWindowFlags		(|&SDL_Window| win, |uint64|)
+///
+
+	cpp_func SDL_CaptureMouse		(|bool| state, |int|) 
+	cpp_func SDL_GetMouseState		(|$int| x, |$int| y, |mousebutton|) 
+	cpp_func SDL_SetRelativeMouseMode (|bool| Relative)
+	cpp_func SDL_WarpMouseInWindow   (|&sdl_window| window, |int| x, |int| y)
+
+	cpp_func SDL_CreateRenderer		(|&SDL_Window| window, |int| index, |Uint| flags, |?&SDL_renderer|)
+
+	cpp_func SDL_GetRendererOutputSize (|&SDL_Renderer| renderer, |&int| w, |&int| H, |int|)
+	cpp_func SDL_CreateTexture		(|&SDL_Renderer| renderer, |Uint| format, |int| access, |int| w, |int| h, |&SDL_Texture|)
+	cpp_func SDL_GL_GetDrawableSize	(|&SDL_Window| window, |&int| w, |&int| h)
+	cpp_func SDL_RenderCopy			(|&SDL_Renderer| renderer,  |&SDL_Texture| texture,  |?&SDL_Rect| srcrect, |&SDL_Rect| dstrect)
+	cpp_func SDL_RenderPresent		(|&SDL_Renderer| renderer)
+	cpp_func SDL_EventState			(|int| event, |int| enable, |byte|)
+	cpp_func SDL_SetWindowPosition	(|&SDL_Window| w,  |int| x, |int| y)
+	cpp_func SDL_GetDisplayBounds	(|int| displayIndex, |&SDL_Rect| rect, |int|)
+	cpp_func SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
+	cpp_func SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
+	cpp_func SDL_MaximizeWindow		(|&SDL_Window| window)
+	cpp_func SDL_SetWindowFullscreen	(|&SDL_Window| window, |int| Mode=0x1001, |int|)
+	cpp_func SDL_RestoreWindow		(|&SDL_Window| window)
+	cpp_func SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
+	cpp_func SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
+	cpp_func SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
+	cpp_func SDL_StartTextInput		()
+	cpp_func SDL_StopTextInput		()
+	cpp_func SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
+	cpp_func JB_SDL_RemoveWindowBorder (|&nil| window)
+	cpp_func JB_SDL_SetModified		(|&nil| window, |bool| b)
+	target osx
+		cpp_func JB_SDL_FullScreenToggle	(|&nil| w)
+	cpp_func JB_SDL_FullScreen	(|&nil| w, |bool| On)
+	cpp_func SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
+
+	libinternal SDL_FullScreen (|&nil| w, |int| Mode=1)
+		target osx
+			|| full = .isfullscreen
+			if (mode == 0) or (!full and mode>0) or (full and mode<0)
+				.JB_SDL_FullScreenToggle(w)
+		  else
+			.JB_SDL_FullScreen(W, Mode>0)
+		
+	function DocumentOpened  (|bool|Clear=true, |String|)
+		cpp_Wrapper JB_App__DocumentOpened
+		
+
+	libinternal InitDelegates
+		cpp_Wrapper JB_App__InitStuff
+
+
+	function ScreenSize (|ivec4|)
+		cpp_Part GetScreen
+		return (.Screenraw.vec4 / .scale).iVec4
+
+	libinternal NativeWindow (|&nil|)
+		|SDL_SysWMinfo| data
+		|| s = .ScreenWindow
+			s.SDL_GetWindowWMInfo(data)
+			return data.window|&nil|
+
+	function Alert (|string| msg, |string| title="")
+		cpp_part MsgBox
+		visible
+		SDL_ShowSimpleMessageBox(0, Title.ZeroTerm, msg.ZeroTerm, nil)
+
+	
+	libinternal SelChanged
+		.FlashSelector = true
+		.ChangeSelFlash = 1
+
+
+	libinternal ScreenRaw (|ivec4|)
+		|| P = .ScreenPosRaw
+		return (p, p + .SizeRaw)
+
+
+	libinternal SizeRaw (|ivec2|)
+		|ivec2[1]| place
+		|| s = .ScreenWindow
+			|| p0 = (&place[0])|&int|
+			.SDL_GetWindowSize(s,  p0,  p0+1)
+			return place[0]
+
+
+	libinternal SizeRaw (assigns:|ivec2|)
+		|| p = .ScreenPosRaw
+		|| r = (p, p + value)
+		.Screenraw(r)
+
+
+	function Title (|string|)
+		|| s = .ScreenWindow
+			return SDL_GetWindowTitle(s).Render
+
+
+	function Title (assigns:|string|)
+		|| s = .ScreenWindow 
+			SDL_SetWindowTitle(s, value.ZeroTerm)
+
+
+	libinternal ScreenPosRaw (|ivec2|)
+		|int[2]| place
+		|| s = .ScreenWindow
+			.SDL_GetWindowPosition(s,  place[0],  place[1])
+			return (place[0], place[1])
+
+
+	libinternal CenterCursor
+		|| sz = .Sizeraw/2
+		.SDL_WarpMouseInWindow(.screenwindow!, sz.x, sz.y)
+		
+
+	libinternal NukeCursor
+		|| w = .ScreenWindow$
+		SDL_Cursor.Empty.Use
+		.ShowCursor(false)
+						
+
+	inline ShowCursor (|bool| v = true)
+		sdl_cursor.Show(v|int|)
+
+
+	inline CursorVisible (|bool|)
+		return sdl_cursor.Show()
+
+
+	libinternal Screenraw (assigns:|ivec4| result, |bool|)
+		require .ScreenWindow
+		if (result.x <= 0) and (result.y <= 0)
+			|| n = .NativeWindow
+				.SDL_FullScreen(n)
+			return true
+		|| Old = .SizeRaw
+		|| aligned = .scale * (1.0+.IsHighDPI)
+		|| wh = result.size-1
+		if aligned > 1.0
+			 wh = wh align aligned|int|
+		.SDL_SetWindowSize(.screenwindow!, wh.x, wh.y)
+		if .Sizeraw != wh
+			.TryResizeLater = wh
+		if result.xy
+			.SDL_SetWindowPosition(.ScreenWindow!, result.x, result.y)
+
+		if old != .Sizeraw
+			.NewSize = .Sizeraw
+		return true
+		
+	
+	inline Touch (|guicontrol| modified=nil)
+		modified.touch
+
+	
+	function Resized (|guicontrol| modified)
+		opt norefcounts
+		.AControlWasResized = true
+		|| w = modified.window
+			w._NeedsResize = true
+		.Touch(modified)
+
+	
+	function IsTyping (|bool|)
+		opt inline
+		|| ev = .event
+		return ev is TEXTINPUT or KEYDOWN
+	
+	
+	libinternal RunError (|string?|)
+		if (!window.all.HasAny)
+			return "Create a window first, then call GUI.run"
+		if .SingleFrameDepth
+			return "To nest the event loop, use Window.SyntaxCall" // not good
+		return nil
+	
+	
+	function Run (|errorint|)
+		opt norefcounts
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
+
+		|| msg = .runerror
+		if msg!=nil
+			error msg
+			return 1
+
+		require .init
+		.SingleFrameDepth++
+		while .SingleFrameSub
+			0
+		.SingleFrameDepth--
+		.quit
+		.sdl_quit
+		
+		return (!StdErr.OK)|int|
+
+	
+	libinternal PostLoads
+		opt norefcounts
+		|| s = .TryResizeLater
+			.TryResizeLater = nil // clear... in case of inf loop
+			.Sizeraw = s
+
+		for w in window.all
+			if !w._PostLoaded
+				w._PostLoaded = true
+				w.__PostLoad__
+
+
+	function MouseXY (|ivec2|)
+		// sexy mouse
+		|| x = -1,  || y = -1
+		SDL_GetMouseState(x, y)
+		return (x,  y).sdlxy
+		
+		
+	function MouseButtons (|Mousebutton|)
+		|| x = 0
+		return SDL_GetMouseState(x, x)
+
+	
+	constants
+		PIXELFORMAT_ARGB8888 = 372645892
+		PIXELFORMAT_RGBA8888 = 373694468
+		PIXELFORMAT_ABGR8888 = 376840196
+		ChosenPixelFormat = PIXELFORMAT_ABGR8888
+		INIT_TIMER =			0x00000001
+		INIT_AUDIO =			0x00000010
+		INIT_VIDEO =			0x00000020  /** implies SDL_INIT_EVENTS */
+		INIT_JOYSTICK =			0x00000200  /** implies SDL_INIT_EVENTS */
+		INIT_HAPTIC =			0x00001000
+		INIT_GAMECONTROLLER =	0x00002000  /** implies SDL_INIT_JOYSTICK */
+		INIT_EVENTS =			0x00004000
+		INIT_SENSOR =			0x00008000
+		WINDOWPOS_CENTERED =	0x2FFF0000
+		TEXTUREACCESS_STREAMING = 1
+		WINDOW_RESIZABLE =		0x20
+		WINDOW_ALLOW_HIGHDPI =	0x00002000
+		WINDOW_FULLSCREEN = 	0x1
+		WINDOW_FULLSCREENISH = 	0x1001
+
+
+	libinternal InitSDL (|&nil|)
+		expect (font.small) "SmallFont not loaded."
+		// joystick works around a sdl2-bug
+		SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
+
+		|| DS = .CurrDisplaySize
+		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
+			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+		.screenwindow = w
+		.SDL_SetWindowMaximumSize(w, 2K, 2K)
+		.SDL_SetWindowMinimumSize(w,  400,  200)
+		.vsync = true
+		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
+		return .NativeWindow
+
+
+	function vsync (assigns:|bool|)
+		// Lowers frame-rate. We'll need a better option to resyncing.
+		// if we draw into our own buffer anyhow.
+		|byte[2]| cvalue
+		cvalue[0] = '0' + value
+		.SetHint("SDL_RENDER_VSYNC", (&cvalue[0])|cstring|)
+	
+	
+	function RemoveBorder
+		|| n = .NativeWindow
+			JB_SDL_RemoveWindowBorder(n)
+
+
+	function SavePrefs
+		if app._prefs
+			app.prefs["screen"] = GUI.Screenraw.Msg
+			app.Prefs.save
+
+	function ivec4.Msg (|message|)
+		rz = @list.msg
+		for i in 4
+			rz <~ self[i]
+
+
+	function CurrDisplaySize (|ivec2|) // screensize
+		// we call the monitor a "display"
+		// and our SDL window we call it a "screen"
+		// cos we have sub-windows. They can't both be windows
+		|sdl_displaymode| mode = nil
+		if SDL_GetCurrentDisplayMode(0, mode)
+			return (mode.w, mode.h)
+
+
+	libinternal IsHighDPI (|bool|)
+		|int[2]| SmallPx
+		|int[2]| BigPx
+		SDL_GetWindowSize(.ScreenWindow!,  &BigPx[0],  &BigPx[1] )
+		SDL_GL_GetDrawableSize( .screenwindow!,  &SmallPx[0],  &SmallPx[1] )
+		|| s = SmallPx[0]
+		|| b = BigPx[0]
+		if s and b
+			return s > b
+	
+	
+	function IsFullScreen (assigns:|bool|)
+		|| n = GUI.NativeWindow
+			.SDL_FullScreen(n, (value<<1)-1)
+		
+		
+	function IsFullScreen (|bool|)
+		return .CurrDisplaySize.y <= .Screenraw.size.y
+		
+	
+//  seems unneeded now?
+//	libinternal BumpSize
+//		description "Fixes a MacOSX bug. Not my fault!" 
+//		.FixScreenBug = 0
+//		|| n = GUI.NativeWindow
+//			|| was = .IsFullScreen
+//			.SDL_FullScreen(n, -1)
+//			if was
+//				.SDL_FullScreen(n, 1)
+	
+	
+	function Scaling (assigns:|float| scale)
+		scale = scale.clamp(1.0, 8.0)
+		|| v1 = .Sizeraw.vec2
+		|| v2 = v1 / scale
+		|| bigPx = v2.ivec2
+		.Screen.AreaInfo = bigPx
+		|| r = .Renderer
+			.Raw = SDL_CreateTexture(r, ChosenPixelFormat, TEXTUREACCESS_STREAMING, bigPx.x, bigPx.y)
+			.scale = Scale
+			window.all.lastrect = bigPx.rect
+		
+	libinternal GUICheck
+		if app.yes("version")
+			printline app.Conf("version")
+			app.quit
+		if app.yes("created")
+			printline __now__|date|.LocalTime
+			app.quit
+	
+	libinternal NiceAppName (|string|)
+		opt norefcounts
+		with app.Conf("selfname")
+			return it
+		with app.Conf("name")
+			return it
+		return app.appname
+	
+	
+	function Init (|float| Scaling=1.0, |bool|) // startup
+		opt norefcounts
+		target !gui
+			disabled `Put "targets gui" in the app's conf section to use this!`
+		if .drawframelength
+			return .StartedProperly
+		.DrawFrameLength = 60th.date // could try changing this to 61th?
+		
+		.GUICheck
+		app.Guimode = true
+		pico.start
+		.OpenedTime = date.now
+		.ForeGroundTime = .OpenedTime
+		.CurrMouseXY = ivec2(-1)
+
+		AppMenu.GetAppMenu
+		|| n = .InitSDL
+		if !n
+			gui.Alert("Unable to load SDL2", StdErr.LastError.name)
+			return false
+	
+		.SDL_FullScreen(n, 1)
+		scaling *= 2.0 - (0.5*.IsHighDPI)
+		.Scaling = scaling
+		.sdl_stoptextinput
+		.FastToolTipDate = 1
+		
+		.CheckQuarantine
+		¥.LoadDefaults
+
+		.InitDelegates
+		.ShowCursor(false)
+		.StartedProperly = true
+		return true
+		
+	
+	libinternal SetHint (|cstring| name, |cstring| value)
+		cpp_wrapper SDL_SetHint
+	
+	
+	inline IsBackground (|bool|)
+		return !.ForeGroundTime
+	
+	
+	libinternal TrySelectorFlash
+		if !.IsBackground and (GUI.ChangeSelFlash.fired)
+			.FlashSelector = !.FlashSelector
+			.Touch
+			if .ChangeSelFlash == 1
+				.FlashSelector = true
+			GUI.ChangeSelFlash = .FrameStart + 1s
+
+
+	libinternal ClearAlerts
+		|| it = .PendingAlerts
+			.PendingAlerts = []
+			for s in it
+				app.alert(s)
+
+
+	inline DialogIsOpen (|bool|)
+		opt norefcounts
+		return .FrontDialog
+
+
+	function FrontDialog (|window|)
+		opt norefcounts
+		for w.backwards in window.all
+			if w.IsDialog
+				return w
+	
+	
+	libinternal DoFakeMouseMove
+		opt norefcounts
+		.NeedMouseMove = false // noice
+		|| w = .EventWindow
+			.MouseMoveEvent(nil, w, .MouseXY)
+	
+	
+	libinternal ActualEvents (|GUIActivity|) // frameevents
+		while ((.SingleFrameDepth > 1) or (.QuitReason isnt ExitOrTerminate)) and .Event.Poll
+			.EventCount++
+			rz |= .CheckEvent(.event)
+			.Event.type = 0
+		if .NeedMouseMove
+			.DoFakeMouseMove
+		
+		if .SingleFrameDepth <= 1
+			|| Quitish = .QuitReason &~ (GUIActivity.Activity ||| GUIActivity.Questioning)
+				rz = .StrongClose(Quitish) ||| GUIActivity.Activity 
+			.QuitReason = 0
+			
+		.StartResize	// don't remove! causes delayed updates! resizes can happen here
+						// and the next thing that happens is a draw!
+		if .NewSize
+			.TouchCount ?= 1
+	
+	
+	libinternal DroppingInto (|guicontrol|)
+		opt norefcounts
+		|| fr = window.front
+			return fr.droppinginto
+
+
+	libinternal UpdateTextFocus (|window| w)
+		opt norefcounts
+		|| f = w.RealFocus
+		|| AllowTyping = (f is editable) or (f isa menu) or (f isa textview)
+		if !f and (w is editable)
+			AllowTyping = true	// allow type-through if the window is "editable". like to type secret codes in
+		if (f isa textview)
+			if (!f.Selection.width) and f.inrange(f.Selection.x)
+				GUI.TrySelectorFlash
+		
+		require .TextInputEnabled != AllowTyping
+		.TextInputEnabled = AllowTyping
+		if AllowTyping
+			.SDL_StartTextInput
+		  else
+			.SDL_StopTextInput
+		
+			
+	libinternal PreframeText (|window| W)
+		.TextInputEnabledAtStart = .TextInputEnabled		
+		if ListView.delayedItTill_.fired
+			ListView.delayedItTill_ = 0
+			|| lv = w.realfocus
+			if lv isa ListView
+				lv.TryDelayedEdit
+
+	
+	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
+		require path
+		// shouldn't 
+		|| d = .AppDocumentOpen
+			|| f = path.Resolve(Allowmissing)
+				// if its not existing, the called-func can create it, or not.
+				|| flags = CopyPasteFlags.PasteFile 
+				if allowmissing
+					flags |= copypasteflags.CreateFile
+				rz = (d)(nil, nil, f, flags)
+	
+	
+	libinternal HandleOpenFile
+		|| d = .DocumentOpened$
+		.OpenDocument(d, false)
+//		if .OpenedFirst.guiago < 3s
+//			.FixScreenBug = .FrameStart + 1s
+
+
+	libinternal OrderWindows (|window|)
+		opt norefcounts
+		|| i = 0
+		for w in window.all
+			if w is NewlyShown
+				GUI.Resized(w)
+				(w isnt newlyshown)
+			if w is visible
+				if rz
+					w.position = i++
+				rz = w
+			  else
+				w.position = -1
+				window.all.first = w
+
+		
+	libinternal PreFrame (|GUIActivity|)
+		opt norefcounts		
+		while (|| err = stderr.pop)
+			notifications <~ err
+			beep
+			rz = GUIActivity.activity
+
+		.HandleOpenFile
+		
+		|| w = .OrderWindows
+			.UpdateTextFocus(W)
+			.PreFrameText(w)
+			
+			|| ed = w.inline
+			if ed.needshide
+				ed.clear
+
+			if .CanDrag >= mousedragging.DragEvenIfStill
+				.touch
+				w.DoMouseDrag(.MouseXY, true)
+				rz = GUIActivity.activity
+	
+	
+	libinternal DoDrawDrag (|window| w)
+		|| s = .drawdrag
+		|| d = w.DroppingInto
+		require s and d and d != w.currmousedown
+		|| P	= .mousexy
+		|| sigh	= P.grow((6,6))
+		|| img = .Screen
+		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 0.0)
+		sigh	= P.grow((10,10))
+		img.DrawCircleStyled(sigh, ¥.DragAndDrop, 7.0)
+		
+		img.controlclip = sigh
+		|| t	= s.length.Render
+		|| x	= t.length*font.width
+		|| h	= font.height
+		|| P2	= (x, h)/2
+		img.drawtext(t, P-P2, true)
+
+
+	libinternal DialogSorter (SorterComparerWindow)
+		opt norefcounts
+		if a and b
+			return a.isdialog - b.isdialog
+
+
+	libinternal DrawWinFrom (|window|)
+		opt norefcounts
+		for w.backwards in window.all
+			if w.isviewable and w.UsesEntireScreen
+				return w
+		return window.all.first
+
+
+	libinternal StartResize (|bool| Force=false)
+		opt norefcounts
+		require .acontrolwasresized
+		.acontrolwasresized = false
+		.Touch
+		.DuringAction = GUIActivity.Resizing
+		for w.fast in window.all
+			.CalculateWindowSize(w, force, true)
+		for w.fast in notifications.Alerts
+			.CalculateWindowSize(w, force, false)
+		.DuringAction = GUIActivity.Nothing
+
+
+	function Window.CalculateSize
+		gui.CalculateWindowSize(self, true, true)
+	
+	
+	libinternal CalculateWindowSize (|window| W, |bool| Force, |bool| NotAlert)
+		cpp_Part CalcWinSize
+		opt norefcounts
+		require w._NeedsResize or force
+		w._NeedsResize = false
+
+		|| D = GUI.Screen
+		|| BigRect = d.rect
+		|| rect = (0,0,0,0)
+		if NotAlert
+			|| b = w.prev
+				rect = b.lastrect
+		w.CalculateSize(BigRect, rect, BigRect)
+
+		if gui.ControlResizedSafely
+			gui.ControlResizedSafely = false
+			|| XY = .MouseXY
+			gui.MouseMoveEventSub(xy - gui.CurrMouseXY, w, xy)
+			// don't think we need fakemousemove if we can just do this here?
+
+	
+	libinternal CheckTaskAnimations
+		opt norefcounts
+		
+		for w.fast in window.all
+			for t in w.tasks
+				if t is Animation
+					.animate(t)
+	
+	
+	libinternal Animate (|guicontrol.taskgui| t)
+		opt norefcounts
+		|| p = t.taskprogress
+		if p != t.prevprogress
+			t.PrevProgress = p
+			t.upon.touch(-1)
+		
+		
+	libinternal StartDraw
+		opt norefcounts
+		.DuringAction = GUIActivity.Drawing
+		|| CanBlur = !app.prefs["noblur"]
+		
+		if !.DialogIsOpen
+			.BlurBackgroundStart = 0
+		
+		.TouchCount = 0
+		.DrawState = 2
+		.StartFrame(.Raw!)
+
+		|| w1 = .DrawWinFrom
+		while w1
+			if w1.IsViewable
+				if w1.IsDialog
+					if CanBlur: .Screen.Blur(.BGBlurAmount)
+					CanBlur = false
+				w1.DrawWindow(.Screen)
+			w1 = w1.next as window // :O
+		
+		|| w = window.front
+			notifications.Draw
+			.DoDrawDrag(w)
+			if app.prefs["beep"]
+				beep // debug drawing!
+		.DuringAction = 0
+
+
+	libinternal BGBlurAmount (|float|)
+		.BlurBackgroundStart ?= gui.FrameStart
+		|| Scale = 7.0
+		|| ago = .BlurBackgroundStart.guiago.Float
+		rz = ago*Scale*4.0
+		if rz > Scale
+			return scale
+		GUI.Touch
+
+
+	libinternal window.AnyFrameStepsNeeded (|ind|)
+		|| Time = gui.FrameStart
+		|| Within = Time & 0xFFFF
+		|| Remain = ._FrameNext|int| - Within
+		if Remain <= 0
+			if remain < -0.5s
+				return -1
+			return Within
+		if Remain >= 0.5s			// wrapped
+			return Within+1s
+
+
+	libinternal window.FrameStepsAmount (|int|)
+		|| Within = .AnyFrameStepsNeeded()		#require
+
+		|| fps = .SimulationFPS|int|
+		if fps < 10
+			fps = 10 + 50*(.Tasks.first!=nil)
+			fps >>= gui.IsBackground
+		
+		|int| i = ._FrameNum
+		if (i >= FPS)
+			i = 0
+		
+		|duration| Next
+		while 
+			next = (1s*(i+rz))/FPS
+			loop next <= Within
+			rz++
+
+		._FrameNext = Next		
+		i += rz
+		while i > fps
+			i -= fps
+		._Framenum = i
+
+		|| ST = gui.FrameStart
+		if (._LastTimeSeen - ST).abs > 0.5s					// Computer paused, or clock changed.  Just do 1 frame.
+			rz = 1
+		._LastTimeSeen = ST
+		
+
+	libinternal window.DoFrameStep (|bool| ChangeOK)
+		.RunWindowTasks(false)
+		.FixFocus
+		.FrameCount++
+		.__FrameStep__(ChangeOK and !.OpenedMenu)
+	
+	
+	libinternal DoSimulation
+		opt norefcounts
+		|| wf = Window.front$
+		.DuringAction = guiactivity.Simulation
+		|| FrontIsDialog = .DialogIsOpen
+		if FrontIsDialog or wf.AnyFrameStepsNeeded()
+			keys.FlushKeys
+
+		|| Got = 0
+		for  w  in  window.all
+			|| N = w.FrameStepsAmount
+			for n
+				w.DoFrameStep(!FrontIsDialog)
+				Got++
+
+		if Got
+			window.all.sort(DialogSorter|sortercomparer|)
+			.StartResize
+		.DuringAction = 0
+
+// ideally we remove the whole concept of sorting windows
+// there is just one window... the main window.
+// it might have subwindows, though? games have inventories and settings and stuff
+// maybe window.SubWindows(|[window]|) makes sense for games? kinda?
+// settings would just be a dialog window.
+// who knows? Also dialogs and the confirm window exist...
+
+	function Cycle (|duration| length, |Duration| Adjust=0, |float|)
+		description "Returns a number between 0 and 1. This number cycles back and forth in a sinusoidal fashion."
+		opt inline
+		return (.FrameStart+adjust).cycle(length)
+
+
+	function Loop (|duration| length, |float|)
+		description "Returns a number between 0 and 1. This number increases linearly."
+		opt inline
+		return .FrameStart.loop(length)
+
+	
+	libinternal SingleFrameNested (|bool|)
+		if .SingleFrameDepth <= 4
+			.SingleFrameDepth++
+			|| WasQuitting = .quitreason
+			rz = .SingleFrameSub
+			.SingleFrameDepth--
+
+			|| NowQuit = .quitreason
+			gui.quitreason = NowQuit ||| (WasQuitting &~ GUIActivity.exiting)
+			return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
+
+
+	libinternal SingleFrameSub (|bool|)
+		opt norefcounts
+		if .ForeGroundTime.GuiAgo < 0.1s
+			keys.Reset
+		|| EnoughTime = .DelayEvents
+		if EnoughTime or SDL_Event.HasAny
+			|| Occur = .HandleEvents
+			require Occur isnt ExitOrTerminate
+		
+		.DoSimulation
+		.CheckTaskAnimations
+		.DrawState |= (.TouchCount != 0)
+		
+		// draw waiting could be improved. Could simulate instead of sleeping?
+		// also drawtime could be variable...
+		if .DrawState == 1
+			.StartDraw
+		if .DrawState & 2
+			|| remain = .EndDraw
+			// do we need to sleep if vsync is on?
+//			if remain > 2
+//				app.Sleep(remain)
+		return true
+
+
+	libinternal EndDraw (|duration|)
+		// we could just draw immediately? but then delay the next drawstart?
+		// perhaps 1-frame faster reaction on screen?
+		|| d = date.now
+		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
+		rz = .DrawFrameLength|int64| - ago
+		require rz < 128							// 512th of a second
+		.DrawState &= ~2
+		.DrawFinish = d
+		.EndFrame(.Raw!)
+
+
+	libinternal DelayEvents (|bool|)
+		|| CanSleep = !SDL_Event.HasAny
+		|int64| L = 256										// 256th of a second
+		if .IsBackground and !.DroppingInto
+			l = .DrawFrameLength*9
+
+		|| d = date.now
+		.framestart = d		
+
+		|uint64| Ago = d - .FrameLastDelay				// Unsigned, in case the clock goes backwards
+		|date| Remain = L - ago
+		if Remain <= 0
+			.FrameLastDelay = d
+			return true
+
+		if CanSleep
+			app.Sleep(Remain)
+	
+	
+	libinternal HandleEvents (|GUIActivity|)
+		.DuringAction = GUIActivity.EventHandling
+		.StartResize
+		rz = .PreFrame
+
+		.ClearAlerts
+		.HandleAppResize
+		.PostLoads
+		notifications.CheckForDisappear
+		rz |= .ActualEvents
+		.DuringAction = 0
+		.BlockTextInput = false
+
+
+	libinternal CheckQuarantine
+		if platform.osx and app.isQuarantined
+			GUI.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
+
+
+	libinternal ReScale (|float| NewScale, |bool|)
+		if (NewScale >= 1.0 and NewScale <= 8.0)
+			.scale = NewScale
+			.NewSize = .Sizeraw
+		  else
+			beep
+		return true
+	
+	
+	libinternal HandleAppResize  // handleresized
+		if !.NewSize
+			if .ResizedCounter
+				.ResizedCounter--
+			return
+
+		.ResizedCounter = 4
+		
+		|| r = .raw
+			r.dispose
+		|| v = (.NewSize.vec2/.Scale).ivec2
+		.newsize = nil										// phew
+		.Screen.size = v
+		.Raw = SDL_CreateTexture(.renderer!, ChosenPixelFormat, TEXTUREACCESS_STREAMING, v.x, v.y)
+
+		window.all.EntireScreen = v
+		.StartResize(true)
+
+
+	libinternal StartFrame (|&SDL_Texture| T)
+		opt norefcounts
+		|| stride = 0
+		|&nil| SDLBuff
+		t.lockThatZerosEventhoughItShouldnt(nil, sdlbuff, stride)
+		// could use SDL_UpdateTexture instead? use my own buffer! then
+		// we don't need to lock/unlock, which uses 2x memory and DOESN'T
+		// let me get access to the old buffer! might be faster too.
+		if SDLBuff?
+			.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
+		
+	
+	libinternal EndFrame (|&SDL_Texture| T)
+		|SDL_Rect| dstrect
+		SDL_GL_GetDrawableSize( .screenwindow!,  &dstrect.w,  &dstrect.h )
+		t.UnlockThatCopiesEvenThoughItShouldnt
+		// SDL_UpdateTexture(T, nil, &pixels, w*h*4);
+		SDL_RenderCopy(.renderer!, T, nil, &dstrect)
+		SDL_RenderPresent(.renderer!)
+
+
+	inline IsQuitting (|bool|)
+		return .quitreason is ExitOrTerminate
+
+
+	function Quit (|GUIActivity| Reason=0, |GUIActivity|)
+		opt norefcounts
+		reason |= GUIActivity.Exiting
+		
+		.SavePrefs // in case we crash during quit
+
+		SDL_SetRelativeMouseMode(false)		// helpful
+		for w in window.all
+			.quitreason |= reason			// in case of wierd events clearing the reason
+			w.close(reason)
+
+		.SavePrefs
+		return reason
+
+
+	libinternal FileDroppedIntoApp (|window| w, |SDL_DropEvent| Drop, |SDLEventType| t, |int|)
+		|| path = drop.file.copy
+		memory.free((drop.file)|&byte|)
+		Drop.file = nil
+		|| p = (t is dropfile)(copypasteflags.pastefile, copypasteflags.pastetext)
+		|| c = w[.MouseXY] ?? w
+		c.PasteFromClipboard(path, p)
+		w.DroppingInto = nil
+		return GUIActivity.activity
+
+
+	libinternal AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
+		opt norefcounts
+		if !.TextInputEnabledAtStart or ev.command
+			return true
+		|| k = ev.sym
+		if k is tab or escape
+			return true
+		if k.iscmm or k.isscan
+			return true
+		if k.isaccept or k.isdelete
+			return true
+
+
+	inline AllowTyping (|bool|)
+		opt norefcounts
+		return .TextInputEnabledAtStart and !keys.cmd
+	
+	
+	libinternal Window.MenuAt (|ivec2| xy, |bool| Test, |guicontrol|)
+		opt norefcounts
+		|| F = .openedmenu$
+		if (!test) or (f.lastrect.horz contains xy.x)
+			return f
+	
+	
+	libinternal Window.ControlOrMenuAt (|ivec2| xy, |bool| Test = true, |guicontrol|)
+		opt norefcounts
+		return .MenuAt(xy, test) ?? self[xy]
+
+
+	libinternal StandardKeyHandler (|keys| key, |bool|)
+		opt norefcounts
+		|| w = window.front						#require
+		|| cmd = keys.cmd
+		|| rf = w.realfocus
+			if cmd
+				if (key is g)
+					if !rf.__Search__(GUI.lastsearch, false)
+						beep
+					return true
+				if (key is f) and !(keys.shift or keys.option)
+					return rf.OpenSearch
+			  elseif (key is find or AC_SEARCH)
+				return rf.OpenSearch
+
+		|| gw = rf ?? w
+		if cmd
+			if (key is PLUS or EQUALS)
+				return .Rescale(.scale+0.5)
+			if (key is minus)
+				return .Rescale(.scale-0.5)
+			if (key is f) and keys.option
+				|| n = .nativewindow
+					.SDL_FullScreen(n)
+				return true
+			if (key is l) and keys.shift
+				JB_Mem_ClassLeakCounter()
+			if (key is squote)
+				return w.DoListViewNext(true)
+			if (key is semicolon)
+				return w.DoListViewNext(false)
+			if (key is d) and  keys.ctrl
+				|| ov = w.CurrMouseOver
+					Notifications <~ ov.ContainedName
+				  else
+					beep
+		  
+		if (key is copy) or (cmd and key is c)
+			|| wf = w._FocusAttempt
+			if !rf and wf isa textview
+				return wf.CopyToClipboard
+			return gw.CopyToClipboard
+		if (key is paste) or (cmd and key is v)
+			return gw.PasteFromClipboard(clipboard.text)
+
+
+	libinternal StrongClose (|GUIActivity| Reason, |GUIActivity|)
+		opt norefcounts
+		if Reason is Terminating
+			return GUIActivity.Terminating // terminate will call windowclose anyhow
+	
+//		if Reason isnt windowclose
+//			return .quit(reason)
+
+		return GUI.AskQuit
+	
+	
+	libinternal BackgroundChanged (|bool| back, |int|)
+		keys.Reset
+		|| same = .IsBackground == back
+		
+		require !same
+		if back
+			.ForeGroundTime = 0
+		  else
+			SDL_RaiseWindow(.ScreenWindow!) // work around crappy SDL/MacOSX event issues?
+			.ForeGroundTime = gui.FrameStart
+
+		beep.OK = 1		
+		.FlashSelector = false
+		if !.DialogIsOpen
+			for w in window.all
+				w.__AppForegroundChange__(!back)
+		.touch
+		return GUIActivity.activity
+
+
+	libinternal EventWindow (|window--|)
+		opt norefcounts
+//		|| window = 0
+//		(window) // just test that __modules__ works
+//		the c++ won't compile then. sadly.
+		return .FrontDialog ?? __modules__.window.front
+	
+	
+	libinternal CheckEvent (|&SDL_Event| ev, |int|)
+		visible, opt norefcounts
+		|| t = ev.type
+		
+		if t is APP_DIDENTERFOREGROUND or APP_DIDENTERBACKGROUND
+			return .BackgroundChanged(t is APP_DIDENTERBACKGROUND)
+		
+		if  t is APP_TERMINATING
+			.quitreason |= GUIActivity.ExitOrTerminate
+			return GUIActivity.ExitOrTerminate
+		
+		if  t is QUIT // comes from cmd-w! this code is to block this bad SDL2 design.
+			if !.Quitreason
+				.Quitreason |= GUIActivity.Exiting
+			return .Quitreason
+		
+		if  t is WINDOWEVENT
+			return .windowevent(ev)
+
+		|| w = .EventWindow
+		require w // and w.parent // why would w.parent be nil?
+				  // quitting the app during breakout in perry caused this, though
+				  // need to trap this event...
+
+		w.__Tickle__
+		if T is dropbegin
+			w.DroppingInto = w[.MouseXY] ?? w
+			return GUIActivity.activity
+		
+		if t is DROPFILE or Droptext
+			return .FileDroppedIntoApp(w, ev.drop, t)
+		
+		if t is DropComplete
+			w.DroppingInto = nil
+			return GUIActivity.activity
+
+		if t is TEXTINPUT
+			return .TextInputevent(ev, w)
+
+		if t is KEYDOWN
+			return .KeyDownEvent(ev, w)
+
+		if t is KEYUP
+			return .KeyUpEvent(ev)
+
+		if t is MOUSEWHEEL
+			return .MouseWheelEvent(ev,	w)
+
+		|| b = ev.button
+		if (b.button >= 4) and (t is mousedown)					// what about holding it?
+			return w.DoListViewNext(b.button == 4)|int|			// assumes GUIActivity.activity == 1
+	
+		if t is MOUSEDOWN
+			return .MouseDownEvent(w, b)
+
+		if t is MULTIGESTURE
+			require !.IsBackground
+			return .GestureEvent(ev, w)
+
+		|| xy = b.xy
+		if t is MOUSEMOVE
+			require !.IsBackground or w.DroppingInto
+			return .MouseMoveEvent(ev.motion, w, xy)
+
+		if t is MOUSEUP
+			return .MouseUpEvent(w, xy, b.button)
+
+	
+	libinternal GestureEvent (|&SDL_Event| ev, |window| w, |int|)
+		|| f = ev.Gesture
+		|| rot = f.dTheta
+		|| pinch = f.dDist
+		|| mina = (π/180.0)|float|
+		if rot.length > mina or pinch.length > 0.002
+			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
+			
+		
+	libinternal QuitBecauseWindowClosed (|window| w, |GUIActivity|)
+		opt norefcounts
+		if !w.ismainwindow
+			return nil
+		
+		for ww in window.all
+			if (w != ww) and ww.ismainwindow
+				return nil
+		
+		if .AskQuit
+			.quitreason |= GUIActivity.exiting
+			return GUIActivity.exiting
+		
+		return GUIActivity.Activity
+			
+		
+		
+	libinternal WindowEvent (|&SDL_Event| ev, |int|)
+		opt norefcounts
+		|| wev = ev.window
+		|| wt = wev.event
+		if wt is CLOSE										// A request to close ANY window.
+			|| w = window.front								// should really be .frontvisible
+			if !w
+				return GUIActivity.exiting
+								// or .front should only return visible windows...
+			|| Activity = .QuitBecauseWindowClosed(w)
+				return Activity
+			.Quitreason |= GUIActivity.activity
+			w.Close(GUIActivity.WindowClose)
+			.Quitreason |= GUIActivity.activity
+			return GUIActivity.activity
+			
+		if wt is RESIZED
+			.NewSize = (wev.data1, wev.data2)
+			return GUIActivity.activity
+		
+		if wt is FOCUS_GAINED
+			return .BackgroundChanged(false)
+		
+		if wt is FOCUS_LOST
+			return .BackgroundChanged(true)
+
+
+	libinternal MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
+		SDL_CaptureMouse(false)
+		|| dd   = .drawdrag
+		|| di	= w.DroppingInto
+			for c in dd
+				di.PasteFromClipboard(c, copypasteflags.pastefile)
+		
+		|| dow	= w.CurrMouseDown
+		|| F	= w.openedmenu
+		w.ClearDrops
+		if !(di and dd) and (button == 3) and (dow != F) and f and (f contains xy)
+			f.__rightclick__(xy)
+		  elseif dow and (button!=3) and !ScrollInfo.JustClicked_
+			dow.__MouseUp__(xy)
+		ScrollInfo.JustClicked_ = false
+		return GUIActivity.activity
+
+
+	libinternal MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
+		// shouldn't occur in background... unless we have a DragEvent?
+		|| OldXY = .CurrMouseXY
+		|ivec2| move
+		if ev
+			move = (ev.xrel, ev.yrel)
+			.MouseMoveInited = true
+		if !move
+			move = xy - OldXY		#require
+			if !.MouseMoveInited
+				return GUIActivity.Activity				// or else we never get there
+
+		|| MB = .MouseButtons
+		require MB or !.IsBackground
+		
+		if OldXY.x < 0
+			move = nil // some bug work around?
+			
+		.CurrMouseXY = xy
+		if !w.SimulationFPS
+			.ShowCursor
+		if .EventCount isa 8
+			|| contrain = w.SimulationFPS > 0
+				.CenterCursor
+			SDL_SetRelativeMouseMode(contrain)			// in case a window comes up or closes
+
+		if (.CanDrag >= mousedragging.DragWithin) and (MB is left)
+			w.DoMouseDrag(xy, .CanDrag >= mousedragging.DragBeyond)
+			return GUIActivity.activity
+
+		return .MouseMoveEventSub(move, w, xy)
+
+	
+	libinternal MouseMoveEventSub (|ivec2| Move, |window| w, |ivec2| XY, |int|)
+		opt norefcounts
+		|| PrevOver = w.CurrMouseOver
+		|| Over  = w.ControlOrMenuAt(Xy, false)
+
+		w.CurrMouseOver = Over
+		|| Down = w.CurrMouseDown
+		if !Down
+			|| TT = w.ControlAt(xy)
+				.SetToolTips(TT)
+		
+		require w.CreatedDate.guiago > 0.01s
+		if (PrevOver != nil and Over) and (Down == nil or PrevOver)
+			PrevOver.__MouseMove__(xy, move, SDL_WindowEventID.leave)
+						
+		if (down == Over or nil)
+			|| state = (PrevOver == Over)(SDL_WindowEventID.moved, SDL_WindowEventID.enter)
+			if !over
+				Over = w
+			if Over.__MouseMove__(xy, move, state)
+				return GUIActivity.activity
+
+
+	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
+		#!textinput!
+		if .AllowTyping and !.BlockTextInput and (.CanDrag <= mousedragging.Handled)
+			|| e = ev.Editing.str
+			if w.__TypedString__(e)
+				rz = GUIActivity.activity
+
+
+	libinternal KeyUpEvent (|&SDL_Event| ev, |int|)
+		|| key = ev.key.key
+		keys.Removekey(key)
+		return GUIActivity.activity
+
+
+	libinternal MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
+		w.__gesture__(ev.wheel.xy*(1,-1), 0, 0)
+		return GUIActivity.Activity
+	
+	
+	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
+		#!keydown!
+		|| kev = ev.keysym
+		|| key = kev.sym
+
+//		beep key|int|.Render + " " + kev.scancode|int|
+		
+		if .ForeGroundTime.GuiAgo < 0.1s
+			return GUIActivity.nothing
+		
+		if key.IsEaten
+			return GUIActivity.nothing
+
+		if (key is w) and (keys.cmd)
+			// i think we could try eliminate this test.
+			// later... I mean... send an event of same type that is already sent
+			// so hopefully only 1 gets through?
+			return 0
+		beep.OK = 1
+
+		keys.AddKey(key)
+
+		if !w.openedmenu and !.AllowKeyDown(kev)
+			return GUIActivity.nothing
+		
+		if (key isnt escape) or key.IsFirstFrame
+			if .StandardKeyHandler(key) or w.__keydown__(key)
+				.BlockTextInput = true
+				return GUIActivity.activity
+		
+		// not sure why this is 2. Are we trying to stop this from dialogs?
+		// or stop it being opened just to close? Or what?
+		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
+			keys.escape.eat
+			return  AppMenu.show
+		
+
+	libinternal Window.GetUserAttention
+		if !.Focus
+			._FlashSelf |= 1
+		._alphafader = gui.FrameStart
+		beep
+	
+	
+	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,   |int|)
+		|| xy = b.xy
+		beep.OK = 1
+		if notifications.Clickedat(xy)
+			return GUIActivity.activity
+			
+		|| InsideWin = w.lastrect.soothe contains xy
+		if !InsideWin and (w == .FrontDialog)
+			if w.ClickOutsideCloses
+				w.Close
+				return GUIActivity.activity
+			w.GetUserAttention
+			return GUIActivity.nothing
+		
+		.candrag = nil
+
+		|| foc = w.realFocus
+			if foc.ClickOutsideCloses and !(foc contains xy)
+				w.setfocus(nil)
+				return GUIActivity.activity
+
+		if w.MouseDownEvent(b.button, b.clicks, xy)
+			.Touch
+			return GUIActivity.activity
+		
+	
+	libinternal Window.MouseDownEvent (|int| bn,  |int| clicks,  |ivec2| xy, |bool|)
+		target osx
+			|| Ctrl = keys.ctrl // only osx needs this
+		  else
+			|| ctrl = false
+		|guicontrol--| clicked 
+		if (bn == 3) or (Ctrl and bn == 1) 
+			clicked = .ControlOrMenuAt(xy)
+			if clicked
+				clicked.__rightclick__(xy)
+		  else
+			mousebutton.DownAt = gui.FrameStart
+			clicked = .DoMouseDown(xy, clicks)
+		.currmousedown = clicked
+		return clicked
+
+
+	libinternal GuiControl.ContainedName (|string|)
+		|| fs = FastString()
+		fs <~ "Name: "
+		while
+			fs <~ .ID
+			self = self.Parent
+			loop self and !(self isa window)
+			fs <~ " <~ "
+		return fs
+	
+	
+	libinternal SetToolTips (|guicontrol?| r)
+		opt norefcounts
+		|| w = r.window
+		require w and r and w.ToolTipControl != r
+		w.ToolTipControl = r
+		
+		|| info = ""
+		ifn r isa textview  and  r is editable
+			info = r.Description
+		|| delay = 0.0s
+		if GUI.FastToolTipDate.fired
+			delay = 1.25s
+		|| now = gui.FrameStart
+		|| t = .tooltip
+		if t.name and t.when.fired
+			GUI.FastToolTipDate = now + 1s
+		t.when = now + delay
+		t.name = info
+
+
+inline guicontrol.Description (|string|)
+	return .tooltip // :)
+	
+
+datatype GUIActivity (byte)
+	flags
+		|GUIActivity|
+		Nothing = 0
+		Activity
+		Questioning
+		WindowClose
+		ExitOrTerminate = [Exiting, Terminating]
+		StrongWindowClose = WindowClose+Exiting
+
+	constants
+		Resizing = 1
+		Drawing
+		Simulation
+		EventHandling
+
+	syntax is (|GUIActivity| act, |bool|)
+		return self & act
+
+
+inline Duration.syntaxcall (|float|)
+	return gui.loop(self)
+
+// CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.
+// Linux/Win have their own alternatives.
+

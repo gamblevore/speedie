@@ -1,0 +1,52 @@
+
+target false {
+
+module MzResearch
+	linkage
+		cpp_part MzR
+	// theres no way to do huffman-like stuff myself...
+	// its exactly the thing that is best based off of other people's work!
+	// finding a good base-work is the hard part though!
+	
+	function Run (|int|)
+		|| dump = "~/Desktop/prob.txt".outputstream
+			|| root = file.speediedir.file
+			|[file]| files
+			.CollectProbs(root, files)
+			file.sizesort <~ files
+			for f in files
+				mzresearch.probability(F, dump)
+			
+			dump <~ "total {\n"
+			dump.ProbabilityDump
+			dump <~ "}\n\n"			
+	
+	function Probability (|file| f, |faststring| dump)
+		|| s = f.Read(64K)
+			|| d = s.Compress
+			dump <~ "+'$f' \"${f.ext}\" {\n"
+			|| sz = s.length
+			dump <~ "\tsize $sz // ${sz.strsize}\n"
+			dump.ProbabilityDump
+			dump <~ "}\n\n"
+			(s), (d)
+		
+	function Faststring.ProbabilityDump
+		cpp_wrapper JB_ProbabilityDump
+	
+	function file.SizeSort (SorterComparer of File)
+		return .size < b.size
+	
+	function CollectProbs (|file| base, |[file]| out)
+		for n in base
+			|| c = base[n]
+			if c.visible
+				if c.IsSymLink or (n ~= "Build") or (n isa "mov") or (n contains "Compress")
+					0
+				  elseif c.isdir
+					.CollectProbs(c, out)
+				  elseif c.size >= 4K
+					out <~ c
+
+}
+

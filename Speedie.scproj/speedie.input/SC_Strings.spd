@@ -1,0 +1,553 @@
+
+
+
+module SCStrings
+	|Message| RenderInsides
+	|Message| RenderNewParams
+	|Message| RenderFinish
+
+
+
+extend_module SCFunction {
+SCStrings.RenderInsides = "
+	|| fs = FastString.New(fs_in)
+	finish
+	return fs.GetResult(fs_in)
+".ParseCleanWipe
+
+SCStrings.RenderNewParams = "
+	|?FastString| fs_in = nil
+	|string|
+".ParseCleanWipe
+
+SCStrings.RenderFinish = SCStrings.RenderInsides.find( @tmp, "finish" )
+
+
+function Tran_Render (|Message| msg, |SCClass| Cls, |bool|)
+	|| using2 = msg.SyntaxUsing
+	return tran_RenderSub(msg, cls)								// using bug
+
+
+function Tran_RenderSub (|Message| msg, |SCClass| Cls, |bool|)
+	msg.name = "function"
+	|| IsPureRender = msg.first != @thg
+		msg.first = @thg + "Render"
+		if cls
+			msg.name = "behaviour"
+	|| arg = msg.NormaliseFunc$
+	|| name = msg.first
+	|| params = name.next$
+
+	if msg.isbehaviour
+		params <~ (@thg, "render")
+	  else
+		SCStrings.RenderNewParams.CopyAllInto(params)
+	
+	if msg.FindNested( @thg, "fs" )
+		SCStrings.RenderFinish.CopyAllBeforeInto( arg, arg )
+		SCStrings.RenderFinish.CopyAllAfterInto( arg, arg )
+	
+	if msg.isbehaviour
+		msg.second.remove
+		return true
+
+
+function NewRender (CollectFunc)
+	|| cls = name_space.isnormalobject 
+	if Tran_Render( node, cls )
+		rz = SCBehaviour.NewActual( node, name_space, ErrPlace )
+	  else
+		rz = SCFunction.NewFunc( node, name_space, ErrPlace )
+	if rz
+		(rz|scfunction| is render) // use this later to reliably turn:   fs <~ obj.somefunc   <--   obj.Somefunc(fs)
+		
+
+
+function ObjectifyString (|Message| func)
+	opt norefcounts
+	func.func = @sstr
+
+/*
+	// this causes extra refcounting... due to it being a function
+	// which speedie doesn't know is fully owned.
+	func.func = @dot
+	func <~ (@thg, "string")
+	|| prm = func.msg(@prm)
+	prm <~ func.name[0]
+	func.name = "byte"
+*/
+		
+	
+
+
+function GetFileString (|Message| msg, |string| name, |message|)
+	expect (msg ~= "file" or "img") (msg)
+	
+	|| OK = name.Last == '?'
+		name = name.shorten(1)
+	
+	|| data = ""
+	|| f = compiler.InputFile(name, msg)
+		data = f.readall
+		if msg ~= "img"
+			data = ImageHelper.ConvertPNGToVOI(data, msg)
+		OK = data
+
+	if OK
+		msg.become(@str, data)
+		(SCImport.Recent max= f.modified) 
+		msg.clear
+		.ObjectifyString(msg)
+		return msg
+
+	error (msg, "File does not exist")
+
+
+function Tran_Strings (|Message| start, |SCFunction| fn)
+	// once collectdecls is re-written to happen per decl
+	// instead of per arg, we can remove this!
+	opt norefcounts
+	for msg.flat in start		
+		|| f = msg.Func
+		if (f == @Str)
+			using msg
+			String_Expand( msg, fn )
+
+
+function InBuiltFunc (|message| self, |string| name, |bool|)
+	opt norefcounts
+	require self in @ques
+	if self == name
+		|| f = .first
+			error (f)
+		.become(@bra)
+		return true
+
+
+function String_Expand (|Message| msg, |SCFunction| fn) {
+	|| P = msg.parent !
+	if (P istmp "disabled" or "description")
+		msg.Func = @str								// in case of description ''
+		return
+	
+	|| URL = msg in @url
+		scfunction.GetFileString(p, msg.name) 
+		msg = p
+	
+	if InbuiltFunc(msg, "digest")
+		msg.name = msg.name.digest
+	  elseif P == @arg
+		msg.wrapwith(@tmp, "printline")
+		
+	if !msg.first
+		ObjectifyString( msg )
+		Return
+	
+	require fn
+	|| Point = msg.UpToArg!
+	using (msg)
+	|| FSName = UniqueTmpVar( fn, "fs" )
+	|| Dot = @dot + "new"
+	dot <~ (@Thg, "FastString")
+	dot <~ @emb
+	
+	|| decl = MakeDecl( "FastString", fsName, Dot, scdeclinfo.Borrowed )
+	point.Prev = decl
+	|| errpos = msg
+	for item in msg
+		|| syx = item.func
+		if syx == @Emb or @Str
+			if syx == @emb
+				errpos = item
+			ObjectifyString( item )
+	
+	check !(scmodule.curr) (errpos, "Strings with expressions, must be in proper functions. (Compiler limitation)")
+
+	for (item in msg)
+		|| dot2 = @dot + "SyntaxAppend"
+		dot2 <~ (@thg, fsname)
+		dot2.msg(@prm) <~ item
+		point.Prev = dot2
+
+//	|| WeAreAppending = false
+//	|| fnc = msg.parent
+//	if fnc == @prm
+//		fnc = fnc.parent
+//		if fnc ~= @dot and "SyntaxAppend"
+//			WeAreAppending = true
+	// wrong approach.
+	msg.become(@dot, "getresult") // keep the reference the same so it doesn't whoop up.
+	msg <~ (@thg, fsname)
+	msg <~ @emb
+	(decl)
+}
+}
+
+
+function String.ParseCleanWipe (|Message|)
+	rz = .parseclean
+	if rz
+		for v.flat in rz
+			v.position = -1
+
+
+function String.ParseClean (|Message|)
+	Compiler.stTotalSourceSize += .Length
+	|| P1		= Date.Now
+	FlowLog.DisabledIncr // the system parse less sensitive.
+	rz			= .Parse   // clean already will detect real differences
+	FlowLog.DisabledIncr(-1)
+	if rz
+		Compiler.stParseTime += (Date.Now - P1)|int|
+		rz.clean(True)
+		rz.PrepareAST
+
+
+
+function Message.Clean (|bool| erl = false)
+	|| pos		= parser.using.position
+
+	|message--| QEscape
+	|message| IgnoreArg 
+	if ((message).layer == (message).defaultlayer)
+		pos = -1
+	
+	for (curr.flat in self)
+		if pos >= 0
+			curr.position = pos
+			curr.RangeLength = parser.Using.Length
+			curr.Tag = parser.Using.Tag
+		
+		if curr == QEscape
+			QEscape = nil
+		
+		|| f = curr.func
+		if (f != @Back and @Str and @sstr and @bin and @hint)
+			expect !(curr.name contains "\A0") (curr, "Node contains option-space")
+
+		if (f == @arg)
+			curr.name = ""
+			
+		  elseif (f == @Back or @sstr or @bin)
+			Curr.Func = @Str
+		
+		  elseif (f == @Rel)
+			Curr.RelFix(false)
+		
+		  elseif (erl and f == @erel)
+			curr.name = curr.name.Lowercase
+			curr.FixErl
+
+		  elseif (f == @msg)
+			continue_with curr.MsgFix
+		
+		  elseif (f == @arel)
+			if !QEscape and curr == "?"
+				curr.Tran_QMark
+				continue_with curr.flatnext
+
+		  elseif (f == @brel)
+			if (curr == "$") and !(curr in @decl)
+				Compiler.AddFunny(self, curr)
+			
+		  elseif (f == @decl)
+			|| l = curr.last
+			if l == @arg
+				|| types = curr.first
+				|| names = types.next
+				if (types and names and names.next == l)
+					l.WithDeclTransform(curr, names, l)
+			QEscape = curr.first.FlatAfter
+		
+		  elseif (f == @opp or @cnj or @erel)
+			if curr == "<>"
+				problem (curr, "Use !=")
+				curr.name = "!="
+			  elseif curr == "~<>"
+				problem (curr, "Use ~!=")
+				curr.name = "~!="
+			  elseif curr == "<~"
+				curr.BecomeAppend("SyntaxAppend")
+			  elseif curr == "~>" // noice
+				curr.BecomeAppend("SyntaxSendTo")
+			  elseif (f == @opp) and curr.OppExpand
+				0 // 
+			  elseif CharSet.LettersUnderScore[curr.name[]]
+				curr.name = curr.name.Lowercase
+
+		  elseif (f == @adj)
+			if curr.first ~= "target"
+				curr.BecomeTarget
+
+
+		  elseif (f == @tmp)
+			if curr.parent != IgnoreArg
+				|| s  = curr.name.Lowercase
+				curr.name = s
+				if s == "if" or "elseif" or "ifn"
+					curr.FixElseif
+				  elseif s == "target"
+					continue_with curr.tran_target
+				  elseif s == "is" or "isnt"
+					curr.Tran_Isnt("self")
+				  elseif SCGlobals.UniqueNum and AutoComplete.spdfunctions[s]!=nil
+					SCGlobals.UniqueNum = 0 // why not? make for smaller/more-predictable numbers
+				  elseif s == "dispatch" or "flags" or "constants"
+					IgnoreArg = curr.last
+				  elseif s == "with"
+					curr.tran_with
+				  elseif s == "direct_test_only"
+					if options.IsDirectTest
+						curr.name = "if"
+						using (curr)
+						curr.first = @thg + "true"
+					  else
+						curr.name = "ignore"
+				  elseif s == "unfinished"
+					SCFile.curr!.Unfinished = true // for autocomplete
+					curr.remove
+
+
+function message.Tran_Isnt (|string| name)
+	// is dead --> (self is dead)
+	|| type = self.needfirst
+	require type.ExpectLast
+	
+	using (self)
+		.BecomeSetRel
+		self <~ (@thg, name)
+		self <~ (@opp, .name)
+		self <~ type
+
+
+
+function message.ElseIfIndentBad (|bool|)
+	opt norefcounts
+	|| bb = .prev
+	if bb is Inserted
+		return !(.indent & 2)
+
+	return !(self in @tmp)
+
+
+function message.FixElseif
+	opt norefcounts
+	|| curr = .next
+	|| f = .first // cond 
+	|| NeedArg = f and (f.next != @arg)
+	
+	while curr istmp "else" or "elseif"			
+		if curr.ElseIfIndentBad
+			|| s = "Add two spaces to nicely indent this"
+			if curr.indent&1
+				s = "Add one space to nicely indent this"
+			problem (curr, s)
+		|| n = curr.next
+		if NeedArg
+			using (self)
+				self <~ @arg
+				needarg = false
+		self <~ curr
+		curr = n
+	
+	|| inner = self[2] // hopefully theres an @arg before us
+	while inner
+		if inner.indent&1
+			problem (inner, "Indent is odd")
+		inner++
+
+
+function message.Tran_With 
+	|| obj = .needfirst
+	require obj and obj != @arg 
+	|| arg = obj.Next(@arg)
+	if obj == @rel
+		error obj
+	
+	require arg and obj != @rel
+	
+	using (obj)
+	|| name = obj.name
+	|| If = self
+	if obj.func == @thg
+		.name = "if"
+	  else
+		.become(@arg)
+		If = @tmp + "if"
+		.first = If
+		if <~ obj
+		if <~ arg
+		|| dcl  = scfunction.tempmoveout(obj)
+		name = dcl.DeclName!.name
+
+	if.first!.wrapwith(@bra, "?")
+	
+	for ch.flat in arg
+		if ch == @tmp
+			if ch == "is" or "isnt"
+				ch.Tran_Isnt("it")
+				continue_With ch
+			  elseif ch == "with"
+				continue_with ch.flatafter
+		  elseif ch == @sdot
+			ch.func = @dot
+			ch.first = @thg + name
+		  elseif ch == @thg
+			if ch == "it"
+				ch.name = name
+	
+
+
+function message.WithDeclTransform (|message| decl, |message| rel, |message| arg)
+	require rel.expect(@rel)
+	|| name = rel[@thg]
+		using arg
+		|| IF = @tmp + "if"
+		decl.next = if
+		if <~ (@thg, name.name)
+		if <~ arg
+
+
+function message.BunchFixSub (|message| subject, |message| stuff)
+	while (stuff)
+		|| test = @rel.msg
+		test <~ subject
+		test <~ .copy
+		if stuff != @rel
+			stuff.replaceinto(Test)
+			exit
+		|| R = stuff[2]							#expect (stuff, "Rel missing right side.")
+		stuff.first!.ReplaceInto(test)
+		stuff = R
+		subject = subject.copy
+
+	
+function Message.BunchlessFix
+	|| subject		= .first
+	|| multi_opp	= subject.Next$ // or
+	|| c			= multi_opp.next$
+	// P			is the rel (a=b or c)
+	// self/stuff	is the bunch (b or c)
+	// subject		is left side of rel (a)
+	// multi_opp	is the opp (=)
+	.become(c)
+	using (self)
+	multi_opp.BunchFixSub(subject!, self)
+
+
+
+function Create_JeeboxTest (|Message| msg)
+	using (ErrorReceiver.new)
+		|| f = Compiler.InputFile( "self_test.txt", nil )
+		expect (f!=nil) "self_test.txt can’t be found."
+		|| s = f.ReadAll
+		if msg ~= "__SELF_TEST_JBIN__"
+			using (msg)
+			s = s.digest
+
+		msg.become(@str, s)
+
+
+
+
+
+module StringCorrector
+	linkage: cpp_Part Crkt
+	|{MessageID}|			Table2 = dictionary()
+	|[messageid]|			CppStrings
+	|int|					TotalSize
+
+	function Count (|int|)
+		return .CppStrings.Length
+	
+	function IDSort (|bool| IDOrder)
+		opt norefcounts
+		|| sorter = (idorder)(&messageid.byid, &string.sorter)
+		.CppStrings.sort(sorter)
+		for (s in .CppStrings) (i)
+			s.id = i
+		
+
+	function UseID (|messageID| s, |message| old, |bool|)
+		opt norefcounts
+		require old
+		|int| OldID = old.Position
+		require oldid < .Count
+		expect (!old.length == !oldid) (old, "Invalid string table")	// "" must come first
+		s.ID = oldid
+		s.func = @num													// mark as used
+		old.remove
+		return true
+
+		
+	function MergeTable (|message| disk, |{message}| D3)
+		opt norefcounts
+		|| NextID = 0
+		|| dl = disk.last
+			NextID = dl.Position + 1
+
+		// the disk names will be ordered... 1,2,3,4,5,6
+		if disk.hasany
+			for s in .CppStrings
+				.UseID(s, d3[s])
+
+		// now like: 1,3,4,6
+
+		for s in .CppStrings
+			if (s.func != @num) and !.useid(s, disk.first)
+				// we have more ids than they do!
+				s.id = nextID++
+			
+		
+	function CollectString (|message| m)
+		opt norefcounts
+		|| p = .Table2.MakePlace(m.name)
+		|| i = (p[])|MessageID|
+		if i == nil
+			i = MessageID(m.name, @str, .count) // .id = .count
+			p[] = i
+			.CppStrings <~ i
+			.TotalSize += m.name.Length + 1 // nul terminated
+		m.name = i
+
+
+	function CorrectStrings
+		opt norefcounts
+		for d in compiler.DeclConstants
+			|| def = d.default
+			if def.IsString
+				.CollectString(def)
+	
+		if !options.Scripting
+			stringcorrector.CorrectStringsSub
+
+
+	function StringFile (|file|)
+		|| f = (Options.SingleFileInput!="")(compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)!
+		return f[".strings.txt"]
+		
+		
+	function CorrectStringsSub
+		|| where = .StringFile
+		if options.PrintCompileString
+			printline where
+		
+		|| HasAnything = false
+		|| m = where.parse(4MB, true)
+			HasAnything = m.HasAny
+			|| D = m.Dict(false, true)
+			.MergeTable(m, D)
+		
+		.IDsort(HasAnything)
+		
+		if !Platform.isdebug
+			|| fs = where.OutputStream
+				.WriteTable(fs)
+
+	
+	function WriteTable (|faststring| fs)
+		opt norefcounts
+		for s in .CppStrings
+			fs.AppendQuotedEscape(s)
+			fs <~ '\n'
+		

@@ -1,0 +1,26 @@
+
+main
+	|| hello = abc.HelloSayer()
+	|| say = abc.stringsayer("goodbye")
+	|| rsay = abc.randomsayer("hehe")
+	"Now that we made 3 tasks... lets try running them"
+	hello()
+	say()
+	rsay()
+
+
+module abc
+	task HelloSayer
+	    run
+		    app.say "hello" // will print "hello" when run
+
+	task StringSayer (|string| str)
+		run
+			app.say  .str
+	
+	task RandomSayer (|string| name)
+		|int| RandomID
+		constructor
+			.randomid = random.int
+		run
+			app.say "$.name $.randomid"

@@ -1,0 +1,233 @@
+
+
+class FixedDict
+	contains object
+	linkage: cpp_part fix
+	|uint|					ItemTypes
+	|Byte|					ValueType
+	|Byte|					Letter
+	|(&nil)?|				Value
+	|FixedDict--?|			Parent
+	|(&nil)[16]|			Items
+	
+	constants
+		TypeValue	= 0
+		TypeObj		= 1
+		TypeStem	= 2
+		TypeDict	= 3
+	
+	constructor (|&nil| Value = nil, |Byte| type = 0)
+		cpp_part ConstructorValue
+		.value = value
+		.valuetype = type
+		if (type == typeobj)
+			jb_incr(value|object|)
+	
+	constructor (|FixedDict| Parent, |int| Part, || old, |byte| type)
+		cpp_part ConstructorReplace
+		.value = old|&nil|
+		.valuetype = type
+		parent.typeof(part) = typedict
+		parent.items[part] = self|&nil|
+		jb_incr(self)
+
+
+	destructor
+		.clear
+	
+	function Clear
+		opt norefcounts
+		|| T = .itemtypes
+		|| i = 0
+		while T
+			if T & 3
+				jb_decr( self[i] )
+			++i
+			T >>= 2
+		if .valuetype == typeobj
+			jb_decr( .value|object| )
+		.valuetype = 0
+		.itemtypes = 0
+	
+	
+	libinternal TypeOf (|int| i, |int|)
+		return 3 & .itemtypes >> (i<<1)
+
+
+	libinternal TypeOf (|int| i2, assigns:|uint|)
+		i2 <<= 1
+		.itemtypes	= (.itemtypes &~ (3 << i2))  |||  (Value << i2)
+
+
+	libinternal syntaxaccess (|int| i, |fixeddict?|)
+		inlined
+		return .items[i]|fixeddict?|
+
+
+	libinternal SetPart (|int| B, || Val, |int| type)
+		opt NoRefCounts
+		if type
+			jb_incr(val)
+
+		|| BT = .typeof(b)
+		|| place = &.items[b]
+		|| obj = (place[])|fixeddict|		// verbose but faster
+		if BT >= typestem
+			if obj
+				if obj.valuetype
+					jb_decr( obj.value|object| )
+				obj.valuetype = type
+				obj.value = val|&nil|
+			  else
+				debugger // obj will never be nil here
+		  else
+			.typeof(b) = type
+			place[] = val|&nil|
+			if bt
+				jb_decr( obj )				// cos we call this last, compiler can opt it.
+	
+
+	libinternal DownPart (|int| part, |FixedDict|)
+		opt NoRefCounts
+		|| rt = .typeof(part)
+		|| r  = self[Part]
+		if rt == TypeDict
+			return r!
+		return fixeddict(self, part, r, rt)
+	
+
+	libinternal InlineValue (|int| t, ||)
+		nil self
+		if T == typeobj: return self|...|
+		if T and self and .valuetype
+			return .value|...|
+
+
+	syntax access (|string| s, assigns:|| o)
+		cpp_part SetValue
+		|| n = s.length
+			.addType(s.addr, n, o, typeobj)
+		// could allow "" as a name, using .value?
+
+
+	syntax access (|string| s, ||)
+		cpp_part GetValue
+		|| n = s.length
+			return .gettype(s.addr, n)|...|
+
+	
+	libinternal AddType (|&byte| Addr, |int| n, || val, |int| Type)
+		opt norefcounts
+		|| i = 0
+		while 
+			|| b = addr[i++]
+			self = .DownPart(b&15)
+			if i >= n
+				return .SetPart(B>>4, Val, Type)
+			self = .DownPart(B>>4)
+
+
+	libinternal GetType (|&byte| Addr, |int| n, ||)
+		opt norefcounts
+		|| i = 0
+		while
+			|| B	= addr[i++]
+			self	= self[B&15]				#require
+			|| T	= .typeof(B>>4)
+			self	= self[B>>4]!
+			if i >= n
+				return .InlineValue(t)
+			require T == typedict
+
+
+	module
+		libinternal TimeTest (|[string]| items)
+			|fixeddict of string|  fd = fixeddict()
+			|{string}| ed = dictionary()
+			|| n = 4
+			
+			printline
+			for (n)
+				fd = fixeddict()
+				time "fixed set"
+					for a in items: fd[a] = a
+
+			printline
+			for (n)
+				time "fixed set reuse"
+					for a in items: fd[a] = a
+			
+
+			printline
+			for (n)
+				ed = dictionary()
+				time ("set")
+					for a in items: ed[a] = a
+			
+			printline
+			for (n)
+				time ("set reuse")
+					for a in items: ed[a] = a
+			
+			printline
+			for (n)
+				time ("fixed get")
+					for a in items
+						expect (fd[a] == a)
+
+			printline
+			for (n)
+				time ("get")
+					for a in items
+						expect (ed[a] == a)
+		
+		
+		libinternal Test
+			|[string]| items	= []
+			|| fs				= faststring.new
+
+			for i in 100
+				fs <~ ('A' + i)|Byte|
+				fs <~ ('Z' + i)|Byte|
+				fs <~ (i&15)|Byte| // just for the mix
+			
+			|| s = fs.getresult
+			|| prefill = fixeddict()
+
+			for i in 100
+				for j in (i + 1) to 100 // fill ooftester
+					|| t = s[i, j]
+					items <~ t
+					prefill[t] = t
+			prefill.clear
+		
+			|| LK = leaktester.new("oof2")
+			|| f = fixeddict()
+			for t in items
+				f[t] = t
+			LK.test
+			
+			(prefill)
+			|fixeddict of string| dict	= FixedDict.new
+			for t in items
+				dict[t] = t
+			for t in items
+				expect (dict[t] == t) (dict[t])
+			dict.clear
+
+			TimeTest(items)
+
+
+
+/*
+	Could replace:
+		* Array			(arrays suck in every language. we only wanna go forward/backward!)
+		* Dictionary	(kinda bloated, and slower!! and takes more memory!)
+*/
+
+// Possible idea: Optimise speedie's lookuptables for properties/globals
+	// * nil means empty dictionary
+	// * Store <= 8 values, as inline-array in FixedDict (name+value stored in .items)
+	// * FixedDict can be upgraded to a proper dictionary
+
+

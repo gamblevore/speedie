@@ -1,0 +1,27 @@
+
+
+datatype ASM (uint)
+	function Print
+		visible
+		cpp_name PrintASM
+	 
+	function R1 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 8
+	function R2 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 13
+	function R3 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 18
+	function R4 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 23
+	function R5 (assigns:|uint|, |asm|)
+		return self ||| (value << 27) >> 28
+
+	module
+		|byte|					NoisyASM = 1
+		|asm_encoder[128]|		Forms
+		|asm_encoder[256]|		Encoders
+
+
+
+prototype ASM_Encoder  (|&FatASM| self, |!&asm| Curr, |!&asm| After,  |&asm|)
+

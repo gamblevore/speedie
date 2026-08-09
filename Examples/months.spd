@@ -1,0 +1,21 @@
+#!/usr/local/bin/spd
+
+datatype AnyMonth (uint16)
+    flags
+        |AnyMonth|
+        January, February, March, April, May, June, July, August, September, October, November, December
+    module
+        || Names = "January,February,March,April,May,June,July,August,September,October,November,December"/','
+    
+    render
+        || NeedSep = false
+        for i in 12
+            if self & (1<<i)
+                if NeedSep
+                    fs <~ "/"
+                fs <~ Anymonth.names[i]
+                NeedSep = true
+
+main
+    || PlantMySeeds = anymonth.January + anymonth.February + anymonth.March
+    printline PlantMySeeds.render

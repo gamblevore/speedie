@@ -1,0 +1,74 @@
+
+
+function PerryIDE.ACTUAL_COMPILE
+	expect !.compilr (beep)  // wah?
+	require .FileList.SaveAll(documentaction.saving, .CurrFileRow)
+
+	// so should I save this here? Or in saveall?
+	// lets try here. Why not... in the textview itself?
+	// it would need to know whether to save or not...
+
+	|| args = ["--nocolor"]
+	if .projname ~= "Speedie.scproj"
+		args <~ "--perry"
+	  else
+		args <~ "--perry=bin"
+	
+	if (.DebugMode is CakeMode)
+		args <~ "--bake"
+	if (.debugmode is debug)
+		args <~ "--targetdebug"
+		args <~ "--hideaway" // store the scripts in a hidden temp folder
+	args <~ .project
+
+	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
+	if .compilr
+		.GUIIsCompiling(args)
+
+
+function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug also. but whatever
+	|| out = .DebugAppCallArgsDisplay(F, args)
+	|| str = out.GetResult
+	.ProductOut.Log(str, 256K)
+	.LogOneAction(str)
+	out <~ ('\n', 2)
+
+	if .DebugMode isnt cakeMode
+		.LogOneAction("Unix Debug: " + f)
+		.RunCompileSub(UnixProcess.spawn(f, args, ProcessMode.OwnGroup))
+		return
+	
+	args.insert(0, f)
+	target perryexec and xcode
+		|| cake = (Cake_Main).Spawn(CakeExec, args)
+	  else
+		|| cake = spdprocess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
+
+	.LogOneCake("Starting: " + args.render)
+	.RunCompileSub(cake)	
+
+
+
+function PerryIDE.RUN_COMPILE_WRAP (|file| product)
+	|| DebugArgs = .DebugArgs						#require
+	|| ArgMsg = DebugArgs["args"]
+		ArgMsg = ArgMsg.Copy
+		argmsg.Ask
+		
+	|[string]| args	
+	if  ArgMsg.DebugArgNames(args)
+		|| f = Product
+		if product.IsDir and Platform.OSX
+			f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
+		
+		|| old = app.cwd
+		.DebugPath(debugargs)	
+		.DebugEnvs(debugargs["env"])		
+		.ACTUAL_DEBUG(f, args)
+		app.cwd = old
+	
+	if !StdErr.ok
+		.RunArgsText.FillErrors(StdErr)
+		|| err = StdErr.LastError
+			Notifications <~ err
+

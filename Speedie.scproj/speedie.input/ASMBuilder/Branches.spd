@@ -1,0 +1,632 @@
+	
+
+#!"if (x) return, a(), b()   -->   if !x {a(), b()}, return"
+
+
+extend Assembler {
+
+function ElseSub (|message?| other, |asmreg|)
+	opt norefcounts
+	if !other.HasAsmStuff
+		return asmreg()
+	|| T = other.ASMType
+	if T == ASMType.kif
+		return .MainBrancher(other, asmreg())
+	if other != @arg
+		other = other.first!
+	  else
+		debugger
+	rz = ASMType.Argument(self, other)
+	// .NextBasicBlock // Will be done by the caller (IfSub)
+
+
+
+function IfSub (fn_asm)
+	opt norefcounts
+
+	|| cond = exp.first!,  || arg1 = cond.next!
+	|| Other = arg1.next
+	
+	|FATRange| B
+	.Branch(cond, B)
+	if b.Never
+		return .ElseSub(other)								// if k0 {b()} else {return}
+
+	if b.Always
+		return ASMType.Argument(self, arg1)					// if k1: return 
+
+	|| Arg1Return = ASMType.Argument(self, arg1)
+	if !other.HasAsmStuff									// if (x): func()
+		|| Clamped = .MiniClampOpt(exp, b.start)
+			return Clamped
+		.ExpectOneMore = true
+		.BranchToCurr(b)
+		return asmreg()
+	
+	|| AfterFirst = other.jump								// Basicblock ++
+	.BranchToCurr(b)
+	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
+	AfterFirst.JumpTo(.curr)
+
+
+
+function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
+	while C < S
+		#!ClearExits
+		|| op = C.Op
+		|| k = c._const
+		if (op == asm.jump) and k >= kContinue
+			C._Const = 0
+			if k == kContinue				// continue
+				C.JumpTo(S)
+			  else							// exit
+				C.JumpTo(A)
+		C++
+
+
+function MainBrancher (fn_asm)
+	.ParentSanity
+	|| NothingDone = .curr
+	|| BreakReq = .BreakRequest
+	|| Old = .BasicParent
+
+	|| s = .state
+	s.BranchDepth++
+	s.RealBranchDepth++
+	if dest == nil
+		rz = .WhileSub(exp)
+	  elseif dest isnt VerySpecial
+		rz = .IfSub(exp, nil)
+	  else
+		rz = .TernarySub(Exp, dest)
+	s.BranchDepth--
+	s.RealBranchDepth--
+	
+	if old != .basicparent
+		.nextbasicblock
+
+	.breakrequest = nil
+	if NothingDone == .curr
+		.BreakRequest = BreakReq
+	
+
+function While (fn_asm)
+	.LoopDepth++
+	rz = .MainBrancher(exp, nil)
+	.loopdepth--
+	
+
+function WhileSub (|message| exp,  |asmreg|)
+	opt norefcounts
+	|| InitialJump = exp.JUMP										// test goes after loop
+	|| Returns = ASMType.ArgumentSub(self, exp.second!)
+	|FatRange| loop_test
+	.breakrequest |= assembler.breakable ||| InitialJump.ASMIndex
+	.Branch(exp.first!, loop_test, true)
+
+	|| Known = loop_test.Constness.negate							// loops are weird :]
+	if Known.knownfalse
+		.nop(InitialJump)
+		return ASMReg()
+
+	if Known.knowntrue
+		.Nop(InitialJump)	
+		exp.JUMP.JumpTo(initialjump+1)
+		loop_test.after++
+	  else
+		InitialJump.JumpTo(loop_test.start)
+		loop_test.JumpTo(InitialJump+1)
+		if loop_Test.length == 1									// loop opt!
+			InitialJump.copyfrom(loop_test.Start)
+			InitialJump.JumpTo(loop_test.After)
+			InitialJump.JumpNegate
+		returns = nil
+
+	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
+
+//	I can't underrstand this.
+//	|| BB = .BasicBlock												// just do it always?
+//	.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))				// we need to move it up.
+// looks hard. and broken.
+	
+	return returns
+
+
+
+function Exit			(fn_asm)
+	opt norefcounts
+	|| J = exp.jump											// request jump to exit
+	j._Const = kexit
+
+
+function Continue		(fn_asm)
+	opt norefcounts
+	|| J = exp.jump											// request jump to continue
+	J._Const = kcontinue
+
+
+function NopBranch (|fatasm| start)
+	|| l = .last
+	require l >= start
+	|| bb = l.basicblock
+	.Nop(l)
+	--l
+	if l.basicblock == bb  and  l >= start  and  l is Const
+		.nop(l)
+
+
+function Ternary		(fn_asm)
+	opt norefcounts
+	return .MainBrancher(exp, dest as asmreg.veryspecial)
+
+
+function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
+	// I'd rather actually re-write this to be like an if-condition! Like reuse the code
+	// then we can put back in, the opts... into the generalised "if" thing.
+	// this will do for now.
+	opt norefcounts	
+	dest = dest &~ asmreg.veryspecial	
+
+	|| A = exp.second.second!
+	|| B = A.next!
+	
+	// opt this:
+	// x = JB_Ternary(Bool, 1, -1) --> 
+	// x = -1
+	// x += Bool << 1
+	
+	|| DestType = exp.ASMDecl.typeonly
+	|| mA = .ExistingVar(a)
+	|| mB = .ExistingVar(b)
+	
+	|| cond = a.prev!
+	if ma isa DestType
+		if (mb isa DestType) and !DestType.isfloat
+			return .InbuiltTernary(dest, ma, mb, cond)
+	
+	dest = .TempTyped(exp, dest)
+	|FatRange| br
+	.Branch(cond, Br)
+	|| KK = br.Constness
+	if KK.IsKnown
+		|| which = B
+		if (KK.Default): which = A
+		return .µInto(which, dest)
+
+	return .RealTernary(exp, dest, a, b, br)
+
+
+function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
+	|| mA = .µInto(A, dest)
+	|| Exit = exp.jump				// .JumpInput already calls .NextBasicBlock
+	.BranchToCurr(Branch)
+	|| mB = .µInto(B, dest)	
+	rz = .TernRefCount(ma, mb)						
+	Exit.jumpto(.curr)
+
+
+function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
+	// We want things that are refered to... to not disappear.
+	rz = B
+	|| fa = A.fat
+	|| fb = B.fat		
+		fb.reginput(5) = A			// refcount A, save from disposal
+	  elseif fa
+		rz = A
+
+
+function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
+	opt norefcounts
+	dest = .temponly(dest)
+	|| C = ASMReg()
+	ifn (Dest iz A or B)
+		C = dest
+	C = .µ(cond, C)
+	
+	if C isnt Const
+		return cond.TERN(dest, C, A, B, C.issmall|int|) * dest
+
+	|| T = B
+	if (C.Const)
+		T = A
+	.NopConst(C)
+	return t
+
+
+
+function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
+	range.Start = .curr
+	range.FirstBlock = .BasicBlock
+	|| mode = asmreg.CondRequest.Negate(neg)
+
+	rz = .µ(cond, mode)
+	if rz isnt CondAnswer
+		rz = .Exists(cond, mode, rz)
+
+	if rz is Const
+		range.Constness = (rz.const!=0)|maybebool|
+		if rz is Const
+			.NopBranch(range.start)
+	  else
+		range.Constness = maybebool.default(false)
+	
+	range.after = .curr
+
+
+// this was crazy complex before. We simplified it!
+helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
+	opt norefcounts // 😵‍💫 // 😵‍💫 // 😵‍💫 // 😵‍💫
+	dest.µtype = DataTypeCode.bool
+	
+	|| A = exp.first!
+	|| B = exp.last!
+	if dest is CondRequest									// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
+		if OPP is OR
+			return .BranchOr(A, B, dest)
+		return .BranchAnd(A, B, Dest)
+
+	return .BoolAndOrOpt(A, b, dest, opp)
+	
+
+
+function FoundReg (|message| All, |int| R, |bool|)
+	opt norefcounts
+	all = all.Declable
+	
+	if all == @thg or @num	// nums used to be hoistable.
+		|| d = all.FastDeclSafe
+		if (d is local) and (d.reg == r)
+			return true
+		
+	for s.fast in All
+		if .FoundReg(s, r)
+			return true
+
+
+function Unchanged (|message| A, |asmreg| dest, |message| B, |bool|)
+	|| Dr = dest.reg
+	return !.FoundReg(a,dr) or !.FoundReg(b,dr)
+
+
+function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
+	// a = a or b, can   directly set 'a' (But code isnt't smart enough?)
+	// a = b or a, can't directly set 'a'
+	// a = b or c, can   directly set 'a'
+	if dest.reg
+		if .Unchanged(A, dest, B)
+			return dest
+		  else
+			debugger 
+	rz = .TempOnly()
+	(rz is negate) = (Dest is negate)
+	rz.µtype = dest.µtype	
+
+
+function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
+	|| mode = ASMReg.CondRequest.negate(opp is OR)
+	return .Exists(exp, mode, req).fat!
+
+	
+function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
+	opt norefcounts
+	
+	|| start = .curr
+	|| bowl = .BoolAndOrValue(a, b, dest, opp)
+	|| last = .Last
+	if start + 2 != last
+		return bowl
+	
+	|asm| middle = (start+1).Op
+	ifn  (start isa asm.EQUL)  and  (last isa asm.EQUL)  and  (middle == asm.jbor or asm.jban)
+		if 0: a.jbor, a.JBAN
+		return bowl
+	
+	|| nA = start.prms[3]
+	|| nB = last.prms[3]
+	|| rA = start.asmreg(2)
+	|| rB = last.asmreg(2)
+	if !start.p1.Reg and !last.p1.reg and (ra iz rb)
+		0
+	  else
+		ifn na.EqulInputsAreBothBool and nb.EqulInputsAreBothBool
+			return bowl
+	
+	// equl: out, r0, in, mode
+	na &= 1
+	if na == nb&1
+		.Rewind(start+1, last+1)
+		if ra iz rb												// a and/or a
+			return bowl
+		start.RegInput(1) = rB
+		start.prms[3] = 63
+		|| WantBAND = ((middle == asm.jban) == (na==0))|int|
+		start._op = asm.BORR - WantBAND
+		if na
+			A.parent!.BNOT(dest, dest, nil, -1)
+		return start.info
+	
+	// do later:
+	// if a and !a --> false
+	// if a or !a  --> true
+	
+	return bowl
+
+
+
+function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
+	opt norefcounts
+	if dest is negate
+		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
+		(dest is AlreadyNegated)
+
+	|| Tmp = .UniqueLocation(a, dest, B)
+	return .BoolAndOrValueSub(a,b,Tmp,opp)
+		
+	
+function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
+	opt norefcounts
+	
+	target debug
+		if asmtrapper == -1
+	|| first = .µBoolInto(A, dest)
+	if first is Const
+		return .BoolConst1(b, dest, opp, first).boolanswermaybebugged	// x = 5 or Y() --> x = Y()
+	
+	|| JUMP = .BoolTestAndJump(a, first, opp)						// AND/OR
+	|| Second = .µBoolInto(B, dest)
+	if Second is Const
+		return .BoolConst2(first, second, opp, jump).boolanswermaybebugged
+	
+	JUMP.JumpTo(.curr)
+	
+	if first.IsBool and Second.IsBool
+		return dest.boolanswermaybebugged
+
+	// exists always handles negate...
+	return .Exists(A.next!, dest, dest)
+
+
+
+function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asmreg|)
+	|| V = (ml.const!=0) != (dest is negate)
+	|| expect = opp is OR
+	if v == expect
+		ml.µtype = datatypecode.bool
+		return .SetConst(b, v|int|, ml, dest)
+									// x = 5 or  2	 --> x = true
+									// x = 0 and 2	 --> x = false
+	
+	.NopReg(ml)						// x = 0 or y()  --> x = y()
+									// x = 7 and y() --> x = y()
+	|| mr = .µ(B, dest)
+	if mr is Const
+		mr.µtype = datatypecode.bool
+		v = (mr.const!=0) != (dest is negate)
+		return .SetConst(b, v|int|, mr, dest)
+	
+	if mr.isbool
+		return mr
+	return .Exists(B, dest, mr)
+
+
+function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
+	|| V = kr.const!=0
+	if v == (opp is AND)
+		.softnop jump
+		.NopReg(kr)
+		return ml
+		
+	.nop jump // this also nops ml!
+	return kr
+
+
+function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
+	|fatrange| AndTest
+	|| First = .Branch(A, andtest, dest is negate)
+	if AndTest.never
+		return first
+
+	|| Second = .Branch(B, AndTest, dest is negate)
+	if  first isnt Const
+		// a and b
+		// a and 1
+		// a and 0
+		return first
+
+	// 1 and 1
+	// 1 and 0
+	// 1 and b
+	return second
+
+
+function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
+	|FatRange| OrTest
+	|| First = .Branch(A, OrTest, dest isnt negate)
+	|| KF = OrTest.Constness.negate
+	if kf.knowntrue
+		|| fake = A.noop
+		fake.const = KF|int|
+		(first is condanswer)
+		first.fatindex = fake.index
+		return first.boolanswerok						// only way around this. Cos we got asm-reg(0)
+
+	|fatrange| Br2
+	|| second = .Branch(B, Br2, dest is negate)
+	.BranchToCurr(OrTest)
+
+	// why do we not call .boolanswerok on these though?
+	if Br2.always
+		// a or 1
+		// 0 or 1
+		return second
+
+	if kf.KnownFalse
+		// 0 or 0
+		// 0 or b
+		return second
+
+	// a or 0
+	// a or b
+	
+	return first
+
+
+
+// We should do one basicblock per depth...
+// And one down per depth... it could make it simpler
+
+function NextBasicBlock
+	// Goes up one at a time... to allow for going DOWN one at a time.
+	|| B = .BasicBlock
+	|| P = .BasicParent
+
+	|| Depth = .state.RealBranchDepth
+	|| Gain = Depth - .BasicDepth
+	while {
+		if Gain
+			.BasicDepth = depth
+			if Gain > 0
+				P = B
+			  else
+				P = .ParentBlock(P)
+			.BasicParent = P
+		
+		.BasicBlock = ++B						
+		if B >= 16K								// whaaaaat??
+		BlockParents[B&(16K-1)] = P
+
+		.ParentSanity
+		if gain
+			gain -= (gain>0).dir
+	} (gain)
+		
+
+
+	
+function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
+	// Clamp for ints isn't used so much...
+	// its actually very good for floats and vectors
+	// and someday we'll have our own hardware... Might as well do this now then.
+	
+	|| bflg = .last(asm.bflg)!
+	require (bflg - 1) == compare
+	require (compare isa asm.jmpi or asm.jmpf)
+	
+	|| mode = compare.prms[2]
+	|| Small = (mode>>2)&1
+	|| IsFloat = compare isa asm.jmpf
+	if !IsFloat
+		require (mode>>3) & 1 == Small
+
+	|| X = compare.ASMReg(0)
+	|| Y = compare.ASMReg(1)
+	|| IsMax = mode & 1
+		swap (x) (y)
+	|| A = bflg.ASMReg(0)
+	|| B = bflg.ASMReg(1)
+		
+	if x iz b and y iz a
+		ismax ^= 1
+	  else
+		require x iz a and y iz b
+		swap (x) (y)
+	
+	.SoftNop(bflg)
+	.SoftNop(compare)
+	|| input = (ismax!=nil)(y, x)
+	|| f = exp.iclm(a, x, input, y, small)
+	if IsFloat
+		f.prms[4] = small^1						// other way around, wew.
+		f._op = asm.FCLM
+		if 0: exp.FCLM
+	  else
+		if mode & 2
+			f._op = asm.uclm
+			if 0: exp.uclm
+	return f * a
+
+}
+
+
+
+
+Struct FatRange
+	|&FatASM|		Start
+	|&FatASM|		After
+	|uint16|		FirstBlock
+	|maybebool|		Constness
+	
+	function Length (|int|)
+		return .after - .Start
+	
+	function Always (|bool|)
+		return .Constness.KnownTrue
+	
+	function Never (|bool|)
+		return .Constness.KnownFalse
+	
+	iterator
+		|| curr = .after!
+		while (curr > .start)
+			curr--
+			yield curr
+
+
+extend Assembler
+	function fatasm.JumpFix (|&fatasm| curr)
+		isnt CondAnswer
+		.JumpTo(curr)							// shouldn't (s isnt CondAnswer) go inside .jumpto?
+	
+	
+	function BranchToCurr (|FatRange| range)
+		return range.JumpTo(.curr)
+	
+	
+	function FatRange.JumpTo (|&FatAsm| curr)
+		for s in self
+			if (s is CondAnswer) and !(s isa asm.knst)
+				s.JumpFix(curr)
+	
+
+function @assembler.PrintProgress
+	cpp_name adb
+	visible
+	opt norefcounts
+	target debug
+		require !compiler.inperry
+		"---"
+		|| fn = scfunction.currfunc!
+		printline fn
+		|| Start = fn.µStart
+			|| Base = assembler.sh.Start + Start
+			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+			for n in amount
+				base[n].debugprint
+			
+			.PrintRegs
+
+
+function @assembler.PrintRegs
+	target debug
+		|| i = 0
+		|| D = .sh.vdecls_
+		|| T = .sh.vtemps
+		|| X = D|||T
+		|| Prev = false
+		print "Regs: "
+		while ++i <= 31
+			|| test = 1<<i
+			if X&Test
+				if Prev
+					print ",  "
+				Prev = true
+
+				ifn D&Test
+					print "t"
+				  elseif T&Test
+					print "x"
+				  else
+					print "r"
+				print i
+		printline
+

@@ -1,0 +1,49 @@
+
+
+target debug and vm
+	|!&CakeVM| TestVM = CakeVM()
+
+
+extend_module ASM
+	function TextASMTestSub (|message| tests)
+		opt norefcounts
+		Assembler.sh.ASMInit
+		|| list = tests.last(@arg)
+		|| TestName = tests[@thg]
+		require list and testname
+
+		textassembler.assemble(list)
+		target debug and !perrydbg
+			|| fn = .GetASMFunc(testname)
+				|| ff = fn.µTest
+				testvm.Registers(true)
+				testvm.SetDebug(cakevm.kBreakStated)
+				testvm.load(ff.ptr, ff.length)
+				object.totalsanity
+				testvm.Run(0)
+				object.totalsanity
+				testvm.SetDebug(0)
+
+
+	function GetASMFunc (|message| m, |scfunction|)
+		cpp_part AccessStr
+		opt norefcounts
+		return compiler.XFunc(m.name, m)	#expect (m, "This function has no ASM")
+
+
+	function TestASMText 
+		target debug and vm
+			require options.Modecake// and options.dev > 0
+			asm.noisyasm = 3		
+			using ErrorSeverity.Warning
+			|| T = ( file://syntax.asm ).parse[@tmp, "tests"]
+				.TextASMTestSub(T)
+	
+
+function message.GetASMFunc (|message|)
+	opt norefcounts
+	|| op = .next(@opp, "=")
+	|| Adj = op.Next(@adj)
+		return adj[@func]
+
+

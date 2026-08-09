@@ -1,0 +1,108 @@
+
+
+dylib libcurl `libcurl`
+	cpp_func curl_global_init	(|int| Flags=curlenv.GLOBAL_DEFAULT, |int|)
+	cpp_func curl_easy_init		(|?&CurlEnv|)
+	cpp_func curl_easy_cleanup	(|&CurlEnv| curl)
+	cpp_func curl_global_cleanup
+
+	// setopt is not correct. We can't do it by just type-casting. We can code-gen the correct cpp
+	// but we can't do this in ASM... not so easily anyhow.
+	// I'd also need to update speedie to allow for a variadic C++
+//	cpp_func curl_easy_setopt	(|&CurlEnv| curl, |int| Type, |...| Value, |int|)
+
+// if only libcurl had this instead:
+//	cpp_func curl_easy_setopt	(|&CurlEnv| curl, |int| Type, |void*| Value, |int|)
+// what an absolute disaster and waste of my time. I wrote an entire feature and I can't test it.
+// I don't have any libs worth testing apart from curl.
+
+	cpp_func curl_easy_perform	(|&CurlEnv| curl, |int|)
+	cpp_func curl_easy_strerror	(|int| err, |cstring|)
+	
+	module
+		function H (|&libcurl|)
+			return curl
+//		|libcurl| H = libcurl.new! putting this here crashes... bad code gen.
+
+|| curl = libcurl.new!
+
+
+struct CurlEnv
+	constants
+		GLOBAL_DEFAULT		= 3
+		OPT_TIMEOUT			= 13
+		OPT_FOLLOWLOCATION	= 52
+		OPT_CA_CACHE_TIMEOUT= 321
+		OPT_WRITEDATA		= 10001
+		OPT_URL				= 10002
+		OPT_USERAGENT		= 10018
+		OPT_COOKIE			= 10022
+		OPT_WRITEFUNCTION	= 20011
+
+		FOLLOW_FIRSTONLY = 3
+
+	function Report (|int| Err)
+		if Err
+			error libcurl.h.curl_easy_strerror(err).wrap
+		
+	function Opt (|int| Type, assigns:|&nil| Value)
+		debugger // my idea totally failed because ASMing a variadic-arg is not easy
+		// and I don't want to do it, and curl relies on variadic-args to send ONE single value!
+		// any work around would be a hack.
+		// So I'm giving up. Sigh.
+//		|| err = libcurl.h.curl_easy_setopt(self, Type, Value)
+//			.report(Err)
+			
+	function Opt (|int| Type, assigns:|stringzeroterminated?| Value)
+		.opt(type, value.addr|&nil|)
+	
+	function Perform (|ErrorInt|)
+		|| err = libcurl.h.curl_easy_perform(self)
+			.report(err)
+
+
+	module
+		|&CurlEnv| MyEnv
+		function Init (|&CurlEnv|)
+			|| env = .MyEnv
+				return env
+			libcurl.h.curl_global_init
+			env = libcurl.h.curl_easy_init								#expect ("Can't init Curl")
+			.MyEnv = env
+			env.opt(OPT_WRITEFUNCTION) = &CurlAppender
+			env.opt(OPT_USERAGENT) = "libcurl-agent/1.0"
+			return env
+			
+		function Cleanup
+			|| env = .MyEnv
+				libcurl.h.curl_easy_cleanup(env)
+				libcurl.h.curl_global_cleanup()
+				.myenv = nil
+
+		prototype Reader (|&nil| contents, |uint64| size, |uint64| nmemb, |FastString| FS, |int|)
+		function CurlAppender (Reader)
+			|| realsize = size * nmemb
+			fs.AppendMemory(contents|&byte|, realsize)
+			return realsize
+
+
+function faststring.AppendURL (|string| URL, |Date| Timeout=nil, |string?| Cookie=nil, |ErrorInt|)
+	cpp_part AppendURLWrap
+	return .AppendURLC(Url.zeroterm.cstr, Timeout, cookie.zeroterm.cstr)
+
+
+function faststring.AppendURLC (|cstring| URL, |Date| Timeout=nil, |cstring?| Cookie=nil, |ErrorInt|)
+	|| env = CurlEnv.Init
+/		env.opt(curlenv.OPT_COOKIE) = Cookie|&nil|
+		env.opt(curlenv.OPT_URL) = URL|&nil|
+		env.opt(curlenv.OPT_WRITEDATA) = self|&nil|
+/		env.opt(curlenv.OPT_TIMEOUT) = ((Timeout<<30) / 1073741)|&nil|
+		rz = env.Perform
+
+
+function String.Download (|Date| Timeout=nil, |string?| Cookie=nil, |string|)
+	|| fs = FastString()
+	if fs.AppendURL(self, timeout, cookie) == 0
+		return fs
+	return string.error
+

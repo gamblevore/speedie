@@ -1,0 +1,120 @@
+
+
+
+class StartupWindow (window)			// splashscreen, startupscreen, startwindow
+	linkage: cpp_part ttup
+
+	behaviour CancelClose
+		if perry.Projects.hasany
+			return false
+		Notifications <~ "Open a project or create a new one, to use Perry"
+		beep
+		return true
+	
+	
+	module
+		|StartupWindow|			_win
+
+		function Open (guiaction)
+			startupwindow.Show
+
+
+		function Hide
+			opt norefcounts
+			|| w = ._win
+				w.close
+
+
+		function Show
+			opt norefcounts
+			|| w = .CreateStartup
+			if GUI.startedproperly
+				(w)()
+			  else
+				w.Show
+
+	
+		helper CreateOptionSub (|string| name,  |string| tooltip, |guiaction| fnc, |Button|)
+			opt norefcounts
+			|| b = Button(._win,	fnc)
+			b.tooltip	= tooltip
+			b.id		= name
+			b.PressMakesLighter = true
+			b.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
+			return b
+
+	
+		function CreateOption (|string| name,  |string| icon,  |guiaction| fnc,  |string| tooltip)
+			opt norefcounts
+			|| b = .CreateOptionSub(name, tooltip, fnc)
+			|| t = .CreateOptionSub(name, tooltip, fnc)
+			
+			(t isnt editable)
+			t.text		= "\n" + name
+			b.text		= icon
+
+			t.takesfocus = 0
+			
+			b.size		= 4~right for 30 by 4~after for 30 
+			t.size		= 6~after to 6~left  by  the~same
+			t.align		= ListViewState.aligncenter
+			
+
+		function CreateStartup (|startupwindow|)
+			opt norefcounts
+			rz = ._win
+			if rz
+				return rz
+			rz = StartupWindow()
+			._win = rz
+			
+			with rz
+				.id				= "startup"
+				.size			= 200 by 140
+				.gnormal		= ¥.SystemStyle.copy
+				.gnormal.solid	= ((0.01, 0.05, 0.01, 0.9))
+				.ClickOutsideCloses = true
+				isnt visible
+
+			.CreateOption("Open Project",	"\1a",	ClickedOpenProj,   "Open a Speedie project.")
+			.CreateOption("Open File",		"\11",	ClickedOpenFile,   "Open a text file.")
+			.CreateOption("New Project", "\19+",	ClickedCreateProj, "Create new Speedie project!")
+			.CreateOption("New Script",	"\11+",	ClickedCreateFile, "Create new single file project.")
+
+
+
+function ClickedOpenProj (GUIaction)
+	|| start		= "~/".resolve
+	|| path			= app.AskOpen("spd,scproj/,input/", start, "Open Project", "Open", "OpenProj")
+		|| better_path	= path.GetSpeedieProj
+			path = better_path
+		perry.IdeAddProj(path)
+		perry.HideStartIfNeeded
+
+
+function ClickedCreateProj (GUIAction)
+	|| path = app.AskSave("scproj/",  "",  "New Project",  "Create", "OpenProj")
+		perry.CreateProj(path)
+		perry.HideStartIfNeeded
+
+
+function ClickedCreateFile (GUIaction)
+	|| path = app.AskSave("spd",  "",  "Enter new filename",  "New", "OpenProj")
+		perry.CreateProj(path)
+		perry.HideStartIfNeeded
+
+
+function ClickedOpenFile (GUIaction)
+	|| file = app.AskOpen("",  "",  "Open File", "Open", "OpenProj")
+		perry.IdeAddProj(file)
+		perry.HideStartIfNeeded
+
+
+
+function perry.HideStartIfNeeded
+	if .projects.hasany
+		startupwindow.hide
+		
+
+
+

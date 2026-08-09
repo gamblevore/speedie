@@ -1,0 +1,412 @@
+
+
+class FileRow (ListViewRow)
+// this would be better if it were simply a normal class set on message.Obj
+// then fileviewer can handle it...
+	linkage
+		cpp_part FR
+	|string|						FilePath
+	|Document?|						_Document
+	|date|							DateOfFileAtRead
+	|string|						DirFile
+	|int|							LastSize
+	|int|							LastScroll
+	|int|							LastFileCount
+	|byte|							FindID
+	|bool|							HasError
+	|bool|							InMainProj
+	|bool|							AsDir
+	|bool|							DoesntExist
+	|bool|							SameNameAsPrev
+	contains FileRow
+	
+	
+	constructor (|FileRow| R)
+		cpp_Part ConstructorCopy
+		.func = r.func
+		.FilePath = R.FilePath
+		.dirfile	= r.DirFile
+		.asdir		= r.asdir
+		.name		= r.name
+		.lastsize	= r.lastsize
+		.rangelength = r.rangelength // for the sorter
+		.lastfilecount = r.lastfilecount
+		.DoesntExist = r.DoesntExist
+		.InMainProj = r.InMainProj
+	
+	constructor (|string| path, |string| name, |string| DirFile="")
+		.func		= @file
+		.rangelength = 0 // for the sorter
+
+		.FilePath	= (DirFile!="")(path.PathDir, path)
+		.dirfile	= DirFile
+
+		.asdir		= dirfile
+		.name		= name
+		if path and !.asdir
+			.lastsize = path.File.Size
+		.lastfilecount = (!.asdir)|int|
+	
+
+	render
+		opt norefcounts
+		fs <~ "file: "
+		fs <~ .FilePath
+		fs <~ .dirfile	
+
+	
+	function AskDelete (|fileviewer| fv)
+		|| ex = fv.extra
+		if ex contains self
+			fv.Removerow(self)
+			return
+		|| l = .FilePath$
+		require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
+		if l.file.MoveToTrash
+			fv.removerow(self)
+		fv.checksize
+	
+	
+	libinternal MoveTo (|string| v, |bool|) // rename
+		if (v contains '/') or (v.FindBadUTF8) or (Charset.line in v)
+			beep v + " is not a valid filename!"
+			return false
+		
+		|| l = .FilePath.file
+		|| f = l.sibling(v)
+		if .FilePath != f
+			if (.filepath ~!= f) and f.Exists
+				beep v + " already exists!"
+			  elseif l.moveto(f)
+				.FilePath = f.path
+				.name = f.name
+				.parent.filesort
+				|| d = ._Document
+					d.MoveTo(.readfrom)
+				rz = true
+
+
+	operator isa (|string| s, |bool|)
+		inlined
+		return .FilePath isa s
+	
+	
+	function IsDir (|bool|)
+		disabled "use .Asdir. Not quite the same, but usually close enough"
+	
+	
+	function ReadFrom (|string|)
+		return .FilePath + .dirfile
+
+
+	libinternal IsAlsoDir (|file| f, |bool|)
+		return f.isdir == .asdir
+	
+	
+	libinternal MatchField (|string| Name, |string| Match, |bool|)
+//		opt norefcounts
+		|| d = .FileData.parse
+			|message--| m = d[name]
+			|string--| str = m.value
+			rz = str ~= Match 
+	
+	function TryReload (|fileviewer|fv)
+		require .asdir
+		|| l = .FilePath
+			|| f = l.file
+			|| d = f.modified
+			if d > .DateOfFileAtRead
+				.DateOfFileAtRead = d
+				.ReloadFiles(f, fv)
+			fv.checksize
+	
+
+	function AddFile (|file| f, |fileviewer| o)
+		|| Count = 2000
+		.AddFileSub(f,  o.excludes,  o.listsource.name,  Count)
+
+
+	libinternal AddFileSub (|file| f, |dictionary?| excl, |string| folfile, |$int| Count, |bool|)
+		|| C = Count--
+		require C > 0
+		|| r = filerow(f.path, f.name)
+		self <~ r
+		if f.isdir
+			r.FilePath = r.FilePath.pathdir
+			r.dirfile = folfile
+
+		if f.IsntAnOSXBundle and !f.issymlink
+			r.asdir = true
+			r.FillFilessub(f, excl, folfile, Count)
+		return true
+
+
+	libinternal RemoveFile (|filerow| r, |fileviewer| fv)
+		for c.flat in r
+			|| d = c._document
+				if d.ismodified
+					r.DoesntExist = true
+					fv.select(r)
+					return
+		r.remove
+
+
+	libinternal ReloadFiles (|file| dir, |fileviewer|o)
+		|| excl = o.excludes
+		|{filerow}| found = dictionary()
+		for s in self
+			found[s.name] = s
+
+		for name in dir
+			|| ch = dir[name]!
+			ifn (name[0] == '.') or (excl[name.ext])
+				|| f = found[name]
+				if f and f.IsAlsoDir(ch)
+					found[name] = nil
+					f.DoesntExist = false
+				  else
+					.addfile(ch, o)
+		
+		for lost in found
+			.removefile(lost, o)
+		.FileSort
+
+
+	libinternal FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
+		.DateOfFileAtRead = fol.modified
+		for f.files in fol // merge these two
+			|| name = f.path.name
+			|| ext = name.ext
+			if (name[0] != '.')  and  (!excl[ext])
+				if !.AddFileSub(f, excl, folfile, count)
+					exit
+		.filesort
+
+
+	function ReadName (|string|)
+		|| n = .FilePath.name
+		if .dirfile
+			return n.pathdir + .dirfile
+		return n
+
+
+	inline IsModified (|bool|)
+		opt norefcounts
+		return ._Document$.ismodified
+
+
+	function Document (|document|)
+		opt norefcounts
+		|| s = ._Document
+			return s
+		s = document(.readfrom)
+		._Document = s
+		return s
+	
+	
+	function FileData (|bool| Binary=false, |string|)
+		|document--| d = ._Document
+			return d.text
+		
+		|| f = .readfrom.file
+		|| Data = ""
+		if f.isdir or !f.Exists
+			//
+		  elseif Binary
+			Data = f.ReadAll
+		  else
+			// how do we know a file is binary? just... by checking it... really.
+			|| x = f.open(file.readmode)
+				|| fsize = f.size
+				|| ToRead = 4K
+				if fsize <= 32K
+					ToRead = fsize
+				Data = f.Read(ToRead)
+				|| badness = Data.UTF8Badness
+				if badness.y > 0
+					ifn  badness.x >= 4093  and  fsize > 4096 // heuristic, in case we cut a char in half.
+						data = ""
+						fsize = ToRead
+				if fsize != ToRead
+					Data = f.readall
+				
+		return Data
+
+
+	libinternal FindAllParent (|message| FoundList, |error|)
+		opt norefcounts
+		rz = error(nil, .FilePath, errorseverity.ok)
+		(rz|listviewrow| is expanded)
+		|| str = "\11 "
+		if .asdir: str = "\11 "
+		rz.name = str + .FilePath.name
+		rz.path = .FilePath
+		rz.obj = self
+		rz.position = -1
+		FoundList <~ rz
+
+
+	libinternal FindInFile (|string| text,  |message| FoundList,  |$int| Remain,  |bool| DoRepl)
+		|| t = .FileData$
+		
+		|error| parent
+		|| Lim = Remain
+		|| i = 0
+		|| LastBefore = -1
+		
+		while (i < t.length) and (lim > 0)
+			|| R	= t.StretchyFind(text, i)
+			|| p = r.x
+			if p < 0
+				exit
+			i = r.x2
+			|| after  = t.find(charset.Line, i, i+30)   ??  (i+30)
+			|| before = t.find(charset.Line, p, p-30 max 0)   ??  (p-10)
+			|| s = t[before, after]
+			if DoRepl or (lastbefore != before)
+				LastBefore = before
+				
+				s = s.trim.remove(charset.Line)
+				|| result = error(nil, ErrorSeverity.OK)
+				parent ?= .FindAllParent(FoundList)
+				parent <~ result
+				
+				lim--
+				
+				result.range = R
+				result.obj = self
+				result.path = .FilePath
+				result.name = s
+		Remain = lim
+
+
+	syntax append (|filerow| r)
+		super.syntaxappend(r)
+		r.inmainproj = .InMainProj
+
+
+	libinternal Match (|string| path, |bool| NameOnly, |int|)
+		rz = .FilePath.name(nameonly).FileViewMatch(path)
+		if .dirfile
+			|| r = .readfrom
+			if rz and path.last != '/' and r.filesize == 0
+				rz = 0 // folder matched uselessly
+			  elseif rz < 8
+				rz = rz max r.name(nameonly).FileViewMatch(path)
+
+	module
+		function FindFileName (|listview| s, |string| name, |filerow|)
+			for r.all in s
+				if r isa filerow
+					if r.FilePath.hasname(name)
+						return r
+
+		libinternal error.ViewDate (|date|)
+			opt norefcounts
+			|| f = .obj as FileRow
+				|| d = f._Document
+					return d.ViewDate
+		
+		libinternal BatchFindSorter (SorterComparer of Error)
+			// the document viewfrom date logic elsewhere
+			// via load seems buggered somehow.... not sure why?
+			|| an = .path.name 
+			|| bn = b.path.name 
+			|| ae = an.ext
+			|| be = bn.ext
+			// spds first.
+			rz = isbetter(ae, be, "spd")
+			if !rz
+				|| af = .ViewDate
+				|| bf = b.ViewDate
+				rz = bf - af
+			if !rz
+				rz = isbetter(ae, be, "box")
+			if !rz
+				if be ~!= ae
+					rz = ae.syntaxcompare(be)
+				  else
+					rz = an.syntaxcompare(bn)
+
+		libinternal IsBetter (|string| a, |string| b, |string| ext, |int|)
+			if (b == ext) != (a == ext)
+				return (a==ext)+1
+
+		
+	
+
+libinternal string.FindExistingPath (|string|)
+	while (self > 1) and !.fileexists
+		self = self.parent
+	return self
+
+
+libinternal ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
+	|| path = InPath.TrimSlashes.FindExistingPath
+	require .listfiles(path, types, save, max) and inpath // also calls clear
+	|filerow| r
+	|| pp = path.parent
+		r = filerow(pp, "..", ".nothing")
+		.listsource.first = r
+	|| f = path.file
+	|| r2 = filerow.FindFileName(self, path.name) as filerow
+	if f.exists and !f.isdir and r2
+		.show(r2)
+		r = r2
+	.select(r)
+	return path
+			
+
+function string.TypeContains (|string| s, |bool|)
+	// maybe neater to do this with string matching.
+	// its usally used for things ending with '/' anyhow
+	|| Last = 0
+	while
+		|| Word = .NextField(',', Last)
+		if Word == nil
+			exit
+		if word ~= s
+			return true
+
+
+function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int| max = 256, |bool|)
+	|| s = .listsource
+	s.clear
+	|| path = InPath.Resolve(true)			#require
+	|| AllSight	= path.hasname(".")
+	|| AtRoot	= (path == "/")
+	|| pf		= path.file
+	if !pf.exists or !pf.isdir
+		pf = pf.parent
+	
+	for f.files in pf						// merge these two
+		|| p = f.path
+		|| n = p.name
+		if AllSight or n.PlatformVisible(ATroot)
+			if --max <= 0
+				exit
+			|| isdirlike = f.IsntAnOSXBundle
+			|| ext = n.ext
+			if isdirlike
+				p = p.PathDir
+			|| icon = filerow.FileIcon(p, types).Render
+			n = icon + " " + n
+			|| r = filerow(p, n, ".nothing" * isdirlike)
+			self <~ r
+			|| IsOK = isdirlike
+			if !save and !isdirlike and !types and f.isdir
+				isok = false				// can't open package if we want files
+			  elseif save and isdirlike and types.typecontains(ext + "/")
+				isok = false
+			  elseif !save and !isok
+				isok = !types
+				if !isok
+					if isdirlike or f.isdir
+						ext = ext.pathdir
+					isok = types.typecontains(ext)
+			(r isnt disabled) = IsOK
+			
+	s.filesort
+	return true
+
+

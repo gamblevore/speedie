@@ -1,0 +1,27 @@
+#!/usr/local/bin/spd
+
+|| Fails = FastString()
+|| Speedie = "/usr/local/bin/spd"
+
+
+main (|[string]| Paths)
+	|| files = Paths.GlobExpand
+	if app["d"] // debug
+		"$Paths\n$Files\n"
+	
+	for f in files
+		app.TryCompileOne(f)
+	if fails.Length	
+		printline fails
+		app.say("Failed")
+	  else
+		app.say("// All OK")
+
+
+function app.TryCompileOne (|file| f)
+	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
+	if Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
+		printline f.TrimStart(app.cwd)
+	  else
+		fails <~ "Fail: $f\n"
+

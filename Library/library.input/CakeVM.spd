@@ -1,0 +1,93 @@
+
+
+
+struct CakeVM {
+|int|			CakeFail
+|int|			UserFlags
+|CakeChef|		__VIEW__
+|&CakeStack|	ProposedStack
+
+
+linkage: cpp_class CakeVM, wrapper
+
+constants
+	TrapTooFar		= 16
+	CanDebug		= 32
+
+	ErrOverFlow		= -2
+	ErrStillInRange = -1
+	
+	kBreakNever = 1
+	kBreakStated = 2
+	kBreakAlways = 3
+
+
+target cpp or vm {
+	function Load		(|&uint| ASM, |int| Length)
+		|| Code = .code(Length)					// length is just used to check that its within the maximum
+			memory.copy(code, asm, length<<2)
+	
+	function Code		(|int| CodeLength=0, |?&uint|)
+		cpp_wrapper JB_ASM_Code
+	
+	function Run		(|int| StartAt, |&ivec4|)
+		cpp_wrapper JB_ASM_Run
+	
+	function Registers	(|bool| Clear=true, |&ivec4|)
+		cpp_wrapper JB_ASM_Registers
+	
+	function TestInit	(|int| n, |int| g, |&&nil|)
+		cpp_wrapper JB_ASM_InitTable
+	
+	function ExecInit	(|&byte| LibGlobs, |&byte| PackGlobs, |&&nil| CppFuncs)
+		cpp_wrapper JB_ASM_FillTable
+	
+	function SetDebug (|int| BreakLevel, |?&uint|)
+		cpp_wrapper JB_ASM_SetDebug
+	
+	function BaseStack	(|&CakeStack|)
+		cpp_wrapper JB_ASM_BaseStack
+	
+	function Action		(|Pico| P, assigns:|PicoActionFn|)
+		cpp_wrapper JB_ASM_LinkPico
+	
+	inline Pause
+		while !.SetDebug(kBreakAlways)
+			0
+
+	function Index		(|&uint| Code, |ind|)
+		cpp_wrapper JB_ASM_Index
+		
+	function CallBack	(|&uint| Code, |&ivec4|)
+		cpp_wrapper JB_ASM_CallBack
+
+	module
+		function New	(|int| Flags = cakevm.CanDebug, |&CakeVM|)
+			cpp_wrapper JB_ASM__VM
+		
+		function VM (|&cakevm|) // this is not a real function, its an inline
+			cpp_Wrapper JB_ASM_GlobalVM // how to remove it? some target? which? no idea.
+}
+
+
+prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode, |uint| Break, |int64|)
+	// return 0 to continue onwards. return 1-256 to exit the program. Return -1 or less to jump backwards
+
+}
+
+
+
+struct CakeStack
+	linkage
+		wrapper
+		cpp_class CakeStack
+	|&uint|			Code
+	|uint|			SFlags
+	|byte|			Up
+	|byte|			Down
+	|uint16|		Depth
+	
+	inline Reg0 (|&ivec4|)
+		return self|&ivec4| + 1
+
+

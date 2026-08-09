@@ -1,0 +1,491 @@
+	
+
+|jbin| VarPrinter = faststring()	
+
+extend PerryIDE {
+
+
+function HandleCake (|message| msg)
+	opt norefcounts
+	if msg ~= "run"
+		.DelayedRun = date.now
+		.UpdateDebugButtons
+	  else
+		.DelayedRun = nil
+		if msg ~= "stack" or "break" or "crash"
+			.UpdateStack(msg)
+		  elseif msg ~= "hoi :3"
+			.GotHello(msg.name)
+		  elseif msg ~= "breakpoint"
+			.SetBreaks(msg)
+		  elseif msg ~= "error"
+			|| ch = msg.first
+			if ch == @arg
+				Notifications <~ (ch.FirstName, msg)
+			  else
+				.LastCakeError = msg
+				.SetAppInfo
+		  else
+			Notifications <~ ("unrecognised message", msg)
+	
+	
+function CakeTalk (|SpdProcess| Cake)
+	if .DelayedRun.ago > 0.5s
+		.DelayedRun = nil
+		.DebugMode &= ~compilemode.paused
+		.SetAppInfo		
+	
+	|| root = cake.Get$							// getmsg
+	.LogOneCake(root, "\1B ")
+	if root != @arg
+		.HandleCake(root)
+	  else
+		for msg.fast in root
+			.HandleCake(msg)
+
+
+
+function SetBreaks (|message| breaks)
+	opt norefcounts
+	|| file = breaks.FirstName
+	require file ~= .Path
+
+	|| All = breaks.second.int
+//		.editme.debuglevel = TextView.DebugLevelDebugging
+		for l.lines in .editme
+			(l isnt ActiveBreakPoint)
+			(l isnt CodeReached)
+
+	for line in breaks.last
+		|| Pos = line.second.int
+		if pos <= .editme.text.Length
+			|| dummy = -1
+			|| D = .editme.FindTextLine(pos, dummy, true)
+				if all
+					(D is Codereached)
+				if line ~= "break"
+					(D is ActiveBreakPoint)
+	.editme.Touch			
+		
+	
+
+function AppInfoExtra (|UnixProcess| r, |string|)
+	if !r
+		return "Inactive"
+	|| st = r.Status
+	if st == 0
+		return "Exit OK"
+	
+	if (r isa SpdProcess) and st.IsRunning
+		|| DB = .DebugMode
+		if DB is Finished
+			return "Killed" // right?
+		if DB is Crashed
+			return "Crashed"
+		if DB isnt ReceivedHello
+			return "Waiting..."
+		return ""
+	
+	if st.IsRunning
+		return "Running"
+	return st.Name
+
+
+
+function ExtraAppInfo (|faststring| fs)
+	opt norefcounts
+	|| r = .RunningProd
+	if !r or (.DebugMode is Finished) or (.DebugMode isnt cakemode)
+		fs <~ "  --"
+		return
+	
+	|| R0 = r.args[0]
+		fs.AppendRange(r0, R0.NamePart)
+		fs <~ "://"
+	|| o = .appinfo.tag
+	if o isa Message
+		|message--| l = o.first$
+		l.MemPrint("Obj", 0, 3, fs)
+		l.MemPrint("Str", 1, 3, fs)
+		l.MemPrint("IDK", 2, 3, fs)
+		l = o.second
+		if l
+			l.MemPrint("Sck", 0, 3, fs)
+			l.MemPrint("/", 1, 0, fs)
+
+
+
+function UpdateDebugButtons (|bool| ForceRunning=false, |bool|)
+	opt norefcounts
+	|| r = .RunningProd
+	|| D = .DebugMode
+	|| CanDebug = (r isa SpdProcess) and (r.Status.IsRunning) and (D isnt finished)
+	|| Paused = D is paused
+	if ForceRunning
+		paused = false
+
+	for btn in .DebugBtns
+		|| Last = btn.IsLast
+			btn.text = (paused)("\02\02", "\0E")
+		|| On = CanDebug and (Paused or Last) and (D isnt crashed)
+		(btn is enabled) = On
+	
+	return CanDebug
+
+
+function AppInfoWrite (|faststring| fs, |message| info, |string| extra)
+	opt norefcounts
+	if extra
+		fs <~ "\n("
+		fs <~ extra
+		if .DebugMode is Crashed
+			fs <~ " "
+			|| Err = info[2].first.int|ErrorInt|
+			|| name = err.name
+			|| m = .editme._ActiveLine
+				m.clear
+				m <~ name
+			fs <~ name
+		fs <~ ")"
+
+	|| mem = 0
+	for c.fast in info.first
+		mem += c.int
+	if mem
+		fs <~ "\n"
+		mem.StrSize(Fs)
+	
+	|| err = .LastCakeError
+		fs <~ "\nVM Error: "
+		fs <~ err.firstname
+		|| num = err.second
+		if num.name.isint
+			|| errnum = num.int
+				fs <~ ' '
+				fs <~ errnum
+		
+
+
+function SetAppInfo
+	opt norefcounts
+	|| CanDebug = .UpdateDebugButtons
+
+	if !CanDebug
+		.AppInfo.obj = nil
+	if !CanDebug or .DebugMode isnt paused
+		.stack.clear
+	
+	|| fs = VarPrinter
+	fs.Length = 0
+	fs.AppendRange(.project, .project.namepart)
+	|| r = .RunningProd
+		fs <~ ": "
+		fs <~ r.pid
+
+	|| Info = .AppInfo.obj as message
+	|| extra = .AppInfoExtra(r)
+
+	.AppInfoWrite(fs, info, extra)
+	.AppInfo.text = fs
+
+	if .MyStatsMode == 0
+		.ShowLeftStats
+
+
+
+function message.NameCheck (|message| other, |int| index=0, |bool|)
+	opt norefcounts
+	self = self[index]
+	other = other[index]
+	return .ShallowEquals(other)
+
+
+function message.IsSameItem (|message| row, |int| Depth, |bool|)
+	opt norefcounts
+	if .NameCheck(row)
+		|| index = 2
+		if depth > 0
+			index = 1
+		return .NameCheck(row, index)
+
+
+function listviewrow.BadVar
+	opt norefcounts
+	Notifications <~ "Something wrong with var: " + .name
+
+
+function listviewrow.CopyNames (|listviewrow| Row)
+	opt norefcounts
+	if self isnt error and row is error
+		row.badvar
+	
+	(self is error) = (row is Error)
+	.name = row.name
+	self = .first
+	row = row.first
+	while self and row
+		.name = row.name
+		self++
+		row++
+	if self
+		.RemoveAfter
+		.Remove
+
+
+function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
+	opt norefcounts
+	.CopyNames(Inputrow)
+	|| InputArg = InputRow.last
+	if InputArg == @arg
+		.givearg|listviewrow|.ReStitchAndFixup(InputArg, Depth)
+		
+	
+function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
+	opt norefcounts
+	|| O = .last
+	while (|| N = NewList.Last)
+		if o and o.IsSameItem(n, Depth)
+			o.CopyDebugData(n, Depth+1)
+			n.remove
+			o--
+		  else
+			if o
+				o.next = n
+			  else
+				.first = n
+			if n is error
+				n.badvar
+
+	o.RemoveBefore
+	o.remove
+
+
+function message.DebugName (|string|)
+	opt norefcounts
+	|| n = .name
+	|| i = n.find(~charset.NameMid)
+	if i >= 0
+		n = n[0, i]
+	.obj = n
+	return n
+
+
+function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
+	opt norefcounts
+	.PerryAppendMsg("|", 2)
+	fs <~ "| "
+	fs <~ dbname
+	fs <~ " = "
+	fs <~ (' ', 6 - fs.LengthUTF8)
+	.PerryAppendMsg("", 3)
+
+
+// tbh it kinda defeated itself... but whatever.
+// maybe creation is the answer. a holy holey creation
+
+//stack ((\516096, \29072, \6064), (\1, \1), (\0, )) {
+//	+'1)  Main' "/usr/local/speedie/Examples/branch_test.spd" \902 \1 {
+//		r "" \0 "Array" "0x00!" \1 bad
+//	}
+//}
+
+function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
+	opt norefcounts
+
+	|| dbname = .DebugName // not sure why it needs some bytes removed?
+	{
+		|| Last = .Last
+		|| bad = (Last == @thg and "bad")
+		(self is error) = bad
+		if (!bad and CanHide and dbname[] == '_')
+			.Remove
+			return
+	}
+	
+	is editable
+	if depth > 0
+		|| s1 = .second
+			s1.name = .name
+			s1.func = @thg
+
+	|| f = .first
+		f.name = dbname
+	|| fs = VarPrinter
+	fs.Length = 0
+	.ImproveVarSub(dbname, fs)
+	.name = fs
+
+	|| Fields = .Last
+	if fields == @arg
+		for prop in Fields
+			prop.ImproveVar(depth+1, CanHide)
+
+
+
+function message.MemPrint (|string| s, |int| item, |int| Mode, |faststring| fs)
+	opt norefcounts
+	|| ch = self[item]
+		if Mode&1
+			fs <~ (' ', 3)
+		fs <~ s
+		if Mode & 2
+			fs <~ " "
+		ch.int.StrSize(fs)
+
+
+function message.PerryAppendMsg (|string| s, |int| Item)
+	opt norefcounts
+	|| v = VarPrinter
+	v <~ s
+	|| ch = self[item]
+		v <~ ch.name
+
+}
+
+
+function @perry.VariableFinder (listview.columnfinder)
+	opt norefcounts
+	|| upon = self
+	if Column
+		if column == -2
+			return .name
+		if column != -1
+			upon = self[3]
+	if value == nil
+		return upon.name
+	if upon
+		upon.name = value
+
+
+
+function PerryStackKeyDown (guikeyevent)
+	opt norefcounts
+	if (key is up or down) and (self isa ListView)
+		|| i = .ide
+		|| sel = .FirstSelected
+		|| Edge = .ListEdge(key is down)
+		if sel == edge
+			.selectnone
+			i.AppInfo.SetFocus
+			return true
+			
+
+function PerryStackEditCell (GUIListEditEvent)
+	opt norefcounts
+	|| row = cell.row!
+	|| field = row[3]
+		if value==nil
+			return field.name
+		field.name = value
+		.ide.DebugEditVar(row, value)
+	
+	
+
+extend ListViewRow
+	function DebugPath (|jbin| j, |bool|)
+		opt norefcounts
+		|| p = .parent
+		if p and !p.isroot
+			require p.DebugPath(j)
+		
+		if self != @arg
+			if p.isroot
+				j.addHInt(.index)
+			  else
+				|| f = .first #require
+				j.addstr(f.debugname)
+		return true
+	
+
+
+function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
+	|jbin--| j = VarPrinter.start(@tmp, "edit")
+	j.addstr value
+	expect row.DebugPath(j) (Beep)
+	.SendJbin(j)
+
+
+
+function perryide.ReloadBreaks
+	if .EditorIsCode
+		|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
+		j.addstr .path
+		.SendJbin(j)
+
+
+
+function perryide.UpdateStack (|message| stack)
+	opt norefcounts
+	
+	|| arg = stack.last$
+	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
+	|| StackSrc = .stack.listsource
+	
+	for m in Arg
+		|| l = m.Last
+		if l == @arg					// Assume its a var-dump
+			for s in l
+				s|ListViewRow|.ImproveVar(0, .DebugHideUnderscore)
+
+	StackSrc.ReStitchAndFixup(arg, 0)
+	StackSrc.name = "vars"
+	
+	|| Break = stack != "stack"
+		|| f = .stack.liststart|listviewrow|
+			if !.stack.FirstSelected
+				.stack.ExpandRow(f)
+		
+			|| m = .DebugMode
+			|| crash = stack == "crash"
+				(f is Error)
+				(M is Crashed)
+			|| l = .editme._ActiveLine
+				l.Flags = crash|int|
+			(m is paused)
+			.DebugMode = m
+			.UpdateCodePointer(F, PerryUpdateStack)
+
+	.SetAppInfo
+
+
+
+function jbin.ExpandDebug (|listviewrow| list)
+	opt norefcounts
+	.enter
+	for var in list
+		|| arg = var.last
+		if (arg == @arg) and (var is expanded)
+			|| name = var.obj as string
+				.enter(@tmp, name)
+				.ExpandDebug(arg)
+				.exit
+	.exit
+		
+
+function @perry.CollectExpansion (GUIListExpandEvent)
+	opt norefcounts
+	.ide.CollectExpansion
+
+
+function perryide.CollectExpansion
+	// This would expand ALL vars of the same function... even if recursive.
+	// So how to deal with recursive funcs? Whatever... too much is still OK??
+//	main: "/usr/local/speedie/Examples/hello_world.spd" \150 \4
+
+	opt norefcounts
+	|| funcs = .Stack.ListSource
+	|| j = VarPrinter.Start(@tmp, "expansion")
+	j.Enter(@arg)
+
+	for fn in funcs
+		|| arg = fn.last
+		if (arg == @arg) and (fn is Expanded)
+			j.Enter(@tmp, fn.name)
+			j.AddStr(fn.firstname) // path
+			|| loc = fn[2]
+			j.Add(loc.func, loc.name)
+			j.ExpandDebug(arg)
+			j.exit
+	
+	.SendJbin(j)
+

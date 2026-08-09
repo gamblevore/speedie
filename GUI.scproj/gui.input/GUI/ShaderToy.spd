@@ -1,0 +1,64 @@
+
+
+prototype ShaderToyFunc (|ShaderToy| self,  |vec2| Resolution,  |vec2| Pos,  |vec2| Coord,  |vec4|)
+	linkage: cpp_Part ToyFn
+	syntax cast (|ErrorInt|)
+		cpp_name GUI_Toy_SilentRun
+		opt norefcounts
+		|| win = ShaderToy(self)
+		return win.RunAsMain(60)
+
+
+class FPSView (GuiControl)
+	|date|			LastDraw
+	|date|			LastFPSChange
+
+	constructor (|guicontrol| parent)
+		super.constructor(parent)
+		.Size = (3~right for 89)  by  (17~down for 14)
+
+	behaviour Draw
+		|| Ago = .LastDraw.guiago
+		.LastDraw = gui.FrameStart
+		.LastFPSChange ?= .LastDraw
+		if .LastFPSChange.guiago > 0.5s
+			.text = (1.0/ago.float).Render(1) + "fps"
+			.LastFPSChange = .LastDraw
+		Where.DrawRect(self, vec4(0, 0.25))
+		Where.DrawText(.text, .lastrect.xy+(5,3))
+
+
+
+class ShaderToy (window)
+	|vec3|			cam
+	|float|			Time
+	|ShaderToyFunc| Shader
+	linkage: cpp_Part Toy
+
+	constructor (|ShaderToyFunc| fn)
+		.Shader = fn
+		.GNormal.clear // black background
+	
+		
+	behaviour Drawbackground
+		opt norefcounts
+		opt min 3
+		
+		.time = (gui.FrameStart - .CreatedDate).Float
+		|| size = where.size.vec2
+		|| scale = 1.0/size.xx
+		|| adjust = size*-0.5	
+		for (c in where) (p)
+			|| pv = p.vec2
+			|| XY = (pv + adjust) * scale
+			|| Col = (.Shader)(self, size, pv, XY)
+			c <~ col
+		gui.Touch
+
+	behaviour FrameStep
+		|| m = keys.Movement.sign
+			.cam += m.xyz * 0.2
+		GUI.touch
+
+
+

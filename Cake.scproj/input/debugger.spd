@@ -1,0 +1,397 @@
+
+
+module debugger
+	|uint|					StackOverDepth
+	|bool|					OverFlowTrack
+	|bool|					WantDebug
+	|bool|					BreakMapBad
+	|message|				PackInfo
+	|Message|				Globs
+	|[FileWithData]|		FileList
+	|{FileWithData}|		FileMap
+	|string|				CodeToSrcStr
+	|string|				SrcToCodeStr
+	|string|				InbuiltBreaks
+	|&cakestack?|			StackTrap
+	|faststring|			VariablePrinter
+	|faststring|			ErrorPrinter
+	
+	constants
+		BreakRealBit		= 1<<30
+		BreakReqBit			= 2<<30
+		BreakBits			= 3<<30
+		ClearRealKeepUser	= 2
+		
+		MinPointer			= 64K
+	
+	function DbgLength (|uint|)
+		opt inline
+		return SpdTable.CodeLength
+		
+	function CodeToSrc (|uint| Index, |SourceLocation|)
+		|| Base = .CodeToSrc
+		if index < .dbgLength
+			return base[index]
+	
+	function CodeToSrc (|&SourceLocation|)
+		return .CodeToSrcStr.Addr|&SourceLocation|
+	
+	function SrcToCode (|&SourceMap|)
+		return .SrcToCodeStr.Addr|&SourceMap|
+
+	
+	function PicoReader (PicoActionFn)	
+		self|&cakevm|.Pause		// cool. now we can safely do stuff
+
+	
+	function RestoreBreaks
+		.StackTrap = nil
+		.StackOverDepth = nil
+		|| B = cake.ActiveBreaks!
+
+		|| After = B + .DbgLength
+		while B < After
+			|uint| C = B[] &~ BreakRealBit
+			C |= (C>>31)<<30 // replenish
+			B++[] = C
+	
+	
+	function SetAllBreaks (|spdfunc| fn = nil)
+		|| B = cake.ActiveBreaks! // no need to check if its real, because if its not, then dbglength == 0
+		|| After = B + .DbgLength // also we won't come here anyhow.
+		if fn
+			B += fn.Position
+			After = B + fn.RangeLength
+		while B < After
+			B[] |= BreakRealBit
+			B++
+	
+	
+	function ActivateInbuiltBreaks
+		|| L = .DbgLength
+		|| CakeBreak = cake.ActiveBreaks!
+		|| P = .InbuiltBreaks.Addr|&uint|
+		|int| n = .InbuiltBreaks.Length >> 2
+		for i in n
+			|| Code = P[i]
+			if Code < L
+				CakeBreak[Code] |= BreakBits
+	
+	
+	function DebugList (|string?| name=nil)
+		(name)
+		target debug {
+		name ?= "breaks"
+		|| CakeBreak = cake.ActiveBreaks!
+		|| Max = debugger.dbgLength
+		".......$name......"
+		for Raw in .SrcToCode
+			|| Src = raw.Loc
+			|| FilePos = src.Position
+			|| ff = src.file
+			|| F = (ff!=nil)(ff.FileName, "")
+			|| PosInCode = Raw.code(Max)
+			|| Excl = " "
+			|| Op = 0
+			if PosInCode < max
+				|| br = Cakebreak[posincode]
+				if br&breakreqbit
+					excl = "?"
+				if br&BreakRealBit
+					Excl += "!"
+				Op = (Cakebreak-256K)[posincode] >> 24
+				
+			"$F $FilePos: $PosInCode$Excl ($op)"
+		}
+		
+
+	function SourceMap.NeedsChange (|&uint| CakeBreak, |uint| Active, |bool|)
+		|| Code = self|uint|
+		|| Curr = CakeBreak[Code]
+		|| Final = curr.breakset(Active)
+		if Curr != Final
+			return true
+
+
+	function spdfunc.ASMRange (|ivec3|)
+		opt norefcounts
+		|| f = self[2]
+			|| input = xtype.shared
+			input.Reset(f.name)
+			for i in 3
+				rz[i] = Input.hint
+	
+	
+	function GoRunClearBreaks (|message| M, |spdfunc| fn, |StepAction| Action, |stepaction|)
+		opt norefcounts
+		cake.vm.SetBreakLevel(cakevm.kBreakStated)
+		
+		|| F = debugger.file(m)
+		if F == nil
+			return StepAction.GoRun
+		
+		|| CurrFunc = fn.ASMRange
+		|| p = m[1].int
+		|| a = p + m[2].int
+		|| CakeBreak = cake.ActiveBreaks!
+		|| N = debugger.dbgLength
+		|| Locations = .CodeToSrc
+		|| Lowest = int.max
+		|| Highest = 0
+		
+		for i in n
+			|| loc = Locations[i]
+				|| Src = loc.map(i)
+				if Src.Score(F, P, A, N, 0)
+					Lowest = Lowest min i
+					Highest = Highest max i
+					.SetUserBreak(CakeBreak, i, ClearRealKeepUser, N)
+				  elseif (Action is stepover) and (loc out CurrFunc)
+			// step over inlined funcs that CAKE (not user) set via debugger.SetAllBreaks(fn)
+			// but we don't want to clear breaks the user DID set in other funcs
+					ifn CakeBreak[i]&BreakReqBit
+						.SetUserBreak(CakeBreak, i, ClearRealKeepUser, N)
+		
+		while Lowest <= Highest
+			|| loc = Locations[lowest]
+				if loc out CurrFunc
+					.SetUserBreak(CakeBreak, Lowest, ClearRealKeepUser, N)
+			Lowest++
+		
+		return Action ||| StepAction.GoRun
+		
+		
+	function SetBreaks (|message| M, |bool| Active, |stepaction| Action, |stepaction|)
+		opt norefcounts
+		|| F = debugger.file(m)
+		if f == nil
+			return action
+		
+		|| p = m[1].int
+		|| a = p + m[2].int
+		
+		debugger.UserMultiBreak(F, p, a, Active*BreakBits)
+		cake.perry!.SendBreaks(F)
+	
+		return action
+		
+		
+	function UserMultiBreak (|FileWithData| Path, |uint| Position, |uint| After, |uint| Active)
+		opt norefcounts
+		|| CakeBreak = cake.ActiveBreaks
+		|| Max = debugger.dbgLength
+
+		|| BestScore = 0
+		|| BestValue = 0
+		|| BestCount = 0
+
+		for Src in .SrcToCode
+			if src.NeedsChange(cakebreak, active)
+				|| Score = Src.Score(path, position, after, Max, Active)
+				if Score > BestScore
+					BestScore = Score
+					BestValue = Src
+					BestCount = 1
+				  elseif BestScore and (Score == BestScore)
+					BestCount++
+		
+		require BestCount
+		if BestCount == 1										// same thing as below, but faster...
+			.SetUserBreak(CakeBreak, BestValue, active, max)
+		  else
+			for Src in .SrcToCode
+				|| Score = Src.Score(path, position, after, max, Active)
+				if src.NeedsChange(cakebreak, active) and (Score == BestScore)
+					.SetUserBreak(CakeBreak, Src, active, max)
+	
+
+	function uint.BreakSet (|uint| Active, |uint|)
+		|| Keep = (-1|uint|) >> 2
+		keep |= Active << 30
+		self &= Keep
+		self |= (Active>>30)<<30
+		return self
+
+	
+	function SetUserBreak (|&uint| CakeBreak, |uint| Code, |uint| Active, |uint| Max)
+		if Code < Max
+			CakeBreak[Code] = CakeBreak[Code].BreakSet(Active)
+			return
+			
+		if !.BreakMapBad
+			.BreakMapBad = true
+			printerror "BreakMapBad"
+	
+
+	function Path (|int| i, |filewithdata|)
+		opt norefcounts
+		|| f = .FileList[i]
+		if f != nil				// what if i == 0? is that an output error? What about lib-internal code? like init-code?
+			return f
+		debugger.senderror("MissingFile", i)
+
+
+	function StartUp (|!&uint|)
+		opt norefcounts
+		cake.vm.__View__ = __Dumper__
+		|| Dbg = cakevm.kbreaknever+debugger.WantDebug
+		|| p = cake.Perry
+			cake.vm.__View__ = __PerryView__
+			cake.vm.Action(p.pico) = PicoReader	
+			dbg = cakevm.kBreakStated
+		return cake.VM.SetBreakLevel(dbg)
+			
+		
+	function __Dumper__ (cakevm.CakeChef)
+		// just dumps everything. Useful for testing the system even works.
+		opt norefcounts
+		if ErrorCode
+			return .PrintCrashTrace(Stack)
+		if debugger.VariablePrinter
+			|| index = .Index(Stack.code)
+			if index|uint| >= debugger.dbgLength
+				app.quit "Code pointer escaped: " + index
+			.DumpStackAtIndex(Stack)
+		
+
+	function cakevm.DumpStackAtIndex (|CakeStack| Stack)
+		opt norefcounts
+		|| index = .Index(Stack.Code)
+		|| Where = debugger.CodeToSrc(index)
+		|| fn = spdtable.Find(index)
+		|| Path = debugger.path(Where.FileNum)
+			|| TabTo = .PrintCodeLocation(Path, fn, Where.Position)
+			if fn and fn.HasVar(index)
+				.PrintStackVars(index, fn, Stack, TabTo)
+
+
+	function spdfunc.HasVar (|int| Index, |bool|)
+		opt norefcounts
+		for v in .obj|&nil||[xvar]|
+			if v contains index
+				return true
+	
+	
+	function LoadDebugger (|bool|)
+		opt norefcounts
+		if .PackInfo
+			.VariablePrinter = FastString(64)
+			require .VariablePrinter
+			return .LoadSub(.PackInfo)
+		return !(debugger.WantDebug or cake.perry)			#EXPECT "Program file doesn't contain debug info."
+
+
+	function LoadLibAndGlobs (|message| PackInfo)
+		opt norefcounts
+		|| LibInfo = cakerun.LibDebug.parse
+		xtype.LoadTypes(PackInfo["type"])
+		
+		|| g = PackInfo.giveitem("glob", @msg)
+		.Globs = g
+		|| LibGlobs = LibInfo["glob"]					// probably need to keep the libglobs.
+			g.Appendall(libglobs)						// merge!
+	
+	
+	function LoadSub (|message| PackInfo, |bool|)
+		opt norefcounts
+
+		.LoadLibAndGlobs(packinfo)
+		
+		.LoadFiles(PackInfo["files"].value.decompress)
+		.SrcToCodeStr = PackInfo["breakmap"]
+		.InbuiltBreaks = PackInfo["breakpoint"]
+		.CodeToSrcStr = PackInfo["pos"]
+		|| DbgLength = .CodeToSrcStr.Length >> 2
+
+		|| L2 = SpdTable.CodeLength
+		expect (L2 == dbgLength)				("Map-length is: " + dbgLength) + (" but code-length is: " + L2)
+		expect (L2 < 1MB)						("Oversized source-map: " + L2)
+		
+		.ActivateInbuiltBreaks
+		return .LoadFuncVars
+
+	
+	function LoadFuncVars (|bool|)
+		opt norefcounts
+		for fn in SpdTable.funcs
+			fn.obj = fn.second.xvariables
+		return StdErr.ok
+		
+	
+	function PrintBreaks
+		target debug {
+
+		|| T = SpdTable.CodeLength
+		|filewithdata--| LastFile
+		printline "--- BreakInfo ---"
+		
+		for raw in .SrcToCode
+			|| Src = raw.Loc
+			|| P = src.Position
+			|| Code = raw.code(T)
+			|| fn = src.FileNum
+				|filewithdata--| File = debugger.path(fn)
+				if File!=LastFile
+					printline
+					printline File
+					LastFile = file
+			  else
+				print "(NoFile) "
+			printline "textpos: $P,  code: $code"
+		
+		printline "--- InbuiltBreaks ---"
+		|| CakeBreak = cake.ActiveBreaks
+		for i in T
+			|| Code = CakeBreak[i]
+				printline "break: $i"
+	}
+	
+	
+	helper LoadFiles (|string| List)
+		opt norefcounts
+		|| Last = 0
+		|| i = 0
+		|| out = .FileList
+		.FileMap = Dictionary()
+		while
+			|| P = list.NextField('\n', Last)
+			if P == nil
+				exit
+			|| F = FileWithData(P, i++)
+			out <~ F
+			.FileMap![F] = F
+
+		
+		
+function CakeVM.PrintCodeLocation (|FileWithData| File,  |spdfunc| fn,  |uint| Position, |int|)
+	print "\t\t\t\t\t\t"
+	if TerminalColor.RainbowTerm
+		print terminalcolor.green.render
+	
+	print file.filename
+	print " "
+	if fn
+		print fn.name
+		print ": "
+	
+	if TerminalColor.RainbowTerm
+		print TerminalColor.normal
+
+	|| Code = File.GetLine(position)
+	|| comment = Code.find("//")								// whoop!
+		Code = Code[0, comment]
+	Code = Code.trim
+
+	printline Code
+	return 7 + file.filename.Length + fn.Name.Length
+
+
+function CakeVM.PrintStackVars (|int| Index, |spdfunc| Fn, |CakeStack| Stack, |int| TabTo)
+	opt norefcounts
+	index -= fn.Position
+	for v in fn.obj|[xvar]|
+		if v contains index
+			print "\t\t\t\t\t\t"
+			v.Print(Stack, TabTo)
+	printline
+

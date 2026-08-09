@@ -1,0 +1,81 @@
+
+/*
+	Jeebox internals.
+*/
+
+
+module Platform
+	function BackTrace (|&nil| space, |$int| size, |&cstring|) 
+		cpp_wrapper JB_App__BackTrace
+
+	function Name (|string|)
+		cpp_wrapper JB_Platform
+
+	autogen cpu (|int|)
+		cpp_wrapper JB_Platform__CPU
+	
+	inline CPU_Intel (|bool|)
+		return .cpu & 4
+
+//	inline CPU_PPC (|bool|)
+//		return .cpu & 8
+
+	inline CPU_ARM (|bool|)
+		return .cpu & 2
+
+	inline CPU_Spd (|bool|)
+		return .cpu & 1
+
+	function CPU_Name (|string|)
+		if .CPU_Intel: return "intel"
+		if .CPU_ARM:   return "arm"
+//		if .CPU_PPC:   return "ppc"
+		if .CPU_Spd:   return "spd"
+
+	function OSX (|bool|)
+		cpp_wrapper JB_Platform__OSX
+
+	function Lin (|bool|)
+		cpp_wrapper JB_Platform__Lin
+
+	function Win (|bool|)
+		cpp_wrapper JB_Platform__Win
+
+	function IsDebug (|bool|)
+		cpp_Wrapper JB_IsDebug
+	
+	inline Release (|bool|)
+		return !.Isdebug
+
+	function PointerBits (|int|)
+		cpp_wrapper JB_PointerSize
+
+	inline PointerBytes (|int|)
+		return .PointerBits >> 03
+
+	inline Is64Bit (|bool|)
+		return .PointerBits == 64
+
+	inline HALT_Crash
+		asm HALT(0) // creates sigkill
+
+	inline HALT_Clean
+		asm HALT(0xBADA55)
+
+		
+	function Log (|string| s)
+		visible
+		opt norefcounts
+		// logging should merge with stderr logging? cos we'll want that too... usually.
+		// should not printline... that should be it's own function...
+		|| L = .logger_ init openlog()
+		L.write(s)
+		L.write("\n")
+	
+	libinternal OpenLog (|file|)
+		rz = file.logs[app.appname + ".log"]!
+		.logger_ = rz
+		rz.OpenEmpty
+	
+	|file| Logger_
+		

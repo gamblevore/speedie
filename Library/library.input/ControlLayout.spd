@@ -1,0 +1,202 @@
+
+
+// move to gui.scproj?
+
+insertion the
+	top		2|ControlPoint|
+	bottom	0|ControlPoint|
+	middle	ControlPoint.Centered
+	left	0|ControlPoint|
+	right	2|ControlPoint|
+	height	(0,2)|ControlLine|
+	width	(0,2)|ControlLine|
+	rest	(6,2)|ControlLine| // after, end
+	area	(0,0,2,2)|ControlRect|
+	same	(ControlPoint.Before to ControlPoint.After)
+
+
+
+insertion
+	timeit	({|| starttime = date.now, (_0), rejoin (starttime.ago)})
+	right	the~left + (_0)
+	left	the~right- (_0)
+	up		the~bottom+(_0)
+	down	the~top -  (_0)
+	wide	_0.middlelayout
+	high	_0.middlelayout
+	after	ControlPoint.After.layout(_0)
+	before	ControlPoint.Before.layout(-(_0)) // brackets needed for cpp... not for speedie! sheesh.
+	inside	_0.insidelayout
+	above	ControlPoint.After.layout(_0)
+	under	ControlPoint.Before.layout(-(_0))
+	long	ControlPoint.length.layout(_0)
+//	pc		Controlpoint.percent.layout(_0*64K)
+	
+
+
+
+datatype ControlRect (ivec4)
+	linkage:cpp_part CL4
+
+	function AbsSize (|ivec2|)
+		return (.x2>>4, .y2>>4)
+	
+	function Width (|ControlLine|)
+		inlined
+		return (.x1, .x2)|ControlLine|
+	
+	function Height (|ControlLine|)
+		inlined
+		return (.y1, .y2)|ControlLine|
+	
+	function BasicSize (|ivec4|)
+		inlined
+		return self >> 4
+	
+	function IsBasic (|bool|)
+		return .syntaxequals(.BasicSize.Layout)
+		
+	render
+		self[0]|controlpoint|.AppendInto(fs)
+		fs <~ " to "
+		self[2]|controlpoint|.AppendInto(fs)
+		fs <~ " by "
+		self[1]|controlpoint|.AppendInto(fs)
+		fs <~ " to "
+		self[3]|controlpoint|.AppendInto(fs)
+
+
+autogen int.MiddleLayout (|controlline|)
+	return the~middle-(self>>1) to (self)~long
+
+autogen int.InsideLayout (|controlline|)
+	return the~left+self to the~right-self
+
+function ivec2.Layout (|controlrect|)
+	return .x~wide by .y~high
+
+
+datatype ControlLine (ivec2)
+	linkage:cpp_part CL2
+	
+	operator by (|ControlLine| B,	|ControlRect|)
+		cpp_part By
+		return (.x,b.x,   .y,b.y)|ControlRect|
+	operator by (|Controlpoint| B,	|ControlRect|)
+		cpp_part ByPoint
+		inlined
+		return self by b.expand
+	operator by (|intrange| B,		|ControlRect|)
+		cpp_part ByRange
+		inlined
+		return self by (b<<4)|controlline|
+	operator back (|int| N,			|controlline|)
+		inlined
+		.y = .y|controlpoint| - n
+		return self
+		
+
+
+
+datatype ControlPoint (int)
+	default nil
+	linkage
+		cpp_part CL1
+		numeric false // disallow implicit (syntax <--> int) conversion
+	syntax is (|ControlPoint| m, |bool|)
+		inlined
+		return (self|int|&15)==m
+	operator plus (|int| n, |ControlPoint|)
+		return ((self|int|&15) ||| ( (.length+n) << 4))|controlpoint|
+	operator minus (|int| n, |ControlPoint|)
+		inlined
+		return .operatorplus(-n)
+	operator to (|ControlPoint| High, |ControlLine|)
+		inlined
+		return (self|int|, high|int|)|ControlLine|
+	operator for (|int| n, |controlline|)
+		inlined
+		return (self|int|, ((n)~long)|int|)|ControlLine|
+	operator for (|controlpoint| pc, |controlline|)
+		cpp_Part ForPoint
+		inlined
+		return (self|int|, pc|int|)|ControlLine|
+	operator back (|int| n, |controlline|)
+		inlined
+		return (((n)~long)|int|, self|int|)|ControlLine|
+	operator back (|controlpoint| cp, |controlline|)
+		cpp_Part BackPoint
+		inlined
+		return (cp|int|, self|int|)|ControlLine|
+	operator by (|ControlPoint| B, |controlRect|)
+		cpp_part ByPoint
+		inlined
+		return .expand by b.expand
+	operator by (|ControlLine| B, |controlRect|)
+		cpp_part ByLine
+		inlined
+		return .expand by b
+	function Length (|int|)
+		inlined
+		return self|int|>>4
+		
+	function Expand (|ControlLine|)
+		if self is low
+			return the~bottom to self
+		if self is high
+			return self to the~top
+	function Layout (|int| value, |ControlPoint|)
+		inlined
+		return (self|int| ||| value<<4)|controlpoint|
+	
+	function AppendInto (|faststring| fs)
+		fs <~ .length
+		fs <~ "~"
+		
+		|| type = self|int| & 15
+		|| type1 = type &~ 1
+		if low|int| == type1
+			fs <~ "low"
+		  elseif high|int| == type1
+			fs <~ "high"
+		  elseif before|int| == type1
+			fs <~ "before"
+		  elseif after|int| == type1
+			fs <~ "after"
+		  elseif centered|int| == type
+			fs <~ "centered"
+//		  elseif percent|int| == type
+//			fs <~ "percent"
+		  elseif length|int| == type
+			fs <~ "length"
+		  else
+			fs <~ type
+		
+	constants
+		|ControlPoint|
+		Low		= 0
+		High	= 2
+		Before	= 4
+		After	= 6
+		Centered = 7
+//		Percent = 8
+		Length	= 10
+
+
+datatype ControlClipMode (byte)
+	Flags
+		SlideBackInParent
+		SlideBackInWindow
+		Debug
+	syntax is (|controlclipmode| b, |bool|)
+		return (self & b) == b
+
+
+function ivec4.Layout (|ControlRect|)
+	return (self<<4)|ControlRect|
+
+function int.OperatorBy (|int| h, |controlrect|)
+	return (self)~wide by (h)~high
+
+function int.SyntaxCast (|controlpoint|)
+	disabled "Do you mean '(amount)~long' ?"

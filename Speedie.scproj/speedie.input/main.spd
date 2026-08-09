@@ -1,0 +1,82 @@
+
+/*
+	Speedie. By Theodore H. Smith.  Licence available in licence.txt
+*/
+
+
+
+main // main {
+	Compiler.SetupEnv
+	Compiler.MiniTests
+	if compiler.EnterCompile
+		using FlowLog.attempt("Speedie"+options.variant)
+			compiler.CompileTime
+	Compiler.PrintResults
+
+
+function Compiler.EnterCompile (|bool|)
+	opt norefcounts
+	require !.TryVariousStartModes
+	require FeedBack.ParseArgs
+	if app["perry"] and app.yes("check")
+		if interact.EnterAutoComplete
+			return false
+	return true
+
+
+function Compiler.PrintResults
+	|| OK = stderr.ok // incase errors happen AFTER success!
+	.PrintCompileErrors
+	if app.parent != nil
+		"Exiting Speedie ${app.id}"
+
+	if options.SelfReplacement and FileDes.StdOut.IsTerminal
+		if ok and !StdErr.ok // how?
+		if .VariantSuffix ~= "Test"
+			|| msg =  (ok)("Success", "Failed")
+			app.say(msg, false)
+	if Options.Beep
+		"\07"
+
+
+function Compiler.MiniTests
+	expect fatasm.VerifyNumbers "ASM Setup failiure"
+	target debug
+		jeebox.Test
+	.TestDate
+
+
+function compiler.ClearEnvs
+	|| Allowed = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
+	for (v in app.env) (k)
+		ifn k in Allowed
+			app.childenv(k) = nil
+
+
+
+function compiler.SetupEnv
+	opt norefcounts
+	expect fatasm.VerifyNumbers "ASM Setup failiure"
+	
+	app.Parent									// sigh. do this before clearenvs
+	.ClearEnvs
+	if !app.IsMainThread
+		app.ThreadName = "SpeedieDebug"
+
+	TerminalColor.RainbowTerm = FileDes.StdOut.IsTerminal
+	stderr.PrintNewErrors = errorflags.PrintFirst
+	if app.parent
+		stderr.PrintNewErrors = 0
+		TerminalColor.RainbowTerm = false
+
+
+
+api Speedie_Main (spdprocess.MicroProcess)
+// easier if this is always compiled.
+	cpp_name Speedie_Main
+	SpdProcess._ForceParent = Comms
+	rz = app.sp_run(args, mode&4)
+	if rz == 0
+		rz = app.sp_run(args, mode)
+	memory.Free(args) // no need anymore!
+

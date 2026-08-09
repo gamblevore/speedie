@@ -1,0 +1,371 @@
+
+
+role StretchControl (GuiControl)
+	contains stretchdivider
+	linkage
+		cpp_part SC
+	
+	libinternal AddPane (|string| name)
+		opt norefcounts
+		|| rz = GUIControl(self)
+		rz.ID = name
+		(rz is PassThru)
+	
+	setter Collapsed (|bool|)
+		opt norefcounts
+		|| d = .Divider
+		if Value
+			d.collapse
+		  elseif d.DistanceToEdge <= 0
+			d.Open
+
+
+	function StretchTo (|int| P)
+		opt norefcounts
+		.Divider.StretchTo(P)
+
+
+	function Collapsed (|bool|)
+		opt norefcounts
+		return .divider.DistanceToEdge <= 0
+		
+	inline IsOpen (|bool|)
+		opt norefcounts
+		return !.Collapsed
+		
+	
+	function Reset
+		.Divider.distancetoedge = .Divider.Initial
+		
+		
+	function AddHigh (|guicontrol| G)
+		opt norefcounts
+		.Divider.high! <~ g
+		
+	inline AddLeft (|guicontrol| G)
+		.AddLow(g)
+
+	inline AddRight (|guicontrol| G)
+		.AddHigh(g)
+
+	function AddLow (|guicontrol| G)
+		opt norefcounts
+		.Divider.low! <~ g
+
+	inline Divider (|stretchdivider!|)
+		return .last|stretchdivider|!
+	
+	inline Open
+		.divider.open
+		
+	module
+		inline Horz (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+			return .Build(p, start, LowGap, HighGap, 0)
+
+		inline Vert (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+			return .Build(p, start, LowGap, HighGap, 1)
+
+		function Build (|guicontrol| p, |ControlPoint| start, |int| LowGap, |int| HighGap, |int| D, |stretchcontrol|)
+			opt norefcounts
+			|StretchControl| sG = StretchControl(p)
+			(sg is PassThru)
+			sG.AddPane((d!=nil)("bottom", "left"))
+			sG.AddPane((d!=nil)("top", "right"))
+			|| SD   = StretchDivider(sG, d)
+			SD.Initial= start.Length.abs
+			SD.LowGap  = LowGap
+			SD.HighGap  = HighGap
+			sd.CollapseToRight = start is high
+			sd.InitGroup
+			return sG
+
+
+
+
+class StretchDivider (GuiControl)
+	linkage:cpp_part Div
+	|guiAction?|				OnHide
+	|guiAction?|				OnShow
+	|guiAction?|				OnStretch
+	|int|						LowGap
+	|int|						HighGap
+	|int|						Initial
+	|date|						Entered
+	|float|						DefaultFraction
+	|bool|						CollapseToRight
+	|byte|						D
+
+	constructor (|guicontrol| p, |int| d)
+		super.constructor(p)
+		isnt drawsfocus
+		.d = D&1
+		.DefaultFraction = 0.333
+		.takesfocus = 0
+		.gnormal.solid = (0.65, 0.75, 0.0, 1.0)
+
+	
+	function InitGroup
+		opt norefcounts
+		.id = "stretch"
+		|| A = .low!
+		|| C = .high!
+		|| s = .alignvalue(.initial)
+		if A == "left"								// noice
+			|| H = the~height
+			A.size = the~left to s		by  H
+			C.size = the~rest			by  H
+		  else
+			|| W = the~width						// down/up controls split by horz-line
+			A.size = W  by  the~bottom	to  s
+			C.size = W  by  the~rest
+		(.OnStretch)(self)?
+		.ResizeDivider
+
+
+	function ResizeDivider
+		// puts divider overlapping the panes... unless collapsed.
+		|| W = 3~before for 6
+		if .DistanceToEdge <= 0
+			W = 0~before for 4
+		|| H = W
+		if .d & 1
+			W = the~width
+		  else
+			H = the~height
+		.size = W by H
+
+
+	behaviour Resized
+		if Initial
+			.distancetoedge = .Initial
+		.InTest(GUI.mousexy, true)
+	
+	
+	libinternal Collapse
+		opt norefcounts
+		debugger 
+		if .DistanceToEdge > 0
+			.distancetoedge = 0
+
+
+	libinternal DistanceToEdge (|int|)
+		rz = .ActiveEnd.length
+		if .CollapseToRight
+			rz = -rz
+	
+	libinternal AlignValue (|int| Value, |Controlpoint|)
+		|| V = (value) ~ Right
+		if .CollapseToRight
+			V = (value) ~ left
+		return v
+		
+	libinternal DistanceToEdge (assigns:|int|)
+		.ActiveEnd = .alignvalue(value)
+
+
+	libinternal StretchTo (|int| P)
+		opt norefcounts
+		|| pr = .parent!.lastrect ± 1
+		|| d = .d & 1
+		|| x = 0
+		if !.CollapseToRight
+			x  = p - pr[d]
+			(x max= .LowGap)
+			(x min= pr.size[d]-.HighGap)
+		  else
+			x  = pr[d + 2] - p
+			(x max= .HighGap)
+			(x min= pr.size[d]-.LowGap)
+		.distancetoedge = x
+
+
+	libinternal ActiveEnd (|controlpoint|)
+		opt NoRefCounts
+		|| l = .low
+			return l.sizer[2+(.d&1)]
+	
+	
+	libinternal ActiveEnd (assigns:|controlpoint|)
+		opt NoRefCounts
+		|| l = .low
+			l.sizer.g(2+(.d&1), self) = value
+			.ResizeDivider
+	
+
+	libinternal Flip
+		|| E = .edge
+		if .DistanceToEdge <= 0
+			|| OnShow = .onshow
+			if OnShow and E > 0 // shouldnt be possible?
+				(OnShow)(self, 1)
+			  else
+				.Open
+		  else
+			|| OnHide = .onhide
+			if onhide and E > 0
+				(onhide)(self, 0)
+			  else
+				.Collapse
+
+
+	libinternal DefaultEnd (|guicontrol| P, |int|)
+		|| pr = p.lastrect
+		|| d = (.d&1)
+		return .DefaultFraction.mix(pr[d]|float|, pr[d+2]|float|)|int|	
+
+
+	libinternal Edge (|int|)
+		|| v = .lowgap
+		if .CollapseToRight
+			v = .HighGap
+		return v
+	
+	
+	function Open
+		opt norefcounts
+		|| p = .parent$
+		|| M = .Edge max 10
+		if .distancetoedge < M
+			.distancetoedge = .initial max m
+
+
+	libinternal High (|guicontrol|)
+		opt norefcounts
+		return .parent.second
+
+	libinternal Low (|guicontrol|)
+		opt norefcounts
+		return .parent.first
+	
+	behaviour MouseDown
+		require .InTest(P, false)
+		if keys.cmd or (clicks == 2)
+			.Flip
+			return MouseDragging.handled
+		
+		.StretchTo(p[.d&1])
+		return MouseDragging.DragBeyond
+
+
+	libinternal InTest (|ivec2| P, |bool| MightBeOut, |bool|)
+		|| Out = MightBeOut and !(.lastrect contains P)
+		|| dateout = !.entered
+		if Out != dateout
+			.touch
+			.Entered = (out)(0, gui.FrameStart)
+		if GUI.MouseButtons is left
+			|| d = gui.FrameStart-0.75s
+			if .Entered > d
+				.Entered = d
+		return !Out
+
+
+	behaviour MouseMove
+		opt norefcounts
+		|| Cursor = SystemCursor.SizeWE+(.d&1)
+		if state is enter or systemcursor.curr != Cursor
+			Cursor.Use
+		
+		if .MouseDownOnSelfOrNil
+			return .InTest(P, true)
+
+
+	libinternal FadeAlpha (|float|)
+		|| now  = gui.FrameStart
+		|| diff = now - .entered
+		|| f = (diff.float - 0.6)*2.0
+		rz = f.clamp
+		if rz >= 0 and rz < 1.0
+			.touch
+	
+	
+	module
+		constants
+			kGrabDist = 6
+		
+		libinternal DrawDash (Image.Shader)
+			|| C = vec4(0)
+			if P.y != rect.y
+				C = colors.white(0.1)
+			  else
+				c.a = 0.05
+			if (p.x == rect.x) or (p.x == rect.x2-1)
+				c.a *= 0.5
+			c.a *= Color.a
+			pix[].overlay(C.premul)
+	
+	
+	behaviour Draw
+		opt norefcounts
+		|| DrawColored = .MouseDownOnSelfOrNil and .entered
+		|| rect = .LastRect
+		|| xy   = rect.xy
+		ifn where contains xy
+			Drawcolored = false
+		
+		|| win = .Window
+			|| scr = win._Scroller
+				|| u = scr.upon			
+				if u.CanDrawScroll(win) and u.InScrollArea(win.mousexy)
+					drawcolored = false
+		
+		|| a = .FadeAlpha
+		|| scale = rect.size.Vec2
+		|| d = .d&1
+		|| h = scale[1-d]
+		|| w = scale[d]
+		scale = 2.5 / (w, h)
+		w = 3.0
+		xy[.d] += 1
+		|| add = (d|int|, (1-d)|int|)
+		|| stride = 1
+		if d: stride = where.width
+		|| col = .gnormal.edge.Color
+		|| center = (w, h)*0.5 - 0.5
+
+		// not sure why I neeed these wierd adjustments...
+		if !d
+			center.x += 2
+			scale.x *= 1.26th
+			scale.y *= 2th
+		  else
+			xy.y+=(.DistanceToEdge > 0)*3
+			scale.y *= 1.2th
+			scale.x *= 1th
+
+		
+		if !d
+			|| TickCount = 7
+			|| txy = (xy + add * (h*0.5)|int|) - (kGrabDist*add*TickCount)
+			
+			if !DrawColored
+				a = 0
+			
+			for ticks in TickCount
+				|| box = (txy, txy+(4,2))
+				|| B = vec4(1.0)
+				if ticks == 0 or ticks == tickcount-1
+					b.a = 0.5
+				b.a = b.a-a max 0.05
+				where.DrawShader(DrawDash, box, b)
+				txy += kGrabDist*add
+		
+		
+		if DrawColored
+			for j in h
+				|| p = where[xy]
+				for i in w
+					|| diff2 = ((i,j)-center) * scale
+					col.a = (1.0 - diff2.abs.sum)*a
+					p.overlay(col.PreMul)
+					p += stride
+				xy += add
+
+
+
+libinternal GuiControl.MouseDownOnSelfOrNil (|bool|)
+	opt norefcounts
+	|| w = .window
+		|| c = w.CurrMouseDown
+		return (c == self or nil)
+

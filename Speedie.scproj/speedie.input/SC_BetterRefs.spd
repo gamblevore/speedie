@@ -1,0 +1,112 @@
+
+
+/*
+	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
+	* can fold the refcount optimiser into the nilchecker... mostly in .function and .variableset
+	* can just store each class disturbance as one bit? just use 128 bits per... function?
+		* if list is disturbed, everything is disturbed... because list could be a message, and message could have an obj... which could be anything.
+	* look into how things like "Disowner checking" would work within the nil-checker.
+
+* Approach: Do bit by bit
+	* get property but only did math
+	* mark a few string funcs as not-modifier/disowner/capturer
+	* mark entire class
+	* fast capture of disowned things. like: r1 <~ r2.pop
+*/	
+
+
+// unfinished
+class CppRefs
+	|uint16|			DisturbParams
+	|bool|				Owned
+	|[string]?|			Disturbs		// cant be a class cos this is called BEFORE the classes are inited.
+										// awkward.
+	
+	constructor (|message| s=nil)
+		if s
+			.read(s)
+
+
+	function SetDefaultRefStatus
+		.Owned			= false
+		.Disturbs		= array.new
+		.disturbparams	= -1
+		.disturbsget	<~ "object"
+
+
+	function DisturbsGet (|[string]|)
+		|| ds = .disturbs
+			return ds
+		rz = array()
+		.Disturbs = ds
+		
+	function AddOne (|message| C)
+		opt norefcounts
+		if (C ~= "nil") // typeofnil
+			// 
+		  elseif (C ~= "self") // dcl is self
+			.DisturbParams |= 1
+		  elseif (C == @num)
+			.DisturbParams |= (C.int << 1)
+		  else
+			.Disturbsget <~ C.name
+	
+
+	function Read (|message| node)
+/*
+	cpp_refs {
+		Disowns			true
+		Disturbs		nil
+		ParamSafe		true
+	}
+*/
+		.SetDefaultRefStatus
+		|| arg = node[@arg]				#require
+		arg.expectlast
+		
+		for c in arg
+			c.expect(@tmp)
+			expect (c=="disturbs" or c=="disowns") (c, "Should be 'disturbs' or 'disowns'")
+			|| ch = c.first
+			if (ch == @bra): ch.func = @prm
+			expect (ch == @thg or @prm or @num) (ch)
+			ch.expectlast
+
+		require stderr.ok
+
+		
+		|| Disown = arg.find(@tmp, "returnsdisowned")[0]
+			.Owned = !disown.TrueOrFalse
+
+		|| Stuff = arg.find(@tmp, "disturbs")[0]
+			.Disturbs.clear
+			.DisturbParams = 0
+			if (Stuff != @list)
+				.addone(stuff)
+			  else
+				for c in Stuff
+					.addone(C)
+	
+	module
+		function Linkage (collectfunc)
+			return name_space.ProcessLinkage(node[@arg], ClassOrModuleLinkage, true)
+		
+		function ReadIntoCppRefs (CollectFunc)
+			name_space.SpaceModule$.DefaultRefs.Read(node)
+			return compiler.program
+
+
+
+dispatch CppRefTable (TranFunc)
+	disowns				{} //(SCFunction.NewCppWrapper)
+	disturbs			{} //(SCNode.LoadCppPart)
+	paramsafe			scfunction.tran_cpprefs
+
+
+
+extend_module SCFunction	
+	function Tran_CppRefs (TranFunc)
+		expect (fn) (node, "Only use this on functions")
+		fn.refs = cpprefs.new(node)
+		node.remove
+

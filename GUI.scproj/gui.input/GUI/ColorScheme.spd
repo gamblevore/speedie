@@ -1,0 +1,185 @@
+
+
+|| ¥ = colorscheme()
+
+class ColorScheme
+	linkage
+		cpp_part Sch
+	|ImagePixel[64]|		SyxCol
+	|ImagePixel|			RootTmp
+	|ImagePixel|			None
+	|ImagePixel|			ActiveTextLine
+	|ImagePixel[8]|			History
+	|vec4[4]|				BGCorners
+	|int|					HistoryIndex
+	|int|					Altered
+//Border
+	|drawstyle|				Scroll
+	|drawstyle|				TextSelection
+	|drawstyle|				TextSelectionUnfocus
+	|drawstyle|				ModifiedBorder
+	|drawstyle|				FocusBorder
+	|drawstyle|				DragAndDrop
+	|drawstyle|				WhiteStyle
+	|drawstyle|				SystemStyle
+	|drawstyle|				Menus
+	|DrawStyle|				MenuRowSel
+
+
+	function LoadDefaults
+		.load(DefaultColors.parse)
+	
+	
+	function LoadFromPrefs
+		.loaddefaults
+		|| s = app.prefs["colors"]
+			¥.load(s)
+
+	
+	constructor
+		// speedie could try to optimise this. its a big function!
+		// all we want to do is write some numbers into a memorylocation...
+		// could just be a 4-byte const and... write it.
+		// would be nice to have imagepixel/vec4 conversion optimised...
+		.ActiveTextLine			<~ ((0.2, 0.5, 0.2, 0.3))
+		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4)) 
+		.scroll.edge			<~ ((0.75, 0.25, 0.9, 0.5))
+		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
+//		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
+//		.TextCopy.edge			<~ ((0.6, 0.6, 0.1, 0.2))
+		.TextSelection.edge		<~ ((1.0, 0.25, 0.75, 0.5))
+		.TextSelectionUnfocus.bg <~ ((1.0, 0.35, 0.65, 0.2))
+		.TextSelectionUnfocus.edge <~ ((1.0, 0.35, 0.65, 0.2))
+		.modifiedborder.edge	<~ ((1.0, 1.0, 0.5, 1.0))
+		.modifiedborder.Bg		<~ ((0.0, 0.0, 0.0, 0.0))
+		.focusborder.edge		<~ vec4(1)
+		.Focusborder.Bg			= nil
+		.DragAndDrop.edge		<~ ((1.0, 0.0, 0.0, 1.0))
+		.DragAndDrop.bg			<~ ((1.0, 0.0, 0.0, 1.0))
+		.whitestyle.bg			<~ vec4(1)
+		.whitestyle.edge		<~ vec4(1)
+		.systemstyle.bg		<~ ((0.0, 0.1, 0.0, 0.96))
+		.systemstyle.edge	<~ vec4(1)
+		
+		.systemstyle.PixelShader = image.CurlieQueDrawer		
+		.BGCorners[0]		= (0.7, 1.0, 0.2, 1.0)
+		.BGCorners[1]		= .BGCorners[0] 
+		.BGCorners[2]		= (0.6, 1.0, 0.1, 1.0)
+		.BGCorners[3]		= .BGCorners[2]
+		.menus.edge			= (1.0, 0, 1.0, 1.0).px
+		.menus.bg			= (0.0, 0.0, 0.0, 1.0).px
+		.menus.Separator			= nil
+		.MenuRowSel.solid	= (0.5, 0.5, 0.5, 0.65)
+
+	
+	setter BG (|vec3|)
+		for i in 4
+			.bgcorners[i] = (value, 1.0)
+
+
+	libinternal Load (|message| s)
+		|| list = s["syx"]$
+		for syx in list
+			|| num = syntax.Func(syx.Name, syx)
+				|| c = &.syxcol[num]
+				c.load(syx.first)
+				c.a = 255
+		.RootTmp.load(s["root"])
+		.none.load(s["none"])
+
+
+	render SaveColors
+		fs.FieldEnter("syx")
+		for i in @max|int|
+			|| obj = i|syntax|.obj
+				fs.field( obj.name, .SyxCol[i].render )
+		fs.indent--
+		
+		fs.field( "root", .RootTmp.render )
+		fs.field( "none", .None.render )
+		
+//	function FadeV (|vec4| top, |vec4| bottom)
+//		.BGCorners[0] = top
+//		.BGCorners[1] = top
+//		.BGCorners[2] = bottom
+//		.BGCorners[3] = bottom
+		
+		
+	libinternal DrawIntoBackground (|image| where)
+		// so...
+		|| C0 = .BGCorners[0]
+		|| C1 = .BGCorners[1]
+		|| C2 = .BGCorners[2]
+		|| C3 = .BGCorners[3]
+		if c0 == c1 and c2 and c3
+			where.DrawRect(where.controlclip, c0)
+		  else
+			|| scale = (2.0, 2.0)/(where.size.vec2)		// interpolate these... sigh.
+			for (P in where) (v) 
+				|| vs = v.vec2*scale
+				|| CX1	= vs.x.mix(C0,	c1)
+				|| Cx2	= vs.x.mix(C2,	c3)
+				|| C	= vs.y.mix(cx2, cx1) 
+				P <~ C 
+
+
+
+libinternal message.ColorDeclNicely (|message?|)
+	opt norefcounts
+	while self
+		|| p = .parent$
+		|| f = p.func
+		if f == @decl
+			require .IsFirst
+			return p
+		require f == @rel or @bra or @brel or @arel
+		self = p
+		
+	
+libinternal FixupColor (|message| self, |ind| pos, |message|)
+	opt norefcounts						// need to fixup container colors...
+	require self
+
+	if (self == @thg)
+		|| p = .ColorDeclNicely
+			return p
+	if self == @emb
+		self = .Parent$
+
+	if .Position <= pos					// if we are after, its too far
+		while .After <= pos
+			self = .Parent						#require
+	require .Contains(pos, true)
+
+	if self == @prm or self in @url
+		return .Parent // NICE
+	if .IsContainer
+		return self // just see what happens
+		if (pos == .position) or pos == (.after-1)
+			return self
+		return nil
+	return self
+
+
+libinternal message.UseRootTmpColor (|bool|)
+	require (self == @tmp)
+	|| p = .parent
+	if !p or !p.parent
+		return true
+
+
+libinternal colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |imagepixel|)
+	opt NoRefCounts
+	if !HasColor
+		return 0
+	if msg
+		|| fixed_msg = FixupColor(msg, pos)
+			if fixed_msg.UseRootTmpColor
+				return .RootTmp
+			return .SyxCol[fixed_msg.func|uint| & 63]
+	if HasColor == 3
+		return .None
+	if hascolor == 2
+		return .SyxCol[@arg|int|]
+	return .SyxCol[0]
+

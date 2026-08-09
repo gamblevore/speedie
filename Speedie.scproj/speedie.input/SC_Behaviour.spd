@@ -1,0 +1,430 @@
+ 
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+class SCBehaviour (SCNode)
+	|SCModule?|							FuncTable
+	|{SCModule}|						Interfaces
+	|[SCFunction]|						WrapperFuncs	
+	
+	
+	constructor (|SCClass| parent)
+		.project = parent.project
+		.parent = parent
+		.Interfaces = dictionary.new
+
+
+	function Cls (|SCClass|)
+		return .parent|scclass|
+	
+	
+	function Add (|SCNode| fn)
+		opt norefcounts
+		if fn
+			.TryAdd(fn.source, fn, fn.name)
+	
+	
+	function Upwards (|SCBehaviour|)
+		opt norefcounts
+		|| curr = .cls
+		while curr
+			curr = curr.Super$
+			|| b = curr.behaviour
+				return b
+		
+	
+	function SCClass.AddBehaviourOrInterface (|SCNode| M)
+		|| b = .behaviour
+		if (!b)
+			b = SCBehaviour.new(Self)
+			.behaviour = b
+		
+		if (M isa SCModule)
+			b.interfaces.valuelower(M.name) = M
+		  else
+			b.add(m)
+	
+		
+	function SCModule.OneOrOther (|SCModule| B, |string| name,  |SCModule|)
+		if (self and b)
+			.NameConflict(b, name)
+		return B
+
+
+	function SCClass.InterfaceForBehaviour (|SCFunction| Fn, |SCClass|)
+		|| name = fn.name.lowercase
+		if (name.UnderScoreAtAnyEnd)
+			name = name.InterfaceToBehaviour
+		
+		if (name.last == '0')
+			name = name[0, name.length-1]
+		if (!name.UnderScoreAtAnyEnd)
+			name = name.moat
+		return .InterfaceFor(name, fn.source)
+	
+	
+	function SCClass.InterfaceFor (|string| name, |message| errplace, |SCClass|)
+		opt norefcounts
+		|SCModule| Result
+		for (C.upwards in self)
+			|| B = C.behaviour
+				|| I = B.interfaces[name]
+					Result = Result.OneOrOther(I, name)
+
+		expect result (ErrPlace, "No interface found for this behaviour")
+		return Result.cls
+	
+	
+	function SCClass.CreateBehaviour
+		require .isobject and !.isrole
+		
+		.Behaviour ?= SCBehaviour.new(self)
+		.Behaviour!.CreateFuncTable( .sourcearg! )
+	
+	
+	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)
+		opt norefcounts
+		|| b = .behaviour
+		while (b)
+			|| fn = b[name]
+			if (fn isa SCFunction)
+				return fn
+			b = b.upwards
+
+	
+	function SCClass.FillInterFaceIn  (|SCFunction| fn, |bool| Late)
+		|| Interface = .InterfaceForBehaviour(fn)					#require
+		|| prm = fn.source.find(@prm,true)							#require
+		
+		|| f = prm.first
+			fn.DeclsPrototypeInterface(f, interface, late)
+
+
+	function message.StartCakeVirtual (|message| Prms, |message| WriteTo)
+		opt norefcounts
+
+		|| ret = .last
+		if (ret == @decl) and !ret.declname
+			|| Tmp = macro.TmpPrms
+			tmp <~ ret.first!.copy
+			prms.BecomeMacro(CakeVirtualReturn, prms, tmp) // just use .run?
+			tmp.clear
+		  else
+			prms.func = @sheb
+		writeto.first = "|| _r = _v.callback(_fn|&uint|)" ~ Parse
+		writeto.first = "|| _v = cakevm.vm" ~ parse
+		writeto.allflags = messageflags.inserted
+
+	
+	function SCClass.FillInterFaceWrapper  (|SCFunction| fn)
+		opt norefcounts
+		|| Interface = .InterfaceForBehaviour(fn)					#require
+		|| prm = fn.source.find(@prm, true)							#require
+		
+		|| f = prm.first											#require
+		fn.DeclsProtoCleanup(interface, f, true, false)
+
+		require stderr.ok
+	
+		|| CakeAlso = options.makeexec and .IsLibrary
+
+		while
+			|| prms = fn.source!.findnested(@sthg, "...")			#require
+		
+			|| WriteTo = prms.parent!
+			|| Using = fn.source!.SyntaxUsing
+			|| CopyFrom = fn.source.Second
+
+			if CakeAlso
+				CopyFrom.StartCakeVirtual(prms, writeto)
+			  else
+				WriteTo.func = @prm
+				prms.Remove
+			
+			WriteTo.VirtualAdd("self", cakealso, nil, 0)
+	
+			|| i = 0
+			for C in CopyFrom
+				if C == @decl
+					|| it = c.declname
+						i++
+						WriteTo.VirtualAdd(it.name, cakealso, C.first, i)
+			CakeAlso = false
+
+
+		
+	function SCClass.IsBehaviourTable (|bool|)
+		require self
+		return .Behaviourness == scbehaviour.kBehaviourTable
+	
+	
+	function SCFunction.IsBehaviour (|bool|)
+		opt norefcounts
+		return .HasProto$.Type.IsInterface
+	
+	
+	function SCClass.IsInterface (|bool|)
+		if self
+			return .Behaviourness & scbehaviour.kBehaviourProto
+
+
+	function String.InterfaceToBehaviour (|string|)
+		return self[2, .length-2].lowercase
+
+		
+	function SCClass.ProcessBehaviours
+		opt norefcounts
+		.project.use
+		.ProcessBehavioursSub
+		scimport.curr = nil
+	
+	
+	function SCClass.ProcessBehavioursSub
+		|| B = .behaviour										#require
+		|| Table = b.FuncTable									#require
+		|| TableCls = Table.cls									#require
+		
+		for (fn in B)
+			.FillInterFaceIn(fn, false)
+		
+		for (W in b.Wrapperfuncs)
+			scfunction.currfunc = w
+			.FillInterfaceWrapper(w)
+
+		for (interface in B.interfaces)
+			interface.AddInterfaceToTable(TableCls)
+		scfunction.currfunc = nil
+	
+	
+	function SCClass.ProcessInterfaces
+		require .IsInterface
+		|| fn = .funcproto					#require
+		|| L = fn.parent
+		if (L isa scmodule)
+			|| cls = L.cls
+				fn.AddSelfPrm(cls)
+	
+	
+	function SCModule.AddInterfaceToTable (|SCClass| TableCls)
+		|| d = SCDecl(.cls!)
+		d.NilDeclared = NilState.real
+		d.Name = .name.InterfaceToBehaviour
+		TableCls.properties <~ d
+		TableCls.tryadd(.source, d, d.name)
+	
+	
+	function SCClass.BehaviourName (|string|)
+		return .name + "_Behaviour"
+	
+
+	function CreateFuncTable (|Message| ErrPlace)
+		expect !.FuncTable
+
+		|| name = .cls!.BehaviourName
+		using errplace 
+		|| msg = @tmp + "struct"
+		msg <~ (@Thg, name)
+		msg <~ @Arg
+		
+		.project.use
+		|| F = SCClass.NewStruct(msg, compiler.program, ErrPlace)|SCModule|
+			F.cls!.Behaviourness = kBehaviourTable
+			f.cls!.IsRole = .cls!.IsRole
+			compiler.program.TryAddBase( ErrPlace, F )			
+			.FuncTable = F
+			scimport.noproj
+	
+	
+	function String.UnderScoreAtAnyEnd (|bool|)
+		return (Self[] == '_') or (self[-1] == '_')
+	
+
+	function SCNode.ShouldBeClass (|message|errplace, |SCClass|)
+		return .IsNormalObject #expect (errplace, "Can only use this in a class.")
+
+	
+	function SCFunction.AddSelfPrm (|SCClass| cls)
+		|| prms = .source.find(@prm)
+		|| name = .source.first			#expect (.source, "No name found")
+		using name
+			if !prms
+				prms = @prm.msg
+				name.next = prms
+			
+			prms.first = MakeDecl(cls.name, "self", nil)
+	
+	
+	module {
+		function Tran_Behaviour (|message| node, |scclass| cls, |bool|)
+			require node
+			expect !cls.IsRole (node, "roles can't specify behaviours (roles aren't real classes!)")
+			|| name = node[@thg]$
+			|| lst = name.next
+				expect (!lst.isparams)  (lst, "Behaviours can't specify params")
+			using node 
+				|| it = name.next
+					it.expect(@arg)
+				  else
+					node <~ @arg.msg
+				
+				|| p = @prm.msg
+				p <~ (@thg, name.name.moat)
+				name.next = p
+			return true
+		
+		
+		function NewActual (CollectFunc)
+			|| cls = name_space.ShouldBeClass(errplace)
+			if cls and Tran_Behaviour(node, cls)
+				|| fn = SCFunction.NewFunc(node, cls, node)|scfunction|
+					cls.AddBehaviourOrInterface( fn )
+					(fn is Behaviour)
+					(fn is ExpectsRealVars)
+					Return fn
+
+		
+		function message.AllFlags (assigns:|MessageFlags|)
+			opt norefcounts
+			for s.fastflat in self
+				s!.flags = value
+		
+		
+		function MakeVirtualCaller (|SCModule| Mod, |SCClass| Cls, |Message| ErrPlace, |SCFunction|)
+			// so it's a func, on the base, with the same name... as... the module
+			|| InterName = mod.name
+			|| Type = cls.behaviourname
+			|| FuncName = Intername.InterfaceToBehaviour
+			|| fs = faststring()
+
+			fs <~ "
+function $InterName (,$InterName)
+	opt inline
+	|| _Table = .ClassBehaviours|&$Type|
+	|| _fn = _Table.$FuncName"
+
+			if !Options.MakeExec		// cpp
+				fs <~ "
+	return (_fn)(...)
+"
+					
+			  else						// cake
+				fs <~ "
+	if (_fn|int64| >> 63) // spd
+		...
+	  else
+		return (_fn)(...)
+		"
+
+			using Errplace
+			
+			|| FNSrc = fs.getresult.ParseClean
+				FNSrc.AllFlags = MessageFlags.Inserted
+				rz = SCFunction.NewFunc( fnsrc.first, Cls, ErrPlace )|SCFunction|
+				if rz
+					(rz is VirtualCaller)
+					(rz is ExpectsRealVars)
+					cls.behaviour!.WrapperFuncs <~ rz
+		
+		
+
+		function NewVirtual (CollectFunc)
+			require errplace
+			using (errplace)
+			|| cls = name_space.ShouldBeClass(errplace)
+				|| arg = node.find(@arg)
+					|| Beh = @tmp + "behaviour"
+					beh <~ node.first!.copy
+					beh <~ arg
+					node.next = beh
+					name_Space.CollectOne( beh, true ) // cos we collect from a list... sigh
+
+				|| Mod = .NewVirtualSub(node, cls, errplace)
+					return .MakeVirtualCaller(Mod, cls, errplace)
+		
+		
+		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
+			|| Thg = node.first!
+			|| required = (thg isarel "++")
+				thg = thg.replacewith(thg.first!)
+
+			expect (thg==@thg) (node, "Interface has no name.")
+			|| s = Thg.name
+			expect (!s.UnderScoreAtAnyEnd) (thg, "Interfaces can’t start or end with underscore.")
+			expect (s~!="destructor")      (thg, "Bad name.")
+			Thg.name = s.moat
+			
+			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
+			Mod.IsRequiredInterface = required
+			cls.AddBehaviourOrInterface( Mod )
+			|| mcls = mod.cls
+				mcls.Behaviourness = kBehaviourProto
+				if required
+					mcls.Behaviourness = kBehaviourProtoRequired
+			Return Mod
+		}
+	}
+
+	
+	constants
+		kBehaviourTable = 1
+		kBehaviourProto = 2
+		kBehaviourProtoRequired = 6
+	
+	
+	iterator
+		|| FnList = .access.navigate
+		while
+			|| value = fnlist.NextValue
+			if (!value): exit
+			yield value|scfunction|
+	linkage
+		cpp_part Beh
+
+
+function SCNode.IsNormalObject (|SCClass|)
+	if (self isa SCClass)
+		if .isobject
+			return self
+
+
+function message.IsBehaviour (|bool|)
+	return .name == "behaviour" or "actual"
+
+
+function SCClass.RenameInterfaces
+	|| b = .Behaviour$
+	for (f in b.interfaces)
+		|| it = f.cls
+			it.name = it.CppClass + it.name
+
+
+
+function Message.VirtualAdd (|string| name, |bool| Cake, |message| Ty, |int| i)
+	opt norefcounts
+	if !cake
+		self <~ (@thg, name)
+		return
+	
+	|| prms = macro.TmpPrms
+	prms <~ i.msg
+	if !ty
+		ty = @thg+"Object"
+	  else
+		ty = ty.copy
+	prms <~ ty
+	prms <~ @thg + name
+	
+	|| msg = CakeVirtualMacro.run(prms)
+	.last.prev!.prev = msg
+	prms.Length = 0
+
+
+
+|macro| CakeVirtualMacro = `(_v.proposedstack + _0)|&_1|[] = _2`.macro
+|macro| CakeVirtualReturn = `return _r|&_0|[]`.macro
+
+
+

@@ -1,0 +1,74 @@
+
+/*
+	Speedie Internals. By Theodore H. Smith...
+*/
+
+
+
+
+// bad design and only sciterator uses it!
+// better to NOT use it!
+class SCNodeRenamer {
+|string|		Name
+|[Message]| 	Nodes
+linkage
+	cpp_part		NR
+	
+
+function Rename (|message| name)
+	opt norefcounts
+	expect !(name.HasAny) (name, "Missing variable name on iterator")
+	for n in .nodes
+		n.func = name.func
+		n.name = name.name
+		n.position = name.position	
+
+
+function Message.FullAfter (|Message|)
+	opt norefcounts
+	|| P = .Parent
+	|| N = P.Next
+	while (N)
+		P = N
+		N = P.Next
+	return P.FlatAfter
+
+
+function CollectDclThg (|Message| DclThg)
+	opt norefcounts
+	|| Dcl = DclThg.Ancestor( @Decl )
+	expect (dcl and dclthg == @thg) (dclthg)
+
+	/*
+		Because of wonky things like this:
+	
+		while {
+			|| abc = test()
+		} (abc)
+		
+		I can’t just end at "}"... 
+	*/
+	
+	.Collect( DclThg,  DclThg.name,  dcl.FullAfter )
+
+
+function Uniqueify (|SCNode| p)
+	.Rename( @thg + UniqueTmpVar(p, .Name) )
+
+
+function Collect (|Message?| msg, |String| name, |Message?| after)
+	.Name = name
+	While msg != after
+		if (msg IsThing name)
+			.nodes <~ msg
+		msg = msg.FlatNext
+
+
+function CollectSelfs (|Message| root)
+	for Msg.flat in root
+		if Msg == @SDot
+			SCFunction.Tran_Sdt( Msg )
+// Not the cleanest design. it should rely on being transformed for this, previously.
+	.Collect( root, "self", root.flatAfter )
+}
+

@@ -1,0 +1,219 @@
+
+/*
+	Jeebox internals. By Theodore H. Smith...
+*/
+
+
+class Array
+	size 24
+	linkage
+		wrapper
+
+	default		array.new
+	contains	object
+
+	|int|		Marker
+
+////////////////////////////////////////////////////////////////////////////
+// We use the general naming convention that faststring, and others use.
+// length = "items in use"
+// size   = "buffer size"
+////////////////////////////////////////////////////////////////////////////
+	
+	constructor
+		visible
+		cpp_wrapper JB_Array_Constructor0
+		
+	destructor
+		cpp_wrapper JB_Array_Destructor
+
+	function Shuffle
+		cpp_wrapper JB_Array_Shuffle
+
+	function Last (||)
+		return self[.length - 1]
+	
+	function First (||)
+		return self[0]		
+
+	function Next (||)
+		if .marker < .length
+			return self[.marker++]
+	
+	setter Next (|...!|)
+		self[.marker++] = value
+
+	function Prev (||)
+		if .marker > 0
+			return self[--.marker]
+
+	function Active (|bool|)
+		return .marker < .length
+
+	function Reset
+		inlined
+		.marker = 0
+	
+	function Trim
+		.length = .length - 1
+	
+	function Pop (||)
+		nil checker
+		cpp_wrapper JB_Array_Pop
+
+	function SetAt (|...!| c, |int| i)
+		|| n = .length
+		if n == i
+			self <~ c
+		  elseif i < n
+			self[i] = c
+		
+	function Clear
+		nil self
+		if self!=nil
+			.length = 0
+	
+	function Wipe (|int|)
+		description "Clears entire array, then returns the previous size."
+		cpp_wrapper JB_Array_Wipe
+	
+	function Size (|int|)
+		disabled "use length"
+	
+	function Length (|int|)
+		nil checker
+		cpp_wrapper JB_Array_Size
+	
+	function Reverse
+		cpp_wrapper JB_Array_Reverse
+	
+	function Insert (|int| Pos, || Value)
+		cpp_wrapper JB_Array_Insert
+			
+	function Remove (|int| Pos)
+		cpp_wrapper JB_Array_Remove
+
+	function FastRemove (|int| Pos)
+		opt norefcounts
+		|| p = .pop
+			self[pos] = P
+
+	function Sort (|SorterComparer| Compare=&(...).Sorter)
+		// this wierd syntax is just to say, that the default sort function, is the default
+		// sort function for that object type.
+		// for example, string would use string.sorter, and message would use message.sorter
+		// this way, you can just call myarray.sort and not need to remember the sorter's name.
+		cpp_wrapper JB_Array_Sort
+	
+	function Count (|int|)
+		disabled "Use .length instead"
+	
+	function Shrink
+		description "Makes the array minimise space used. (Removes spare-unused space)" 
+		cpp_wrapper  JB_Array_Shrink
+	
+	function Length (assigns:|int|)
+		cpp_wrapper JB_Array_SizeSet
+
+	function Size (assigns:|int|)
+		cpp_part wtfwtfwf
+		disabled "Use .length instead."
+	
+	function Copy (|[...]|)
+		cpp_wrapper JB_Array_Copy
+	
+	function Swap (|int| i, |int| j)
+		cpp_wrapper JB_Array_Swap
+	
+	syntax Access (|int| pos, assigns:|...!|)
+		cpp_wrapper JB_Array_ValueSet
+	
+	syntax Access (|int| pos=0, ||)
+		nil checker
+		cpp_wrapper JB_Array_Value
+	
+	function Now (||)
+		return self[.length.now]
+	
+	syntax cast (|bool|)
+		inlined
+		return .length > 0
+	
+	syntax Append (|...?| item)
+		inlined
+		.SyntaxAppend(item, 1)
+	
+	function Append (|[...]| R)
+		cpp_part AppendMany
+		opt norefcounts
+		for s in r
+			self <~ s
+	
+	syntax Append (|...?| item, |int| Count)
+		cpp_wrapper JB_Array_AppendCount
+	
+	render
+		nil self
+		cpp_wrapper
+	
+	function Find (|| f, |ind|)
+		nil checker
+		cpp_wrapper JB_Array_Find
+
+	syntax Compare (|int| n, |int|)
+		nil self
+		inlined
+		return .length - n
+	
+	syntax Equals (|int| n, |bool|)
+		nil self
+		inlined
+		return .length == n
+	
+	function OperatorPlus (|array of ...| other, |array of ...|)
+		opt norefcounts
+		rz = .Copy
+		for s in other
+			rz <~ s 
+	
+	iterator
+		|| i = 0
+		while
+			|| Item = self[i]
+			if item == nil: exit
+			yield Item (i)
+			++i
+
+	iterator Backwards
+		|| i = .length - 1
+		while
+			|| Item = self[i]
+			if item == nil: exit
+			yield Item (i)
+			--i
+
+
+
+prototype SorterComparer (|...| self , |...| b, |SortComparison|)
+	linkage
+		cpp_Part SrtFn
+	contains Object
+	syntax append (|array| x)
+		inlined
+		cpp_part Sort
+		x.sort(self)
+	
+
+datatype SortComparison (int)
+	function bool.syntaxcast (|SortComparison|)
+		inlined
+		return self|SortComparison|
+	function int.syntaxcast (|SortComparison|)
+		inlined
+		return self|SortComparison|
+
+
+function @string.Sorter (SorterComparer of string)
+	return b.syntaxcompare(self, false)
+	
+

@@ -1,0 +1,210 @@
+
+
+libinternal textviewline.TextMapAfter (|int| OldPos, |textviewline|)
+	opt norefcounts
+	while
+		|| P = .Position
+		if P == OldPos
+			return self
+
+		if P > OldPos
+			return .textmapinside
+
+		|| n = .next
+		if !n
+			return self
+		.remove
+		self = n
+
+	
+libinternal textviewline.TextMapInside (|textviewline|)
+	opt norefcounts
+	|| Empty = TextViewLine.new
+	.prev = empty
+	return empty
+
+
+
+libinternal TextView.TextMapHasLine (|int| A, |int| B, |bool|)
+	opt norefcounts
+	|| t = .text
+	while A < B
+		if t[A++].IsTextLine
+			return true
+			
+
+libinternal textviewline.UnimportantDeletion (|ivec4| Map, |int| After,  |bool|)
+	opt norefcounts
+	// deleted an unimportant line
+	if self is EndsNormally
+		|| n = .next
+		if n.MoreKeepable(self)
+			return map[1] >= after
+
+
+libinternal textviewline.MoreKeepable (|TextViewLine| other, |bool|)
+	nil checker
+	if self
+		if .CompilePos >= 0 and other.CompilePos < 0
+			return true
+		if self is Keepable and other isnt Keepable
+			return true
+
+	
+libinternal textviewline.TextMapLineDeleted (|ivec4| Map, |textviewline|)
+	opt norefcounts
+	
+	// so we deleted the end of the line
+	// kinda similar to UnimportantDeletion
+
+	if self is EndsNormally
+		|| n = .next
+		while n.Morekeepable(Self)
+			|| OldAfter = .After
+			loop (map[0] < OldAfter  and  map[1] >= OldAfter)
+			.Remove
+			self = n
+			n++
+				
+	return self
+
+
+libinternal TextView.TextMapToOld (|ivec4| Map, |int| P, |textviewline| D,  |int|)
+	// AAA<BBB>CCC		2-->2,		6-->3
+	// AAACCC
+	// AAABBBCCC
+	opt norefcounts
+	
+	|| InsertStart = Map[0]					// 3
+	if P < InsertStart
+		return P
+
+	|| InsertEnd = InsertStart + Map[2]		// 6
+
+	if P == InsertStart						
+		|| OldAfter = d.After
+		if !d.UnimportantDeletion(Map, OldAfter) and !.TextMapHasLine(InsertStart, insertend)
+			return P
+
+	if P >= InsertEnd						// P==6
+		|| Gain = Map[3]					// 3
+		return P - Gain
+	return -1								// deleted :O
+
+
+libinternal ivec4.TextMapShrink (|string| Old, |string| New, |ivec4|)
+	// For large alterations in a silly way. Might as well allow it
+	// For code-debugging, its nice to have a more solid debugger.
+	|| N = self[2]
+	if N <= 0
+		return self
+
+	|| Start = self[0]
+	|| End = Start + N
+
+	|| A = old.Addr
+	|| B = new.Addr
+	while  start < End
+		if A[Start] != B[Start]
+			exit
+		Start++
+		n--
+	A--
+	B--
+	while Start < End
+		if A[End] != B[End]
+			exit
+		End--				// bug: thats the inserted end, not the selection end!
+		n--
+
+	self[2] = N
+	self[0] = Start
+	Self[1] = End			// bug here
+	return self
+
+
+libinternal ivec4.TextMapFix (|ivec4|)
+	opt inline
+	self[3] = (self[0] - self[1]) + self[2]
+	if self == ivec4()
+		self[2] = -1 // cant save
+	return self
+
+
+
+////////////////////////////////////////////////////////////////////////////////
+extend textview
+	constants
+		DebugLevelOff
+		DebugLevelRunning
+		DebugLevelDebugging
+
+
+	function DebugLevel (assigns:|byte| Level)
+		opt norefcounts
+		opt noinline
+		if !._Viewing
+			level = 0
+		
+		if level < DebugLevelDebugging
+			._ActiveLine = nil
+		require ._debuglevel != Level
+
+		if level > DebugLevelOff
+			.DebugInfoSave
+			
+		._debuglevel = level
+	
+		require level == DebugLevelOff
+		|| w = .WrappedLines			
+		w.obj = nil
+		
+		|| f = w.first
+		|| cleared = TextLineFlags.CodeReached ||| TextLineFlags.ActiveBreakPoint
+		w.CompilePos = -1
+		while f
+			f.textFlags	&=~ cleared
+			f.CompilePos = -1
+			f++
+	
+		._SavedCompileInfos.clear
+			
+	
+	libinternal DebugInfoRestore (|document| u)
+		opt norefcounts
+		|| w = .DebugInfoRestoreSub(u)
+		.WrappedLines = w
+		.ScrollStart = w
+		.ClearAutoComplete
+	
+	
+	libinternal DebugInfoRestoreSub (|document| u, |textviewline|)
+		opt norefcounts
+		if ._debuglevel	>= debuglevelrunning			// each file needs its own wrapped lines
+/			|| f = u.FilePath
+			for wr in ._SavedCompileInfos	
+				if (wr.obj as string) ~= f
+					return wr
+		
+		return textviewline()	
+	
+	
+	libinternal DebugInfoSave
+		opt norefcounts
+		|| w = .WrappedLines
+		|| f = w.first!
+		|| u = ._Viewing
+		require u and w.compilepos < 0
+		if !w.obj
+			|| info = ._SavedCompileInfos
+			info <~ w
+		  else
+			debugger
+		W.obj = u.FilePath
+		
+		w.CompilePos = 0
+		while f
+			f.CompilePos = f.Position
+			f++
+
+

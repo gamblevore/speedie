@@ -1,0 +1,21 @@
+
+user_list (count:3) {
+	user UnicronKid (85910191) {
+		screen_name "üñîçrøñ Kî∂"
+		inventory (framed_glasses, glitter, )
+		clothing (kids_unicron_suit, rainbow_boots, )
+	}
+
+	user Fred_Flintstone (77591794) {
+		screen_name "Fred Ebola-son"
+		inventory ()
+		clothing (animal_furs, )
+	}
+	
+	user GhostmanMLG420xXxX (35619104) {
+		screen_name "dat sniper yo"
+		inventory (sidney_sleeper, )
+		clothing (sniper_outfit1, tactical_boots, )
+	}
+}
+

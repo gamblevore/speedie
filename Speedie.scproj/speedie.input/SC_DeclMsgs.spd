@@ -1,0 +1,449 @@
+
+
+
+function DeclsDefault (|Message| def, |Message|)
+	opt norefcounts
+	if def.IsSetRel
+		return def.Last
+
+
+function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| Purpose = 0, |Message!|)
+	opt NoRefCounts
+	rz = @decl.msg
+	
+	|| f = rz
+	if purpose is Borrowed // seems to make no difference? sigh.
+		f = f.msg(@arel, "--")
+
+	f = f.msg(@emb)
+	if Type
+		f.func = @name
+		f.name = type
+	
+	if !Value
+		rz <~ (@thg, name)
+		return rz
+	
+	|| Rel = rz.msg(@rel)
+	|| NameMsg = rel.msg(@thg, name)
+	rel <~ (@opp, "=")
+	rel <~ value
+	
+	|| o = value.obj as scdecl
+		|| dcl = o.copydecl(true)
+		dcl.mu.info |= purpose
+		dcl.Name = name
+		dcl.Default = value
+		NameMsg.obj = dcl		
+		Rel.obj = dcl
+		rz.obj = dcl
+		f.obj = dcl
+	
+
+function MakeDeclOrRel (|Message| Into, |message| namemsg, |Message| value, |Message|)
+	require into
+	rz = @decl.msg
+	rz <~ @emb
+	
+	if value
+		Value = NeweqRel( NameMsg, value )
+	  else
+		Value = NameMsg
+	rz <~ value
+	into.First = rz
+
+
+
+function SCDecl.IntsOnly (|Message| exp, |bool|)
+	|| T = .type.TypeInfo
+	if (.isnormalnumber and t.isint)
+		return true // for constants... isreallynumeric allows constants a bit better.
+	
+	expect (T is numeric or t is bool)			(exp, "Can’t do bit ops on this")
+	expect (!T.isfloat)							(exp, "Can’t do bit ops on floats")
+	return true
+
+
+
+function DefaultStitch (|Message| Default, |Message| dcl, |message|)
+	opt norefcounts
+	using (dcl)
+	rz = dcl.msg(@rel)
+	rz <~ dcl.second
+	rz <~ (@Opp, "=")
+	rz <~ Default
+
+
+function SCFunction.CollectDeclsParams (|Message| prms, |SCNode| AddToSpace)
+	opt norefcounts
+	scmodule.curr = .parent|scmodule|
+	|| cls = .Cls
+	if !cls
+		cls = .parent|SCModule|!.Cls
+	  elseif !prms.HasSelfAsFirst and (self isnt dylib)
+		expect (AddToSpace) (prms)
+		.AddSelfToFunc(cls, AddToSpace)
+
+	for item in prms
+		item.CollectOneParam(self, AddToSpace, cls)
+
+	|| ns = .NilSelf
+		.WantAs(ns)
+
+	|| r = .ReturnType
+		r.CalculateDataType
+		if r.IsBareStruct
+			(r is ReturnedStruct)
+		check (r isnt Reference) (r.source, "Only params can be references")
+		if self is HidesProperties
+			.ReturnType = r.makereal
+
+
+
+function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cls,  |bool|)
+	opt norefcounts
+	real self
+	if (func.isassigns == 2) and .islast
+		if !cls
+			error (self, "Can’t use this here." )
+		  else
+			// setter x (|int|) --> fn x (|int| value)
+			func.IsAssigns = 3
+			if cls.IsDataTypeOrFP
+				.next = .copy // fn x (|int|) --> fn x (|int| value, |int|)
+			.AddValue(func)
+		
+	if  self == @Item  and  .first == "assigns"
+		self = .Last
+		func.IsAssigns = 1
+		.addvalue(func)
+	
+	require .Expect(@decl)
+
+	|| dcl = .CollectDecl(func, recv, declmode.FuncParam, cls, func)		#require
+	if dcl.default isthing "nil"
+		if dcl.TypeSuffers
+			// seems to be taking the default type... for string/array, making it "real"
+			// for example function abc (|object|A=nil, |string|B=nil)
+			// it complains about B, but not A!
+			
+			check (!dcl.StatedReal) (self, "Can't be both real and nil!")
+		dcl.NilDeclared = nilstate.optional
+
+	if !dcl.type.isstruct
+		|| n = dcl.name
+		check (n ~!= "rz") (self, "Using reserved name.")
+		if self isnt inserted
+			check (n[] != '_') (self, "Using reserved name.")
+	
+	func.AddTypeInfo(dcl)
+	if dcl.name
+		(dcl is Param)
+		check (!dcl.Default or dcl isnt reference) (self, "References can't have default values")
+	  else
+		(dcl is return)					// A struct return.
+	(dcl isnt Altered)					// SCDecl defaults as being altered... not sure why.
+	(dcl isnt NumberConst)
+
+	func.args <~ dcl
+	if func.IsLibrary
+		check (func.IntPrmCount <= 6)	(self, "Too many int/ptr/obj params, 6 max for lib funcs.")
+		// i think this is an X86 limitation. My ARM CakeBridge has a limit of 8 each, and 10 total.
+	check (func.args <= 8)				(self, "Too many params defined. (8 max)")
+
+	return true
+
+
+function scclass.CollectProp (|Message| msg, |bool|)
+	opt norefcounts
+	|| dcl = msg.CollectDecl( .modul, self, DeclMode.properties, self)
+		.properties <~ dcl
+		(dcl is property)
+		(dcl is library) = .islibrary
+		dcl.becomereal
+		return true
+
+
+function CollectDeclsGlobals (|Message| arg, |SCmodule| Mod)
+	opt norefcounts
+	mod.use
+		
+	for item in arg
+		if item == @decl
+			require item.CollectAGlobalDecl(Mod)
+
+
+function scdecl.ForContained (|scdecl|) // notglobal, noglobal
+	|| Strong = (.NilDeclared isnt nilish) and .typesuffers
+	if (self isnt global) and !.name and !strong 
+		return self
+	rz = .copydecl
+	rz.name = ""
+	rz.nildeclared |= nilstate.nilish
+	(rz isnt global)
+
+
+function scdecl.NotLocal (|scdecl|)
+	if (self isnt local) and !.name 
+		return self
+	rz = .copydecl
+	rz.name = ""
+	(rz isnt local)
+
+
+function scdecl.AsLocal (|scdecl|)
+	opt norefcounts
+	if (self is local) 
+		return self
+	rz = .copydecl
+	rz.name = ""
+	(rz is local)
+
+
+function Message.CollectAGlobalDecl (|SCModule| Mod, |bool|)
+	opt norefcounts
+	|| f = .file
+		f.proj.use
+	
+	|| dcl = .CollectDecl(Mod, Mod, declmode.Globals)		#require
+	|| def = dcl.Default
+	if def and !dcl.nilstated
+		|| d = def.MsgDecl
+		if d and d.StatedReal
+			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
+	
+	(mod.Globals init []) <~ dcl
+	return dcl.AddToGlobs							// return false for error.
+
+
+function scdecl.AddToGlobs (|bool|)
+	opt norefcounts
+	is Global
+	
+//	|| n = .name
+//	if ('_' == n[]) ||| ('_' == n.Last)
+//		is hidden
+// maybe just do visibility textually?
+// add more in perry mode?
+	
+	if  self is Library and self isnt ClassObj
+		|| fn = .func
+		if fn and fn|scnode| is LibInternal
+			return true								// no error. just ignore.
+		ifn fn and fn|scnode| is embeddedonly
+			PackMaker.LibGlobs <~ self
+			return true
+
+	// classobjs go in here. Thats just how it is. The system is designed that way.
+	// it works better overall. Its just for Packs not normal compiles, which have
+	// no difference between lib/pack.
+	
+	// and wheres the freaking energy behind my thought-voice...???
+
+	packmaker.PackGlobs <~ self
+	return true
+
+
+function CollectManyDeclsFromBody (|Message| arg, |SCNode| scarg) 	// remove later... :)
+	opt norefcounts	// basically... the caller needs fixing.
+	for item in arg
+		if item == @decl
+			item.CollectFromBody(scarg) // keep on going even if one failed. good for autocomplete
+
+
+function scdecl.AsBody
+	is body
+	isnt altered
+	isnt NumberConst
+	.DepthOfBranch = SCFunction.InBranch
+	.DepthOfLoop = SCFunction.InLoop
+
+
+function Message.CollectFromBody (|SCNode| Name_space)
+	opt norefcounts
+	if .obj // when does this happen? hopefully not on anything that escaped .collectdecl?
+		return
+
+	|| dcl = .CollectDecl(Name_space, Name_space, DeclMode.FunctionBody)
+		dcl.AsBody
+		StructStuff.DelayedFix
+		if self isnt inserted
+			check (dcl.name[] != '_') (self, "Using reserved name.")
+		|| def = dcl.Default
+			check (def != @thg  or  def.name ~!= dcl.name) (def, "Same name!")
+
+	
+function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |scclass| cls=nil, |scfunction| FuncPrmz=nil,  |scdecl|) // collectdecls
+	|message--| Type = .first							#expect (self, errorreceiver.nonfatal)
+	|message--| Name = type.Next
+	
+	expect (FuncPrmz or Name)  (self, "No name found.")
+	|| Default = DeclsDefault( name )
+	|| Sdcl = ExtractDecl( Type, P, mode )
+		check ((sdcl isnt reference) or (mode is FuncParam)) (Type, "Only params can be references")
+	  elseif !default  and  (P isa SCArg)
+		Sdcl = P.ParentFunc!.ReturnType
+
+	|message--| NameItm = name.CollectDclName
+	|SCDecl--| DefaultDcl
+	if FuncPrmz
+		0
+	  elseif (Default and mode isnt Properties)
+		DefaultDcl = TypeOfExprNeeded( Default, P )		#require
+		DefaultDcl = DefaultDcl.Downgrade(Default)
+		if (sdcl)
+			default = sdcl.ExpectMatchForDecl( DefaultDcl, default )
+		
+	  elseif (!cls) and (sdcl) and (sdcl.CanUseDefault)
+		Default = sdcl.CreateDefault(type, mode >= 4)
+		if (Default)
+			TypeOfExpr( default, P )
+			name = DefaultStitch( Default, self )
+	
+	|| NoOriginalDcl = false
+	if !Sdcl
+		NoOriginalDcl = true
+		if (cls) and (cls.Contained)
+			sdcl = cls.Contained!						// (|| x = Y), (|object| x = Y)
+		  else
+			|string--| str = (FuncPrmz!=nil)("Missing type, or default value.", "Missing type" )
+			expect (!FuncPrmz and defaultdcl) (self, str)
+			sdcl = DefaultDcl
+	
+	if sdcl.NeedsContainedfix
+		sdcl = sdcl.Containedfix
+	
+	|| dcl = Sdcl.CopyDeclsStructFixer(self, mode * (nameitm!=nil), type)
+	dcl.source = self
+	if !NameItm
+		check (.islast) ( self, "Param is missing a name." )
+		if !FuncPrmz
+			return nil
+		if FuncPrmz.CollectReturnAsReal					// allocs dont fail (assumed so)
+			dcl.nildeclared = nilstate.real
+
+		check !dcl.IsCArray (self, "Can't return c-arrays")
+		FuncPrmz.ReturnType = dcl						// we need the copy
+		if !dcl.isbarestruct or funcprmz is constructor
+			(dcl is return)
+			return nil
+
+		(dcl is ReturnedStruct)
+		dcl = dcl.getaddress
+		nameitm = .msg(@thg,"rz")
+		(dcl is IntendedAsReturn)
+		funcprmz.StructReturnPos = funcprmz.args.Length+1 // sheesh a lot of work!
+
+
+	if !Default
+		name.ExpectLast
+	
+	if mode isnt Properties								// the old .obj is needed
+		nameitm.obj = dcl
+	
+	if (Mode & declmode.functionbody) and NoOriginalDcl						// functionbody
+		if sdcl isnt StayBorrowed
+			(Dcl Isnt Borrowed)
+		dcl.nildeclared = NilState.real >> dcl.TypeSuffers
+	
+	if (nameitm in @Rel)
+		nameitm.Parent!.obj = dcl
+	
+	.obj = dcl
+	type.obj = dcl										// might as well set it everywhere.
+	dcl.Default = Default
+	dcl.Name = nameitm.name
+	(dcl Isnt Const)									// on "|| bla = true", make "bla" editable.
+
+	if DefaultDcl										// default must exist if DefaultDcl does
+		if mode & DeclMode.Globals
+			dcl.Absorb(defaultdcl)
+		dcl.AssignabilityCheck(nil, default!, DefaultDcl)
+
+	if Recv												// nil for prototypes
+		Recv.TryAdd( self, dcl, dcl.Name )
+	
+	return dcl
+
+
+function scdecl.Absorb (|scdecl| Default)
+	require !.NilStated
+	if Default.StatedReal
+		.NilDeclared = Default.NilDeclared	// absorb realness
+	  elseif .TypeSuffers
+		.NilDeclared = NilState.Optional	// normalise
+					
+	
+
+function Message.CollectFuncTableName (|string|)
+	//	@msg.ID-->"msg"
+	//	"abc"-->"abc"
+	//	why? why not?
+	if self == @name
+		return .name.UpperCase
+	if .name and self != @dot
+		Return .Name
+
+	Return .Firstname 
+	
+
+function scdecl.NeedsContainedfix (|bool|)
+	opt NoRefCounts
+	if !.AllocSource and !.contains
+		return .ReallyContains
+
+
+function SCDecl.Containedfix (|scdecl|)
+	opt norefcounts
+	|| t = .Type
+	|| IsSelf = T.TypeNormal == self
+	rz = (IsSelf)(.CopyDecl, self)
+	rz.contains = t.SelfDecl.Contains
+
+
+
+function SCDecl.DownGrade (|message| Orig, |scdecl|)
+	// Remove borrowing and also downgrade stringzeroterminated to a plain old string
+	opt norefcounts
+	if !.IsNormalObject
+		return self
+	
+	orig = orig.unbra
+	if orig.isstring and (.type is downgradetostring)
+		|| d = typestring!.TypeNormal
+		if (self is StayBorrowed) and orig == @type
+			d = d.CopyDecl
+			(d is BothBorrowed)
+		return d
+	
+	if (self is StayBorrowed)  and orig != @type
+		self = .CopyDecl
+		isnt BothBorrowed
+	
+	return self
+
+
+	
+function message.AddValue (|scfunction| f)
+	opt norefcounts
+	if !.HasChildCount(2)
+		using f.source!
+			self <~ (@thg, "Value")
+
+
+datatype DeclMode (int)
+	constants
+		|DeclMode|
+		FuncParam		= 4
+		Properties		= 3
+		Globals			= 1
+		FunctionBody	= 8
+//		Local			= FuncParam+FunctionBody
+		Proto			= 16
+		TypeCast		= 32
+		ProtoParam		= FuncParam + Proto
+		Always			= 64
+
+	syntax is (|DeclMode|o, |bool|)
+		return self == o
+

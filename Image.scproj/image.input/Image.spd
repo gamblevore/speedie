@@ -1,0 +1,576 @@
+
+
+class Image (memory)
+	linkage
+		cpp_part Img
+		opt min 3
+	|ivec2|			Area
+	|ivec2|			WindowBase
+	|ivec4|			_ControlClip
+	|string|		Name
+	|image?|		Temp
+	contains byte
+
+	constructor (|ivec2| S, |&byte| P, |string| name="")
+		cpp_Part ConstructorPointer
+		super.constructor(s.area, 4, P)
+		.name = name
+		.length = self|memory|.size
+		.AreaInfo = s
+	
+
+	destructor
+		if .name
+			"Destroying: $.name"
+	
+	render
+		opt norefcounts
+		fs <~ "image${.size}:${.name}"
+	
+	setter Size (|ivec2|)
+		inlined
+		.ResizeTo(value)
+	
+	function Size (|ivec2|)
+		inlined
+		return .area
+	
+	function NeedTemp (|image|)
+		opt norefcounts
+		return .Temp init image(.size)
+
+
+	inline ImageOfSameSize (|string| name="", |image|)
+		return image(.size, name)
+	
+	function CopyImage (|string| name="", |Image|)
+		rz = .ImageOfSameSize(name)
+		if rz
+			memory.Copy(rz.ptr, .ptr, rz.ByteCapacity)
+	
+	
+	target __IMPORT_GUI__
+		function Window (assigns:|window| W)
+			|| s = w.LastRect
+			.windowbase = s.xy
+			.ControlClip = s.Soothe
+
+
+	function ControlClip (assigns:|ivec4| R)
+		cpp_part ControlClipSet4
+		|| sigh = (0, 0, .size)
+		|| b = .WindowBase.xyxy
+		r = (r + b).clip(sigh)
+		._ControlClip = r - b
+
+	operator contains (|&imagepixel| P, |bool|)
+		cpp_part ContainsPixel
+		|| Start = ._ptr
+		|| After = Start+.ByteCapacity
+		return P >= Start|&imagepixel|  and P < After|&imagepixel| 
+		
+	
+	function ControlClip (|ivec4|)
+		inlined
+		return ._ControlClip
+		
+	
+	target __IMPORT_GUI__
+		function Tile (|ivec2| t, |imagetiler|)
+			cpp_Part Tile2
+			rz.tile = t
+			rz.bounds = ._Controlclip
+	
+	function Rect (|ivec4|)
+		inlined
+		return .size.rect
+	
+	
+	function Width (|int|)
+		inlined
+		return .size.x
+	
+	
+	function Height (|int|)
+		inlined
+		return .size.y
+	
+	
+	inline AreaInfo (assigns:|ivec2| wh)
+		.area = wh
+		.ResetBoundsToSize
+
+
+	function ResetBoundsToSize
+		cpp_Part resetarea
+		.WindowBase = (0, 0)
+		.noclip
+	
+	libinternal NoClip
+		._ControlClip = (0, 0, .size)
+	
+	function Horz (assigns:|ivec2|r)
+		._controlclip.x = r.x
+		._controlclip.x2 = r.x2
+	
+//	function Horz (|intrange|)
+//		return ._Controlclip.x1x2
+//	
+//	function Vert (|intrange|)
+//		return ._Controlclip.y1y2
+	
+		
+	function Clip (|ivec4| R, |ivec4|)
+		if (self)
+			r = r.clip(.ControlClip)
+		return R
+
+	function Clip (|vec4| R, |vec4|)
+		cpp_part ClipVec
+		if (self)
+			r = r.clip(.ControlClip.vec4)
+		return R
+
+	syntax cast (|ivec4|)
+		inlined
+		return ._controlclip
+	
+	function ResizeTo (|ivec2| value, |bool|)
+		|| N = value.area
+		require !.deathaction  or .SetSize(N)
+		// !.deathaction means our memory is externally managed, so we assume its already been resized.
+
+		.length = n
+		.AreaInfo = value
+		return true
+			
+	
+	function DrawGradientV (|ivec4| r, |vec4| B, |vec4| T)
+		if B == T
+			return .DrawRect(r, b)
+		|| hz = r.horz
+		|| vt = r.vert
+		|| Step = 1.0 / (vt[1] - vt[0])|float|
+		|| curr = 0.0
+		for y in vt
+			|| value = curr.mix(b,t).PreMul
+			|| Px = self[hz.x  , y]
+			|| Px2 = self[hz.x2-1, y]
+			while px <= px2
+				px.overlay(value)
+				px++
+			curr+=step
+	
+	
+	function Clear (|vec4| Color=colors.black)
+		.DrawRect((0,0,.size), color)
+	
+	
+	function Pixels (|&imagepixel|)
+		inlined
+		return .ptr|&imagepixel|
+	
+	
+	function @Vec4.Colorise (|byte| D, |float| a=1.0,  |vec4|)
+		|| DB = (d>>2)&3				// too brown otherwise
+		|| DX = (d>>5)&3
+		rz.r = ((d>>0)&7)|float|*7th
+		rz.g = ((d>>3)&7)|float|*7th
+		rz.b = (DB xor DX)|float|*3th
+		rz.a = a
+	
+	
+	function Interp (|vec2| P, |vec4|)
+		|| base = p.ifloor
+		for i in 4
+			|| base2 = base + (i>>1, i&1)
+			|| closeness = (base2.Vec2 - p).abs.sum
+			|| c0 = self[base2][].color
+			rz += (closeness*c0*0.25)
+
+	
+	operator contains (|ivec2| P, |bool|)
+		return (p+.windowbase) inrange .size
+		
+
+	syntax access (|ivec4| rect, |imagereader|)
+		cpp_part imagereader
+		inlined
+		rz.rect = .clip(rect)
+		rz.img = self
+	
+
+	syntax access (|ivec2| P, assigns:|ImagePixel|)
+		if self contains p
+			self[p][0] = value
+	
+	
+	syntax access (|ivec2| P, |&ImagePixel|)
+		cpp_part AtXY
+		P += .windowbase
+		|| S = .size
+		rz = .pixels
+		ifn p inrange s
+			p = p.clip(s-(1,1))
+		p.y = s.y - (1 + p.y) // invert
+		rz += (p fma s.x)
+
+		
+	syntax access (|int| x, |int| y, |&imagePixel|)
+		cpp_part AtXYInt
+		inlined
+		return self[(x,y)]
+	
+	
+	syntax access (|vec2| P, |&ImagePixel|)
+		disabled "use ivec2 coords to get &pixel, or syntaxcall for interpolated result"
+		cpp_part AtVec2
+		return self[p.ivec2]
+	
+
+	syntax call (|ivec2| P, |vec4|)
+		cpp_part ColXY
+		inlined
+		return .SyntaxAccess(p)[].Color
+	
+		
+//	function SavePNG (|file| f) // writetofile
+//		disabled "Unfinished"
+//		if f.openEmpty
+//			f.RawWritePng(.size.x, .size.y, .ptr|&byte|)
+	
+		
+	inline ClearMarks (|ivec4| R)
+		.mark(r, 0)
+	
+	
+	function Mark (|ivec4| R,  |byte| Mark=1)
+		|| range = self[r]
+		for px in range
+			px.a = mark
+
+	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
+		|| R = .clip(P.xyxy + (0,0,width+1,0))
+		|| sigh = self[R.xy]
+		for r.width
+			(sigh++).a = Mark
+
+
+	function MarkLineV (|ivec2| P, |int| Height, |int| Mark)
+		|| iw = .width
+		|| R = .clip(P.xyxy + (0,0,0,height))
+		|| sigh	= self[R.xy]
+		|| px = .pixels
+		for r.height
+			sigh.a = Mark
+			sigh -= iw
+			require sigh >= px
+		
+
+	function DrawLineH (|ivec2| P, |int| Width, |imagepixel| Col, |int| alpha=-1)
+		require col.a
+
+		|| R = .clip(P.xyxy + (0,0,width,0))
+		|| sigh = self[R.xy]
+		|| ColV = col.PreMul
+		|| n = r.width
+		
+		for n
+			if col.a == 255
+				sigh[0] = Col
+			  else
+				sigh.Overlay(ColV)
+			if alpha >= 0
+				sigh.a = alpha
+			sigh++
+	
+	
+	prototype Shader (|ivec4| Rect,  |ivec2| P,  |&imagepixel| Pix,  |vec4| color)
+	
+	
+	function DrawShader (|Image.Shader| Shader, |ivec4| Rect, |vec4| Col=vec4(1))
+		|| R = .clip(rect)
+		|| range = self[r]
+		for (px in range) (pos)
+			(Shader)(self, r, pos, px, col)
+				
+	
+	function DrawLineV (|ivec2| P, |int| Height, |imagepixel| Col, |int| alpha=-1)
+		require col.a
+		|| iw	= .width
+		|| ColV = col.PreMul
+		|| R = .clip(P.xyxy + (0,0,0,height))
+		|| sigh	= self[R.xy]
+		|| px = .pixels
+		|| n = r.height
+		for n
+			if col.a == 255
+				sigh[0] = Col
+			  else
+				sigh.Overlay(ColV)
+			if alpha >= 0
+				sigh.a = alpha
+			sigh -= iw
+			require sigh >= px
+	
+	
+	function FillMarks (|ivec4| R, |imagepixel| A, |imagepixel| B, |imagepixel| C, |imagepixel| D)
+		|| va = a.PreMul
+		|| vb = b.PreMul
+		|| vc = c.PreMul
+		|| vd = d.PreMul
+		|| range = self[r]
+		for sighs in range
+			|| i = sighs.a
+			if i == 0
+				sighs.overlay(va)
+			  elseif i == 1
+				sighs.overlay(vb)
+			  elseif i == 2
+				sighs.overlay(vc)
+			  elseif i == 3
+				sighs.overlay(vd)
+	
+
+	function DebugPixels
+		cpp_part Dump
+		visible
+		for y in .height
+			for x in .width
+				if x: print ", "
+				print self[x,y][].render
+			printline
+		printline
+
+	
+	iterator
+		|| curr = ._controlclip.x1y1
+		|| xstart = ._controlclip.x
+		|| end = ._controlclip.x2y2
+		while (curr.y < end.y)
+			while (curr.x < end.x)
+				yield (self[curr]) (curr)
+				++curr.x
+			curr = (xstart, curr.y+1)
+	
+	
+	module
+		function New (|ivec2| wh, |string| name="", |image?|)
+			cpp_part NewWithSize
+			|| alloc = memory.zalloc(wh.area*4 max 4)
+				return image(wh, alloc, name)
+		
+		function New (|string| name="", |image!|)
+			cpp_part NewWithName
+			|| alloc = memory.ZAlloc(4)!
+			return image((0,0), alloc, name)
+
+		function string.LoadQOI (|string| name="", |image|)
+			|int[2]| xy
+			|| str = .Decompress
+			|| buff = imagehelper.loadqoi( str.addr, str.length, xy[0] )
+				return image((xy[0], xy[1]), buff, name)
+
+		function file.LoadQOI (|image|)
+			|| s = .readall
+				return s.loadqoi(self) #expect (.path, "Failed to read image.")
+
+		function image.WriteQOI (|string|)
+			|| l = .ByteLength
+			|| qoi = imagehelper.WriteQOI(.ptr, .Width, .Height, l)
+				return string.FromPtr(qoi, l)
+
+
+// move over to the other file.
+	
+	function LoadEmpty (|int| W, |int| H, |bool|)
+		if (.size.x != W or .size.y != h)
+			.setsize(w * h)
+			.AreaInfo = (w,h)
+		return .Pixels
+	
+	
+	inline CurrSize (|ivec2|)
+		return ._controlclip.size
+	
+				
+	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| Edges)
+		opt norefcounts
+		(Edges isnt open)
+		|| d = g.PixelShader
+			(d)(self, r, G, Edges)
+		  else
+			.DrawOutlineOnly(R, g.SafeEdge, g.SafeBG, Edges)
+
+
+	function DrawRectStyled (|ivec4| R, |DrawStyle| G, |MoveCode| Edges=movecode.allcodes)
+		|| D = g.PixelShader
+			(D)(self, r, G!, edges)
+		  else
+			.DrawRectOutlined(r, g, edges)
+
+		
+	function Rotate (|image| Dest, |bool| Right=true)
+		|| into = dest
+		if dest == self
+			into = .ImageOfSameSize$
+		
+		|| W = .Width,       || H = .Height
+		|| DH = into.Height, || DW = into.Width
+		require DH >= W and DW >= H
+		|| step = DW.SetSign(Right)
+		|| h1 = H-1
+		|| dh1 = dh-1
+
+		for y in H
+			|| Read = self[0, y]
+			|| R = (h1-y, 0)
+			|| L = (y, dh1)
+			|| start = (right)(R, L)
+			|| Write = into[start]
+			for i in w
+				Write[0] = Read[i]
+				Write += step
+
+		if dest == self
+			into.CopyTo(self)
+					
+		
+	function DrawRect (|ivec4| Rect, |imagepixel| Color)
+		cpp_part SimpleRectSub
+		require Color.a
+		|| i = 0
+		|| range = self[rect]
+		if color.a != 255
+			|| c = color.PreMul
+			for sigh in range
+				sigh.Overlay(C)
+				i++
+		  elseif Rect == .rect
+			memory.fill(.ptr|&int|, .length, Color)
+		  else
+			for sigh in range
+				sigh[0] = Color
+				i++
+		
+		
+	inline DrawRect (|ivec4| Rect, |vec4| Color)
+		opt inline
+		|| px = color.px
+		.DrawRect(Rect, px)
+	
+
+	function DrawOutlineOnly (|ivec4| R, |ImagePixel| Edge, |imagepixel| attached_edge=0, |MoveCode| AllowEdge=MoveCode.allCodes)
+		require Edge.a
+		// not sure why this is so complicated.
+		// did I do something wrong? is all my code off by 1 or something?
+		// I know that my controls assume that if a control is from 0 to 1, it draws 2px wide
+		// even though actually the "Width" reads as 1. I'd have to change everything to fix that.
+		// sigh.
+
+		|| P = r.x2y1+(-1,1)
+		|| C = (AllowEdge is right)(edge, attached_edge)
+		.DrawLineV(P, r.height-2, C)
+		
+		P = r.x1y1+(0,1)
+		C = (AllowEdge is left)(edge, attached_edge)
+		.DrawLineV(P,  r.height-2, C)
+		
+		P = r.x1y2+(0,-1)
+		C = (AllowEdge is top)(edge, attached_edge)
+		.DrawLineH(P,  r.width,  C)
+		
+		P = r.x1y1
+		C = (AllowEdge is bottom)(edge, attached_edge)
+		.DrawLineH(P,  r.width,  C)
+
+
+	function DrawRectOutlined (|ivec4| Rect, |DrawStyle?| g, |MoveCode| AllowEdge=MoveCode.all)
+		|| Outline = g.SafeEdge
+		|| BG = g.SafeBG
+
+		|| InnerRect = Rect ± (BG!=outline)|int|
+		
+		.DrawRect(InnerRect, BG)
+		if rect != InnerRect
+			.DrawOutlineOnly(rect, outline, bg, AllowEdge)
+	
+	
+	function Invert 
+		|| p = ._Ptr
+		|| End = p + (.bytecapacity-3) 
+		while p < End
+			p[0] = 255-p[0] 
+			p[1] = 255-p[1] 
+			p[2] = 255-p[2] 
+			p[3] = 255-p[3] 
+			p+=4
+	
+
+	function DrawCircleStyled (|ivec4| R, |drawstyle| G, |float| fade=0.0)
+		cpp_part DrawCircleG // sigh. remove this
+		.DrawCircle(r, g.bg.color, fade)
+	
+	
+	function DrawCircle (|ivec4| R, |vec4| C, |float| fade=0.0)
+		// remove this and use drawcircle2...
+		|| Back		= .Clip(R)$
+		
+		R -= (0,0,1,1)
+		|| mid		= r.CenterVec2
+		|| maxdist	= (0.5 * r.width|float|) + 0.5
+		|| scale	= (1.0, r.aspect)
+		|| area_over= r.area|float|
+		|| Dim		= area_over.RangeConvertClamped(2000.0, 8000.0, 0.15, 0.26)
+		
+		// OK so... jsut fade? 
+		|| cm = c.PreMul // why tho? the a is just 1? Do we clear c.a later?
+		|| c2		= c * fade
+
+		for Pix.rect in Back
+			|| V	= (mid - pix.vec2)*scale
+			if fade > 0
+				|| L = v.length
+				|| briht = 1.0-dim
+				if L > 0.0001
+					briht = ((maxdist*0.15) / L) - dim
+				if (briht > 0)
+					self[Pix].add(briht*c2)
+			  elseif v <= maxdist
+				self[Pix].Overlay(cm)
+
+		
+	function DrawSoftCircle (|vec4| R, |vec4| Col, |float| str=1.0)
+		|| Back		= .Clip(R)$
+
+		|| mid		= r.Center
+		|| maxdist	= ((0.5 * r.width) + 0.5) * 0.15
+		|| scale	= (1.0, r.aspect)
+		|| Dim		= r.area.RangeConvertClamped(2000.0, 8000.0, 0.15, 0.26)
+		|| c1		= col * str * col.a
+		|| MD		= (maxdist / dim).pow2
+
+		for Pix.rect in Back.ivec4
+			|| V = (mid - pix.vec2)*scale
+			|| vv = v • v
+			if MD > vv
+				|| D = maxdist / vv.sqrt
+				self[Pix].add((D-dim)*c1)
+
+	
+
+struct ImageReader
+	|ivec4|				Rect
+	|Image|				Img
+	iterator
+		while (.rect.y < .rect.y2 and .rect.x < .rect.x2) // test x in case of huge single-line text drawing
+			|| v	= .rect.xy
+			|| v1	= .img[v]
+			|| v2	= v1 + .rect.width
+			while v1 < v2
+				yield v1 (v)
+				++v.x
+				++v1
+			++.rect.y
+
+

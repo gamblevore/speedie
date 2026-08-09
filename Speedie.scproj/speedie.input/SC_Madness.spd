@@ -1,0 +1,205 @@
+
+
+function Message.WrapExpr (|scdecl| src, |int|)
+	if !self
+		Return kNeedsTypeCast
+
+	|| W = @dot + "new"
+	W <~ (@thg, "dataobject")
+	w <~ @emb
+	if src.isfloat
+		w.name = "newfloat" // sigh
+	.ReplaceWith(W)
+	W.last! <~ self
+	TypeOfExpr(W, compiler.program)
+	|| D = .AsDecl
+		w.obj = D.NewWrapper(D)
+	  else
+		debugger
+	
+	return kCastedmatch
+	
+
+function Message.CastToBool (|SCNode| name_space = nil, |int|)
+	return .castToType("bool", TypeBool!, name_space, kLossyCastedMatch)
+
+
+function Message.CastFPToVoidPtr (|int|)
+	|| cst = @type + ":)"
+	.prev = cst
+	cst <~ self
+	cst.msg(@emb).obj = TypeVoidPtr
+	
+	cst.obj = TypeVoidPtr	 // hmmm.... why not do it anyhow?
+	return kCastedMatch
+
+
+function Message.CastToClass (|scclass|type, |SCNode|name_space=nil, |int|)
+	return .CastToType(type.name, type, name_space)
+
+
+function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_space, |int| loss = kCastedMatch, |int|)
+	if (!self)
+		Return kNeedsTypeCast ||| loss
+	
+	|| FoundType = TypeOfExpr(self, name_space)
+		if FoundType.type.isstruct
+			expect FoundType.PointerCount (self, "Can't typecast a struct!")
+		
+		if (self == @type) and (FoundType.isnormal and foundtype.type == type)
+			return kSimpleMatch			// done.
+
+	using self
+	|| cst = @type + ":)"
+	.prev = cst
+	cst <~ self
+	cst.msg(@thg, typeName).obj = Type.TypeNormal 
+	cst.obj = Type.TypeNormal	 		// hmmm.... why not do it anyhow?
+	Return loss	
+
+
+
+function message.GetAddrButNicer (|message|)
+	opt norefcounts
+	if .func == @acc
+		|| L = .last
+		|| num = L.first
+		if num == @num and "0"
+			.func = @bra
+			l.remove
+			return self
+	rz = @brel + "&"
+	.next = rz
+	rz <~ self
+
+
+function Message.GetAddressOf (|SCDecl| Type, |bool| WasCArray = false, |int|)
+	if !self
+		Return kNeedsAddressOf
+	
+	using self
+	|| Addr = @brel + "&"
+	Addr.obj = Type
+	.ReplaceWith( Addr )
+	if WasCArray
+		|| Acc = addr.msg(@acc)
+		acc <~ self
+		acc.msg(@arr) <~ (@num, "0")
+	  else
+		addr <~ self
+	Return kAddressOfMatch
+
+
+
+function scdecl.MemAccess (|message| Access, |message| side,   |scdecl|)
+	opt norefcounts
+	|| c = .MemAccessSub(Access, side)
+		return c
+	error (Access.first, "Can't access this.")
+
+
+
+function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |scdecl|)
+	opt norefcounts
+	
+	|| internal = type.internal
+	|| rel = exp.ancestor(@rel)
+	expect rel and internal    (rel, "AccessToMemCpy fail")
+	
+	|| F = rel.first!
+	rel.func = @func
+	|| Name = @thg + "memcpy"
+	rel.first = name
+	rel.obj = typevoid
+	rel.asmtype = 0
+	|| prms = F.next!
+	prms.func = @prm
+	prms <~ f
+	
+	|| nxt = prms.next
+		|| nxtyp = nxt.fastdecl
+		if nxtyp.isbarestruct
+			nxt = nxt.wrapwith(@brel, "&")
+	
+	if side.obj == typenil
+		name.name = "memzero"
+		nxt.remove
+	  else
+		prms <~ nxt
+	prms.obj = compiler.XFunc(name.name)
+
+	|| msg = internal.SizeOfQuery.msg
+	msg.obj = typeint!.typenormal
+	prms <~ msg
+	return Type
+
+
+
+function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
+	opt norefcounts
+	if .TypeSuffers
+		return .MakeNewOptional
+	if .IsMemoryOnly
+		if .isbarestruct
+			return self
+		|| P = Exp.niceparent
+		if p.IsAddr
+			return self
+		|| IsAcc = p == @Acc
+		if IsAcc and .iscarray // x = y[1][0]
+			debugger
+			return self
+		
+		using exp
+		|| NewExp = exp.GetAddrButNicer
+		|| i = .GetAddress
+		NewExp.obj = i
+		if side
+			i = .AccessToMemCpy(newexp, side, i)
+		  else
+			if IsAcc
+				SCFunction.TempMoveOut(newExp, "", i)
+		return i
+	return self
+
+
+function SCDecl.MemAccessSub (|message| Exp, |message| side,  |scdecl|)
+	opt norefcounts
+	|| i = .Internal								#require			
+	if .IsCArray or i.isBareStruct
+		return i.MemAccessNonStorable(exp, side)
+	require .PointerCount > 0
+	if !i.IsCarray
+		return i
+	return i.MemAccessNonStorable(exp, side)
+	
+
+
+/*
+	|byte[10]| C1
+	|| y = &C1		// y is &byte[10]
+	|| x = y[]		// x is byte
+
+	for r1 in C1
+	|| R1 = &C1[0]
+	|| i = 0
+	while i < 10
+		yield r1[]
+		r1++
+
+	
+	|byte[10][20]| C2
+	|| y = &C2		// y is &(byte[10][20])
+	|| x = y[]		// x is &byte[10]
+	for R2 in Carray
+
+	|| R2 = &C2[0] // r1 is &byte[10]
+				   // wouldn't we be iterating over an addrses of a carray?
+				   // we'll need to remove the standard pointer iterator...
+	|| i = 0
+	while i < 20
+		yield r2[]
+		r2++s
+*/
+
+

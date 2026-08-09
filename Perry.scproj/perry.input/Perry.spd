@@ -1,0 +1,375 @@
+
+
+|| Speedie		= "/usr/local/bin/speedie".file
+|| CakeExec		= "/usr/local/bin/cake".file
+
+
+module Perry
+	|ListViewRow|					Projects = Message()
+	|{string}|			PathDict
+	|listviewrow|					RecentProjects = message()
+	|date|							FinishedStartUp
+	|byte|							FindID	
+	
+	function RecentProjNames (listview.columnfinder)
+		if value == nil
+			return .FirstName
+	
+	function LoadWindowsFromArgs (|bool|)
+		require app.args > 0
+		for arg in app.args // load specified documents
+			|| ide = .LoadAppArg(arg)
+				ide.ProjectTabs.ButtonSource = .projects
+				rz = true
+	
+	
+	function ReadButtonNames (listview.ColumnFinder)
+		return .firstname
+	
+	
+	function LoadAppArg (|string| arg, |perryide|)
+		// xcode can't even pass params containing \n in it... and lots of things.
+		// despite having a GUI... you know the thing designed to store any text...
+		// meanwhile perry can pass any param despite being textual.
+		
+		|| path = arg.ExtractPathAndLine
+		|| ide = GUI.OpenDocument(path.name, true)
+		if ide isa PerryIDE
+			|| Sub = path.first
+				ide.EditPath(Sub.name)
+			|| Line = path.rangelength
+				ide.editme.ShowLine(Line)
+			
+			rz = ide
+
+
+	function OpenProj (|[PerryIDE]|)
+		opt norefcounts
+		for w in window.all
+			if w isa PerryIDE
+				rz <~ w
+	
+	function Save
+		app.prefs.save
+	
+	
+//	function UpdateColors
+//		app.prefs["colors"] = ¥.savecolors.parse
+
+	
+	function CleanProjectList
+		opt norefcounts
+		|| P = .Projects
+		for proj_item in P
+			if !proj_item.name.FileExists
+				proj_item.Remove
+		if !P.HasAny
+			P <~ .FindStartingExample
+	
+	
+	function StartFile (|string| Fol, |string| Name, |bool| Force = false, |message|)
+		|| path = .StartFileStr(fol, name, force)
+			rz = @tmp + path
+			rz.msg(@str, path.name)
+	
+	
+	function StartFileStr (|string| Fol, |string| Name, |bool| Force, |string|)
+		|| s = file.SpeedieDir
+		if fol
+			s = s.Child(Fol)
+		if Name
+			|| f = s.Child(name)
+			if force or f.FileExists
+				return f
+		for f in s.file
+			if f isa "spd" or "scproj" or "spd.jbin"
+				return f
+				
+
+	function FindStartingExample (|message|)
+		rz  = .StartFile("Examples", "banana_count.spd")
+		rz ?= .StartFile("Examples", "")
+		rz ?= .StartFile("GameExamples", "")
+		rz ?= .StartFile("", "Perry.scproj")
+		rz  = .StartFile("Examples", "banana_count.spd", true)
+	
+	
+	function LoadWindowsSub
+		.CleanProjectList
+		for proj_item in .projects
+			|| proj = proj_item.name.file
+			PerryIDE(proj)
+			startupwindow.hide
+
+
+	function BuildAppMenu
+		appmenu.addsep
+//		|| extra = platform.isdebug or app.prefs["dev"].Yes
+//			appmenu <~ ("Prepare Upload",	ClickedMakeArchiveMenu)
+//			appmenu <~ ("Uninstall",		ClickedUninstallMenu)
+		appmenu <~ ("Edit Preferences",	ClickedEditPrefs)
+//		appmenu <~ ("Self-Test",   		ClickedTestInstallMenu)
+//		appmenu <~ ("Install",  		ClickedInstallMenu)
+
+
+	function LoadRecents
+		Perry.RecentProjects = app.prefs()("Recents")|listviewrow|
+		for s in Perry.RecentProjects
+			|| nxt = s.next
+				|| second = .FindRecent(s.name, nxt)
+					second.remove
+			if !s.name.FileExists
+				s.Remove // ooof
+
+	
+	function Startup
+		target lin: GUI.removeborder // doesnt seem to work in Windows WSL?
+		GUI.AppDocumentOpen = &PerryIDE.PerryOpenDoc
+		stderr.LogFile = "PerryErrors.txt"
+		|| old = app.prefs["currproj"]
+		app.InitColors
+		¥.LoadDefaults
+		.BuildAppMenu
+		.LoadRecents
+	
+		app.GoddamnXcodeBugs // work around for Xcode bug
+
+		if filedes.StdOut.IsTerminal
+			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
+		
+
+		if !.LoadWindowsFromArgs
+			.Projects = app.prefs.giveitem("lastproj", @arg)|listviewrow|
+			.LoadWindowsSub
+		
+		|| oof = (old!=nil)(.FindProj(old), .Projects.First)
+			oof.ide.showide
+		perry.FinishedStartUp = date.now
+
+
+	function FindProj (|string| path, |message|)
+		return .Projects.find(path)
+
+
+	function ProjContaining (|string| path, |PerryIDE|)
+		opt norefcounts
+		for w.backwards in window.all
+			if w isa perryide
+				if w.FindPath(path)
+					return w
+
+
+	function string.ProjCleanName (|string|)
+		rz = .name
+		while rz endswith "()"
+			rz = rz[0, rz.length-2]
+	
+			
+	function AddProj (|string| path, |PerryIDE| i)
+		opt norefcounts
+		|| old	= .FindProj(path)
+		if !old
+			old = .projects.msg(@tmp, path)
+			old.msg(@str, path.TrimCodeExt)
+			old["edit"] = ""
+			old["pos"] = ""
+		
+		i.SharedProjectTabSource = old
+		i.SetTab2Name(old)
+
+
+
+extend PerryIDE {
+function SetTab2Name (|message| old)
+	opt norefcounts
+	.ProjectTabs.selected = old
+
+	|| f = old[@nil]
+		f.name = f.name.ProjCleanName
+		.id = "IDE: " + f.name
+		|| ii = .CompileTabs.ButtonSource[@nil, 2]
+			ii.name = f.name + "[]"
+
+
+function EditorIsCode (|bool|)
+	opt norefcounts
+	return .Path.PathIsCode
+
+
+function ProjectIsCode (|bool|)
+	opt norefcounts
+	// why not just use .project?
+	return .Project.PathIsCode
+	
+
+function StrongView (|Button| btn, |bool|)
+	if .IsTextMode
+		.ViewAsProject
+	.view(btn)
+	return true
+
+
+function View (|Button| btn, |bool| CanChangeFocus=true)
+	opt norefcounts
+	require !.IsTextMode
+	|| g		= btn.tag as guicontrol #require
+	
+	|| changed	= g isnt visible
+	|| old = .viewing
+	if btn != old
+		.PrevView = old
+	
+
+	// colors
+	for b in .viewbuttons
+		|| c = (0.0, 0.0, 0.0, 0.0)
+		if b == btn
+			c = (0.7, 1.0, 0.2, 0.1)
+		b.gnormal.solid = c
+	
+	// visable
+	for g2 in .views
+		(g2 is visible) = g == g2
+	
+	// consistancy
+	if (btn == .ViewSearch)
+		g = .MassSearchField
+		g.text = GUI.LastSearch
+	  elseif (btn == .ViewErrors)
+		.SwitchedToErrors
+	  elseif (btn == .ViewDebugger)
+		g = .stack
+	
+	if changed and CanChangeFocus
+		g.setfocus
+
+	.CheckViewWorthIt(old)
+
+
+function ShowCompileCutely (|bool| Always=false)
+	require .ProductSep.Collapsed
+	if !always
+		if .AlreadyExpandedCompileTab
+			return
+		.AlreadyExpandedCompileTab = true
+	.ProductSep.Open
+
+
+function OutText (|textview|)
+	|| row = .CompileTabs.Selected
+		return row.obj as TextView
+
+
+function SwitchedToErrors
+	|| e = .ErrorList
+	if e.listsource.hasany and !e.FirstSelected
+		e.selectfirst
+	  else
+		.editme.ShowNextParseError
+
+
+function NoNeed (|string| s = "", |Button| old = nil)
+	|| n = .UnNeededLabel
+	n.text = s
+	|bool| Vis = s
+	(n is visible) = vis 
+	if !vis
+		n.obj = old
+
+
+function CheckViewWorthIt (|Button| old)
+	|| s = ""
+	if (.errorlist is visible) and !.errorlist.HasAnyRows
+		s = .CompileOKString
+	.noneed(s, old)
+
+
+function Viewing (|Button|) // currview
+	opt norefcounts
+	for i in .ViewButtons
+		if (i.tag as guicontrol) is visible
+			return i
+
+
+function IsViewing (|guicontrol| g, |bool|)
+	return (g is visible)
+
+
+function IsSingleFileProject (|bool|)// IsProj
+	return !.project.isdir
+
+
+function ViewAsBetter
+	if .IsSingleFileProject
+		.ViewAsProject
+	  else
+		.viewascurr
+
+
+function ViewAsCurr
+	.ViewAsVis(!.IsTextMode)
+
+
+function ViewAsText
+	.ViewAsVis(false)
+
+
+function ViewAsProject
+	.ViewAsVis(True)
+
+
+function ViewTextModeSwap
+	if .IsTextMode
+		.ViewAsProject
+	  else
+		.ViewAsText
+
+
+function ViewAsVis (|bool| AsProject)
+	opt norefcounts
+	.IsTextMode = !AsProject
+	|| AnyViews = false
+	for v in .ViewButtons
+		|| t = v.tag as guicontrol
+			(t is visible) = (v.gnormal.bg!=nil)
+			AnyViews ?= t is visible
+	
+	if AsProject and !AnyViews
+		.viewfiles.selected = nil|listviewrow| // typecast shouldn't be necessary
+
+	.FileSep.Collapsed = !AsProject
+	(.gonext is visible)	= AsProject
+	(.goPrev is visible)	= AsProject
+	(.rborder is visible)	= AsProject
+	(.ViewButtons is visible) = AsProject
+	(.filesep.divider is visible) = AsProject
+		
+	(.UnNeededLabel is visible) = .UnNeededLabel.text and AsProject and (.FileList isnt visible)
+	(.searcharea is visible)	= AsProject and (.searcharea is visible) 
+
+	if AsProject
+		.CurrFileName.size = 8 ~ after for 140 by 1~inside
+		.PutFileListersInside(.rborder)
+	  else
+		.CurrFileName.size = 140~wide by 3~inside
+		.PutFileListersInside(.toolbar)
+	
+	|| IsPic = .IsGraphics
+	(.editme is visible) = !IsPic
+	(.ASMButton is visible) = !ispic
+	(.CommandsMenu is visible) = !IsPic
+	(.FunctionMenu is visible) = !IsPic and .FunctionMenu.ListSource.HasAny
+	(.drawme is visible) = IsPic
+	.CalculateSize
+	if !.Focus.IsViewable
+		.editme.SetFocus
+	
+
+
+function PutFileListersInside (|guicontrol| dest)
+	dest <~ .CurrFileName
+	dest <~ .FunctionMenu
+	dest <~ .CommandsMenu
+	dest <~ .ASMButton
+}
+

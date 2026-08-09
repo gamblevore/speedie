@@ -1,0 +1,293 @@
+
+
+	
+// openfile,  filedialog,  folderdialog,  askfile,  openfolder
+
+function app.AskOpen (|string| types, |string| base="", |string| question="", |string| accept="Open", |string| Restore="", |string|)
+	require GUI.StartedProperly
+	return OpenSaveRequest(types, base, accept, false, question, restore)
+
+
+function app.AskSave (|string| SingleType, |string| base="", |string| question="", |string| accept="Save", |string| Restore="",   |string|)
+	require GUI.StartedProperly
+	if SingleType contains ','
+		error "Can't save with multiple extensions"
+		return string.error
+	return OpenSaveRequest(SingleType, base, accept, true, question, restore)
+	
+
+function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bool| Save,  |string| question,  |string| RestoreDir="",  |string|)
+	|| w = OpenSaveDialog._asker init OpenSaveDialog()
+	
+	with w
+		.types				= types
+		.accept.text		= accept
+		(.name is visible)	= save
+		.question.vistext = question
+	
+	|| bigger = question and save
+	|| wsize = (bigger)(350 by 300, 350 by 275)
+	w.size = wsize
+	|| bot = (bigger)(39~up, 23~up)
+	w.files.size = 1~inside by bot to 16~down
+	
+	if save
+		|| t = "Untitled.txt"
+		|| ext = types.name
+			t = "untitled." + ext
+		w.name.text = t
+	
+	|| last = OpenSaveDialog.LastDir[restoredir??types].value
+		base = last
+	base ?= "~/".resolve
+	w.path.text = base
+	
+	|| f = w.files
+	f.ListFilesUp(base, types, save)
+	f.SelectFirst
+	if last
+		f.select(filerow.FindFileName(f, last.name))
+	
+//	if save and w.name.text contains '.'
+//		w.name.Selection = (0, 8) // only works on the second time we run this func? annoying.
+	f.setfocus
+	
+	rz = (w)() as string
+	if rz == nil
+		rz = ""
+	|| p = w.path.text
+	if p.FileExists
+		OpenSaveDialog.LastDir[restoredir??types] = p
+		GUI.Saveprefs // nicer
+	
+
+
+class OpenSaveDialog (Window)
+	linkage
+		cpp_part Open
+	|textview|					Path
+	|textview|					Name
+	|textview|					Question
+	|ListView|					Files
+	|Button|				Cancel
+	|Button|				Accept
+	|Button|				Reveal
+	|string|					Types
+	|string|					LastGoodPath
+	|string|					Keyboard
+	|date|						KeyDownExpired
+
+	constructor
+		super.constructor
+		.LastGoodPath = "/"
+		.copypaste		|= copypasteflags.pastefile
+		.onpaste		= PastePathEvent|GUIPasteEvent|
+		.Accept			= Button(self, OnAskSaveAnswer)
+		.Cancel			= Button(self, OnAskSaveAnswer)
+		.Path			= TextView(self, nil)
+		.files			= ListView(self, nil, OnAskSaveEntered)
+		.question		= TextView(self)
+		.Name			= TextView(self, OnAskSaveName)
+		.Reveal			= Button(self, OnAskSaveReveal)
+		.size			= 500 by 225
+		.id				= "opensave"
+		isnt visible
+		.path.onpaste = nil// nice
+		.AddButton(.accept, "Open")
+		.AddButton(.Cancel,	"Cancel")
+		.init
+	
+	
+	libinternal InitField (|textview| f, |string| id)
+		with f
+			isnt AlwaysScrollable
+			is   enabled
+			is   editable
+			is   NeverDrawModified
+			isnt DrawsFocus
+			.singleline = TextView.SingleLine
+			.id			= id
+			.gnormal.solid= ((0.0, 0.0, 0.0, 0.1))
+	
+	
+	libinternal PastePathEvent (GUIPasteEvent)
+		.path.text = data.Trim
+		RelistKey(.path, 0, true)
+		return true
+
+	
+	libinternal Init
+		.path.id = "opensave"
+		.path.OnTextChanged= relistkey
+		
+		.InitField(.path, "path")
+		.InitField(.name, "name")
+		.InitField(.question, "question")
+		(.Question isnt enabled)
+		.path.size =  1~right to 20~left  by  1 ~ down back 15
+		.name.size =  1~right to 92~left  by  4~up for 15
+		.question.size =  1~right to 102~left  by  2~under back 15
+		with .reveal
+			.size 		= the~right-2 back 19  by  the~top back 14
+			.text		= "\10"
+			.gnormal.clear 
+		
+		with .files
+			isnt DrawsFocus
+			.KeepOneSelected = true
+			.id			= "files"
+			.size 		= 1~inside by 23~up to 16~down
+			.gnormal.solid = ((0.0,0.0,0.0,0.1))
+			.growsel = ¥.Menurowsel
+		
+		.gnormal = ¥.systemstyle.Copy
+		.gnormal.PixelShader = image.CurlieQueDrawer
+
+
+	behaviour TypedString
+		if !.files.HasFocus
+			return super.typedstring(input)
+		if .KeyDownExpired.Fired
+			.Keyboard = ""
+		.KeyDownExpired = gui.FrameStart + 0.5s
+		.Keyboard += input
+		if !.Files.JumpTo(.keyboard)
+			beep
+		return true
+
+		
+	behaviour KeyDown
+		opt NoRefCounts
+		if (key is up or down) and !.Name.hasfocus
+			return .files.keydown(key)
+		  elseif key.iscancel
+			.cancelReturn
+			return true
+		  elseif key.IsAccept
+			if .focus == .path or nil
+				.files.setfocus
+				return true
+			if (.focus == .Files)
+				if .name isnt visible
+					.Accept.Click
+				  else
+					.GoIntoFolder
+				return true
+		return super.keydown(key)
+
+
+	libinternal AddButton (|Button| BTN,  |string| Name)
+		btn.ExpandOnMouseOver = 2
+		btn.size = (44~long to 4~before) by (4~up for 16)
+		btn.Text = Name
+		btn.ID = Name
+		btn.gnormal.solid = (1.0, 1.0, 1.0, 0.15)
+	
+
+	libinternal RelistFiles (|string| path, |bool| AlwaysUse=true)
+		|| pf = path.file
+		if !pf.exists and !AlwaysUse
+			return
+	
+		if path[0] == '~'
+			path = path.Resolve
+		if path
+			.LastGoodPath = path
+			.files.ListFilesUp(path, .types, (.name is visible))
+	
+	
+	libinternal GoIntoFolder (|bool|)
+		|| f = .files.FirstSelected as filerow				#expect beep
+		|| Acceptable = (f isnt disabled)					#expect beep
+		if f.asdir
+			if (f.name == "..") or !.types or !.types.typecontains(f.FilePath.ext+"/")
+				.path.text = f.FilePath
+				.RelistFiles(f.FilePath)
+				return true
+		if (f.name != "..")
+			if .Name is visible
+				beep
+			  else
+				.ReturnValue = f.FilePath
+			return true
+	
+	
+		
+	
+	module
+		|OpenSaveDialog|				_Asker
+		
+		libinternal LastDir (|message|)
+			rz = app.prefs()("opensave")
+			rz.trim(20)
+			for f in rz
+				if f != @tmp
+					f.remove
+			
+
+		libinternal RelistKey (guitextChangeevent)
+			opt NoRefCounts
+			|| w = .window as OpenSaveDialog
+				|| p = w.path
+				|| t = p.text
+				|| f = t[0]
+				if (f == '/' or '~')
+					w.RelistFiles(t, false)
+				  elseif f == '@' or 0
+					p.text = file.Speediedir
+					w.RelistFiles(p.text, false)
+				  else
+					beep
+					p.text = w.LastGoodPath
+
+
+		libinternal OnAskSaveAnswer (GUIAction)
+			opt NoRefCounts
+			|| w = .window as OpenSaveDialog			#require
+			if self != w.accept
+				w.cancelreturn
+				return nil
+		
+			if w.name is visible and editable
+				OnAskSaveName(w.name, keys.return)
+			  else
+				w.GoIntoFolder
+		
+		
+		libinternal OnAskSaveName (GUIKeyEvent)
+			opt norefcounts
+			if key.isaccept
+				|| w = .window as OpenSaveDialog		#require
+				|| s = .text							#expect beep
+				w.ReturnValue = w.path.text.child(s)
+				return true
+		
+		
+		libinternal OnAskSaveReveal (GUIAction)
+			opt NoRefCounts
+			|| w = .window as OpenSaveDialog			#require
+			|| f = w.files.FirstSelected
+			|| p = w.path.text
+			if f isa filerow
+				|| p2 = f.FilePath
+				if (f.name != "..")
+					p = p2
+			p.reveal
+		
+		
+		libinternal OnAskSaveEntered (GuiListEvent)
+			return (.parent as OpenSaveDialog)!.GoIntoFolder
+
+
+
+libinternal file.IsntAnOSXBundle (|bool|)
+	require .IsDir
+	|| n	= .Name
+	|| ext	= n.Ext
+	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM" and "scproj") // mostly osx
+
+
+function window.CancelReturn
+	.ReturnValue = self
+
+

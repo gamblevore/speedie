@@ -1,0 +1,155 @@
+
+
+// this replaces my entire old CharSet class!
+// no classes involved! Just raw data! So much smarter!
+// faster and smaller. And does more. And more expressive.
+
+function string.Find (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
+	cpp_part FindCharset
+	nil checker
+	if from < 0 or after < 0 // i don't think its such a good API to take negative numbers...
+							 // makes for confusing code. Would be nice if Speedie had 1-based strings
+							 // because -1 is also the return value of a missing value.
+							 // nicer to make an explicit function that to handle end-relative searches
+							 // of course thats a tricky line to split. Should arrays be 1-based?
+							 // pointers too? No way on the pointers!
+	
+	|| p = &CharSet.Props[0]
+	if self!=nil
+		|| addr = .addr
+		if from < After
+			from = from max 0
+			After = After min .Length
+			while From < After
+				|| pb = p[addr[from++]]|uint|
+				if (1<<pb) & Find|uint|
+					return from-1
+		  else // oof
+			from = from min .length
+			After = After max 0
+			while From > After
+				|| pb = p[addr[--from]]|uint|
+				if (1<<pb) & Find|uint|
+					return from
+
+
+inline string.OutCharSet (|CharSet| Find, |int| From=0, |int| After=int.max, |ind|)
+	return .find(~find, from, after)					// so nice.
+
+
+
+datatype CharSet (uint)
+	linkage
+		numeric false
+		
+	operator contains (|string| s, |bool|)
+		cpp_Part ContainsStr
+		inlined
+		return s.OutCharSet(self) < 0
+	
+	operator in (|string| s, |bool|)
+		inlined
+		return s.find(self) >= 0
+		
+	syntax Access (|uint| b, |bool|)
+		if b <= 255
+			|| cp = CharSet.Props[b]|uint|
+			return (1<<cp) & self|uint|
+			
+	operator Plus (|Charset| C, |charset|)
+		inlined // selftool uses this
+		return (self|uint| ||| c|uint|)|charset|
+
+	syntax is (|charset| cs, |bool|)
+		inlined
+		return self|uint| & cs|uint|
+		
+	
+	constants
+		|int|
+		fInvalid
+		fNull					// 0
+		fUnprintable			// 1-8, 11, 12, 14-30
+		fLine					// nl, rt
+		fHSpace					// space, tab
+		fUnderscore				// _
+		fColon					// :
+		fDotDash				// .-
+		fCommaSlash				// \,
+		fRemainingPunct			// &|~@!()[]}?
+		fAfterTmp				// '`"{#$%		 // { directly after a TMP doesn't change it... should it?
+		fEditorSeparators		// -^+/*;<>=	 // would be nice to remove { from aftertmp...
+		fNumber					// 0123456789
+		fUpper					// A-Z
+		fLower					// a-z
+		fUnicode				// 128+
+
+	constants
+		|CharSet|
+		Line			= (1<<fLine)
+		SafeInC			= (1<<fUpper) + (1<<fLower) + (1<<fUnderScore) + (1<<fNumber)
+		Unicode			= (1<<fUnicode)
+		LowerCase		= (1<<fLower)
+		UpperCase		= (1<<fUpper)
+		Numbers			= (1<<fNumber)
+		UnderScore		= (1<<fUnderscore)
+		LettersOnly 	= (1<<fUpper) + (1<<fLower) + Unicode
+		LettersUnderScore= LettersOnly+ (1<<fUnderscore) 
+		NameMid			= LettersUnderScore + (1<<fNumber)
+		XMLNameMid		= NameMid + (1<<fDotDash) + (1<<fColon)
+		White			= (1<<fLine) + (1<<fHSpace)
+		AfterDot		= White + (1<<fColon) + (1<<fCommaSlash)
+		AfterStatement	= White + (1<<fColon) + (1<<fCommaSlash) + (1<<fAfterTmp)
+		EditorSplitter  = White + (1<<fColon) + (1<<fCommaSlash) + (1<<fEditorSeparators)
+		Trim			= White + (1<<fNull)
+	
+	inline byte.CharSet (|charset|)
+		return (1<<charset.Props[self])|charset|
+	
+	inline byte.IsPrintable (|bool|)
+		|| p = CharSet.Props[self]
+		return p > charset.fUnprintable and p < CharSet.fUnicode
+
+	
+	module
+		|byte[256]| Props
+		CharSet.MakeDefault
+	
+		libinternal MakeDefault
+			|| item = &.Props[0]
+			for s in 32
+				item[s] = fUnprintable
+			for s in 33 to 126
+				item[s] = fRemainingPunct
+			for s in 128 to 253
+				item[s] = fUnicode
+			for s in '0'|int| to '9'|int|
+				item[s] = fnumber
+			for s in 'A'|int| to 'Z'|int|
+				item[s] = fupper
+				item[s+32] = flower
+			for s in "'`\"{#$%"
+				item[s] = fAfterTmp
+			for s in "-^+/*;<>="
+				item[s] = fEditorSeparators
+
+			item[0] = fnull
+			item[9] = fHSpace
+			item[10] = fline
+			item[13] = fline
+			item[32] = fHSpace
+
+			item['_'] = fUnderscore
+			item['-'] = fDotDash
+			item[':'] = fColon
+			item['.'] = fDotDash
+
+			item[','] = fCommaSlash
+			item['\\'] = fCommaSlash
+
+			item[0x7f] = fInvalid
+			item[0xC0] = fInvalid
+			item[0xFE] = fInvalid
+			item[0xFF] = fInvalid
+
+

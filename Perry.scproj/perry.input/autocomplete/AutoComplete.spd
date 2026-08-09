@@ -1,0 +1,732 @@
+		
+
+extend_module Autocomplete
+	|| Owners			= "module/extend_module/class/struct/role/task/datatype/extend"
+	|| Owner_dict		= owners.dict('/')
+	
+	|| FunctionClsList = autocomplete.function_cls_only / '/'
+	|| FunctionAnywhereList = autocomplete.function_anywhere  / '/'
+	|| OwnerList = autocomplete.Owners / '/'
+
+
+function PerryIDE.BuildTmp (|string| reason, |message| where, |string| name,  |message|)
+	|| response = .BuildTmpSub(where, name)
+		.AutoCompleteFB(response, AutoCompleteMode.edit, reason)
+
+	
+function PerryIDE.BuildTmpSub (|message| where, |string| name,  |message|)
+	opt norefcounts
+	rz = rz.AddToAutoCompleteList(name, autocomplete.FunctionAnywhereList)
+	|| ClsMod = where.parent.owningSyntax(AutoComplete.owner_dict, true)
+	|| IsMod = (ClsMod ~= "module" or "extend_module")
+	if !ClsMod or IsMod
+		rz = rz.AddToAutoCompleteList(name, autocomplete.OwnerList)
+	if clsmod and !IsMod
+		rz = rz.AddToAutoCompleteList(name, autocomplete.FunctionClsList)
+
+
+
+function message.AddToAutoCompleteList (|string| name, |[string]| CouldBe, |message|)
+	opt norefcounts
+	for s in CouldBe
+		if s[0, name, true]
+			self ?= @arg + name
+			.msg(@tmp, s) <~ s
+	return self
+				
+
+
+function message.list_desired (|int| common, |string|)
+	rz = .firstname[0, Common]
+	if self == rz
+		rz = "" // oof
+
+
+
+function PerryIDE.CallFromSelect (|listviewrow| list)
+	opt norefcounts
+	|| Count = 0
+	for s in list
+		|| IsCurr = s ~= "curr"
+			(s is Active)
+			(s is selected)
+			Count++
+		  else
+			(s isnt selected)
+			
+		if s.last.int < 0
+			(s is separator)
+		s.name = s.second.name
+	
+	if !count
+		|| f = list.first
+			(f is selected)
+
+
+function PerryIDE.CallFromFB (|message| list, |bool|)
+	.ClearAutoComplete
+	list = list.last
+	|| define = list.first
+	require define and list
+	define.remove
+	define.DefineToLine(list.Count)
+	define.name = "line"
+	
+	list.sort(CallFromSorter)
+	list.first = listviewrow.NewSeparator(1)
+	list.first = define
+	.autocomplete.listsource = list!
+	.SetAutoPoint(.editme.Selection.x)
+	.CallFromSelect(list)
+	.ShowAutoComplete
+	(.AutoComplete isnt typethrough)
+
+
+function message.DefineToLine (|int| count)
+	|| l = self[-1]											#require
+	if self ~= "define"  and  l == @str  and  self > 1		// is that all?
+		.first!.next = l
+		l.name += " has " + (count of "caller")
+	  else
+		|| s = "place".Pluralize(count, "Nowhere")
+		l.name = " - Called From " + s + " - "
+		
+
+function CallFromSorter (SorterComparer of message)
+	opt norefcounts
+
+	|| aa = .second
+	|| bb = b.second
+	if !aa and !bb
+		return .Position - b.position
+	if !aa or !bb
+		return (aa!=nil)
+	return (bb.name < aa.name)
+
+
+function string.LowerDiffAt (|string| A, |ind|)
+	|| i = 0
+	while
+		|| aa = a[i]
+		|| sa = self[i]
+		if aa.LowerCase!=sa.lowercase
+			return i
+		if !aa
+			if !sa
+				return -1
+			return i
+		i++
+
+	
+function PerryIDE.AutoCompleteFB (|message| list, |AutoCompleteMode| Mode, |string| reason, |bool|)
+	opt NoRefCounts
+	require .EditMe.CanAutoComplete == 1
+	|| Common	= int.max
+	|| shortest = Common
+	|| longest  = 0
+	
+	for ch in list
+		if ch.HasAny
+			|| chn = ch.name
+			(longest max= chn.length)
+			(shortest min= chn.length)
+			|| p = ch.prev
+				common = common min chn.LowerDiffAt(p.name)
+		  else
+			ch.remove
+		
+	|| e = .editme
+	|| n = list.length
+	if longest
+		|| CanShow = ((shortest != n) or (reason ~= "Escape"))
+			if  common == n  and  longest > common  and  mode isnt default
+				e.AutoCompleteString = list.name
+			  else
+				e.AutoCompleteString = list.list_desired(common)
+			e.AutoCompleteBack = n
+		.autocomplete.listsource = list
+		if  list == 1  and  mode is sel
+			.autocomplete.CloseMenu
+			return false
+		if .autocomplete.isopenedmenu or (canshow and mode is default)
+			|| open = mode is default
+			.ShowAutoBeep(open)
+			
+		return false
+	if mode is default
+		beep
+	.ClearAutoComplete
+
+
+function PerryIDE.ClearAutoComplete
+	.autocomplete.listsource.clear
+	.autocomplete.closemenu
+	.editme.AutoCompleteString = ""
+
+
+function PerryIDE.ShowAutoBeep (|bool| beeps)
+	if !.ShowAutoComplete and beeps
+		beep
+
+
+function PerryIDE.ShowAutoComplete (|bool|)
+	|| a = .autocomplete
+	if a.listsource.hasany
+		a.ListSource.obj = .Path
+		
+		// this thing can get too large. So... how to make it smaller.
+		// those job is it to limit the size? us? the cmm itself? a huge menu
+		// doesn't raelly make sense. but how can they know what size it should be?
+		
+		a.ShowCmm(self, .AutoPoint.x, .AutoPoint.y - .lastbottom)
+		(a is typethrough)
+		return true
+	a.ListSource.obj = nil
+	a.closemenu
+
+
+
+function AutoCompleteKeys (guikeyEvent)
+	opt norefcounts
+	require key.IsDelete
+	if self isa ListView
+		|| row = .FirstSelected
+			|| n = row.next
+			|| p = row.prev
+				row.Remove
+				if p isnt UnSelectable
+					.Select(p)
+				  else
+					.Select(n)
+				.Touch // well its nice to be able to remove items?
+				return true
+			beep
+	
+	
+
+function AutoCompleteInsertText (GuiListEvent)
+	opt norefcounts
+	|| i = .ide
+	|| e = i.editme
+	if row >= 3
+		|| file = row.firstname
+		|| num = row[2].int
+		i.DefineSub(file, num|int|)
+	  else
+		e.AutoCompleteString = row.Name
+		e.InsertAutoComplete
+
+
+function PerryIDE.DefineSub (|string| NewPath, |int| L, |bool|)
+	if NewPath.isproj
+		NewPath = NewPath.file.FindProjectMain$	
+	
+	|| CurrPath = .Path
+	if CurrPath ~= NewPath
+		.AddToJumpHistory
+		.editme.ShowAndSelect(l, true)
+	  else
+		if .EditPath(NewPath, false)
+			.editme.ShowAndSelect(l, true)
+	.PopupHide
+
+
+function PerryIDE.DefineFB (|message| msg, |bool|)
+	opt norefcounts
+	.DefineSub(msg.firstname, msg.second.int|int|)
+
+
+function PerryIDE.DisplayFB (|message| display, |bool|)
+	|| f = display.first ?? display
+	f.parent = nil // for @args
+	if (f == @arg) and !f.hasany and (display starts "displayall")
+		.PopupHide
+	  else
+		.PopupDisplay.JeeboxMode = documentjeeboxmode.prefer
+		(f is style2)
+		.PopupReason = 1
+		.DisplayInPopup(f.render.trim, display.name contains "forced")
+
+
+// "" '' <(``)> ``
+
+function PerryIDE.DisplayStr (|message| f, |date|)
+	|| r = f.Range										// f.rangetrim
+	|| orig = .EditMe[r]
+	if f.name != orig
+		.PopupDisplay.jeeboxMode = 0
+		.popupreason = 1
+		.DisplayInPopup(f.name, false)
+	return 1
+
+
+function PerryIDE.DisplayInPopup (|string| s,  |bool| instant,  |vec4| Color=vec4(),  |ivec2| Corner=.PopupDisplayCorner)
+	// using GUITask would be better... sigh.
+	|| sizer_str = s.wrap(80)
+	|| size = .PopupDisplay.TextSize(sizer_str) + (10, 2) // i think textsize isnt accurate. so no amount of +8 or +5
+	// will get it right, as it alters per whatever
+	(size.x max= 40)
+	if Corner.x < 0
+		Corner.x = .EditMe.lastrect.x2 - (size.x + 4)
+//	Corner.y += 24
+	Corner.x -= 4
+	.PopupDisplay.AttachedFrom = MoveCode.up
+	.PopupDisplay.size = Corner.x~right for size.x   by   Corner.y~up back size.y
+	.PopupDisplay.text = s
+	
+	|| pg = .PopupDisplay.GNormal
+	|| def = .FileList.GNormal.bg.color
+	if color
+		color = 0.3.mix(def, color)
+	  else
+		color = def
+	pg.bg = color.px
+	color = 0.8.mix(colors.white(0.5), color)
+	pg.edge	= color.px
+	.StartPopupVis(instant)
+
+
+function PerryIDE.StartPopupVis (|bool| instant)
+	if !.PopupDateOn
+		// Using GUITask would be better... sigh.
+		|| add = 0.5s
+		if  instant or keys.CmdAgo(2s)
+			add = -10s
+		.PopupDateOn = gui.framestart + add
+	.PopupDisplayFadeIn
+
+
+function @keys.CmdAgo (|date| ago, |bool|)
+	if keys.LCTRL.HeldKey(ago) or keys.RCTRL.HeldKey(ago)
+		return true
+	target osx
+		return keys.LGUI.HeldKey(ago) or keys.RGUI.HeldKey(ago)
+
+
+
+
+function PerryIDE.PopupDisplayFadeIn
+	// using guitask would be better... sigh.
+	(.PopupDisplay is visible) = .PopupDisplayFadeInSub
+
+
+function PerryIDE.PopupDisplayFadeInSub (|bool|)
+	require .PopupDisplay.text
+	|| ago = .PopupDateOn.ago.Float
+	|| alpha = (ago*2.0).clamp
+	if (alpha < 0.5) and !keys.cmd and .PopupReason == 1
+		.PopupDateOn = 0
+	if keys.shift
+		return true
+	require alpha
+
+	|| g = .PopupDisplay.GNormal
+	|| New = (alpha * 255.0)|int|
+	if g.BG.a != New
+		GUI.touch
+	g.BG.a = New
+	g.TextColor.a = New
+	return true
+
+
+function PerryIDE.PopupHide
+	.PopupDateOn = 0
+	if .popupdisplay is visible
+		.PopupDisplay.text = ""
+		.lastextrainfo = nil
+		.PopupDisplay.visible = false
+	
+
+
+// SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
+function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
+	debug_require c
+	if (c == .compilr) and !c.CommsOpen
+		isnt active
+
+	|| msg = C.Get					#require
+	|message| date
+	if msg == @arg and "Perry"
+		date = msg[@num]
+		msg = date.Next$
+
+	if msg ~= "error"
+		if msg.last == "define"
+			beep
+		.LogOneComm(msg, "\1b ")
+		if date.int == .sectionkeytime
+			.sectionkeytime = 0
+			.editme.insertautocomplete
+		if msg.first == "asm"
+			.GotASMError(msg.second)
+		return false
+
+	.DuringMsgFB = true
+	|| reason = ""
+	if msg ~= "result"
+		reason = msg.firstname
+		msg = msg.second$ // in case of garbled result?
+		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
+			msg.name = "" // returns
+	
+	.LogOneComm(msg, "\1b ")
+	|| f = msg.first
+		if msg ~= "autocomplete"
+			.AutoCompleteFB(f, AutoCompleteMode.default, reason)
+		  elseif msg ~= "autocomplete_edit"
+			.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
+		  elseif msg ~= "autocomplete_sel"
+			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
+		  elseif msg starts "display"
+			.DisplayFB(msg)
+		  elseif msg starts "log"
+			0 //
+		  elseif msg starts "callfrom"
+			.CallFromFB(msg)
+		  elseif msg starts "asm"
+			.GotASM(msg)
+		  elseif msg starts "check"
+			.CheckFB(msg, true)
+		  elseif msg starts "unused"
+			.CheckFB(msg, false)
+		  elseif msg starts "define"
+			.DefineFB(msg)
+	.DuringMsgFB = false
+
+
+
+function PerryIDE.UnusedShow (|message!| arg)
+	opt norefcounts
+	for tmp.fast in arg
+		.UnusedFuncsSub(tmp, arg.name)
+
+
+function PerryIDE.CheckFB (|message| msg, |bool| check)
+	|| Extracted = .UnusedExtract(msg)
+	if check
+		.ErrorListFB(msg)
+	.UnusedShow(extracted)
+	
+
+function EditMeModified (guitextChangeEvent)
+	|| i = .ide
+	require i? // somehow we are getting called when we are nil?
+	i.LastSendTime = 0
+	require i.SharedProjectTabSource
+	i.EditMeTabRetryThing = 0
+	i.ShowStats
+	
+	if (reason isnt saving) and !i.DuringTempView
+		|| x = .Selection.x2
+		if !GUI.IsTyping
+			i.InteractUpdate
+		  elseif !i.DuringLoad and (.Selection.x1 == x)
+			|| b = self[x]
+			if !b or b.istextline or i.autocomplete.isopenedmenu
+				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
+	
+	(i is modified) = (self is modified)
+	|listviewrow| msg = i.SharedProjectTabSource
+		|| Mod = (self is modified)
+		(msg is modified) = Mod
+		|| sub = i.CurrFileName.SubMenu
+			(sub.ListSource is modified) = Mod
+	
+	if !i.duringasmevent
+		i.CurrASMFunc = nil
+		if i.ASMVis
+			i.UpdateASM
+
+
+function PerryIDE.ShowStats
+	.ShowLeftStats
+	.ShowRightStats
+
+
+function PerryIDE.InteractUpdate
+	opt norefcounts
+	|| au = .autocomplete
+	if .openedmenu == au
+		au.closemenu
+		au.clear
+	.popuphide
+
+
+function PerryIDE.ShowExtraInfo (|ivec2| P, |message| M, |error| err, |string| reason, |bool| Instant)
+	opt norefcounts
+	if err
+		.LastExtraInfo = nil
+		.PopupDisplay.JeeboxMode = 0
+		.PopupDisplayCorner = p
+		.PopupReason = 2
+		.DisplayInPopup(err.name, Instant, err.severity.color, P)
+		return 
+	
+	if !M
+		return .PopupHide
+
+	require (M != .lastextrainfo) or (.popupdisplay isnt visible)
+	|| s = .feedback
+		.LastExtraInfo = M
+		.PopupDisplayCorner = p
+		.MaybeSendMessage(reason ?? "display", M)
+
+
+function OnShowExtraInfo (GUITextShowEvent)
+	opt NoRefCounts
+	.ide.ShowExtraInfo(LeftCorner, msg, Error, reason, !WasDelayed)
+
+
+function PerryIDE.ShowImport (|string| name)
+	|| path = name
+	if path[0] != '/'
+		ifn  (path contains "/")  or  (path contains "scproj")
+			path += ".scproj"
+		path = "/usr/local/speedie".child(path)
+	.filelist.OpenQuick(path)
+
+
+function JumpToDefinition (GUIAction)
+	|| rightclick = state == -1
+	|| cmd = state == -2
+	require (cmd or rightclick)
+	|| ide = .ide
+	|| msg = ide.EditMe.MessageAtSel
+		|| p = msg.parent
+			
+		if msg in @url
+			msg = p!
+		if msg == @url
+			app.ShowURL(msg.render)
+		  elseif p == @tmp and p ~= "import"
+			ide.ShowImport(msg.name)
+		  elseif msg == @sheb
+			msg.name.Reveal
+		  else
+			|| f = msg.owningfunc
+				if msg == f  or  msg in f
+					cmd = false
+			|| op = (cmd)("define", "callfrom")
+			|| d = ide.MaybeSendMessage(op, msg)
+			ide.SectionKeyTime = d * rightclick
+			
+	return true
+	
+
+function PerryIDE.FuncText (|message| spd_func, |message|)
+	require spd_func
+	rz = spd_func.OwningFullName(@prm)
+	|| Last = rz.last
+	|| oop = spd_func.EntireRange
+	last <~ oop.x
+	oop.x2 += .editme[oop.x2].iswhite
+	Last.msg(@sstr, .editme[oop])
+
+
+//function message.IsDeclName (|bool|)
+//	opt norefcounts
+//	|| p = .parent!
+//	if (p == @decl)
+//		return p.second == self
+//	if (p == @rel) and (p in @decl)
+//		return .isfirst
+
+
+function message.CommandIsOK (|bool|)
+	opt norefcounts
+	require self
+	if (self == "display") and (self == 1) and (.first == "")
+		return false
+	return true
+
+
+function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
+	opt norefcounts
+	|| spd_func = where.OwningFunc
+	if spd_func or ((where == @decl) or where.Ancestor(@decl))
+		return .BuildNormalCommand(cmd,  where,  spd_func, name,  reason)
+	
+//	if (where == @thg) and Where.IsDeclName
+//		return .BuildDeclCommand(cmd,  where,  name,  reason)
+	
+	if (where == @tmp) and cmd[0, "autocomplete"]
+		return .BuildTmp(reason, where, name)
+
+		
+
+
+//function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
+//	ignore
+//		global "/usr/local/speedie/Perry.scproj/perry.input/IDE.spd" 15814 17
+//	debugger  // do some shit
+
+
+function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message| spd_func,  |string| name,  |string| reason,  |message|)
+	if spd_func == where
+		|| thg = where.first
+		if thg == @dot or @thg
+			where = thg
+	  else
+		if  (where == @tmp)  and  !(cmd starts "autocomplete")
+			return nil // annoy speedie less. it will only generate errors and slow communication down
+	|| pp = where.parent$
+	if pp != @tmp and where == @tmp
+		pp = where
+	|| ppp = pp.parent
+
+	|| Jump = 0
+	if spd_func and  cmd != "callfrom"
+		if where == @thg
+			if pp == @dot and ppp == spd_func
+				jump = 1
+		if !jump and pp == @bra and ppp == spd_func
+			jump = 2	// function bla (prototype)
+			
+	if !jump
+		if (pp == @bra or @list) and pp.OwningModClass			// class asdasd (super)
+			jump = 1
+		  elseif pp == @tmp and where.OwningModClass			// extend message
+			jump = 1
+		
+	rz = @tmp + cmd
+	if (where == 0 and @tmp) and (pp == @arg) and (ppp and ppp.OwningModClass)
+		ppp = nil
+		
+	if jump or (!jump and where.IsUsefulTypeOfDecl)
+		.describewhere(rz, where)
+		|| jj = (@name + where.name)
+		rz <~ jj
+		if jump == 2
+			jj <~ (@ask, "prototype")
+			
+		// to search for the GUITask or other tasks... we need to send the position and file
+		// just like the stuff below does! then speedie can do its normal name-space lookup system.
+
+	  elseif ppp
+		.describewhere(rz, where)
+		|| str = rz.msg(@str, name)
+		str <~ (@thg, reason)
+		rz <~ .FuncText(spd_func)
+
+	if !rz.hasany and (where == @tmp)
+		rz.SimpleComplete(pp, where)
+
+	if !rz.hasany or ((jump==1) and cmd[0, "autocomplete"])
+		rz = nil
+	if !rz.CommandIsOK
+		rz = nil
+
+
+function PerryIDE.DescribeWhere (|message| out, |message| where)
+	out <~ (@str, .path)
+	out <~ where.position
+	out <~ where.rangelength
+
+
+function message.IsUsefulTypeOfDecl (|bool|)
+	return (self == @thg) and .name and .IsTypeOfDecl
+
+
+function message.SimpleComplete (|message| pp, |message| where, |bool|)
+	opt norefcounts
+	if where == "import"
+		|| imp = .msg(@arg, "import")
+		imp <~ where.firstname
+		return true
+	|| cls = pp.OwningModClass	// seems adding this info is bad? Especially if we already filled it in?
+		|| simple = .msg(@arg, "simple")
+		simple <~ cls.name
+		simple <~ where.name
+		return true
+
+
+function message.OwningFunc (|bool| EndAtArg = false, |message|) // isfunction
+	return .owningSyntax(AutoComplete.spdFunctions, EndAtArg)
+
+		
+function message.OwningModClassSub (|bool| EndAtArg=true, |message|)
+	return .owningSyntax(AutoComplete.owner_dict, EndAtArg)
+
+
+function message.OwningModClass (|bool| EndAtArg=true, |message|)
+	opt norefcounts
+	require self
+	rz = .OwningModClassSub(EndAtArg)
+	if !.parent
+		rz ?= @tmp+"root"
+	
+
+
+function message.OwningSyntax (|dictionary| find, |bool| EndAtArg, |message|)
+	opt norefcounts
+	nil self
+	|| s = self
+	|| WillEnd = false
+	while s
+		if (s == @tmp) and find.ValueLower(s.name)
+			return s
+		require !WillEnd
+		|| p = s.parent
+		if EndAtArg and p == @arg
+			Willend = true
+		s = p
+
+
+function autocomplete.IsAFunc (|message| m, |bool|)
+	opt norefcounts
+	return .spdfunctions.valueLower(m.name) != nil
+
+
+function message.OwningFullName (|syntax| prm, |message|)
+	if self != @tmp // it's always a tmp?
+		return nil
+	if self == @tmp and self ~= "main"
+		return "@app.main"~parse
+
+	|| f = .first
+	if (f == @dot) and autocomplete.isafunc(self)
+		// OK... so heres the problem... we don't know if we are module or not.
+		// but we can't do this syntactically... the module can be hidden ANYWHERE.
+		// unless we had function @registration.name
+		// to be honest... it's not a bad idea.
+		f = f.copy
+		f.first.RemoveAfter
+		f <~ prm
+		return f
+	|| name = f.name
+	if self ~= "syntax" or "operator"
+		name = .name.lowercase + name
+	if self ~= "behaviour" or "virtual"
+		name = name.moat // technically... only should be virtuals...
+		// but I PREFER here too as we have so many behaviours
+	if f != @thg and self ~= "render"
+		name = "Render"
+	|| fn   = @name
+
+	|| mod_class = .OwningModclass(false)
+	if mod_class and (mod_class ~!= "module" and "extend_module")
+		fn = @thg 
+		if self ~= "constructor" or "destructor"
+			name = .name
+	  elseif mod_class ~= "module" and mod_class[0] == @arg // what if it's a class module?
+		|| sub = mod_class.parent.owningmodclass(false)
+			mod_class = sub
+	
+	rz = @dot.msg(name)
+	|| modname = mod_class[0].name
+	// ModName needs to be able to handle module.class.func not just class.func
+	modname ?= "main"
+	rz.msg(fn, modname)
+	rz <~ prm
+ 
+
+
+datatype AutoCompleteMode (int)
+	constants
+		Sel		= -1
+		Default = 0
+		Edit	= 1
+	syntax is (|AutoCompleteMode| i, |bool|)
+		return self == i
+
+

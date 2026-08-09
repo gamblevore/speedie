@@ -1,0 +1,80 @@
+
+
+class ProgressBar (GUIControl)
+	linkage
+		cpp_part Bar
+	|float|		Progress
+	|date|		NextUpdate
+	|bool|		Indefinite
+	|bool|		RandomStyle
+
+	constructor (|guicontrol| p, |guiaction| onclicked=nil)
+		super.constructor(p)
+		.onclicked = onclicked
+		.indefinite = true
+
+	libinternal RandomData (|memory|)
+		if gui.FrameStart >= .NextUpdate
+			.NextUpdate = gui.FrameStart + 1s/16
+			GUI.touch
+			RandomBank.Temporal
+		return RandomBank
+	
+	
+	libinternal ColorIndef (|image| image, |Memory| data, |float| Strength=1)
+		require strength > 0
+		|| in = data.ptr
+		|| after = data.Next
+		|| w = ((strength)~gray).PreMul
+		|premultipliedcolor| c
+		|| clip = image.ControlClip
+		|| Top = clip.y2 & 1
+		|| ymin = clip.y
+		
+		for (p in image) (i)
+			if ((i.y & 1) == Top) and (i.y > ymin)
+				p.overlay(w)
+			  else
+				ifn i.x & 1
+					c = vec4.colorise(in[0], strength).PreMul
+					if ++in >= after
+						in = data.ptr
+				p.overlay(c)
+	
+	
+	behaviour Draw
+		|| s = .Declutterer.Strength
+		|| edge = .gnormal.edge
+		edge.Alpha = s
+		where.DrawOutlineOnly(self, edge)
+		where.ControlClip = where.ControlClip ± 1
+		if .Indefinite
+			.ColorIndef(where, .RandomData, s)
+			GUI.touch
+			
+		  else
+			|| Dark  = vec4(0.2, s).PreMul
+			|| Light = vec4(0.7, s).PreMul
+			if !.RandomStyle
+				light = vec4(0.4, s).PreMul
+				
+			for (p in where) (v)
+				|| First = .StripeDark(v)
+				p.overlay((first)(dark, light))
+	
+	setter Progress	(|float|)
+		if .Progress != value
+			.Progress = value
+			GUI.touch
+	
+	behaviour Mouseup
+		if .LastRect contains p
+			(.onclicked)(self)?
+	
+	module
+		|| RandomBank = byte[128]!
+	
+	libinternal StripeDark (|ivec2| v, |bool|)
+		if .RandomStyle
+			return 0.5[]
+		return ((v.sum|int64| - date.ticks/3) / 4) mod 2
