@@ -9,8 +9,11 @@ main {
 	ifn R.Last isa "git"
 		expect (!R.length) ("This script takes no arguments.")
 	
+	"Making OSX script"
 	app.Gen("osx", platform.OSX)
+	"Making Linux script"
 	app.Gen("linux", platform.lin)
+	"App Finished"
 }
 
 
