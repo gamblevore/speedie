@@ -36,7 +36,6 @@
 		AC7D3CAF29A27C7700148ADB /* JB_Utils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8829A27C1D00148ADB /* JB_Utils.cpp */; };
 		AC7D3CB029A27C7700148ADB /* JB_PNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */; };
 		AC7D3CB129A27C7700148ADB /* JB_Alloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9429A27C1D00148ADB /* JB_Alloc.cpp */; };
-		AC7D3CB229A27C7700148ADB /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8929A27C1D00148ADB /* JB_Saveable.cpp */; };
 		AC7D3CB329A27C7700148ADB /* JB_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9329A27C1D00148ADB /* JB_File.cpp */; };
 		AC7D3CB429A27C7700148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7929A27C1D00148ADB /* JB_List.cpp */; };
 		AC7D3CB529A27C7700148ADB /* JB_Compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7B29A27C1D00148ADB /* JB_Compress.cpp */; };
@@ -49,7 +48,6 @@
 		AC7D3D8A29A280A700148ADB /* JB_List.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C7929A27C1D00148ADB /* JB_List.cpp */; };
 		AC7D3D8B29A280A700148ADB /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9529A27C1D00148ADB /* JB_FastString.cpp */; };
 		AC7D3D8C29A280A700148ADB /* JB_Date.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8D29A27C1D00148ADB /* JB_Date.cpp */; };
-		AC7D3D8D29A280A700148ADB /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8929A27C1D00148ADB /* JB_Saveable.cpp */; };
 		AC7D3D8E29A280A700148ADB /* JB_PNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */; };
 		AC7D3D8F29A280A700148ADB /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C9129A27C1D00148ADB /* JB_Main.cpp */; };
 		AC7D3D9029A280A700148ADB /* JB_Array.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC7D3C8029A27C1D00148ADB /* JB_Array.cpp */; };
@@ -159,7 +157,6 @@
 		AC7D3C8629A27C1D00148ADB /* JB_Math.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Math.cpp; path = ../Library/CppLib/JB_Math.cpp; sourceTree = "<group>"; };
 		AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Tokeniser.cpp; path = ../Library/CppLib/JB_Tokeniser.cpp; sourceTree = "<group>"; };
 		AC7D3C8829A27C1D00148ADB /* JB_Utils.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Utils.cpp; path = ../Library/CppLib/JB_Utils.cpp; sourceTree = "<group>"; };
-		AC7D3C8929A27C1D00148ADB /* JB_Saveable.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Saveable.cpp; path = ../Library/CppLib/JB_Saveable.cpp; sourceTree = "<group>"; };
 		AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_PNG.cpp; path = ../Library/CppLib/JB_PNG.cpp; sourceTree = "<group>"; };
 		AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_String.cpp; path = ../Library/CppLib/JB_String.cpp; sourceTree = "<group>"; };
 		AC7D3C8C29A27C1D00148ADB /* JB_Vectors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Vectors.cpp; path = ../Library/CppLib/JB_Vectors.cpp; sourceTree = "<group>"; };
@@ -179,7 +176,6 @@
 		AC7D3E0D29A2844100148ADB /* JB_DirReaderUnix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_DirReaderUnix.h; path = ../Library/CppLib/JB_DirReaderUnix.h; sourceTree = "<group>"; };
 		AC7D3E0E29A2844100148ADB /* JB_BasicTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_BasicTypes.h; path = ../Library/CppLib/JB_BasicTypes.h; sourceTree = "<group>"; };
 		AC7D3E0F29A2844100148ADB /* JB_Umbrella.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; name = JB_Umbrella.hpp; path = ../Library/CppLib/JB_Umbrella.hpp; sourceTree = "<group>"; };
-		AC7D3E1029A2844100148ADB /* JB_Saveable.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Saveable.h; path = ../Library/CppLib/JB_Saveable.h; sourceTree = "<group>"; };
 		AC7D3E1229A2844100148ADB /* JB_SafeIncludes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_SafeIncludes.h; path = ../Library/CppLib/JB_SafeIncludes.h; sourceTree = "<group>"; };
 		AC7D3E1429A2844100148ADB /* JB_VM.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_VM.h; path = ../Library/CppLib/JB_VM.h; sourceTree = "<group>"; };
 		AC7D3E1529A2844100148ADB /* JB_GameAll.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_GameAll.h; path = ../Library/CppLib/JB_GameAll.h; sourceTree = "<group>"; };
@@ -200,7 +196,6 @@
 		AC7D3E2529A2844200148ADB /* JB_FastString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_FastString.h; path = ../Library/CppLib/JB_FastString.h; sourceTree = "<group>"; };
 		AC7D3E2629A2844200148ADB /* JB_Errors.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Errors.h; path = ../Library/CppLib/JB_Errors.h; sourceTree = "<group>"; };
 		AC7D3E2729A2844200148ADB /* JB_VectorTypes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_VectorTypes.h; path = ../Library/CppLib/JB_VectorTypes.h; sourceTree = "<group>"; };
-		AC7D3E2829A2844200148ADB /* JB_OSX.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_OSX.h; path = ../Library/CppLib/JB_OSX.h; sourceTree = "<group>"; };
 		AC7D3E2929A2844200148ADB /* StringConvert.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = StringConvert.h; path = ../Library/CppLib/StringConvert.h; sourceTree = "<group>"; };
 		AC7D3E2A29A2844200148ADB /* JB_ByteArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_ByteArray.h; path = ../Library/CppLib/JB_ByteArray.h; sourceTree = "<group>"; };
 		AC7D3E2B29A2844200148ADB /* JB_Atomic.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_Atomic.h; path = ../Library/CppLib/JB_Atomic.h; sourceTree = "<group>"; };
@@ -369,7 +364,6 @@
 				AC7D3C8A29A27C1D00148ADB /* JB_PNG.cpp */,
 				AC7D3C7929A27C1D00148ADB /* JB_List.cpp */,
 				AC7D3C8329A27C1D00148ADB /* JB_Run.cpp */,
-				AC7D3C8929A27C1D00148ADB /* JB_Saveable.cpp */,
 				AC7D3C8B29A27C1D00148ADB /* JB_String.cpp */,
 				AC534D712C58F90800F0D6C5 /* JB_Temporal.cpp */,
 				AC7D3C8729A27C1D00148ADB /* JB_Tokeniser.cpp */,
@@ -428,10 +422,8 @@
 				AC7D3E1929A2844200148ADB /* JB_MemUtils.h */,
 				AC7D3E1629A2844100148ADB /* JB_MSR.h */,
 				AC7D3E1E29A2844200148ADB /* JB_ObjArray.h */,
-				AC7D3E2829A2844200148ADB /* JB_OSX.h */,
 				AC7D3E2F29A2844200148ADB /* JB_Pipe.h */,
 				AC7D3E1229A2844100148ADB /* JB_SafeIncludes.h */,
-				AC7D3E1029A2844100148ADB /* JB_Saveable.h */,
 				AC7D3E2329A2844200148ADB /* JB_String.h */,
 				AC7D3E3129A2844200148ADB /* JB_Tokeniser.h */,
 				AC7D3E1729A2844200148ADB /* JB_Umbrella.h */,
@@ -706,7 +698,6 @@
 				AC7D3CB429A27C7700148ADB /* JB_List.cpp in Sources */,
 				AC7D3CA829A27C7700148ADB /* JB_FastString.cpp in Sources */,
 				AC7D3CA729A27C7700148ADB /* JB_Date.cpp in Sources */,
-				AC7D3CB229A27C7700148ADB /* JB_Saveable.cpp in Sources */,
 				AC7D3CB029A27C7700148ADB /* JB_PNG.cpp in Sources */,
 				AC7D3CA329A27C7700148ADB /* JB_Main.cpp in Sources */,
 				AC7D3CAC29A27C7700148ADB /* JB_Array.cpp in Sources */,
@@ -746,7 +737,6 @@
 				AC7D3D8A29A280A700148ADB /* JB_List.cpp in Sources */,
 				AC7D3D8B29A280A700148ADB /* JB_FastString.cpp in Sources */,
 				AC7D3D8C29A280A700148ADB /* JB_Date.cpp in Sources */,
-				AC7D3D8D29A280A700148ADB /* JB_Saveable.cpp in Sources */,
 				AC7D3D8E29A280A700148ADB /* JB_PNG.cpp in Sources */,
 				AC7D3D8F29A280A700148ADB /* JB_Main.cpp in Sources */,
 				AC7D3D9029A280A700148ADB /* JB_Array.cpp in Sources */,
