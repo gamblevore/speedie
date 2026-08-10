@@ -384,6 +384,10 @@ module Feedback
 			options.targetdebug = value.optionbool // no explanation haha.		
 
 		+'targetdebug'
+			Explain(Purpose)$
+			options.targetdebug = value.optionbool
+		
+		+'debug'
 			Explain(Purpose, "Enables your own debug code in compiled-output.")$
 			options.targetdebug = value.optionbool
 

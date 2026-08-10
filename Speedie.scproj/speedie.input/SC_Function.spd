@@ -524,10 +524,6 @@ function message.IntSmallness (|scdecl| T, |int|)
 			rz |= kTypeCastFromZero
 		
 		
-function HiderMatch (|bool| IsAssigns, |bool|)
-	if self and .IsAssigns
-		return IsAssigns
-
 
 function DescribeParamFail (|SCParamArray| params, |int| bad)
 	// if bad == 0, then its good. so bad == 1 means the first arg.
