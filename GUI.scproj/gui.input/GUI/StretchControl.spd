@@ -143,7 +143,6 @@ class StretchDivider (GuiControl)
 	
 	libinternal Collapse
 		opt norefcounts
-		debugger 
 		if .DistanceToEdge > 0
 			.distancetoedge = 0
 
