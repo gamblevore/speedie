@@ -95,16 +95,18 @@ function compiler.CompileTime
 
 
 function compiler.VariousSelfTests
+	|| WantCompress = false
 	target cpp
 		Jeebox.test // bug if put into compiler.run!. Wierd!
 		if (options.perryoutput < 2) and !options.scripting and !app.Parent
-			if options.PrintLibraries
-				if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
-					"Compression: OK"
+			WantCompress = options.PrintLibraries
+	if WantCompress
+		if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
+			"Compression: OK" // stabilise strings by putting outside of target
 	mzlab.FreeNow
 
 
-target cpp {
+
 function string.CompressTest_ (|bool| report, |int| which=3, |bool|)
 	if which & 1
 		require .CompressTestSub_(mzlab.strong, report)
@@ -123,4 +125,4 @@ function string.CompressTestSub_ (|int| Strength, |bool| report, |bool|)
 	if !rz
 		error "Decompression failed on: " + self
 		decomp = c.Decompress(int.max)
-}
+

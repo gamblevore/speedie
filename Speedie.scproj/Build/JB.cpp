@@ -2754,16 +2754,18 @@ JB_String* SC_Comp__VariantSuffix() {
 }
 
 void SC_Comp__VariousSelfTests() {
+	bool WantCompress = false;
 	JB_FreeIfDead(JB_Constants__TestJB());
 	if ((SC__Options_PerryOutput < 2) and ((!SC__Options_Scripting) and (!JB_FreeIfDead(JB_App__Parent(false))))) {
-		if (SC__Options_PrintLibraries) {
-			JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
-			JB_Incr(_tmPf0);
-			if (SC_Str_CompressTest_((_tmPf0), false, 3)) {
-				JB_PrintLine(JB_LUB[2417]);
-			}
-			JB_Decr(_tmPf0);
+		WantCompress = SC__Options_PrintLibraries;
+	}
+	if (WantCompress) {
+		JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
+		JB_Incr(_tmPf0);
+		if (SC_Str_CompressTest_((_tmPf0), false, 3)) {
+			JB_PrintLine(JB_LUB[2417]);
 		}
+		JB_Decr(_tmPf0);
 	}
 	JB_CompFreeNow();
 }
@@ -3511,7 +3513,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026080910));
+	JB_FS_AppendInt32(_fsf0, (2026081012));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10238,7 +10240,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026080910));
+	JB_FS_AppendInt32(_fsf0, (2026081012));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
