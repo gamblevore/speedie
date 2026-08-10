@@ -121,8 +121,8 @@ struct AllocationBlock {
     u16                     HiddenObjCount;
     u16                     ObjSize;
     u16                     DebugMark; 
-    AllocationBlock*        Next;
-    AllocationBlock*        Prev;
+    AllocationBlock*        NextBlock;
+    AllocationBlock*        PrevBlock;
     
     JB_MemoryLayer*         Owner;
     SuperBlock*             Super;
@@ -228,14 +228,13 @@ uint JB_Obj_ID( JB_Object* Obj );
 JB_MemoryLayer* JB_Class_DefaultLayer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_Layer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_CurrLayer( JB_Class* Cls );
-JB_Object* JB_Class_AllocZeroed( JB_Class* Cls );
 int64 JB_Class_MemoryUsed( JB_Class* Cls );
 void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Layer_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
 void JB_Class_SetIndex(JB_Class* cls, int i);
-void JB_DebugAllMemory(bool b);
+bool JB_DebugAllMemory(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -283,6 +282,7 @@ u32 JB_ObjCount();
 			debugger;
 	}
     #define JBTestSanityOK 1
+    #define JB_TotalSanity_Force 0
 #else
     #define JBObjRefTest(obj)
     #define JBTestSanityOK 0
@@ -296,7 +296,7 @@ bool JB_Obj_IsValid (JB_Object* Obj);
 inline JB_Object* JB_Incr_(JB_Object* self) {
     if (self) {
     #if DEBUG
-		JB_TotalSanity(false);
+		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
         self->RefCount += 1<<JB_RefCountShift;
 		JBObjRefTest(self);
@@ -318,7 +318,7 @@ inline void JB_Decr(JB_Object* self) {
 
 inline void JB_Clear_(JB_Object** Place) {
     #if DEBUG
-		JB_TotalSanity(false);
+		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
 	JB_Object* self = *Place;
 	*Place = nil;
@@ -328,7 +328,7 @@ inline void JB_Clear_(JB_Object** Place) {
 #define JB_DecrMulti(a, b)  (JB_DecrMulti_((JB_Object**)(a),b))
 inline void JB_DecrMulti_(JB_Object** Start, int n) {
     #if DEBUG
-		JB_TotalSanity(false);
+		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
 	JB_Object** End = Start+n;
 	while (Start < End) {
@@ -342,14 +342,14 @@ inline JB_Object* JB_SafeDecr_(JB_Object* self) {
 		JBObjRefTest(self);
     }
     #if DEBUG
-		JB_TotalSanity(false);
+		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
     return self;
 }
 
 inline JB_Object* JB_FreeIfDead(JB_Object* self) {
     #if DEBUG
-		JB_TotalSanity(false);
+		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
     if (self) {
 		JBObjRefTest(self);

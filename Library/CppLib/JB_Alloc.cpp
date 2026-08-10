@@ -199,7 +199,7 @@ u64 JB_MemCount () {
     return (u64)( JB_MemoryStats(World, false, 0).Blocks ) << World->BlockSize;
 }
 
-JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
+JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 
 #if !JBTestSanityOK
 	#define TestMemory_(x)
@@ -230,30 +230,27 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 		};
 	}
 
-	static bool FreeBlock_ (AllocationBlock* B) {
+	static bool BlockIsFree_ (AllocationBlock* B) {
 		return (GetDestructor_(B) == BlockIsFreeMark);
 	}
 
 
 	void TestMemory_ (AllocationBlock* B) {
-		if (!B) {
+		if (!B or IsDummy(B))
 			return;
-		}
-		if (IsDummy(B)) {
-			return;
-		}
-		AllocationBlock* N = B->Next;
-		AllocationBlock* P = B->Prev;
+
+		AllocationBlock* N = B->NextBlock;
+		AllocationBlock* P = B->PrevBlock;
 		if (N) {
 			if (IsDummy(N))
 				failed("isdummy");
-			if (FreeBlock_(N) != FreeBlock_(B))
+			if (BlockIsFree_(N) != BlockIsFree_(B))
 				failed("freeblock");
 		}
 		if (P) {
 			if (IsDummy(P))
 				failed("isdummy2");
-			if (FreeBlock_(P) != FreeBlock_(B))
+			if (BlockIsFree_(P) != BlockIsFree_(B))
 				failed("freeblock2");
 		}
 		
@@ -275,22 +272,22 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 			return failed("startobj");
 		if (O >= Curr->BlockEnd)
 			return failed("blockend");
+
 		int i = 0;
 		while (O) {
 			O = O->Next; // check for memory corruption
 			i++;
-			if (i >= (1<<kBlockSize)>>2) {
+			if (i >= (1<<kBlockSize)>>2)
 				return failed("corrupt1");
-			}
 		}
 	}
 
 	static bool IsBadFree_ (AllocationBlock* Curr) {
-		if (Curr->Prev) {
+		if (Curr->PrevBlock) {
 			failed("corrupt2");
 			return true;
 		}
-		AllocationBlock* N = Curr->Next;
+		AllocationBlock* N = Curr->NextBlock;
 		if (N == Curr) {
 			failed("corrupt3");
 			return true;
@@ -316,9 +313,9 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 			}
 			Count++;
 			if (Forward) {
-				Curr = Curr->Next;
+				Curr = Curr->NextBlock;
 			} else {
-				Curr = Curr->Prev;
+				Curr = Curr->PrevBlock;
 			}
 			if (!Curr) {
 				failed("corrupt6");
@@ -366,7 +363,7 @@ JBObject_Behaviour SuperSanityTable = {(void*)BlockIsFreeMark, 0};
 				failed("corrupt9");
 			}
 			IsBadFree_(Curr);
-			Curr = Curr->Next;
+			Curr = Curr->NextBlock;
 		}
 	}
 
@@ -395,21 +392,21 @@ JB_MemoryLayer* JB_Layer_Constructor ( JB_MemoryLayer* self, JB_Class* Cls, JB_O
 }
 
 
-void JB_Layer_Use ( JB_MemoryLayer* self ) {
+void JB_Layer_Use ( JB_MemoryLayer* Layer ) {
     // shouldn't we incr the layer? or not?
-    if (self->IsActive) { // save time...
+    if (Layer->IsActive) { // save time...
         return;
     }
-    JB_Class* Cls = self->Class;
+    JB_Class* Cls = Layer->Class;
     AllocationBlock* ClsBlock = Cls->DefaultBlock;
     ClsBlock->Owner->IsActive = false;
-    Cls->DefaultBlock = self->CurrBlock; // swap first...
-    self->IsActive = true;
+    Cls->DefaultBlock = Layer->CurrBlock; // swap first...
+    Layer->IsActive = true;
     /// we are putting into the class, but why compare something to self and why incr or decr?
 	// I guess we don't want the memorylayer to disapear while being used... thats all? 
 	// but we didn't replace the owner... so whats to stop it being decrd multiple times?
-    if (ClsBlock->Owner != self) {
-        JB_Incr_((JB_Object*)self);
+    if (ClsBlock->Owner != Layer) {
+        JB_Incr_((JB_Object*)Layer);
         JB_Decr(ClsBlock->Owner);
     }
     TestMemory_(Cls->DefaultBlock);
@@ -477,15 +474,6 @@ JB_MemoryLayer* JB_Class_CurrLayer ( JB_Class* Cls ) {
 }
 
 
-JB_Object* JB_Class_AllocZeroed ( JB_Class* Cls ) {
-    JB_Object* Result = JB_AllocNew(Cls->DefaultBlock);
-    if (Result) {
-        memzero(Result, Cls->Size);
-    }
-    return Result;
-}
-
-
 JB_MemoryLayer* JB_Class_DefaultLayer ( JB_Class* Cls ) {
     return &Cls->Memory;
 }
@@ -545,8 +533,10 @@ Sanity(NewBlock);
 }
 
 
-void JB_DebugAllMemory (bool b)  {
+bool JB_DebugAllMemory (bool b)  {
+	bool old = DoTotalMemoryTest;
 	DoTotalMemoryTest = b;
+	return old;
 }
 
 
@@ -566,7 +556,7 @@ static int TestMemory (volatile byte* B, int N, int Mode) {
 		for (int i = 0; i < N; i++)
 			B[i] ^= Mode;
 		for (int i = 0; i < N; i++)
-			B[i] ^= Mode; // restore
+			B[i] ^= Mode;		// restore
 	}
 	
 	MemFailKeeper = C;			// stop optimiser
@@ -597,7 +587,7 @@ static int ObjIsValid (JB_Object* Obj) {
 	if (Count <= 0)
 		return 1001;
 
-	if (!Block->Next or !Block->Prev)
+	if (!Block->NextBlock or !Block->PrevBlock)
 		return 1003;
 
 	if (!Block->Owner->Class)
@@ -654,17 +644,19 @@ bool JB_TotalSanity (bool Force) {
 
 
 static FreeObject* LinkIn_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock) {
-Sanity(NewBlock);
+	Sanity(NewBlock);
+	
 // Call this when returning the first item from a newly allocated block.
     SetCurrBlock_( Mem, NewBlock );
     Mem->RefCount+=1<<JB_RefCountShift;
     FreeObject* First = NewBlock->FirstFree;
     NewBlock->FirstFree = First->Next;
     NewBlock->ObjCount++;
-Sanity(NewBlock);
+	Sanity(NewBlock);
 	
     return First;
 }
+
 
 static AllocationBlock* LinkInSuper_ (JB_MemoryWorld* World, SuperBlock* Super) {
     if (Super->World!=World) {
@@ -675,9 +667,9 @@ static AllocationBlock* LinkInSuper_ (JB_MemoryWorld* World, SuperBlock* Super) 
     }
     AllocationBlock* First = Super->FirstBlock;
 Sanity(First, false);
-Sanity(First->Next, false);
-    Super->FirstBlock = First->Next;
-    First->Next = 0;
+Sanity(First->NextBlock, false);
+    Super->FirstBlock = First->NextBlock;
+    First->NextBlock = 0;
     return First;
 }
 
@@ -694,13 +686,13 @@ static inline void SetupSuper_ (SuperBlock* Super, JB_MemoryWorld* W) {
     while (Curr < End) {
         AllocationBlock* Next = JBShift(Curr, Size);
         Curr->Super = Super;
-        Curr->Virtuals = &SuperSanityTable;
+        Curr->Virtuals = &BlockIsFreeTable;
         Curr->Owner = 0; // for clearing
-        Curr->Next = Next;
+        Curr->NextBlock = Next;
         Curr = Next;
     }
     Curr = JBShift(Curr, -Size);
-    Curr->Next = 0;
+    Curr->NextBlock = 0;
 }
 
 
@@ -789,7 +781,6 @@ void JB_CollectClassDepths () {
 	}
 }
 
-
 static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock, JB_MemoryWorld* World ) {
     if (!NewBlock)
         return 0;
@@ -805,9 +796,16 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
 
-    NewBlock->Prev = NewBlock;
-    NewBlock->Next = NewBlock;
+    NewBlock->PrevBlock = NewBlock;
+    NewBlock->NextBlock = NewBlock;
+    
+    // can we link in... the new block here? so that the memory-layer keeps track of its allocated blocks?
+    // seems... possible?
+    // surely when a block goes away, its layer does too? So then... which block is it, that had its layer
+    // still "laying" around?
 
+//	if (strcmp(Mem->Class->Name, "Message") == 0)
+//		debugger;
     return LinkIn_(Mem, NewBlock);
 }
 
@@ -909,8 +907,8 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
             }
             World->CurrSuper = Curr;
             Curr->BlocksActive++;
-            Curr->FirstBlock = Item->Next;
-            Item->Next = 0;
+            Curr->FirstBlock = Item->NextBlock;
+            Item->NextBlock = 0;
             return Item;
         }
         
@@ -922,7 +920,7 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
 
 
 static AllocationBlock* ReturnSpareHidden_ (AllocationBlock* CurrBlock) {
-    AllocationBlock* NewBlock = CurrBlock->Next;
+    AllocationBlock* NewBlock = CurrBlock->NextBlock;
     if (NewBlock != CurrBlock) {        // use this!
         JB_Helper_Unlink((JB_RingList*)CurrBlock);
         return NewBlock;
@@ -971,10 +969,8 @@ static FreeObject* NewBlock ( AllocationBlock* CurrBlock ) {
         CurrBlock->HiddenObjCount = Hidden;
         CurrBlock->ObjCount -= Hidden;
 
-        AllocationBlock* Spare = ReturnSpare_( Mem );
-        if (Spare) {
+        if (AllocationBlock* Spare = ReturnSpare_( Mem ); Spare)
             return LinkIn_(Mem, Spare);
-        }
     }
 
     AllocationBlock* Result = FindAllocBlock_( World );
@@ -1077,13 +1073,16 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
     } else {
         // return block to superblock
 
-        FreeBlock->Prev = 0;
-        FreeBlock->Virtuals = &SuperSanityTable;
-        FreeBlock->Next = Super->FirstBlock;
+        FreeBlock->PrevBlock = 0;
+        FreeBlock->Virtuals = &BlockIsFreeTable;
+        FreeBlock->NextBlock = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
-        Sanity(FreeBlock->Next, false); // this might not even be a real block?
+        Sanity(FreeBlock->NextBlock, false); // this might not even be a real block?
     }
 
+	if (JB_RefCount(Mem) == 1) {
+		FreeBlock->Owner = 0; // oof
+	}
     JB_Decr(Mem); // i hope this works...
     
     int N = --(Super->BlocksActive);
@@ -1148,7 +1147,7 @@ __restrict __hot fpDestructor JB_Destructor (JB_Object* Obj) {
 }
 
 
-//byte* CheckTrashed;
+
 __restrict __hot void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 
