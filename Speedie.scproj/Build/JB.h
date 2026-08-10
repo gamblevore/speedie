@@ -2949,6 +2949,8 @@ bool SC_FB__AppOptions_crash(JB_String* Name, JB_String* Value, FastString* Purp
 
 bool SC_FB__AppOptions_d(JB_String* Name, JB_String* Value, FastString* Purpose);
 
+bool SC_FB__AppOptions_debug(JB_String* Name, JB_String* Value, FastString* Purpose);
+
 bool SC_FB__AppOptions_directtest(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -9530,6 +9532,8 @@ SCDecl* SC_Decl_GetAddress(SCDecl* Self, DeclMode Purpose);
 
 SCDecl* SC_Decl_GetCArray(SCDecl* Self, int Amount);
 
+SCFunction* SC_Decl_GetHider(SCDecl* Self, SCParamArray* Params);
+
 SCIterator* SC_Decl_GetIteratorAny(SCDecl* Self, JB_String* Name, Message* Node);
 
 bool SC_Decl_HasStruct(SCDecl* Self);
@@ -10671,8 +10675,6 @@ void SC_Func_FuncParamsLoad(SCFunction* Self);
 bool SC_Func_HasCVersion(SCFunction* Self);
 
 bool SC_Func_HasProperSpeedieCode(SCFunction* Self);
-
-bool SC_Func_HiderMatch(SCFunction* Self, bool IsAssigns);
 
 void SC_Func_Init_Sub(SCFunction* Self, Message* Node, SCNode* Name_space);
 
