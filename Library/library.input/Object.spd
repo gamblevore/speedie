@@ -100,7 +100,7 @@ class Object
 	
 	
 	module
-		function DebugAllMemory (assigns:|bool|)
+		function DebugAllMemory (assigns:|bool|, |bool|)
 			cpp_wrapper JB_DebugAllMemory
 		
 		function TotalSanity (|bool| Force=true, |bool|)
@@ -108,6 +108,7 @@ class Object
 		
 		function New (|object|)
 			disabled "Subclass object to create one"
+				
 
 
 
@@ -132,8 +133,8 @@ struct ClassData
 	|&nil|					DefaultBlock
 	visible true
 	
-	function AllocZeroed (|Object|)
-		cpp_Wrapper JB_Class_AllocZeroed
+//	function AllocZeroed (|Object|)
+//		cpp_Wrapper JB_Class_AllocZeroed
 		
 	function MemoryUsed (|int64|)
 		cpp_Wrapper JB_Class_MemoryUsed
