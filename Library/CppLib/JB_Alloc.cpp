@@ -256,8 +256,8 @@ JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 		
 		AllocBlock_Debug(B);
 		
-		auto W = B->Owner;
-		if (W) {
+		
+		if (auto W = B->Owner; W) {
 			auto Cls = W->Class;
 			if (Cls and Cls->DefaultBlock == B) {
 				return;
@@ -425,9 +425,11 @@ void JB_Mem_Mark ( ) {
 
 
 void JB_Layer_Destructor ( JB_MemoryLayer* self ) {
-    if (self->SpareBlock) {
-        self->SpareBlock->Owner = 0;
-    }
+    if (auto S = self->SpareBlock; S)
+        S->Owner = 0;
+    if (auto B = self->CurrBlock; !IsDummy(B))
+        B->Owner = 0;
+    
     JB_SetRef( self->Obj, 0 );
     JB_SetRef( self->Obj2, 0 );
     JB_Obj_Destructor(self);
@@ -796,6 +798,8 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
 
+	
+	
     NewBlock->PrevBlock = NewBlock;
     NewBlock->NextBlock = NewBlock;
     
@@ -896,34 +900,39 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
     if (!First) {
         return 0;
     }
-    SuperBlock* Curr = First;
+    SuperBlock* Sup = First;
     
     do {
-        AllocationBlock* Item = Curr->FirstBlock;
+        AllocationBlock* Item = Sup->FirstBlock;
         if (Item) {
             Sanity(Item, false);
-            if (Curr == World->SpareSuper) {
+            if (Sup == World->SpareSuper) {
                 World->SpareSuper = 0;
             }
-            World->CurrSuper = Curr;
-            Curr->BlocksActive++;
-            Curr->FirstBlock = Item->NextBlock;
+            World->CurrSuper = Sup;
+            Sup->BlocksActive++;
+            Sup->FirstBlock = Item->NextBlock;
             Item->NextBlock = 0;
             return Item;
         }
         
-        Curr = Curr->Next;
-    } while (First != Curr);
+        Sup = Sup->Next;
+    } while (First != Sup);
 
     return 0;
 }
 
 
 static AllocationBlock* ReturnSpareHidden_ (AllocationBlock* CurrBlock) {
-    AllocationBlock* NewBlock = CurrBlock->NextBlock;
-    if (NewBlock != CurrBlock) {        // use this!
+    AllocationBlock* NextBlock = CurrBlock->NextBlock;
+    if (NextBlock != CurrBlock) {
+    // Use next... Can't remember why i did this. Must have been a pretty good reason.
+    // Perhaps... To save memory? I'm not exactly sure what is linked where and why, though.
+    // The Next/Prev links seem only well-defined for free-blocks. And yet this works
+    // so it must be partially defined at least?
+	
         JB_Helper_Unlink((JB_RingList*)CurrBlock);
-        return NewBlock;
+        return NextBlock;
     }
     return 0;
 }
@@ -931,12 +940,12 @@ static AllocationBlock* ReturnSpareHidden_ (AllocationBlock* CurrBlock) {
 
 static AllocationBlock* ReturnSpare_ (JB_MemoryLayer* Mem) {
 // Allocate a "NewBlock" by just re-using the spareblock as the currentblock...
-    AllocationBlock* NewBlock = ReturnSpareHidden_( Mem->CurrBlock );
-    if (NewBlock) {
+    
+    if (auto NewBlock = ReturnSpareHidden_( Mem->CurrBlock ); NewBlock) {
         return NewBlock;
     }
 
-    NewBlock = Mem->SpareBlock;
+    AllocationBlock* NewBlock = Mem->SpareBlock;
     Sanity(NewBlock);
     if (NewBlock) { // Improvement?: Stick the spareblock on the normal "next" list. And just test that it's a spare. 1 less branch!
         if (NewBlock->Owner!=Mem) {
@@ -1053,23 +1062,20 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
     Sanity(FreeBlock);
     JB_MemoryLayer* Mem = FreeBlock->Owner;
     SuperBlock* Super = FreeBlock->Super;
-    if (JB_RefCount(Mem) == 2) {
-        if (!Mem->World->SpareSuper and IsAlone_( Super ) ) { // avoid freeing last super, avoid thrashing.
-            return;
-        }
-    }
     
     if (Mem->CurrBlock == FreeBlock) {
         AllocationBlock* NewCurr = ReturnSpareHidden_(FreeBlock);
-        if (!NewCurr) {
+        if (!NewCurr)
             NewCurr = (AllocationBlock*)&(Mem->Dummy);
-        }
         SetCurrBlock_(Mem, NewCurr);
     }
     JB_Helper_Unlink((JB_RingList*)FreeBlock);
 
     if (!Mem->SpareBlock) {
         Mem->SpareBlock = FreeBlock;
+		if (JB_RefCount(Mem) == 1)
+			FreeBlock->Owner = 0; // oof
+		
     } else {
         // return block to superblock
 
@@ -1078,11 +1084,9 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
         FreeBlock->NextBlock = Super->FirstBlock;
         Super->FirstBlock = FreeBlock;
         Sanity(FreeBlock->NextBlock, false); // this might not even be a real block?
+		FreeBlock->Owner = 0; // oof
     }
 
-	if (JB_RefCount(Mem) == 1) {
-		FreeBlock->Owner = 0; // oof
-	}
     JB_Decr(Mem); // i hope this works...
     
     int N = --(Super->BlocksActive);
