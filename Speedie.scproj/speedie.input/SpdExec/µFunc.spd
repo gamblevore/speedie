@@ -114,7 +114,7 @@ function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 
 	target debug: debug_require dest >= start and dest <= after
 	|| J2 = (dest - SelfOut) -1
-	check (J2 != -1) (self, "Infinite loop")
+	check (J2 != -1) (self, errorreceiver.internalerror)
 	.prms[reg] = J2
 	.µBakeInto(SelfOut, SelfOut+1)			// rerender
 	.prms[reg] = J							// restore!

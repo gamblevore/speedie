@@ -20793,7 +20793,7 @@ void SC_FAT_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg) {
 	ASM* Dest = Start + DestOut;
 	int64 J2 = (Dest - SelfOut) - 1;
 	if (J2 == -1) {
-		SC_FAT_SyntaxExpect(Self, JB_LUB[513]);
+		SC_FAT_SyntaxExpect(Self, kJB__Rec_InternalError);
 	}
 	Self->Prms[Reg] = J2;
 	SC_FAT_xC2xB5BakeInto(Self, SelfOut, SelfOut + 1);
