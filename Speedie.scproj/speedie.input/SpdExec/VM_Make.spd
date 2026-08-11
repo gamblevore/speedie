@@ -364,6 +364,41 @@ function MakeFatCreator (|string| name, |µform| form)
 		fs <~ "\n"
 
 
+
+function FatCreatorSub2 (|µParam| P, |message| f, |int| i, |message| fatdecl, |message| arg)
+	opt norefcounts
+	|| PIsReg = p.isreg
+	|| ty = (pisreg)("asmreg", "int")
+	|| pname = f.VMMsgArgName(i)
+	|| rel = NewEqRel(@thg + pname, @thg + "nil")
+	|| dcl = NewDecl(ty, rel)
+	fatdecl.prev = dcl
+	.rdz[0] = i.msg
+	.rdz[1] = @thg + pname
+
+	|| Mac = vm_builder.skibidy
+	if p is output
+		.TempDests <~ mac.run(.rdz)
+		if p is input
+			.rdz[0] = i.msg // oof
+			.rdz[1] = @thg + pname
+	
+	if p isnt output or p is input
+		if p is jump
+			Mac = vm_Builder.gyatt
+		  elseif p is number
+			mac = VM_Builder.legs
+		  else
+			mac = vm_builder.arms
+		arg <~ mac.run(.rdz) // AppendMacro is better?
+	
+	if p is jump
+		.rdz[0] = @thg+pname
+		|| size = 32 - p.bitsize
+		.rdz[1] = @num+size
+		arg <~ .ohio.run(.rdz) // AppendMacro is better?
+
+
 function FatCreatorSub (|string| name, |µform| form, |message|)
 	opt norefcounts
 	|| fn = .IceCream.run(@thg+name)
@@ -375,38 +410,7 @@ function FatCreatorSub (|string| name, |µform| form, |message|)
 		.rdz <~ (arg, 2)
 	
 	for (p in form) (i)
-		|| PIsReg = p.isreg
-		|| ty = (pisreg)("asmreg", "int")
-		|| pname = f.VMMsgArgName(i)
-		|| rel = NewEqRel(@thg + pname, @thg + "nil")
-		|| dcl = NewDecl(ty, rel)
-		fatdecl.prev = dcl
-		.rdz[0] = i.msg
-		.rdz[1] = @thg + pname
-
-
-		|| Mac = vm_builder.skibidy
-		if p is output
-			.TempDests <~ mac.run(.rdz)
-			if p is input
-				.rdz[0] = i.msg // oof
-				.rdz[1] = @thg + pname
-				
-		
-		if p isnt output or p is input
-			if p is jump
-				Mac = vm_Builder.gyatt
-			  elseif p is number
-				mac = VM_Builder.legs
-			  else
-				mac = vm_builder.arms
-			arg <~ mac.run(.rdz) // AppendMacro is better?
-		
-		if p is jump
-			.rdz[0] = @thg+pname
-			|| size = 32 - p.bitsize
-			.rdz[1] = @num+size
-			arg <~ .ohio.run(.rdz) // AppendMacro is better?
+		.FatCreatorSub2(p, f, i, fatdecl, arg)
 		f++
 
 	while (|| dest = .tempdests.first)

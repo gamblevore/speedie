@@ -39,7 +39,7 @@ extend Assembler
 			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found
 		
-		dest = .TempOnly(dest)		
+		dest = .TempMe(dest)		
 		if dest isnt Textual
 			|| K = .Last(asm.knst)
 				if (k.p0 == dest.reg) and (k is temp)

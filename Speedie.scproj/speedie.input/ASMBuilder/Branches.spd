@@ -217,7 +217,7 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
 	opt norefcounts
-	dest = .temponly(dest)
+	dest = .TempMe(dest)
 	|| C = ASMReg()
 	ifn (Dest iz A or B)
 		C = dest
@@ -297,7 +297,7 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 			return dest
 		  else
 			debugger 
-	rz = .TempOnly()
+	rz = .TempMe()
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 
@@ -592,18 +592,19 @@ function @assembler.PrintProgress
 	cpp_name adb
 	visible
 	opt norefcounts
-	target debug
-		require !compiler.inperry
-		"---"
-		|| fn = scfunction.currfunc!
-		printline fn
-		|| Start = fn.µStart
-			|| Base = assembler.sh.Start + Start
-			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-			for n in amount
-				base[n].debugprint
-			
-			.PrintRegs
+	target debug {
+	require !compiler.inperry
+	"---"
+	|| fn = scfunction.currfunc!
+	printline fn
+	|| Start = fn.µStart
+		|| Base = assembler.sh.Start + Start
+		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+		for n in amount
+			base[n].debugprint
+		
+		.PrintRegs
+	}
 
 
 function @assembler.PrintRegs
@@ -629,4 +630,10 @@ function @assembler.PrintRegs
 					print "r"
 				print i
 		printline
+		i = 0
+		while ++i <= 31
+			|| test = 1<<i
+			if X&Test
+				|| msg = .sh.declarations[i]
+					"$i = $msg"
 

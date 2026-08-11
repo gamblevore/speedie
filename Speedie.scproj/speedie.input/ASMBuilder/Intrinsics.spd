@@ -116,7 +116,7 @@ function assembler.TheTrinity (|message| SrcPrms, |message| ASMPrms, |asmreg| de
 	if opcode == asm.halt
 		(Dest is exit)
 	|| DestPos = .FillTheFat(collection, fat, ASMPrms, n)
-		dest = .TempOnly(dest)
+		dest = .TempMe(dest)
 		fat.Dest(destpos, dest, self)
 	return fat*dest
 	

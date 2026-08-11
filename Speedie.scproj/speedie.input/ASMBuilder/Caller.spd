@@ -137,12 +137,15 @@ function SCFunction.HasCVersion (|bool|)
 
 
 
+function assembler.FailInline
+	.EntireInlineFailed = .EntireInlineFailed|int| max 1
+
 function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
 	opt norefcounts
 	if !.InlineDepth
 		|| unable = (.EntireInlineFailed<2)
 		debugger 
-		|| reason =  (unable!=nil)("Unable to inline function: ", "Inlined too deep on function: ")
+		|| reason =  (unable)("Unable to inline function: ", "Inlined too deep on function: ")
 		error (exp, reason + fn)
 	.EntireInlineFailed = 1 + !DepthOK
 	return asmreg()
@@ -221,7 +224,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		.GrabbedRegisters(exp, Start, fat)
 		return fat * dest
 
-	|| HighBit = .TempOnly(datatypecode.uint64|asmreg|)
+	|| HighBit = .TempMe(datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(asmreg(tableid), 63)
 	branch.OperatorMul(highbit)
 	.Whatever(exp, dest, fn, tableid, regs, false)

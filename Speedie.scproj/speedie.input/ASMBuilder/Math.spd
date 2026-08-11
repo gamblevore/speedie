@@ -525,7 +525,7 @@ extend Assembler
 	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
 		if src.issmall and cmp.IsBig
 			cmp.reg = 0
-			|| dest = .TempOnly(cmp)
+			|| dest = .TempMe(cmp)
 			return .BFLG_Sub(exp, dest, src, 32, 32, false)
 		return src
 		

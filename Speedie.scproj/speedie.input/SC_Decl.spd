@@ -56,8 +56,8 @@ class SCDecl (SCObject) {
 		return .mu.DataType & datatypecode.possiblebits
 	
 	setter WholeType (|asmreg|)
-		value.tmpcheck
 		target debug
+			assembler.sh.TempCheck(value)
 			if value is temp and value isnt okastemp // huh?
 		.mu.DataType = value|datatypecode|
 	

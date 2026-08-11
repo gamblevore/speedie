@@ -45,7 +45,6 @@ datatype ASMReg (uint64)
 		FlagsToRemove	= Const		||| Discard
 		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
 		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
-
 		// don't go above 47
 
 	
@@ -337,7 +336,7 @@ datatype ASMReg (uint64)
 		return self
 	
 	target debug {
-	function DebugPrint 
+	function DebugPrint
 		target debug
 			print .render
 			|| f = .fat
@@ -347,18 +346,26 @@ datatype ASMReg (uint64)
 				""
 	}
 	
-	function TmpCheck (|bool| AllowZero=false, |bool|)
-		|| R = .reg
+	constants
+		DontWantTempsHere = 26
+
+
+	function assembler.TempCheck (|asmreg| V, |bool| AllowZero=false, |bool|)
+		|| R = v.reg
 		if !r and AllowZero
 			return true
-		|| IsTmp = self is temp and self isnt OKAsTemp
-		|| Big = R >= 26
-		if big == IsTmp or (big and self is temp)
+		|| IsTmp = V is temp and V isnt OKAsTemp
+		|| Big = R >= asmreg.DontWantTempsHere
+		if big == IsTmp or (big and V is temp)
 			return true
-		if big
-			"big reg $R unmarked"
-		  else
-			"low reg $R marked"
+		if .InlineDepth > 0 // just fail?
+			.FailInline
+			return false
+		target debug
+			if big
+				"big reg $R unmarked"
+			  else
+				"low reg $R marked"
 		debugger
 	
 			

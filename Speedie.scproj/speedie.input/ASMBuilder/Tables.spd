@@ -107,7 +107,7 @@ function Swap (fn_asm)
 	|| B = .ExistingVar(prms.second!)
 	expect (A.reg and B.reg) (Exp, "Can only swap registers")
 	
-	|| T = .assign(exp, .TempOnly, A)
+	|| T = .assign(exp, .TempMe, A)
 	.assign(exp, A, B)
 	.assign(exp, B, T)
 	|| f = T.fat
@@ -263,7 +263,7 @@ function TypeCast (fn_asm)
 			from.µtype = newtype
 			return from
 	
-	dest = .TempOnly(dest)
+	dest = .TempMe(dest)
 	
 	if (OV|||NV) > 1
 		if NewType.IsFloat == oldtype.isfloat
@@ -337,7 +337,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	dest.µType = Reff.µType
 	
 	if dest isnt set
-		dest = .TempOnly(dest)
+		dest = .TempMe(dest)
 		if dest is ContainsAddr // how?
 		// dest = reff --> dest = *reff
 		return .Read(dest, exp, Reff, nil, nil) * dest
@@ -366,7 +366,7 @@ function Decl (fn_asm) // DeclareSub declare
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
 	opt norefcounts
-	if !dest
+	if !dest or dest is temp // can't declare temps!
 		dest = .DeclareBody(exp, ty)
 	  else
 		dest.µType = ty.CalculateASMType
@@ -386,6 +386,9 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 	
 	
 function StatExpr (fn_asm)
+	// temp vars are meant to belong "inside" instructions... so they can be safely nopped
+	// so how can this take a temp? Its clearly not inside anything.
+	// I mean we can use it as a place to write to... but definitely not to declare anything.
 	opt norefcounts
 	exp = exp.first
 	|scdecl| Rejoined
@@ -647,9 +650,9 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 	opt	NoRefCounts
 	|| TmpCloser = .OpenVars
 	if dest is Discard
-		dest = .TempOnly(Dest)
+		dest = .TempMe(Dest)
 	if Dest iz Addr
-		dest = .TempOnly
+		dest = .TempMe
 
 	(addr is BlockNop)
 	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ
@@ -837,7 +840,7 @@ function ExistingVar (|message| m, |asmreg|)
 
 function Str (fn_asm)
 	opt	norefcounts
-	dest = .TempOnly(dest)
+	dest = .TempMe(dest)
 	dest.µtype = DataTypeCode._voidptr
 	
 	|| real = exp.name|MessageID|
@@ -859,7 +862,7 @@ function Str (fn_asm)
 
 helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 	|| T = src.BasicVec.reg(0)
-	T = .TempOnly(T)
+	T = .TempMe(T)
 	|| Mode = (1<<2) + (1<<5) + (1<<8) + (1<<11)
 	return exp.VSWZ(T, src, Mode) * T
 

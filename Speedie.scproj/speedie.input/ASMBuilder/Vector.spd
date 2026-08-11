@@ -15,7 +15,7 @@ extend Assembler
 	function IncrVectorPart (|message| exp, |AsmReg| Dest, |AsmReg| Src, |int64| Value, |int| mode, |asmreg|)
 		|AsmReg| OldValue
 		if (dest isnt discard) and mode & ASMType.IncrAfter		// x = S[1]++
-			OldValue = .Assign(exp, .temponly(dest), Src)
+			OldValue = .Assign(exp, .TempMe(dest), Src)
 
 		|| vget = src.fat!
 		|| VReg = vget.asmreg(2)
@@ -58,7 +58,7 @@ extend Assembler
 		dest.µType = T
 		
 		.CloseVars(Closer)
-		dest = .TempOnly(dest)
+		dest = .TempMe(dest)
 		
 		|| v3 = vv[3]
 		if v3.reg >= 16

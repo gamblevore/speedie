@@ -40,6 +40,8 @@ struct Assembler
 		|byte|					StackSize
 	|InlineState[8]|			InlineState
 	|scfunction--|				Out
+	target debug
+		|(Message--)[32]|		Declarations
 
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
@@ -174,7 +176,7 @@ struct Assembler
 			T = DataTypeCode.int
 		if !dest.reg
 			dest.µtype = T
-		dest = .TempOnly(dest)
+		dest = .TempMe(dest)
 
 		|| Where = orig • dest
 		(where is Const)
@@ -197,25 +199,10 @@ struct Assembler
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
 			return exp.ADAK(dest, Src, Value) * Dest
-		rz = .Assign(exp,  .temponly(dest),  Src)
+		rz = .Assign(exp,  .TempMe(dest),  Src)
 		if !dest.reg
 			dest = src
 		.AddToReg(exp, dest, src, value, src)
-
-
-//	function IsOnlyVarThatWeReturn (|scdecl| D, |asmreg|)
-//		// A param/body var, that we return.
-//		// .DeclareMe is also called from inlines. What does it do there, then?
-//		// does it still make sense?
-//		
-//		// VarThatGotReturned isnt set anywhere?
-//		// remove this?
-//		|| st = .state
-//		|| ret = st.return
-//		if  ret.reg  and  (D is VarThatGotReturned)  and  (st.fn.ReturnedVars == 1)
-//			ret.µtype = rz|DataTypeCode|
-//			D.wholetype = ret
-//			return ret
 
 	
 	function DeclareBody (|Message| where,  |scdecl| Type,  |asmreg|)
@@ -227,10 +214,21 @@ struct Assembler
 		|| d = .VDecls
 		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
 		d |= FreeBit
-		v.reg = freeBit.log2
+		|| Index = freeBit.log2
+		v.reg = index
+		target debug
+			.Declarations[index] = where
 
 		.Vdecls = d
-		check (freebit and !(d & .VTemps)) (where, "No free local variables.")	// entirely full
+		if freebit and !(d & .VTemps)
+			if Index < asmreg.DontWantTempsHere or .InlineDepth == 0
+				return v
+			#!inlining too many registers
+
+		if .InlineDepth > 0
+			.FailInline
+		  else
+			error (where, "No free local variables.")	// entirely full
 		return v
 	
 
@@ -267,7 +265,7 @@ struct Assembler
 	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
 		if type
 			t.µtype = type.mu.DataType
-		return .TempOnly(t)
+		return .TempMe(t)
 	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)		// .needreg
@@ -276,10 +274,10 @@ struct Assembler
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
 			t.µtype = where.asmdecl.mu.DataType
-		return .TempOnly(t)
+		return .TempMe(t)
 
 
-	function TempOnly (|asmreg| T=asmreg.Temp, |asmreg|)						// .needreg
+	function TempMe (|asmreg| T=asmreg.Temp, |asmreg|)						// .needreg
 		opt norefcounts
 		if t.reg
 			return t
@@ -294,7 +292,13 @@ struct Assembler
 		(t isnt Const) // why would it be?
 		(t is temp)
 		t.fatindex = 0
-		check (!(.vdecls & .VTemps)) (.fn.sourcearg, "No free local variables.")	// entirely full
+		if !(.vdecls & .VTemps)
+			return t
+
+		if .InlineDepth > 0
+			.FailInline
+		  else
+			error (.fn.sourcearg, "No free local variables.")	// entirely full
 		return t
 	
 	
@@ -546,7 +550,14 @@ struct Assembler
 		|| OV = .OpenVars
 		Dest = .DeclareBody(exp, a) as dest
 		(dest is NewlyDeclared)
-		|| r = .µInto(Exp, dest)
+		|| Closer = .OpenVars
+
+		|| r = .µGetASM(Exp, dest)
+		if !(r iz dest) and r.reg
+			r = .Assign(exp, dest, r)
+		r = .CloseVars(Closer, nil, r)
+		
+//		|| r = .µInto(Exp, dest)
 		if r is temp
 			target debug
 /				.µGetASM(Exp, dest)
@@ -580,7 +591,7 @@ struct Assembler
 		target debug
 			|| trap = ++ASMTrapper
 			if trap == -1
-			Dest.TmpCheck(true)
+		require .TempCheck(dest, true)
 
 		|| OV = .OpenVars
 		if exp is BreakPoint
@@ -589,18 +600,15 @@ struct Assembler
 		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
 			Dest = Dest asnt ASMReg.NewlyDeclared
 		  elseif Dest is temp										//	x = (y + 1) + (z + 1)
-			Dest = .TempOnly(Dest)
+			Dest = .TempMe(Dest)
 		  else
 			// when compiling:		x()[y()] = z()
 			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
 			// but these are functionally temps.
 			Dest = .DeclareMe(exp, Dest)
 			(dest isnt const)										// :3
-//			(Dest is Temp)											// temps are instruction-local... so no
-//			(Dest is OKAsTemp)
 		
-		target debug
-			Dest.TmpCheck
+		require .TempCheck(dest)
 
 		|| r = .µGetASM(Exp, Dest)
 		ov = ov.AddReg(R)
@@ -654,10 +662,10 @@ struct Assembler
 		cpp_part GetASM
 		
 		target debug
-			dest.TmpCheck
+			.TempCheck(dest)
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == 83830 or stacksize > 30 // ugh
+			if trap == -1 or stacksize > 30 // ugh
 				
 		  else
 			opt inline
@@ -670,7 +678,7 @@ struct Assembler
 			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"
 				.µdebug(exp, dest)
-			if !ss.tmpcheck
+			if !.TempCheck(ss)
 				.µdebug(exp, dest)
 			// dest discard means "we are telling you that we don't need the result"
 			// return discard means "the result is unused, so reg0 isn't actually being set to"

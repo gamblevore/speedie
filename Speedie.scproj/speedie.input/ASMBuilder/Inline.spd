@@ -79,11 +79,11 @@ struct InlineInfo
 extend assembler {
 function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
 	opt norefcounts
-	dest.tmpcheck
+	require .TempCheck(dest)
 	|| dest2 = dest
 	if (dest isnt discard) and (!dest.reg or dest is temp)
 		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
-		dest2.tmpcheck
+		require .TempCheck(dest)
 	
 	dest2 = dest2.simplify
 	dest2.µtype = fn.ASMReturn.ASMRegType
@@ -175,7 +175,15 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	opt norefcounts
 	|| p = prms.first$
-	(fn) // for debug
+
+	// OK so this has a design flaw.
+	// around temp regs. tempregs should be considered "will disappear"
+	// i think its always considered an "input" to an instruction. So if the instruction
+	// does not need it, it can nop the thing. However... its NOT a temp here.
+	// So we should not be getting temps, right? I mean... the thing COULD just...
+	// call another func. It shouldn't be so hard, just give it a good dest?
+	
+	(fn)
 	|| args = .fn.args
 	info.DoImmediates(p, args)
 	
@@ -209,7 +217,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 			require SubInline < MaxEnd
 	
 	|| AllowedGain = 5 + (fn is OptInline) * 18		// Assume that functions have 5 instruction overhead.
-	|| Grace = 2 + (fn isnt constructor)<<2			// 2 grace for constructors, 6 for others.
+	|| Grace = 2 + (fn isnt constructor)*3			// 2 grace for constructors, 5 for others.
 	if fn is LinkInline
 		allowedgain += 2
 	  elseif fn.IsLibrary
@@ -218,9 +226,9 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	AllowedGain -= .inlinedepth
 	
 	for p.fast in prms
-		Grace += .IsASMConst(p)<<2
+		Grace += .IsASMConst(p)<<1
 
-	if (AllowedGain + Grace)|uint| <= N
+	if N >= (AllowedGain + Grace)|uint|
 		require fn is linkinline
 		problem (prms, "Inline function oversized")
 

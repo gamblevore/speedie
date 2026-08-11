@@ -19,7 +19,7 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 	if !dest.reg
 		dest.TryReg = Vara
 		dest.TryReg = Base
-		dest = .TempOnly(dest)
+		dest = .TempMe(dest)
 	return .Plus(exp, dest, base, vara)
 
 

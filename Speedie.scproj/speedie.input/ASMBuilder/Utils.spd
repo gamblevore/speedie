@@ -144,7 +144,9 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 			.MarkVarClosed(v_bits)
 	  else
 		.vtemps = Result // 🔥🔥🔥🔥🔥
-
+	
+	target debug
+		.declarations[v] = nil
 	|| fat = .register(v)
 		// why do I do this?
 		// Clearstruct also does nothing if exp==nil
