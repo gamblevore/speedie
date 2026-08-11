@@ -2015,6 +2015,7 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_DebugVarOpen ((ASMReg)8388608)
 #define kSC__Reg_DebugVars ((ASMReg)25165824)
 #define kSC__Reg_Discard ((ASMReg)262144)
+#define kSC__Reg_DontWantTempsHere ((int)26)
 #define kSC__Reg_Exit ((ASMReg)13194139533312)
 #define kSC__Reg_ExitAtAll ((ASMReg)8796093022208)
 #define kSC__Reg_ExitFunction ((ASMReg)4398046511104)
@@ -3896,6 +3897,8 @@ void SC_VM_Builder__DefineGetSub(JB_String* Fname, int Up, int Down, uint /*byte
 
 Message* SC_VM_Builder__FatCreatorSub(JB_String* Name, xC2xB5Form* Form);
 
+void SC_VM_Builder__FatCreatorSub2(uint /*MuParam*/ P, Message* F, int I, Message* Fatdecl, Message* Arg);
+
 int SC_VM_Builder__FillEncoders(Message* List, bool ActuallyMakeTheVM);
 
 void SC_VM_Builder__FillTypePrm(JB_String* Fname, int Pname);
@@ -4776,8 +4779,6 @@ bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
 ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
 
 ASMReg SC_Reg_Temp(ASMReg Self, ASMReg Other);
-
-bool SC_Reg_TmpCheck(ASMReg Self, bool AllowZero);
 
 ASMReg SC_Reg_TryRegSet(ASMReg Self, ASMReg Dest);
 
@@ -6276,6 +6277,8 @@ ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest);
 
+void SC_Pac_FailInline(Assembler* Self);
+
 bool SC_Pac_FatterCompile(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_FillDebugInfo(Assembler* Self);
@@ -6522,7 +6525,9 @@ ASMReg SC_Pac_Str(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_Subtract(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-ASMReg SC_Pac_TempOnly(Assembler* Self, ASMReg T);
+bool SC_Pac_TempCheck(Assembler* Self, ASMReg V, bool AllowZero);
+
+ASMReg SC_Pac_TempMe(Assembler* Self, ASMReg T);
 
 ASMReg SC_Pac_TempTypedWithDeclReg(Assembler* Self, SCDecl* Type, ASMReg T);
 
