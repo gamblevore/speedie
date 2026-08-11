@@ -101,9 +101,11 @@ class Object
 	
 	module
 		function DebugAllMemory (assigns:|bool|, |bool|)
+			description "Internal memory-debugging feature. I'll probably make it public sometime."
 			cpp_wrapper JB_DebugAllMemory
 		
 		function TotalSanity (|bool| Force=true, |bool|)
+			description "Internal memory-debugging feature. I'll probably make it public sometime."
 			cpp_wrapper JB_TotalSanity
 		
 		function New (|object|)
