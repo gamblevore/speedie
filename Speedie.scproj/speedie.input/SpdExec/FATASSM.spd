@@ -245,18 +245,19 @@ struct FatASM
 			return self + 1 + .prms[j-1]|int|
 	
 	
-	function JumpTo (|&fatasm| value)
+	function JumpTo (|&fatasm| value, |int64|)
 		cpp_Part JumpToSet
 		|| j = .JumpPrm
 			|| D = (value - self) - 1
 			check (D != -1) (self, "Infinite loop")
 			.prms[j-1] = D
 			if d == 0
-				assembler.sh.nop(self)
+				._op = asm.noop
+				.JumpPrm = 0 // safer for jump calculations
+//				assembler.sh.nop(self)
+			return D
 		  else
-			target debug
-				|| ID = .Index
-				debugger
+			error (value, errorreceiver.internalerror)
 
 ////////////////////////////////////////////////////////////
 	function p0 (|ASMParam|): return .prms[0]

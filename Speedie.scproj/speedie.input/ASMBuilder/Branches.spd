@@ -40,16 +40,12 @@ function IfSub (fn_asm) // function If (fn_asm)
 		|| Clamped = .MiniClampOpt(exp, b.start)
 			return Clamped
 		.ExpectOneMore = true
-		.BranchToCurr(b)
+		b.JumpTo(.curr)
 		return asmreg()
 	
-	debugger
-	// bug here... jumpto(.curr) can nop other.jump
-	// but soemhow the branch B now points to... nothing?
-	// at lesat if elsesub does nothing... sigh
-	
+//	debugat 79
 	|| AfterFirst = other.jump								// Basicblock ++
-	.BranchToCurr(b)
+	b.JumpTo(.curr)	
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
 
@@ -78,13 +74,14 @@ function MainBrancher (fn_asm)
 	|| s = .state
 	s.BranchDepth++
 	s.RealBranchDepth++
-	if "PerryFuncListFilter".trap
+
 	if dest == nil
 		rz = .WhileSub(exp)
 	  elseif dest isnt VerySpecial
 		rz = .IfSub(exp, nil)
 	  else
 		rz = .TernarySub(Exp, dest)
+	
 	s.BranchDepth--
 	s.RealBranchDepth--
 	
@@ -205,7 +202,7 @@ function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
 	|| mA = .µInto(A, dest)
 	|| Exit = exp.jump				// .JumpInput already calls .NextBasicBlock
-	.BranchToCurr(Branch)
+	Branch.jumpto(.curr)	
 	|| mB = .µInto(B, dest)	
 	rz = .TernRefCount(ma, mb)						
 	Exit.jumpto(.curr)
@@ -458,7 +455,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	|fatrange| Br2
 	|| second = .Branch(B, Br2, dest is negate)
-	.BranchToCurr(OrTest)
+	OrTest.JumpTo(.curr)
 
 	// why do we not call .boolanswerok on these though?
 	if Br2.always
@@ -582,10 +579,6 @@ extend Assembler
 	function fatasm.JumpFix (|&fatasm| curr)
 		isnt CondAnswer
 		.JumpTo(curr)							// shouldn't (s isnt CondAnswer) go inside .jumpto?
-	
-	
-	function BranchToCurr (|FatRange| range)
-		return range.JumpTo(.curr)
 	
 	
 	function FatRange.JumpTo (|&FatAsm| curr)
