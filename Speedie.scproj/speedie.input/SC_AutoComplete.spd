@@ -1085,7 +1085,7 @@ function CallFromDefine (|message| msg, |scfunction| fn, |object| found, |messag
 function CallFrom (|message| msg, |object| found=nil, |message|)
 	opt norefcounts
 	
-	|| fn = msg.AutoMsgFuncFn
+/	|| fn = msg.AutoMsgFuncFn
 		rz = .CallFromDefine(msg, fn, found)
 		.CallFromSub(rz.first, fn)
 

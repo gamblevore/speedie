@@ -57,6 +57,8 @@ class SCDecl (SCObject) {
 	
 	setter WholeType (|asmreg|)
 		value.tmpcheck
+		target debug
+			if value is temp and value isnt okastemp // huh?
 		.mu.DataType = value|datatypecode|
 	
 	function WholeType (|asmreg|)

@@ -23,7 +23,7 @@ datatype ASMReg (uint64)
 		Set
 		NewlyDeclared
 		DebugVars = [DebugVarOpen, DebugVarClose]
-		ForceInto
+		ParamNeedsCopy
 		NoScale
 		FromInline
 		ContainsAddr
@@ -55,10 +55,14 @@ datatype ASMReg (uint64)
 
 	
 	target debug
+		function RegTypeLetter (|byte|)
+			rz = ('r' + ((self is temp)<<1))|byte| // r,t
+			if self is OKAsTemp
+				rz = rz.uppercase
 		render
 			if self is Const
 				fs <~ "k"
-			fs <~ ('r' + ((self is temp)<<1))|byte| // r,t
+			fs <~ .RegTypeLetter
 			fs <~ .reg
 			fs <~ "("
 			.µtype.render(Fs)
@@ -278,13 +282,15 @@ datatype ASMReg (uint64)
 			if !value.reg and self is alteredorref
 		
 		isnt const
-		.ExportPosition = 0 // this is for a local. locals store their consts in fats...
+		.ExportPosition = 0		// this is for a local. locals store their consts in fats...
 		if value is Const
 			value.incr
 			value.ConstCheck
 			if self isnt Altered
 				is const
 		
+		(value isnt temp)		// i don't think a decl can be temp?
+		(value isnt okastemp)
 		value.µType = .mu.DataType
 		.WholeType = value
 	

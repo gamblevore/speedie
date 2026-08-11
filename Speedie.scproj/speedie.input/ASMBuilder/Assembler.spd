@@ -537,27 +537,26 @@ struct Assembler
 			
 
 	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
-	/*
-		possible inline param cases. int A is a normal reg. int B is altered
-		theres also references...
-		
-		A+B: nil
-		A:	reg1
-		B:	asmreg.into	// can't pass B, so pass a copy?
-		0:	asmreg.into	// if altered or ref
-		0:	nil			// otherwise
-	*/
+		// we just want to avoid passing a register twice, once as a reference
+		// and another as the actual reg... cos if we alter the refered ASM reg
+		// that will alter the actual reg.
 
 		if exp is BreakPoint
 			.Breakrequest |= BreakPoint
 		|| OV = .OpenVars
 		Dest = .DeclareBody(exp, a) as dest
-		|| r = .µGetASM(Exp, dest)
+		(dest is NewlyDeclared)
+		|| r = .µInto(Exp, dest)
+		if r is temp
+			target debug
+/				.µGetASM(Exp, dest)
+			error (exp, "ASM temp param generated")
+			
 		if r iz dest
 			return r
-		if (dest isnt ForceInto) and !(a is alteredorref and r.reg == 0)
+		if (dest isnt ParamNeedsCopy) and !(a is AlteredOrRef and r.reg == 0)
 			return .CloseVars(ov, nil, r)
-		(dest isnt forceinto)
+		(dest isnt ParamNeedsCopy)
 		return .Assign(exp, dest, r)
 
 
@@ -597,8 +596,8 @@ struct Assembler
 			// but these are functionally temps.
 			Dest = .DeclareMe(exp, Dest)
 			(dest isnt const)										// :3
-			(Dest is Temp)
-			(Dest is OKAsTemp)
+//			(Dest is Temp)											// temps are instruction-local... so no
+//			(Dest is OKAsTemp)
 		
 		target debug
 			Dest.TmpCheck
@@ -658,7 +657,7 @@ struct Assembler
 			dest.TmpCheck
 			|| StackSize = ++.stacksize
 			|| trap = ++ASMTrapper
-			if trap == -1 or stacksize > 30 // ugh
+			if trap == 83830 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

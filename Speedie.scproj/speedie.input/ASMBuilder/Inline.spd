@@ -22,7 +22,7 @@ struct InlineInfo
 			|| v = r.reg
 			if !v
 				0
-			  elseif r is Const 
+			  elseif r is Const
 				sh.Decr(r.needfat, fatnopmode.hard)
 			  elseif r iz Ret
 				0
@@ -52,9 +52,6 @@ struct InlineInfo
 		(a is reference) = (d is reference)
 		a.mu.Info |= (d.mu.info & scdeclinfo.alteredcopy)
 		if a is TypeImprove // oof? typeimprove param?
-//		require self is TypeImprove
-//		|| orig = .IsLookupOnly
-//		if orig isa SCDecl
 		return v	
 	
 	
@@ -65,17 +62,17 @@ struct InlineInfo
 			.ClearInlineParamClash(args, AR, AN)
 
 
-	function ClearInlineParamClash (|[scdecl]| args, |int| AR, |int| AN)
+	function ClearInlineParamClash (|[scdecl]| args, |int| AlteredRefs, |int| AlteredNormal)
 		opt norefcounts
 		|| n = args.Length
 		while n-- > 0
 			|| V = .items[n]
 				|| a = args[n]!
 				|| r = 1<<v.reg
-				if (AR & r) and (a isnt reference)
-					.items[n] = asmreg.ForceInto				// needs copy to save other regss
-				  elseif (AN & r) and (a is altered)
-					.Items[n] = asmreg.ForceInto
+				if (AlteredRefs & r) and (a isnt reference)
+					.items[n] = asmreg.ParamNeedsCopy				// needs copy to save other regs
+				  elseif (AlteredNormal & r) and (a is altered)
+					.Items[n] = asmreg.ParamNeedsCopy
 	
 
 
@@ -148,7 +145,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| svregs
 	|InlineInfo| Info
 	svregs.Collect(fn.args, self)
-	.InlineParams(prms, info)
+	.InlineParams(prms, info, fn)
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopParams(fn.args.length, .state.return)
@@ -175,20 +172,21 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 
 	
-function InlineParams (|message| prms, |InlineInfo| Info)
+function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	opt norefcounts
 	|| p = prms.first$
-
+	(fn) // for debug
 	|| args = .fn.args
 	info.DoImmediates(p, args)
 	
 	for (a in args) (i)
 		|| V = info.Items[i]
 		target debug: || trap = ++asmtrapper, if trap == -1
-		if !(V asnt ASMReg.ForceInto) // its nil or into
+		if !(V asnt ASMReg.ParamNeedsCopy) // its nil or ParamNeedsCopy
 			info.items[i] = .µInlineParam(p, a, V)
 		
-		a.AsmReg = info.Items[i] // a is the output, nt the input decls.
+		
+		a.AsmReg = info.Items[i] // A stores the output of P
 		p = p.next!
 
 

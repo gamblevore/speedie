@@ -879,7 +879,8 @@ function CanConst (|scdecl| D, |&fatasm| f, |bool|)
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
-
+	if t is temp // how can a declared variable be a temp?
+	
 	(t is param) = d is param
 	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
 		if .CanConst(d, f)
