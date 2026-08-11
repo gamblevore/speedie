@@ -612,7 +612,7 @@ class SCDecl (SCObject) {
 			return self
 
 		if new.pointercount
-			error (.source, errorreceiver.NonFatal + ": Not sure what to do about this?")
+			error (.source, errorreceiver.InternalError + ": Not sure what to do about this?")
 		  else
 			|| last = self
 			while --p > 0

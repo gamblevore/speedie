@@ -550,7 +550,7 @@ struct Assembler
 		if r is temp
 			target debug
 /				.µGetASM(Exp, dest)
-			error (exp, "ASM temp param generated")
+			error (exp, errorreceiver.InternalError)
 			
 		if r iz dest
 			return r
@@ -621,7 +621,7 @@ struct Assembler
 
 		|| r = .µGetPrms(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
-			error (exp, errorreceiver.nonfatal)
+			error (exp, errorreceiver.InternalError)
 		return r.incr
 
 

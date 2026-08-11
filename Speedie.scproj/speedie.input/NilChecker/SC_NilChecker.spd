@@ -237,7 +237,7 @@ function NilFunction (NilTrackerFn)
 	
 	|| fn = prms.obj|SCFunction|
 	if !fn
-		fn = fp.GetFunctionPointer #expect (fp, errorreceiver.nonfatal)
+		fn = fp.GetFunctionPointer #expect (fp, errorreceiver.InternalError)
 	if fn.ProtoType or fn is Dylib
 		require .UseAsReal(fp, 0, nilreason.accessing)					// (abc)()
 

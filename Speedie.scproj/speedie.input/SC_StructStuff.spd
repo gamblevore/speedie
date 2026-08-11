@@ -60,7 +60,7 @@ function SCFunction.MatchImprove (|scparamarray| incoming, |scfunction|)
 	|| ft = .StructReturned
 		incoming.StructReturner(ft.AsLocal, self)
 	  elseif .returntype is ReturnedStruct			// remove this? its always the prev?
-		error (self, ErrorREceiver.nonfatal)
+		error (self, ErrorREceiver.InternalError)
 		//incoming.StructExtract(.ReturnType)
 	return self
 

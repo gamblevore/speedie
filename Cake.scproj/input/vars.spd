@@ -83,7 +83,7 @@ class XVar (list)
 		// both should never happen. Its like a register being nil, or an object being nil.
 		// Despite that we should have tested it for nil and not come here.
 			debugger
-			error (ErrorReceiver.nonfatal)
+			error (ErrorReceiver.internalerror)
 
 		|| Ptr = (Where|&?&nil|)[]
 		if .PointerOK(ptr)
@@ -457,7 +457,7 @@ class XVar (list)
 
 			|| Ptr = addr|&&nil|[]|int64|
 			if (w is Reference)										// barestructs already handled in rendervalue
-				expect (Ptr) (ErrorReceiver.NonFatal)
+				expect (Ptr) (ErrorReceiver.internalerror)
 				Addr = ((ptr>>1)<<1)|&nil|
 				
 			  else

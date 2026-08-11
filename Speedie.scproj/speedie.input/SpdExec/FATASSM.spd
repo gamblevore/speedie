@@ -184,7 +184,7 @@ struct FatASM
 		|int| o = f._Outputs
 			target debug: if !o.IsPow2
 			return .ReDest(f, dest, o.log2)
-		error (f, errorreceiver.nonfatal) // what?
+		error (f, errorreceiver.InternalError) // what?
 		
 		
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |uint| a, |asmreg|)

@@ -228,7 +228,7 @@ class ErrorReceiver
 			curr_err = N
 			
 	constants
-		NonFatal = "Internal Error"
+		InternalError = "Internal Error"
 
 
 
@@ -237,7 +237,7 @@ extend Object
 		cpp_part Fail
 		app.CrashPrint
 		|| fs = FastString()
-		fs <~ errorreceiver.NonFatal
+		fs <~ errorreceiver.InternalError
 		fs <~ ": "
 		.render(Fs)
 		fs.SyntaxExpect

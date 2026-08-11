@@ -56,7 +56,7 @@ extend Assembler
 			return .ASMBoolMaker(exp, dest, scop.Kind)
 		|| fn = scop.OpASM
 			return .DoMathSub(exp, dest, fn)
-		error (exp, errorreceiver.nonfatal)
+		error (exp, errorreceiver.InternalError)
 
 
 	helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)

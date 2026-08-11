@@ -2019,7 +2019,6 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_ExitAtAll ((ASMReg)8796093022208)
 #define kSC__Reg_ExitFunction ((ASMReg)4398046511104)
 #define kSC__Reg_FlagsToRemove ((ASMReg)274878169088)
-#define kSC__Reg_ForceInto ((ASMReg)33554432)
 #define kSC__Reg_FromInline ((ASMReg)134217728)
 #define kSC__Reg_GlobalMemory ((ASMReg)68719476736)
 #define kSC__Reg_InlineCopyable ((ASMReg)1102732918784)
@@ -2028,6 +2027,7 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_NoScale ((ASMReg)67108864)
 #define kSC__Reg_OKAsTemp ((ASMReg)8589934592)
 #define kSC__Reg_Param ((ASMReg)524288)
+#define kSC__Reg_ParamNeedsCopy ((ASMReg)33554432)
 #define kSC__Reg_Set ((ASMReg)2097152)
 #define kSC__Reg_SetAlways ((ASMReg)538968064)
 #define kSC__Reg_Subtract ((ASMReg)1048576)
@@ -2508,7 +2508,7 @@ extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_NonFatal ((JB_StringC*)JB_LUB[2001])
+#define kJB__Rec_InternalError ((JB_StringC*)JB_LUB[2001])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -5985,7 +5985,7 @@ void SC_HairyMan_Churn(HairyMan* Self, FastString* Fs);
 // JB_InlineInfo
 void SC_InlineInfo_CleanupClash(InlineInfo* Self, Array* Args);
 
-void SC_InlineInfo_ClearInlineParamClash(InlineInfo* Self, Array* Args, int AR, int AN);
+void SC_InlineInfo_ClearInlineParamClash(InlineInfo* Self, Array* Args, int AlteredRefs, int AlteredNormal);
 
 void SC_InlineInfo_DoImmediates(InlineInfo* Self, Message* P, Array* Args);
 
@@ -6328,7 +6328,7 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv);
 
 ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Bytes, int& Index, uint MaxBits, SCDecl* Decl, Message* Exp);
 
-void SC_Pac_InlineParams(Assembler* Self, Message* Prms, InlineInfo* Info);
+void SC_Pac_InlineParams(Assembler* Self, Message* Prms, InlineInfo* Info, SCFunction* Fn);
 
 ASMReg SC_Pac_IntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
