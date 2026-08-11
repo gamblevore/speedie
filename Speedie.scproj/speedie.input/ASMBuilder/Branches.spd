@@ -21,7 +21,7 @@ function ElseSub (|message?| other, |asmreg|)
 
 
 
-function IfSub (fn_asm)
+function IfSub (fn_asm) // function If (fn_asm)
 	opt norefcounts
 
 	|| cond = exp.first!,  || arg1 = cond.next!
@@ -42,6 +42,11 @@ function IfSub (fn_asm)
 		.ExpectOneMore = true
 		.BranchToCurr(b)
 		return asmreg()
+	
+	debugger
+	// bug here... jumpto(.curr) can nop other.jump
+	// but soemhow the branch B now points to... nothing?
+	// at lesat if elsesub does nothing... sigh
 	
 	|| AfterFirst = other.jump								// Basicblock ++
 	.BranchToCurr(b)
@@ -73,6 +78,7 @@ function MainBrancher (fn_asm)
 	|| s = .state
 	s.BranchDepth++
 	s.RealBranchDepth++
+	if "PerryFuncListFilter".trap
 	if dest == nil
 		rz = .WhileSub(exp)
 	  elseif dest isnt VerySpecial
