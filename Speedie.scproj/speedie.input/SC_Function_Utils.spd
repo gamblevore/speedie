@@ -56,12 +56,6 @@ dispatch FuncPreReader (fnPreReader)
 		|| f = msg.first
 			error f
 		(self is numbercreator)
-		
-	+'inline'
-		opt norefcounts
-		problem (msg, "Use 'inlined' instead")
-		msg.expectempty
-		.MakeLinkInline
 
 	+'inlined'
 		opt norefcounts
@@ -136,8 +130,6 @@ function message.RefFallback (|bool|)
 
 function SCFunction.MakeLinkInline
 	check (.islibrary) (self, "Only library funcs can use this. Use `opt inline` if you want to optimise without affecting linking.")
-	if Options.AutoOptInline
-		is OptInline
 	is LinkInline
 
 

@@ -209,7 +209,7 @@ function CurrGain (|&fatasm| Start, |int|)
 
 function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	opt norefcounts
-	|| N = fn.µfatlength
+	|| N = fn.µSmallerLength
 	if fn isnt LinkInline
 		require N and (N < 64)
 		|| MaxEnd = .InlineEnd
@@ -236,7 +236,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 		.InlineDepthLimit = 3
 		.DeepestInline = 0
 		.InlineEnd = .curr + AllowedGain
-	
+
 	|| I = .TryInline(prms, dest, fn, AllowedGain)
 		return I
 

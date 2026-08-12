@@ -35,7 +35,6 @@ module Options
 	||		ExternalCompile			= false
 	||		StripNames				= false
 	||		TrapFromPerry			= true
-	||		AutoOptInline			= false
 
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -295,10 +294,6 @@ module Feedback
 			|| b = value.optionbool
 			Options.GenFlowLogCode = b 
 			SC_Targets["flow"] = b
-
-		+'optinline'
-			Explain(Purpose, nil)$
-			options.AutoOptInline = value.optionbool
 			
 		+'noisy'
 			Explain(Purpose, "Prints more stuff")$

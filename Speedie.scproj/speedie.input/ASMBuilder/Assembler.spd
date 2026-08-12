@@ -778,15 +778,23 @@ struct Assembler
 		.AddFuncParams(fn)
 
 
-	function CapASM 
+	function CapASM
 		opt norefcounts
 		|| fn = .out
-		|| n = .fnlength
-		fn.µfatlength = n
+		|| After = .curr_
+		|| Start = .funcstart
+		fn.µfatlength = After - Start
+		
+		|| Count = 0
+		while Start < After
+			Count += start.GuessSize > 0
+			Start++
+		fn.µSmallerLength = Count
+			
 		jsm!.length = .curr - .start
 		
 	
-	function MissingReturn 
+	function MissingReturn
 		opt norefcounts
 		debugger !.fn.ASMReturn
 		|| arg = .fn.source!
@@ -861,7 +869,7 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok
 	|| max = fn.MaxASM
-		check (fn.µasmlength <= max) (fn.SourceArg, "ASM too large")
+		check (fn.µASMLength <= max) (fn.SourceArg, "ASM too large")
 	return true
 
 

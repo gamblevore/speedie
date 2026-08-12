@@ -93,6 +93,8 @@ linkage
 |byte|					StructReturnPos
 |byte|					ASMAndCpp
 |uint16|				µASMLength
+|uint16|				µSmallerLength		// not sure this is the right way but it was the old behaviour
+											// perhaps comparing the µASMLength is better.
 |uint|					µStart
 |uint|					µFATLength
 

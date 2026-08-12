@@ -587,23 +587,29 @@ extend Assembler
 				s.JumpFix(curr)
 	
 
+target debug
+	function @assembler.PrintProgress (|scfunction| fn)
+		cpp_name adb2
+		"---"
+		printline fn
+		|| Start = fn.µStart
+			|| Base = assembler.sh.Start + Start
+			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+			for n in amount
+				base[n].debugprint
+			
+			.PrintRegs
+
+
+
 function @assembler.PrintProgress
 	cpp_name adb
 	visible
 	opt norefcounts
-	target debug {
-	require !compiler.inperry
-	"---"
-	|| fn = scfunction.currfunc!
-	printline fn
-	|| Start = fn.µStart
-		|| Base = assembler.sh.Start + Start
-		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-		for n in amount
-			base[n].debugprint
-		
-		.PrintRegs
-	}
+	target debug
+		if !compiler.inperry
+			.PrintProgress(scfunction.currfunc!)
+	
 
 
 function @assembler.PrintRegs
