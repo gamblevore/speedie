@@ -38,7 +38,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		return p
 
 	error (exp, "Function too large (over 64K)")
-	return .start
+	return .TotalStart
 
 
 function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)

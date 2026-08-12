@@ -11,7 +11,7 @@ extend SCFunction
 
 
 	function FatFirst (|&fatasm|)
-		return Assembler.sh.start + .µstart
+		return Assembler.sh.TotalStart + .µstart
 	
 	
 	function Message.SrcMap (|uint|)

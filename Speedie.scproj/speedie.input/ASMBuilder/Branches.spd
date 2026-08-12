@@ -593,7 +593,7 @@ target debug
 		"---"
 		printline fn
 		|| Start = fn.µStart
-			|| Base = assembler.sh.Start + Start
+			|| Base = assembler.sh.TotalStart + Start
 			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
 			for n in amount
 				base[n].debugprint
@@ -634,7 +634,8 @@ function @assembler.PrintRegs
 				  else
 					print "r"
 				print i
-		printline
+
+		printline "\n"
 		i = 0
 		while ++i <= 31
 			|| test = 1<<i

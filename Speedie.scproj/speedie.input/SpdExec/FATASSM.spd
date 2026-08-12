@@ -143,8 +143,13 @@ struct FatASM
 		disabled "Use isa asm.xxx instead"
 		// if I need to compare vs an int, I can do... if 123 == fat
 	
+	
 	function Index (|uint|)					// for storing in uint16 actually
 		return self - Assembler.sh.funcstart_
+
+	function ID (|uint|)
+		visible
+		return self - Assembler.sh.TotalStart
 
 	function uint.FAT (|&FATASM|)
 		if self
@@ -395,21 +400,22 @@ struct FatASM
 		return true
 	
 
-	function RendaOpenClose (|faststring| fs)
-		opt norefcounts
-		if self is DebugVarClose
-			fs <~ "\t\tClose: "
-			|| any = false
-			for i.bits in ._Const
-				if any
-					fs <~ ", "
-				fs <~ i.log2
-				any = true
-			fs <~ "\n"
-		  elseif self is DebugVarOpen
-			fs <~ "\t\tOpen: "
-			fs <~ .output.reg
-			fs <~ "\n"
+	target debug
+		function RendaOpenClose (|faststring| fs)
+			opt norefcounts
+			if self is DebugVarClose
+				fs <~ "\t\tClose: "
+				|| any = false
+				for i.bits in ._Const
+					if any
+						fs <~ ", "
+					fs <~ i.log2
+					any = true
+				fs <~ "\n"
+			  elseif self is DebugVarOpen
+				fs <~ "\t\tOpen: "
+				fs <~ .output.reg
+				fs <~ "\n"
 	
 	
 	function RenderFat (|FastString| fs, |bool| Simpler=false)

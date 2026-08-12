@@ -45,7 +45,7 @@ struct Assembler
 
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
-	|&FatASM|					Start
+	|&FatASM|					TotalStart
 	|&FatASM|					Curr_
 	|&FatASM|					End
 
@@ -83,7 +83,7 @@ struct Assembler
 		return .curr_ - .funcstart
 
 	function Index (|int|)
-		return .curr_ - .start
+		return .curr_ - .TotalStart
 	
 	function Last (|&FatASM|)
 		return .curr_ - 1
@@ -371,6 +371,7 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
+		if fat.id == 2108
 		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
@@ -760,8 +761,8 @@ struct Assembler
 		
 		|| j = Assembler.jsm
 		.end = j.NeedSpare(64K, 64K)
-		.start = j.ptr
-		.curr_ = .start + j.Length
+		.TotalStart = j.ptr
+		.curr_ = .TotalStart + j.Length
 		.FuncStart_ = .curr
 		
 		HoistSpace.Length = 0
@@ -791,7 +792,7 @@ struct Assembler
 			Start++
 		fn.µSmallerLength = Count
 			
-		jsm!.length = .curr - .start
+		jsm!.length = .curr - .TotalStart
 		
 	
 	function MissingReturn
