@@ -170,13 +170,16 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	|| extras = asmreg.ExitAtAll
 	if .state.TailInlineable
 		(extras is exitfunction)
-
+	
 	(dest as= extras)
 	|| f = exp.first
-		if dest.reg
-			dest = .µinto(f, dest)
-		  else
+		if !dest.reg
 			dest = .µ(f, asmreg.discard)
+		  elseif .state.fn.ReturnCount == 1
+			if "bg".trap
+			dest = .µ(f, dest)
+		  else
+			dest = .µinto(f, dest)
 	
 	(dest as= extras) // it can get lost... sadly.
 	if .state.TailInlineable

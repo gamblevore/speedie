@@ -438,7 +438,7 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space, |mess
 		|| last = arg.FlatLast
 		using last
 		|| ret = arg.AddReturn
-		f.ReturnedVars++
+		f.ReturnCount++
 		if used
 			ret.msg(@thg, "rz").obj = d
 		  else

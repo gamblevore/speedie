@@ -80,7 +80,7 @@ linkage
 |uint16|				TmpCounter
 |uint16|				LinkID
 |nilstate|				NilSelf
-|byte|					ReturnedVars
+|byte|					ReturnCount
 |byte|					FSOpt
 |byte|					MinOpt
 |Byte|					MaxASM
@@ -1733,7 +1733,7 @@ function Tran_Return (TranFunc)  // exitter
 	
 	expect (fn) (node, "Only use this on functions")
 
-	fn.ReturnedVars++
+	fn.ReturnCount++
 	node.obj = fn.returntype
 	ifn node.islast and (node in fn.sourcearg)
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")

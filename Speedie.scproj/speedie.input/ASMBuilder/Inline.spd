@@ -1,22 +1,68 @@
 
+function assembler.StartInlineState (|message| prms, |asmreg| dest, |SCFunction| fn, |&inlinestate|)
+	|int| ID = .inlinedepth + 1
+	|| st = &.inlinestate[ID]
+	st[0] = st[-1]					// copy old state to new
+	st.ParentVars = .openvars
+	st.fn = fn
+	st.BranchDepth = 0
+	st.FuncStart = .curr - .FuncStart
+	st.Return = .SetInlineDest(prms, dest, fn)
+	st.ID = ID
+	
+	.InlineDepth = ID
+	.DeepestInline = ID max .DeepestInline
+	return st		
+
+
+function assembler.CloseInline (|&inlinestate| st)
+	|| ID = st.ID
+	.InlineState[ID] = nil // could we just do st = nil?
+	.InlineDepth = --ID
+	if !ID
+		.InlineEnd = nil
+	
+
+
+// I prefer this, BUT it seems to change the behaviour. Why? Its meant to do the same?
+function assembler.TryInline2 (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
+	opt norefcounts
+	|| OV = .OpenVars
+	|| st = .StartInlineState(prms, dest, fn)
+	if dest isnt ExitFunction
+		.state.TailInlineable = false
+
+	|fatrange| LL
+	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
+		if fn is constructor
+			|| des = fn.cls!.DestructorFunc
+				.ASMReach(des)
+	
+	.CloseInline(st)
+	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
+
+
+
+
+
 struct InlineInfo
 	|asmreg[10]|	Items
 	|uint|			Altered
 	|uint|			References
 	|uint|			Normal
+	|uint|			CantNop
 	
-	function DoImmediates (|?message| p, |[scdecl]| args)
+	function DoImmediates (|?message| p, |[scdecl]| args, |&assembler| sh)
 		opt norefcounts
-		|| sh = Assembler.sh
 		for (a in args) (i)
-			.Items[i] = .PreInlineOneParam(p!, a, sh)
+			.Items[i] = .PreInlineOneParam(p!, a, sh, i)
 			p++
 
 		.CleanupClash(args)
 
 
-	function NopParams (|int| n, |asmreg| Ret)
-		|| sh = Assembler.sh
+	function NopParams (|int| n, |asmreg| Ret, |assembler| sh)
+		opt norefcounts
 		while  --n >= 0
 			|| r = .Items[n]
 			|| v = r.reg
@@ -27,31 +73,37 @@ struct InlineInfo
 			  elseif r iz Ret
 				0
 			  else
-				|| s = r.fat
-				if s  and  !s.µrefcount  and  s.guesssize
-					sh.nop(s) 
+				|| f = r.fat
+				if f  and  !f.µrefcount  and  f.guesssize
+					if .CantNop & 1<<n
+						0 // it was passed in from a parent inline?
+					  elseif sh.IsWithinCurrInline(f)
+						sh.nop(f)
 
 	
-	function PreInlineOneParam (|message| p, |scdecl| a, |assembler| sh, |asmreg|)
+	function PreInlineOneParam (|message| p, |scdecl| arg, |assembler| sh, |int| i, |asmreg|)
 		opt norefcounts
 		p = p.ASMUnbra
 		require (p.func == @thg)
-		|| d = p.ASMDecl
-		require d is local
-		|| v = sh.LocalThg(d)
+		|| passed = p.ASMDecl
+		require passed is local
+		|| v = sh.LocalThg(passed)
 		|| vr = 1<<v.reg
-		if a is Reference
+		.CantNop |= 1<<i
+		if arg is Reference
 			.References |= vr
-		  elseif a is Altered
+		  elseif arg is Altered
 			if .Altered & vr
-				.Normal |= vr
+				.Normal |= vr // passed a reg twice, both alter it.
+							  // but why do I mark it as normal??
 			.Altered |= vr
+			
 		  else
 			.Normal |= vr
 
-		(a is reference) = (d is reference)
-		a.mu.Info |= (d.mu.info & scdeclinfo.alteredcopy)
-		if a is TypeImprove // oof? typeimprove param?
+		(arg is reference) = (passed is reference)
+		arg.mu.Info |= (passed.mu.info & scdeclinfo.alteredcopy)
+		if arg is TypeImprove // oof? typeimprove param?
 		return v	
 	
 	
@@ -80,6 +132,7 @@ extend assembler {
 function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
 	opt norefcounts
 	require .TempCheck(dest)
+	if "bg".trap
 	|| dest2 = dest
 	if (dest isnt discard) and (!dest.reg or dest is temp)
 		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
@@ -89,16 +142,7 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	dest2.µtype = fn.ASMReturn.ASMRegType
 	if !dest2.reg
 		(dest2 is discard)
-	
-	target false // sigh... a nice idea but causes deep issues somewhere. dont wanna do it now.
-		if 	fn.ReturnedVars == 1
-			|| last = fn.SourceArg.last
-			if (last and last.asmtype is kReturn)
-				(dest2 as= (dest & asmreg.InlineCopyable))	// <-- Makes assign fail
-			// needs to be looked at properly...
-			// Also causes slightly different behaviour.
-			// Assigns is now getting vars with reg0 that aren't const??
-	
+		
 	return dest2
 				
 	
@@ -112,7 +156,7 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	st.ParentVars = .openvars
 	st.fn = fn
 	st.BranchDepth = 0
-	
+	st.FuncStart = .FuncIndex	
 	st.Return = .SetInlineDest(prms, dest, fn)
 
 	.InlineDepth = ++ID
@@ -147,8 +191,11 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	svregs.Collect(fn.args, self)
 	.InlineParams(prms, info, fn)
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
+	target debug
+		|| InlineTrap = ++asmtrapper
+		if InlineTrap == 25978
 	asmtype.ArgumentSub(self, fn.SourceArg!)
-	info.NopParams(fn.args.length, .state.return)
+	info.NopParams(fn.args.length, .state.return, self)
 	svregs.Restore(fn.args)
 	
 	ll.after = .curr
@@ -185,14 +232,13 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	
 	(fn)
 	|| args = .fn.args
-	info.DoImmediates(p, args)
+	info.DoImmediates(p, args, self)
 	
 	for (a in args) (i)
 		|| V = info.Items[i]
 		target debug: || trap = ++asmtrapper, if trap == -1
 		if !(V asnt ASMReg.ParamNeedsCopy) // its nil or ParamNeedsCopy
-			info.items[i] = .µInlineParam(p, a, V)
-		
+			info.items[i] = .µInlineOneParam(p, a, V)
 		
 		a.AsmReg = info.Items[i] // A stores the output of P
 		p = p.next!

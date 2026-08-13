@@ -5,7 +5,9 @@ struct InlineState
 	|scfunction!--|	Fn
 	|asmreg|		Return
 	|uint64|		ParentVars
+	|uint16|		FuncStart
 	|byte|			BranchDepth
+	|byte|			ID
 	|byte|			RealBranchDepth
 	|bool|			TailInlineable
 
@@ -84,6 +86,9 @@ struct Assembler
 
 	function Index (|int|)
 		return .curr_ - .TotalStart
+	
+	function FuncIndex (|int|)
+		return .curr_ - .FuncStart
 	
 	function Last (|&FatASM|)
 		return .curr_ - 1
@@ -371,7 +376,16 @@ struct Assembler
 	
 	
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
-		if fat.id == 2108
+//		if !.iswithincurrinline(fat)
+		// its Ok if its in the same block, though???
+		// like overwriting an existing value? not for param nopping...
+//	/		return
+
+		// how do i separate those out?
+		// perhaps I can print all the times it is nopped OUTSIDE
+		// and fix each one.
+		// 
+		
 		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
@@ -541,7 +555,7 @@ struct Assembler
 			return f.FoundFunc
 			
 
-	function µInlineParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		// we just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
 		// that will alter the actual reg.

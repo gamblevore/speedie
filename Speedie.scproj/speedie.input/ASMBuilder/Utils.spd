@@ -41,18 +41,24 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 	return .TotalStart
 
 
-function asmreg.ExpectSameType (|Asmreg| Dest, |asmreg|)
-	|| dt = dest.µType
+function asmreg.ExpectSameType (|Asmreg| Expected, |asmreg|)
+	|| dt = Expected.µType
 	|| st = .µType
 	target debug
 		if dt is floating and st is floating
 			|| stb = st.bytecount
 			|| dtb = dt.bytecount
 			if (stb != dtb) and !(stb == 16 and dtb == 12)
+				expected.debugprint
+				.debugprint
+				debugger
 		if dt isnt floating and st is bool			// allow
 			0
 		  else
 			if (dt is Floating != st Is Floating)
+				expected.debugprint
+				.debugprint
+				debugger
 
 	if dt.isfloat
 		return self									// can't change anything about it...

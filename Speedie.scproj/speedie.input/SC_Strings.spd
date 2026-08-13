@@ -341,7 +341,7 @@ function message.FixElseif
 			|| s = "Add two spaces to nicely indent this"
 			if curr.indent&1
 				s = "Add one space to nicely indent this"
-			warn (curr, s)
+			problem (curr, s) // warnings don't get sent normally...
 		|| n = curr.next
 		if NeedArg
 			using (self)
