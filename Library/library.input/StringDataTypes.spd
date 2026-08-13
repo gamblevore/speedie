@@ -13,10 +13,6 @@ datatype byte
 		|Byte|
 		max = 255
 		min = 0
-		
-	function Equals (|string| B, |bool|)
-		cpp_part EqualsByte
-		return b == 1 and b[] == self
 	
 	render
 		if (!fs_in)
