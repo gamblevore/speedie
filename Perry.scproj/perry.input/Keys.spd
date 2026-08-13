@@ -37,7 +37,17 @@ extend PerryIDE
 			return .NumberKey(numkey)
 		
 		if keys.Option
+			if key is COMMA or PERIOD
+				return .MoveProject(key is period)
 			return false
+
+		if key is COMMA
+			return ClickedHistory(.goprev)
+				
+		if key is period
+			if keys.shift
+				return .CancelKey
+			return ClickedHistory(.gonext)
 		
 		if key is T
 			return PressingDebug(.runbutton)
@@ -58,9 +68,7 @@ extend PerryIDE
 		if key is i
 			FileViewerCountCode(.filelist, nil, .filelist.LastSelected.ascell)
 			return true
-		
-		if key is COMMA
-			return ClickedHistory(.goprev)
+
 		
 		if key is ESCAPE
 			return .CancelKey
@@ -68,12 +76,7 @@ extend PerryIDE
 		target osx
 			if key.IsCtrl and .CanSwapToAppInfo
 				.AppInfo.SetFocus
-				return true			
-				
-		if key is period
-			if keys.shift
-				return .CancelKey
-			return ClickedHistory(.gonext)
+				return true
 		
 		if key is b
 			Clickedcompile(.buildbutton)

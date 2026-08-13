@@ -6,7 +6,7 @@
 
 module Perry
 	|ListViewRow|					Projects = Message()
-	|{string}|			PathDict
+	|{string}|						PathDict
 	|listviewrow|					RecentProjects = message()
 	|date|							FinishedStartUp
 	|byte|							FindID	
@@ -174,7 +174,7 @@ module Perry
 			old["edit"] = ""
 			old["pos"] = ""
 		
-		i.SharedProjectTabSource = old
+		i.ProjectTab = old
 		i.SetTab2Name(old)
 
 

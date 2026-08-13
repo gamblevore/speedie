@@ -412,7 +412,7 @@ function EditMeModified (guitextChangeEvent)
 	|| i = .ide
 	require i? // somehow we are getting called when we are nil?
 	i.LastSendTime = 0
-	require i.SharedProjectTabSource
+	require i.ProjectTab
 	i.EditMeTabRetryThing = 0
 	i.ShowStats
 	
@@ -426,7 +426,7 @@ function EditMeModified (guitextChangeEvent)
 				.PerryTryAutoComplete(x, "autocomplete_edit", PerryAutoCompleteReason.modified)
 	
 	(i is modified) = (self is modified)
-	|listviewrow| msg = i.SharedProjectTabSource
+	|listviewrow| msg = i.ProjectTab
 		|| Mod = (self is modified)
 		(msg is modified) = Mod
 		|| sub = i.CurrFileName.SubMenu

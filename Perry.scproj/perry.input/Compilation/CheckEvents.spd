@@ -33,7 +33,7 @@ extend PerryIDE
 
 	syntax is (|ListViewState| s, assigns:|bool| mod)
 		opt norefcounts
-		|| r = .SharedProjectTabSource
+		|| r = .ProjectTab
 			r.syntaxis(s) = mod
 		
 		if (s is modified)

@@ -395,7 +395,7 @@ function PerryIDE.DoReplacements (|bool|)
 function EditMeSelChange (GUITextSelectEvent)
 	opt norefcounts
 	|| i = .ide
-	|| proj = i.SharedProjectTabSource
+	|| proj = i.ProjectTab
 		proj["pos"] = self|textview|.Selection.x
 
 	i.TryReselectASM
@@ -630,17 +630,12 @@ function listview.PerryCopyComms (guicopyevent)
 	return (cp)(self, item)
 
 
-// So... we are tired
-// we are sooo tired
-// not knowing what to do...
-// its a function
-// its a function of destruction
-// we are disconnected
-// i can't see... what to do.
-// yeah... callbacks, functions, tasks, overrides, whatever
-// it should be easy.
-// but its not.
-// in theory... just override PerryRenameFile. But not so easy.
 
-
-
+function perryide.MoveProject (|bool| Fwd, |bool|)
+	|| row = .ProjectTab.step(fwd)
+		|| i = row.ide
+		i.showide(true)
+		return true
+	beep
+	return true
+		
