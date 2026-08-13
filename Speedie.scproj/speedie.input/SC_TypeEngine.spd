@@ -779,9 +779,18 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	return MemWrapper
 
 
-function TypeOfVecAccess (|message| index, |scdecl| ty0, |int| w, |scdecl|)
+function TypeOfVecAccess (|message| exp, |message| index, |scdecl| ty0, |message| side, |scdecl|)
+	if side
+//		if ty0 is Param
+		ty0.MarkAsAltered(exp)
 	if index == @num // ok!
+		|| w = ty0.IsNumeric
+		if w == 3
+			w = 4
 		expect (index.int inrange w) (index, "Vector access is too large.")
+	
+	if ty0.isfloat != ty0.type.typeinfo.isfloat // ??? use this instead?
+
 	if ty0.type.typeinfo.isfloat
 		return typefloat!.NotConst
 	return typeint!.NotConst
@@ -831,7 +840,7 @@ function TypeOfAccess (ExprResolver)
 			
 			if access and Index.ExpectInt(Access)
 				if oof == 1
-					return TypeOfVecAccess(index, ty0, ty0.IsNumeric)
+					return TypeOfVecAccess(exp, index, ty0, side)
 				return ty0.MemAccess(exp, side)
 
 	arr.Func = @prm
@@ -1060,7 +1069,7 @@ function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 		exp.become(@acc)
 		prms.func = @arr
 		prms.DeclAddNumbInt(swiz, name_space)
-
+		t = TypeOfVecAccess(exp, prms.first, type, side)
 	  else
 		prms.remove
 

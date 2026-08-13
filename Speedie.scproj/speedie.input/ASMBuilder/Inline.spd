@@ -108,6 +108,11 @@ struct InlineInfo
 	
 	
 	function CleanupClash (|[scdecl]| args)
+		// this should handle altered params like in vecmix31
+		// its altering the param...
+		// this is only allowed if we always RETURN that param
+		// or it is unused after... but we don't know that, 
+		// so basically only if its returned!
 		|| AR = .References & .Altered
 		|| AN = .Normal & .Altered
 		if AR ||| AN
@@ -132,7 +137,6 @@ extend assembler {
 function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
 	opt norefcounts
 	require .TempCheck(dest)
-	if "bg".trap
 	|| dest2 = dest
 	if (dest isnt discard) and (!dest.reg or dest is temp)
 		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
@@ -230,8 +234,8 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	// So we should not be getting temps, right? I mean... the thing COULD just...
 	// call another func. It shouldn't be so hard, just give it a good dest?
 	
-	(fn)
-	|| args = .fn.args
+	|| args = fn.args
+	if fn == "vecmix"
 	info.DoImmediates(p, args, self)
 	
 	for (a in args) (i)

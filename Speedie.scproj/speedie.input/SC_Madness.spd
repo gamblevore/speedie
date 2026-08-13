@@ -155,6 +155,7 @@ function SCDecl.MemAccessNonStorable (|message| Exp, |message| side, |scdecl|)
 		|| i = .GetAddress
 		NewExp.obj = i
 		if side
+//			.MarkAsAltered(exp) // its just the contents that is altered... so no.
 			i = .AccessToMemCpy(newexp, side, i)
 		  else
 			if IsAcc

@@ -1047,39 +1047,41 @@ function Tran_Time (TranFunc)
 
 
 
-function scfunction.Transform ()
-	opt norefcounts
-
-	.CheckNotBadName
-	require !.isMacro
-	scfunction.CurrFunc = self
-	scmodule.curr = .parent as scmodule
-	.Badness = 0
-	.SavedError = nil
-	|| StillOK = StdErr.Mark
-
-	|| arg = .SourceArg							#require
-	|| Space = arg.SCArg( self )				#require
+extend scfunction
+	function Transform ()
+		opt norefcounts
 	
-	space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
-	if self Isnt cpp
-		|| r_z = Tran_Result( self )
-		Tran_All( self, arg, space )
-		if r_z
-			Tran_ResultFinish( self, r_z, space, arg )
-//		  else
-//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
-		parser.Using.Flags = 0
-
-	if !StillOK
-		.SavedError = StdErr.LastError
-		.Badness |= 1
-	  elseif (self is ConOrDes) and .IsARealSpdFunc
-		.CallParents					// hehe 🥰
-		.BuildConstructorDestructor
-		Tran_All( self, arg, space )
+		.CheckNotBadName
+		require !.isMacro
+		scfunction.CurrFunc = self
+		scmodule.curr = .parent as scmodule
+		.Badness = 0
+		.SavedError = nil
+		|| StillOK = StdErr.Mark
 	
-	scfunction.CurrFunc = nil
-	scmodule.curr = nil
-
-
+		|| arg = .SourceArg							#require
+		|| Space = arg.SCArg( self )				#require
+		
+		space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
+		if self Isnt cpp
+			|| r_z = Tran_Result( self )
+			Tran_All( self, arg, space )
+			if r_z
+				Tran_ResultFinish( self, r_z, space, arg )
+	//		  else
+	//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
+			parser.Using.Flags = 0
+	
+		if !StillOK
+			.SavedError = StdErr.LastError
+			.Badness |= 1
+		  elseif (self is ConOrDes) and .IsARealSpdFunc
+			.CallParents					// hehe 🥰
+			.BuildConstructorDestructor
+			Tran_All( self, arg, space )
+		
+		scfunction.CurrFunc = nil
+		scmodule.curr = nil
+	
+	
+	
