@@ -709,13 +709,16 @@ struct InlineInfo {
 	uint Altered;
 	uint References;
 	uint Normal;
+	uint CantNop;
 };
 
 struct InlineState {
 	SCFunction* Fn;
 	ASMReg Return;
 	uint64 ParentVars;
+	u16 FuncStart;
 	byte BranchDepth;
+	byte ID;
 	byte RealBranchDepth;
 	bool TailInlineable;
 };
@@ -801,7 +804,7 @@ struct Assembler {
 	SCFunction* Out;
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
-	FatASM* Start;
+	FatASM* TotalStart;
 	FatASM* Curr_;
 	FatASM* End;
 	RegFile Regs;
@@ -1277,7 +1280,7 @@ struct SCFunction_Behaviour: SCBetterNode_Behaviour {
 
 JBClass ( SCFunction , SCBetterNode , 
 	NilState NilSelf;
-	byte ReturnedVars;
+	byte ReturnCount;
 	byte FSOpt;
 	byte MinOpt;
 	byte MaxASM;
@@ -1293,10 +1296,10 @@ JBClass ( SCFunction , SCBetterNode ,
 	u16 LinkID;
 	u16 LinkDepth;
 	u16 xC2xB5ASMLength;
+	u16 xC2xB5SmallerLength;
 	FunctionType FuncInfo;
 	uint xC2xB5Start;
 	uint xC2xB5FATLength;
-	SCClass* ProtoType;
 	SCDecl* ReturnType;
 	SCFunction* DepthFinder;
 	Message* IsMacro;
@@ -1308,6 +1311,7 @@ JBClass ( SCFunction , SCBetterNode ,
 	Message* Intrinsic;
 	SCFunction* NextFunc;
 	SCDecl* HasProto;
+	SCClass* ProtoType;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1487,7 +1491,6 @@ extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
 extern JB_String* SC__Options_Arch;
-extern bool SC__Options_AutoOptInline;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 #define kSC__Options_cake ((int)2)
@@ -2986,8 +2989,6 @@ bool SC_FB__AppOptions_noisy(JB_String* Name, JB_String* Value, FastString* Purp
 
 bool SC_FB__AppOptions_optimise(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_optinline(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_output_path(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_path(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -4080,8 +4081,6 @@ bool SC_FuncPreReader_disabled(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_embedded(SCFunction* Self, Message* Msg);
 
-bool SC_FuncPreReader_inline(SCFunction* Self, Message* Msg);
-
 bool SC_FuncPreReader_inlined(SCFunction* Self, Message* Msg);
 
 bool SC_FuncPreReader_libinternal(SCFunction* Self, Message* Msg);
@@ -4704,7 +4703,7 @@ void SC_Reg_ConstCheck(ASMReg Self);
 
 int SC_Reg_EqulClip(ASMReg Self);
 
-ASMReg SC_Reg_ExpectSameType(ASMReg Self, ASMReg Dest);
+ASMReg SC_Reg_ExpectSameType(ASMReg Self, ASMReg Expected);
 
 float SC_Reg_F32(ASMReg Self);
 
@@ -5862,6 +5861,8 @@ int SC_FAT_GuessSize(FatASM* Self);
 
 ASM* SC_FAT_Halt_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
+uint SC_FAT_ID(FatASM* Self);
+
 uint SC_FAT_Index(FatASM* Self);
 
 FatASM* SC_FAT_InputFat(FatASM* Self, int I);
@@ -5894,7 +5895,7 @@ bool SC_FAT_JumpNegateWithPacFAT(FatASM* Self, Assembler* Sh, FatASM* Mid);
 
 FatASM* SC_FAT_JumpTo(FatASM* Self);
 
-void SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
+int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
@@ -5988,11 +5989,11 @@ void SC_InlineInfo_CleanupClash(InlineInfo* Self, Array* Args);
 
 void SC_InlineInfo_ClearInlineParamClash(InlineInfo* Self, Array* Args, int AlteredRefs, int AlteredNormal);
 
-void SC_InlineInfo_DoImmediates(InlineInfo* Self, Message* P, Array* Args);
+void SC_InlineInfo_DoImmediates(InlineInfo* Self, Message* P, Array* Args, Assembler* Sh);
 
-void SC_InlineInfo_NopParams(InlineInfo* Self, int N, ASMReg Ret);
+void SC_InlineInfo_NopParams(InlineInfo* Self, int N, ASMReg Ret, Assembler* Sh);
 
-ASMReg SC_InlineInfo_PreInlineOneParam(InlineInfo* Self, Message* P, SCDecl* A, Assembler* Sh);
+ASMReg SC_InlineInfo_PreInlineOneParam(InlineInfo* Self, Message* P, SCDecl* Arg, Assembler* Sh, int I);
 
 
 
@@ -6187,8 +6188,6 @@ ASMReg SC_Pac_BranchAnd(Assembler* Self, Message* A, Message* B, ASMReg Dest);
 
 ASMReg SC_Pac_BranchOr(Assembler* Self, Message* A, Message* B, ASMReg Dest);
 
-void SC_Pac_BranchToCurr(Assembler* Self, FatRange* Range);
-
 ASMReg SC_Pac_CallFunc(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* Fn);
 
 bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
@@ -6299,6 +6298,8 @@ bool SC_Pac_FoundReg(Assembler* Self, Message* All, int R);
 
 void SC_Pac_Fries(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* S, int I, int MaxParam);
 
+int SC_Pac_FuncIndex(Assembler* Self);
+
 FatASM* SC_Pac_FuncStart(Assembler* Self);
 
 ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest);
@@ -6348,6 +6349,8 @@ bool SC_Pac_IsCurrWithFAT(Assembler* Self, FatASM* F);
 bool SC_Pac_IsCurrBranch(Assembler* Self, FatASM* F);
 
 bool SC_Pac_IsWithin(Assembler* Self, FatASM* F);
+
+bool SC_Pac_IsWithinCurrInline(Assembler* Self, FatASM* F);
 
 ASMReg SC_Pac_JumpIntK(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, uint Mode);
 
@@ -6467,9 +6470,7 @@ FatASM* SC_Pac_ReadOrWriteSub(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg
 
 ASMReg SC_Pac_RealTernary(Assembler* Self, Message* Exp, ASMReg Dest, Message* A, Message* B, FatRange* Branch);
 
-ASMReg SC_Pac_ReDestWithFATReg(Assembler* Self, FatASM* F, ASMReg Dest);
-
-ASMReg SC_Pac_ReDestWithFATRegUint(Assembler* Self, FatASM* F, ASMReg Dest, uint A);
+ASMReg SC_Pac_ReDest(Assembler* Self, FatASM* F, ASMReg Dest);
 
 ASMReg SC_Pac_RefCount(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -6581,7 +6582,7 @@ ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A);
 
 ASMReg SC_Pac_xC2xB5GetPrms(Assembler* Self, Message* Exp, ASMReg Dest);
 
-ASMReg SC_Pac_xC2xB5InlineParam(Assembler* Self, Message* Exp, SCDecl* A, ASMReg Dest);
+ASMReg SC_Pac_xC2xB5InlineOneParam(Assembler* Self, Message* Exp, SCDecl* A, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5Into(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -11357,7 +11358,7 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 			return nil;
 		}
 	}
-	return SC_Pac_ReDestWithFATReg(Self, F, Dest);
+	return SC_Pac_ReDest(Self, F, Dest);
 }
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L) {
