@@ -828,11 +828,13 @@ struct Assembler
 
 	function Guard
 		opt norefcounts
-		|| arg = .fn.SourceArg!
+		|| ret = .fn.SourceArg!
+		|| l = ret.last
+			ret = l
 		target debug
-			if arg.position < 0
-				arg.position = 0 // skip error detection
-		Arg.HALT.BasicBlock = -1
+			if ret.position < 0
+				ret.position = 0 // skip error detection
+		ret.HALT.BasicBlock = -1
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 

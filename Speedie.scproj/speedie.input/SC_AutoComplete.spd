@@ -485,7 +485,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	layer.obj2 = nil
 
 
-function SCFunction.Update_Source (|int| start, |string| text, |scfile| File,   |bool|)
+function SCFunction.Update_Source (|int| start, |string| text, |scfile| File, |bool|)
 	parser.using.Position = -1
 	parser.using.Flags = 0
 	parser.using.Tag = file.FileNum << 5

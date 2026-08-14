@@ -72,7 +72,8 @@ linkage
 |{SCImport}|				ImportedNames = Dictionary.new
 
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, {||E=AppInitSub_(), if E!=0: return E}}`~parse).WipePos
-|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts, {^"NilChecking", if (1==nil): return 12}}`~parse).WipePos // enomem == 12
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
+|Message|					AppInitTest = (`{^"NilChecking", if (1==nil): return 12}`~parse).WipePos // enomem == 12
 
 |SCModule|					Program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
@@ -865,6 +866,8 @@ function AddMain (|int| mark, |bool|)
 
 	|| f = compiler.MainFunc 
 		f.blindcasts = errorseverity.error
+		|| c = Compiler.AppInitCode
+			C.FixFileNumber(f.source!.tag)
 	  else
 		"Compiling as library!"
 		Options.ProjectisLibrary = true
@@ -873,6 +876,9 @@ function AddMain (|int| mark, |bool|)
 	|| conf = .ConfMsg
 		using conf
 		|| P = `app._conf = "abc".parsejbin` ~ parse
+		|| Tag = (f!=nil)(f.source!.tag, 1)
+		P.FixFileNumber(tag)
+		
 		|| abc = P.FindNested(@str, "abc")
 			abc.name = compiler.ConfMsg.RenderJbin
 		Compiler.AppInitCode.first = P

@@ -7,7 +7,7 @@ struct FatASM
 	
 	|ASMParam[6]|		Prms
 	|ASMReg|			Info
-	|Message--|			Msg				// Only used for reporting now. Not ASMGen. Not easy to remove.
+	|Message--|			Msg
 	|uint64|			_Const
 	|uint|				FatMap
 	|uint16|			BasicBlock
@@ -46,8 +46,18 @@ struct FatASM
 	setter FatMap (|message|)
 		opt inline //
 		.msg = Value
-		.FatMap = value.SrcMap
-		
+//		|| Where = value.SrcMap
+//		Message.FatMap(where)
+//		.FatMap = where
+//		target debug
+//			if Message.FatMap(where) == Compiler.ExtendList
+//				debugger
+//				value.srcmap
+//				Message.FatMap(where)
+	
+//	function Msg (|message|)
+//		return message.fatmap(.fatmap)
+	
 	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat

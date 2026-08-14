@@ -365,7 +365,7 @@ function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp)
 	opt norefcounts
 	|| Sue = .Super
 		sue.ExpandSub(j, obj, xp)
-
+ 
 	for v in .Properties
 		v.DescribeJBin(j, Obj+v.position, xp)
 

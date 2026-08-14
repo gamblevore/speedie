@@ -158,12 +158,13 @@ function scdecl.TryTypeCastDeref (|SCDecl| O, |Message| exp, |int| TypeCast,  |i
 	if !exp
 		Return kNeedsAddressOf
 
-	|| Addr = @acc.msg
-	exp.next = addr
-	Addr <~ exp
-	|| num = addr.msg(@arr).msg(@num, "0")
-	num.obj = typenil
-	Addr.obj = i
+	using exp
+		|| Addr = @acc.msg
+		exp.next = addr
+		Addr <~ exp
+		|| num = addr.msg(@arr).msg(@num, "0")
+		num.obj = typenil
+		Addr.obj = i
 	Return kAddressOfMatch		
 
 

@@ -226,19 +226,30 @@ class SCImport
 		|date|				Recent
 		|bool|				STDLibTime
 		|byte|				CurrIsManuallyImported
+		|bool|				NeatenDone
 		
+		function CurrFileNum (|int|)
+			if .NeatenDone
+				return .AllFiles.Length
+			return -1										// Set later in sort()
+
 		
 		function PleaseDoConfsDifferently (|message| s, |int| t)
+			s.FixFileNumber(t)
+		
+		
+		function message.FixFileNumber (|int| Tag)
 			// Confs shouldn't preload stuff... not before sort!
 			opt norefcounts
-			for ch.flat in s
-				ch.tag = t
+			for ch.flat in self
+				ch.tag = Tag
 		
 		
 		function Neaten 
 			opt norefcounts
+			.NeatenDone = true
+
 			.AllFiles.sort			// or else file-dates can mess things up.
-		
 			|| TooMany = .allfiles[2K]
 				if options.modecake		// only 11 bits free in SourceLocation type.
 					problem (TooMany, "Too many files included, debugging will misreport some file-positions")
@@ -247,6 +258,7 @@ class SCImport
 				f.filenum = i
 				|| s = f.liveast
 					.PleaseDoConfsDifferently(s, i<<5)
+			
 									
 				
 		function DoImport (CollectFunc)

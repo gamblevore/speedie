@@ -538,6 +538,7 @@ function message.FrenchSpyReturn (|int| file=0, |int|) // naturally!
 	
 function message.AddReturn (|bool| NoSet=false, |message|)
 	opt norefcounts
+	using self
 	parser.using.position = .FrenchSpyReturn
 	|| ret = .msg(@tmp, "return")
 	(ret is inserted)

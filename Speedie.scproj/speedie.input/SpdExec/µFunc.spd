@@ -1,5 +1,40 @@
 
 
+function message.FindNearest (|int| ToFind, |message!|) // findpos, findat
+	opt norefcounts
+	|| BestDist = int.max
+	rz = self
+	for ch.flat in self
+		|| p = ch.Position
+		|| Dist = ((p - ToFind).abs << 1) + ch.Contains(tofind)
+		if dist < BestDist
+			rz = ch.unbra
+	if rz == self // what?
+
+
+function @message.FatMap (|uint| Map, |Message|)
+	opt norefcounts
+	|| i = map >> 21
+	|| file = scimport.AllFiles[i]
+		if i == 0
+			return file.liveast!
+		|| o = file.Orig
+			return o.FindNearest(map&21~bits)
+/	return Compiler.ExtendList // dummy
+
+
+function Message.SrcMap (|uint|)
+	opt inline
+	|| P = .Position
+	// 11-bits for the file num, 21-bits for the position
+	// 2K files and 2MB per-file max
+	// File Num goes at the top, to make it more significant
+
+	|| FileNum = .tag|uint|>>5
+	return (FileNum << 21) ||| (P&(21~bits))
+
+
+
 extend SCFunction
 	function µTest (|memory of asm|)
 		description "Generate some code (only for testing)."
@@ -13,19 +48,6 @@ extend SCFunction
 	function FatFirst (|&fatasm|)
 		return Assembler.sh.TotalStart + .µstart
 	
-	
-	function Message.SrcMap (|uint|)
-		opt inline
-		return .SrcMap2(.position)
-
-	
-	function Message.SrcMap2 (|int| Fake, |uint|)
-		// 11-bits for the file num, 21-bits for the position
-		// 2K files and 2MB per-file max
-		// File Num goes at the top, to make it more significant
-
-		|| FileNum = .tag|uint|>>5
-		return (FileNum << 21) ||| (Fake&(21~bits))
 	
 	
 	function FatBetterPos (|fatasm| fat, |uint|)

@@ -133,7 +133,7 @@ function message.FindTightest (|int| pos, |bool| Named=false, |bool| SamePositio
 		if !r
 			0
 		  elseif (ch.contains(pos, true)) and (!named or ch.name or (ch == @dot or @sdot))
-			if sameposition and ch.position != pos
+			if SamePosition and ch.position != pos
 				0// fail
 			
 			  elseif (r < size) or ((rz!=nil) and (pos == rz.position and pos == ch.after)) // smallest

@@ -151,8 +151,7 @@ function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |boo
 		|| msg = .msg
 		if (msg.NilDecl == ty)
 			return true
-		if msg.func != @func				// fatrenderer needs @func
-			.msg = exp
+		if msg.func != @func
 			return true
 
 

@@ -97,7 +97,7 @@ function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
 function scfunction.ProtectGlobals
 	// done after the nil-checker, so we know what this func returns.
 	opt norefcounts
-	|| tocopy = Compiler.AppInitGlobals.find("NilChecking")
+	|| tocopy = Compiler.AppInitTest.find("NilChecking")
 	tocopy = tocopy.first #require
 	
 	|| arg = .SourceArg
@@ -126,8 +126,8 @@ function scfunction.ProtectOneGlobal (|message| Rel, |message| test)
 function message.ProtectOneSub (|message| F, |message| L,  |message| test)
 	opt norefcounts
 	|| fn = l.unwrap.MsgFunc$
-	require fn isnt Constructor			// constructors should never fail...
-	test = test.copy					// we really are just protecting from user-functions.
+	require fn isnt Constructor				// constructors should never fail...
+	test = test.copy(self)					// we really are just protecting from user-functions.
 	|| One = test.FindNested("1")				#require
 	one.ReplaceWith f.copy
 	.next = test

@@ -14,7 +14,6 @@ class SCFile (file)
 	|uint16|		FileNum
 	|bool|			IsInternal
 	|bool|			Unfinished
-	|bool|			UsedByASM
 	|[scclass]?|	Types
 
 
@@ -26,7 +25,7 @@ class SCFile (file)
 		super.constructor(x)
 		.Proj = p
 		.Types = nil
-		.FileNum = -1										// Set later in sort()
+		.FileNum = SCImport.CurrFileNum
 		.IsInternal = f == nil
 		.LiveAST = .start_ast
 		Compiler.stTotalFileCount += .isinternal
@@ -133,8 +132,8 @@ class SCFile (file)
 			opt norefcounts
 			|| lib = .Proj.IsLibraryImp - b.Proj.IsLibraryImp
 				return lib
-			|| asm = .UsedByASM - b.UsedByASM
-				return asm
+//			|| asm = .UsedByASM - b.UsedByASM
+//				return asm
 			return self < b
 
 
