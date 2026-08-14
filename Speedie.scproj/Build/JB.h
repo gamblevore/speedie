@@ -6213,6 +6213,8 @@ bool SC_Pac_ClearAllStructs(Assembler* Self, Message* Exp);
 
 bool SC_Pac_ClearStruct(Assembler* Self, Message* Exp, FatASM* Fat, int V);
 
+void SC_Pac_CloseInline(Assembler* Self, InlineState* St);
+
 bool SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, uint Missing);
 
 ASMReg SC_Pac_CloseVars(Assembler* Self, uint64 Orig, Message* Exp, ASMReg Return);
@@ -6425,6 +6427,8 @@ void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B);
 
 void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, int Depth);
 
+bool SC_Pac_nop_sub_keep(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode);
+
 void SC_Pac_NopBranch(Assembler* Self, FatASM* Start);
 
 bool SC_Pac_NopConstWithRegInt64(Assembler* Self, ASMReg R, int64 K);
@@ -6522,6 +6526,8 @@ ASMReg SC_Pac_SHR(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R
 ASMReg SC_Pac_SmallToBig(Assembler* Self, ASMReg Src, ASMReg Cmp, Message* Exp);
 
 void SC_Pac_SoftNop(Assembler* Self, FatASM* ToNop);
+
+InlineState* SC_Pac_StartInlineState(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
 
 InlineState* SC_Pac_State(Assembler* Self);
 
