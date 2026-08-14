@@ -37,6 +37,7 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		VerySpecial
 		Const
+		Nopped
 //		NotNil				// probably a big addition. Will need tests...
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
