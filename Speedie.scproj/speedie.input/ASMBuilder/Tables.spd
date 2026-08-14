@@ -176,7 +176,6 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 		if !dest.reg
 			dest = .µ(f, asmreg.discard)
 		  elseif .state.CanReturnAnyReg
-			if "bg".trap
 			dest = .µ(f, dest)
 		  else
 			dest = .µinto(f, dest)

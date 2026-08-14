@@ -374,6 +374,16 @@ struct Assembler
 		return BlockParents[B&(16K-1)]
 	
 	
+	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
+		if NopMode isnt Rewind
+			|| Break = fat.ASMIndex
+				if .IsCurrBranch(fat)
+					.BreakRequest |= Break
+				if break & BreakPoint
+					.BreakRequest = 0
+					return true
+		
+		
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
 //		if !.iswithincurrinline(fat)
 		// its Ok if its in the same block, though???
@@ -383,26 +393,16 @@ struct Assembler
 		// how do i separate those out?
 		// perhaps I can print all the times it is nopped OUTSIDE
 		// and fix each one.
-		// 
 		
 		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  nopmode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
 
-		|| Type = asm.noop
-		if NopMode isnt Rewind
-			|| Break = fat.ASMIndex
-				if .IsCurrBranch(fat)
-					.BreakRequest |= Break
-				if (break & BreakPoint)
-					type = asm.ADDB
-					.BreakRequest = 0
-
-		if type == asm.noop
+		|| keep = .nop_sub_keep(fat, nopmode)
+		if !keep
 			|| C = .curr - 1
 			if fat == C
 				.curr_ = C					// do it before both kinds of nop...
-				Type = nil
 
 		depth++
 		if depth > 7
@@ -415,10 +415,36 @@ struct Assembler
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
 		
-		fat.setop = Type
-		if type == asm.ADDB
+		if keep
+			fat.setop = asm.addb
 			fat.ASMIndex = breakpoint ||| Breakable
+		  else
+			fat.setop = asm.noop
 			
+	
+	function nop_sub2 (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
+		//	remove AddBFix also, and other addb special behaviour
+		|| keep = .nop_sub_keep(fat, nopmode)
+		if !keep
+			|| C = .curr - 1
+			if fat == C
+				.curr_ = C					// do it before both kinds of nop...
+
+		depth++
+		if depth > 7
+		
+		for f.FatInputs in fat
+			.Decr(f, NopMode, depth)
+		
+		for v.RegOutputs in fat
+			v &= 31
+			if .Register(v) == fat
+				.SetRegister(v, nil, fat.FindOlder)
+		
+		(fat is nopped)
+		if keep
+			(fat is veryspecial)
+				
 		
 	function Register (|int| i, |?&FATASM|)
 // If a var is altered in a loop, and we're in a loop, its not a known value.

@@ -1,37 +1,38 @@
 
 function assembler.StartInlineState (|message| prms, |asmreg| dest, |SCFunction| fn, |&inlinestate|)
-	|int| ID = .inlinedepth + 1
-	|| st = &.inlinestate[ID]
-	st[0] = st[-1]					// copy old state to new
+	|int| ID = .inlinedepth
+	|| st = .inlinestate[ID+1]
+	st[0] = .inlinestate[ID]
 	st.ParentVars = .openvars
 	st.fn = fn
 	st.BranchDepth = 0
-	st.FuncStart = .curr - .FuncStart
-	st.Return = .SetInlineDest(prms, dest, fn)
-	st.ID = ID
-	
-	.InlineDepth = ID
+	st.FuncStart = .FuncIndex	
+	if dest isnt ExitFunction
+		st.TailInlineable = false
+	dest = .SetInlineDest(prms, dest, fn)
+	st.Return = dest
+
+	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
-	return st		
+	st.ID = ID
+	return st
 
 
 function assembler.CloseInline (|&inlinestate| st)
 	|| ID = st.ID
-	.InlineState[ID] = nil // could we just do st = nil?
+	.InlineState[ID] = nil
 	.InlineDepth = --ID
 	if !ID
-		.InlineEnd = nil
-	
+		.InlineEnd = nil	
 
 
-// I prefer this, BUT it seems to change the behaviour. Why? Its meant to do the same?
-function assembler.TryInline2 (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
+function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| OV = .OpenVars
-	|| st = .StartInlineState(prms, dest, fn)
-	if dest isnt ExitFunction
-		.state.TailInlineable = false
 
+	|| st = .StartInlineState(prms, dest, fn)
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
+		
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
@@ -173,42 +174,6 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 		(dest2 is discard)
 		
 	return dest2
-				
-	
-	
-function TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |int| AllowedGain, |asmreg|)
-	opt norefcounts
-	|| OV = .OpenVars
-	|int| ID = .inlinedepth
-	|| st = .inlinestate[ID+1]
-	st[0] = .inlinestate[ID]
-	st.ParentVars = .openvars
-	st.fn = fn
-	st.BranchDepth = 0
-	st.FuncStart = .FuncIndex	
-	if dest isnt ExitFunction
-		st.TailInlineable = false
-	dest = .SetInlineDest(prms, dest, fn)
-	st.Return = dest
-
-	.InlineDepth = ++ID
-	.DeepestInline = ID max .DeepestInline
-
-	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
-		
-	|fatrange| LL
-	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
-		if fn is constructor
-			|| des = fn.cls!.DestructorFunc
-				.ASMReach(des)
-	
-	.InlineState[ID] = nil
-	.InlineDepth = --ID
-	if !ID
-		.InlineEnd = nil
-	
-	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
-
 
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)

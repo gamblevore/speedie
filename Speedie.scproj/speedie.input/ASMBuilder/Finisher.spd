@@ -61,6 +61,7 @@ function Assembler.FinishASM
 
 function fatasm.AddBFix (|&fatasm| Last)
 	// addb(x,0)
+	// remove this function... once we improve our nopper
 	|| n = self
 	require (.p1 == 0)
 	while (++n <= Last)

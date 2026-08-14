@@ -212,8 +212,7 @@ struct FatASM
 			|| a = o.log2
 			// asmtodo: what if the old is a ref and new isnt,  or new is a ref and old isnt?
 			// references need to be incremented, as their output is needed.
-			if "LowerDiffAt".trap
-			|| old = f.prms[a] & 31 							// Need to remove the old output.
+			|| old = f.prms[a] & 31							// Need to remove the old output.
 				if .Register(old) == f
 					.SetRegister(old, nil, f.FindOlder)
 			
@@ -506,9 +505,11 @@ struct FatASM
 		// and long-jumps might require more awkward encoding.
 		|| o = ._op
 		if (o != asm.noop and asm.mark)
-			if o < 32
-				return 2 + (o&1)
-			return 1
+			
+			if self isnt Nopped
+				if o < 32
+					return 2 + (o&1)
+				return 1
 	
 	
 	target debug {
