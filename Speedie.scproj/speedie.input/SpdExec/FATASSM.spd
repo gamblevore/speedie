@@ -46,9 +46,9 @@ struct FatASM
 	setter FatMap (|message|)
 		opt inline //
 		.msg = Value
-//		|| Where = value.SrcMap
+		|| Where = value.SrcMap
+		.FatMap = where
 //		Message.FatMap(where)
-//		.FatMap = where
 //		target debug
 //			if Message.FatMap(where) == Compiler.ExtendList
 //				debugger

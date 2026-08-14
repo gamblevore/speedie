@@ -152,6 +152,7 @@ function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |boo
 		if (msg.NilDecl == ty)
 			return true
 		if msg.func != @func
+			.msg = exp
 			return true
 
 
