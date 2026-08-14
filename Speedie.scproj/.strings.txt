@@ -1593,7 +1593,7 @@
 "result"
 "gcc"
 "general"
-"\01\10êâ\03\00\0B\08cpp_name\14\11JB_SP_AppInitSub_ð\0B\03opt\14\0Bnorefcountsð\03\0BNilChecking\0B\02if?\00K\00\1C\011\12\02==\14\03nilñ\03\00\0B\06return\1C\0212ô"
+"\01\10êâ\03\00\0B\08cpp_name\14\11JB_SP_AppInitSub_ð\0B\03opt\14\0Bnorefcountsñ"
 "getresult"
 "getter"
 "gui"
@@ -2409,3 +2409,4 @@
 "File_List"
 "quot"
 "Quotation"
+"\01\10êâ\03\0BNilChecking\0B\02if?\00K\00\1C\011\12\02==\14\03nilñ\03\00\0B\06return\1C\0212ó"
