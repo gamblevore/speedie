@@ -6,7 +6,7 @@ extend_module ArchonPurger {
 		@bra:	Bracket
 		@type:	Type
 		@func:	NilFunction
-		@tmp:   StatementJump
+		@tmp:	StatementJump
 		@dot:	Property
 		@acc:	Access
 		@item:	Item
@@ -17,7 +17,7 @@ extend_module ArchonPurger {
 		@decl:	Declaration
 		@arg:	Argument
 		@tril:	Argument
-		@sheb:  Ignore
+		@sheb:	Ignore
 		@sstr:	String
 		@str:	String
 		@num:	Number
@@ -666,15 +666,16 @@ function Arel (NilTrackerFn)
 function Declaration (NilTrackerFn) // function decl 
 	opt norefcounts
 	|| rel = msg.last!			// || x = y  --> x = y
+	|| d = rel.FastDecl
+	d.Source = msg				// standardise for ASM, can be nil cos of inserted.
+	
 	|| thg = rel.first			// x = y     --> x
-		|| d = thg.FastDecl
 		|| J = .Jump(rel.last!)
 		if d.IsReg
 			return .T.Declare(D, J, msg)
 	  else
 		// carrays declared like: |int[1]| LocalVar
-		|| d = rel.FastDecl // hmmm. a carray?
-		if d.IsReg
+		if d.IsReg // hmmm. a carray?
 			return .T.Declare(D, nilstate.real, msg)
 	
 

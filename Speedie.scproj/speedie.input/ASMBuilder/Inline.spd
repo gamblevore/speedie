@@ -58,7 +58,8 @@ struct InlineInfo
 			.Items[i] = .PreInlineOneParam(p!, a, sh, i)
 			p++
 
-		.CleanupClash(args)
+		|| dest = sh.state.Return
+		.CleanupClash(dest, args, sh)
 
 
 	function NopParams (|int| n, |asmreg| Ret, |assembler| sh)
@@ -80,54 +81,78 @@ struct InlineInfo
 					  elseif sh.IsWithinCurrInline(f)
 						sh.nop(f)
 
-	
-	function PreInlineOneParam (|message| p, |scdecl| arg, |assembler| sh, |int| i, |asmreg|)
+
+	function scdecl.IsUsedAfter (|message| thg, |bool|)
+		// its a good opt, but can destroy debugging variables...
+		// add later
 		opt norefcounts
-		p = p.ASMUnbra
-		require (p.func == @thg)
-		|| passed = p.ASMDecl
+		|| After = .Source.Parent
+		if self is Param
+			After = After.next
+		After = After.flatafter
+		while
+			thg = thg.FlatNext
+			if !thg or thg == after
+				return false
+			if thg.obj == self
+				return true
+
+	
+	function PreInlineOneParam (|message| msg, |scdecl| param, |assembler| sh, |int| i, |asmreg|)
+		opt norefcounts
+		msg = msg.ASMUnbra
+		require (msg.func == @thg)
+		|| passed = msg.ASMDecl
 		require passed is local
 		|| v = sh.LocalThg(passed)
 		|| vr = 1<<v.reg
 		.CantNop |= 1<<i
-		if arg is Reference
+		if param is Reference
 			.References |= vr
-		  elseif arg is Altered
+		  elseif (param is Altered)	// and passed.isUsedAfter(msg)
 			if .Altered & vr
-				.Normal |= vr // passed a reg twice, both alter it.
-							  // but why do I mark it as normal??
+				.Normal |= vr		// passed a reg twice, both alter it.
+									// but why do I mark it as normal??
 			.Altered |= vr
 			
 		  else
 			.Normal |= vr
 
-		(arg is reference) = (passed is reference)
-		arg.mu.Info |= (passed.mu.info & scdeclinfo.alteredcopy)
-		if arg is TypeImprove // oof? typeimprove param?
+		(param is reference) = (passed is reference)
+		param.mu.Info |= (passed.mu.info & scdeclinfo.alteredcopy)
+		if param is TypeImprove // oof? typeimprove param?
 		return v	
 	
 	
-	function CleanupClash (|[scdecl]| args)
+	function CleanupClash (|asmreg| Dest, |[scdecl]| Args, |assembler| sh)
 		// this should handle altered params like in vecmix31
-		// its altering the param...
-		// this is only allowed if we always RETURN that param
-		// or it is unused after... but we don't know that, 
-		// so basically only if its returned!
-		|| AR = .References & .Altered
-		|| AN = .Normal & .Altered
-		if AR ||| AN
-			.ClearInlineParamClash(args, AR, AN)
+		
+		|| A = .Altered$
+		/*
+			Easy: Could return param that we are altering
+			OMG:  Could return new local, despite altering param, AND despite that we expected to receive the altered param!
+		*/
+
+		|| Ret = 1<<Dest.reg
+		|| AR = .References & A
+		|| AN = .Normal & A
+		|| MustReturnInto = (Ret&A)!=A
+		if MustReturnInto or (AR ||| AN)
+			sh.state.MustReturnInto = MustReturnInto
+			.ClearInlineParamClash(args, AR, AN, ~ret&A)
 
 
-	function ClearInlineParamClash (|[scdecl]| args, |int| AlteredRefs, |int| AlteredNormal)
+	function ClearInlineParamClash (|[scdecl]| args, |int| AlteredRefs, |int| AlteredNormal, |int| AlteredNoReturn)
 		opt norefcounts
 		|| n = args.Length
 		while n-- > 0
 			|| V = .items[n]
 				|| a = args[n]!
 				|| r = 1<<v.reg
-				if (AlteredRefs & r) and (a isnt reference)
+				if AlteredNoReturn & r
 					.items[n] = asmreg.ParamNeedsCopy				// needs copy to save other regs
+				  elseif (AlteredRefs & r) and (a isnt reference)
+					.items[n] = asmreg.ParamNeedsCopy
 				  elseif (AlteredNormal & r) and (a is altered)
 					.Items[n] = asmreg.ParamNeedsCopy
 	
@@ -151,7 +176,7 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 				
 	
 	
-function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| AllowedGain, |asmreg|)
+function TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| OV = .OpenVars
 	|int| ID = .inlinedepth
@@ -161,16 +186,16 @@ function TryInline (|message| prms, |asmreg| dest, |SCFunction| fn, |int| Allowe
 	st.fn = fn
 	st.BranchDepth = 0
 	st.FuncStart = .FuncIndex	
-	st.Return = .SetInlineDest(prms, dest, fn)
+	if dest isnt ExitFunction
+		st.TailInlineable = false
+	dest = .SetInlineDest(prms, dest, fn)
+	st.Return = dest
 
 	.InlineDepth = ++ID
 	.DeepestInline = ID max .DeepestInline
 
 	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
-	if dest isnt ExitFunction
-		.state.TailInlineable = false
-
-	
+		
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
@@ -203,7 +228,8 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	svregs.Restore(fn.args)
 	
 	ll.after = .curr
-	rz = .InlineFinish(ll, svregs)
+	if !.EntireInlineFailed
+		rz = .InlineFinish(ll, svregs)
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain) or .EntireInlineFailed
 		if .EntireInlineFailed  and  (fn isnt linkinline)
@@ -235,7 +261,6 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	// call another func. It shouldn't be so hard, just give it a good dest?
 	
 	|| args = fn.args
-	if fn == "vecmix"
 	info.DoImmediates(p, args, self)
 	
 	for (a in args) (i)

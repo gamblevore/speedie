@@ -175,7 +175,7 @@ function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg
 	|| f = exp.first
 		if !dest.reg
 			dest = .µ(f, asmreg.discard)
-		  elseif .state.fn.ReturnCount == 1
+		  elseif .state.CanReturnAnyReg
 			if "bg".trap
 			dest = .µ(f, dest)
 		  else
@@ -432,7 +432,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|regfile| Restore = .Regs	// adapt nilchecker to check if arg COULD return? If not... dont save.
 	
 //	.parentsanity
-	while
+	while !.EntireInlineFailed
 		.BreakRequest |= assembler.Breakable
 		if (ch is BreakPoint)
 			.Breakrequest |= assembler.BreakPoint

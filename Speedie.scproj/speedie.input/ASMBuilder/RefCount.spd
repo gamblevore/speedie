@@ -77,15 +77,16 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 
 function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 	opt	NoRefCounts
-	|| Last = .last(asm.rfun, asm.GOBJ)
-		|| Ret = .CanOptDecr(exp, obj, last)
-			if ret != last
-				return nil
-			return ret
-
-		if (Last isa asm.GOBJ) and (Last.p0 iz Obj)  and  Last.p1
+	|| Last = .last
+	if .iscurr(last)
+		if (last isa asm.gobj) and (Last.p0 iz Obj)  and  (Last.p1 != 0)
 			last.p2 = 0							// decring a global mem obj. Lets just NOT incr!
-			return nil
+			return nil		
+		if last isa asm.rfun
+			|| Ret = .CanOptRFUN(exp, obj, last) // what if this returns last+1?
+				if ret != last
+					return nil
+				return ret
 	
 	return exp.RFUN(Obj, Obj, asmreg(), .RefSave(Obj))
 
@@ -126,8 +127,7 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 
 
 // dead-code stripping means this is better in ASM, than at c-level phase.
-function assembler.CanOptDecr (|message| exp, |asmreg| Obj, |&fatasm| last, |&fatasm|)
-	require (last isa asm.rfun)
+function assembler.CanOptRFUN (|message| exp, |asmreg| Obj, |&fatasm| last, |&fatasm|)
 	require  !last.RegOnly(0)  and  !last.RegOnly(1)
 
 	|| incred = last.p2
@@ -140,12 +140,13 @@ function assembler.CanOptDecr (|message| exp, |asmreg| Obj, |&fatasm| last, |&fa
 		if uponfat.IsRead and (uponfat.basicblock == .basicblock)
 			// incr + decr = nothing... assuming it wasn't needed
 			.SoftNop(Last)
-			return last + 1
+/			return last + 1 // hmmm but our caller will return nil here?
 	
-	last.p0 = Incred				// freeifdead
-	last.p2 = 0						// no longer an incr!
-	last.fatmap = exp				// makes more sense to show we did both...
-	return last
+	if .IsWithinCurrInline(last)
+		last.p0 = Incred				// freeifdead
+		last.p2 = 0						// no longer an incr!
+		last.fatmap = exp				// makes more sense to show we did both...
+		return last
 
 
 function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)

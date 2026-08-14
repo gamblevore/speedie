@@ -570,14 +570,12 @@ function LastUsedRefPlace (|Message| name, |Message| arg, |Message|)
 	// Maybe ordering issues with writing to stdout, files, etc.
 	opt norefcounts
 	|| d = name.AsDecl						#expect
-	|| Type = d.Type
-	require Type isnt NoEarlyFree 
+	require d.Type isnt NoEarlyFree
 	
-	|| s = name.name
 	|| found = name
 	
 	for c.Flat in arg
-		if c IsThing s
+		if c.obj == d
 			found = c
 	
 	// scan up until we hit the arg. return item's position in the arg.

@@ -63,6 +63,7 @@ extend Assembler
 		opt norefcounts
 		|| ml = ASMReg()
 		|| mr = ASMReg()
+		require !.EntireInlineFailed
 		|| First = exp.first!
 		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 
@@ -77,6 +78,7 @@ extend Assembler
 				ml = .µgetasm(first, dest.µtype(0))
 				ifn ml iz dest
 					mr = dest.µtype(0)
+			require !.EntireInlineFailed
 			mr = .µGetASM(exp.last!, mr)
 
 

@@ -2,14 +2,18 @@
 
 
 struct InlineState
-	|scfunction!--|	Fn
-	|asmreg|		Return
-	|uint64|		ParentVars
-	|uint16|		FuncStart
-	|byte|			BranchDepth
-	|byte|			ID
-	|byte|			RealBranchDepth
-	|bool|			TailInlineable
+	|scfunction!--|		Fn
+	|asmreg|			Return
+	|uint64|			ParentVars
+	|uint16|			FuncStart
+	|byte|				BranchDepth
+	|byte|				ID
+	|byte|				RealBranchDepth
+	|bool|				TailInlineable
+	|bool|				MustReturnInto
+
+	function CanReturnAnyReg (|bool|)
+		return !.MustReturnInto and (.fn.ReturnCount == 1)
 
 
 
@@ -104,11 +108,6 @@ struct Assembler
 		if .IsCurr(L, type)
 			return L
 
-	function Last (|asm| type, |asm| type2, |&FatASM|)
-		|| L = .curr_ - 1
-		if (l isa type or type2) and .IsCurr(L)
-			return L
-	
 	
 	function IsWithin (|&fatasm| f, |bool|)
 		// loops could still fail...
@@ -564,6 +563,10 @@ struct Assembler
 			.Breakrequest |= BreakPoint
 		|| OV = .OpenVars
 		Dest = .DeclareBody(exp, a) as dest
+
+		// possible opt, if we are returning dest, we can the returned variable as dest
+		// (Assuming we aren't altering dest AND passing it twice.)
+		
 		(dest is NewlyDeclared)
 		|| Closer = .OpenVars
 
@@ -572,7 +575,6 @@ struct Assembler
 			r = .Assign(exp, dest, r)
 		r = .CloseVars(Closer, nil, r)
 		
-//		|| r = .µInto(Exp, dest)
 		if r is temp
 			target debug
 /				.µGetASM(Exp, dest)

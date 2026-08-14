@@ -106,6 +106,7 @@ function WhileSub (|message| exp,  |asmreg|)
 	|FatRange| loop_test
 	.breakrequest |= assembler.breakable ||| InitialJump.ASMIndex
 	.Branch(exp.first!, loop_test, true)
+	require !.EntireInlineFailed
 
 	|| Known = loop_test.Constness.negate							// loops are weird :]
 	if Known.knownfalse

@@ -185,6 +185,9 @@ struct FatASM
 				i.µRefCount++
 	
 
+	// i doubt we'd change their inputs, only their output or our inputs
+	// So it should be OK to rely on this... right.
+	
 	function assembler.IsWithinCurrInline (|fatasm| f, |bool|)
 		|| st = .state
 		|| findex = f - .funcstart

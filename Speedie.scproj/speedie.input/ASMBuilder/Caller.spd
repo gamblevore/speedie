@@ -140,6 +140,7 @@ function SCFunction.HasCVersion (|bool|)
 function assembler.FailInline
 	.EntireInlineFailed = .EntireInlineFailed|int| max 1
 
+
 function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
 	opt norefcounts
 	if !.InlineDepth

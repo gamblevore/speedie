@@ -211,11 +211,11 @@ struct ArchonPurger
 			(compiler is NilChecking)
 			|| Old = stderr
 			|| Rec = ErrorReceiver()
-			.LaunchMothershipSub(old, rec)
+			.LaunchGoldenArmada(old, rec)
 			SCFunction.currfunc = nil
 	
 	
-		function LaunchMothershipSub (|ErrorReceiver| Old, |ErrorReceiver| Rec) // purgearchons, firelasers
+		function LaunchGoldenArmada (|ErrorReceiver| Old, |ErrorReceiver| Rec) // purgearchons, firelasers
 			opt norefcounts
 			if !compiler.ConfBool("nil_check")
 				rec.LowerErrorsTo = ErrorSeverity.Warning

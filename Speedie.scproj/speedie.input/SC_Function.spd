@@ -1243,10 +1243,6 @@ function SCDecl.MarkAsAltered (|message| Exp)	// markaltered
 
 	require self is local
 	is altered
-	// //                 ////////////////////                 //////////////////
-	/////////////////// //////////// / / /    ///////// // /  /  / /  /////////
-	
-	///// IT LOOKS COOL... but..,. it could be sooo much more.
 	
 	if SCFunction.InBranch > .DepthOfBranch
 		is AlteredInIf
