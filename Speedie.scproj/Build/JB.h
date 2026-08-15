@@ -4296,7 +4296,7 @@ JB_String* JB_bool_Render0(bool Self);
 
 
 // byte
-bool JB_byte_In(uint /*byte*/ Self, uint A, uint B);
+bool JB_byte_In(uint /*byte*/ Self, uint /*byte*/ A, uint /*byte*/ B);
 
 bool JB_byte_IsHex(uint /*byte*/ Self);
 
@@ -4917,8 +4917,6 @@ bool JB_CP_IsLetter(Codepoint Self);
 bool JB_CP_IsLower(Codepoint Self);
 
 bool JB_CP_IsUpper(Codepoint Self);
-
-bool JB_CP_IsWhite(Codepoint Self);
 
 
 
@@ -6205,8 +6203,6 @@ Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB,
 
 FatASM* SC_Pac_CanOptRFUN(Assembler* Self, Message* Exp, ASMReg Obj, FatASM* Last);
 
-ASMReg SC_Pac_CantLinkInline(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn);
-
 void SC_Pac_CapASM(Assembler* Self);
 
 bool SC_Pac_ClearAllStructs(Assembler* Self, Message* Exp);
@@ -6418,6 +6414,8 @@ ASMReg SC_Pac_MoreEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 FatASM* SC_Pac_MUL_(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, ASMReg Add, Message* Exp);
 
 ASMReg SC_Pac_Multiply(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
+
+ASMReg SC_Pac_MustInlineFailed(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn);
 
 void SC_Pac_NextBasicBlock(Assembler* Self);
 

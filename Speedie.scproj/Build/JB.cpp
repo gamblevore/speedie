@@ -3517,7 +3517,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026081419));
+	JB_FS_AppendInt32(_fsf0, (2026081518));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10240,7 +10240,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026081419));
+	JB_FS_AppendInt32(_fsf0, (2026081518));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -15409,8 +15409,8 @@ JB_String* JB_bool_Render0(bool Self) {
 }
 
 
-bool JB_byte_In(uint /*byte*/ Self, uint A, uint B) {
-	return (Self >= A) and (Self <= B);
+bool JB_byte_In(uint /*byte*/ Self, uint /*byte*/ A, uint /*byte*/ B) {
+	return ((uint)(Self - A)) <= ((uint)(B - A));
 }
 
 bool JB_byte_IsHex(uint /*byte*/ Self) {
@@ -15418,7 +15418,7 @@ bool JB_byte_IsHex(uint /*byte*/ Self) {
 }
 
 bool JB_byte_IsInt(uint /*byte*/ Self) {
-	return ((uint)(((int)Self) - '0')) <= 9;
+	return JB_byte_In(Self, '0', '9');
 }
 
 bool JB_byte_IsLetter(uint /*byte*/ Self) {
@@ -15426,7 +15426,7 @@ bool JB_byte_IsLetter(uint /*byte*/ Self) {
 }
 
 bool JB_byte_IsLower(uint /*byte*/ Self) {
-	return JB_CP_IsLower(((Codepoint)Self));
+	return JB_byte_In(Self, 'a', 'z');
 }
 
 bool JB_byte_IsTextLine(uint /*byte*/ Self) {
@@ -15437,16 +15437,24 @@ bool JB_byte_IsTextLine(uint /*byte*/ Self) {
 }
 
 bool JB_byte_IsUpper(uint /*byte*/ Self) {
-	return JB_CP_IsUpper(((Codepoint)Self));
+	return JB_byte_In(Self, 'A', 'Z');
 }
 
 bool JB_byte_IsWhite(uint /*byte*/ Self) {
-	return JB_CP_IsWhite(((Codepoint)Self));
+	uint X = ((uint)(Self - 9));
+	bool White = X <= 1;
+	if (X == 4) {
+		White = true;
+	}
+	if (X == 23) {
+		White = true;
+	}
+	return White;
 }
 
 byte JB_byte_LowerCase(uint /*byte*/ Self) {
 	if (JB_byte_IsUpper(Self)) {
-		return Self + 32;
+		Self = (Self + 32);
 	}
 	return Self;
 }
@@ -15471,7 +15479,7 @@ JB_String* JB_byte_Render(uint /*byte*/ Self, FastString* Fs_in) {
 
 byte JB_byte_UpperCase(uint /*byte*/ Self) {
 	if (JB_byte_IsLower(Self)) {
-		return Self - 32;
+		Self = (Self - 32);
 	}
 	return Self;
 }
@@ -16751,7 +16759,7 @@ ASMReg SC_ASMType__ASMFunction(Assembler* Self, Message* Exp, ASMReg Dest) {
 				}
 			}
 			if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_LinkInline)) {
-				return SC_Pac_CantLinkInline(Self, Exp, DepthOK, Fn);
+				return SC_Pac_MustInlineFailed(Self, Exp, DepthOK, Fn);
 			}
 		}
 		TableID = SC_Pac_ASMTableID(Self, Exp, Fn);
@@ -17599,10 +17607,6 @@ bool JB_CP_IsLower(Codepoint Self) {
 
 bool JB_CP_IsUpper(Codepoint Self) {
 	return JB_CP_In(Self, 'A', 'Z');
-}
-
-bool JB_CP_IsWhite(Codepoint Self) {
-	return (Self == ' ') or ((Self == '\n') or ((Self == '\x0D') or (Self == '\t')));
 }
 
 
@@ -22078,7 +22082,7 @@ ASMReg SC_Pac_AskForInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFuncti
 		AllowedGain = (AllowedGain + 2);
 	}
 	 else if (SC_Base_IsLibrary(Fn)) {
-		AllowedGain = (AllowedGain - (1 + ((SC_Func_SyntaxIs(Fn, kSC__FunctionType_OptInline)) << 2)));
+		AllowedGain = (AllowedGain - ((SC_Func_SyntaxIs(Fn, kSC__FunctionType_OptInline)) << 2));
 	}
 	AllowedGain = (AllowedGain - Self->InlineDepth);
 	{
@@ -22733,18 +22737,6 @@ FatASM* SC_Pac_CanOptRFUN(Assembler* Self, Message* Exp, ASMReg Obj, FatASM* Las
 		return Last;
 	}
 	return nil;
-}
-
-ASMReg SC_Pac_CantLinkInline(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn) {
-	if (!Self->InlineDepth) {
-		bool Unable = (Self->EntireInlineFailed < 2);
-		JB_StringC* Reason = ((JB_StringC*)JB_Ternary((Unable), JB_LUB[591], JB_LUB[2188]));
-		if (true) {
-			JB_Msg_Fail(Exp, SC_Str_operatorplus(Reason, Fn));
-		}
-	}
-	Self->EntireInlineFailed = (1 + (!DepthOK));
-	return SC_Reg__NewWith0();
 }
 
 void SC_Pac_CapASM(Assembler* Self) {
@@ -24576,6 +24568,18 @@ ASMReg SC_Pac_Multiply(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 		return SC_Pac_IntMul(Self, Exp, Dest, R, L);
 	}
 	return SC_Pac_FloatMul(Self, Exp, Dest, L, R);
+}
+
+ASMReg SC_Pac_MustInlineFailed(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn) {
+	if (!Self->InlineDepth) {
+		bool Unable = (Self->EntireInlineFailed < 2);
+		JB_StringC* Reason = ((JB_StringC*)JB_Ternary((Unable), JB_LUB[591], JB_LUB[2188]));
+		if (true) {
+			JB_Msg_Fail(Exp, SC_Str_operatorplus(Reason, Fn));
+		}
+	}
+	Self->EntireInlineFailed = (1 + (!DepthOK));
+	return SC_Reg__NewWith0();
 }
 
 void SC_Pac_NextBasicBlock(Assembler* Self) {
@@ -33484,10 +33488,10 @@ bool JB_Str_OperatorIsa(JB_String* Self, JB_String* S) {
 
 JB_String* JB_Str_MulBool(JB_String* Self, bool B) {
 	//cpp_part;
-	if (JB_Str_Exists(Self) and B) {
-		return Self;
+	if ((!B) or (!JB_Str_Exists(Self))) {
+		Self = JB_LUB[0];
 	}
-	return JB_LUB[0];
+	return Self;
 }
 
 JB_String* JB_Str_OperatorMul(JB_String* Self, int N) {
@@ -60747,4 +60751,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 8593494815173317396 -6086024341732837364
+// 2244472126519640045 -6086024341732837364
