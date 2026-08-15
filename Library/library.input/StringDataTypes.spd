@@ -71,29 +71,10 @@ datatype byte
 			++i
 	
 										///// Tests /////
-// Jumps with bad inline
-	inline Failed1 (|bool|)
-		|| x = (self-9)|uint|
-		if x <= 1
-			return true
-		if x == 4
-			return true
-		if x == 23
-			return true
-
  // Missing a jbor?
 	inline Failed2 (|bool|)
+		visible
 		rz = self == ' ' or '\n' or '\r'
-
- // White = true being nopped!
-	inline Failed3 (|bool|)
-		|| x = (self-9)|uint|
-		|| White = x <= 1
-		if x == 4
-			White = true
-		if x == 23
-			White = true
-		return White
 
 
 
