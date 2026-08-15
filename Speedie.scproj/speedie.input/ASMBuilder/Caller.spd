@@ -141,11 +141,11 @@ function assembler.FailInline
 	.EntireInlineFailed = .EntireInlineFailed|int| max 1
 
 
-function assembler.CantLinkInline (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
+function assembler.MustInlineFailed (|message| exp, |bool| DepthOK, |scfunction| fn,  |asmreg|)				// dofunction function
 	opt norefcounts
 	if !.InlineDepth
 		|| unable = (.EntireInlineFailed<2)
-		debugger 
+		debugger
 		|| reason =  (unable)("Unable to inline function: ", "Inlined too deep on function: ")
 		error (exp, reason + fn)
 	.EntireInlineFailed = 1 + !DepthOK
@@ -194,7 +194,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 					return MiniDest
 			
 			if fn is LinkInline
-				return .CantLinkInline(exp, depthok, fn)
+				return .MustInlineFailed(exp, depthok, fn)
 		
 		TableID = .ASMTableID(exp, fn)
 		

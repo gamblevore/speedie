@@ -22,12 +22,12 @@ datatype byte
 	
 	function LowerCase (|Byte|)
 		if .isupper
-			return self + 32
+			self += 32
 		return self
 
 	function UpperCase (|Byte|)
 		if .islower
-			return self - 32
+			self -= 32
 		return self
 
 	 operator in (|charset| c, |bool|)
@@ -38,25 +38,31 @@ datatype byte
 		return .IsInt  or  .in('a', 'f')  or  .in('A', 'F')
 
 	inline IsInt (|bool|)
-		return (self|int| - '0')|uint| <= 9
+		return .In('0', '9')
 		
 	operator eq (|byte| b, |bool|)
 		self = .lowercase
 		b = b.lowercase
 		return self == b
-		
 	inline IsLetter (|bool|)
 		return self|codepoint|.isletter
 	inline IsAlphaNum (|bool|)
 		return self|codepoint|.isalphanum
-	inline IsWhite (|bool|)
-		return self|codepoint|.iswhite
+	inline IsWhite (|bool|) // 8388627
+		|| x = (self-9)|uint|
+		|| White = x <= 1
+		if x == 4
+			White = true
+		if x == 23
+			White = true
+		return White
+
 	inline IsUpper (|bool|)
-		return self|codepoint|.isupper
+		return .in('A', 'Z')
 	inline IsLower (|bool|)
-		return self|codepoint|.islower
-	inline In (|uint| a, |uint| b, |bool|)
-		return  self >= a  and  self <= b
+		return .in('a', 'z')
+	inline In (|byte| a, |byte| b, |bool|)
+		return (self - a)|uint| <= (b-a)|uint|
 	
 	iterator
 		|| i = 0
@@ -64,6 +70,31 @@ datatype byte
 			yield i
 			++i
 	
+										///// Tests /////
+// Jumps with bad inline
+	inline Failed1 (|bool|)
+		|| x = (self-9)|uint|
+		if x <= 1
+			return true
+		if x == 4
+			return true
+		if x == 23
+			return true
+
+ // Missing a jbor?
+	inline Failed2 (|bool|)
+		rz = self == ' ' or '\n' or '\r'
+
+ // White = true being nopped!
+	inline Failed3 (|bool|)
+		|| x = (self-9)|uint|
+		|| White = x <= 1
+		if x == 4
+			White = true
+		if x == 23
+			White = true
+		return White
+
 
 
 datatype int8 // aka char

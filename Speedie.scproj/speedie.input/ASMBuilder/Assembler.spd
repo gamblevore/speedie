@@ -707,8 +707,8 @@ struct Assembler
 		target debug
 			.TempCheck(dest)
 			|| StackSize = ++.stacksize
-			|| trap = ++ASMTrapper
-			if trap == -1 or stacksize > 30 // ugh
+			|| µTrap = ++ASMTrapper
+			if µtrap == 53421 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

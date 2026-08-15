@@ -289,9 +289,12 @@ class String
 	
 	operator mul (|bool| b, |string|)
 		cpp_part MulBool
+		opt norefcounts
 		inlined
-		if self and b
-			return self
+		nil self
+		if !b or !self
+			self = ""
+		return self
 	
 	operator Mul (|int| n, |string|)
 		if n <= 1

@@ -31,7 +31,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	|| OV = .OpenVars
 
 	|| st = .StartInlineState(prms, dest, fn)
-	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == 53422
 		
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
@@ -187,7 +187,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	target debug
 		|| InlineTrap = ++asmtrapper
-		if InlineTrap == 25978
+		if InlineTrap == -1
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopParams(fn.args.length, .state.return, self)
 	svregs.Restore(fn.args)
@@ -261,7 +261,7 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	if fn is LinkInline
 		allowedgain += 2
 	  elseif fn.IsLibrary
-		AllowedGain -= 1 + (fn is OptInline)<<2
+		AllowedGain -= (fn is OptInline)<<2
 
 	AllowedGain -= .inlinedepth
 	
