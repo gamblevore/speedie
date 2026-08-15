@@ -164,12 +164,12 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	return ret
 	
 		
-function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|)
+function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|) // inlinereturn
 	opt norefcounts
 	// What about getting the address of registers?
-	|| extras = asmreg.ExitAtAll
+	|| Extras = asmreg.ExitAtAll
 	if .state.TailInlineable
-		(extras is exitfunction)
+		(extras is ExitFunction)
 	
 	(dest as= extras)
 	|| f = exp.first

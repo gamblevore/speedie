@@ -414,13 +414,14 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 
 
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
+	if "Failed2".trap
 	|| V = kr.const!=0
 	if v == (opp is AND)
 		.softnop jump
 		.NopReg(kr)
 		return ml
 		
-	.nop jump // this also nops ml!
+	.nop jump			// this also nops ml!
 	return kr
 
 

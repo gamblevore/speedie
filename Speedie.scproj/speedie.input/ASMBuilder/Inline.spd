@@ -308,13 +308,29 @@ function InlineFinish (|FatRange| R, |savedregisters| sv, |ASMReg|)
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
 
-		  elseif op == asm.knst
-			|| reg = s.RegOnly
-			|| Info = sv.decls[reg-1].info
-			if info is reference
-				s.µRefCount++			// what about refcounting ALL references, not just knst?
-			
-			.AskNop(s)					// nopping ALL ops... has issues
+//		  elseif op == asm.knst
+
+// Not possible without proper refcounting.
+//			z = 3
+//			if x == 1
+//				z = 8
+//			  elseif x == 2
+//				z = 5
+//			return z
+//
+//	z is set to consts, but we can't just remove them
+//  SOME can be removed but which are used or not?
+//  Perhaps we can do this in a final pass.
+//  like build up some kind of graph model...
+
+//			// what about consts that we are returning. they haven't got anything yet.
+//			// maybe just refcount them...
+//			|| reg = s.RegOnly
+//			|| Info = sv.decls[reg-1].info
+//			if info is reference
+//				s.µRefCount++			// what about refcounting ALL references, not just knst?
+//			
+//			.AskNop(s)					// nopping ALL ops... has issues
 			
 		if s.GuessSize
 			(s.info as= asmreg.FromInline)
