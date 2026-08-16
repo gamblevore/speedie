@@ -28,11 +28,13 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		.curr_ = p + 1
 		p[0] = nil
 		|| Info = p.index|uint64|<<48
-		p.info = Info|asmreg|				// no need to call fat*reg now
-		p.ASMIndex = .BreakRequest
+		p.info = Info|asmreg|
 		p._op = op
 		p.FatMap = exp						// could remove this?
-		.breakrequest = nil
+		if op != asm.noop					// what about mark?
+			p.ASMIndex = .BreakRequest
+			.breakrequest = nil
+
 		.ExpectOneMore = false
 		p.BasicBlock = .BasicBlock
 		return p

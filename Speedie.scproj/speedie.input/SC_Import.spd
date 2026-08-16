@@ -119,7 +119,7 @@ class SCImport
 		opt norefcounts
 		|| arg = conf[@arg]
 			compiler.ConfMsg = arg
-			conf.MakeComment
+			conf.CommentOut
 
 	
 	function  IndexLinkage (|message| link, |scfile| scf)

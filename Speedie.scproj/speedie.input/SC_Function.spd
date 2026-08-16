@@ -1685,7 +1685,7 @@ function Tran_TestProblem (TranFunc)
 		msg.ExpectLast
 		str = msg.name
 	problem (node, str)
-	node.MakeComment
+	node.CommentOut
 	return true
 
 

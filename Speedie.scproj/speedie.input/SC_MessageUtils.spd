@@ -43,7 +43,7 @@ function Message.MsgOwningFunc (|SCFunction|)
 			Return o
 
 
-function message.MakeComment // ignorenode ()  makeignored ()
+function message.CommentOut // ignorenode ()  makeignored ()
 	.ASMType = ASMType.kIgnore
 	.func = @Sheb
 	.clear

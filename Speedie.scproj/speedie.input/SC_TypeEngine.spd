@@ -884,7 +884,7 @@ function message.TypeOfArrItem (|message|)
 
 
 function TypeOfSthg (ExprResolver)
-	exp.MakeComment
+	exp.CommentOut
 
 
 function SCDecl.AvoidGlobals (|scdecl|)

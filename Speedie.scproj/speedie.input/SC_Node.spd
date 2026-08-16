@@ -968,7 +968,7 @@ function LoadVisibility (|Message| p, |bool|)
 	rz = .FindVis(p.first) //   visible false,   visibile true,   visible
 	.IsVisible = rz
 	scnode.CurrVisibility = rz
-	p.MakeComment
+	p.CommentOut
 
 
 

@@ -152,7 +152,7 @@ function Tran_Using (TranFunc)
 		node.name = "if"
 		node.first <~ (@thg, "true")
 	  else
-		node.MakeComment
+		node.CommentOut
 
 
 function Tran_Array (|Message| S, |SCNode| name_space) {
@@ -696,7 +696,7 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 	
 	arg.First = IfTest
 	IfTest.Next!.Move( start, iftest.last )
-	start.MakeComment
+	start.CommentOut
 
 
 || SyxID = 0

@@ -429,8 +429,7 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 		return asmreg()
 	|| v = .OpenVars
 	|regfile| Restore = .Regs	// adapt nilchecker to check if arg COULD return? If not... dont save.
-	
-//	.parentsanity
+
 	while !.EntireInlineFailed
 		.BreakRequest |= assembler.Breakable
 		if (ch is BreakPoint)
@@ -439,7 +438,6 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 			rz = decl(self, ch, nil)
 		  else
 			rz = .µ(ch, asmreg.discard)
-//		.parentsanity
 		ch++
 		loop ch and rz isnt exit
 	

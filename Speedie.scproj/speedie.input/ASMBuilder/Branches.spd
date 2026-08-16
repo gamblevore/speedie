@@ -43,7 +43,6 @@ function IfSub (fn_asm) // function If (fn_asm)
 		b.JumpTo(.curr)
 		return asmreg()
 	
-//	debugat 79
 	|| AfterFirst = other.jump								// Basicblock ++
 	b.JumpTo(.curr)	
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
@@ -451,7 +450,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	if kf.knowntrue
 		|| fake = A.noop
 		fake.const = KF|int|
-		(first is condanswer)
+		(first is CondAnswer)
 		first.fatindex = fake.index
 		return first.boolanswerok						// only way around this. Cos we got asm-reg(0)
 

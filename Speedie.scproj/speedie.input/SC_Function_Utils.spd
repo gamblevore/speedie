@@ -18,7 +18,10 @@ function SCFunction.PreRead (|message| Arg)
 		if s == @tmp
 			|| fn = FuncPreReader[s.name]
 				(fn[])(self, s)
-				s.remove
+				if s is breakpoint
+					s.CommentOut
+				  else
+					s.remove
 
 
 dispatch FuncPreReader (fnPreReader)
