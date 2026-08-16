@@ -31,7 +31,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	|| OV = .OpenVars
 
 	|| st = .StartInlineState(prms, dest, fn)
-	target debug: || TrapInline = ++asmtrapper, if  TrapInline == 53422
+	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
 		
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)

@@ -704,11 +704,13 @@ struct Assembler
 		opt norefcounts
 		cpp_part GetASM
 		
+		dest = dest asnt asmreg.const		// a dest is a dest. so it should never be a const, right?
+											// I mean it can be, but WE have to decide that, not the caller.
 		target debug
 			.TempCheck(dest)
-			|| StackSize = ++.stacksize
+			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
-			if µtrap == 53421 or stacksize > 30 // ugh
+			if µtrap == -1 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

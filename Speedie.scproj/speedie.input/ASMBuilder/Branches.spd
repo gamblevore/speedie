@@ -370,20 +370,21 @@ function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Op
 	opt norefcounts
 	
 	target debug
-		if asmtrapper == -1
+		if ASMTrapper == -1
 	|| first = .µBoolInto(A, dest)
 	if first is Const
-		return .BoolConst1(b, dest, opp, first).boolanswermaybebugged	// x = 5 or Y() --> x = Y()
+		return .BoolConst1(b, dest, opp, first).BoolAnswerMaybeBugged	// x = 5 or Y() --> x = Y()
 	
-	|| JUMP = .BoolTestAndJump(a, first, opp)						// AND/OR
+	|| JUMP = .BoolTestAndJump(a, first, opp)							// AND/OR
 	|| Second = .µBoolInto(B, dest)
 	if Second is Const
-		return .BoolConst2(first, second, opp, jump).boolanswermaybebugged
+		return .BoolConst2(first, second, opp, jump).BoolAnswerMaybeBugged
 	
+	dest = dest asnt asmreg.const
 	JUMP.JumpTo(.curr)
 	
 	if first.IsBool and Second.IsBool
-		return dest.boolanswermaybebugged
+		return dest.BoolAnswerMaybeBugged
 
 	// exists always handles negate...
 	return .Exists(A.next!, dest, dest)
