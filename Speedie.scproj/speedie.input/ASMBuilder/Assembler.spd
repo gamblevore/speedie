@@ -385,6 +385,8 @@ struct Assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
+		if !fat.IsStateless // AARGHH. We can't nop this??? who is trying to do this even?
+		
 //		if !.iswithincurrinline(fat)
 		// its Ok if its in the same block, though???
 		// like overwriting an existing value? not for param nopping...
@@ -394,15 +396,15 @@ struct Assembler
 		// perhaps I can print all the times it is nopped OUTSIDE
 		// and fix each one.
 		
-		|| info = fat.info					// Nothing uses canclose right now. This can be fixed
-		if  info is temp  and  nopmode is CanClose
+		|| info = fat.info						// Nothing uses canclose right now. This can be fixed
+		if  info is temp  and  NopMode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
 
 		|| keep = .nop_sub_keep(fat, nopmode)
 		if !keep
 			|| C = .curr - 1
 			if fat == C
-				.curr_ = C					// do it before both kinds of nop...
+				.curr_ = C						// do it before both kinds of nop...
 
 		depth++
 		if depth > 7
@@ -657,7 +659,7 @@ struct Assembler
 		ov = ov.AddReg(R)
 		// this will close all vars, except the one we just got back!
 		return .CloseVars(ov, nil, r)
-		
+	
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		description "Same as µGetASM, except this closes temp vars for reuse."

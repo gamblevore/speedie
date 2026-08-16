@@ -363,15 +363,7 @@ class String
 		for (item in list) (i)
 			if item == self
 				return i
-	
-//	operator in (|string| s, |bool|)
-//		cpp_part OpInStr
-//		return s contains self
-			
-//	operator in (|dictionary| d, |bool|)
-//		cpp_part OpInDict
-//		return d[self]
-	
+		
 	operator in (|byte| d, |bool|)
 		cpp_part OpInByte
 		if self

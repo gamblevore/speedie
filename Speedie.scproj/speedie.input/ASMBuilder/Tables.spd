@@ -718,6 +718,7 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
+	if dest is const							// should never happen	(look below)
 	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
@@ -725,7 +726,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
-		(dest isnt const)
+		(dest isnt const)						// remove test!!		(look above)
 		if mode & IncrAfter
 			dest = .TempTyped(exp, dest)
 		  else

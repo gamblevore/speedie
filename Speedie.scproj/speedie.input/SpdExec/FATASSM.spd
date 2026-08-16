@@ -70,12 +70,22 @@ struct FatASM
 		|| b = .BaseOp
 		return b == asm.fncx or asm.fnc
 	
-	function asm.IsReffer (|bool|)
-		return self >= asm.RFUN and self <= asm.RFRD
+	
+	constants
+		kTrashedByFunction = 1
+		kTrashedByRefCounting
+	
 
-	function IsTrasher (|bool|)
-		|asm| b = .BaseOp
-		return (b == asm.fncx or asm.fnc) or b.isReffer
+	function CanTrashRegisters (|int|)
+		|asm| b = .op
+		if (b == asm.fncx or asm.fncx3 or asm.fnc or asm.fnc3)
+			return kTrashedByFunction
+		if b >= asm.RFUN and b <= asm.RFRD
+			if b == asm.RFUN
+				if .prms[0] == 0 and .prms[1] == 0
+					return 0									// jb_incr
+			return kTrashedByRefCounting
+	
 	
 	function BaseOp (|int|)
 		|| f = .op
@@ -238,11 +248,11 @@ struct FatASM
 			|| d = f.Output.reg
 			if d == reg
 				return f
-			if f.IsTrasher and d < reg
+			if f.CanTrashRegisters and d < reg
 				return nil // can't go past ops that wipe stuff!
 			f--
-		
-		
+	
+	
 	function Output (|asmparam|)
 		|| o = ._Outputs|uint|
 			o = o.log2
@@ -267,7 +277,7 @@ struct FatASM
 			return self + 1 + .prms[j-1]|int|
 	
 	
-	function JumpTo (|&fatasm| value, |int64|)
+	function JumpTo (|&fatasm| Value, |int64|)
 		cpp_Part JumpToSet
 		|| j = .JumpPrm
 			|| D = (value - self) - 1
@@ -498,6 +508,22 @@ struct FatASM
 		if !Simpler
 			target debug
 				.RendaMsg(fs, n)
+	
+
+	function IsStateless (|bool|)
+		// so what do we want to do with statelessness?
+		// argh? USE it ??? somehow? what was I doing, even?
+		|| op = .op
+		if op >= asm.WR1U and op <= asm.WR16
+			return false
+		if op == asm.CNTD or asm.CNTC
+			return false
+		|| Trasher = .CanTrashRegisters
+			if Trasher == kTrashedByFunction
+				return self is StatelessFunc		// we don't care if it trashes registers, only alters memory.
+			return false							// refcounts are the opposite of stateless!
+		return true
+		// I think its just these right?
 	
 	
 	function GuessSize (|int|)
@@ -732,7 +758,7 @@ datatype FatNopMode	(byte)
 		Soft
 		Rewind
 	
-	syntax is (|fatnopmode| f, |bool|)
+	Syntax Is (|fatnopmode| f, |bool|)
 		return self&f
 		
 
