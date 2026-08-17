@@ -425,11 +425,8 @@ class PerryIDE (Window)
 	function HideStuff
 		opt norefcounts
 		|| M  = .MouSEXY
-		|| LB = .ViewButtons.lastrect.y1
-		|| LF = .filelist.lastrect.x2-2
-		
-		|| HideTop  = (m.y < LB)
-		|| HideSide = (m.x > LF)
+		|| HideTop  = (m.y < .ViewButtons.lastrect.y1)
+		|| HideSide = !(.FileList contains M)
 		|| HideTabs = HideTop or .IsTextMode
 		|| VisSide  = !.filelist.decluttering
 		|| VisTop   = !.RecentAndSplash.decluttering
