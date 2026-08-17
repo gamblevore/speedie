@@ -224,3 +224,4 @@
 #define	VecInc_partu		(((uint)((Op)<<18))>>30)
 #define	VecInc_Amounti		((( int)((Op)<<20))>>20)
 #define	VecInc_Amountu		(((uint)((Op)<<20))>>20)
+

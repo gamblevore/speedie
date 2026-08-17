@@ -252,5 +252,5 @@
 &&HALT,
 &&HALT,
 &&HALT,
-&&HALT,
+&&PHI,
 &&MARK,
