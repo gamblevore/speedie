@@ -1159,3 +1159,23 @@ datatype ASM_VecInc (ASM) {
 }
 
 ASM.Forms[62] = &ASM_VecInc.Encode
+datatype ASM_Phi (ASM) {
+	module {
+		function Encode (ASM_Encoder, ) {
+			visible true
+			|asm| rz = .op|asm| << 24
+			rz.r1 = .prms[0]
+			rz.r2 = .prms[1]
+			rz.r3 = .prms[2]
+			rz.r4 = .prms[3]
+			rz.r5 = .prms[4]
+			if curr < after {
+				curr++[] = rz
+			}
+
+			return curr
+		}
+	}
+}
+
+ASM.Forms[63] = &ASM_Phi.Encode

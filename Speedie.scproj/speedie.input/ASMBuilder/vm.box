@@ -344,6 +344,15 @@ forms
 		part	2
 		Amount	l
 		
+		
+	Phi
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		r5		r
+		r6		r
+		
 	
 // this file:
 // 1) builds the c++ codes, and the jump-table, and the ASM accessor functions
@@ -423,6 +432,10 @@ POS 26
 	FNCX (ForeignFunc)
 		BridgeEntry(vm, Code, r, Op, *Code)
 		Code++ 
+
+POS 254
+	PHI (Phi)
+		0 // not a real instruction.
 
 POS 255
 	MARK (U0)

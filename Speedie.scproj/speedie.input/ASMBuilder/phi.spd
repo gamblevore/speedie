@@ -1,0 +1,64 @@
+
+/*
+// Not possible without phi-nodes:
+	z = 3
+	if x == 1
+		z = 8
+	  elseif x == 2
+		z = 5
+	if x
+		return z
+	z = 6
+	return z
+
+We are going to need some phi-node tests. Its a large-system
+So when/where do we add this test? Getting it correct will be
+harder than actually... writing the system.
+
+Lets make some examples
+
+function ...
+	z = 3
+	if x == 1
+		z = 8
+	  elseif x == 2
+		z = 5
+	// merge 3/5/8
+	if x
+		return z // incr all 3
+	return 0
+
+
+function ...
+	z = 3
+	if x == 1
+		z = 8
+	// merge 8/3
+	z = 6 // erases both sets, making them useless.
+	return z
+
+
+function ...
+	z = 3
+	if x == 1
+		z = 8
+	  elseif x == 2
+		z = 5
+	if x
+		return z
+	z = 6
+	return z
+	
+
+function ...
+	
+	z = 1
+	// z is altered in loop, so premake a phi-node
+	while
+		if x
+			return z // refer to phi-node, not z=1
+		z = 2
+
+*/
+
+

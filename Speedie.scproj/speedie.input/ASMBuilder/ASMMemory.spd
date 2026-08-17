@@ -74,21 +74,24 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 	
 	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
-		// avoid setting ._output
 		rz = exp.WR4U(dest, base, VarAdd, index, pinc)
 		rz.µrefcount = 1
-		if byte_shift <= 2
-			// vector opt... writing vec[0] can just write the actual thing itself.
-			// assuming we are writing 4 bytes or less.
-			|| destfat = dest.fat
-			if (destfat isa asm.vget) and (destfat is Temp)
-				if !destfat.regonly(2) and !destfat.prms[3]
+		|| DestFat = dest.fat
+			if (byte_shift <= 2) and (DestFat isa asm.vget) and (DestFat is Temp)
+				// vector opt... writing vec[0] can just write the actual thing itself.
+				// assuming we are writing 4 bytes or less.
+				if !DestFat.regonly(2) and !DestFat.prms[3]
 					|| input = destfat.prms[1]
 					rz.prms[0] = input
 					destfat.prms[1] = 0 // stop nop going mad.
 					.nop(destfat)
+					destfat = nil
+		if destfat
+			destfat.µrefcount++
 			
 	  else
+		// the two branches can't be shared for creating the fat as
+		// they use input/output differently.
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]

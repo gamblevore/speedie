@@ -6,6 +6,7 @@ extend_module ASM {
 		FNC = 24
 		FNCX3 = 25
 		FNCX = 26
+		PHI = 254
 		MARK = 255
 		KNST2 = 4
 		KNST3 = 5

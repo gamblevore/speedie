@@ -129,11 +129,11 @@ function assembler.FillTheFat (|&asmreg| Collection, |fatasm| fat, |message| Prm
 			s.expect(@thg)
 			rz = i
 		  else
-			.Fries(Collection, fat, s, i, n)
+			.FillOneTrinParam(Collection, fat, s, i, n)
 		i++
 	
 
-function assembler.Fries (|&ASMReg| Collection, |fatasm| fat, |message| s, |int| i, |int| MaxParam)
+function assembler.FillOneTrinParam (|&ASMReg| Collection, |fatasm| fat, |message| s, |int| i, |int| MaxParam)
 	opt norefcounts
 	if s.IsInt
 		fat.NumInput(i) = s.int

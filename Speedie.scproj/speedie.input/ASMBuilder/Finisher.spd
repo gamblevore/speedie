@@ -61,13 +61,10 @@ function Assembler.FinishASM
 
 function fatasm.AddBFix (|&fatasm| Last)
 	// addb(x,0)
-	// remove this function... once we improve our nopper
-	|| n = self
 	require (.p1 == 0)
-	while (++n <= Last)
-		require (n.BasicBlock == .BasicBlock)
-		|| op = n.op
-		if op != asm.noop and asm.addb and asm.mark
+	|| n = self
+	while (++n <= Last) and (n.BasicBlock == .BasicBlock)
+		if n.GuessSize
 			._op = asm.noop
 			n.ASMIndex |= .ASMIndex // actually .breakrequest
 			return

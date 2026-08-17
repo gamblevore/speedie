@@ -193,10 +193,8 @@ struct Assembler
 			rz = .assign(exp, dest, rz) // but we don't want that here.
 			
 	
-	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
-//		if !dest.reg // more about keeping the type, I guess.
-//			dest = src
+		(dest)
 		return .AddToReg(exp, src, src, value, src)
 
 
@@ -384,18 +382,13 @@ struct Assembler
 					return true
 		
 		
-	function nop_sub (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
-		if !fat.IsStateless // AARGHH. We can't nop this??? who is trying to do this even?
-		
-//		if !.iswithincurrinline(fat)
-		// its Ok if its in the same block, though???
-		// like overwriting an existing value? not for param nopping...
-//	/		return
+	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
+		if !fat.IsStateless						// Can't nop something that does something.
+/			return								// Also should never happen!
 
-		// how do i separate those out?
-		// perhaps I can print all the times it is nopped OUTSIDE
-		// and fix each one.
-		
+		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
+/			return								// we'll need to back it up first.
+
 		|| info = fat.info						// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  NopMode is CanClose
 			.CloseOneVar(nil, 1<<info.reg)
@@ -404,7 +397,7 @@ struct Assembler
 		if !keep
 			|| C = .curr - 1
 			if fat == C
-				.curr_ = C						// do it before both kinds of nop...
+				.curr_ = C						// Do it before both kinds of nop...
 
 		depth++
 		if depth > 7
@@ -422,31 +415,7 @@ struct Assembler
 			fat.ASMIndex = breakpoint ||| Breakable
 		  else
 			fat.setop = asm.noop
-			
-	
-	function nop_sub2 (|FATASM| Fat, |fatnopmode| NopMode, |int| Depth=0)
-		//	remove AddBFix also, and other addb special behaviour
-		|| keep = .nop_sub_keep(fat, nopmode)
-		if !keep
-			|| C = .curr - 1
-			if fat == C
-				.curr_ = C					// do it before both kinds of nop...
-
-		depth++
-		if depth > 7
-		
-		for f.FatInputs in fat
-			.Decr(f, NopMode, depth)
-		
-		for v.RegOutputs in fat
-			v &= 31
-			if .Register(v) == fat
-				.SetRegister(v, nil, fat.FindOlder)
-		
-		(fat is nopped)
-		if keep
-			(fat is veryspecial)
-				
+							
 		
 	function Register (|int| i, |?&FATASM|)
 // If a var is altered in a loop, and we're in a loop, its not a known value.
@@ -483,34 +452,6 @@ struct Assembler
 				sh.nop_sub(old, fatnopmode.hard)
 		(NopDest isnt AllowNopDest)
 		return NopDest
-
-
-	target debug
-		function byte.FatConst (|bool|)
-			return self == asm.KNSR or asm.KNST or asm.KNST2 or asm.KNST3
-	
-	
-	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
-		|| Changed = info.prm
-		.prms[a] = changed
-		changed &= 31
-		info.FatIndex = self - sh.funcstart_
-
-		if info
-			target debug
-				|| OpIsConst = .op.FatConst
-				|| InfoConst = info is const
-				if InfoConst != OpIsConst
-					if a
-			.info = info
-
-		if !changed
-			return info
-		
-		._Outputs |= 1 << a
-		if info
-			(info is AllowNopDest)
-		return sh.SetRegister(changed, info, self)
 	
 	
 	function RegIsConst (|asmreg| R, |int64| k, |bool|)
@@ -712,7 +653,7 @@ struct Assembler
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
-			if µtrap == -1 or stacksize > 30 // ugh
+			if µtrap == 252883 or stacksize > 30 // ugh
 				
 		  else
 			opt inline
@@ -773,11 +714,12 @@ struct Assembler
 		instruction.InstructionInit
 		ASMType.InitAccess
 
-		Instruction[asm.KNSR].Const
 		asm.encoders[asm.halt] = fatasm.Halt_Encoder
 		asm.encoders[asm.noop] = fatasm.Nop_Encoder
 		asm.encoders[asm.mark] = fatasm.Nop_Encoder
+		asm.encoders[asm.phi] = fatasm.Nop_Encoder
 
+		Instruction[asm.KNSR].Const
 		.Knst(asm.KNST)
 		.Knst(asm.KNST2)
 		.Knst(asm.KNST3)
@@ -792,6 +734,10 @@ struct Assembler
 		Instruction[op].Const
 		asm.encoders[op] = fatasm.KNST_Encoder
 		
+
+	function byte.FatConst (|bool|)
+		return self == asm.KNSR or asm.KNST or asm.KNST2 or asm.KNST3
+	
 	
 	function InitAndStartFunc (|scfunction| fn)			// init
 		opt norefcounts

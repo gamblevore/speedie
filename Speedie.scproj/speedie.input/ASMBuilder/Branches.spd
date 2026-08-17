@@ -340,6 +340,7 @@ function BoolAndOrOpt (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |A
 		.Rewind(start+1, last+1)
 		if ra iz rb												// a and/or a
 			return bowl
+		if start.prms[1] // hmmm
 		start.RegInput(1) = rB
 		start.prms[3] = 63
 		|| WantBAND = ((middle == asm.jban) == (na==0))|int|
