@@ -73,7 +73,7 @@ extend Assembler
 			ml = .µGetASM(first, dest)
 		  else
 			if dest isnt NewlyDeclared
-				ml = .µGetPrms(First, ml)
+				ml = .µGetPrms(First, exp.last.ASMAllowsTemp)
 			  else
 				ml = .µgetasm(first, dest.µtype(0))
 				ifn ml iz dest

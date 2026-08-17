@@ -298,16 +298,8 @@ datatype ASMReg (uint64)
 	
 	operator mul (|bool| b, |asmreg|)
 		return (b)(self, nil)
-			
-
-	operator mul (|message| m, |asmreg|)
-		disabled "use temp"
-	
-	operator temp (|message| m, |asmreg|)
-		if !m.ContainsFunc
-			is temp
-		return self
-	
+		
+		
 	function Temp (|asmreg| Other, |asmreg|)
 		self &=~ TempFlags
 		(self as= other&tempflags)

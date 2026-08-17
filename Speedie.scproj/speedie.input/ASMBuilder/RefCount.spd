@@ -4,9 +4,9 @@
 function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| DestMsg = prms.first!
-	|| P = prms.second!
-	|| A = .µGetPrms(DestMsg, ASMReg.AddrRequest temp p)
-	|| B = .µ(P, ASMReg.AddrRequest)
+	|| SrcMsg = prms.second!
+	|| A = .µGetPrms(DestMsg, ASMReg.AddrRequest as SrcMsg.ASMAllowsTemp)
+	|| B = .µ(SrcMsg, ASMReg.AddrRequest)
 	if A iz B
 		return nil // wat?
 	
@@ -22,7 +22,7 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	if A isnt ContainsAddr
 		if B is ContainsAddr
 			|| offset = 0
-			B = .InlineOffsetOpt(B, 3, offset, 13, P.ASMDecl, p)
+			B = .InlineOffsetOpt(B, 3, offset, 13, SrcMsg.ASMDecl, SrcMsg)
 			return exp.RFRD(A, B, .RefSave, offset)				// mem to reg
 		return exp.RFST(A, B, .RefSave)							// reg to reg
 	
@@ -30,10 +30,10 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	if  B is ContainsAddr
 		|| where = .TempMe
 		where.µtype = datatypecode._voidptr
-		B = .Read(where, P, B, nil, p.ASMDecl) * where			// (mem to reg)?
+		B = .Read(where, SrcMsg, B, nil, SrcMsg.ASMDecl) * where			// (mem to reg)?
 	
 	|| offset = 0
-	A = .InlineOffsetOpt(A, 3, offset, 13, glob, p)
+	A = .InlineOffsetOpt(A, 3, offset, 13, glob, SrcMsg)
 	return exp.RFWR(A, B, .RefSave, offset)						// reg to mem
 
 

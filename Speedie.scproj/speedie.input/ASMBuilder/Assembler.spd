@@ -55,7 +55,6 @@ struct Assembler
 	|&FatASM|					Curr_
 	|&FatASM|					End
 
-//	|FatASM|					Zero
 	|RegFile|					Regs
 
 	constants
@@ -383,11 +382,12 @@ struct Assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-		if !fat.IsStateless						// Can't nop something that does something.
-/			return								// Also should never happen!
+		if "floatness".trap
+//		if !fat.IsStateless						// Can't nop something that does something.
+///			return								// Also should never happen!
 
-		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
-/			return								// we'll need to back it up first.
+//		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
+///			return								// we'll need to back it up first.
 
 		|| info = fat.info						// Nothing uses canclose right now. This can be fixed
 		if  info is temp  and  NopMode is CanClose
@@ -433,13 +433,12 @@ struct Assembler
 		.regs.KnownMap = M
 			
 
-	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Value, |asmreg|)
+	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
 		|| n = 0
-		|| start = .FuncStart_
-		if value
-			n = value - start
+		if Alterer
+			n = Alterer - .FuncStart_
 			
-		.KnownValues(changed) = value is Const
+		.KnownValues(changed) = Alterer is Const
 		|| where = &sh.regs.Setters[changed]
 		|| oldi = where[]
 		where[] = n										// set value
@@ -447,7 +446,7 @@ struct Assembler
 			if .Register(changed) != value				// huh?
 		
 		if oldi and (NopDest is AllowNopDest)
-			|| old = start + oldi
+			|| old = .FuncStart_ + oldi
 			if (old.µRefCount <= 0) and .iscurr(old)
 				sh.nop_sub(old, fatnopmode.hard)
 		(NopDest isnt AllowNopDest)
@@ -499,30 +498,23 @@ struct Assembler
 		return .Exists(exp, dest, X)
 	
 	
-	function message.FoundFunc (|bool|)
+	function message.ASMAllowsTemp (|asmreg|)
 		opt norefcounts
 		
 		while self
 			if (.func == @prm)
-				target debug: ifn .obj isa scfunction		// it must be, right?
-				return true
+				|| fn = .obj as SCFunction
+				if !fn									// a function pointer
+					return nil
+				ifn (fn is linkinline) or fn.Intrinsic
+					return nil
 			|| c = .first
-				|| r = c.FoundFunc
-					return r
+				require c.ASMAllowsTemp
 			self++
-	
-	
-	function message.AllowsTemp (|asmreg|)
-		return ASMReg.temp * (!.FoundFunc)
-	
-	
-	function message.ContainsFunc (|bool|)
-		opt norefcounts
-		if .func == @prm // what the?
-		|| f = .first
-			return f.FoundFunc
-			
 
+		return ASMReg.temp
+	
+	
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		// we just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
@@ -575,8 +567,8 @@ struct Assembler
 		// Returns a var that will remain alive, as vdecl or vtemp.
 		// This is used for passing params to funcs, or to anything func-like.
 		target debug
-			|| trap = ++ASMTrapper
-			if trap == -1
+			|| PrmTrap = ++ASMTrapper
+			if PrmTrap == 6985
 		require .TempCheck(dest, true)
 
 		|| OV = .OpenVars
@@ -621,7 +613,7 @@ struct Assembler
 
 	function µTrin (|message| exp, |asmreg|)
 		opt norefcounts
-		return .µGetPrms(exp, exp.AllowsTemp) as asmreg.Textual
+		return .µGetPrms(exp, exp.next.ASMAllowsTemp) as asmreg.Textual
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)

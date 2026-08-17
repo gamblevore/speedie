@@ -1104,7 +1104,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 				item.name = "curr"
 			
 
-function message.FoundFunc (|scfunction| f, |bool|)
+function message.AutoFoundFunc (|scfunction| f, |bool|)
 	opt norefcounts
 	|| o = .obj
 	if o == f
@@ -1117,7 +1117,7 @@ helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)
 	opt norefcounts
 	rz = .originalfilepath
 	for ss.flat in self
-		if ss.foundfunc(fn)
+		if ss.autofoundfunc(fn)
 			rz ?= ss.originalfilepath
 			self = ss
 			exit

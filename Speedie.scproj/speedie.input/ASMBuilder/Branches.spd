@@ -17,7 +17,6 @@ function ElseSub (|message?| other, |asmreg|)
 	  else
 		debugger
 	rz = ASMType.Argument(self, other)
-	// .NextBasicBlock // Will be done by the caller (IfSub)
 
 
 
@@ -66,7 +65,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 
 function MainBrancher (fn_asm)
 	.ParentSanity
-	|| NothingDone = .curr
+	|| StartOfBranch = .curr
 	|| BreakReq = .BreakRequest
 	|| Old = .BasicParent
 
@@ -74,12 +73,23 @@ function MainBrancher (fn_asm)
 	s.BranchDepth++
 	s.RealBranchDepth++
 
+	// while/ifsub already have regfiles saved, in argumentsub... however those regs COULD be altered, by the branch
+	// so I guess we gotta save it here too. Shame. Theres enough fiddly logic to waste time on saving memory/CPU	
+	// on this.
+	
+//	|regfile| Restore = .Regs
+	// could avoid this by marking if the branch alters any local vars... in the nil-checker. Do later!
+
 	if dest == nil
 		rz = .WhileSub(exp)
 	  elseif dest isnt VerySpecial
 		rz = .IfSub(exp, nil)
 	  else
 		rz = .TernarySub(Exp, dest)
+
+	
+	// Need to capture alterations using PHI nodes here
+	// how to deal with already captured changes?
 	
 	s.BranchDepth--
 	s.RealBranchDepth--
@@ -87,8 +97,29 @@ function MainBrancher (fn_asm)
 	if old != .basicparent
 		.nextbasicblock
 
+	
+//	if !.EntireInlineFailed
+//		.BranchEnded(restore, StartOfBranch, dest)
+	/*
+		|| x = 1
+		if y
+			x = 2
+		// (phi) // OK, that works... but what about this?
+
+		|| x = 0
+		if z
+			x = 1
+			if y
+				x = 2
+			// phi
+		// 
+
+	
+	*/
+
+
 	.breakrequest = nil
-	if NothingDone == .curr
+	if StartOfBranch == .curr // nothing done
 		.BreakRequest = BreakReq
 	
 
@@ -100,6 +131,9 @@ function While (fn_asm)
 
 function WhileSub (|message| exp,  |asmreg|)
 	opt norefcounts
+	// we need to make PHI nodes for vars that are altered in a loop.
+	// I'm assuming its only for vars already declared?
+	
 	|| InitialJump = exp.JUMP										// test goes after loop
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test

@@ -312,17 +312,16 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 
 function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
-	|| A = exp.first!.asmunbra
-	|| X = .ExistingVar(A)
+	|| F = exp.first!.asmunbra
+	|| X = .ExistingVar(F)
 		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
 
 	// Probably x.y = z, or x[y] = z 
 
-	exp = exp.last!
-	dest = nil|asmreg| temp a
-	|| Src = .µGetPrms(exp, dest)
+	dest = f.ASMAllowsTemp
+	|| Src = .µGetPrms(exp.last!, dest)
 	(Src is SetAlways)
-	.µ(A, Src)
+	.µ(F, Src)
 	return asmreg.discard
 
 
@@ -466,29 +465,29 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| f = exp.first!
 	|| d = f.asmdecl
 	
-	|| sc = exp.Second.first!
-	|| mode = ASMReg.AddrRequest temp sc
+	|| Index = exp.Second.first!
+	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
 	
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
 		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
 															// So we simplify
 	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
-	|| vara = .µGetASM(sc)
+	|| RegToAdd = .µGetASM(Index)
 
 	|| TyA = d.ASMRegType
 	if tya.VecCount > 1
-		return .VecAccess(exp, dest, base, vara)
+		return .VecAccess(exp, dest, base, RegToAdd)
 
 	target debug: if !d.PointerCount and !d.IsCarray
 	
 	if d.CanCopyNormally
 		if dest isnt AddrRequest
 			dest.µType = exp.ASMDecl.mu.DataType
-			return .ReadOrWrite(Dest, exp, base, vara, d, 0)		// readorwrite can convert vara to a const
+			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)		// readorwrite can convert vara to a const
 	  elseif dest is set
-		return .CopyMemory(0, Exp, dest, base, vara, D.internal!) * asmreg()	
+		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!) * asmreg()	
 		
-	return .IncrPointerByVar(dest, base, vara, exp)
+	return .IncrPointerByVar(dest, base, RegToAdd, exp)
 	
 
 

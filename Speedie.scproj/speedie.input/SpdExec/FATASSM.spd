@@ -257,8 +257,8 @@ struct FatASM
 		|| reg = .Output.reg$
 		|| b = .BasicBlock
 
-		// maybe better if each fat refers to the prev setter
-		// then we get a linked-list back.
+		// Could phi-nodes help instead of this?
+		// besides, findolder also misses multiple outputs, perhaps in X++ instructions
 		
 		
 		|| f = self-1

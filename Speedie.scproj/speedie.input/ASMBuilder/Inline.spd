@@ -181,9 +181,11 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	LL.Start = .curr
 	
 	|SavedRegisters| svregs
-	|InlineInfo| Info
 	svregs.Collect(fn.args, self)
+
+	|InlineInfo| Info
 	.InlineParams(prms, info, fn)
+	
 	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
 	target debug
 		|| InlineTrap = ++asmtrapper

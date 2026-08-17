@@ -1,4 +1,55 @@
 
+
+	
+	// Need to capture alterations using PHI nodes here
+	// how to deal with already captured changes?
+	
+function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Type)
+	// perhaps we can do a "pending phi" map? for setregister?
+	// and map them on branchclose? i guess based on the parentblock?
+	// x = 1, if y: y++, x = 2
+	
+	|| Curr = .curr
+	|| StartIndex = Start - .FuncStart_
+	while Start < Curr
+		for Out.RegOutputs in start
+			|| R = out.Reg
+			|| OrigSet = OrigRegs.Setters[r]
+				|| OrigFat = .FuncStart_ + OrigSet
+				if OrigSet < StartIndex					// was altered before branch start, or not altered
+					
+				  else
+					debugger							// wait how? Originally set AFTER the branch started?
+			  else
+				if type isnt VerySpecial				// wow. its not a ternary?
+					
+			
+				
+			// now what? well... WE altered it, and in a branch. So... lets get the branch start, huh?
+			
+			
+		
+		Start++
+
+
+	// so... we need to check the outputs
+/*
+	|| x = 1
+	if y
+		x = 2
+	// (phi) // OK, that works... but what about this?
+
+	|| x = 0
+	if z
+		x = 1
+		if y
+			x = 2
+		// phi
+	// 
+
+
+*/
+	
 /*
 // Not possible without phi-nodes:
 	z = 3
