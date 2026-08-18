@@ -1,13 +1,140 @@
 
-
-	
 	// Need to capture alterations using PHI nodes here
 	// how to deal with already captured changes?
 	
+
+struct BranchPHITracker
+	|RegFile|					Start
+	|RegFile|					A
+
+
+
+function assembler.BranchInit (|BranchPhiTracker|)
+//	rz.Start = .regs
+//	.regs.Alterations = 0
+
+
+
+function assembler.BranchA (|BranchPhiTracker| T)
+//	t.A = .regs
+//	.regs = T.Start // restore
+//	.regs.Alterations = 0
+
+
+
+function assembler.WritePHIs (|BranchPhiTracker| T)
+//	|| XA = T.A.Alterations
+//	|| XB = .regs.Alterations
+//	|| Phis = XA & XB
+//	for (P.bits in Phis) (i)
+//		|| S = T.Start.Setters[i]
+//		|| A = T.A.Setters[i]
+//		|| B = .regs.Setters[i]
+//	
+//	.regs.Alterations = XB ||| XA ||| T.Start.Alterations
+
+
+
 function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Type)
-	// perhaps we can do a "pending phi" map? for setregister?
+	// Perhaps we can do a "pending phi" map? for setregister?
 	// and map them on branchclose? i guess based on the parentblock?
 	// x = 1, if y: y++, x = 2
+	
+	// even if we have one pending caught... we still have to go backwards, to capture the old. Or use the regfile.
+	// The thing is, if we are going backwards, why not just... go backwards? Most functions aren't so big.
+	// and we might find it nearby.
+	// Regfiles still need to be saved, so thats overhead...
+	// theres also register trashing to take care of... we can't just read a register if something trashed it.
+	// And theres branching, although we hope to find phi nodes to counteract that.
+	// Also, we don't need to merge ALL the outputs, just the last from any block... in fact from the same parentblock
+	
+	// thats a lot of... work.
+	
+	/*
+	// lets start with the most basic thing
+		x = 1
+		if y
+			x = 2
+//	 so we just need to look at the setter, and the thing doing the setting.
+//	 now what about this?
+
+		x = 1
+		if y
+			x = 2
+			G = x
+			x = 3
+		// merge two only
+			
+	OK, so we can't go back over the instructions... that won't work. I guess we gotta use the new regfile instead.
+	OK, so thats fine. Some kind of regfile merge?
+	
+	Now, what about something more complex.
+
+		x = 1
+		if y
+			x = 2
+			G = x
+			x = 1
+			if y<0
+				x = 4
+				G = x
+				x = 5
+			// merge two only
+		// merge two only
+		
+	seems simple? We only need to look at two regfiles, to merge two ops into one phi... although we can do it
+	at multiple points. We could merge phi merges, but nvm that. Do AFTER everything is working.
+	
+	OK, what about else?
+	
+		x = 1
+		if y
+			x = 2
+		  else
+			x = 3
+		
+	So... here we ALSO merge two sets, BUT we don't need it from the original x = 1	
+	I'm thinking, we can do the merge in the ifsub function, its the only thing that knows about the else block	
+		
+	Ternaries are the same	
+
+	while... has no else block	
+	
+	and/or also!!! ({A = 1, x}) or ({A=2, y})
+	
+	OK, so lets look at the elseif
+	
+		
+		x = 1
+		if y == 1
+			x = 2
+		  elseif y == 2
+			x = 3
+		
+	Kinda tricky. Lets look at this:
+
+		x = 1
+		if y == 1
+			x = 2
+		  else
+			if y == 2
+				x = 3
+			// merge: x = 3/1
+		// merge: x = 3/1/2
+	
+	Not so simple!
+	
+	So the issue, is that we need to merge x=3 and x=1
+	
+	How to merge them?
+	
+	Well... on the else branch, we need to get the old regfile, then pass it up. Seems... reasonable? lets see?
+	
+	Why not start with something simpler? the ternary? see how we get on?
+		
+		
+	*/
+
 	
 	|| Curr = .curr
 	|| StartIndex = Start - .FuncStart_
@@ -30,6 +157,10 @@ function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Ty
 			
 		
 		Start++
+
+
+
+
 
 
 	// so... we need to check the outputs
@@ -111,5 +242,11 @@ function ...
 		z = 2
 
 */
+
+
+
+	// while/ifsub already have regfiles saved, in argumentsub... however those regs COULD be altered, by the branch
+	// so I guess we gotta save it here too. Shame. Theres enough fiddly logic to waste time on saving memory/CPU	
+	// on this. or delete this... hhaha
 
 

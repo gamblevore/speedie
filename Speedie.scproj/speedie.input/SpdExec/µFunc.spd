@@ -65,11 +65,12 @@ extend SCFunction
 		assembler.sh.funcstart_ = .fatfirst - 1			// for debug
 		
 		|byte| HasLabel
+//		|uint| Fat
 		for fat.fat in self
 			HasLabel |= fat.JumpPrm
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
-			|| Break = fat.ASMIndex
+			|| Break = fat.BreakInfo
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 			

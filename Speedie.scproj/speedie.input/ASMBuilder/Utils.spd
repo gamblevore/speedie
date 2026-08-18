@@ -32,7 +32,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		p._op = op
 		p.FatMap = exp						// could remove this?
 		if op != asm.noop					// what about mark?
-			p.ASMIndex = .BreakRequest
+			p.BreakInfo = .BreakRequest
 			.breakrequest = nil
 
 		.ExpectOneMore = false

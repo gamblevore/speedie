@@ -165,7 +165,7 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	require .TempCheck(dest)
 	|| dest2 = dest
 	if (dest isnt discard) and (!dest.reg or dest is temp)
-		dest2 = .CallFunc(prms, dest, fn)			// better to put this in the right place...
+		dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
 		require .TempCheck(dest)
 	
 	dest2 = dest2.simplify
@@ -197,6 +197,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	ll.after = .curr
 	if !.EntireInlineFailed
 		rz = .InlineFinish(ll, svregs)
+	
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain) or .EntireInlineFailed
 		if .EntireInlineFailed  and  (fn isnt linkinline)

@@ -16,10 +16,11 @@ struct InlineState
 		return !.MustReturnInto and (.fn.ReturnCount == 1)
 
 
-
 struct RegFile
 	|uint16[32]|				Setters
-	|int|						KnownMap
+	|uint|						KnownMap
+	|uint|						Alterations
+
 
 
 
@@ -27,6 +28,7 @@ struct Assembler
 	contains asmreg
 	linkage: cpp_part Pac
 
+	|regfile|					Regs
 	|uint16|					BasicBlock
 	|uint16|					BasicParent
 	|bool|						ExpectOneMore
@@ -55,8 +57,6 @@ struct Assembler
 	|&FatASM|					Curr_
 	|&FatASM|					End
 
-	|RegFile|					Regs
-
 	constants
 		kContinue		= 254
 		kExit			= 255
@@ -69,7 +69,7 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!
 		|uint16|					StringsOutOfRange
 		|jbin?|						DebugDecls
-		|uint16[16K]|				BlockParents
+		|uint16[16K]|				BlockParents // this should be part of the FatASM. need to free a few bytes first.
 
 	
 	function State (|&InlineState|)
@@ -372,26 +372,21 @@ struct Assembler
 	
 	
 	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
-		if NopMode isnt Rewind
-			|| Break = fat.ASMIndex
-				if .IsCurrBranch(fat)
-					.BreakRequest |= Break
-				if break & BreakPoint
-					.BreakRequest = 0
-					return true
+		require NopMode isnt Rewind
+		|| Break = fat.ASMIndex$
+		if .IsCurrBranch(fat)
+			.BreakRequest |= Break
+		if break & BreakPoint
+			.BreakRequest = 0
+			return true
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-		if "floatness".trap
 //		if !fat.IsStateless						// Can't nop something that does something.
 ///			return								// Also should never happen!
 
 //		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
 ///			return								// we'll need to back it up first.
-
-		|| info = fat.info						// Nothing uses canclose right now. This can be fixed
-		if  info is temp  and  NopMode is CanClose
-			.CloseOneVar(nil, 1<<info.reg)
 
 		|| keep = .nop_sub_keep(fat, nopmode)
 		if !keep
@@ -411,8 +406,10 @@ struct Assembler
 				.SetRegister(v, nil, fat.FindOlder)
 		
 		if keep
+			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?
+			// then addb isnt a nop anymore.
 			fat.setop = asm.addb
-			fat.ASMIndex = breakpoint ||| Breakable
+			fat.BreakInfo = breakpoint ||| Breakable
 		  else
 			fat.setop = asm.noop
 							
@@ -426,34 +423,48 @@ struct Assembler
 	function KnownValues (|int| changed, assigns:|bool|)
 		|| M = .regs.KnownMap
 		changed = 1 << changed
+		m &=~ changed
 		if Value
-			m |=  changed
-		  else
-			m &=~ changed
+			m |= changed
 		.regs.KnownMap = M
 			
-
-	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
-		|| n = 0
-		if Alterer
-			n = Alterer - .FuncStart_
 			
+	function Trash (|int| Reg)				// refcounting needs to set this
+		// what about tests? what if it gets out of sync?
+		// surely this is a map of anything with remaining values set?
+		|| A = .regs.alterations
+		.regs.Alterations &= (1<<Reg)-1
+		while ++Reg < 32
+			.SetRegister(reg, nil, nil)
+	
+	
+	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
 		.KnownValues(changed) = Alterer is Const
-		|| where = &sh.regs.Setters[changed]
-		|| oldi = where[]
-		where[] = n										// set value
+
+		|| A = .regs.Alterations &~ (1<<Changed)
+		|| N = 0
+		if Alterer
+			A |= 1 << Changed
+			N = Alterer - .FuncStart_							// set value
+
+		|| oldi = .regs.Setters[changed]
+		.regs.Alterations = A
+		.regs.Setters[changed] = n
+		
 		target debug
-			if .Register(changed) != value				// huh?
+			if .Register(changed) != alterer					// huh?
 		
 		if oldi and (NopDest is AllowNopDest)
+			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
 			if (old.µRefCount <= 0) and .iscurr(old)
-				sh.nop_sub(old, fatnopmode.hard)
+				.nop_sub(old, fatnopmode.hard)
+		
 		(NopDest isnt AllowNopDest)
 		return NopDest
 	
 	
-	function RegIsConst (|asmreg| R, |int64| k, |bool|)
+	function RegIsConst (|asmreg| R, |int64| K, |bool|)
 		|| f = .register(r.reg)
 		if f is Const
 			return f.const == k
@@ -470,9 +481,9 @@ struct Assembler
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
 		if ToNop.µRefCount <= 0
-			|| br = ToNop.ASMIndex
+			|| br = ToNop.BreakInfo
 			.nop(ToNop)
-			replace.ASMIndex = br
+			replace.BreakInfo = br
 
 	
 	function AskNop (|fatasm| ToNop)
@@ -568,7 +579,7 @@ struct Assembler
 		// This is used for passing params to funcs, or to anything func-like.
 		target debug
 			|| PrmTrap = ++ASMTrapper
-			if PrmTrap == 6985
+			if PrmTrap == -1
 		require .TempCheck(dest, true)
 
 		|| OV = .OpenVars
@@ -790,7 +801,7 @@ struct Assembler
 		ASMType.ReturnOpt(self, nil)
 		|| FatRat = arg.ret
 		fatrat.µRefCount = 1
-		fatrat.ASMIndex = Breakable
+		fatrat.BreakInfo = Breakable
 		arg.Position = old		
 
 

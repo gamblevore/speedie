@@ -24,7 +24,7 @@ function PrmCollectSpd (|&int64| prms,  |SCFunction| fn,  |uint64|)		// paramcol
 	rz |= i
 
 
-function CollectParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Regs,  |uint64|)
+function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Regs,  |uint64|)
 	opt norefcounts
 	if !Cpp
 		rz = .PrmCollectSpd(regs, fn)
@@ -71,7 +71,7 @@ function message.RegCheck (|int| Bad)
 		error (self, "Too many registers in use. No space for result.")
 
 
-function CallFunc (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
+function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	opt norefcounts
 	.CurrFuncGrab++
 	.ASMReach(fn)
@@ -109,7 +109,7 @@ function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg
 
 
 
-function GrabbedRegisters (|message| AllPrms,  |&fatasm| Start, |&fatasm| Fn)
+function GrabbedRegisters (|message| AllPrms, |&fatasm| Start, |!&fatasm| Fn)
 	opt norefcounts
 	if 0: AllPrms.FNC3, AllPrms.FNCX3			// MARK USED
 
@@ -183,7 +183,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	|| prms = exp.last!
 	|| TableID = 0
 	
-	if dest is const // cant be?
 	.ParentSanity
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
@@ -204,8 +203,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		TableID = .µ(f).Reg
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 	
-	dest = .CallFunc(exp, dest, fn)
-//	(dest isnt Const)								// why would it be?
+	dest = .FunctionDestination(exp, dest, fn)
 	|| Start = .curr
 	|int64[8]| Regs
 
@@ -221,17 +219,17 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 
 	|| C = fn.HasCVersion
 	if !fn.ProtoType or (fn.ASMAndCpp != 3)
-		|| fat = .Whatever(exp, dest, fn, tableid, regs, C)
+		|| fat = .ASMCall(exp, dest, fn, tableid, regs, C)
 		.GrabbedRegisters(exp, Start, fat)
 		return fat * dest
 
 	|| HighBit = .TempMe(datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(asmreg(tableid), 63)
 	branch.OperatorMul(highbit)
-	.Whatever(exp, dest, fn, tableid, regs, false)
+	.ASMCall(exp, dest, fn, tableid, regs, false)
 	|| J = exp.jump
 	
-	|| fn2 = .Whatever(exp, dest, fn, tableid, regs, true)
+	|| fn2 = .ASMCall(exp, dest, fn, tableid, regs, true)
 	j.Jumpto(.curr)
 	branch.JumpTo(fn2)
 	
@@ -239,9 +237,9 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	return fn2 * dest
 
 
-function assembler.Whatever (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&int64| Regs, |bool| Cpp, |&fatasm|)
+function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&int64| Regs, |bool| Cpp, |&fatasm|)
 	opt norefcounts
-	|| P = .CollectParams(exp.last!, fn, Cpp, regs)
+	|| P = .EncodeParams(exp.last!, fn, Cpp, regs)
 	|| PExt = P >> 32
 	(dest is statelessfunc) = (fn is Stateless)
 	
@@ -253,6 +251,8 @@ function assembler.Whatever (|message| exp, |asmreg| dest, |scfunction| fn, |int
 	  elseif PExt > 0
 		fat._op = asm.fnc3
 	
+	.Trash(dest.reg)
+
 	fat.µRefCount += fn isnt STATELESS				// NOICE!
 	if fn is Killer
 		dest = asmreg.exit

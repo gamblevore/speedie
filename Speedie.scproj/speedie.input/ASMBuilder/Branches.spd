@@ -72,53 +72,22 @@ function MainBrancher (fn_asm)
 	|| s = .state
 	s.BranchDepth++
 	s.RealBranchDepth++
-
-	// while/ifsub already have regfiles saved, in argumentsub... however those regs COULD be altered, by the branch
-	// so I guess we gotta save it here too. Shame. Theres enough fiddly logic to waste time on saving memory/CPU	
-	// on this.
 	
-//	|regfile| Restore = .Regs
-	// could avoid this by marking if the branch alters any local vars... in the nil-checker. Do later!
-
 	if dest == nil
 		rz = .WhileSub(exp)
 	  elseif dest isnt VerySpecial
 		rz = .IfSub(exp, nil)
 	  else
 		rz = .TernarySub(Exp, dest)
-
-	
-	// Need to capture alterations using PHI nodes here
-	// how to deal with already captured changes?
 	
 	s.BranchDepth--
 	s.RealBranchDepth--
 	
 	if old != .basicparent
 		.nextbasicblock
-
 	
-//	if !.EntireInlineFailed
-//		.BranchEnded(restore, StartOfBranch, dest)
-	/*
-		|| x = 1
-		if y
-			x = 2
-		// (phi) // OK, that works... but what about this?
 
-		|| x = 0
-		if z
-			x = 1
-			if y
-				x = 2
-			// phi
-		// 
-
-	
-	*/
-
-
-	.breakrequest = nil
+	.BreakRequest = nil
 	if StartOfBranch == .curr // nothing done
 		.BreakRequest = BreakReq
 	
@@ -197,29 +166,28 @@ function Ternary		(fn_asm)
 	return .MainBrancher(exp, dest as asmreg.veryspecial)
 
 
+function TernaryOfLocals (|message| cond, |asmreg| dest, |message| A, |message| B, |asmreg|)
+	opt norefcounts
+	|| mA = .ExistingVar(a)$							// returns nil if not existing
+	|| mB = .ExistingVar(b)$
+	require (ma.µtype == mb.µtype) and !ma.isfloat
+	return .InbuiltTernary(dest, ma, mb, cond)
+
+
 function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
-	// I'd rather actually re-write this to be like an if-condition! Like reuse the code
-	// then we can put back in, the opts... into the generalised "if" thing.
-	// this will do for now.
+	// possible opt:
+	// x = JB_Ternary(Bool, 1, -1) --> 
+	// x = -1
+	// x += Bool << 1
+
 	opt norefcounts	
 	dest = dest &~ asmreg.veryspecial	
 
 	|| A = exp.second.second!
 	|| B = A.next!
-	
-	// opt this:
-	// x = JB_Ternary(Bool, 1, -1) --> 
-	// x = -1
-	// x += Bool << 1
-	
-	|| DestType = exp.ASMDecl.typeonly
-	|| mA = .ExistingVar(a)
-	|| mB = .ExistingVar(b)
-	
 	|| cond = a.prev!
-	if ma isa DestType
-		if (mb isa DestType) and !DestType.isfloat
-			return .InbuiltTernary(dest, ma, mb, cond)
+	|| Opt = .TernaryOfLocals(cond, dest, A, B)
+		return Opt
 	
 	dest = .TempTyped(exp, dest)
 	|FatRange| br
@@ -233,17 +201,27 @@ function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 	return .RealTernary(exp, dest, a, b, br)
 
 
+
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
+	|| T = .BranchInit
 	|| mA = .µInto(A, dest)
-	|| Exit = exp.jump				// .JumpInput already calls .NextBasicBlock
-	Branch.jumpto(.curr)	
+
+	.BranchA(T)
+	
+	
+	|| Exit = exp.jump
+	Branch.jumpto(.curr)
 	|| mB = .µInto(B, dest)	
+
+	.WritePhis(T)
+	
+	
 	rz = .TernRefCount(ma, mb)						
 	Exit.jumpto(.curr)
 
 
 function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
-	// We want things that are refered to... to not disappear.
+	// use phi instead.
 	rz = B
 	|| fa = A.fat
 	|| fb = B.fat		
