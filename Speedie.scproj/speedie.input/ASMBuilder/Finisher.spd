@@ -85,7 +85,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc.prms[0] = Fnc.prms[1]
 	Fnc.prms[1] = Fnc.prms[2]
 	Fnc.prms[2] = 0
-	Fnc._Outputs = 0
+	Fnc.OutputMap = 0
 	Fnc._op = asm.tail
 	fnc.µRefCount++
 	(Fnc.info as= ASMReg.exit)

@@ -40,7 +40,6 @@ target debug
 			.a(.items)
 
 
-
 target debug2
 	struct BadParamErrorReportTests
 		// everything is reported OK...

@@ -169,7 +169,8 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 		Last--
 
 	last = exp.mark()
-	last._Outputs = 1,  last.µrefcount = 1,  last.prms[0] = Declared.reg
+	|| r = Declared.reg
+	last.OutputMap = r,  last.µrefcount = 1,  last.prms[0] = r
 	(Last is DebugVarOpen)	
 	return Declared
 
