@@ -223,9 +223,9 @@ function BuildInstructions (TranFunc) // __instructionlist__
 	|| after = node
 	for (tmp in .namelist) (pos)
 		|| form = tmp[0][0].name
-			|| fnc = @sdot + "add" 
+			|| fnc = @sdot + "add"
 			|| list = fnc.msg(@list)
-			list <~ (@str, form.lowercase)
+			list <~ (@str, form)
 			list <~ (@str, tmp.name)
 			list <~ pos
 			after.next = fnc
