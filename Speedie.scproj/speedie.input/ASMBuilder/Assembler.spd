@@ -439,6 +439,9 @@ struct Assembler
 	
 	
 	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
+		// does grabbed need to be changed?
+		// its setting a register but... which? adn why does the outputmap not get updated?
+		
 		.KnownValues(changed) = Alterer is Const
 
 		|| A = .regs.Alterations &~ (1<<Changed)

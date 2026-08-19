@@ -685,7 +685,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	fat.µRefCount++					// memory alteration!
 	(dest is set)
 	if !dest.reg
-		fat._Outputs &= ~1			// clear output
+		fat.OutputPrms &= ~1			// clear output
 	
 	if mode & IncrAfter
 		if 0: exp.CNTC
