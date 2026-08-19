@@ -866,10 +866,14 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 		ifn options.silent or compiler.InPerry or options.perryoutput
 			.PrintASM(fn, packmaker.PackFuncIndex)
 	
+	target debug
+		object.totalsanity
+
 	|| err = StdErr // debug in perry via xcode, which won't give me stderr unless in local
 	require err.ok
 	|| max = fn.MaxASM
 		check (fn.µASMLength <= max) (fn.SourceArg, "ASM too large")
+	
 	return true
 
 

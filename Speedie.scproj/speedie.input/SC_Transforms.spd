@@ -1065,9 +1065,7 @@ extend scfunction
 		space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
 		if self Isnt cpp
 			|| r_z = Tran_Result( self )
-			sane()
 			Tran_All( self, arg, space )
-			sane()
 			if r_z
 				Tran_ResultFinish( self, r_z, space, arg )
 			parser.Using.Flags = 0
@@ -1082,11 +1080,4 @@ extend scfunction
 		
 		scfunction.CurrFunc = nil
 		scmodule.curr = nil
-	
-
-function sane ()
-//	if !SCFunction.InBranch
-	if "MainOneArg".trap
-		object.totalsanity
-	
 	

@@ -14,13 +14,17 @@ extend_module PackMaker
 
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
+		object.totalsanity
 		|| mod = compiler.program.FindModule("ASMExamples")
 			testvm.registers(true) // clears
 			rz = mod.Findfunction(s)
 			scfunction.currfunc = rz 
+		object.totalsanity
 			
 	
-function PackMaker.RunAFewTests 
+function PackMaker.RunAFewTests
+	object.totalsanity
+	
 	|scfunction--| fn
 	
 	fn = .testfn("BranchTest") /// active ///
