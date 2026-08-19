@@ -321,7 +321,7 @@ JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 				failed("corrupt6");
 				return -2;
 			}
-			if (Count > 100) {
+			if (Count > 10000) {
 				failed("corrupt7");
 				return -3;
 			}
@@ -443,12 +443,12 @@ void JB_Layer_Destructor ( JB_MemoryLayer* self ) {
 
 
 
-void JB_Helper_PutBefore (JB_RingList* Old, JB_RingList* New) {
-	JB_RingList* P = Old->Prev;
-	P->Next = New;
-	New->Prev = P;
-	New->Next = Old;
-	Old->Prev = New;
+void JB_Helper_PutBefore (JB_RingList* Self, JB_RingList* Before) {
+	JB_RingList* P = Self->Prev;
+	Self->Prev = Before;
+	P->Next = Before;
+	Before->Prev = P;
+	Before->Next = Self;
 }
 
 
