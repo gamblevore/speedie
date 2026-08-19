@@ -14,17 +14,14 @@ extend_module PackMaker
 
 	function TestFn (|string| s, |scfunction--|)
 		opt norefcounts
-		object.totalsanity
 		|| mod = compiler.program.FindModule("ASMExamples")
 			testvm.registers(true) // clears
 			rz = mod.Findfunction(s)
 			scfunction.currfunc = rz 
 		object.totalsanity
-			
+		
 	
 function PackMaker.RunAFewTests
-	object.totalsanity
-	
 	|scfunction--| fn
 	
 	fn = .testfn("BranchTest") /// active ///
@@ -83,6 +80,8 @@ function PackMaker.RunAFewTests
 	if fn
 		|| atomic = fn.TestObesity|&int|[]
 		if atomic != 1150 // oof
+	
+	object.TotalSanity
 
 
 |ivec4| Butter 
