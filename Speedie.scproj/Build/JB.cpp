@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2414];
+extern JB_StringC* JB_LUB[2415];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026081919));
+	JB_FS_AppendInt32(_fsf0, (2026081921));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -6594,7 +6594,7 @@ Message* JB_Tk__DotSub(Syntax Fn, int Start, Message* Parent) {
 Message* JB_Tk__ElseIfAdder(Message* Prev, Message* Curr) {
 	Syntax Cf = Curr->Func;
 	if ((Prev->Func != kJB_SyxTmp) or ((Cf != kJB_SyxTmp) and (Cf != kJB_SyxBra))) {
-		return JB_Tk__UnexpectedSyntax(Curr);
+		return JB_Tk__ErrorAdd(JB_LUB[2414], Curr->Position);
 	}
 	if (Curr->Indent & 1) {
 		return JB_Tk__ErrorAdd(JB_LUB[1683], Curr->Position);
@@ -7004,10 +7004,6 @@ Message* JB_Tk__fError(int Start, Message* Parent) {
 	return nil;
 }
 
-Message* JB_Tk__fError2(int Start, Message* Parent) {
-	return JB_Tk__ErrorAdd(JB_LUB[2031], Start);
-}
-
 Message* JB_Tk__fFuncCall(int Start, Message* Parent) {
 	Message* Rz = nil;
 	Rz = JB_Tk__NewAt(nil, kJB_SyxFunc, Parent->Position);
@@ -7403,7 +7399,7 @@ Message* JB_Tk__fTmpPlus(int Start, Message* Parent) {
 			}
 		}
 	}
-	return JB_Tk__fError2(Start, nil);
+	return JB_Tk__fUnexpected(Start, nil);
 }
 
 Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags) {
@@ -7439,6 +7435,10 @@ Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags) {
 
 Message* JB_Tk__fTypeCast(int Start, Message* Parent) {
 	return JB_Tk__BarThings(Start, kJB_SyxType);
+}
+
+Message* JB_Tk__fUnexpected(int Start, Message* Parent) {
+	return JB_Tk__ErrorAdd(JB_LUB[2031], Start);
 }
 
 Message* JB_Tk__fURL(int Start, Message* Parent) {
@@ -7607,7 +7607,7 @@ void JB_Tk__Init() {
 	JB_Tk__TokenzFn(JB_LUB[2040], kJB__Tk_kTemporalSyx, ((FP_ParseHandler)(JB_Tk__fXML_DTD)));
 	JB_Tk__TokenzFn(JB_LUB[2158], kJB__Tk_kEndContainer, ((FP_ParseHandler)(JB_Tk__fEndOfLine)));
 	JB_Tk__TokenzFn(JB_LUB[2159], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fError)));
-	JB_Tk__TokenzFn(JB_LUB[2160], kJB__Tk_kOppSyx, ((FP_ParseHandler)(JB_Tk__fError2)));
+	JB_Tk__TokenzFn(JB_LUB[2160], kJB__Tk_kOppSyx, ((FP_ParseHandler)(JB_Tk__fUnexpected)));
 	TokHan* IllegalHandler = JB_Tk__Handler(-1, ((FP_ParseHandler)(JB_Tk__fError)));
 	{
 		int I = 0;
@@ -7664,7 +7664,7 @@ Message* JB_Tk__MakeInvisArg(Message* Tmp) {
 	if ((JB_Msg_EqualsSyx(Tmp, kJB_SyxItem))) {
 		Message* Last = ((Message*)JB_Ring_Last(Tmp));
 		if (!JB_Msg_EqualsSyx(Last, kJB_SyxEmb)) {
-			return JB_Tk__UnexpectedSyntax(Last);
+			return JB_Tk__fUnexpected(Last->Position, nil);
 		}
 		Last->Func = kJB_SyxArg;
 		(JB_Msg_SyntaxIsSet(Last, kJB__MessageFlags_Style2, true));
@@ -8146,10 +8146,6 @@ void JB_Tk__TokenzFn(JB_String* S, int Bits, FP_ParseHandler Func) {
 	 else {
 		(JB_Tk__TokenSet(S, JB_Tk__Handler(Bits, ((FP_ParseHandler)(Func)))));
 	}
-}
-
-Message* JB_Tk__UnexpectedSyntax(Message* Bad) {
-	return JB_Tk__ErrorAdd(JB_LUB[2031], Bad->Position);
 }
 
 Message* JB_Tk__UnTmpPlace(Message* R) {
@@ -10235,7 +10231,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026081919));
+	JB_FS_AppendInt32(_fsf0, (2026081921));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -60803,4 +60799,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 5502000770803537940 -6474763151641880743
+// -9164760950682242269 8822961995347469277

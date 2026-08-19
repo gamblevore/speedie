@@ -3425,8 +3425,6 @@ Message* JB_Tk__fEndOfLine(int Start, Message* Parent);
 
 Message* JB_Tk__fError(int Start, Message* Parent);
 
-Message* JB_Tk__fError2(int Start, Message* Parent);
-
 Message* JB_Tk__fFuncCall(int Start, Message* Parent);
 
 Message* JB_Tk__fHint(int Start, Message* Parent);
@@ -3488,6 +3486,8 @@ Message* JB_Tk__fTmpPlus(int Start, Message* Parent);
 Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags);
 
 Message* JB_Tk__fTypeCast(int Start, Message* Parent);
+
+Message* JB_Tk__fUnexpected(int Start, Message* Parent);
 
 Message* JB_Tk__fURL(int Start, Message* Parent);
 
@@ -3580,8 +3580,6 @@ void JB_Tk__TokensFn(Array* Arr, int Bits, FP_ParseHandler Func);
 void JB_Tk__TokensHan(Array* Arr, TokHan* H);
 
 void JB_Tk__TokenzFn(JB_String* S, int Bits, FP_ParseHandler Func);
-
-Message* JB_Tk__UnexpectedSyntax(Message* Bad);
 
 Message* JB_Tk__UnTmpPlace(Message* R);
 
