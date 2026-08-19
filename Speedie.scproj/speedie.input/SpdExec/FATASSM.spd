@@ -16,7 +16,7 @@ struct FatASM
 	|byte|				CurrGrabID
 	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
-	|byte|				OutputPrms
+	|byte|				OutputPrms		// not just dependant on µform. For example RD1U can increment or not.
 	|byte|				_Op
 	|byte|				JumpPrm
 	|byte[67]|			ExtraSpace
@@ -234,12 +234,32 @@ struct FatASM
 		error (f, errorreceiver.InternalError)				// what?	
 
 
-	
-	function FindOlder (|&fatasm|)
-		return nil // for now
-		|| OM = .OutputMap
+	function OutputMap (|uint|)
+		|| outprms = .OutputPrms|int|$
+		|| Found = 0
+		if outprms&1
+			Found |= 1<<.prms[0].reg
+		if outprms&2									// we never set more than 2, and only the first two.
+			Found |= 1<<.prms[1].reg
+		return Found
 
-		// besides, findolder also misses multiple outputs, perhaps in X++ instructions
+
+
+	function FindOlder (|&fatasm|)
+		|| OM = .OutputMap 
+	
+		// if we look at trashing stuff... its not so simple.
+		// OK look at this, branches.
+		// So... What are we doing with the regfile, and branches?
+		// we want to save the regfile in a branch, then merge it
+		// so all changes are merged.
+		// but what about trashing. Shouldn't that be merged too?
+		// in that case, a linear scan is enough?
+		// I think so?
+		
+		// another issue is nopping.
+		// lets say a var is trashed, then we nop it. So... i guess
+		// we find nothing? cos of the trashing?
 		
 		|| s = Assembler.sh.FuncStart
 		while --self >= s
@@ -504,9 +524,11 @@ struct FatASM
 				.RendaMsg(fs, n)
 	
 
+	function IsChanger (|bool|)
+		return !.IsStateless
+	
+	
 	function IsStateless (|bool|)
-		// so what do we want to do with statelessness?
-		// argh? USE it ??? somehow? what was I doing, even?
 		|| op = .op
 		if op >= asm.WR1U and op <= asm.WR16
 			return false
@@ -694,10 +716,10 @@ struct FatASM
 			
 	iterator RegOutputs
 		// maybe going up to 128bytes, and simply doing it as a map... is better?
-		|| oo = .OutputPrms|int|
-		while oo
-			|| i = oo.lowestbit
-			oo &=~ i
+		|| outprms = .OutputPrms|int|
+		while outprms
+			|| i = outprms.lowestbit
+			outprms &=~ i
 			yield .prms[i.log2]
 
 
@@ -723,12 +745,19 @@ datatype ASMParam (uint)
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
 	
-	function ASMReg (|asmreg|)
+	function failing4 (|asmreg|)
+		|asmreg| R = nil
 		if self >> 31
-			(rz is temp)
-		rz.reg = self&31
+			(R is temp)
+		return R
+	
+	function ASMReg (|asmreg|)
+		|asmreg| R = ((self>>31)<<10)|asmreg|
+		R.reg = self&31
 		|uint64| fatindex = (self >> 15)&0xFFFF
-		rz = rz as (fatindex << 48)|asmreg|
+		R = R as (fatindex << 48)|asmreg|
+		return R
+	
 	function Reg (|int|)
 		return self&31
 	operator iz (|asmreg| M, |bool|)

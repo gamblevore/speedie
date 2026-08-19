@@ -427,13 +427,15 @@ struct Assembler
 		.regs.KnownMap = M
 			
 			
-	function Trash (|int| Reg)				// refcounting needs to set this
-		// what about tests? what if it gets out of sync?
-		// surely this is a map of anything with remaining values set?
-		|| A = .regs.alterations
-		.regs.Alterations &= (1<<Reg)-1
-		while ++Reg < 32
-			.SetRegister(reg, nil, nil)
+	function Trash (|int| Reg)									// refcounting needs to set this
+		// What about tests? what if it gets out of sync?
+		// Surely this is a map of anything with remaining values set?
+		
+/		|| A = .regs.alterations &~ ((1<<Reg)-1)
+		while A
+			|| r = a.log2
+			a &= ~(1<<r)
+			.SetRegister(R, nil, nil)
 	
 	
 	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)

@@ -899,8 +899,6 @@ datatype ASM_Swap (ASM) {
 			|asm| rz = .op|asm| << 24
 			rz.r1 = .prms[0]
 			rz.r2 = .prms[1]
-			rz.r3 = .prms[2]
-			rz.r4 = .prms[3]
 			if curr < after {
 				curr++[] = rz
 			}
@@ -935,8 +933,8 @@ datatype ASM_RefSetApart (ASM) {
 			|asm| rz = .op|asm| << 24
 			rz.r1 = .prms[0]
 			rz.r2 = .prms[1]
-			rz.r3 = .prms[2]
-			rz.RefSetApart_Save = .prms[3]
+			rz.RefSetApart_Save = .prms[2]
+			rz.r4 = .prms[3]
 			if curr < after {
 				curr++[] = rz
 			}

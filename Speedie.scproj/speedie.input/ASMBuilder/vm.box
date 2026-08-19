@@ -261,8 +261,8 @@ forms
 	Swap
 		r1		R
 		r2		R
-		r3		R
-		r4		R
+//		r3		R
+//		r4		R
 	
 
 	// refcounting
@@ -273,8 +273,8 @@ forms
 	RefSetApart
 		r1		r
 		r2		r
-		r3		r
 		Save	5
+		r4		r
 	
 	RefSet1
 		r1		R
