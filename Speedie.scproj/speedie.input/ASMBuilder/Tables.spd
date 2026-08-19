@@ -312,8 +312,9 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 
 function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
-	|| F = exp.first!.asmunbra
+	|| F = exp.first!.ASMUnbra
 	|| X = .ExistingVar(F)
+		(x is setalways)
 		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
 
 	// Probably x.y = z, or x[y] = z 
@@ -463,7 +464,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 		dest = .TempTyped(exp, dest)
 	
 	|| f = exp.first!
-	|| d = f.asmdecl
+	|| d = f.ASMDecl
 	
 	|| Index = exp.Second.first!
 	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
@@ -485,7 +486,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 			dest.µType = exp.ASMDecl.mu.DataType
 			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)		// readorwrite can convert vara to a const
 	  elseif dest is set
-		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!) * asmreg()	
+		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!)
 		
 	return .IncrPointerByVar(dest, base, RegToAdd, exp)
 	

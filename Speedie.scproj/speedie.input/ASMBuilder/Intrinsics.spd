@@ -150,7 +150,7 @@ function assembler.FillOneTrinParam (|&ASMReg| Collection, |fatasm| fat, |messag
 	expect (name[] eq 'p') (s)
 	
 	|int| l = s.Int(1, 1, MaxParam)
-		fat.RegInput(i) = collection[l-1] asnt asmreg.Textual
+		fat.RegInput(i) = collection[l-1] asnt asmreg.Always
 
 
 

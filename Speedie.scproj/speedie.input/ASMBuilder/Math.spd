@@ -785,7 +785,7 @@ extend Assembler
 		if (l is Const)
 			swap (l) (r)
 
-		if dest isnt Textual
+		if dest isnt Always
 			|| F = .MiniBOR(l, r, dest)
 				return F
 		

@@ -27,7 +27,7 @@ datatype ASMReg (uint64)
 		NoScale
 		FromInline
 		ContainsAddr
-		Textual
+		Always
 		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest
 		CondRequest			// Perhaps the responses could also be merged into a number, all exclusive.
 		CondAnswer
@@ -42,7 +42,7 @@ datatype ASMReg (uint64)
 //		NotNil				// probably a big addition. Will need tests...
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
-		SetAlways		= Textual	||| Set			// reuse const
+		SetAlways		= Always	||| Set			// reuse const
 		TempFlags		= OKAsTemp	||| Temp
 		FlagsToRemove	= Const		||| Discard
 		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest

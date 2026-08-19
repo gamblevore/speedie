@@ -271,7 +271,7 @@ struct Assembler
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)		// .needreg
 		opt norefcounts
-		if t isnt textual
+		if t isnt Always
 			// what if there is a type and its different?
 			// and if its NEVER different... why add it?
 			t.µtype = where.asmdecl.mu.DataType
@@ -627,7 +627,7 @@ struct Assembler
 
 	function µTrin (|message| exp, |asmreg|)
 		opt norefcounts
-		return .µGetPrms(exp, exp.next.ASMAllowsTemp) as asmreg.Textual
+		return .µGetPrms(exp, exp.next.ASMAllowsTemp) as asmreg.Always
 
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
