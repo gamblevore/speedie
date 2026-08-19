@@ -66,16 +66,20 @@ datatype ProcessMode (byte)
 		cpp_part PIDM
 	
 	flags
-		|ProcessMode| 
+		|ProcessMode|
 		CaptureAll = 0
 		MsgPassing = 1
 		StdOutSilence = 4
 		StdOutPassThru = 8
 		StdErrSilence = 16
 		StdErrPassThru = 32
+		
 		Silence = StdOutSilence|||StdErrSilence
 		PassThru = StdOutPassThru|||StdErrPassThru
 		OwnGroup = 128 // has no effect right now.
+
+		// what about capturing into speedie's errorreceiver?
+		// its not the same as "passthru"...
 
 
 	syntax is (|ProcessMode| M, |bool|)
