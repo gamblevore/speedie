@@ -285,7 +285,7 @@ Relative paths take the current working directory.`
 
 		
 function @file.OSXMaxCaseWarnings_ (|&int|)
-	cpp_Wrapper JB_File__Compar
+	cpp_wrapper JB_File__Compar
 
 
 function string.ShellPath (|string|)

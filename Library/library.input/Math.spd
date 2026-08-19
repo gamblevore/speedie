@@ -196,7 +196,7 @@ extend float
 		return .clamp(0, h)
 		
 	function Cluster (|float|)
-		cpp_Wrapper	
+		cpp_wrapper	
 
 	inline Negate (|bool| b, |float|)
 		if (b)

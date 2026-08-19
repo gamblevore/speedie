@@ -9,7 +9,7 @@ module beep
 
 extend_module app
 	function BeepSub
-		cpp_Wrapper JB_App__Beep
+		cpp_wrapper JB_App__Beep
 	
 	function Beep (|string?| q=nil)
 		if beep.OK.fired

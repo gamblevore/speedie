@@ -26,7 +26,7 @@ class Object
 		cpp_wrapper JB_Obj_Layer
 	
 	function RefCount (|int|)
-		cpp_Wrapper JB_RefCount
+		cpp_wrapper JB_RefCount
 	
 	function ObjectID (|int|)
 		description "Returns an object ID, decided by class-type, and order of creation (but not memory-location)."
@@ -139,7 +139,7 @@ struct ClassData
 //		cpp_Wrapper JB_Class_AllocZeroed
 		
 	function MemoryUsed (|int64|)
-		cpp_Wrapper JB_Class_MemoryUsed
+		cpp_wrapper JB_Class_MemoryUsed
 
 	function CreateLayerAndUse (|Object| obj, |object| obj2, |MemoryLayer!|)
 		opt norefcounts
@@ -148,7 +148,7 @@ struct ClassData
 		rz.use
 
 	function Layer (|MemoryLayer|)
-		cpp_Wrapper JB_Class_Layer
+		cpp_wrapper JB_Class_Layer
 
 	function DefaultLayer (|MemoryLayer|)
 		cpp_Wrapper JB_Class_DefaultLayer

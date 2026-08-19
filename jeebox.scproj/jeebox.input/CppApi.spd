@@ -111,7 +111,7 @@ class_api Message (msg)
 	api flatnext (|message|)
 		.nil$
 		return .flatnext
-		description "Lists over the tree as if it were one-dimensional! A kind of 'stateless-tree-traversal'!"
+		description "Lists over the tree as if it were one-dimensional."
 
 		
 	api flatafter (|message|)

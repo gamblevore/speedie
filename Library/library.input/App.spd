@@ -135,7 +135,7 @@ inline Restart
 	.turninto(.path, ._rawargs)
 
 function ThreadName (assigns:|string|)
-	cpp_Wrapper JB_App__SetThreadName
+	cpp_wrapper JB_App__SetThreadName
 
 function AppName (|string|)
 	opt norefcounts
@@ -159,7 +159,7 @@ function CallPath (|?cstring| NewPath=nil, |stringzeroterminated--|)
 
 function TurnInto (|string| ExePath, |[string]| R=nil, |bool|)
 	description "Replaces this program, with the program at {ExePath}, with arguments {R}... Sort of like monster-transformation. Used by .Restart() which turns the program into itself..."
-	cpp_Wrapper JB_App__TurnInto
+	cpp_wrapper JB_App__TurnInto
 
 function ObjMemory (|int64|)
 	cpp_wrapper JB_MemCount
@@ -180,7 +180,7 @@ function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| val
 	cpp_wrapper JB_App__SetEnv
 
 function Input (|string|)
-	cpp_Wrapper JB_App__Readline
+	cpp_wrapper JB_App__Readline
 
 function IsMainThread (|bool|)
 	return !.IsThreadedAsLib
@@ -195,7 +195,7 @@ function ID (|pid_int|)
 	cpp_wrapper JB_App__ID
 
 function sp_run  (|&cstring| args, |int| mode = 3, |errorint|)
-	cpp_Wrapper JB_SP_Run
+	cpp_wrapper JB_SP_Run
 
 function _RawArgs  (|array of string|)
 	cpp_wrapper JB_App__Args

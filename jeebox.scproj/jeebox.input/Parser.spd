@@ -1314,7 +1314,7 @@ ive been~running #since morning
 	
 	
 	Syntax Access (|int| p, |byte|)
-		cpp_Wrapper JB_Tk__Byte
+		cpp_wrapper JB_Tk__Byte
 
 
 	Syntax Access (|int| s, |int| e, |syntax| f, |string|)
@@ -1327,7 +1327,7 @@ ive been~running #since morning
 
 
 	function Range (|int| Start, |int| End, |string|)
-		cpp_Wrapper JB_Tk__Range
+		cpp_wrapper JB_Tk__Range
 
 
 

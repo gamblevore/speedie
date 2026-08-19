@@ -442,7 +442,7 @@ datatype float
 		return (self * math.iTau).tan
 	
 	function Minus0 (|float| B, |float|)
-		cpp_Wrapper (fdimf)
+		cpp_wrapper (fdimf)
 
 	inline IsPow2 (|bool|)
 		return !.log2.Fract
@@ -814,7 +814,7 @@ datatype uint64
 
 	function CountBits (|int|)
 		asm BSTT(dest, p1, 0)
-		cpp_Wrapper (__builtin_popcountll)
+		cpp_wrapper (__builtin_popcountll)
 
 	function ByteSwap (|uint64|)
 		asm BSTT(dest, p1, 4)

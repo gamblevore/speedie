@@ -185,8 +185,8 @@
 
 
 
-#define	RefSetApart_Savei		((( int)((Op)<<23))>>27)
-#define	RefSetApart_Saveu		(((uint)((Op)<<23))>>27)
+#define	RefSetApart_Savei		((( int)((Op)<<18))>>27)
+#define	RefSetApart_Saveu		(((uint)((Op)<<18))>>27)
 
 #define	RefSet1_Savei		((( int)((Op)<<18))>>27)
 #define	RefSet1_Saveu		(((uint)((Op)<<18))>>27)

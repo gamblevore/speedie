@@ -46,14 +46,14 @@ class File (StringShared)
 
 	function Mode (|FileMode|)
 		nil checker
-		cpp_Wrapper JB_File_Mode
+		cpp_wrapper JB_File_Mode
 	
 	function Path (|string|)
 		nil checker
-		cpp_Wrapper JB_File_Path
+		cpp_wrapper JB_File_Path
 
 	function Mode (assigns:|FileMode|)
-		cpp_Wrapper JB_File_ModeSet
+		cpp_wrapper JB_File_ModeSet
 
 	function LinksTo (|string|)
 		cpp_wrapper JB_File_LinkToGet
@@ -293,7 +293,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			
 	function Relax (|bool| NeedsMode=true, |errorint|)
 		description "Alters file permissions. If this process is in sudo mode, it makes this file not need sudo to access it"
-		cpp_Wrapper JB_File_RelaxPath
+		cpp_wrapper JB_File_RelaxPath
 	
 	function DeleteAll (|bool| KeepSelf=false, |ErrorInt|)
 		if super == "/" or ""

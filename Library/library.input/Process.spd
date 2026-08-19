@@ -38,7 +38,7 @@ class UnixProcess
 		cpp_wrapper
 
 	function Start (|ExitCode|)
-		cpp_Wrapper JB_Sh_StartProcess
+		cpp_wrapper JB_Sh_StartProcess
 	
 	render
 		cpp_wrapper JB_Sh_Render

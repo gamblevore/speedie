@@ -225,7 +225,7 @@ class FastString {
 		disabled "use .AppendDecimal"
 	
 	function AppendInt (|int| data)
-		cpp_Wrapper JB_FS_AppendInteger
+		cpp_wrapper JB_FS_AppendInteger
 	
 	function AppendInt64 (|int64| data)
 		cpp_Wrapper JB_FS_AppendInteger64

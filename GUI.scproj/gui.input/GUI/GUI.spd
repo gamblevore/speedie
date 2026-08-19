@@ -104,7 +104,7 @@ module GUI
 			.JB_SDL_FullScreen(W, Mode>0)
 		
 	function DocumentOpened  (|bool|Clear=true, |String|)
-		cpp_Wrapper JB_App__DocumentOpened
+		cpp_wrapper JB_App__DocumentOpened
 		
 
 	libinternal InitDelegates

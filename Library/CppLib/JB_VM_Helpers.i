@@ -293,7 +293,7 @@ VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 
 
 VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
-	JB_Incr(o3);
+	JB_Incr(o4);
 	JB_SafeDecr(o2);
 	
 	int n = n1;

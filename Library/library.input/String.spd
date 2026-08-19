@@ -161,11 +161,11 @@ class String
 	function ParseInt (|int| Start=0, |message?| where=nil, |int64|)
 		nil checker
 		// could be nice to add KB, MB, GB, TB suffixes to this
-		cpp_Wrapper JB_Str_TextIntegerSection
+		cpp_wrapper JB_Str_TextIntegerSection
 	
 	function ParseHex (|int| Start=0, |message?| where=nil, |int64|)
 		nil checker
-		cpp_Wrapper JB_Str_HexIntegerSection
+		cpp_wrapper JB_Str_HexIntegerSection
 	
 	inline Int (|int64|) // remove?
 		return .parseint(nil)
@@ -176,7 +176,7 @@ class String
 	
 	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
 		nil checker
-		cpp_Wrapper JB_Str_TextDouble
+		cpp_wrapper JB_Str_TextDouble
 
 	function UnicodeSync (|string|)
 		cpp_wrapper JB_Str_UnicodeSync
@@ -307,7 +307,7 @@ class String
 		return self[n, int.max] + self[0, n]
 		
 	function FindBadUTF8 (|int| From=0, |ind|)
-		cpp_Wrapper JB_Str_BadUTF8
+		cpp_wrapper JB_Str_BadUTF8
 
 	function IsBinary (|float| f = 512.0, |bool|)
 		|| badness = .UTF8Badness
@@ -374,7 +374,7 @@ class String
 	
 	function ZeroTerm (|StringZeroTerminated|)
 		nil self
-		cpp_Wrapper JB_Str_ZeroTerm
+		cpp_wrapper JB_Str_ZeroTerm
 	
 	inline CopyTo (|&byte| Where, |bool|)
 		cpp_Part CopyToHopeful
@@ -393,16 +393,16 @@ class String
 	module
 		autogen New (|int| n, |string|)
 			description "Creates a new string containing garbage data."
-			cpp_Wrapper JB_Str_New
+			cpp_wrapper JB_Str_New
 
 		function New (|cstring| s, |StringZeroTerminated|)
 			description "Wraps an existing cstring into a Speedie string. Expects the cstring to last longer than us."
-			cpp_Wrapper JB_StrC
+			cpp_wrapper JB_StrC
 
 		// could merge these two... give it a 0 length and see what you get?
 		function New (|cstring| s, |int| n, |StringZeroTerminated|)
 			description "Wraps existing memory into a Speedie string. Must be a c-string. The length is just for speed.  Expects the cstring to last longer than us."
-			cpp_Wrapper JB_StrCN
+			cpp_wrapper JB_StrCN
 
 		function Own (|&byte| addr,  |int| n, |string|)
 			cpp_wrapper JB_Str__Freeable
