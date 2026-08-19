@@ -147,7 +147,7 @@ extend Parser
 	function fError (ParseHandler)
 		return nil // seems OK... doesn't need to do more
 
-	function fError2 (ParseHandler)
+	function fUnexpected (ParseHandler)
 		return .erroradd("Unexpected syntax", start)
 	
 

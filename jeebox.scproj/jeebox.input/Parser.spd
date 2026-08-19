@@ -106,7 +106,7 @@ extend Parser
 		.Tokenz( "] ) } #/ » ” ?>", kEndContainer,		fEndOfLine			)
 
 		.Tokenz( "::",			kThingSyx,				fError				)
-		.Tokenz( "!~=",			kOppSyx,				fError2				)
+		.Tokenz( "!~=",			kOppSyx,				fUnexpected			)
 
 		|| IllegalHandler = .Handler( -1, fError ) // catch all?
 		for i in 256
@@ -273,11 +273,7 @@ extend Parser
 		rz = parser.new( nil, @Arr, Start )
 		parser.ParseLoopFlags( rz, "]", kTemporalSyxNoBar )
 	
-	
-	function UnexpectedSyntax (|message| bad, |message|)
-		return .ErrorAdd("Unexpected syntax", bad.position)
-	
-	
+		
 	function fMsgList (ParseHandler)
 		opt norefcounts
 		|| NameStart = start + 2
@@ -323,7 +319,7 @@ extend Parser
 				tmp = ftmpsub(tmp, kOpp & ~kOppBra, kthing )
 				if tmp != @thg
 					return tmp
-		return parser.fError2(start, nil)
+		return parser.fUnexpected(start, nil)
 
 
 	function fAtNamedExp (ParseHandler)
@@ -989,7 +985,7 @@ ive been~running #since morning
 		if (tmp == @item)
 			|| last = tmp.last!
 			if last != @emb
-				return parser.UnexpectedSyntax(last)
+				return parser.fUnexpected(last.position)
 			last.func = @arg
 			(last is style2)
 			return last
@@ -1145,7 +1141,7 @@ ive been~running #since morning
 		opt norefcounts
 		|| cf = curr.func
 		if (prev.func != @tmp) or (cf != @tmp and @bra)
-			return parser.UnexpectedSyntax(curr)
+			return parser.erroradd("Multiple-of-4 white-space indent required here.", curr.position)
 		if curr.indent & 1 // we never seem to get this?
 			return .ErrorAdd("Indent is odd", curr.position)
 
