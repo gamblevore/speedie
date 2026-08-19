@@ -42,8 +42,6 @@ function Assembler.FinishASM
 		  elseif op == asm.FNC3 or asm.FNC
 			if s < last
 				.TryTail(s)
-		  elseif op == asm.addb
-			s.AddBFix(Last)
 
 		|| Predicted = s.guesssize
 		length += Predicted
@@ -56,18 +54,6 @@ function Assembler.FinishASM
 		S++
 		
 	.out.µASMLength = Length
-
-
-
-function fatasm.AddBFix (|&fatasm| Last)
-	// addb(x,0)
-	require (.p1 == 0)
-	|| n = self
-	while (++n <= Last) and (n.BasicBlock == .BasicBlock)
-		if n.GuessSize
-			._op = asm.noop
-			n.ASMIndex |= .ASMIndex // actually .breakrequest
-			return
 
 
 

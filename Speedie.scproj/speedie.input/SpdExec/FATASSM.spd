@@ -525,11 +525,9 @@ struct FatASM
 		// and long-jumps might require more awkward encoding.
 		|| o = ._op
 		if (o != asm.noop and asm.mark and asm.phi)
-			
-			if self isnt Nopped
-				if o < 32
-					return 2 + (o&1)
-				return 1
+			if o < 32
+				return 2 + (o&1)
+			return 1
 	
 	
 	target debug {

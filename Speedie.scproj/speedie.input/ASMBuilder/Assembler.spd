@@ -405,13 +405,11 @@ struct Assembler
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
 		
+		fat.setop = asm.noop
 		if keep
 			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?
 			// then addb isnt a nop anymore.
-			fat.setop = asm.addb
 			fat.BreakInfo = breakpoint ||| Breakable
-		  else
-			fat.setop = asm.noop
 							
 		
 	function Register (|int| i, |?&FATASM|)
@@ -720,10 +718,10 @@ struct Assembler
 		instruction.InstructionInit
 		ASMType.InitAccess
 
-		asm.encoders[asm.halt] = fatasm.Halt_Encoder
+		asm.encoders[asm.halt] = fatasm.halt_Encoder
 		asm.encoders[asm.noop] = fatasm.Nop_Encoder
-		asm.encoders[asm.mark] = fatasm.Nop_Encoder
-		asm.encoders[asm.phi] = fatasm.Nop_Encoder
+		asm.encoders[asm.mark] = fatasm.DoNotEncode
+		asm.encoders[asm.phi] = fatasm.DoNotEncode
 
 		Instruction[asm.KNSR].Const
 		.Knst(asm.KNST)

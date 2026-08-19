@@ -1,6 +1,12 @@
 
 
 function fatasm.Nop_Encoder (Asm_encoder)
+	if .BreakInfo & assembler.breakpoint
+		return ASM_u0.Encode(self, curr, after)
+	return curr
+
+
+function fatasm.DoNotEncode (Asm_encoder)
 	return curr
 
 
