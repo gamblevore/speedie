@@ -659,7 +659,7 @@ struct Assembler
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
-			if µtrap == 252883 or stacksize > 30 // ugh
+			if µtrap == -1 or stacksize > 30 // ugh
 				
 		  else
 			opt inline

@@ -60,9 +60,9 @@ function compiler.SetupEnv
 	.ClearEnvs
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
-
 	TerminalColor.RainbowTerm = FileDes.StdOut.IsTerminal
-	stderr.PrintNewErrors = errorflags.PrintFirst
+	target debug
+		stderr.PrintNewErrors = errorflags.PrintFirst
 	if app.parent
 		stderr.PrintNewErrors = 0
 		TerminalColor.RainbowTerm = false

@@ -298,8 +298,8 @@ function ExecuteGCC (|[string]| Commands, |bool|)
 		fserrs <~ (Commands, " ")
 		fserrs <~ "`)>"
 		error fserrs
-		target debug
-			.CppCompilerPath.Execute(Commands)		
+//		target debug
+//			.CppCompilerPath.Execute(Commands)		
 	
 
 function CollectAndCompile (|File| Input, |String| Output, |bool|)
@@ -575,7 +575,10 @@ function File.TestSpeedie (|string| v, |bool|)
 		printline cmd_args
 	
 	/////	/////	/////	/////
-	.path.execute(cmd_args, 0) // <------ CALL SPEEDIE
+	|| errs = FastString()
+	.path.execute(cmd_args, nil, errs, 0) // <------ CALL SPEEDIE
+	if errs.Length
+		printline errs
 	/////	/////	/////	/////
 
 	|| TestProd = compiler.SpeedieDir("Terminal/SpeedieTest" + v)
