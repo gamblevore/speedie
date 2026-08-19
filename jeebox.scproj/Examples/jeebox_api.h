@@ -71,7 +71,7 @@ jbmessage* jb_msg_last(jbmessage* Self); /* Gets the last child of this node, if
 jbmessage* jb_msg_prev(jbmessage* Self); /* Gets the previous-sibling, if it exists. */
 jbmessage* jb_msg_next(jbmessage* Self); /* Gets the next-sibling, if it exists. */
 jbmessage* jb_msg_parent(jbmessage* Self); /* Gets the parent of this node, if it exists. */
-jbmessage* jb_msg_flatnext(jbmessage* Self); /* Lists over the tree as if it were one-dimensional! A kind of 'stateless-tree-traversal'! */
+jbmessage* jb_msg_flatnext(jbmessage* Self); /* Lists over the tree as if it were one-dimensional. */
 jbmessage* jb_msg_flatafter(jbmessage* Self); /* If you want to loop over all the nested-children (descendants) of one node, but that node is contained in a tree (it's not the root), you'll need to call this function first. Returned node is the 'end-marker'. Once you reach it, you stop. Example:
 	Message* SearchMe = TheMsgYouWantToSearch();
 	Message* LoopEnd = jb_msg_flatafter(SearchMe);
