@@ -87,7 +87,6 @@ module Notifications
 
 	
 	syntax append (|error| note)
-		cpp_part Msg
 		|| s = note.name
 		if note.path
 			s = (s + "\n\"") + (note.path + "\"")
