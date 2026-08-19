@@ -250,7 +250,7 @@ function Tran_Swap (TranFunc)
 		node.ASMType = ASMType.kSwap	
 
 
-function Tran_If (TranFunc) 
+function Tran_If (TranFunc)
 	node.ASMType = ASMType.kIf // for the ASM
 	SCFunction.InBranch++
 	Tran_IfSub(node, name_space)
@@ -1065,11 +1065,11 @@ extend scfunction
 		space.ProcessLinkage( arg, FuncLinkageTable, self is cpp )
 		if self Isnt cpp
 			|| r_z = Tran_Result( self )
+			sane()
 			Tran_All( self, arg, space )
+			sane()
 			if r_z
 				Tran_ResultFinish( self, r_z, space, arg )
-	//		  else
-	//			Tran_ReturnFinish( self, arg ) // seems to break the compiler?
 			parser.Using.Flags = 0
 	
 		if !StillOK
@@ -1083,5 +1083,10 @@ extend scfunction
 		scfunction.CurrFunc = nil
 		scmodule.curr = nil
 	
+
+function sane ()
+//	if !SCFunction.InBranch
+	if "MainOneArg".trap
+		object.totalsanity
 	
 	

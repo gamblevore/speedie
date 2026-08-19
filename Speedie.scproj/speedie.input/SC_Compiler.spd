@@ -938,6 +938,8 @@ function Timer (|string| name)
 
 
 function Stage (|string| name, |bool|)
+	target debug
+		object.TotalSanity
 	require StdErr.OK
 	if (Options.PrintStages)
 		|| space = " "*(Compiler.CurrStage <= 9)

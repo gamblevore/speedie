@@ -1624,6 +1624,7 @@ function message.Blocks (assigns:|int|)
 function Tran_IfSub (|message| node, |SCNode| name_space)
 	opt norefcounts
 	|| cond = node.NeedFirst						#require
+	sane()
 	|| arg = cond.next
 		require arg.expect(@arg)
 	  else
@@ -1632,32 +1633,44 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 		if node == "if"
 			arg <~ (@tmp, "debugger")				// better than debugat
 		cond.next = arg
+	sane()
 	
 	|| SubTest = arg.next
 		expect (SubTest isTmp "elseif" or "else")  ( SubTest )
 		SubTest.ExpectLast
 		
 		if SubTest == "elseif"
+			sane()
 			subtest.ASMType = ASMType.kIf			// for the ASM
+			sane()
 			Tran_IfSub(SubTest, name_Space)
+			sane()
 		  else // "else" branch
+			sane()
 			|| ElseArg = SubTest.first
 				check (ElseArg ~!= "if")			(ElseArg, "Use 'elseif' instead.")
 				elsearg.expect(@arg)
 			  else
 				SubTest.msg(@arg)
+			sane()
 	
+	sane()
 	name_space = arg.scarg(name_space) #require
 	using (node)	
 	cond = cond.ExpandToBool( name_space )
+	sane()
 	if !cond
 		0 //
 	  elseif cond.IsAlwaysFalse
+		sane()
 		cond.ElseNeverFires
+		sane()
 	  else
+		sane()
 		if cond.first == @arg // if a.b? --> if ({||x=a.b, rejoin x}), fails in c cos if ({}) is bad
 			cond.wrapwith(@bra).obj = cond.obj 
 		Tran_Isa(node, name_space)
+		sane()
 
 
 function message.ElseNeverFires // self == cond

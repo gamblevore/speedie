@@ -427,11 +427,11 @@ struct Assembler
 		.regs.KnownMap = M
 			
 			
-	function Trash (|int| Reg)									// refcounting needs to set this
+	function Trash (|uint| Reg)									// refcounting needs to set this
 		// What about tests? what if it gets out of sync?
 		// Surely this is a map of anything with remaining values set?
 		
-/		|| A = .regs.alterations &~ ((1<<Reg)-1)
+		|uint| A = .regs.alterations &~ ((1<<(Reg+1))-1)
 		while A
 			|| r = a.log2
 			a &= ~(1<<r)
@@ -652,7 +652,6 @@ struct Assembler
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM
-		
 		dest = dest asnt asmreg.const		// a dest is a dest. so it should never be a const, right?
 											// I mean it can be, but WE have to decide that, not the caller.
 		target debug

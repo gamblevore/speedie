@@ -162,7 +162,7 @@ module PackMaker
 		return true
 	
 		
-	function MakePack 
+	function MakePack
 		opt norefcounts
 		(compiler is Packing)
 		.OrderLibGlobs
