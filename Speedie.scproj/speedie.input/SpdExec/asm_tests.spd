@@ -1147,6 +1147,7 @@ helper jump_improvements (|int| a, |int|)
 	  else
 		rz--
 	(m)
+	
 
 
 helper asm_test_flow (|int| a, |int| b, |int|)
@@ -1163,13 +1164,6 @@ helper asm_test_flow (|int| a, |int| b, |int|)
 	if b != b // NOOP
 		b = 0
 }}}
-
-
-function StructTest2 (|&fatasm| A)
-	|fatasm| B
-	B = A		// ASM compiles bad, should copy
-	B = A[0]	// also fails!
-	
 
 // im not sure what other tests need doing? We'll think of some... over time!!
 

@@ -107,7 +107,7 @@ function TypeOfARel (ExprResolver)
 		return TypeOfDotDotDot(exp, name_Space)
 	|| Brel = exp.niceparent == @arg
 		exp.func = @brel
-	return SCFunction.Tran_AfterOrBeforeRel(exp, name_space, side)
+	return SCFunction.Tran_AfterRel(exp, name_space, side)
 
 
 function TypeOfFunc (ExprResolver)
@@ -239,7 +239,7 @@ function TypeOfBRel (ExprResolver)
 		check (subtype.IsInteger) (exp, "Expected an integer.") 
 		Return subtype
 		
-	SCFunction.Tran_AfterOrBeforeRel( exp, name_space, side )
+	SCFunction.Tran_AfterRel( exp, name_space, side )
 	Return SubType
 
 

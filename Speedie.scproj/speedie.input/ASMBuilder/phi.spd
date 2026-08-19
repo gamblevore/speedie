@@ -136,27 +136,27 @@ function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Ty
 	*/
 
 	
-//	|| Curr = .curr
-//	|| StartIndex = Start - .FuncStart_
-//	while Start < Curr
-//		for Out.RegOutputs in start
-//			|| R = out.Reg
-//			|| OrigSet = OrigRegs.Setters[r]
-//				|| OrigFat = .FuncStart_ + OrigSet
-//				if OrigSet < StartIndex					// was altered before branch start, or not altered
-//					
-//				  else
-//					debugger							// wait how? Originally set AFTER the branch started?
-//			  else
-//				if type isnt VerySpecial				// wow. its not a ternary?
-//					
-//			
-//				
-//			// now what? well... WE altered it, and in a branch. So... lets get the branch start, huh?
-//			
-//			
-//		
-//		Start++
+	|| Curr = .curr
+	|| StartIndex = Start - .FuncStart_
+	while Start < Curr
+		for Out.RegOutputs in start
+			|| R = out.Reg
+			|| OrigSet = OrigRegs.Setters[r]
+				|| OrigFat = .FuncStart_ + OrigSet
+				if OrigSet < StartIndex					// was altered before branch start, or not altered
+					
+				  else
+					debugger							// wait how? Originally set AFTER the branch started?
+			  else
+				if type isnt VerySpecial				// wow. its not a ternary?
+					
+			
+				
+			// now what? well... WE altered it, and in a branch. So... lets get the branch start, huh?
+			
+			
+		
+		Start++
 
 
 

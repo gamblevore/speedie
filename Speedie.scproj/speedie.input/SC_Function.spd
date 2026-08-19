@@ -1372,7 +1372,7 @@ function NeuSyx (CollectFunc)
 
 
 
-function Tran_AfterOrBeforeRel (|Message| msg, |SCNode| name_space, |message| side,  |SCDecl|)
+function Tran_AfterRel (|Message| msg, |SCNode| name_space, |message| side,  |SCDecl|)
 	|| exp = msg.first!
 	if msg == "!"
 		|| ty = TypeOfExpr( exp, name_space, side )				#require
@@ -1389,8 +1389,6 @@ function Tran_AfterOrBeforeRel (|Message| msg, |SCNode| name_space, |message| si
 	|| Type = TypeOfExpr( exp, name_space )						#require
 	(type is readfrom)
 	check (type isnt const) (msg, "Not assignable.")
-//	check type.IsBareStruct (msg, "Not assignable.") // secondhand error returning example
-	check !type.IsBareStruct (msg, "Not assignable.")
 	if type.PointerCount > 0
 		check (!side) (msg, "Not assignable.")
 		type.MarkAsAltered(msg)

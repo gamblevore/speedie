@@ -9,7 +9,7 @@ struct FatASM
 	|ASMReg|			Info
 	|Message--|			Msg
 	|uint64|			_Const
-	|uint|				OutputMap
+	|uint|				FatMap
 	|uint16|			BasicBlock
 	|int16|				µRefCount
 	|uint16|			ASMIndex
@@ -17,7 +17,7 @@ struct FatASM
 	|byte|				CurrGrabID
 	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
-//	|byte|				_Outputs
+	|byte|				_Outputs
 	|byte|				_Op
 	|byte|				JumpPrm
 	|byte[63]|			ExtraSpace
@@ -29,10 +29,12 @@ struct FatASM
 	setter SetOp (|byte| value)
 		opt norefcounts
 		|| m = .Msg
+		|| s = .FatMap
 		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
 		|| b = .BasicBlock
 		self[0] = nil
 		.Msg = m
+		.FatMap = s
 		._Const = k
 		._op = value
 		.BasicBlock = b
@@ -40,6 +42,23 @@ struct FatASM
 	setter _op (|byte|)
 		._op = value
 		
+	setter FatMap (|uint|)
+		.FatMap = value
+	
+	setter FatMap (|message|)
+		opt inline //
+		.msg = Value
+		|| Where = value.SrcMap
+		.FatMap = where
+//		Message.FatMap(where)
+//		target debug
+//			if Message.FatMap(where) == Compiler.ExtendList
+//				debugger
+//				value.srcmap
+//				Message.FatMap(where)
+	
+//	function Msg (|message|)
+//		return message.fatmap(.fatmap)
 	
 	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
@@ -214,7 +233,7 @@ struct FatASM
 		if !changed
 			return info
 		
-		.OutputMap |= 1 << Changed
+		._Outputs |= 1 << a
 		if info
 			(info is AllowNopDest)
 		return sh.SetRegister(changed, info, self)
@@ -223,16 +242,19 @@ struct FatASM
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
 		if !.IsWithinCurrInline(f)
 /			return nil
-		|| a = f.OutputIndex								// what if theres multiple? for x = y++
-		|| output = f.prms[a]
-		|uint| old = Output & 31							// Need to remove the old output.
-			if .Register(old) == f
-				.SetRegister(old, nil, f.FindOlder)
+		|uint| o = f._Outputs
+			|| a = o.log2
+			target debug: if 1<<a != o
+			|| old = f.prms[a] & 31								// Need to remove the old output.
+				if .Register(old) == f
+					.SetRegister(old, nil, f.FindOlder)
 			
-			return f.Dest(a, dest, self)					// Then we set it to the new value
-		error (f, errorreceiver.InternalError)				// what?	
+			return f.Dest(a, dest, self)						// Then we set it to the new value
+		error (f, errorreceiver.InternalError) // what?	
 
 
+	function OutputMap (|uint|)
+		|| O = ._Outputs
 	
 	function FindOlder (|&fatasm|)
 		return nil // for now
@@ -249,22 +271,10 @@ struct FatASM
 	
 	
 	function Output (|asmparam|)
-		|| o = .OutputMap$
-		for i in 6
-			|| p = .prms[i]
-			if (1<<p.Reg) & o
-				return p
-		debugger 
+		|| o = ._Outputs|uint|
+			o = o.log2
+			return .Prms[o]
 
-
-	function OutputIndex (|int|)
-		|| o = .OutputMap
-			for i in 6
-				if o & (1<<.prms[i].Reg)
-					return i
-			debugger 
-		return -1
-	
 	
 	Syntax Expect (|string| Error)
 		target debug
@@ -707,11 +717,12 @@ struct FatASM
 			i++
 			
 	iterator RegOutputs
-		|| oo = .OutputMap
+		// maybe going up to 128bytes, and simply doing it as a map... is better?
+		|| oo = ._Outputs|int|
 		while oo
 			|| i = oo.lowestbit
 			oo &=~ i
-			yield (i.log2) (i)
+			yield .prms[i.log2]
 
 
 	module

@@ -71,8 +71,7 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 			Last.p2 = 1										// incring a gobj. Lets do it internally!
 			return Last
 	|| fat = exp.rfun(asmreg(), asmreg(), Obj)
-	if fat.OutputMap // how?
-	Fat.OutputMap = 0 // already zero though?
+	Fat._Outputs = 0
 	return fat
 
 
@@ -146,7 +145,7 @@ function assembler.CanOptRFUN (|message| exp, |asmreg| Obj, |&fatasm| last, |&fa
 	if .IsWithinCurrInline(last)
 		last.p0 = Incred				// freeifdead
 		last.p2 = 0						// no longer an incr!
-		last.msg = exp					// makes more sense to show we did both...
+		last.fatmap = exp				// makes more sense to show we did both...
 		return last
 
 

@@ -213,7 +213,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	if (.curr > RealStart)							// useful, to stop jumping all over in IDE
 		if RealStart isnt DebugVars					// dont break the type
-			realstart.msg = prms.parent!			// cleanup
+			realstart.Fatmap = prms.parent!			// cleanup
 
 
 	
