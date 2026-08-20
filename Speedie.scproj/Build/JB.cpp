@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026081921));
+	JB_FS_AppendInt32(_fsf0, (2026082010));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10231,7 +10231,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026081921));
+	JB_FS_AppendInt32(_fsf0, (2026082010));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -25117,14 +25117,6 @@ ASMReg SC_Pac_RefCount(Assembler* Self, Message* Exp, ASMReg Dest) {
 		ASMReg A = SC_Pac_xC2xB5(Self, Pf, SC_Reg__NewWith0());
 		return SC_FAT_AsReg(SC_Msg_RALO(Exp, Dest, A), Dest);
 	}
-	if (Fn == SC__Comp_RefFreeIfDead) {
-		ASMReg A = SC_Pac_xC2xB5(Self, Pf, SC_Reg__NewWith0());
-		// Disallow: if obj.X(),   when obj.X() is a disowner;
-		// Then we will never freeifdead within if-branch or other tests.;
-		// needs understanding of disowners!;
-		SC_Msg_RFUN(Exp, A, SC_Reg__NewWith0(), SC_Reg__NewWith0(), SC_Pac_RefSaveWithReg(Self, A));
-		return A;
-	}
 	FatASM* Fat = SC_Pac_RefCountSub(Self, Exp, Prms, Fn);
 	if (Fat) {
 		int Saved = SC_FAT_RegOnly(Fat, 2);
@@ -25161,7 +25153,7 @@ FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj) {
 			}
 		}
 	}
-	return SC_Msg_RFUN(Exp, Obj, Obj, SC_Reg__NewWith0(), SC_Pac_RefSaveWithReg(Self, Obj));
+	return SC_Msg_RFUN(Exp, Obj, Obj, SC_Pac_RefSaveWithReg(Self, Obj), SC_Reg__NewWith0());
 }
 
 FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj) {
@@ -25172,7 +25164,7 @@ FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj) {
 			return Last;
 		}
 	}
-	FatASM* Fat = SC_Msg_RFUN(Exp, SC_Reg__NewWith0(), SC_Reg__NewWith0(), Obj, nil);
+	FatASM* Fat = SC_Msg_RFUN(Exp, SC_Reg__NewWith0(), SC_Reg__NewWith0(), 0, Obj);
 	Fat->OutputPrms = 0;
 	return Fat;
 }
@@ -25226,6 +25218,12 @@ FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunct
 	ASMReg Obj = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), SC_Reg__NewWith0());
 	if (SC_Pac_RegIsConst(Self, Obj, 0)) {
 		return nil;
+	}
+	if (Fn == SC__Comp_RefFreeIfDead) {
+		// Disallow: if obj.X(),   when obj.X() is a disowner;
+		// Then we will never freeifdead within if-branch or other tests.;
+		// needs understanding of disowners!;
+		return SC_Msg_RFUN(Exp, Obj, SC_Reg__NewWith0(), SC_Pac_RefSaveWithReg(Self, Obj), SC_Reg__NewWith0());
 	}
 	if (Fn == SC__Comp_RefIncr) {
 		return SC_Pac_RefCountIncr(Self, Exp, Obj);
@@ -42539,15 +42537,15 @@ FatASM* SC_Msg_RFST(Message* Self, ASMReg R1, ASMReg R2, int Save) {
 	return Rz;
 }
 
-FatASM* SC_Msg_RFUN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Save) {
+FatASM* SC_Msg_RFUN(Message* Self, ASMReg FreeIfDead, ASMReg SafeDecr, int Save, ASMReg Incr) {
 	FatASM* Rz = nil;
 	//visible;
 	Assembler* A = (&SC__Pac_Sh);
 	Rz = SC_Pac_RequestOp(A, kSC__ASM_RFUN, Self);
-	(SC_FAT_Prm(Rz, 0, R1));
-	(SC_FAT_Prm(Rz, 1, R2));
-	(SC_FAT_Prm(Rz, 2, R3));
-	(SC_FAT_NumInputSet(Rz, 3, Save));
+	(SC_FAT_Prm(Rz, 0, FreeIfDead));
+	(SC_FAT_Prm(Rz, 1, SafeDecr));
+	(SC_FAT_NumInputSet(Rz, 2, Save));
+	(SC_FAT_Prm(Rz, 3, Incr));
 	return Rz;
 }
 
@@ -60799,4 +60797,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -9164760950682242269 8822961995347469277
+// -8732736148632757741 8822961995347469277

@@ -9078,7 +9078,7 @@ FatASM* SC_Msg_RFRT(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_RFST(Message* Self, ASMReg R1, ASMReg R2, int Save);
 
-FatASM* SC_Msg_RFUN(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Save);
+FatASM* SC_Msg_RFUN(Message* Self, ASMReg FreeIfDead, ASMReg SafeDecr, int Save, ASMReg Incr);
 
 FatASM* SC_Msg_RFWR(Message* Self, ASMReg R1, ASMReg R2, int Save, int Offset);
 
