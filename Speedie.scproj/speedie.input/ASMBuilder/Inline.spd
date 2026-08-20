@@ -68,23 +68,21 @@ struct InlineInfo
 		while  --n >= 0
 			|| r = .Items[n]
 			|| v = r.reg
-			if !v
+			if (!v) or (.CantNop & 1<<n)
 				0
 			  elseif r is Const
+				if r iz ret // allowed? shouldn't be?
+				// why is it OK if r iz ret here?
 				sh.Decr(r.needfat, fatnopmode.hard)
-			  elseif r iz Ret
-				0
-			  else
+			  elseif !(r iz Ret)
 				|| f = r.fat
 				if f  and  !f.µrefcount  and  f.guesssize
-					if .CantNop & 1<<n
-						0 // it was passed in from a parent inline?
-					  elseif sh.IsWithinCurrInline(f)
+					if sh.IsWithinCurrInline(f)
 						sh.nop(f)
 
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
-		// its a good opt, but can destroy debugging variables...
+		// its a good opt, but can make debugging harder
 		// add later
 		opt norefcounts
 		|| After = .Source.Parent

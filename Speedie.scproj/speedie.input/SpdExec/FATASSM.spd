@@ -744,11 +744,6 @@ datatype ASMParam (uint)
 	// depending on if they confuse the code or not, but at least we have something that
 	// makes sense, easy to convert from one to the other!
 	// at this point... its too late, really.
-	function failing4 (|asmreg|)
-		|asmreg| R = nil
-		if self >> 31
-			(R is temp)
-		return R
 	
 	function ASMReg (|asmreg|)
 		|asmreg| R = ((self>>31)<<10)|asmreg|
