@@ -343,12 +343,12 @@ GUI_Note__Clicked
 GUI_Note__ClickedAt
 GUI_Note__Draw
 GUI_Note__Init
-GUI_Note__Msg
 GUI_Note__NewWindow
 GUI_Note__NotifySDLError
 GUI_Note__ShouldDraw
 GUI_Note__ShowTip
 GUI_Note__Str
+GUI_Note__SyntaxAppend
 GUI_OpenSaveRequest
 GUI_Open_Constructor
 GUI_Open_Destructor
@@ -796,7 +796,6 @@ JB_CPath_ReadAll
 JB_CakeVM_Load
 JB_CharSet_SyntaxAccess
 JB_ClassData_CreateLayerAndUse
-JB_Class_AllocZeroed
 JB_Class_DefaultLayer
 JB_Class_Layer
 JB_Class_MemoryUsed
@@ -1357,10 +1356,6 @@ JB_SS_StreamJbin
 JB_SS_Trim
 JB_SS_UInt
 JB_SS_UIntBE
-JB_Sel_Constructor
-JB_Sel_Destructor
-JB_Sel_GiveIDs
-JB_Sel_ID
 JB_Sh_Constructor
 JB_Sh_Destructor
 JB_Sh_DiedCount
@@ -1513,7 +1508,6 @@ JB_Str_TextIntegerSection
 JB_Str_TitleCase
 JB_Str_Trim
 JB_Str_TrimFirst
-JB_Str_TrimMiddle
 JB_Str_TrimSlashes
 JB_Str_TrimStart
 JB_Str_UTF16To8
@@ -1655,7 +1649,6 @@ JB_bin_TmpArg
 JB_bin_WriteType
 JB_bool_Render0
 JB_bool__MainArg
-JB_byte_EqualsByte
 JB_byte_IsConso
 JB_byte_IsHex
 JB_byte_IsVowel
