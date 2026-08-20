@@ -18,9 +18,9 @@ datatype CompileMode (int)
 		return (self&M) == M
 	
 	syntax is (|CompileMode| M, assigns:|bool|, |CompileMode|)
-		if Value
-			return self|||M
-		return self&~M
+		self &=~M
+		self|=Value*M
+		return self
 	
 
 
@@ -32,8 +32,7 @@ function perryide.ViewRun (|bool|)
 
 function perryide.ResumeRunning (|int| state, |bool|)
 	if !.RunningProd
-		return .start
-
+		return false
 	if .DebugMode isnt Paused
 		return .SendRunMsg("pause", state)
 

@@ -430,19 +430,22 @@ function perryide.UpdateStack (|message| stack)
 	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
 	
+	Notifications <~ stack.Render
 	|| Break = stack != "stack"
+		|| m = .DebugMode
+		|| crash = stack == "crash"
+			(M is Crashed)
+		(m is paused)
+		.DebugMode = m
+
+		|| l = .editme._ActiveLine
+			l.Flags = crash|int|
+
 		|| f = .stack.liststart|listviewrow|
 			if !.stack.FirstSelected
 				.stack.ExpandRow(f)
-		
-			|| m = .DebugMode
-			|| crash = stack == "crash"
-				(f is Error)
-				(M is Crashed)
-			|| l = .editme._ActiveLine
-				l.Flags = crash|int|
-			(m is paused)
-			.DebugMode = m
+			if crash
+				(f is error)
 			.UpdateCodePointer(F, PerryUpdateStack)
 
 	.SetAppInfo
