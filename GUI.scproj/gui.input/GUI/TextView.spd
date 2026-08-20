@@ -537,10 +537,10 @@ class TextView (GUIControl)
 		if dir < 0 and ToFind == '.'
 			pos--											// MoveCodePoint instead?
 			ToFind = s[pos + adjust]						// also adjust should use MoveCodePoint?
-		|| FindCS = ToFind.charset
 
-		if FindCS is LettersUnderScore
-			FindCS = CharSet.LettersUnderScore
+		|| FindCS = ToFind.charset
+		if (FindCS is LettersUnderScore or Numbers) and !keys.platcmd(false)
+			FindCS = CharSet.LettersUnderScore + CharSet.Numbers
 		
 		|| Opp = ContainerOpposite(ToFind, Dir * ExpandContainers)
 			pos += dir
