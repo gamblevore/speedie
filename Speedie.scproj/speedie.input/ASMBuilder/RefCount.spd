@@ -70,7 +70,7 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 		if (Last.p0 iz Obj) and !Last.p1
 			Last.p2 = 1										// incring a gobj. Lets do it internally!
 			return Last
-	|| fat = exp.rfun(asmreg(), asmreg(), Obj)
+	|| fat = exp.rfun(asmreg(), asmreg(), 0, Obj)
 	Fat.OutputPrms = 0
 	return fat
 
@@ -88,13 +88,13 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 					return nil
 				return ret
 	
-	return exp.RFUN(Obj, Obj, asmreg(), .RefSave(Obj))
+	return exp.RFUN(Obj, Obj, .RefSave(Obj), asmreg())
 
 
 
 function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)
 	opt	NoRefCounts
-	
+
 	if fn == compiler.RefClear
 		return .RefCountClear(exp, prms)
 
@@ -108,6 +108,12 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 	require !.RegIsConst(Obj, 0)
 
 	target debug: if Obj is ContainsAddr						// always a reg!
+
+	if fn == Compiler.RefFreeIfDead
+		#! Disallow: if obj.X(),   when obj.X() is a disowner
+		#! Then we will never freeifdead within if-branch or other tests.
+		#! needs understanding of disowners!
+		return exp.rfun(Obj, asmreg(), .RefSave(Obj), asmreg())
 
 	if fn == Compiler.RefIncr
 		return .RefCountIncr(exp, Obj)
@@ -157,14 +163,6 @@ function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 	if fn == compiler.RefNew
 		|| A = .µ(pf!) // merge gtab into ralo?
 		return exp.RALO(dest, A) * Dest
-
-	if fn == Compiler.RefFreeIfDead
-		|| A = .µ(pf!)
-		#! Disallow: if obj.X(),   when obj.X() is a disowner
-		#! Then we will never freeifdead within if-branch or other tests.
-		#! needs understanding of disowners!
-		exp.rfun(A, asmreg(), asmreg(), .RefSave(A))
-		return a
 
 	|| fat = .RefCountSub(exp, prms, fn)
 		|| saved = fat.RegOnly(2)

@@ -293,6 +293,7 @@ VMOpt ASM* SetRefBasic (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
 
 
 VMOpt ASM* SetRefApart (CakeVM& vm, CakeRegister*& r, ASM Op, ASM* Code) {
+	// p1 = freeifdead, p2 = safedecr, p3 = save, p4 = incr
 	JB_Incr(o4);
 	JB_SafeDecr(o2);
 	

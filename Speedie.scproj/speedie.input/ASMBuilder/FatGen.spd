@@ -745,14 +745,14 @@ function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RFUN (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| Save = nil, |&fatasm|) {
+function message.RFUN (|asmreg| FreeIfDead = nil, |asmreg| SafeDecr = nil, |int| Save = nil, |asmreg| Incr = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RFUN, self)
-	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.reginput(2) = r3
-	rz.numinput(3) = Save
+	rz.reginput(0) = FreeIfDead
+	rz.reginput(1) = SafeDecr
+	rz.numinput(2) = Save
+	rz.reginput(3) = Incr
 }
 
 
