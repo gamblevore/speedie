@@ -1,0 +1,274 @@
+
+
+
+struct RegFile
+	|uint16[32]|				Setters
+	|uint|						KnownMap
+	|uint|						Alterations
+
+
+
+extend assembler
+	function Backup (|&fatasm| Curr)
+		|| S = .state
+		|| B = S.Backup
+		|| Start = .FuncStart
+		S.Backup = curr - Start
+		|| Prev = B + Start
+		|| dest = Backupspace + B
+		target debug2												// failing
+			|| dest2 = Backupspace! + B
+		Memory.Copy(dest!, Prev, Curr|&byte| - prev|&byte|)			// Save the old stuff here.
+	
+	
+	function RevertBackup (|&fatasm| Prev)
+		// Just check everything is correct
+		
+		
+		
+	function ParentBlock (|uint16| B, |uint16|)
+		if B >= 16K // argh
+		return BlockParents[B&(16K-1)]
+
+	
+	function IsWithin (|&fatasm| f, |bool|)
+		// loops could still fail...
+		// we need to mark vars as set in loops... in the asm, right?
+		// we'd have to not mark as fat as CONST even if it came from a const...
+		// I guess... the y=2 thing would have to clear the const bits...
+		// perhaps we shouldn't "pre-lookup" the var its going into...
+		// but instead just GET IT... then... clear bits or whatever
+		// in setrel or whatever it is.
+		
+		/*
+			y = 1
+			while x
+				z = y+1
+				y++
+		*/
+		
+		|| B = f.basicblock
+		|| ToFind = .ParentBlock(B)
+		|| Us = .BasicParent
+		while
+			if Us == ToFind
+				return true
+			if !Us
+				return false
+			Us = .ParentBlock(Us)
+			
+
+	function IsCurrBranch (|&fatasm| f, |bool|)
+		return .BasicParent == .ParentBlock(f.basicblock)
+
+
+	function ParentSanity 
+		target debug
+			|| PP = .BasicParent
+			|| BB = .basicblock
+			|| BP = .parentblock(BB)
+			if BP != PP 
+
+
+	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
+		if (f isa type)
+			return (.basicblock == f.basicblock)
+
+
+	function IsCurr (|&fatasm| f, |bool|)
+		// can these use .within?
+		return .basicblock == f.basicblock
+
+	
+	
+	function AskNopTemp (|asmreg| R)
+		if R is temp
+			|| f = r.fat
+				return .AskNop(f)
+	
+
+	function AskNopTemp (|?&Fatasm| Fat)
+		if fat is temp
+			return .AskNop(fat)
+	
+
+	function NopReg (|asmreg| R)
+		|| f = r.fat
+			return .Nop(f)
+		target debug
+			if r.reg and r isnt param
+				debugat						// we don't know what made it, but we should!!
+	
+	
+	function Nop2Consts (|asmreg| A, |asmreg| B)
+		|| Further = a.FatIndex > b.FatIndex
+			.NopConst(A)
+		.NopConst(B)
+		if !Further
+			.NopConst(A)					// in case of swapped order
+	
+	
+	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
+		if r.reg == 0
+			return 0						// sigh. I DIE.
+		
+		require R is Const
+
+		|| RF = R.fat
+		if rf and .IsWithin(RF)
+			|| k = RF.const
+			if k.fits(bits, signed)
+				.NopConst(R)
+				return k|uint64|.trim(bits)
+	
+	
+	function NopConst (|asmreg| R, |int64| K, |bool|)
+		if r.Const == K
+			.NopConst(R)
+			return true
+	
+	
+	function NopConst (|asmreg| R)
+		require r.reg
+		target debug: if r isnt Const		// hah
+
+		if  R is temp  and  r isnt blocknop	// don't think we can do better. not easily. 
+			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
+	
+	
+	function Nop (|FATASM| ToNop)
+		return .nop_sub(ToNop, fatnopmode.hard, 0)
+	
+	
+	function SoftNop (|FATASM| ToNop)
+		return .nop_sub(ToNop, fatnopmode.soft, 0)
+	
+	
+	
+	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
+		require NopMode isnt Rewind
+		|| Break = fat.ASMIndex$
+		if .IsCurrBranch(fat)
+			.BreakRequest |= Break
+		if break & BreakPoint
+			.BreakRequest = 0
+			return true
+		
+		
+	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
+//		if !fat.IsStateless						// Can't nop something that does something.
+///			return								// Also should never happen!
+
+//		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
+///			return								// we'll need to back it up first.
+
+		|| keep = .nop_sub_keep(fat, nopmode)
+		if !keep
+			|| C = .curr - 1
+			if fat == C
+				.curr_ = C						// Do it before both kinds of nop...
+
+		depth++
+		if depth > 7
+		
+		for f.FatInputs in fat
+			.Decr(f, NopMode, depth)
+		
+		for v.RegOutputs in fat
+			v &= 31
+			if .Register(v) == fat
+				.SetRegister(v, nil, fat.FindOlder)
+		
+		fat.setop = asm.noop
+		if keep
+			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?
+			// then addb isnt a nop anymore.
+			fat.BreakInfo = breakpoint ||| Breakable
+							
+		
+	function Register (|int| i, |?&FATASM|)
+// If a var is altered in a loop, and we're in a loop, its not a known value.
+		|| r = .Regs.Setters[i]
+			return .funcstart_ + r
+
+	
+	function KnownValues (|int| changed, assigns:|bool|)
+		|| M = .regs.KnownMap
+		changed = 1 << changed
+		m &=~ changed
+		if Value
+			m |= changed
+		.regs.KnownMap = M
+			
+			
+	function Trash (|uint| Reg)									// refcounting needs to set this
+		// What about tests? what if it gets out of sync?
+		// Surely this is a map of anything with remaining values set?
+		
+		|uint| A = .regs.alterations &~ ((1<<(Reg+1))-1)
+		while A
+			|| r = a.log2
+			a &= ~(1<<r)
+			.SetRegister(R, nil, nil)
+	
+	
+	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
+		// does grabbed need to be changed?
+		// its setting a register but... which? adn why does the outputmap not get updated?
+		
+		|| A = .regs.Alterations &~ (1<<Changed)
+		|| N = 0
+		if Alterer
+			A |= 1 << Changed
+			N = Alterer - .FuncStart_							// set value
+
+		|| oldi = .regs.Setters[changed]
+		.regs.Alterations = A
+		.regs.Setters[changed] = n
+		.KnownValues(changed) = Alterer is Const
+		
+		target debug
+			if .Register(changed) != alterer					// huh?
+		
+		if oldi and (NopDest is AllowNopDest)
+			target debug: if !alterer							// can't happen,  .Dest sets this.
+			|| old = .FuncStart_ + oldi
+			if (old.µRefCount <= 0) and .iscurr(old)
+				.nop_sub(old, fatnopmode.hard)
+		
+		(NopDest isnt AllowNopDest)
+		return NopDest
+	
+	
+	function RegIsConst (|asmreg| R, |int64| K, |bool|)
+		|| f = .register(r.reg)
+		if f is Const
+			return f.const == k
+	
+	
+	function Decr (|?&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
+		if f
+			|| C = f.µrefcount
+			C -= (C > 0)
+			f.µrefcount = C
+			if (mode isnt soft) and C <= 0
+				.nop_sub(f, mode, depth)
+	
+	
+	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
+		if ToNop.µRefCount <= 0
+			|| br = ToNop.BreakInfo
+			.nop(ToNop)
+			replace.BreakInfo = br
+
+	
+	function AskNop (|fatasm| ToNop)
+		if ToNop.µRefCount <= 0
+			.nop(ToNop)
+	
+	
+	function Rewind (|fatasm| Start, |fatasm| After)
+		|| Mode = fatnopmode.soft|||fatnopmode.rewind
+		while start < After
+			.nop_sub(--After, mode, 0)
+	
