@@ -7,9 +7,9 @@
 
 
 
-void* JB_Str_CopyFromCString( const char* C );
-void JB_FreeIfDead_(void* c);
-static id							sigh;
+void* JB_Str_CopyFromCString		(const char* C);
+void JB_FreeIfDead_					(void* C);
+static id							Sigh;
 static NSString*					FileOpened;
 
 
@@ -23,9 +23,9 @@ void* JB_App__DocumentOpened (bool Clear) {
 }
 
 void JB_App__InitStuff (void) {
-	if (!sigh) {
+	if (!Sigh) {
 		sigh = [[AppDelegate alloc] init];
-		NSApp.delegate = sigh;
+		NSApp.delegate = Sigh;
 	} 
 }
 
