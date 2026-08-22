@@ -1,50 +1,67 @@
 #!/usr/local/bin/spd
 
-class Anagrams
+
+// some very stupid words in the dictionary. So we remove these.
+|| badwords = "eh ho de gog gheg ged edh deg hod aa aalii aam ab aba rede roed reh rhe td th te ree oord thoo toho rehood rhoeo toed rho hoer oe od roto toro ort rot tor ere erd er edo teredo oho re oer toher roe odor thore ret ro rehoe heder oto teer reet tode ed doto dree heer doree het dere dee tored eer dor eer doter els nth es lox lex hon len les lo aes ah hox nae naa na ne nea sal sale oxan oxane shola taxon tanh la sha sah sa sol ons san st sh sla slane loa nesh neth lant lanx las lat olax noxal ole oxheal sant xosa sot taal ta tol salta stoa en elt el han lan nat nal slath tha ha aht al aln esth shen soh sho tox aln tho lenth ax hent lath sten tash hest thon ast oxalan os tae sen stane stean sheat noa ose saho sao soe neath nathe hasan aslet se nexal noel noxa notal selah hal ona seax slon sola noah lao lana holt enol enos ens ean axal leon soxlet helot thos alto alt alo ahsan leat leah shoa tano lasa nael salat lanas hanse oes ox leath hans nash shan latax tal santo lohan solan tolan elon antal ansel ansa anes anatox lohana sheal aho ala alan alans altho hosel lhota shel esox thone ontal nast stan haslet enhat aos hao seah lata lota hano halse toxa hala haet soxhlet hals ahet shela shean shane thea latah lansat natals anax ana loath tosh seth naos shea thane natal laten lena hant saxten hansa lesath aslant laxate shona oast taos saxe santal tala tana shelta anta antes sext sheol shole shole stola ethnos nates nosh ental axel ao anat anas thole salten neal sextan ethal ashet hexa alex saan leno slent aal alen sean losh leo gan garn gnar amgarn ga mang gam mag nar gar mangar mar ragman ra mara naam raga ma ganam anam gara nama gra amang ama amra amar grama gra arn maga agar aga ar rama agra nam marang"
+// if anyone knows an actual sensible dictionary that isnt gibberish, let me know.
+// its also missing the words "box" "fauna" etc!!
+
+Module Anagrams
 	|dictionary of string|		out
 	|string|					orig
+	|dictionary|				WordDict
 		
 	function Split (|string| v, |string| remain)
-		if v
-			v = " " + v
 		for i in 1 to remain.Length
 			|| sub = remain[0, i]
 			if Anagrams[sub]
 				|| v2 = v + sub
 				|| remain2 = remain[i...]
-					.split(v2, remain2)
+					.split(v2 + " ", remain2)
 				  else
 					v2 = v2.sort(' ')
-					.out[v2] = v2
+					.out![v2] = v2
 		
 	
-	function Find (|string| progress, |string| inside, |int| depth)
+	function FindSub (|string| progress, |string| inside, |int| depth)
 		for i in progress.Length + 1
 			|| Variant = progress.insert(inside, (i,i))
 			if depth < .orig
-				.find(Variant, string.byte(.orig[depth]), depth+1)
+				.FindSub(Variant, string.byte(.orig[depth]), depth+1)
 			  else
-				.split("", variant)
+				.Split("", variant)
 	
-	module
-		|dictionary| D
-		syntax access (|string| s, |bool|)
-			if s.length > 1: return .d[s]
-			return s == "i" or "a"
+	syntax access (|string| s, |bool|)
+		if s.length > 1: return .WordDict[s]
+		return s == "i" or "a"
+		
+	function Clean
+		|| Prev = 0
+		|| upon = badwords
+		|| d = .WordDict!
+		while {
+			|| Curr = badwords.find( ' ', Prev )
+			|| word = upon[prev, curr]
+				D[word] = nil
+			Prev = Curr + 1
+		} (Curr)
+		
+	function Find (|string| s, |dictionary of string|)
+		s = s.Remove(~charset.LettersOnly)
+		if !.WordDict
+			|| data = ""
+			time "read":  data = file.words.ReadAll
+			time "lower": data = data.LowerCase
+			time "dict":  .WordDict = data.dict #expect, .Clean
 			
-		function Find (|string| s, |dictionary of string|)
-			s = s.Remove(~charset.LettersOnly)
-			if !.d
-				|| data = ""
-				time "read":  data = file.words.ReadAll
-				time "lower": data = data.LowerCase
-				time "dict":    .d = data.dict
-			rz = Dictionary()
-			time "anagram"
-				Anagrams(rz, s).find("", "", 0)
+		rz = Dictionary()
+		time "anagram"
+			.out = rz
+			.orig = s
+			.FindSub("", "", 0)
 
 
-main (|string| word="hedgehog")
+main (|string| word="anagram")
 	time "total"
 		|| d = Anagrams.find(word)
 		for v in d
