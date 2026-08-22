@@ -24,7 +24,7 @@ void* JB_App__DocumentOpened (bool Clear) {
 
 void JB_App__InitStuff (void) {
 	if (!Sigh) {
-		sigh = [[AppDelegate alloc] init];
+		Sigh = [[AppDelegate alloc] init];
 		NSApp.delegate = Sigh;
 	} 
 }
