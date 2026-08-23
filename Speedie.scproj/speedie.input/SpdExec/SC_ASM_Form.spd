@@ -6,10 +6,10 @@
 class µForm
 	|int|			Count
 	|string|		Name
-	|µParam[6]|		Params
-	|message| 		src
+	|µParam[5]|		Params
+	|message|		src
 	|int|			TotalBits
-	|int| 			RegsAltered
+	|int|			RegsAltered
 	|int|			Index
 	|int|			RegForJump // remove RegForJump and use forms count
 	
