@@ -74,7 +74,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc.OutputPrms = 0
 	Fnc._op = asm.tail
 	fnc.µRefCount++
-	(Fnc is exit)
+	(Fnc.info as= ASMReg.exit)
 // can't do this as its too late. Something can jump to it.
 // we'd have to do this at the time we created the fnc in the first place.
 //	if (fnc.BasicBlock == ret.BasicBlock)

@@ -311,7 +311,7 @@ function InlineFinish (|FatRange| R, |savedregisters| sv, |ASMReg|)
 
 
 		if s.GuessSize
-			(s is FromInline)
+			(s.info as= asmreg.FromInline)
 	
 	rz &= ~ASMReg.Exit
 	|| dest = .state.return

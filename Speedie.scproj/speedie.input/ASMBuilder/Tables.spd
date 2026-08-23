@@ -154,7 +154,7 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	
 	|| BeefIn = BFLG.ASMReg(1)
 	|| R = .Register(BeefIn.reg)
-	if !R or !.IsCurrBlock(R)
+	if !R or !.IsCurr(R)
 		return ret
 	
 	BeefIn = r.info
@@ -470,7 +470,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
 	
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
-		(mode is AddrNoFiddle)								// inlineoffsetopt can't get at buried glob
+		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
 															// So we simplify
 	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
 	|| RegToAdd = .µGetASM(Index)
@@ -868,32 +868,16 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 	return exp.VSWZ(T, src, Mode) * T
 
 
-function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
-	if .IsCurrBlock(f)
-		// K = 1
-		// X += K			// Can const
+function CanConst (|scdecl| D, |&fatasm| f, |bool|)
+	if .IsCurr(f)
 		return true
-	
-	if (d is Alteredinloop) and (.LoopDepth > d.DepthOfLoop)
-		// K = 0
-		// while X
-		//    Y += K		// Can't const
-		//    K++
+	if (.LoopDepth > d.DepthOfLoop) and (d is Alteredinloop)
 		return false
-
-	if d is AlteredInIf
-		// K = 0
-		// if X
-		//     K = 1
-		//     Y += K		// Can const
-
-		// K = 0
-		// if X
-		//     K = 1
-		// Y += K			// Can't const K
-		return .IsWithin(f)
-	
-	return f isnt FromInline		// not sure why inline makes a difference... remove this?
+	if .IsWithin(f)
+		return true
+	if d is alteredinif
+		return false // remove this test? not sure how this works.
+	return f isnt FromInline
 	
 
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
@@ -903,9 +887,9 @@ function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	
 	(t is param) = d is param
 	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
-	if (f is const) and .CanConstLocalThg(d, f)
-		t.FatIndex = f.index
-		(T is Const)
+		if .CanConst(d, f)
+			t.FatIndex = f.index
+			(T is Const) = (f is Const)	
 	
 	
 	|| rr = T.reg

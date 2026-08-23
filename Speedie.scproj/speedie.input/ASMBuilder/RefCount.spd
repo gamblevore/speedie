@@ -78,7 +78,7 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 	opt	NoRefCounts
 	|| Last = .last
-	if .IsCurrBlock(last)
+	if .iscurr(last)
 		if (last isa asm.gobj) and (Last.p0 iz Obj)  and  (Last.p1 != 0)
 			last.p2 = 0							// decring a global mem obj. Lets just NOT incr!
 			return nil		

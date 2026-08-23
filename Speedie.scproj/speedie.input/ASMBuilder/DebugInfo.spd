@@ -160,7 +160,7 @@ function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |boo
 function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
 	|| Last = .Last
 	if Start > Last	and start > .funcstart	// It could have nopped a .gtab if its an inlined param 
-		start -= .IsCurrBlock(start-1)|int|		// and it gets replaced into a .gobj
+		start -= .IsCurr(start-1)|int|		// and it gets replaced into a .gobj
 	
 	while Start <= Last
 		if Last.CanMarkOpen(exp, Declared, ty)

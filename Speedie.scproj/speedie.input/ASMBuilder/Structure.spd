@@ -70,12 +70,12 @@ extend assembler
 			if BP != PP 
 
 
-	function IsCurrBlock (|?&fatasm| f, |asm| Type,  |bool|)
+	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
 		if (f isa type)
 			return (.basicblock == f.basicblock)
 
 
-	function IsCurrBlock (|&fatasm| f, |bool|)
+	function IsCurr (|&fatasm| f, |bool|)
 		// can these use .within?
 		return .basicblock == f.basicblock
 
@@ -233,7 +233,7 @@ extend assembler
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if (old.µRefCount <= 0) and .IsCurrBlock(old)
+			if (old.µRefCount <= 0) and .iscurr(old)
 				.nop_sub(old, fatnopmode.hard)
 		
 		(NopDest isnt AllowNopDest)
