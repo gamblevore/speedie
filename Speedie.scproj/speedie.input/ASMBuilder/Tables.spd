@@ -470,7 +470,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
 	
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
-		(mode as= asmreg.AddrNoFiddle)						// inlineoffsetopt can't get at buried glob
+		(mode is AddrNoFiddle)								// inlineoffsetopt can't get at buried glob
 															// So we simplify
 	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
 	|| RegToAdd = .µGetASM(Index)
