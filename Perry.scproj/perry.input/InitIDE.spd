@@ -333,6 +333,7 @@ extend PerryIDE
 		with .appinfo
 			is	visible
 			is	drawsfocus
+			is UnSearchable
 			.Alignment		= MoveCode.Center
 			.tooltip		= self.debugger.Tooltip
 			.ID				= "Application Info"
