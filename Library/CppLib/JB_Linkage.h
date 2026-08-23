@@ -1,4 +1,5 @@
 
+#include <atomic>
 
 extern "C" {
 

@@ -502,10 +502,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
 			target osx
 				|string--| P = "~/Library/Preferences"
-			  elseif win
-				|string--| P = "~\AppData\Roaming" // whatever
 			  else
-				|string--| P = "~/.config"
+				target win
+					|string--| P = "~\AppData\Roaming" // whatever
+				  else
+					|string--| P = "~/.config"
 			if name
 				return P.child(Name).file
 			return P.file

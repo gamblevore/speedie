@@ -218,10 +218,10 @@ extend float
 		return self
 	
 	function f64.IsNan (|bool|)
-		cpp_wrapper (__isnand)
-	
+		cpp_wrapper (JB_IsNanD)
+
 	function f64.isInf (|bool|)
-		cpp_wrapper (__isinfd)
+		cpp_wrapper (JB_IsInfD)
 	
 	function Pow (|int| n, |float|)
 		visible

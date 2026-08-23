@@ -1,7 +1,6 @@
-
-
-
+extern "C++" {
 #include <utility>
+}
 #if !__has_builtin(__builtin_unreachable)
 	#define __builtin_unreachable()
 #endif
@@ -174,7 +173,7 @@ VMOpt vec4 VSwiz (CakeRegister* r, ASM Op) {
 
 
 // "static __restrict __hot"... now theres some real cpp
-static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Save, ASM* CodePtr) {
+static __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* self, int Save, ASM* CodePtr) {
 // vm_delete, vm_deleteref, vm_decr
 	fpDestructor Destructor = JB_Destructor(self);
 	auto r = rp;
@@ -212,7 +211,7 @@ static __restrict __hot ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Obj
 }
 
 
-__restrict inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister*& r, JB_Object* self, int SaveReg, ASM* Code) {
+inline ASM* JB_RefDecr (CakeVM& vm, CakeRegister*& r, JB_Object* self, int SaveReg, ASM* Code) {
     if ( self ) {
 		int N = self->RefCount - (1<<JB_RefCountShift);
 		self->RefCount = N;
@@ -755,7 +754,7 @@ VMOpt int64 FuncAddr (CakeVM& vm, ASM Op, ASM* Code) {
 	referencer(x)
 */
 
-__restrict VMOpt void BridgeEntry (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
+VMOpt void BridgeEntry (CakeVM& vm, ASM* CodePtr, CakeRegister* r, ASM Op, u64 funcdata) {
 	auto T = ForeignFunc_Tableu;
 	((CakeStack*)(r))[-1].Code = CodePtr;	 // nicer crash logs
 	int n = n1;

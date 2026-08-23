@@ -290,6 +290,9 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 
 	
 function ExecuteGCC (|[string]| Commands, |bool|)
+	target lin
+		if .CppCompilerPath == "/usr/bin/g++"		// on Linux the system g++ can't build the generated code (it uses clang vector builtins); clang++ can. Override --gcc still wins.
+			.CppCompilerPath = "/usr/bin/clang++"
 	|| fserrs = FastString()
 	fserrs <~ "<(`\nC++ compiler failed to compile source code. Command:\n\n $.CppCompilerPath \n" // prebuild
 	|| Result = .CppCompilerPath.Execute(Commands, nil, fserrs)

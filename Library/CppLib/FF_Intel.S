@@ -20,15 +20,20 @@
     4. Any jeebox-licence note may not be removed/altered from any source distribution.
 */
 
+#if defined(__APPLE__)
+	#define CAKE_BRIDGE_SYM ___CAKE_BRIDGE__
+#else
+	#define CAKE_BRIDGE_SYM __CAKE_BRIDGE__
+#endif
 
 #ifdef __x86_64__
 
 	/*** __CAKE_BRIDGE__ (u64 Data, void* FN, Register* R, int N) ***/
 	.text
-	.global ___CAKE_BRIDGE__
+	.global CAKE_BRIDGE_SYM
 	.balign 4
 
-	___CAKE_BRIDGE__:
+	CAKE_BRIDGE_SYM:
 		// Volatile:  RDI, RSI, RDX, RCX, R8,  R9,    ...  R10, R11, RAX
 		// Saved:     RBX, R12, R13, R14, R15
 		// Stack:	  RBP, RSP

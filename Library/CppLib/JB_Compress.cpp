@@ -14,7 +14,7 @@
 
 
 struct DateLocker {
-	atomic_int64_t	Value;
+	atomic_int64	Value;
 	bool			NoLongerNeeded;
 	DateLocker  () {Value = 0; NoLongerNeeded=false;}
 	void unlock () {

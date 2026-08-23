@@ -52,7 +52,7 @@ __H__ vec4 JB_vec4_Abs (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_abs)
 		return __builtin_elementwise_abs(x);
 	#else
-		return vf2(fabsf, x);
+		return vf1(fabsf, x);
 	#endif
 }
 

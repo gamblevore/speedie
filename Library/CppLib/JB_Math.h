@@ -6,6 +6,11 @@
 #include "JB_Umbrella.h"
 
 extern "C" {
+	static inline int JB_IsNanD (double x) { return __builtin_isnan(x); }
+	static inline int JB_IsInfD (double x) { return __builtin_isinf(x); }
+	static inline int JB_IsNanF (float  x) { return __builtin_isnan(x); }
+	static inline int JB_IsInfF (float  x) { return __builtin_isinf(x); }
+
 	int    JB_Math_Rnd32		();
 	float  JB_f_Clamp			(float d, float min, float max);
 	ivec4  JB_ivec4_ClampVec	(ivec4 Self, ivec4 A, ivec4 B);

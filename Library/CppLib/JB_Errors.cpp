@@ -7,6 +7,10 @@
 #include <unistd.h>
 #include <errno.h>
 
+#ifndef ELAST
+	#define ELAST 4095
+#endif
+
 extern "C" {
 
 
