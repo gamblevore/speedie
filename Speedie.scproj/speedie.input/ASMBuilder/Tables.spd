@@ -868,16 +868,32 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 	return exp.VSWZ(T, src, Mode) * T
 
 
-function CanConst (|scdecl| D, |&fatasm| f, |bool|)
+function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
 	if .IsCurrBlock(f)
+		// K = 1
+		// X += K				// Can const
 		return true
-	if (.LoopDepth > d.DepthOfLoop) and (d is Alteredinloop)
+	
+	if (d is Alteredinloop) and (.LoopDepth > d.DepthOfLoop)
+		// K = 0
+		// while X
+		//    Y += K			// Can't const
+		//    K++
 		return false
-	if .IsWithin(f)
-		return true
-	if d is alteredinif
-		return false // remove this test? not sure how this works.
-	return f isnt FromInline
+
+	if d is AlteredInIf
+		// K = 0
+		// if X
+		//     K = 1
+		//     Y += K			// Can const
+
+		// K = 0
+		// if X
+		//     K = 1
+		// Y += K				// Can't const K
+		return .IsWithin(f)
+	
+	return f isnt FromInline		// not sure why inline makes a difference... remove this?
 	
 
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
@@ -887,7 +903,7 @@ function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	
 	(t is param) = d is param
 	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
-		if .CanConst(d, f)
+		if .CanConstLocalThg(d, f)
 			t.FatIndex = f.index
 			(T is Const) = (f is Const)	
 	
