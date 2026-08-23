@@ -36,10 +36,9 @@ module Effects
 
 function PerryColorLineNum (GUITextLineBreakColor)
 	opt norefcounts													// Could we Precolor these? Maybe?
-	|| m = .message
 	if PreRun
 		|| f = 0.0625
-		if m
+		|| m = .message
 			|| fn = m.OwningFunc
 				|| Prev = PreRun[]
 				f = 0.35
@@ -64,7 +63,7 @@ function PerryColorLineNum (GUITextLineBreakColor)
 		c.b = 0.75
 		c.g = 0.75
 		f = -f
-	if (f >= 0.25) and (m == @arg)
+	if (f >= 0.25) and (.message == @arg)
 		f = 0.275
 	c.a = f
 	return c
