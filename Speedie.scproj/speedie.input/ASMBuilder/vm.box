@@ -368,7 +368,7 @@ forms
 		else if (Op == VMHexFinalReturn)
 			0
 		else
-			CakeCrashed(&vm, SIGILL)
+			CakeCrashed(&vm, EILSEQ)
 		return &vm.Registers[2].Ivec
 
 

@@ -76,14 +76,15 @@ struct InlineInfo
 				sh.Decr(r.needfat, fatnopmode.hard)
 			  elseif !(r iz Ret)
 				|| f = r.fat
-				if f  and  !f.µrefcount  and  f.guesssize
+				if f  and  !f.µrefcount  and  f.GuessSize
 					if sh.IsWithinCurrInline(f)
 						sh.nop(f)
 
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
+		return true // remove later
 		// its a good opt, but can make debugging harder
-		// add later
+
 		opt norefcounts
 		|| After = .Source.Parent
 		if self is Param
@@ -108,7 +109,7 @@ struct InlineInfo
 		.CantNop |= 1<<i
 		if param is Reference
 			.References |= vr
-		  elseif (param is Altered)	// and passed.isUsedAfter(msg)
+		  elseif (param is Altered)	and passed.isUsedAfter(msg)
 			if .Altered & vr
 				.Normal |= vr		// passed a reg twice, both alter it.
 									// but why do I mark it as normal??
@@ -289,8 +290,8 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 
-function InlineFinish (|FatRange| R, |savedregisters| sv, |ASMReg|)
-	target debug: || inlinetrap = ++asmtrapper,  if inlinetrap == -1
+function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
+	target debug: || InlineTrap = ++ASMTrapper,  if InlineTrap == -1
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
@@ -311,7 +312,7 @@ function InlineFinish (|FatRange| R, |savedregisters| sv, |ASMReg|)
 
 
 		if s.GuessSize
-			(s.info as= asmreg.FromInline)
+			(s is FromInline) // whyy???? this blocks consts, but why?
 	
 	rz &= ~ASMReg.Exit
 	|| dest = .state.return

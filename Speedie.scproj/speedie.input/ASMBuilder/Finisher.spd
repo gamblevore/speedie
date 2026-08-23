@@ -13,37 +13,22 @@ function Assembler.FinishASM
 		|ASM[4]| TestSpace
 
 	while Last >= S
+		if s is Nopped
+			s++
+			continue
+		
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
 //			.AskNop(s) // this is not good for consts even
-			// breaks andortest...
-			// so we need some kind of phinode.
-			// i don't really want to do that.
-			// can we check if this const is used by looking at the ASM?
-			// using the *BlockParent* map thing?
-			// if we are going linearly forward... that makes it easier
-			// but we don't know when a var opens or closes.
-			// so r4 can mean multiple variables.
-			// loops make it more tricky. Something can be used by something behind it...
-			// I think we need some kind of graphing data-structure?
-			// each thing can be used by multiple things...
-			// and each thing can use multiple things...
-			// even if we only track the "things that we use"...
-			// thats not so simple.
-			// each open/close var... (for args mostly, including if/while)...
-			// could keep track of what decls are open... and what fats made those registers
-			// then each time it is used... we track back the fats. (maybe using RegFile to help.)
-			// nopping isnt so fun then... if its separate... it should be on the fat
-			// but theres no more space. unless I wanna go to 128-bytes.
-			// leave this for now... its not so easy.
+// needs PHIs
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
 			if s < last
 				.TryTail(s)
 
-		|| Predicted = s.guesssize
+		|| Predicted = s.GuessSize
 		length += Predicted
 		
 		target debug
@@ -74,7 +59,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc.OutputPrms = 0
 	Fnc._op = asm.tail
 	fnc.µRefCount++
-	(Fnc.info as= ASMReg.exit)
+	(Fnc is exit)
 // can't do this as its too late. Something can jump to it.
 // we'd have to do this at the time we created the fnc in the first place.
 //	if (fnc.BasicBlock == ret.BasicBlock)
