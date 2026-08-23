@@ -99,6 +99,13 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 	return ty.Simplify
 
 
+function fatasm.CurrGrabID (|byte|)
+	return ._const
+
+function fatasm.CurrGrabID (assigns:|byte|)
+	._const = value
+
+
 function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
 	dest = .TempTyped(d, dest)

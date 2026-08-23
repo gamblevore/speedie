@@ -447,14 +447,14 @@ function VMLine (|message| line, |faststring| vm)
 
 || rizzler = "
 if curr < after		// remove the test for curr!=nil...
-	curr++[] = rz 
+	curr++[] = mu
 return curr
 ".macro
 
 
 || double_rizzler = "
 if curr < after+2
-	curr++[] = rz 
+	curr++[] = mu
 	curr++[] = .prms[_0]
 	|| p2 = .prms[_0+1]
 	if p2
@@ -464,17 +464,17 @@ return curr
 ".macro
 
 
-|| ASM_Datatype = "datatype _0 (ASM) 
+|| ASM_Datatype = "datatype _0 (ASM)
 	module
 		function Encode (ASM_Encoder,)
 			visible true
-			|asm| rz = .op|asm| << 24
+			|asm| mu = .op|asm| << 24
 		
 ASM.Forms[_1] = &_0.Encode
 ".macro
 
 
-|| Ooof  = `rz._0 = .prms[_1]`.macro
+|| Ooof  = `mu._0 = .prms[_1]`.macro
 || Ugh = `function asm._0 (assigns:|uint|, |asm|): return self ||| ((value << _1) >> _2)`.macro
 || ohio    = "if (((_0<<_1)>>_1) != _0): error (self, `Jumped too far`)".macro
 || gyatt   = "rz.jumpinput(_0) = _1".macro

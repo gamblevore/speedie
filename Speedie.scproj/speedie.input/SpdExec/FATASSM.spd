@@ -5,21 +5,20 @@ struct FatASM
 		cpp_part FAT
 		sort_properties true
 	
-	|ASMParam[6]|		Prms
+	|ASMParam[5]|		Prms
+	|uint16|			BasicBlock
+	|int16|				µRefCount
 	|ASMReg|			Info
 	|Message--|			Msg
 	|uint64|			_Const
-	|uint16|			BasicBlock
-	|int16|				µRefCount
 	|uint16|			ASMIndex
 	|byte|				BreakInfo
-	|byte|				CurrGrabID
-	|byte|				InputFats		// could merge with inputprms... easy and better probably. Do later
+	|byte|				InputFats		// Could merge with inputprms... easy and better probably. Do later
 	|byte|				InputPrms	
-	|byte|				OutputPrms		// not just dependant on µform. For example RD1U can increment or not.
+	|byte|				OutputPrms		// Not just dependant on µform. For example RD1U can increment or not.
 	|byte|				_Op
 	|byte|				JumpPrm
-	|byte[67]|			ExtraSpace
+	|byte[72]|			ExtraSpace
 	
 	
 	function Op (|byte|)
@@ -38,8 +37,7 @@ struct FatASM
 	
 	setter _op (|byte|)
 		._op = value
-		
-	
+
 	function InputFat (|int| i, |&fatasm|)
 		|| r = (.prms[i] << 1) >> 16
 			return r.fat
