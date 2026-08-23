@@ -722,6 +722,7 @@ struct InlineState {
 	ASMReg Return;
 	uint64 ParentVars;
 	u16 FuncStart;
+	u16 Backup;
 	byte BranchDepth;
 	byte ID;
 	byte RealBranchDepth;
@@ -2501,6 +2502,7 @@ extern ArchonPurger SC__nil_T;
 extern IsaTester SC__IsaTester_T;
 #define kJB__TerminalDisplay_h ((int)35)
 #define kJB__TerminalDisplay_w ((int)80)
+extern FatASM* SC__Pac_BackupSpace;
 extern u16 SC__Pac_BlockParents[16384];
 #define kSC__Pac_Breakable ((int)1)
 #define kSC__Pac_BreakPoint ((int)2)

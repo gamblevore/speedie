@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026082010));
+	JB_FS_AppendInt32(_fsf0, (2026082314));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10231,7 +10231,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026082010));
+	JB_FS_AppendInt32(_fsf0, (2026082314));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -21585,22 +21585,18 @@ void SC_InlineInfo_NopParams(InlineInfo* Self, int N, ASMReg Ret, Assembler* Sh)
 	while ((--N) >= 0) {
 		ASMReg R = Self->Items[N];
 		int V = SC_Reg_Reg(R);
-		if (!V) {
+		if (((!V)) or (Self->CantNop & (1 << N))) {
 			0;
 		}
 		 else if (SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
+			if (SC_Reg_OperatorIz(R, Ret)) {
+			}
 			SC_Pac_Decr(Sh, SC_Reg_NeedFAT(R), kSC__FatNopMode_Hard, 0);
 		}
-		 else if (SC_Reg_OperatorIz(R, Ret)) {
-			0;
-		}
-		 else {
+		 else if (!(SC_Reg_OperatorIz(R, Ret))) {
 			FatASM* F = SC_Reg_FAT(R);
 			if (F and ((!F->xC2xB5RefCount) and SC_FAT_GuessSize(F))) {
-				if (Self->CantNop & (1 << N)) {
-					0;
-				}
-				 else if (SC_Pac_IsWithinCurrInline(Sh, F)) {
+				if (SC_Pac_IsWithinCurrInline(Sh, F)) {
 					SC_Pac_Nop(Sh, F);
 				}
 			}
@@ -23844,12 +23840,19 @@ void SC_Pac_InitAndStartFunc(Assembler* Self, SCFunction* Fn) {
 	}
 	;
 	Self[0] = ((Assembler){});
+	(JB_Mem_LengthSet(SC__Pac_HoistSpace, 0));
 	MWrap* J = SC__Pac_JSM;
 	Self->End = ((FatASM*)JB_Mem_NeedSpare(J, 65536, 65536));
 	Self->TotalStart = ((FatASM*)JB_Mem_Ptr(J));
 	Self->Curr_ = (Self->TotalStart + J->Length);
 	Self->FuncStart_ = SC_Pac_Curr(Self);
-	(JB_Mem_LengthSet(SC__Pac_HoistSpace, 0));
+	if (!SC__Pac_BackupSpace) {
+		SC__Pac_BackupSpace = ((FatASM*)JB_Mem__Zalloc(((128)) * 1024));
+		if (!SC__Pac_BackupSpace) {
+			JB_Object_Fail(nil);
+			return;
+		}
+	}
 	Self->InlineState[0].TailInlineable = true;
 	Self->Out = Fn;
 	SC_Pac_State(Self)->Fn = Fn;
@@ -25374,7 +25377,6 @@ ASMReg SC_Pac_SetInlineDest(Assembler* Self, Message* Prms, ASMReg Dest, SCFunct
 }
 
 ASMReg SC_Pac_SetRegister(Assembler* Self, int Changed, ASMReg NopDest, FatASM* Alterer) {
-	(SC_Pac_KnownValuesSet(Self, Changed, SC_FAT_SyntaxIs(Alterer, kSC__Reg_Const)));
 	int A = Self->Regs.Alterations & (~(1 << Changed));
 	int N = 0;
 	if (Alterer) {
@@ -25384,6 +25386,7 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Changed, ASMReg NopDest, FatASM* 
 	uint Oldi = Self->Regs.Setters[Changed];
 	Self->Regs.Alterations = A;
 	Self->Regs.Setters[Changed] = N;
+	(SC_Pac_KnownValuesSet(Self, Changed, SC_FAT_SyntaxIs(Alterer, kSC__Reg_Const)));
 	if (Oldi and (SC_Reg_SyntaxIs(NopDest, kSC__Reg_AllowNopDest))) {
 		FatASM* Old = Self->FuncStart_ + Oldi;
 		if ((Old->xC2xB5RefCount <= 0) and SC_Pac_IsCurrWithFAT(Self, Old)) {
@@ -60797,4 +60800,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -8732736148632757741 8822961995347469277
+// -772395953083605510 -1894529771028289115

@@ -296,6 +296,7 @@ byte SC__nil_OldPrint;
 int SC__nil_RestartCount;
 ArchonPurger SC__nil_T;
 IsaTester SC__IsaTester_T;
+FatASM* SC__Pac_BackupSpace;
 u16 SC__Pac_BlockParents[16384];
 FastString* SC__Pac_DebugDecls;
 MWrap* SC__Pac_HoistSpace;
