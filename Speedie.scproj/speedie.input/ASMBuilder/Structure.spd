@@ -179,7 +179,7 @@ extend assembler
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
 		
-//		(fat is nopped)
+//		(fat is nopped) // doesn't work... things can still read .op and .OutputPrms
 		fat.setop = asm.noop
 		if HasBreak
 			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?

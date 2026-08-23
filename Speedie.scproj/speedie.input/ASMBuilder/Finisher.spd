@@ -13,10 +13,6 @@ function Assembler.FinishASM
 		|ASM[4]| TestSpace
 
 	while Last >= S
-		if s is Nopped
-			s++
-			continue
-		
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish

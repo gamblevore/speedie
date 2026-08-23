@@ -37,7 +37,6 @@ datatype ASMReg (uint64)
 		GlobalMemory
 		VerySpecial
 		Const
-		Nopped
 		StatelessFunc
 //		NotNil				// probably a big addition. Will need tests...
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
