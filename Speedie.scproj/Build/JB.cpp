@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026082314));
+	JB_FS_AppendInt32(_fsf0, (2026082317));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10231,7 +10231,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026082314));
+	JB_FS_AppendInt32(_fsf0, (2026082317));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -11270,10 +11270,10 @@ int SC_VM_Builder__Init_() {
 		JB_SetRef(SC__VM_Builder_Parent, JB_LUB[0]);
 		JB_SetRef(SC__VM_Builder_rdz, JB_Array_Constructor0(nil));
 		JB_SetRef(SC__VM_Builder_icecream, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[394])), 1073741824), false));
-		JB_SetRef(SC__VM_Builder_rizzler, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[346])), 1073741824), false));
-		JB_SetRef(SC__VM_Builder_double_rizzler, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[27])), 1073741824), false));
-		JB_SetRef(SC__VM_Builder_ASM_Datatype, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[411])), 1073741824), false));
-		JB_SetRef(SC__VM_Builder_Ooof, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[401])), 1073741824), false));
+		JB_SetRef(SC__VM_Builder_rizzler, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[27])), 1073741824), false));
+		JB_SetRef(SC__VM_Builder_double_rizzler, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[346])), 1073741824), false));
+		JB_SetRef(SC__VM_Builder_ASM_Datatype, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[401])), 1073741824), false));
+		JB_SetRef(SC__VM_Builder_Ooof, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[411])), 1073741824), false));
 		JB_SetRef(SC__VM_Builder_Ugh, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[404])), 1073741824), false));
 		JB_SetRef(SC__VM_Builder_ohio, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[540])), 1073741824), false));
 		JB_SetRef(SC__VM_Builder_gyatt, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[542])), 1073741824), false));
@@ -12861,7 +12861,7 @@ int JB_SP_AppInit() {
 	SC__ASM_Forms[39] = (&SC_ASM_Float__Encode);
 	SC__ASM_Forms[40] = (&SC_ASM_Float3__Encode);
 	SC__ASM_Forms[41] = (&SC_ASM_FloatConst__Encode);
-	SC__ASM_Forms[42] = (&SC_ASM_ConstStretchy__Encode);
+	SC__ASM_Forms[42] = (&SC_ASM_IntConst__Encode);
 	SC__ASM_Forms[43] = (&SC_ASM_MemoryCopy__Encode);
 	SC__ASM_Forms[44] = (&SC_ASM_AddB__Encode);
 	SC__ASM_Forms[45] = (&SC_ASM_AddK__Encode);
@@ -15938,18 +15938,6 @@ ASM SC_ASM_Compare4_SmallSet(ASM Self, uint Value) {
 	return Self | ((Value << 31) >> 28);
 }
 
-ASM SC_ASM_ConstStretchy_CondSet(ASM Self, uint Value) {
-	return Self | ((Value << 31) >> 13);
-}
-
-ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value) {
-	return Self | ((Value << 31) >> 14);
-}
-
-ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value) {
-	return Self | ((Value << 15) >> 15);
-}
-
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value) {
 	return Self | ((Value << 28) >> 18);
 }
@@ -16016,6 +16004,18 @@ ASM SC_ASM_GTable_ModeSet(ASM Self, uint Value) {
 
 ASM SC_ASM_HALT_ReservedSet(ASM Self, uint Value) {
 	return Self | ((Value << 8) >> 8);
+}
+
+ASM SC_ASM_IntConst_CondSet(ASM Self, uint Value) {
+	return Self | ((Value << 31) >> 13);
+}
+
+ASM SC_ASM_IntConst_InvSet(ASM Self, uint Value) {
+	return Self | ((Value << 31) >> 14);
+}
+
+ASM SC_ASM_IntConst_ValueSet(ASM Self, uint Value) {
+	return Self | ((Value << 15) >> 15);
 }
 
 ASM SC_ASM_JBitTest_JmpSet(ASM Self, uint Value) {
@@ -16636,7 +16636,7 @@ ASMReg SC_ASMType__Access(Assembler* Self, Message* Exp, ASMReg Dest) {
 	Message* Index = ((Message*)JB_Ring_First(((Message*)JB_Tree_Second(Exp))));
 	ASMReg Mode = SC_Reg_OperatorAs(kSC__Reg_AddrRequest, SC_Msg_ASMAllowsTemp(Index));
 	if (!(((!SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest))) and ((!SC_Decl_IsCArray(D)) and SC_Decl_CanCopyNormally(D)))) {
-		(Mode = SC_Reg_OperatorAs(Mode, kSC__Reg_AddrNoFiddle));
+		Mode = SC_Reg_SyntaxIsSet(Mode, kSC__Reg_AddrNoFiddle, true);
 	}
 	ASMReg Base = SC_Pac_xC2xB5GetPrms(Self, F, Mode);
 	ASMReg RegToAdd = SC_Pac_GetASM(Self, Index, SC_Reg__NewWith0());
@@ -17225,7 +17225,7 @@ ASMReg SC_ASMType__ReturnOpt(Assembler* Self, ASMReg Ret) {
 	}
 	ASMReg BeefIn = SC_FAT_ASMReg(BFLG, 1);
 	FatASM* R = SC_Pac_Register(Self, SC_Reg_Reg(BeefIn));
-	if ((!R) or (!SC_Pac_IsCurrWithFAT(Self, R))) {
+	if ((!R) or (!SC_Pac_IsCurrBlockWithFAT(Self, R))) {
 		return Ret;
 	}
 	BeefIn = R->Info;
@@ -18332,12 +18332,12 @@ bool SC_xC2xB5Param_SyntaxIs(uint /*MuParam*/ Self, uint /*MuParam*/ P) {
 
 ASM* SC_ASM_AddAK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_AddAK_KSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_AddAK_KSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18345,11 +18345,11 @@ ASM* SC_ASM_AddAK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_AddB__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_AddB_KSet(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_AddB_KSet(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18357,12 +18357,12 @@ ASM* SC_ASM_AddB__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_AddK_KSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_AddK_KSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18370,13 +18370,13 @@ ASM* SC_ASM_AddK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_AddOrSubM__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_AddOrSubM_ShSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_AddOrSubM_ShSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18384,11 +18384,11 @@ ASM* SC_ASM_AddOrSubM__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_Alloc_AmountSet(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_Alloc_AmountSet(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18396,14 +18396,14 @@ ASM* SC_ASM_Alloc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_BFLD_upSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_BFLD_downSet(Rz, Self->Prms[3]);
-	Rz = SC_ASM_BFLD_signSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_BFLD_upSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_BFLD_downSet(Mu, Self->Prms[3]);
+	Mu = SC_ASM_BFLD_signSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18411,13 +18411,13 @@ ASM* SC_ASM_BFLD__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_BoolNot__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_BoolNot_KSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_BoolNot_KSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18425,12 +18425,12 @@ ASM* SC_ASM_BoolNot__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_Bra_SmallSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_Bra_JmpSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_Bra_SmallSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_Bra_JmpSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18438,14 +18438,14 @@ ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_CNTC_offsetSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_CNTC_cnstSet(Rz, Self->Prms[3]);
-	Rz = SC_ASM_CNTC_sizeSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_CNTC_offsetSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_CNTC_cnstSet(Mu, Self->Prms[3]);
+	Mu = SC_ASM_CNTC_sizeSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18453,13 +18453,13 @@ ASM* SC_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_CmpF__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_CmpF_CmpSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_CmpF_CmpSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18467,13 +18467,13 @@ ASM* SC_ASM_CmpF__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_CmpI__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_CmpI_CmpSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_CmpI_CmpSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18481,28 +18481,14 @@ ASM* SC_ASM_CmpI__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Compare4__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_Compare4_SmallSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_Compare4_SmallSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
-	}
-	return Curr;
-}
-
-
-ASM* SC_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After) {
-	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_ConstStretchy_CondSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_ConstStretchy_InvSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_ConstStretchy_ValueSet(Rz, Self->Prms[3]);
-	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18510,12 +18496,12 @@ ASM* SC_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_Convert_ModeSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_Convert_ModeSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18523,14 +18509,14 @@ ASM* SC_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_Div_KindSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_Div_KindSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18538,13 +18524,13 @@ ASM* SC_ASM_Div__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Div2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_Div2_ClearSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Div2_DownSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_Div2_ClearSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Div2_DownSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18552,14 +18538,14 @@ ASM* SC_ASM_Div2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_Float_DSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_Float_DSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18567,13 +18553,13 @@ ASM* SC_ASM_Float__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Float3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Float3_DSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Float3_DSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18581,12 +18567,12 @@ ASM* SC_ASM_Float3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_FloatConst_HighSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_FloatConst_HighSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18594,11 +18580,11 @@ ASM* SC_ASM_FloatConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_ForeignFunc_TableSet(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_ForeignFunc_TableSet(Mu, Self->Prms[1]);
 	if (Curr < (After + 2)) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 		Curr++[0] = Self->Prms[2];
 		ASMParam P2 = Self->Prms[2 + 1];
 		if (P2) {
@@ -18611,11 +18597,11 @@ ASM* SC_ASM_ForeignFunc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_Func_JUMPSet(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_Func_JUMPSet(Mu, Self->Prms[1]);
 	if (Curr < (After + 2)) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 		Curr++[0] = Self->Prms[2];
 		ASMParam P2 = Self->Prms[2 + 1];
 		if (P2) {
@@ -18628,12 +18614,12 @@ ASM* SC_ASM_Func__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_FuncAddr__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_FuncAddr_LibrarySet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_FuncAddr_IndexSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_FuncAddr_LibrarySet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_FuncAddr_IndexSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18641,13 +18627,13 @@ ASM* SC_ASM_FuncAddr__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_GObj__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_GObj_ModeSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_GObj_RefSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_GObj_AddSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_GObj_ModeSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_GObj_RefSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_GObj_AddSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18655,12 +18641,12 @@ ASM* SC_ASM_GObj__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_GTable__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_GTable_ModeSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_GTable_AddSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_GTable_ModeSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_GTable_AddSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18668,10 +18654,24 @@ ASM* SC_ASM_GTable__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_HALT__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_HALT_ReservedSet(Rz, Self->Prms[0]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_HALT_ReservedSet(Mu, Self->Prms[0]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
+	}
+	return Curr;
+}
+
+
+ASM* SC_ASM_IntConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
+	//visible;
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_IntConst_CondSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_IntConst_InvSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_IntConst_ValueSet(Mu, Self->Prms[3]);
+	if (Curr < After) {
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18679,12 +18679,12 @@ ASM* SC_ASM_HALT__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_JBitTest__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_JBitTest_ShSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_JBitTest_JmpSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_JBitTest_ShSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_JBitTest_JmpSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18692,14 +18692,14 @@ ASM* SC_ASM_JBitTest__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_JCmpEq_LSmallSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_JCmpEq_RSmallSet(Rz, Self->Prms[3]);
-	Rz = SC_ASM_JCmpEq_JmpSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_JCmpEq_LSmallSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_JCmpEq_RSmallSet(Mu, Self->Prms[3]);
+	Mu = SC_ASM_JCmpEq_JmpSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18707,13 +18707,13 @@ ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_JCmpF_CmpSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_JCmpF_JmpSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_JCmpF_CmpSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_JCmpF_JmpSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18721,13 +18721,13 @@ ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_JCmpI_CmpSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_JCmpI_JmpSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_JCmpI_CmpSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_JCmpI_JmpSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18735,12 +18735,12 @@ ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_JCmpK_KSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_JCmpK_JmpSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_JCmpK_KSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_JCmpK_JmpSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18748,10 +18748,10 @@ ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_Jump_JUMPSet(Rz, Self->Prms[0]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_Jump_JUMPSet(Mu, Self->Prms[0]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18759,13 +18759,13 @@ ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_Loop_SmallSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Loop_JmpSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_Loop_SmallSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Loop_JmpSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18773,13 +18773,13 @@ ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_MemUtil_OpSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_MemUtil_NSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_MemUtil_OpSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_MemUtil_NSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18787,12 +18787,12 @@ ASM* SC_ASM_MemUtil__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_MemoryCopy__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_MemoryCopy_LengthSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_MemoryCopy_LengthSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18800,14 +18800,14 @@ ASM* SC_ASM_MemoryCopy__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Phi__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_R5Set(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_R5Set(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18815,13 +18815,13 @@ ASM* SC_ASM_Phi__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_REQ__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_REQ_ModeSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_REQ_ValSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_REQ_ModeSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_REQ_ValSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18829,11 +18829,11 @@ ASM* SC_ASM_REQ__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_RET_ValueSet(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_RET_ValueSet(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18841,14 +18841,14 @@ ASM* SC_ASM_RET__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Read_OffsetSet(Rz, Self->Prms[3]);
-	Rz = SC_ASM_Read_moveSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Read_OffsetSet(Mu, Self->Prms[3]);
+	Mu = SC_ASM_Read_moveSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18856,11 +18856,11 @@ ASM* SC_ASM_Read__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RefReturn__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18868,12 +18868,12 @@ ASM* SC_ASM_RefReturn__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RefSet1__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_RefSet1_SaveSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_RefSet1_SaveSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18881,13 +18881,13 @@ ASM* SC_ASM_RefSet1__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RefSet2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_RefSet2_SaveSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_RefSet2_OffsetSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_RefSet2_SaveSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_RefSet2_OffsetSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18895,13 +18895,13 @@ ASM* SC_ASM_RefSet2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RefSet3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_RefSet3_SaveSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_RefSet3_OffsetSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_RefSet3_SaveSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_RefSet3_OffsetSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18909,13 +18909,13 @@ ASM* SC_ASM_RefSet3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RefSetApart__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_RefSetApart_SaveSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_RefSetApart_SaveSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18923,13 +18923,13 @@ ASM* SC_ASM_RefSetApart__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_RotateConst_RotSet(Rz, Self->Prms[1]);
-	Rz = SC_ASM_RotateConst_InvSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_RotateConst_ValueSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_RotateConst_RotSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_RotateConst_InvSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_RotateConst_ValueSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18937,13 +18937,13 @@ ASM* SC_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Shift_ShSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Shift_ShSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18951,11 +18951,11 @@ ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18963,14 +18963,14 @@ ASM* SC_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_TERN__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_TERN_SmallSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_TERN_SmallSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -18978,10 +18978,10 @@ ASM* SC_ASM_TERN__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_Tail_JUMPSet(Rz, Self->Prms[0]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_Tail_JUMPSet(Mu, Self->Prms[0]);
 	if (Curr < (After + 2)) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 		Curr++[0] = Self->Prms[1];
 		ASMParam P2 = Self->Prms[1 + 1];
 		if (P2) {
@@ -18994,10 +18994,10 @@ ASM* SC_ASM_Tail__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_Trap_AtSet(Rz, Self->Prms[0]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_Trap_AtSet(Mu, Self->Prms[0]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19005,9 +19005,9 @@ ASM* SC_ASM_Trap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19015,10 +19015,10 @@ ASM* SC_ASM_U0__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19026,11 +19026,11 @@ ASM* SC_ASM_U1__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19038,12 +19038,12 @@ ASM* SC_ASM_U2__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19051,13 +19051,13 @@ ASM* SC_ASM_U3__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19065,14 +19065,14 @@ ASM* SC_ASM_U4__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecBuild__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_R5Set(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_R5Set(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19080,11 +19080,11 @@ ASM* SC_ASM_VecBuild__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_VecConst_K1Set(Rz, Self->Prms[1]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_VecConst_K1Set(Mu, Self->Prms[1]);
 	if (Curr < (After + 2)) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 		Curr++[0] = Self->Prms[2];
 		ASMParam P2 = Self->Prms[2 + 1];
 		if (P2) {
@@ -19097,13 +19097,13 @@ ASM* SC_ASM_VecConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecGet__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_VecGet_IndSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_VecGet_IndSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19111,13 +19111,13 @@ ASM* SC_ASM_VecGet__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecInc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_VecInc_partSet(Rz, Self->Prms[2]);
-	Rz = SC_ASM_VecInc_AmountSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_VecInc_partSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_VecInc_AmountSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19125,14 +19125,14 @@ ASM* SC_ASM_VecInc__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_R4Set(Rz, Self->Prms[3]);
-	Rz = SC_ASM_VecMix_ModeSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_R4Set(Mu, Self->Prms[3]);
+	Mu = SC_ASM_VecMix_ModeSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19140,13 +19140,13 @@ ASM* SC_ASM_VecMix__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecOpPart__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_VecOpPart_ModeSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_VecOpPart_ModeSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19154,13 +19154,13 @@ ASM* SC_ASM_VecOpPart__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecSet__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_VecSet_IndSet(Rz, Self->Prms[3]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_VecSet_IndSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19168,12 +19168,12 @@ ASM* SC_ASM_VecSet__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_VecSwizzle__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_VecSwizzle_FieldsSet(Rz, Self->Prms[2]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_VecSwizzle_FieldsSet(Mu, Self->Prms[2]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -19181,14 +19181,14 @@ ASM* SC_ASM_VecSwizzle__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 ASM* SC_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
-	ASM Rz = ((ASM)SC_FAT_Op(Self)) << 24;
-	Rz = SC_ASM_R1Set(Rz, Self->Prms[0]);
-	Rz = SC_ASM_R2Set(Rz, Self->Prms[1]);
-	Rz = SC_ASM_R3Set(Rz, Self->Prms[2]);
-	Rz = SC_ASM_Write_OffsetSet(Rz, Self->Prms[3]);
-	Rz = SC_ASM_Write_moveSet(Rz, Self->Prms[4]);
+	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Write_OffsetSet(Mu, Self->Prms[3]);
+	Mu = SC_ASM_Write_moveSet(Mu, Self->Prms[4]);
 	if (Curr < After) {
-		Curr++[0] = Rz;
+		Curr++[0] = Mu;
 	}
 	return Curr;
 }
@@ -20717,7 +20717,7 @@ bool SC_FAT_CopyFrom(FatASM* Self, FatASM* D) {
 	{
 		uint _irf0 = Self->InputFats;
 		int _if1 = 0;
-		while (_if1 < (6)) {
+		while (_if1 < (5)) {
 			if (!(_irf0 & (1 << _if1))) {
 				(++_if1);
 				continue;
@@ -20731,6 +20731,14 @@ bool SC_FAT_CopyFrom(FatASM* Self, FatASM* D) {
 	}
 	;
 	return false;
+}
+
+byte SC_FAT_CurrGrabID(FatASM* Self) {
+	return Self->_Const;
+}
+
+void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value) {
+	Self->_Const = Value;
 }
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh) {
@@ -21042,16 +21050,27 @@ int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value) {
 }
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After) {
-	ASM* Rz = nil;
-	Rz = SC_ASM_ConstStretchy__Encode(Self, Curr, After);
-	uint Op = SC_FAT_Op(Self);
-	if (Op != kSC__ASM_KNST) {
-		Rz++[0] = Self->Prms[4];
-		if (Op == kSC__ASM_KNST3) {
-			Rz++[0] = Self->Prms[5];
+	//visible;
+	ASM Op = ((ASM)SC_FAT_Op(Self));
+	ASM Mu = Op << 24;
+	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
+	uint64 V = Self->_Const;
+	if (V >> 63) {
+		V = (~V);
+	}
+	Mu = SC_ASM_IntConst_CondSet(Mu, Self->Prms[1]);
+	Mu = SC_ASM_IntConst_InvSet(Mu, Self->Prms[2]);
+	Mu = SC_ASM_IntConst_ValueSet(Mu, V & ((1 << 17) - 1));
+	if (Curr < After) {
+		Curr++[0] = Mu;
+		if ((Op != kSC__ASM_KNST) and (Curr < After)) {
+			Curr++[0] = (V >> 17);
+			if ((Op == kSC__ASM_KNST3) and (Curr < After)) {
+				Curr++[0] = (V >> 49);
+			}
 		}
 	}
-	return Rz;
+	return Curr;
 }
 
 ASM* SC_FAT_Nop_Encoder(FatASM* Self, ASM* Curr, ASM* After) {
@@ -21371,16 +21390,16 @@ void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value) {
 }
 
 bool SC_FAT_SimpleConst(FatASM* Self, uint64 V, int Space) {
-	bool Negate = ((int64)V) < 0;
+	uint64 Negate = V >> 63;
 	if (Negate) {
 		V = (~V);
 	}
 	int Sh = 64 - Space;
 	if (((V << Sh) >> Sh) == V) {
+		Self->Prms[1] = 0;
 		Self->Prms[2] = ((int)Negate);
-		Self->Prms[3] = (V & ((1 << 17) - 1));
-		Self->Prms[4] = (V >> 17);
-		Self->Prms[5] = (V >> 49);
+		Self->Prms[3] = V;
+		Self->Prms[4] = (V >> 32);
 		return true;
 	}
 	return false;
@@ -21619,7 +21638,7 @@ ASMReg SC_InlineInfo_PreInlineOneParam(InlineInfo* Self, Message* Msg, SCDecl* P
 	if (SC_Decl_SyntaxIs(Param, kSC__SCDeclInfo_Reference)) {
 		Self->References = (Self->References | Vr);
 	}
-	 else if (SC_Decl_SyntaxIs(Param, kSC__SCDeclInfo_Altered)) {
+	 else if ((SC_Decl_SyntaxIs(Param, kSC__SCDeclInfo_Altered)) and SC_Decl_IsUsedAfter(Passed, Msg)) {
 		if (Self->Altered & Vr) {
 			Self->Normal = (Self->Normal | Vr);
 		}
@@ -22044,7 +22063,7 @@ ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L, ASMReg Zero) {
 	}
 	FatASM* B = SC_Reg_FAT(L);
 	if (B) {
-		if (SC_Pac_IsCurrWithFATASM(Self, B, kSC__ASM_BFLG)) {
+		if (SC_Pac_IsCurrBlockWithFATASM(Self, B, kSC__ASM_BFLG)) {
 			if ((B->Prms[4] == 0) and (B->Prms[3] == 63)) {
 				L = SC_Reg_xC2xB5TypeSetWithTC(L, kJB__TC_bool);
 				B->Info = L;
@@ -22270,6 +22289,10 @@ ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src) {
 	return SC_FAT_AsReg(SC_Msg_BFLG(Exp, Dest, Src, Sh, Sh, Sign), Dest);
 }
 
+void SC_Pac_BackupFAT(Assembler* Self, FatASM* Curr) {
+	return;
+}
+
 ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down) {
 	if ((!Up) and (!Down)) {
 		return SC_Reg_xC2xB5TypeSetWithReg(Src, Dest);
@@ -22309,7 +22332,7 @@ ASMReg SC_Pac_BFLG_Sub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, i
 	}
 	if ((Up == Down) and ((!SC_Reg_IsVec(Dest)) and ((!SC_Reg_Signed(Src)) or Sign))) {
 		FatASM* Mem = SC_Reg_FAT(Src);
-		if (Mem and (SC_FAT_IsRead(Mem) and SC_Pac_IsCurrWithFAT(Self, Mem))) {
+		if (Mem and (SC_FAT_IsRead(Mem) and SC_Pac_IsCurrBlockWithFAT(Self, Mem))) {
 			int Size = 64 - SC_Reg_BitCount(Src);
 			if (Size == Up) {
 				Src = SC_Reg_xC2xB5TypeSetWithTC(Src, SC_Reg_xC2xB5Type(Dest));
@@ -22670,18 +22693,15 @@ int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R) {
 	return 0;
 }
 
-bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F) {
-	if (SC_Pac_IsCurrWithFAT(Self, F)) {
+bool SC_Pac_CanConstLocalThg(Assembler* Self, SCDecl* D, FatASM* F) {
+	if (SC_Pac_IsCurrBlockWithFAT(Self, F)) {
 		return true;
 	}
-	if ((Self->LoopDepth > D->DepthOfLoop) and (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredInLoop))) {
+	if ((SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredInLoop)) and (Self->LoopDepth > D->DepthOfLoop)) {
 		return false;
-	}
-	if (SC_Pac_IsWithin(Self, F)) {
-		return true;
 	}
 	if (SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_AlteredInIf)) {
-		return false;
+		return SC_Pac_IsWithin(Self, F);
 	}
 	return (!SC_FAT_SyntaxIs(F, kSC__Reg_FromInline));
 }
@@ -23683,7 +23703,7 @@ ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest) {
 ASMReg SC_Pac_GrabAddr(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* D, ASMReg T) {
 	Dest = SC_Pac_TempTypedWithDeclReg(Self, D, Dest);
 	FatASM* Fat = SC_Msg_GRAB(Exp, Dest, T);
-	Fat->CurrGrabID = Self->CurrFuncGrab;
+	(SC_FAT_CurrGrabIDSet(Fat, Self->CurrFuncGrab));
 	return SC_FAT_AsReg(Fat, SC_Reg_HaveAddr(Dest));
 }
 
@@ -23696,7 +23716,7 @@ void SC_Pac_GrabbedRegisters(Assembler* Self, Message* AllPrms, FatASM* Start, F
 	FatASM* C = SC_Pac_LastWith0(Self) - 1;
 	while (C >= Start) {
 		if (SC_FAT_OperatorIsa(C, kSC__ASM_GRAB)) {
-			if (C->CurrGrabID == Self->CurrFuncGrab) {
+			if (SC_FAT_CurrGrabID(C) == Self->CurrFuncGrab) {
 				SC_Pac_SetRegister(Self, SC_FAT_RegOnly(C, 1), nil, Fn);
 			}
 		}
@@ -23847,7 +23867,7 @@ void SC_Pac_InitAndStartFunc(Assembler* Self, SCFunction* Fn) {
 	Self->Curr_ = (Self->TotalStart + J->Length);
 	Self->FuncStart_ = SC_Pac_Curr(Self);
 	if (!SC__Pac_BackupSpace) {
-		SC__Pac_BackupSpace = ((FatASM*)JB_Mem__Zalloc(((128)) * 1024));
+		SC__Pac_BackupSpace = ((FatASM*)JB_Mem__Zalloc(((128)) * 65536));
 		if (!SC__Pac_BackupSpace) {
 			JB_Object_Fail(nil);
 			return;
@@ -23923,7 +23943,7 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 				SC_FAT_JumpFix(S, SC_Pac_Curr(Self));
 			}
 			if (SC_FAT_GuessSize(S)) {
-				(S->Info = SC_Reg_OperatorAs(S->Info, kSC__Reg_FromInline));
+				(SC_FAT_SyntaxIsSet(S, kSC__Reg_FromInline, true));
 			}
 		};
 	}
@@ -24067,14 +24087,14 @@ bool SC_Pac_IsASMConst(Assembler* Self, Message* Exp) {
 	return false;
 }
 
-bool SC_Pac_IsCurrWithFATASM(Assembler* Self, FatASM* F, ASM Type) {
+bool SC_Pac_IsCurrBlockWithFATASM(Assembler* Self, FatASM* F, ASM Type) {
 	if (SC_FAT_OperatorIsa(F, Type)) {
 		return (Self->BasicBlock == F->BasicBlock);
 	}
 	return false;
 }
 
-bool SC_Pac_IsCurrWithFAT(Assembler* Self, FatASM* F) {
+bool SC_Pac_IsCurrBlockWithFAT(Assembler* Self, FatASM* F) {
 	return Self->BasicBlock == F->BasicBlock;
 }
 
@@ -24154,7 +24174,7 @@ FatASM* SC_Pac_LastWith0(Assembler* Self) {
 
 FatASM* SC_Pac_LastWithASM(Assembler* Self, ASM Type) {
 	FatASM* L = Self->Curr_ - 1;
-	if (SC_Pac_IsCurrWithFATASM(Self, L, Type)) {
+	if (SC_Pac_IsCurrBlockWithFATASM(Self, L, Type)) {
 		return L;
 	}
 	return nil;
@@ -24196,7 +24216,7 @@ ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D) {
 	T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Param, SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Param)));
 	FatASM* F = SC_Pac_Register(Self, SC_Reg_Reg(T));
 	if (F) {
-		if (SC_Pac_CanConst(Self, D, F)) {
+		if (SC_Pac_CanConstLocalThg(Self, D, F)) {
 			T = SC_Reg_FatIndexSet(T, SC_FAT_Index(F));
 			T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (SC_FAT_SyntaxIs(F, kSC__Reg_Const))));
 		}
@@ -24282,7 +24302,7 @@ void SC_Pac_MarkVarClosed(Assembler* Self, int RegBits) {
 ASMReg SC_Pac_MarkVarOpen(Assembler* Self, Message* Exp, ASMReg Declared, SCDecl* Ty, FatASM* Start) {
 	FatASM* Last = SC_Pac_LastWith0(Self);
 	if ((Start > Last) and (Start > SC_Pac_FuncStart(Self))) {
-		Start = (Start - ((int)SC_Pac_IsCurrWithFAT(Self, Start - 1)));
+		Start = (Start - ((int)SC_Pac_IsCurrBlockWithFAT(Self, Start - 1)));
 	}
 	while (Start <= Last) {
 		if (SC_FAT_CanMarkOpen(Last, Exp, Declared, Ty)) {
@@ -24401,7 +24421,7 @@ int SC_Pac_MemOpt(Assembler* Self, ASMReg& Base, int& Index, int Bytes) {
 
 ASMReg SC_Pac_MergeBFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, uint upB, uint downB, int SignB) {
 	FatASM* Bflg = SC_Pac_Register(Self, SC_Reg_Reg(Src));
-	if (!(Bflg and SC_Pac_IsCurrWithFATASM(Self, Bflg, kSC__ASM_BFLG))) {
+	if (!(Bflg and SC_Pac_IsCurrBlockWithFATASM(Self, Bflg, kSC__ASM_BFLG))) {
 		return nil;
 	}
 	ASMReg PrevInput = SC_FAT_ASMReg(Bflg, 1);
@@ -24650,8 +24670,8 @@ void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B) {
 }
 
 void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, int Depth) {
-	bool Keep = SC_Pac_nop_sub_keep(Self, Fat, NopMode);
-	if (!Keep) {
+	bool HasBreak = SC_Pac_nop_sub_keep(Self, Fat, NopMode);
+	if (!HasBreak) {
 		FatASM* C = SC_Pac_Curr(Self) - 1;
 		if (Fat == C) {
 			Self->Curr_ = C;
@@ -24663,7 +24683,7 @@ void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, i
 	{
 		uint _irf0 = Fat->InputFats;
 		int _if1 = 0;
-		while (_if1 < (6)) {
+		while (_if1 < (5)) {
 			if (!(_irf0 & (1 << _if1))) {
 				(++_if1);
 				continue;
@@ -24688,7 +24708,7 @@ void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, i
 	}
 	;
 	(SC_FAT_SetOpSet(Fat, kSC__ASM_NOOP));
-	if (Keep) {
+	if (HasBreak) {
 		Fat->BreakInfo = (kSC__Pac_BreakPoint | kSC__Pac_Breakable);
 	}
 }
@@ -24697,7 +24717,7 @@ bool SC_Pac_nop_sub_keep(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMo
 	if (SC_FatNopMode_SyntaxIs(NopMode, kSC__FatNopMode_Rewind)) {
 		return nil;
 	}
-	uint Break = Fat->ASMIndex;
+	uint Break = Fat->BreakInfo;
 	if (!Break) {
 		return nil;
 	}
@@ -24771,7 +24791,7 @@ uint64 SC_Pac_OpenVars(Assembler* Self) {
 
 ASMReg SC_Pac_OptFMul(Assembler* Self, ASMReg Dest, ASMReg Mul, ASMReg Add) {
 	FatASM* Fat = SC_Reg_FAT(Mul);
-	if (!SC_Pac_IsCurrWithFATASM(Self, Fat, kSC__ASM_FMUL)) {
+	if (!SC_Pac_IsCurrBlockWithFATASM(Self, Fat, kSC__ASM_FMUL)) {
 		return nil;
 	}
 	if (!((SC_FAT_SyntaxIs(Fat, kSC__Reg_Temp)) or (SC_Reg_OperatorIz(Dest, Fat->Info)))) {
@@ -25141,7 +25161,7 @@ FatASM* SC_Pac_RefCountClear(Assembler* Self, Message* Exp, Message* Prms) {
 
 FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj) {
 	FatASM* Last = SC_Pac_LastWith0(Self);
-	if (SC_Pac_IsCurrWithFAT(Self, Last)) {
+	if (SC_Pac_IsCurrBlockWithFAT(Self, Last)) {
 		if ((SC_FAT_OperatorIsa(Last, kSC__ASM_GOBJ)) and ((SC_ASMParam_OperatorIz(SC_FAT_p0(Last), Obj)) and (SC_FAT_p1(Last) != 0))) {
 			(SC_FAT_p2Set(Last, 0));
 			return nil;
@@ -25389,7 +25409,7 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Changed, ASMReg NopDest, FatASM* 
 	(SC_Pac_KnownValuesSet(Self, Changed, SC_FAT_SyntaxIs(Alterer, kSC__Reg_Const)));
 	if (Oldi and (SC_Reg_SyntaxIs(NopDest, kSC__Reg_AllowNopDest))) {
 		FatASM* Old = Self->FuncStart_ + Oldi;
-		if ((Old->xC2xB5RefCount <= 0) and SC_Pac_IsCurrWithFAT(Self, Old)) {
+		if ((Old->xC2xB5RefCount <= 0) and SC_Pac_IsCurrBlockWithFAT(Self, Old)) {
 			SC_Pac_nop_sub(Self, Old, kSC__FatNopMode_Hard, 0);
 		}
 	}
@@ -25667,6 +25687,7 @@ ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction*
 ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int AllowedGain, FatRange* LL) {
 	ASMReg Rz = ((ASMReg)0);
 	LL->Start = SC_Pac_Curr(Self);
+	SC_Pac_BackupFAT(Self, SC_Pac_Curr(Self));
 	SavedRegisters Svregs = ((SavedRegisters){});
 	SC_SavedRegisters_Collect((&Svregs), Fn->Args, Self);
 	InlineInfo Info = ((InlineInfo){});
@@ -25718,7 +25739,7 @@ void SC_Pac_TryTail(Assembler* Self, FatASM* FNC) {
 	FNC->OutputPrms = 0;
 	(SC_FAT__opSet(FNC, kSC__ASM_TAIL));
 	(++FNC->xC2xB5RefCount);
-	(FNC->Info = SC_Reg_OperatorAs(FNC->Info, kSC__Reg_Exit));
+	(SC_FAT_SyntaxIsSet(FNC, kSC__Reg_Exit, true));
 	if (0) {
 		SC_Msg_TAIL(((Message*)nil), nil, nil);
 	}
@@ -25873,7 +25894,7 @@ ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
 	FatASM* InitialJump = SC_Msg_JUMP(Exp, nil);
 	ASMReg Returns = SC_ASMType__ArgumentSub(Self, ((Message*)JB_Tree_Second(Exp)), kSC__Reg_Exit);
 	FatRange Loop_test = ((FatRange){});
-	Self->BreakRequest = (Self->BreakRequest | (kSC__Pac_Breakable | InitialJump->ASMIndex));
+	Self->BreakRequest = (Self->BreakRequest | (kSC__Pac_Breakable | InitialJump->BreakInfo));
 	SC_Pac_Branch(Self, ((Message*)JB_Ring_First(Exp)), (&Loop_test), true);
 	if (Self->EntireInlineFailed) {
 		return nil;
@@ -34612,7 +34633,7 @@ void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*MuParam*/ P) {
 	}
 	int I = Self->Count++;
 	Self->TotalBits = (Self->TotalBits + Size);
-	if (I >= (6)) {
+	if (I >= (5)) {
 		JB_Str_Fail(JB_LUB[1124]);
 		return;
 	}
@@ -34634,7 +34655,7 @@ xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, Message* Tmp) {
 		Self = ((xC2xB5Form*)JB_NewClass(&xC2xB5FormData));
 	}
 	Self->Count = 0;
-	memzero((&Self->Params[0]), 12);
+	memzero((&Self->Params[0]), 10);
 	Self->TotalBits = 0;
 	Self->RegsAltered = 0;
 	Self->RegForJump = 0;
@@ -46302,6 +46323,10 @@ bool SC_Decl_IsUintLike(SCDecl* Self) {
 
 bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 	return ((!SC_Decl_NilStated(Self))) and (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Param));
+}
+
+bool SC_Decl_IsUsedAfter(SCDecl* Self, Message* Thg) {
+	return true;
 }
 
 bool SC_Decl_IsVoidPtr(SCDecl* Self) {
@@ -60800,4 +60825,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -772395953083605510 -1894529771028289115
+// -9178779658615967174 468578167172329740

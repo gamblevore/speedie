@@ -177,8 +177,6 @@ typedef ASM ASM_CmpI;
 
 typedef ASM ASM_Compare4;
 
-typedef ASM ASM_ConstStretchy;
-
 typedef ASM ASM_Convert;
 
 typedef ASM ASM_Div;
@@ -202,6 +200,8 @@ typedef ASM ASM_GObj;
 typedef ASM ASM_GTable;
 
 typedef ASM ASM_HALT;
+
+typedef ASM ASM_IntConst;
 
 typedef ASM ASM_JBitTest;
 
@@ -680,19 +680,18 @@ struct FastBuff {
 
 struct FatASM {
 	byte BreakInfo;
-	byte CurrGrabID;
 	byte InputFats;
 	byte InputPrms;
 	byte OutputPrms;
 	byte _Op;
 	byte JumpPrm;
-	byte ExtraSpace[67];
-	u16 BasicBlock;
+	byte ExtraSpace[72];
 	s16 xC2xB5RefCount;
+	u16 BasicBlock;
 	u16 ASMIndex;
-	ASMParam Prms[6];
-	Message* Msg;
+	ASMParam Prms[5];
 	uint64 _Const;
+	Message* Msg;
 	ASMReg Info;
 };
 
@@ -1070,7 +1069,7 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 JBClass ( xC2xB5Form , JB_Object , 
 	int Count;
 	Message* src;
-	MuParam Params[6];
+	MuParam Params[5];
 	int TotalBits;
 	int RegsAltered;
 	int Index;
@@ -4539,12 +4538,6 @@ ASM SC_ASM_CNTC_sizeSet(ASM Self, uint Value);
 
 ASM SC_ASM_Compare4_SmallSet(ASM Self, uint Value);
 
-ASM SC_ASM_ConstStretchy_CondSet(ASM Self, uint Value);
-
-ASM SC_ASM_ConstStretchy_InvSet(ASM Self, uint Value);
-
-ASM SC_ASM_ConstStretchy_ValueSet(ASM Self, uint Value);
-
 ASM SC_ASM_Convert_ModeSet(ASM Self, uint Value);
 
 ASM SC_ASM_Div2_ClearSet(ASM Self, uint Value);
@@ -4578,6 +4571,12 @@ ASM SC_ASM_GTable_AddSet(ASM Self, uint Value);
 ASM SC_ASM_GTable_ModeSet(ASM Self, uint Value);
 
 ASM SC_ASM_HALT_ReservedSet(ASM Self, uint Value);
+
+ASM SC_ASM_IntConst_CondSet(ASM Self, uint Value);
+
+ASM SC_ASM_IntConst_InvSet(ASM Self, uint Value);
+
+ASM SC_ASM_IntConst_ValueSet(ASM Self, uint Value);
 
 ASM SC_ASM_JBitTest_JmpSet(ASM Self, uint Value);
 
@@ -5324,11 +5323,6 @@ ASM* SC_ASM_Compare4__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
-// ASM_ConstStretchy
-ASM* SC_ASM_ConstStretchy__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
 // ASM_Convert
 ASM* SC_ASM_Convert__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
@@ -5386,6 +5380,11 @@ ASM* SC_ASM_GTable__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_HALT
 ASM* SC_ASM_HALT__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
+// ASM_IntConst
+ASM* SC_ASM_IntConst__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5856,6 +5855,10 @@ void SC_FAT_ConstFinish(FatASM* Self);
 
 bool SC_FAT_CopyFrom(FatASM* Self, FatASM* D);
 
+byte SC_FAT_CurrGrabID(FatASM* Self);
+
+void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value);
+
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
 
 ASM* SC_FAT_DoNotEncode(FatASM* Self, ASM* Curr, ASM* After);
@@ -6173,6 +6176,8 @@ int SC_Pac_ASMTableID(Assembler* Self, Message* Exp, SCFunction* Fn);
 
 ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src);
 
+void SC_Pac_BackupFAT(Assembler* Self, FatASM* Curr);
+
 ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down);
 
 ASMReg SC_Pac_BFLG_Sub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down, bool Sign);
@@ -6217,7 +6222,7 @@ bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
 
 int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R);
 
-bool SC_Pac_CanConst(Assembler* Self, SCDecl* D, FatASM* F);
+bool SC_Pac_CanConstLocalThg(Assembler* Self, SCDecl* D, FatASM* F);
 
 Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB, int Total);
 
@@ -6367,9 +6372,9 @@ FailableInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub);
 
 bool SC_Pac_IsASMConst(Assembler* Self, Message* Exp);
 
-bool SC_Pac_IsCurrWithFATASM(Assembler* Self, FatASM* F, ASM Type);
+bool SC_Pac_IsCurrBlockWithFATASM(Assembler* Self, FatASM* F, ASM Type);
 
-bool SC_Pac_IsCurrWithFAT(Assembler* Self, FatASM* F);
+bool SC_Pac_IsCurrBlockWithFAT(Assembler* Self, FatASM* F);
 
 bool SC_Pac_IsCurrBranch(Assembler* Self, FatASM* F);
 
@@ -9640,6 +9645,8 @@ bool SC_Decl_IsUintLike(SCDecl* Self);
 
 bool SC_Decl_IsUnknownParam(SCDecl* Self);
 
+bool SC_Decl_IsUsedAfter(SCDecl* Self, Message* Thg);
+
 bool SC_Decl_IsVoidPtr(SCDecl* Self);
 
 bool SC_Decl_IsZero(SCDecl* Self);
@@ -11373,7 +11380,7 @@ inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src) {
 		return nil;
 	}
 	if (!SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
-		if (!(SC_Pac_IsCurrWithFAT(Self, F) and (SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitAtAll)))) {
+		if (!(SC_Pac_IsCurrBlockWithFAT(Self, F) and (SC_Reg_SyntaxIs(Dest, kSC__Reg_ExitAtAll)))) {
 			return nil;
 		}
 		uint Vdecls = ((uint)SC_Pac_State(Self)->ParentVars);
