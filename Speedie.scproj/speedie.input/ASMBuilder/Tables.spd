@@ -154,7 +154,7 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	
 	|| BeefIn = BFLG.ASMReg(1)
 	|| R = .Register(BeefIn.reg)
-	if !R or !.IsCurr(R)
+	if !R or !.IsCurrBlock(R)
 		return ret
 	
 	BeefIn = r.info
@@ -869,7 +869,7 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 
 
 function CanConst (|scdecl| D, |&fatasm| f, |bool|)
-	if .IsCurr(f)
+	if .IsCurrBlock(f)
 		return true
 	if (.LoopDepth > d.DepthOfLoop) and (d is Alteredinloop)
 		return false

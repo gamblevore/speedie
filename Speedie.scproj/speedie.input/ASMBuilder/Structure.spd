@@ -70,12 +70,12 @@ extend assembler
 			if BP != PP 
 
 
-	function IsCurr (|?&fatasm| f, |asm| Type,  |bool|)
+	function IsCurrBlock (|?&fatasm| f, |asm| Type,  |bool|)
 		if (f isa type)
 			return (.basicblock == f.basicblock)
 
 
-	function IsCurr (|&fatasm| f, |bool|)
+	function IsCurrBlock (|&fatasm| f, |bool|)
 		// can these use .within?
 		return .basicblock == f.basicblock
 
@@ -147,7 +147,7 @@ extend assembler
 	
 	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
 		require NopMode isnt Rewind
-		|| Break = fat.ASMIndex$
+		|| Break = fat.breakinfo$
 		if .IsCurrBranch(fat)
 			.BreakRequest |= Break
 		if break & BreakPoint
@@ -162,8 +162,8 @@ extend assembler
 //		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
 ///			return								// we'll need to back it up first.
 
-		|| keep = .nop_sub_keep(fat, nopmode)
-		if !keep
+		|| HasBreak = .nop_sub_keep(fat, nopmode)
+		if !HasBreak
 			|| C = .curr - 1
 			if fat == C
 				.curr_ = C						// Do it before both kinds of nop...
@@ -179,8 +179,9 @@ extend assembler
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
 		
+//		(fat is nopped)
 		fat.setop = asm.noop
-		if keep
+		if HasBreak
 			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?
 			// then addb isnt a nop anymore.
 			fat.BreakInfo = breakpoint ||| Breakable
@@ -233,7 +234,7 @@ extend assembler
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if (old.µRefCount <= 0) and .iscurr(old)
+			if (old.µRefCount <= 0) and .IsCurrBlock(old)
 				.nop_sub(old, fatnopmode.hard)
 		
 		(NopDest isnt AllowNopDest)
