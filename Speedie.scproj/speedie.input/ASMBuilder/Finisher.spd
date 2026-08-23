@@ -65,16 +65,16 @@ function assembler.TryTail (|fatasm| FNC)
 
 
 function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
-	|| negate = v|int64| < 0
+	|| negate = v>>63
 		v = ~v
 	|| sh = 64-Space
 	if (v << sh) >> sh == v
+		.prms[1] = 0
 		.prms[2] = negate|int|
-		.prms[3] = v & 17~bits
-		.prms[4] = v >> 17
-		.prms[5] = v >> 49
+		.prms[3] = v		// encoder will read from ._const anyhow
+		.prms[4] = v>>32	// but we set this for fun.
 		return true
-//		Cond	1		// 0 == always, 1 = only if dest == 0
+//		Cond	1			// 0 == always, 1 = only if dest == 0
 //		Inv		1
 //		Value	17
 
@@ -82,7 +82,7 @@ function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
 function fatasm.ConstFinish 
 	|| v = .const|uint64|
 	if .SimpleConst(v, 17)
-		._op = asm.KNST // already set, but its for clarity
+		._op = asm.KNST		// Already set, but its for clarity
 		return
 	if .RotateConst(V)
 		._op = asm.KNSR
@@ -90,8 +90,9 @@ function fatasm.ConstFinish
 	if .SimpleConst(v, 49)
 		._op = asm.KNST2
 		return
-	.SimpleConst(v, 64)
-	._op = asm.KNST3
+	.SimpleConst(v, 64)		// this is the only one that uses prms[5]. But why?
+	._op = asm.KNST3		// we could just... use ._Const?? 
+
 
 
 function uint64.rotl1 (|uint64|)

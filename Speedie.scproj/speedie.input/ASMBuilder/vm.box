@@ -220,12 +220,11 @@ forms
 		r2		r
 		High	14
 
-	ConstStretchy // rename to just Const
+	IntConst
 		r1		R
 		Cond	1		// 0 == always, 1 = only if dest == 0
 		Inv		1
 		Value	17
-//		Extra	x
 	
 	MemoryCopy
 		r1		r		// dest
@@ -351,7 +350,6 @@ forms
 		r3		r
 		r4		r
 		r5		r
-		r6		r
 		
 	
 // this file:
@@ -459,14 +457,14 @@ POS 255
 /**/ KNSR (RotateConst)
 		RotateConst(r, Op)
 
-/**/ KNST (ConstStretchy)
+/**/ KNST (IntConst) // intconst
 		LoadConst(r, Op, 0)
 
 POS 4
-	KNST2 (ConstStretchy)
+	KNST2 (IntConst)
 		LoadConst(r, Op, *Code++)
 POS 5
-	KNST3 (ConstStretchy)			// this leaves 17 bits unused. Perhaps can be reused for SIMD?
+	KNST3 (IntConst)			// this leaves 17 bits unused. Perhaps can be reused for SIMD?
 		LoadConst(r, Op, *((uint64*)(Code)))
 		Code+=2
 

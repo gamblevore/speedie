@@ -17,10 +17,20 @@ function fatasm.Halt_Encoder (Asm_encoder)
 
 
 function fatasm.KNST_Encoder (Asm_encoder)
-	rz = ASM_ConstStretchy.Encode(self, curr, after)
-	|| op = .op
-	if op != asm.knst
-		rz++[] = .prms[4]
-		if op == asm.knst3
-			rz++[] = .prms[5]
-
+	visible true
+	|| op = .op|asm|
+	|| mu = op << 24
+	mu.r1 = .prms[0]
+	|| V = ._const
+	if v>>63
+		v = ~v
+	mu.IntConst_Cond = .prms[1]
+	mu.IntConst_Inv = .prms[2]
+	mu.IntConst_Value = v & 17~bits
+	if curr < after
+		curr++[] = mu
+		if op != asm.knst and curr < after
+			curr++[] = V>>17
+			if op == asm.knst3 and curr < after
+				curr++[] = V >> 49
+	return curr

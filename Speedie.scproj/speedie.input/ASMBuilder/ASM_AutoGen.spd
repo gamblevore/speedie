@@ -764,15 +764,15 @@ datatype ASM_FloatConst (ASM) {
 }
 
 ASM.Forms[41] = &ASM_FloatConst.Encode
-datatype ASM_ConstStretchy (ASM) {
+datatype ASM_IntConst (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
 			visible true
 			|asm| mu = .op|asm| << 24
 			mu.r1 = .prms[0]
-			mu.ConstStretchy_Cond = .prms[1]
-			mu.ConstStretchy_Inv = .prms[2]
-			mu.ConstStretchy_Value = .prms[3]
+			mu.IntConst_Cond = .prms[1]
+			mu.IntConst_Inv = .prms[2]
+			mu.IntConst_Value = .prms[3]
 			if curr < after {
 				curr++[] = mu
 			}
@@ -782,7 +782,7 @@ datatype ASM_ConstStretchy (ASM) {
 	}
 }
 
-ASM.Forms[42] = &ASM_ConstStretchy.Encode
+ASM.Forms[42] = &ASM_IntConst.Encode
 datatype ASM_MemoryCopy (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {

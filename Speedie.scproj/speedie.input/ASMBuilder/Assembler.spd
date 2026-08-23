@@ -510,7 +510,7 @@ struct Assembler
 		.FuncStart_ = .curr
 		
 		if !Backupspace
-			BackupSpace = memory.Zalloc((–sizeof FATASM) * 1024)|&fatasm| #expect
+			BackupSpace = memory.Zalloc((–sizeof FATASM) * 64K)|&fatasm| #expect
 		
 		
 		.inlinestate[0].TailInlineable = true

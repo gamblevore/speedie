@@ -156,12 +156,12 @@
 #define	FloatConst_Highi		((( int)((Op)<<18))>>18)
 #define	FloatConst_Highu		(((uint)((Op)<<18))>>18)
 
-#define	ConstStretchy_Condi		((( int)((Op)<<13))>>31)
-#define	ConstStretchy_Condu		(((uint)((Op)<<13))>>31)
-#define	ConstStretchy_Invi		((( int)((Op)<<14))>>31)
-#define	ConstStretchy_Invu		(((uint)((Op)<<14))>>31)
-#define	ConstStretchy_Valuei		((( int)((Op)<<15))>>15)
-#define	ConstStretchy_Valueu		(((uint)((Op)<<15))>>15)
+#define	IntConst_Condi		((( int)((Op)<<13))>>31)
+#define	IntConst_Condu		(((uint)((Op)<<13))>>31)
+#define	IntConst_Invi		((( int)((Op)<<14))>>31)
+#define	IntConst_Invu		(((uint)((Op)<<14))>>31)
+#define	IntConst_Valuei		((( int)((Op)<<15))>>15)
+#define	IntConst_Valueu		(((uint)((Op)<<15))>>15)
 
 #define	MemoryCopy_Lengthi		((( int)((Op)<<18))>>18)
 #define	MemoryCopy_Lengthu		(((uint)((Op)<<18))>>18)

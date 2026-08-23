@@ -105,10 +105,10 @@ double FloatSh2 (uint64 u, int S) {
 
 VMOpt void LoadConst (CakeRegister* r, ASM Op, uint64 Value) {
 	int N = n1;
-	if (!ConstStretchy_Condu or !r[N].Int) {
+	if (!IntConst_Condu or !r[N].Int) {
 		Value <<= 17;
-		Value |= ((uint64)ConstStretchy_Valueu);
-		if (ConstStretchy_Invu)
+		Value |= ((uint64)IntConst_Valueu);
+		if (IntConst_Invu)
 			Value = ~Value;
 		r[N].Int = Value;
 	}

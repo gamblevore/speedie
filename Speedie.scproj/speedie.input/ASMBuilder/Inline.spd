@@ -178,14 +178,15 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
 	LL.Start = .curr
+	.backupfat(.curr)
 	
 	|SavedRegisters| svregs
 	svregs.Collect(fn.args, self)
 
 	|InlineInfo| Info
-	.InlineParams(prms, info, fn)
+	.InlineParams(prms, info, fn)					// Params need to be done anyhow... so don't count them.
 	
-	|| RealStart = .curr							// Params need to be done anyhow... so don't count them.
+	|| RealStart = .curr
 	target debug
 		|| InlineTrap = ++asmtrapper
 		if InlineTrap == -1

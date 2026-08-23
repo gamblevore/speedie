@@ -9,19 +9,21 @@ struct RegFile
 
 
 extend assembler
-	function Backup (|&fatasm| Curr)
-		|| S = .state
-		|| B = S.Backup
+	function BackupFAT (|&fatasm| Curr)
+		return
 		|| Start = .FuncStart
-		S.Backup = curr - Start
-		|| Prev = B + Start
-		|| dest = Backupspace + B
-		target debug2												// failing
-			|| dest2 = Backupspace! + B
-		Memory.Copy(dest!, Prev, Curr|&byte| - prev|&byte|)			// Save the old stuff here.
+		if start != curr
+/			|| S = .state
+			|| B = S.Backup
+			S.Backup = curr - Start
+			|| Prev = B + Start
+			|| dest = Backupspace + B
+			target debug2												// failing
+				|| dest2 = Backupspace! + B
+			Memory.Copy(dest!, Prev, Curr|&byte| - prev|&byte|)			// Save the old stuff here.
 	
 	
-	function RevertBackup (|&fatasm| Prev)
+	function RevertFAT (|&fatasm| Prev)
 		// Just check everything is correct
 		
 		
