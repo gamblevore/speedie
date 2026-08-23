@@ -25,7 +25,7 @@ datatype ASMReg (uint64)
 		DebugVars = [DebugVarOpen, DebugVarClose]
 		ParamNeedsCopy
 		NoScale
-		FromInline
+		FromInline			// remove?
 		ContainsAddr
 		Always
 		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest

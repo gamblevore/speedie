@@ -111,7 +111,7 @@ extend Assembler
 	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
 		require Zero.IsZero
 		|| B = L.Fat
-			if .IsCurr(b, asm.bflg)
+			if .IsCurrBlock(b, asm.bflg)
 				if b.prms[4] == 0  and  b.prms[3] == 63
 					L.µType = DataTypeCode.bool
 					B.info = L
@@ -560,7 +560,7 @@ extend Assembler
 	
 	function OptFMul (|asmreg| dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
 		|| fat = mul.FAT!
-		require .IsCurr(fat, asm.fmul)
+		require .IsCurrBlock(fat, asm.fmul)
 		require (fat is temp) or (dest iz fat.info)
 		|| P3 = fat.p3
 		if !p3.reg
@@ -896,7 +896,7 @@ extend Assembler
 		// So I gave up and brute-forced it.
 		
 		|| bflg = .Register(src.reg)
-		require bflg and .iscurr(bflg, asm.bflg)
+		require bflg and .IsCurrBlock(bflg, asm.bflg)
 		|| PrevInput = bflg.ASMReg(1)
 		if (.last != bflg)
 			|| Intefere = .register(previnput.reg)
@@ -978,7 +978,7 @@ extend Assembler
 			// int8 to int, also ok
 			// int8 to uint... bad
 			|| mem = src.fat
-			if mem and mem.IsRead and .IsCurr(mem)
+			if mem and mem.IsRead and .IsCurrBlock(mem)
 				|| size = 64-src.BitCount // already bit correct!
 				if size == up
 					// why not set dest.reg to src.reg?, and return dest? to be more consistant?
@@ -997,7 +997,7 @@ extend Assembler
 		|| f = src.fat$
 		
 		if src isnt temp
-			require .iscurr(f) and (dest is exitatall)
+			require .IsCurrBlock(f) and (dest is exitatall)
 			|| vdecls = .state.parentvars|uint|
 			|| find = 1<<src.reg
 			require (vdecls & find) // the decl is out of range! IE... it won't be missed.
