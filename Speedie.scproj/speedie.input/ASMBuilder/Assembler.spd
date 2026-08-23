@@ -466,7 +466,7 @@ struct Assembler
 		ASMType.InitAccess
 
 		asm.encoders[asm.halt] = fatasm.halt_Encoder
-		asm.encoders[asm.noop] = fatasm.Nop_Encoder
+		asm.encoders[asm.noop] = fatasm.DoNotEncode
 		asm.encoders[asm.mark] = fatasm.DoNotEncode
 		asm.encoders[asm.phi] = fatasm.DoNotEncode
 

@@ -16,13 +16,16 @@ function Assembler.FinishASM
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
-//			.AskNop(s) // this is not good for consts even
-// needs PHIs
+//			.AskNop(s) // this is not good for consts even... needs PHIs
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
 			if s < last
 				.TryTail(s)
+		  elseif (op == asm.noop) and (s.breakinfo&breakpoint)
+			s._op = asm.addb
+			for i in (–count s.prms)
+				s.prms[i] = 0
 
 		|| Predicted = s.GuessSize
 		length += Predicted
