@@ -264,14 +264,15 @@ These must be unified in appreciation of the numbers, or chaos will bomb us!
 
 Table 3.1B. Legal UTF-8 Byte Sequences
  Code Points		1st Byte	2nd Byte	3rd Byte	4th Byte
-U+0000..U+007F		00..7F			 
+U+0000..U+007F		00..7F
+invalid				C0..C1 							 // overlong disallowed. (0x00 to 0x7F but takes two bytes)
 U+0080..U+07FF		C2..DF		80..BF		 
-U+0800..U+0FFF		E0			A0..BF		80..BF	 
+U+0800..U+0FFF		E0			A0..BF		80..BF	 // 0xE0, 0x80 also overlong
 U+1000..U+CFFF		E1..EC		80..BF		80..BF	 
 U+D000..U+D7FF		ED			80..9F		80..BF	 
-U+D800..U+DFFF		ill-formed
+U+D800..U+DFFF		ill-formed						 // decodes to UTF-16 continuation code, disallowed.
 U+E000..U+FFFF		EE..EF		80..BF		80..BF	 
-U+10000..U+3FFFF	F0			90..BF		80..BF		80..BF
+U+10000..U+3FFFF	F0			90..BF		80..BF		80..BF  // 0xF0, 0x80 also overlong
 U+40000..U+FFFFF	F1..F3		80..BF		80..BF		80..BF
 U+100000..U+10FFFF	F4			80..8F		80..BF		80..BF
 */
