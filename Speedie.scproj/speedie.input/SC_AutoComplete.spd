@@ -1087,7 +1087,7 @@ function CallFrom (|message| msg, |object| found=nil, |message|)
 	
 /	|| fn = msg.AutoMsgFuncFn
 		rz = .CallFromDefine(msg, fn, found)
-		.CallFromSub(rz.first, fn)
+		.CallFromSub(rz.first!, fn)
 
 
 function CallFromSub (|message| arg, |scfunction| fn)
@@ -1200,7 +1200,7 @@ function message.FileMark (|message|)
 //		out <~ "Could not compile this function."
 
 
-function ASM (|message| msg,  |SCFunction| fn, |bool|)
+function ASM (|message| arg,  |SCFunction| fn, |bool|)
 	Assembler.Sh.ASMInit
 	Assembler.JSM.zero
 	Assembler.JSM.Length = 0
@@ -1208,7 +1208,7 @@ function ASM (|message| msg,  |SCFunction| fn, |bool|)
 
 	if Assembler.sh.FatterCompile(fn)
 		|| fs = FastString()
-		rz = .FeedBackViewASMSub(msg, fn, fs)
+		rz = .FeedBackViewASMSub(arg, fn, fs)
 
 
 function message.AsmIndent (|message| top, |int|)
@@ -1255,9 +1255,9 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 			path = msg.NextPath(tmp, path)
 		fat++
 	
-	|| title = out.first // going into the wrong place :D
-	title <~ count
-	title <~ size * 4
+	|| title = out.first
+		title <~ count
+		title <~ size * 4
 	
 	.CppView(out, fn)
 	return true

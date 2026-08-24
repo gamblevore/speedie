@@ -148,7 +148,7 @@ role JBin (Faststring)
 
 libinternal InputStream.NextMsgInfo (|uint64|)
 	opt norefcounts
-	|| Msg = ._Object|message|
+	|| Msg = ._Object|message|!
 	|int| info
 	while 
 		info = .NonZeroByte

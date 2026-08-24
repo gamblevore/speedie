@@ -576,7 +576,7 @@ function Message.StartUsingAfter // for "return" debugging.
 	.MemoryLayer.use
 
 
-function message.WipePos (|int| v=0, |message|)
+function message.WipePos (|int| v=0, |message!|)
 	opt norefcounts
 	for s.flat in self
 		s.Position = v

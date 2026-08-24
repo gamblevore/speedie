@@ -114,7 +114,7 @@ function Message.CollectOneParam (|scfunction| func, |SCNode| Recv, |scclass| cl
 			.AddValue(func)
 		
 	if  self == @Item  and  .first == "assigns"
-		self = .Last
+		self = .Last!
 		func.IsAssigns = 1
 		.addvalue(func)
 	

@@ -72,6 +72,7 @@ datatype Syntax (Byte)
 		return Message( nil, self, name )
 	
 	inline message.Msg ( |syntax| fn, |string?| name=nil, |Message| )
+		real self
 		return Message( self, fn, name )
 	
 	

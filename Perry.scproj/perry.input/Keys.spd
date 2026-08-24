@@ -19,14 +19,11 @@ extend PerryIDE
 
 	function RunKey (|bool|)
 		opt norefcounts
-		|| B = .RunButton
-		if keys.shift or keys.Option
-			return PressingDebug(B)
 		if .RunningProd  and  .DebugMode is CakeMode // Run key
 			if .DebugMode is Crashed
 				.MakeNothingRunning
 			return .ViewRun
-		ClickedDebug(B)
+		ClickedDebug(.RunButton)
 		return true
 
 
@@ -50,9 +47,6 @@ extend PerryIDE
 			if keys.shift
 				return .CancelKey
 			return ClickedHistory(.gonext)
-		
-		if key is T
-			return PressingDebug(.runbutton)
 		
 		if key.IsAccept
 			return .ResumeRunning(0)
@@ -85,7 +79,12 @@ extend PerryIDE
 			return true
 		
 		if key is r
+			if keys.shift or keys.Option
+				return PressingDebug(.RunButton)
 			return .RunKey
+
+//		if key is T // r already does this
+//			return PressingDebug(.runbutton)
 		
 		if key is o
 			if keys.shift

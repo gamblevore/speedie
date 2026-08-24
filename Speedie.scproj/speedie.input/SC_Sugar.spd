@@ -125,7 +125,7 @@ function message.Tran_QMark				//"?"
 		r <~ inside
 		r <~ thedot
 		.BecomeMacro(macros.TernQMark, nil, r) // just use .run?
-		thedot.first.msg(@thg, "_t")
+		thedot.first!.msg(@thg, "_t")
 		r.clear
 
 

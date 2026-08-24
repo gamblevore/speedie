@@ -185,8 +185,8 @@ function DollaDolla (|message| exp, |SCNode| name_space, |SCObject|)
 	|| fnc = "funnyword()"~parse
 	|| prm = fnc.last
 		prm <~ exp.first
-	if strength > 0
-		prm <~ strength
+		if strength > 0
+			prm <~ strength
 	if exp in @arg
 		|| say = "app.say()"~parse
 		say.last! <~ fnc

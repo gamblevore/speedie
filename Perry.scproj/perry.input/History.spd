@@ -6,7 +6,7 @@ function PerryIDE.FindInHistory (|string| Path, |int| Line, |message|)
 		if s.Position == Line
 			if s.FirstName ~= Path
 				return s
-	
+
 	
 function PerryIDE.EnablePrevNext
 	opt norefcounts

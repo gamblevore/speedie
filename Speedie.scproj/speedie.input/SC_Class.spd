@@ -444,7 +444,7 @@ function SCFunction.CopyParams (|message| list)
 	opt norefcounts
 	|| p = .prms$
 	using list
-	|| a = .source.GiveArg
+	|| a = .source!.GiveArg
 	|| dot = @dot.msg("Constructor")
 	a.first = dot
 	dot.msg(@thg, "super")

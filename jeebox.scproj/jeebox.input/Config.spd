@@ -66,6 +66,7 @@ function file.Config (|int| Limit = 1MB, |config|)
 extend message
 	libinternal ConfArg (|config|)
 		opt norefcounts
+		nil checker
 		if self == @arg or nil
 			return self
 		|| w = .next
@@ -84,11 +85,14 @@ extend message
 
 	inline SyntaxAccess (|string| Key, |config|)
 		description "Returns the value of the config item found by Key. To create (if not found), use .GiveItem"
-		return .ConfigItem(key, nil, nil)
+		nil checker
+		if self
+			return .ConfigItem(key, nil, nil)
 
 
 	libinternal ConfigValue (|message| item, |syntax| ValueType, |message|)
 		opt norefcounts
+		nil checker
 		if item.func == @msg
 			if (!ValueType or ValueType == @msg)	// handle @msg differently
 				return item

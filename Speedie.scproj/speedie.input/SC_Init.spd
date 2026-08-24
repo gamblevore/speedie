@@ -165,7 +165,7 @@ function SCModule.CallOurInitsByTheBiggerInitFunc
 	if p == self
 		.InitDeclFixer(compiler.appinitglobals)		
 	if .IsLibrary
-		.CallOurInits(p.InitVarsArg, p.InitCodeArg)
+		.CallOurInits(p.InitVarsArg!, p.InitCodeArg!)
 	  else
 		.CallOurInits(compiler.appinitglobals, compiler.appinitcode)
 	

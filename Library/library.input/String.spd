@@ -507,18 +507,31 @@ class String
 		inlined
 		return .length == other
 
-	libinternal MoveCodePoint (|ind| Pos, |int| CodePoints, |ind|)
+
+	libinternal MoveCodePoint (|ind| BytePos, |int| CodePoints, |ind|)
 		|| n	= .length
+		
+//		if BytePos >= N // can't be bothered to make a general API.
+//			if Codepoints >= 0
+//				return BytePos
+//			if BytePos > N
+//				return -1
+//		if BytePos <= 0
+//			if (Codepoints <= 0) or (BytePos < 0)
+//				return 0
+//			if BytePos < 0
+//				return -1
+			
 		|| s0	= .addr
-		|| s	= s0 + pos
+		|| s	= s0 + BytePos
 		if Codepoints >= 0
-			|| s2 = s0 + n
-			while (--CodePoints >= 0) and (s < s2)
+			|| After = s0 + n
+			while (--CodePoints >= 0) and (s < After)
 				codepoint.utf8read(s)
 		  else
 			while (s > s0)
-				|| c = (--s)[0]
-				if (c < 0x80) or (c > 0xC0)
+				|| c = ((--s)[0] - 0x80)|uint|
+				if (c > 0x40)
 					++Codepoints
 					if (CodePoints >= 0)
 						exit

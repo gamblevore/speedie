@@ -91,7 +91,7 @@ function scclass.FillTaskConstructor (|scfunction| con)
 	opt norefcounts
 	|| src = con.source!
 	using src
-	.FillTaskConstructorSub(src, src.last.TaskConBefore, 0)
+	.FillTaskConstructorSub(src, src.last!.TaskConBefore, 0)
 	|| p = .modul.parent as scmodule
 		|| c = p.cls
 			c.tryadd(src, con, .name)

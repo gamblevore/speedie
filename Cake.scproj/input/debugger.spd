@@ -274,10 +274,10 @@ module debugger
 	
 	function LoadDebugger (|bool|)
 		opt norefcounts
-		if .PackInfo
+		|| P = .PackInfo
 			.VariablePrinter = FastString(64)
 			require .VariablePrinter
-			return .LoadSub(.PackInfo)
+			return .LoadSub(P)
 		return !(debugger.WantDebug or cake.perry)			#EXPECT "Program file doesn't contain debug info."
 
 

@@ -150,7 +150,7 @@ function Tran_Using (TranFunc)
 
 	if (arg in node)
 		node.name = "if"
-		node.first <~ (@thg, "true")
+		node.first! <~ (@thg, "true") // node.first == with?
 	  else
 		node.CommentOut
 
@@ -283,9 +283,9 @@ function Tran_WhileSub (|SCNode| name_space, |Message| node)
 
 	using (node)
 	if (Cond == @arg)
+		arg = cond
 		Cond = @Thg + "true"
 		node.first = Cond
-		arg = cond.next
 		
 	  else
 		arg ?= node.GiveArg
@@ -724,26 +724,26 @@ function Tran_Syx (|Message| msg, |Message|)
 	Params.Name = "fpMsgRender"
 	
 	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
-	Compiler.SyxArray <~ OldName
-
-	if !Options.ModeCake				// why cant packs use these? should I reenable it?
-										// again... with the radical compiler-internal changes
-										// its easier to generate files than insert code.
-
-		|| dotnew = argplace.msg(@dot, "StdNew")
-		dotnew <~ (@thg, "syntax")
-		|| prm = dotnew.msg(@prm)
-		|| dot2 = prm.msg(@dot, name.name)
-		dot2 <~ (@thg, "Message")
-		dot2 <~ @emb
-		prm <~ OldName.lowercase
-		prm <~ longname
-		prm <~ .SyxID
-		Compiler.program.CollectOne( dotnew, true )
-
-	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
-
-	.SyxID++
+		Compiler.SyxArray <~ OldName
+	
+		if !Options.ModeCake				// why cant packs use these? should I reenable it?
+											// again... with the radical compiler-internal changes
+											// its easier to generate files than insert code.
+	
+			|| dotnew = argplace.msg(@dot, "StdNew")
+			dotnew <~ (@thg, "syntax")
+			|| prm = dotnew.msg(@prm)
+			|| dot2 = prm.msg(@dot, name.name)
+			dot2 <~ (@thg, "Message")
+			dot2 <~ @emb
+			prm <~ OldName.lowercase
+			prm <~ longname
+			prm <~ .SyxID
+			Compiler.program.CollectOne( dotnew, true )
+	
+		compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
+	
+		.SyxID++
 	Return msg
 
 

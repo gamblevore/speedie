@@ -90,10 +90,11 @@ role FileArchive (message)
 		|| p = f.path
 		|| where = p.TrimStart(.base)
 		if where != p
-			|| item = .last.msg(@tmp, where)
-			item["data"] = f.readall
-			item["modified"] = f.modified.renderint
-			item["mode"] = f.mode.render
+			|| l = .last
+				|| item = l.msg(@tmp, where)
+				item["data"] = f.readall
+				item["modified"] = f.modified.renderint
+				item["mode"] = f.mode.render
 
 
 	function Base (|string|)
