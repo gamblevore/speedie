@@ -1393,7 +1393,6 @@ extern Dictionary* SC__Comp_InsecureWords;
 extern SCFile* SC__Comp_InternalFile;
 extern SCNode* SC__Comp_Interpreter;
 extern JB_File* SC__Comp_JeeboxProj_;
-#define kSC__Comp_kTimeWidth ((int)19)
 extern Date SC__Comp_LastTime;
 extern JB_String* SC__Comp_LastTimeName;
 extern JB_File* SC__Comp_Library;
@@ -3072,7 +3071,7 @@ void SC_AC__ActualDefine(Message* M, Message* S);
 
 Message* SC_AC__AllTmps();
 
-bool SC_AC__ASM(Message* Msg, SCFunction* Fn);
+bool SC_AC__ASM(Message* Arg, SCFunction* Fn);
 
 Message* SC_AC__ASMFail(SCFunction* Fn, Message* Ret);
 
@@ -3205,9 +3204,6 @@ JB_String* JB_Constants__TestJB();
 
 
 
-// Jeebox
-
-
 // LibStability
 SCObject* SC_LibStability__Find(JB_String* Str, bool Funcs);
 
@@ -3275,9 +3271,6 @@ bool SC_Options__ModeCpp();
 
 bool SC_Options__ShouldBuildTrap();
 
-
-
-// Output
 
 
 // PackMaker
@@ -5917,8 +5910,6 @@ int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
-ASM* SC_FAT_Nop_Encoder(FatASM* Self, ASM* Curr, ASM* After);
-
 void SC_FAT_NumInputSet(FatASM* Self, int A, int V);
 
 byte SC_FAT_Op(FatASM* Self);
@@ -7261,8 +7252,6 @@ void SC_FS_AppendLibGlob(FastString* Self, SCDecl* D);
 void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S, uint /*byte*/ Quote);
 
 void SC_FS_AppendVoid(FastString* Self, JB_String* S, uint /*byte*/ Extra);
-
-void SC_FS_AppendWidth(FastString* Self, JB_String* S, int Width);
 
 void SC_FS_AppendWrap(FastString* Self, SCFunction* F);
 
@@ -10798,8 +10787,6 @@ void SC_Func_Reach(SCFunction* Self);
 bool SC_Func_ReachedByPack(SCFunction* Self);
 
 void SC_Func_ReachFunc(SCFunction* Self, SCNode* From);
-
-void SC_Func_ReachFuncFromFunc(SCFunction* Self, SCFunction* From);
 
 void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 

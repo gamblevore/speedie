@@ -702,16 +702,16 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 || SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
 	msg.name	= "libinternal"
-	|| name		= msg[@thg]							#require
-	|| arg		= msg.last(@arg)					#require
+	|message--| name	= msg[@thg]
+	|message--| arg		= msg.last(@arg)
+	require name and arg
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
-	|| Params	= msg.find(@bra)[@thg]
+	|message--| Params	= msg.find(@bra)[@thg]
 
 	using (msg)
 	if !Params
-		params = @thg.msg
 		|| b = @bra.msg
-		b <~ params
+		params = b.msg(@thg)
 		name.Next = b
 
 
@@ -720,25 +720,25 @@ function Tran_Syx (|Message| msg, |Message|)
 
 	name.name	= OldName + "__"
 
-	|| longname = params.name
-	Params.Name = "fpMsgRender"
-	
-	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
+	|message--| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
 		Compiler.SyxArray <~ OldName
 	
 		if !Options.ModeCake				// why cant packs use these? should I reenable it?
 											// again... with the radical compiler-internal changes
 											// its easier to generate files than insert code.
 	
-			|| dotnew = argplace.msg(@dot, "StdNew")
+			|| LongName = params.name
+			
+			|message--| dotnew = argplace.msg(@dot, "StdNew")
 			dotnew <~ (@thg, "syntax")
-			|| prm = dotnew.msg(@prm)
-			|| dot2 = prm.msg(@dot, name.name)
+			|message--| prm = dotnew.msg(@prm)
+			|message--| dot2 = prm.msg(@dot, name.name)
 			dot2 <~ (@thg, "Message")
 			dot2 <~ @emb
 			prm <~ OldName.lowercase
 			prm <~ longname
 			prm <~ .SyxID
+			Params.Name = "fpMsgRender"
 			Compiler.program.CollectOne( dotnew, true )
 	
 		compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
