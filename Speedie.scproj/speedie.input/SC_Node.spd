@@ -20,8 +20,9 @@ linkage
 
 function IsLibrary (|bool|) // .islib, .isntlib
 	opt norefcounts
-	|| p = .project
-		return p.IsLibraryImp
+	|| P = .project
+		if self isnt EmbeddedOnly
+			return P.IsLibraryImp
 
 
 function CollectFromNode (|Message| AST, |bool| Visible, |message| dest=nil)
