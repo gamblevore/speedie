@@ -101,7 +101,7 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	Prms.First = upon
 
 	.NewFuncsLoaded = true
-	fn.ReachFuncFromFunc(scfunction.currfunc!)
+	fn.ReachFunc(scfunction.currfunc!)
 	dot.memorylayer.use
 	|| f = message(@thg, fn.exportname)
 	f.Position = dot.position
