@@ -430,7 +430,7 @@ function perryide.UpdateStack (|message| stack)
 	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
 	
-	Notifications <~ stack.Render
+	//Notifications <~ stack.Render
 	|| Break = stack != "stack"
 		|| m = .DebugMode
 		|| crash = stack == "crash"
