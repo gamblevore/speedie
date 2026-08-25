@@ -90,10 +90,6 @@ function Reach
 	.ReachFunc(Compiler.VisibleFuncs!)
 
 
-function ReachFuncFromFunc (|SCFunction| from)
-	.reachfunc(From) // whatever just leave this for now.
-	
-
 function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach 
 	opt norefcounts
 	flow off							// memory order dependant!
@@ -112,30 +108,10 @@ function ReachFunc (|SCNode| from)		// reachedfunc, funcreached, reach
 		
 	for o in .LinkTo
 		if (o isa SCFunction)
-			o.ReachFuncFromFunc(self)
+			o.ReachFunc(self)
 		  elseif (o isa SCClass)
 			o.Reach(self)
 	
-	
-function IsUnused (|bool|)
-	opt norefcounts
-	|| p = .project
-		require p.WarnUnusedFuncs
-
-	if self == Compiler.mainfunc
-		return false
-	
-	|| MR = .MyReacher
-	if MR and MR != Compiler.VisibleFuncs
-		return false
-	if self|scnode| is EmbeddedOnly
-		return false
-	
-	if .isvisible and .islibrary
-		return false
-
-	return (self isnt ConOrDes) and !.IsAllocOrNew
-
 }
 
 
@@ -155,8 +131,6 @@ function scnode.WasUnReached (|SCNode| from, |bool|)
 		return true
 	
 	if (mr == Compiler.VisibleFuncs) or (mr.IsLibrary and !from.islibrary)
-//		target debug
-//			if (self == "message") and !from.IsLibrary and Options.modecake
 		.MyReacher = from		// set to a better thing.
 
 
