@@ -596,7 +596,6 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 		if !IntoModule
 			Cpp_Export.WriteConst( prop, self )
 			return true
-//			self <~ '\n'
 
 	  elseif prop.TypeIsReached
 		if prop is library and prop is Global
@@ -616,11 +615,7 @@ function FastStringCpp.AddProperty (|scdecl| prop, |bool| intomodule, |bool|)
 			  elseif prop is api
 				self <~ "__lib__ "
 	
-			if 0 // IntoModule and prop is GameFlyingMem
-				// sigh
-				#!prop.StringData.ReplaceAll("$(N)", prop.name, self)
-			  else
-				Cpp_Export.WriteDecl( prop, self, nil )
+			Cpp_Export.WriteDecl( prop, self, nil )
 		self <~ ";"
 		return true
 
