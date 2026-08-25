@@ -40,7 +40,7 @@ But you don't need to compile to `cake` if you don't want to. The main purpose o
 
 One day (After the first release), speedie will have an `OpenCL` feature, which can compile certain GPU-friendly code and run it... even within `cake`! So you could make fast graphics apps, and use `cake` more like a scripting system for the graphics.
 
-Ano even later (not sure how long, could be a long time) we might get a community that could make a JIT. The `cake-JIT` will run `cake` apps at close to native `C++` speed.
+And even later (not sure how long, could be a long time) we might get a community that could make a JIT. The `cake-JIT` will run `cake` apps at close to native `C++` speed.
 
 The point isn't so much about what `cake` can do today, but what it's potential is. It definitely is the right way forward, even if right now it's not as fast as a proper `C++` compile. Either way, you can just limit `cake` to debugging if you need more speed.
 
