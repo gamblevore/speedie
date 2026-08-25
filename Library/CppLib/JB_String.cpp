@@ -7,6 +7,7 @@
 // if we wanna split this up, it has to be into .cpp files.
 
 
+
 #include "JB_Umbrella.hpp"
 #include <stdio.h>
 #include "float.h"
@@ -16,34 +17,27 @@
 extern "C" {
 
 
-#define kStrLengthMax (2147483644) // 2GB string max
-
-// probably should move all this into the string header... utf-8 isnt needed elsewhere
-#define kWrongUTF16			/*Becomes*/		(16+1)
-#define kUTF16BBOM			/*Becomes*/		0xFFFE
-#define kUTF16LBOM			/*Becomes*/		0xFEFF
-#define kUTF32LBOM			/*Becomes*/		0x0000FEFF
-#define kUTF32BBOM			/*Becomes*/		0xFFFE0000
+#define kStrLengthMax					(2147483644) /* 2GB string max */
+#define kUTF8FirstMin					(-62)		 /* A magic number! */
 
 
-#define kUTF8BOM			/*Becomes*/		0xEFBBBF
-#define kUTF8BOM1			/*Becomes*/		0xEF
-#define kUTF8BOM2			/*Becomes*/		0xBB
-#define kUTF8BOM3			/*Becomes*/		0xBF
-#define kLast3ByteMask		/*Becomes*/		0xFFFFFF00
-#define kUTF8FirstMin						-62 /*A magic number! don't change it!*/
+/*
+		Unicode Ranges:
 
-enum {
-	kEncAscii = 0,
-	kEncBytes = 0,
-	kEncUTF8 = 8,
-	kEncUTF16 = 16,
-    kEncUTF32 = 32,
-    kEncBE = 1,
-    kEncUTF = kEncUTF8|kEncUTF16|kEncUTF32,
-    kEncUTF8_BE = kEncUTF8|kEncBE,
-    kEncUTF_BE = kEncUTF| kEncBE,
-};
+Table 3.1B. Legal UTF-8 Byte Sequences
+ Code Points		1st Byte	2nd Byte	3rd Byte	4th Byte
+U+0000..U+007F		00..7F
+invalid				C0..C1 							 // overlong disallowed. (0x00 to 0x7F but takes two bytes)
+U+0080..U+07FF		C2..DF		80..BF		 
+U+0800..U+0FFF		E0			A0..BF		80..BF	 // 0xE0, 0x80 also overlong
+U+1000..U+CFFF		E1..EC		80..BF		80..BF	 
+U+D000..U+D7FF		ED			80..9F		80..BF	 
+U+D800..U+DFFF		ill-formed						 // decodes to UTF-16 continuation code, disallowed.
+U+E000..U+FFFF		EE..EF		80..BF		80..BF	 
+U+10000..U+3FFFF	F0			90..BF		80..BF		80..BF  // 0xF0, 0x80 also overlong
+U+40000..U+FFFFF	F1..F3		80..BF		80..BF		80..BF
+U+100000..U+10FFFF	F4			80..8F		80..BF		80..BF
+*/
 
 
 
@@ -248,34 +242,8 @@ void JB_XStr_Destructor(JB_StringExternal* self) {
 
 
 
-////////////    #include "StringConvert.i"
+//    /////// StringConverters //////
 
-/*
-		Unicode Ranges:
-
-		// Functions that appreciate unicode numbers!
-These must be unified in appreciation of the numbers, or chaos will bomb us!
-
-  JB_Str_UTF8Size
-  u8Write_
-  JB_Str_UniValid
-  c32to8_ etc etc
-
-
-Table 3.1B. Legal UTF-8 Byte Sequences
- Code Points		1st Byte	2nd Byte	3rd Byte	4th Byte
-U+0000..U+007F		00..7F
-invalid				C0..C1 							 // overlong disallowed. (0x00 to 0x7F but takes two bytes)
-U+0080..U+07FF		C2..DF		80..BF		 
-U+0800..U+0FFF		E0			A0..BF		80..BF	 // 0xE0, 0x80 also overlong
-U+1000..U+CFFF		E1..EC		80..BF		80..BF	 
-U+D000..U+D7FF		ED			80..9F		80..BF	 
-U+D800..U+DFFF		ill-formed						 // decodes to UTF-16 continuation code, disallowed.
-U+E000..U+FFFF		EE..EF		80..BF		80..BF	 
-U+10000..U+3FFFF	F0			90..BF		80..BF		80..BF  // 0xF0, 0x80 also overlong
-U+40000..U+FFFFF	F1..F3		80..BF		80..BF		80..BF
-U+100000..U+10FFFF	F4			80..8F		80..BF		80..BF
-*/
 
 
 static uint8* u8Read( uint8* source, u32* pch ) {
@@ -921,10 +889,10 @@ bool IsAsciiSub_(uint8* SelfPos, u32 Length) {
 		if ( *(--SelfEnd) >= 0x80 )
 			return false;
 	
-	int TrimLength = (int)(SelfEnd - SelfPos) / 4;
+	int TrimLength = (int)(SelfEnd - SelfPos) >> 2;
 	u32* intPos = (u32*)SelfPos;
 	while ( TrimLength-- )
-		if ( (*intPos++) & 0x80808080 )
+		if ( *intPos++ & 0x80808080 )
 			return false;
 
 	return true;
@@ -1021,10 +989,6 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
 	double Value = 0;
 	uint8* Read = *ReadPlaceOut;
 	double Mul0 = 10;
-//	if (ReadEnd[-1] == 'm') { // the universe is 12-based. m for "month".
-//		ReadEnd--; // what digit, though.? 7.6am?? Seems we really need unicode.
-//		Mul0 = 12;
-//	}
 	double Max = __DBL_MAX__/Mul0;
 	if (IsFrac) Mul0 = 1.0 / Mul0;
 	double Mul = Mul0;
@@ -1207,7 +1171,8 @@ int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b ) {
 }
 
 
-////////////    #include "StringAlterCopy.i" 
+
+//    /////// String Alter Copiers //////
 
 inline bool CanByteReplace_(MiniStr F, MiniStr T, bool Lexer) {
 	uint8 FindChar = F.Curr();
@@ -1311,7 +1276,10 @@ JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
 JB_String* JB_ASCII () {
     static JB_String* ASCII = 0;
     if (!ASCII) {
-        static const char kASCII[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 0};
+        static char kASCII[129];
+        for (int i = 0; i < 128; i++) {
+			kASCII[i] = i;
+        }
         ASCII = JB_New( JB_String );
         ASCII->Addr = (uint8*)kASCII;
         ASCII->Length = 128;
@@ -1380,36 +1348,6 @@ bool JB_Str_IsAsciiName(JB_String* self) {
 }
 
 
-
-//CharSet* JB_CS_Constructor(CharSet* self, JB_String* Source, bool Ranges);
-//CharSet* TrimCS_() {
-//	static CharSet* cs;
-//	if (!cs) {
-//		JB_String Dummy;  Dummy.Addr = (uint8*)" \t\n\r\0";  Dummy.Length = 5;
-//		cs = JB_CS_Constructor(nil, &Dummy, false);
-//	}
-//	return cs;
-//}
-
-//JB_String* JB_Str_Trim(JB_String* self, CharSet* CS) {
-//	int n = JB_Str_Length(self);
-//	if (n <= 0)
-//		return self;
-//	if (!CS) CS = TrimCS_();
-//	uint8* CC = CS->Cache;
-//	byte* Addr = self->Addr;
-//	
-//	int i = 0;
-//	for (; i < n; i++)
-//		if (!CC[Addr[i]])
-//			break;
-//	for (; i < n; n--)
-//		if (!CC[Addr[n-1]])
-//			break;
-//	return JB_Str_Range(self, i, n);
-//}
-
-
 JB_String* JB_Str_ReplaceAllB(JB_String* self, int lFrom, int lTo) {
 	return JB_Str_ReplaceBytesSub_(self, lFrom, lTo, 0 );
 }
@@ -1459,7 +1397,7 @@ JB_String* JB_Str_Reverse(JB_String* self, FastString* fs_in) {
 
 
 
-//////////    #include "StringSplitters.i"
+//    /////// String Splitters //////
 
 extern "C" void Str_Share_(JB_StringShared* u, JB_String* p, int i, int L) {
 	u->Addr = p->Addr + i;
@@ -1596,7 +1534,7 @@ JB_Object* JB_Str_Owner(JB_String* self) {
 }
 
 
-/////////    #include "StringEncoding.i"
+//    /////// String Encoding //////
 
 JB_String* JB_Str_UnicodeSync(JB_String* Str) {
     int i = JB_Str_Scan_BadUTF8AtEnd(Str);
@@ -1611,24 +1549,24 @@ JB_String* JB_Str_BOM (int Encoding, bool IsBigEndian) {
 	uint8 Write[4];
 	int Len = 0;
 
-	if (Encoding == kEncUTF8) {
+	if (Encoding == 8) {
 		Len = 3;
-		Write[0] = (uint8)kUTF8BOM1;
-		Write[1] = (uint8)kUTF8BOM2;
-		Write[2] = (uint8)kUTF8BOM3;
-	} else if (Encoding == kEncUTF16) {
+		Write[0] = 0xEF;
+		Write[1] = 0xBB;
+		Write[2] = 0xBF;
+	} else if (Encoding == 16) {
 		Len = 2;
 		if (IsBigEndian) {
-			*(u16*)Write = (u16)kUTF16BBOM;
+			*(u16*)Write = (u16)0xFFFE;
 		} else {
-			*(u16*)Write = (u16)kUTF16LBOM;
+			*(u16*)Write = (u16)0xFEFF;
 		}
-	} else if (Encoding == kEncUTF32) {
+	} else if (Encoding == 32) {
 		Len = 4;
 		if (IsBigEndian) {
-			*(u32*)Write = (u32)kUTF32BBOM;
+			*(u32*)Write = (u32)0xFFFE0000;
 		} else {
-			*(u32*)Write = (u32)kUTF32LBOM;
+			*(u32*)Write = (u32)0x0000FEFF;
 		}
 	}
 
@@ -1674,7 +1612,7 @@ int JB_Str_LengthUTF8(JB_String* self) {
 
 
 
-////////////    #include "StringProperties.i"
+//    /////// String Properties //////
 
 bool JB_Str_IsASCII(JB_String* self) {
 	return IsAsciiSub_( self->Addr, self->Length );
@@ -1775,7 +1713,7 @@ struct ChrBData {
 static ChrBData StrByteObjs = {};
 
 JB_String* JB_Str__Byte (int i) {
-	i&=0xFF;
+	i &= 0xFF;
 	JB_String* Result = StrByteObjs.Objects[i];
 	if (Result)
 		return Result;
@@ -1787,7 +1725,7 @@ JB_String* JB_Str__Byte (int i) {
 }
 
 
-////////////    #include "StringRender.i"
+//    /////// String Renderer //////
 
 
 void JB_FS_AppendEscape(FastString* fs, JB_String* self);
