@@ -512,16 +512,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		
 		module Existing
 			autogen MainArg (|int| Pos, |string| name, |file|)
+				embedded
 				|| f = file.MainArg(pos, name)
 				if f and !f.Mustexist
 					f = nil
 				return f
-		module Jeebox
-			autogen MainArg (|int| Pos, |string| name, |messageroot|)
-				return File.existing.MainArg(pos, name)$.parse
-		module Output
-			autogen MainArg   (|int| Pos, |string| name, |faststring|)
-				return file.MainArg(pos, name)$.Outputstream
 
 
 //	function AnyDate (|date|)

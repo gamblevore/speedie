@@ -34,24 +34,32 @@ function String.ArgSwitch (|string| name, |bool|)
 
 
 autogen @int.MainArg		(|int| Pos, |string| name, |int|)
+	opt norefcounts
+	embedded
 	|| big = int64.mainarg(pos, name)
 	expect (big <= int.max and big >= int.min) ("Int out of range")
 	return big
 
 
 autogen @int64.MainArg		(|int| Pos, |string| name,  |int64|)
+	opt norefcounts
+	embedded
 	return string.MainArgSub(Pos, name, "integer")$.int
 
 
 autogen @bool.MainArg		(|int| Pos, |string| name,  |bool|)
+	opt norefcounts
+	embedded
 	return string.MainArgSub(Pos, name, "boolean")$.Yes
 
 
 autogen @string.MainArg		(|int| Pos, |string| name, |string|)
+	embedded
 	return string.MainArgSub(Pos, name, "string")
 
 
 autogen @message.MainArg	(|int| Pos, |string| name, |message|)
+	embedded
 	|| str = string.MainArgSub(Pos, name, "jeebox")
 	ifn str contains '\n' // a file-path?
 		|| s0 = str[]
@@ -61,10 +69,14 @@ autogen @message.MainArg	(|int| Pos, |string| name, |message|)
 
 
 autogen @float.MainArg		(|int| Pos, |string| name, |Float64|)
+	opt norefcounts
+	embedded
 	return string.MainArgSub(Pos, name, "float")$.float
 
 
 autogen @file.MainArg		(|int| Pos, |string| name, |file|)
+	opt norefcounts
+	embedded
 	|| str = string.MainArgSub(Pos, name, "file-path")
 		if str == "-"
 			rz = app.StdOut
@@ -73,12 +85,21 @@ autogen @file.MainArg		(|int| Pos, |string| name, |file|)
 	
 
 autogen @FileSizeInt.MainArg (|int| Pos, |string| name,  |FileSizeInt|)
+	opt norefcounts
+	embedded
 	return string.MainArgSub(Pos, name, "file-size")$.float(true)|FileSizeInt|
+
+
+autogen @FastString.MainArg (|int| Pos, |string| name,  |FastString|)
+	opt norefcounts
+	embedded
+	return file.MainArg(pos, name)$.Outputstream
 
 
 autogen @string.MainArgSub	(|int| Pos,  |string| name,  |string| type,  |stringthatwasreadsafely|)
 	// could remove "pos", and use array.mark?
 	opt norefcounts
+	embedded
 	|| str = app.args[pos.abs-1]
 	if str != nil
 		return str
@@ -92,6 +113,7 @@ autogen @string.MainArgSub	(|int| Pos,  |string| name,  |string| type,  |stringt
 
 autogen app.MainArgsStart	(|string| Usage, |bool| Silent=false, |int|)
 	opt norefcounts
+	embedded
 	if !.usage
 		.usage = usage
 	|| C = .args.length
