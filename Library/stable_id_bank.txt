@@ -724,7 +724,6 @@ JB_App__GetChar
 JB_App__ID
 JB_App__IconSet
 JB_App__IsMainThread
-JB_App__MainArgsStart
 JB_App__MemoryUsage
 JB_App__OrigPath
 JB_App__Parent
@@ -943,7 +942,6 @@ JB_FastBuff_String
 JB_FastBuff_SyntaxExpect
 JB_FastBuff_TmpStr
 JB_FastBuff_UInt16
-JB_FileSizeInt__MainArg
 JB_File_Accessed
 JB_File_Child
 JB_File_ChildExisting
@@ -959,14 +957,12 @@ JB_File_Delete
 JB_File_DeleteAll
 JB_File_Destructor
 JB_File_DirectoryContains
-JB_File_Existing__MainArg
 JB_File_Exists
 JB_File_Flush
 JB_File_HardLinkTo
 JB_File_IsDir
 JB_File_IsLink
 JB_File_IsPipe
-JB_File_Jeebox__MainArg
 JB_File_LinkToGet
 JB_File_LinkToSet
 JB_File_List
@@ -986,7 +982,6 @@ JB_File_Offset
 JB_File_OffsetSet
 JB_File_Open
 JB_File_OpenEmpty
-JB_File_Output__MainArg
 JB_File_Parse
 JB_File_Path
 JB_File_PathFix
@@ -1004,7 +999,6 @@ JB_File_Write
 JB_File__CWD
 JB_File__Compar
 JB_File__Home
-JB_File__MainArg
 JB_File__NewPipe
 JB_File__Prefs
 JB_File__Sorter
@@ -1180,7 +1174,6 @@ JB_Msg_Value
 JB_Msg_WithinType
 JB_Msg_XMLToJeebox
 JB_Msg_Yes
-JB_Msg__MainArg
 JB_Msg__Sorter
 JB_Msg__TreeCompare
 JB_MzSt_Clear
@@ -1532,8 +1525,6 @@ JB_Str__Error
 JB_Str__Freeable
 JB_Str__FromPico
 JB_Str__Hash
-JB_Str__MainArg
-JB_Str__MainArgSub
 JB_Str__Sorter
 JB_Syx_LongName
 JB_Syx_Name
@@ -1648,7 +1639,6 @@ JB_bin_StartAdd
 JB_bin_TmpArg
 JB_bin_WriteType
 JB_bool_Render0
-JB_bool__MainArg
 JB_byte_IsConso
 JB_byte_IsHex
 JB_byte_IsVowel
@@ -1714,7 +1704,6 @@ JB_f_Unsin
 JB_f_Vec2Mix
 JB_f_Vec3Mix
 JB_f_Vec4Mix
-JB_f__MainArg
 JB_f__max
 JB_f__nan
 JB_fix_Clear
@@ -1734,7 +1723,6 @@ JB_int64_OperatorMin
 JB_int64_RandomVec2
 JB_int64_Render
 JB_int64_StrSize
-JB_int64__MainArg
 JB_int_AsFloat
 JB_int_Clamp
 JB_int_ClampRange
@@ -1757,7 +1745,6 @@ JB_int_Sqrt
 JB_int_SyntaxAccessSet
 JB_int_SyntaxCall
 JB_int_Wrap
-JB_int__MainArg
 JB_ivec2_Abs
 JB_ivec2_Clip
 JB_ivec2_Clip2
