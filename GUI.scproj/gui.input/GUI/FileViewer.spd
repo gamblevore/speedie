@@ -556,8 +556,7 @@ class FileViewer (ListView)
 
 
 		libinternal QuickOpenKey (guikeyevent)
-			opt norefcounts
-			|| fv = .tag as fileviewer				#require
+			|fileviewer--| fv = .tag as fileviewer				#require
 			|| l = fv.listopen
 			if key.IsAccept
 				|| row = l.FirstSelected
