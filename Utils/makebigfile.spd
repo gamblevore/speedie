@@ -1,11 +1,11 @@
 #!/usr/local/bin/spd
 
-main (|file| output, |int| reps, |file| input) // useful for testing speed of parsing
-	require output.OpenEmpty
+main (|faststring| output, |int| reps, |file| input) // useful for testing speed of parsing
 	|| data = input.ReadAll$
 	for reps
-		output.write(data)
-	output.Close
-	
-	"$output is ${output.Size.strsize}"
+		output <~ data
+	output.Flush
+
+	|| f = output.file	
+	"$f is ${f.size.strsize}"
 
