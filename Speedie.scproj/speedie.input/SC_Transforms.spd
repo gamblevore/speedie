@@ -701,12 +701,13 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 
 || SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
+	opt norefcounts
 	msg.name	= "libinternal"
-	|message--| name	= msg[@thg]
-	|message--| arg		= msg.last(@arg)
+	|| name	= msg[@thg]
+	|| arg		= msg.last(@arg)
 	require name and arg
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
-	|message--| Params	= msg.find(@bra)[@thg]
+	|| Params	= msg.find(@bra)[@thg]
 
 	using (msg)
 	if !Params
@@ -718,32 +719,32 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| OldName	= name.name
 	|| SyxName	= "Syx" + OldName
 
+
+	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg) #expect
+	Compiler.SyxArray <~ OldName
 	name.name	= OldName + "__"
 
-	|message--| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
-		Compiler.SyxArray <~ OldName
-	
-		if !Options.ModeCake				// why cant packs use these? should I reenable it?
-											// again... with the radical compiler-internal changes
-											// its easier to generate files than insert code.
-	
-			|| LongName = params.name
-			
-			|message--| dotnew = argplace.msg(@dot, "StdNew")
-			dotnew <~ (@thg, "syntax")
-			|message--| prm = dotnew.msg(@prm)
-			|message--| dot2 = prm.msg(@dot, name.name)
-			dot2 <~ (@thg, "Message")
-			dot2 <~ @emb
-			prm <~ OldName.lowercase
-			prm <~ longname
-			prm <~ .SyxID
-			Params.Name = "fpMsgRender"
-			Compiler.program.CollectOne( dotnew, true )
-	
-		compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
-	
-		.SyxID++
+	if !Options.ModeCake				// why cant packs use these? should I reenable it?
+										// again... with the radical compiler-internal changes
+										// its easier to generate files than insert code.
+
+		|| LongName = params.name
+		
+		|| dotnew = argplace.msg(@dot, "StdNew")
+		dotnew <~ (@thg, "syntax")
+		|| prm = dotnew.msg(@prm)
+		|| dot2 = prm.msg(@dot, name.name)
+		dot2 <~ (@thg, "Message")
+		dot2 <~ @emb
+		prm <~ OldName.lowercase
+		prm <~ longname
+		prm <~ .SyxID
+		Params.Name = "fpMsgRender"
+		Compiler.program.CollectOne( dotnew, true )
+
+	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
+
+	.SyxID++
 	Return msg
 
 

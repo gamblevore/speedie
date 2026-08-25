@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026082515));
+	JB_FS_AppendInt32(_fsf0, (2026082516));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10231,7 +10231,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026082515));
+	JB_FS_AppendInt32(_fsf0, (2026082516));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -59882,58 +59882,41 @@ Message* SC_Func__Tran_Syx(Message* Msg) {
 		JB_Msg_Fail(Msg, JB_LUB[943]);
 		return nil;
 	}
-	Message* _tmPf1 = JB_Msg_Find(Msg, kJB_SyxBra);
-	JB_Incr(_tmPf1);
-	Message* Params = JB_Msg_NeedSyx(_tmPf1, kJB_SyxThg);
-	JB_Decr(_tmPf1);
+	Message* Params = JB_Msg_NeedSyx(JB_Msg_Find(Msg, kJB_SyxBra), kJB_SyxThg);
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
 	JB_Msg_SyntaxUsing(Msg, (&_usingf0));
 	if (!Params) {
 		Message* B = JB_Syx_Msg(kJB_SyxBra, nil);
-		JB_Incr(B);
 		Params = JB_Msg_Msg(B, kJB_SyxThg, nil);
 		(JB_Ring_NextSibSet(Name, B));
-		JB_Decr(B);
 	}
 	JB_String* OldName = Name->Name;
-	JB_Incr(OldName);
 	JB_String* SyxName = JB_Str_OperatorPlus(JB_LUB[1160], OldName);
-	JB_Incr(SyxName);
-	JB_SetRef(Name->Name, JB_Str_OperatorPlus(OldName, JB_LUB[1343]));
-	Message* _tmPf2 = JB_Msg_Ancestor(Msg, kJB_SyxArg);
-	JB_Incr(_tmPf2);
-	Message* ArgPlace = JB_Msg_Ancestor(_tmPf2, kJB_SyxArg);
-	JB_Decr(_tmPf2);
-	if (ArgPlace) {
-		JB_Array_SyntaxAppend(SC__Comp_SyxArray, OldName);
-		if (!SC_Options__ModeCake()) {
-			JB_String* LongName = Params->Name;
-			JB_Incr(LongName);
-			Message* Dotnew = JB_Msg_Msg(ArgPlace, kJB_SyxDot, JB_LUB[1131]);
-			JB_Msg_AppendSyx(Dotnew, kJB_SyxThg, JB_LUB[241]);
-			Message* Prm = JB_Msg_Msg(Dotnew, kJB_SyxPrm, nil);
-			Message* Dot2 = JB_Msg_Msg(Prm, kJB_SyxDot, Name->Name);
-			JB_Msg_AppendSyx(Dot2, kJB_SyxThg, JB_LUB[902]);
-			JB_Msg_AppendSyx(Dot2, kJB_SyxEmb, JB_LUB[0]);
-			JB_String* _tmPf3 = JB_Str_LowerCase(OldName);
-			JB_Incr(_tmPf3);
-			JB_Msg_AppendString(Prm, _tmPf3);
-			JB_Decr(_tmPf3);
-			JB_Msg_AppendString(Prm, LongName);
-			JB_Decr(LongName);
-			JB_Msg_AppendNum(Prm, SC__Func_SyxID);
-			JB_SetRef(Params->Name, JB_LUB[1579]);
-			SC_Base_CollectOne(SC__Comp_Program, Dotnew, true);
-		}
-		SCDecl* _tmPf4 = SC_Base_AddNumericConst(SC__Comp_Program, SyxName, SC__Func_SyxID, Msg);
-		JB_Incr(_tmPf4);
-		JB_Array_SyntaxAppend(SC__Comp_ActualSyxes, _tmPf4);
-		JB_Decr(_tmPf4);
-		(++SC__Func_SyxID);
+	Message* ArgPlace = JB_Msg_Ancestor(JB_Msg_Ancestor(Msg, kJB_SyxArg), kJB_SyxArg);
+	if (!ArgPlace) {
+		JB_Object_Fail(nil);
+		JB_MsgPos_Destructor((&_usingf0));
+		return nil;
 	}
-	JB_Decr(OldName);
-	JB_Decr(SyxName);
+	JB_Array_SyntaxAppend(SC__Comp_SyxArray, OldName);
+	JB_SetRef(Name->Name, JB_Str_OperatorPlus(OldName, JB_LUB[1343]));
+	if (!SC_Options__ModeCake()) {
+		JB_String* LongName = Params->Name;
+		Message* Dotnew = JB_Msg_Msg(ArgPlace, kJB_SyxDot, JB_LUB[1131]);
+		JB_Msg_AppendSyx(Dotnew, kJB_SyxThg, JB_LUB[241]);
+		Message* Prm = JB_Msg_Msg(Dotnew, kJB_SyxPrm, nil);
+		Message* Dot2 = JB_Msg_Msg(Prm, kJB_SyxDot, Name->Name);
+		JB_Msg_AppendSyx(Dot2, kJB_SyxThg, JB_LUB[902]);
+		JB_Msg_AppendSyx(Dot2, kJB_SyxEmb, JB_LUB[0]);
+		JB_Msg_AppendString(Prm, JB_Str_LowerCase(OldName));
+		JB_Msg_AppendString(Prm, LongName);
+		JB_Msg_AppendNum(Prm, SC__Func_SyxID);
+		JB_SetRef(Params->Name, JB_LUB[1579]);
+		SC_Base_CollectOne(SC__Comp_Program, Dotnew, true);
+	}
+	JB_Array_SyntaxAppend(SC__Comp_ActualSyxes, SC_Base_AddNumericConst(SC__Comp_Program, SyxName, SC__Func_SyxID, Msg));
+	(++SC__Func_SyxID);
 	JB_MsgPos_SyntaxUsingComplete((&_usingf0), Msg);
 	JB_MsgPos_Destructor((&_usingf0));
 	return Msg;
