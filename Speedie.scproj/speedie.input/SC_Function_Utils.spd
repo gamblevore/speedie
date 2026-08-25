@@ -13,7 +13,7 @@ function SCFunction.PreRead (|message| Arg)
 
 	.NilSelf = 0			// need to clear stuff that could be error-checked, or removed.
 	isnt disabled			// Autocomplete, will call .PreRead
-	
+
 	for s in arg
 		if s == @tmp
 			|| fn = FuncPreReader[s.name]

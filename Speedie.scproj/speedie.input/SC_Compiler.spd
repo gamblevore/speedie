@@ -26,7 +26,7 @@
 |SCClass|	TypeArray
 |SCClass|	TypeDictionary
 |SCClass|	TypeJBClass
-|scclass|	TypeTask
+|SCClass|	TypeTask
 |SCClass|	TypeVec4
 |SCClass|	TypeVec3
 |SCClass|	TypeVec2
@@ -72,8 +72,8 @@ linkage
 |{SCImport}|				ImportedNames = Dictionary.new
 
 |Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, {||E=AppInitSub_(), if E!=0: return E}}`~parse).WipePos
-|Message!|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
-|Message!|					AppInitTest = (`{^"NilChecking", if (1==nil): return 12}`~parse).WipePos // enomem == 12
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
+|Message|					AppInitTest = (`{^"NilChecking", if (1==nil): return 12}`~parse).WipePos // enomem == 12
 
 |SCModule|					Program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
@@ -142,10 +142,9 @@ linkage
 |file|						JeeboxProj_
 
 
-constants: 	kTimeWidth = 19
-
 syntax is (|CompilerStage| Type, |bool|)
 	return type == .During
+
 syntax is (|CompilerStage| Type, assigns:|bool|)
 	.During = type, (value)
 
@@ -232,11 +231,6 @@ function compiler.ReachedClassCount (|int|)
 	opt norefcounts
 	for C in compiler.classlist
 		RZ += ((C.MyReacher) and c.isobject)
-
-
-function FastString.AppendWidth (|string| s, |int| Width)
-	self <~ s
-	self <~ (' ', Width - s.length)
 
 
 function Reached (|string| s, |bool|)
@@ -908,13 +902,16 @@ function FastString.Normal (|string| s)
 		
 
 function AppendCompilerTime (|string| s, |int| Durr)
-	compiler.TimerOutput.appendwidth(s, compiler.kTimeWidth)
+	opt norefcounts
+	|| fs = Compiler.TimerOutput
+	fs <~ s
+	fs <~ (' ', 19 - s.length)
 	if options.color
-		compiler.TimerOutput <~ TerminalColor.good
-	compiler.TimerOutput.appenddurr(Durr)
+		fs <~ TerminalColor.good
+	fs.appenddurr(Durr)
 	if options.color
-		compiler.TimerOutput <~ TerminalColor.normal
-	compiler.TimerOutput <~ '\n'
+		fs <~ TerminalColor.normal
+	fs <~ '\n'
 
 
 function TimerSub (|string| s, |int| Durr)
