@@ -309,7 +309,7 @@ datatype DocumentJeeboxMode (byte)
 		NotJeebox = 0
 		Prefer
 		Expect
-		Colorise = Expect+Prefer
+		_Colorise = Expect+Prefer
 		Jeebox
 	
 	syntax is (|DocumentJeeboxMode| m, |bool|)

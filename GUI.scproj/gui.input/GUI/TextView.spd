@@ -92,7 +92,7 @@ class TextView (GUIControl)
 	
 	
 	libinternal UsingLineNumbers (|bool|)
-		return (.JeeboxMode is colorise) and (self is codeeditor)
+		return (.JeeboxMode is _Colorise) and (self is codeeditor)
 	
 	
 	behaviour MouseMove
@@ -1412,7 +1412,7 @@ class TextView (GUIControl)
 				.Selection = (sel2, sel2+1)
 			return false
 
-		require SW or (.JeeboxMode is colorise)
+		require SW or (.JeeboxMode is _Colorise)
 		|| c = _counterparts.find(s)						#require
 
 		|| After = self[sel2]							// type through
@@ -2091,7 +2091,7 @@ class TextView (GUIControl)
 
 
 	libinternal WillAttemptParse (|documentjeeboxmode| Mode, |bool|)
-		require (Mode is colorise)
+		require (Mode is _Colorise)
 		require !.singleline
 		|| L = .text.Length
 		if Mode isnt expect
@@ -2184,7 +2184,7 @@ class TextView (GUIControl)
 		(d isnt fakemsg)
 		d.message = nil
 		|| Parsed = .ParsedMessage
-		if JX is Colorise
+		if JX is _Colorise
 			msg = d.ColoriseText(msg, parsed!=nil)
 
 		if parsed
