@@ -702,9 +702,9 @@ function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
 || SyxID = 0
 function Tran_Syx (|Message| msg, |Message|)
 	opt norefcounts
-	msg.name	= "libinternal"
+	msg.name= "libinternal"
 	|| name	= msg[@thg]
-	|| arg		= msg.last(@arg)
+	|| arg = msg.last(@arg)
 	require name and arg
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	|| Params	= msg.find(@bra)[@thg]
@@ -720,30 +720,30 @@ function Tran_Syx (|Message| msg, |Message|)
 	|| SyxName	= "Syx" + OldName
 
 
-	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg) #expect
-	Compiler.SyxArray <~ OldName
-	name.name	= OldName + "__"
+	|| ArgPlace = msg.Ancestor(@Arg).Ancestor(@Arg)
+		Compiler.SyxArray <~ OldName
+		name.name	= OldName + "__"
+	
+		if !Options.ModeCake				// why cant packs use these? should I reenable it?
+											// again... with the radical compiler-internal changes
+											// its easier to generate files than insert code.
+	
+			|| dotnew = argplace.msg(@dot, "StdNew")
+			dotnew <~ (@thg, "syntax")
+			|| prm = dotnew.msg(@prm)
+			|| dot2 = prm.msg(@dot, name.name)
+			dot2 <~ (@thg, "Message")
+			dot2 <~ @emb
+			prm <~ OldName.lowercase
+			prm <~ params.name
+			prm <~ .SyxID
+			Params.Name = "fpMsgRender"
+			Compiler.program.CollectOne( dotnew, true )
+	
+		compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
 
-	if !Options.ModeCake				// why cant packs use these? should I reenable it?
-										// again... with the radical compiler-internal changes
-										// its easier to generate files than insert code.
-
-		|| LongName = params.name
-		
-		|| dotnew = argplace.msg(@dot, "StdNew")
-		dotnew <~ (@thg, "syntax")
-		|| prm = dotnew.msg(@prm)
-		|| dot2 = prm.msg(@dot, name.name)
-		dot2 <~ (@thg, "Message")
-		dot2 <~ @emb
-		prm <~ OldName.lowercase
-		prm <~ longname
-		prm <~ .SyxID
-		Params.Name = "fpMsgRender"
-		Compiler.program.CollectOne( dotnew, true )
-
-	compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
-
+	Params.Name = "fpMsgRender"
+	
 	.SyxID++
 	Return msg
 
@@ -770,7 +770,7 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	|| L			= List.First!
 	|| R			= L.next!
 	|| cls			= R.ObjCls
-	expect (cls) (r, "This is not a real class.")
+	expect (cls)		 (r, "This is not a real class.")
 	expect (!cls.IsRole) (r, "This is not a real class. Test it's super-class instead.")
 	|| OldDecl		= space.LookupVarDecl( L.name )					#require
 	|| NewDecl		= OldDecl.copydecl
@@ -783,8 +783,8 @@ function Tran_OneIsa (|Message| isa_f, |Message| arg, |SCNode!| space)
 	|| it = cls.contained
 		if !oldcont or it.type.real_isa(oldcont.type)
 			newdecl.contains = it // oop
-	Space.access ?= Dictionary.new
-	Space.access![ L.name.lowercase ] = NewDecl // I think?
+	|| D = space.Access init Dictionary.new
+	D.valuelower( L.name ) = NewDecl // I think?
 
 
 

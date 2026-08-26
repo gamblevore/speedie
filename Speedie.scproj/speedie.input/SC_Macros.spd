@@ -176,14 +176,32 @@ function message.TranAllTargets
 
 function message.Tran_TargetSub
 	opt norefcounts
-	|| value = self.needfirst					#require
-	|| arg = self[@arg, 1]						#require
-	if !value.TargetTest
-		arg = self[2][@arg]
-
-// can't handle target false
+	|| upon = self
+	|message| arg
+	while
+		|| value = upon.needfirst					#require
+		arg = upon[@arg, 1]							#require
+		
+		|| secondpart = arg.next
+			require secondpart.Expect(@tmp)
+		
+		if value.TargetTest
+			exit
+		
+		if !secondpart
+			require (self!=upon) and (upon.next == @tmp)
+			upon = upon.next
+			continue
+			
+		if (secondpart == "else")
+			arg = secondpart[@arg]
+			exit
+		
+		require secondpart.expect(nil, "elseif")
+		upon = secondpart
+		
 	while arg.hasany
-		.next = arg.pop
+		.next = arg.pop						// dump all new stuff in
 
 
 function message.BecomeTarget
