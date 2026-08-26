@@ -47,13 +47,10 @@ function PrintError (|string| data)
 	cpp_wrapper JB_Str_PrintError
 
 
-function byte.IsConso (|bool|)
-	return .isletter and !.isvowel
-
-
 function byte.IsVowel (|bool|)
 	|| b = .lowercase
-	return (b == 'a' or 'i' or 'e' or 'o' or 'u')
+	if (b == 'a' or 'i' or 'e' or 'o' or 'u')
+		rz = true
 
 
 inline int.operatorof (|string| type, |string| nothing="", |string|)
@@ -107,8 +104,8 @@ function string.Moat (|string?| Prepend=nil, |string|)
 
 
 function string.IsFileLike (|bool|)
-    || c = self[]
-    || c2 = self[1]
+	|| c = self[]
+	|| c2 = self[1]
 	if (c == '/') or ((c == '.' or c == '~') and ((c2 == '.') or (c2 == '/')))
 		return true
 	// so... we want to wrap to w... but prefer to wrap at a SPACE or comma
@@ -140,6 +137,21 @@ function String.UTF8 (|string|)
 */ // do later. compiler can use this :)
 
 
+
+struct VirtualJBString // fakejbstring
+	linkage
+		noauto // no need for people to see this.
+	|int|		RefCount
+	|int|		Length
+	|&byte|		Addr
+
+
+libinternal cstring.Temp (|VirtualJBString|)
+	rz.refcount = 0
+	rz.length = .length
+	rz.addr = self|&byte|
+
+
 function string.OperatorPlus (|cstring| c, |string|)
 	if self
 		|| tmp = c.temp
@@ -168,21 +180,6 @@ function string.OperatorPlus (|int64| i, |string|)
 	fs <~ self
 	fs <~ i
 	return fs
-	
-
-struct VirtualJBString // fakejbstring
-	linkage
-		noauto // no need for people to see this.
-	|int|		RefCount
-	|int|		Length
-	|&byte|		Addr
-
-
-libinternal cstring.Temp (|VirtualJBString|)
-	rz.refcount = 0
-	rz.length = .length
-	rz.addr = self|&byte|
-
 
 
 function String.ExtractPathAndLine (|message|)
@@ -286,9 +283,6 @@ function String.SpacesToTabs (|string|)
 			fs <~ (' ', spacecount&3)
 		fs.AppendRange(line, spacecount, int.max)
 	return fs
-//	if rz == self // nice opt // i wonder if we could do that as a helper func?
-//		rz = self
-
 	
 
 //inline String.Spin (|int| f, |byte|)

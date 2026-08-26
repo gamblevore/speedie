@@ -217,12 +217,6 @@ extend float
 			self = 0
 		return self
 	
-	function f64.IsNan (|bool|)
-		cpp_wrapper (JB_dbl_IsNan)
-
-	function f64.isInf (|bool|)
-		cpp_wrapper (JB_dbl_IsInf)
-	
 	function Pow (|int| n, |float|)
 		visible
 		rz = self

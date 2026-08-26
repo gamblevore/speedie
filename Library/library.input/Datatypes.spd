@@ -36,7 +36,7 @@ datatype int
 	syntax compare (|string| s, |int|)
 		inlined
 		return self - s.length
-
+	
 	syntax access (|bool|) // should be a bool?
 		cpp_part rnd // these random funcs need unifying their purpose / names
 		disabled "use intnum() for a random int, or floatnum[] for a chance at getting true"
@@ -172,8 +172,8 @@ datatype Ind (int) // an INDex. And an INT.
 		return self >= 0
 		
 	operator bitand (|int| x, |int|)
-		// shame we need this... but we do! or else (i&1) will be tested >= 0 rather than != 0
-		inlined // now we can't test if an index is even or odd
+		// we need this, or else (i&1) will be tested >= 0 rather than != 0
+		inlined 
 		return self|int| & x
 //	operator bitor (|int| x, |int|) // might need these too. not sure.
 //		inlined
@@ -351,7 +351,7 @@ datatype float
 		// perhaps just cast this to an ACTUAL duration
 		// AND THEN DO THE CAST!?
 		if self < 0
-			self = .length
+			self = - self
 			fs <~ '-'
 		|| s = self mod 60.0
 		|| m = (.floor - s) / 60.0
@@ -674,6 +674,12 @@ datatype f64
 	render RenderFloat
 		opt norefcounts
 		fs.appenddouble(self, 6, false)
+
+	function IsNan (|bool|)
+		cpp_wrapper (JB_dbl_IsNan)
+
+	function IsInf (|bool|)
+		cpp_wrapper (JB_dbl_IsInf)
 
 	inline Date (|date|)
 		return (self * 64.0K)|date|

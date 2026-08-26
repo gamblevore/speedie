@@ -105,8 +105,8 @@ class FlowLog
 			return -1
 		
 		for c in self
-			ifn (c >= ' ' or c == 9)
-				if c.IsTextLine
+			if  c < ' ' and c != 9
+				if c == '\n' or '\r'
 					return '\n' // This makes it not generic...
 				return -2
 	
