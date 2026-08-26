@@ -27,13 +27,19 @@
 	#define __realarm64__
 #endif
 
+#if defined(__APPLE__)
+	#define CAKE_BRIDGE_SYM ___CAKE_BRIDGE__
+#else
+	#define CAKE_BRIDGE_SYM __CAKE_BRIDGE__
+#endif
+
 #ifdef __realarm64__
 	/*** __CAKE_BRIDGE__(u64 data, void* FN, Register* r15, int n) ***/
 	.text
-	.global ___CAKE_BRIDGE__
+	.global CAKE_BRIDGE_SYM
 	.balign 4
 
-	___CAKE_BRIDGE__:								
+	CAKE_BRIDGE_SYM:
 		r15			.req x15
 		inj			.req x14
 		flj			.req x13

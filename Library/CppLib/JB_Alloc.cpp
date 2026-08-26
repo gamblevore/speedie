@@ -1146,13 +1146,13 @@ struct CakeVM {
 #endif
 
 
-__restrict __hot fpDestructor JB_Destructor (JB_Object* Obj) {
+__boiling fpDestructor JB_Destructor (JB_Object* Obj) {
 	return GetDestructor_(ObjBlock_(Obj));
 }
 
 
 
-__restrict __hot void JB_Delete ( FreeObject* Obj ) {
+__boiling void JB_Delete ( FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 
 	#if DEBUG

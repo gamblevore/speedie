@@ -402,9 +402,9 @@
 ı FSMS:;
 	f1 = JB_f_SmoothStep(f2, f3, f4);
 ı FXNN:;
-	f1 = __isnanf(f2);
+	f1 = JB_f_IsNan(f2);
 ı FXNF:;
-	f1 = __isinff(f2);
+	f1 = JB_f_IsInf(f2);
 ı VFRC:;
 	v1 = JB_vec4_Fract(v2);
 ı VFLR:;

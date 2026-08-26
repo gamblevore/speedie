@@ -45,7 +45,7 @@ chown \$U $dir"
 	
 function compile_example (|string| name, |string|)
 	return "echo \"Compiling ${name}.cpp\"
-g++ -o Build/$name  $ExecFlags  ${name}.cpp
+\$CXX -o Build/$name  $ExecFlags  ${name}.cpp
 ${unmod(`Build/`+name)}
 "
 
@@ -114,11 +114,13 @@ sudo apt install gedit
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 set -e
+# Override clang++ by exporting CXX.
+CXX=\"\${CXX:-clang++}\"
 cd ${CppLib}
 
 $GetUserName
 echo \"Compiling Speedie to $SpdTerm\"
-g++ -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+\$CXX -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
 mv ${SpdTerm}tmp $SpdTerm
 ${unmod(SpdTerm)}
 
@@ -154,7 +156,7 @@ set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
 $SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
 echo \"Compiling $LibPath for user '\$U'\"
-g++ -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+\$CXX -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 ${unmod(LibPath)}
 
 

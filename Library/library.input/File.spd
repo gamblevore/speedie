@@ -503,7 +503,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			target osx
 				|string--| P = "~/Library/Preferences"
 			  elseif win
-				|string--| P = "~\AppData\Roaming" // whatever
+				|string--| P = "~\AppData\Roaming"
 			  else
 				|string--| P = "~/.config"
 			if name

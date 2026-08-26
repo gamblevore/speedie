@@ -1,4 +1,7 @@
 
+#include <atomic>		// needed on linux
+#include <dlfcn.h>
+
 
 extern "C" {
 
@@ -57,9 +60,6 @@ int* JB_SP_ErrorNumber ();
 int	 JB_SP_Run (const char** R, int Mode);
 int	 JB_SP_Init (const char** R, bool IsThread);
 
-
-// dylib
-#include <dlfcn.h>
 
 struct JB_Dylib {
 	void* _handle;

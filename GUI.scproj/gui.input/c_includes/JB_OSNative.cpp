@@ -35,6 +35,10 @@ void JB_SDL_SetModified(void* w, bool b) {
 void JB_SDL_RemoveWindowBorder (void* w) {
 	SDL_SetWindowBordered((SDL_Window*)w, false);
 }
+
+void JB_SDL_FullScreen (void* w, bool On) {
+	SDL_SetWindowFullscreen((SDL_Window*)w, On ? 1 : 0);
+}
 }
 #else
 

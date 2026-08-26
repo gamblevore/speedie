@@ -419,7 +419,7 @@
 "Contents/MacOS/"
 "\t65535,\n"
 "perry"
-"/usr/bin/g++"
+"/usr/bin/clang++"
 "minilib"
 "osx"
 "win"

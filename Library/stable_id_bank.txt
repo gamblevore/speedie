@@ -1655,6 +1655,8 @@ JB_cstring_OperatorPlus
 JB_cstring_Render
 JB_dbl_AsInt
 JB_dbl_Clamp
+JB_dbl_IsInf
+JB_dbl_IsNan
 JB_dbl_Render
 JB_dbl_RenderFloat
 JB_dylib_Close
@@ -1672,6 +1674,8 @@ JB_f_Exponent
 JB_f_FloatMix
 JB_f_Fract
 JB_f_Gaussian
+JB_f_IsInf
+JB_f_IsNan
 JB_f_Length
 JB_f_LoopOK
 JB_f_MakeSane
@@ -1986,10 +1990,6 @@ SpdSort
 __builtin_bswap32
 __builtin_bswap64
 __builtin_popcountll
-__isinfd
-__isinff
-__isnand
-__isnanf
 copysignf
 exp2f
 expf

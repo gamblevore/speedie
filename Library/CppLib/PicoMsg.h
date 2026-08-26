@@ -67,6 +67,9 @@ struct 			PicoAction {PicoActionFn Action; void* Upon;};
 	#include <signal.h>
 	#include <errno.h>
 	#include <sys/socket.h>
+	#include <sys/wait.h>
+	#include <string.h>
+	#include <stdio.h>
 	#include <algorithm>
 	#include <atomic>
 	#include <math.h> // somehow osx intel needs this but osx arm doesn't?

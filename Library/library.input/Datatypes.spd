@@ -595,11 +595,11 @@ datatype float
 	function IsNan (|int|)	// perhaps these IsNan/IsInf can be merged? makes more sense
 							// than wasting opcodes.
 		trin (22, XNN)
-		cpp_wrapper (__isnanf)
-	
+		cpp_wrapper (JB_f_IsNan)
+
 	function IsInf (|int|)
 		trin (23, XNF)
-		cpp_wrapper (__isinff)
+		cpp_wrapper (JB_f_IsInf)
 
 	operator ShiftLeft (|int| x, |float|)
 		while --x >= 0	// there is a faster way, but this is good enough.

@@ -2,6 +2,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+// needed on linux
+	#include <string.h>
+	#include <stdarg.h>
+	#include <errno.h>
+	#include <limits.h>
+	#include <math.h>
+
 // need to include std headers first, as some use these words "u32", "u16" :(
 
 #ifndef __JB_TYPES__

@@ -8,19 +8,6 @@
 #include <math.h>
 
 extern "C" {
-	bool JB_dbl_IsNan (double x) {
-		return std::isnan(x);
-	}
-	bool JB_dbl_IsInf (double x) {
-		return std::isinf(x);
-	}
-	bool JB_f_IsNan (float x) {
-		return std::isnan(x);
-	}
-	bool JB_f_IsInf (float x) {
-		return std::isinf(x);
-	}
-	
     float JB_f_Clamp (float d, float min, float max) {
 		return std_clamp(d, min, max);
     }

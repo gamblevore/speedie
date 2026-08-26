@@ -4,8 +4,10 @@
 #define __JB_MATH__
 
 #include "JB_Umbrella.h"
+#include <algorithm>
 
 extern "C" {
+	
 	int    JB_Math_Rnd32		();
 	float  JB_f_Clamp			(float d, float min, float max);
 	ivec4  JB_ivec4_ClampVec	(ivec4 Self, ivec4 A, ivec4 B);
@@ -40,10 +42,27 @@ extern "C" {
     inline float JB_f__max () {
         return __FLT_MAX__;
     }
+    
     inline float JB_f__nan () {
 		const int x = ((1<<11)-1)<<21;
 		return reinterpret_cast<const float&>(x);
     }
+
+// these 4 functions are getting errors about compile options
+// not sure how to fix it and keep floating-point opts... I'll look into that later.
+	inline bool JB_dbl_IsNan (double x)	{
+		return std::isnan(x);
+	}
+	inline bool JB_dbl_IsInf (double x)	{
+		return std::isinf(x);
+	}
+	inline bool JB_f_IsNan (float x) {
+		return std::isnan(x);
+	}
+	inline bool JB_f_IsInf (float x) {
+		return std::isinf(x);
+	}
+
 
 #if __PLATFORM_CURR__ != __PLATFORM_OSX__
 	// seems to not exist outside of OSX... just yet
@@ -55,7 +74,6 @@ extern "C" {
 
 }
 
-#include <algorithm>
 template <typename T>
 constexpr T std_clamp (T v, T lo, T hi) {
 	if (v < lo)
