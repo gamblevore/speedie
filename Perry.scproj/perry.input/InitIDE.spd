@@ -120,7 +120,7 @@ extend PerryIDE
 			.gnormal.edge = (0.0, 0.0, 0.0, 0.125).px
 			.OnKeyDown = DebugArgsKeyDown
 			.JeeboxMode = DocumentJeeboxMode.Expect
-			.attachedfrom = movecode.top
+			.AttachedFrom = movecode.top
 			.ClickOutsideCloses = true		
 
 

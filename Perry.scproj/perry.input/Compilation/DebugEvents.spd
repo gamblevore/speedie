@@ -115,9 +115,12 @@ function DebugArgsGotFocus (guiaction)
 function textview.InitDebugArgs
 	|| i = .ide
 	if i.ProjectIsCode
-		if !.Document
+		|| D = .Document
+		if !D
 			|| f = i.DebugArgsFile
-			.LoadDocument(Document(f), true)
+			D = Document(f)
+			.LoadDocument(D, true)
+		D.JeeboxMode = DocumentJeeboxMode.Expect
 		// we want to read this from the actual file.
 	
 		if !.text
