@@ -1504,10 +1504,6 @@ function message.AndOrExpansionTest (|int|)
 
 function TypeOfRel (ExprResolver)
 	|message--| opch = exp.second!
-//	if opch == @bra										/// ooh!... interesting!
-//		problem (exp, "Deprecated")
-//		return TypeOfTernary2(exp, name_Space)
-	
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
 	|| RN = opch.Next								#expect	(exp, "Missing right hand side")
 		
@@ -1519,6 +1515,7 @@ function TypeOfRel (ExprResolver)
 	|| P = exp.niceParent
 	|| ParentFunc = P.func
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl)
+
 	if (comp isnt Assigns)
 		if (ShouldBeSet)
 			if comp is ExactlyEquals
@@ -1593,8 +1590,11 @@ function TypeOfRel (ExprResolver)
 		lc = ln.fastdecl
 	
 	
-	if !side and (comp Is Compare)
-		Return TypeBool!.typenormal
+	if comp is compare
+		if !side
+			expect (!lc.isbarestruct) (exp, "Can't compare two bare-structs.")
+			Return TypeBool!.typenormal
+		debugger		// we never come here?
 
 
 	if custom & customops.RecheckType
@@ -1602,7 +1602,7 @@ function TypeOfRel (ExprResolver)
 	// we can't do 1 << (a,b,c) ?
 
 	  else
-		if custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller) 
+		if custom & (CustomOps.TypeCastToBetter|||customops.TypeCastToSmaller)
 			|| pc = lc.better_numeric(rc, comp.Kind, ln, rn)
 			if  pc is const  and  lc isnt const			// sigh... we got rc instead of lc
 				lc = pc.type.typenormal
