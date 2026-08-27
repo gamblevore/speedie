@@ -62,7 +62,10 @@ extend_module Error
 		fs <~ num.Preview(32)
 		
 		|string--| str = fs.GetResult
-		|error--| err = error(where, str)
-		nil|errorreceiver| <~ err
+		if where and parser.running
+			Parser.erroradd(str, pos + where.position )
+		  else
+			|error--| err = error(where, str)
+			nil|errorreceiver| <~ err
 
 
