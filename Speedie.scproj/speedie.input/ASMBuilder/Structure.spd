@@ -16,8 +16,8 @@ extend assembler
 			if (T+Amount < 64K)
 				.BackupTotal = T + Amount
 				|| dest = Backupspace! + T
-				target debug
-/					Memory.Copy(dest, Start, Amount*–sizeof fatasm)			// Save the old stuff here.
+//				target debug
+///					Memory.Copy(dest, Start, Amount*–sizeof fatasm)			// Save the old stuff here.
 			  else
 				error ""
 				amount = 0
@@ -40,10 +40,10 @@ extend assembler
 		|| Live = .FuncStart + T0
 		|| Backup = BackupSpace! + T0
 		|| after = live+amount
-		while live < after
-			if !memory.equals(live, backup, –sizeof fatasm)
-			Backup++
-			live++
+//		while live < after
+//			if !memory.equals(live, backup, –sizeof fatasm)
+//			Backup++
+//			live++
 				
 		
 		

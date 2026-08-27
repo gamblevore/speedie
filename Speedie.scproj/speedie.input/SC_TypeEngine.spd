@@ -1590,11 +1590,10 @@ function TypeOfRel (ExprResolver)
 		lc = ln.fastdecl
 	
 	
-	if comp is compare
-		if !side
-			expect (!lc.isbarestruct) (exp, "Can't compare two bare-structs.")
-			Return TypeBool!.typenormal
-		debugger		// we never come here?
+	if !side and (comp is compare)
+	// if comp is compare (< > == etc), then side is always true: a < b, a==b
+		expect (!lc.isbarestruct) (exp, "Can't compare two bare-structs.")
+		Return TypeBool!.typenormal
 
 
 	if custom & customops.RecheckType

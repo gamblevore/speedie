@@ -224,8 +224,10 @@ function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
 	// use phi instead.
 	rz = B
 	|| fa = A.fat
-	|| fb = B.fat		
-		fb.reginput(5) = A			// refcount A, save from disposal
+	|| fb = B.fat
+		if fa
+			fa.µrefcount++ // can't be helped until we have phi
+		// fb.reginput(4) = A			// refcount A, save from disposal
 	  elseif fa
 		rz = A
 
@@ -427,7 +429,6 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 
 
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
-	if "Failed2".trap
 	|| V = kr.const!=0
 	if v == (opp is AND)
 		.softnop jump
