@@ -2409,6 +2409,6 @@
 "File_List"
 "quot"
 "phi"
-"Failed2"
+"Can't compare two bare-structs."
 "PHI"
 "Multiple-of-4 white-space indent required here."

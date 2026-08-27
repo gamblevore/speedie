@@ -721,7 +721,7 @@ struct InlineState {
 	ASMReg Return;
 	uint64 ParentVars;
 	u16 FuncStart;
-	u16 Backup;
+	uint BackupAmount;
 	byte BranchDepth;
 	byte ID;
 	byte RealBranchDepth;
@@ -795,6 +795,7 @@ struct Assembler {
 	RegFile Regs;
 	u16 BasicBlock;
 	u16 BasicParent;
+	uint BackupTotal;
 	bool ExpectOneMore;
 	byte BreakRequest;
 	byte BasicDepth;
@@ -2342,7 +2343,6 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_Bit ((OpMode)4)
 #define kSC__OpMode_CaseAware ((OpMode)4194304)
 #define kSC__OpMode_Compare ((OpMode)1)
-#define kSC__OpMode_Comparison ((OpMode)512)
 #define kSC__OpMode_CompOrSet ((OpMode)3)
 #define kSC__OpMode_Custom ((OpMode)2097152)
 #define kSC__OpMode_CustomOnFloat ((OpMode)8388608)
@@ -2362,6 +2362,7 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_NilTest ((OpMode)16384)
 #define kSC__OpMode_NoExtraBits ((OpMode)131072)
 #define kSC__OpMode_OR ((OpMode)524288)
+#define kSC__OpMode_Ordering ((OpMode)512)
 #define kSC__OpMode_RightShift ((OpMode)131104)
 #define kSC__OpMode_SameOrLessBits ((OpMode)393216)
 #define kSC__OpMode_ShiftOnly ((OpMode)32)
@@ -4312,8 +4313,6 @@ bool JB_byte_IsInt(uint /*byte*/ Self);
 bool JB_byte_IsLetter(uint /*byte*/ Self);
 
 bool JB_byte_IsLower(uint /*byte*/ Self);
-
-bool JB_byte_IsTextLine(uint /*byte*/ Self);
 
 bool JB_byte_IsUpper(uint /*byte*/ Self);
 
@@ -6519,6 +6518,8 @@ FatASM* SC_Pac_Register(Assembler* Self, int I);
 
 FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp);
 
+void SC_Pac_RevertFAT(Assembler* Self, bool Check);
+
 void SC_Pac_Rewind(Assembler* Self, FatASM* Start, FatASM* After);
 
 void SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
@@ -7757,8 +7758,6 @@ bool JB_Str_IsCompressed(JB_String* Self);
 
 int JB_Str_IsHexLike(JB_String* Self, int N);
 
-bool JB_Str_IsInt(JB_String* Self);
-
 bool JB_Str_IsIntFrom(JB_String* Self, int I);
 
 Ind JB_Str_IsJbin(JB_String* Self);
@@ -8938,7 +8937,7 @@ FatASM* SC_Msg_PADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
 FatASM* SC_Msg_PDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
-FatASM* SC_Msg_PHI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, ASMReg R5, ASMReg R6);
+FatASM* SC_Msg_PHI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, ASMReg R5);
 
 void JB_Msg_pinn__(Message* Self, FastString* Fs);
 
