@@ -5,17 +5,20 @@
 function message.ASMDecl (|SCDecl!|)
 	opt norefcounts
 	rz = .fastdecl
-	if (rz is Global) and !rz.ExportPosition
-		while .func == @arel
-			self = .first!
-		rz = .FastDecl
-		if rz.exportposition
-			.parent!.obj = rz // fix it up.
+	if !rz.ExportPosition and (rz is Global)
+		|| inner = self
+		while inner.func == @arel
+			inner = inner.first!
+		|| inner_decl = inner.FastDecl
+		|| x = inner_decl.ExportPosition
+			rz.ExportPosition = x
+			rz = inner_decl
+			.obj = inner_decl // fix it up.
 		  else
 			if ++ExportPosFails <= 2
-				error (self, "ASM Glob lacks pos: " + .locate)
-	
-	if rz.typeonly == 0
+/				error (self, "ASM Glob lacks pos: " + .locate)
+
+	if rz.TypeOnly == 0
 		|| T = rz.wholetype
 		T.µtype = rz.CalculateASMType
 		rz.wholetype = T

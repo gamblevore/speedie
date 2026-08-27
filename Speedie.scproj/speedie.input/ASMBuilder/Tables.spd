@@ -757,13 +757,15 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 
 function ARel (fn_asm)
 	opt	NoRefCounts
-	|| F = exp.name[]
-	if F == '?' or '!'
-		return .µGetASM(exp.first!, dest)
-	|| M = (F == '+')|int|
+	|| N = exp.name[]
+	|| F = exp.first!
+	if N == '?' or '!'
+		exp.ASMDecl // can correct global export positions, for later code
+		return .µGetASM(F, dest)
+	|| M = (N == '+')|int|
 	if dest isnt discard
 		M += IncrAfter
-	return Incrementa(self, exp.first!, dest, M)
+	return Incrementa(self, F, dest, M)
 
 
 
