@@ -124,7 +124,7 @@ libinternal String.ParseSub (|syntax| Owner, |MessageRoot|)
 	if func == @arg
 		(into is style2)
 	
-	// actual parse here.
+	// actual parse here vvvv
 	|| lines	= parser.ParseLoopFlags(into, "", Flags)
 	
 	if (owner == @nil) and (Lines == false) and into.HasOneChild
