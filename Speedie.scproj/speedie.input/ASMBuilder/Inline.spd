@@ -1,4 +1,6 @@
 
+
+
 function assembler.StartInlineState (|message| prms, |asmreg| dest, |SCFunction| fn, |&inlinestate|)
 	|int| ID = .inlinedepth
 	|| st = .inlinestate[ID+1]
@@ -33,11 +35,13 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	|| st = .StartInlineState(prms, dest, fn)
 	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
 		
+	.backupfat(.curr)
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.ASMReach(des)
+	.RevertFAT(r==nil)
 	
 	.CloseInline(st)
 	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
@@ -178,7 +182,6 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
 	LL.Start = .curr
-	.backupfat(.curr)
 	
 	|SavedRegisters| svregs
 	svregs.Collect(fn.args, self)

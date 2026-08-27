@@ -6,7 +6,7 @@ struct InlineState
 	|asmreg|			Return
 	|uint64|			ParentVars
 	|uint16|			FuncStart
-	|uint16|			Backup
+	|uint|				BackupAmount
 	|byte|				BranchDepth
 	|byte|				ID
 	|byte|				RealBranchDepth
@@ -25,6 +25,7 @@ struct Assembler
 	|regfile|					Regs
 	|uint16|					BasicBlock
 	|uint16|					BasicParent
+	|uint|						BackupTotal
 	|bool|						ExpectOneMore
 	|byte|						BreakRequest
 	|byte|						BasicDepth
