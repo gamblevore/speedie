@@ -106,13 +106,11 @@ class String
 				require !s.islower
 			return true
 
-	inline IsInt (|bool|)
-		return .isint(0)
-	
-	function IsInt (|int|i, |bool|)
+	function IsInt (|int| i=0, |bool|)
 		cpp_part IsIntFrom
 		require self
-		while i < .length
+		|| n = .Length
+		while i < n
 			require self[i++].IsInt
 		return true
 	
