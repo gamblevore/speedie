@@ -16,7 +16,7 @@ datatype OpMode (int)
 		MakesSigned		// -
 		ExactlyEquals
 		EqualOrNot
-		Comparison		// >  >=  <  <=
+		Ordering		// >  >=  <  <=
 		More			// >				// if unsigned > 0
 		Less			// <				// if 0 < unsigned
 		MoreOrEqual		// >=
@@ -153,10 +153,10 @@ module {
 		.Bnot.name = "~"
 
 		.AddComp("==",					&Assembler.Equals,		OpMode.ExactEquals)
-		.AddComp("<",					&Assembler.Less,		opmode.Comparison + opmode.less)
-		.AddComp( ">",					&Assembler.More,		opmode.Comparison + opmode.more)
-		.AddComp( "<=",					&Assembler.LessEq,		opmode.Comparison + opmode.LessOrEqual)
-		.AddComp( ">=",					&Assembler.MoreEq,		opmode.Comparison + opmode.MoreOrEqual)
+		.AddComp("<",					&Assembler.Less,		opmode.Ordering + opmode.less)
+		.AddComp( ">",					&Assembler.More,		opmode.Ordering + opmode.more)
+		.AddComp( "<=",					&Assembler.LessEq,		opmode.Ordering + opmode.LessOrEqual)
+		.AddComp( ">=",					&Assembler.MoreEq,		opmode.Ordering + opmode.MoreOrEqual)
 		.AddComp( "!=",					&Assembler.NotEq,		OpMode.ExactNotEquals)
 		.OppositeComp("==", "!=")
 		.OppositeComp("<", ">=")
@@ -422,12 +422,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	|| RN		= RNT.NumericCountBoolsToo(Rc)
 
 	if lnt is numeric and rnt is numeric
-		if (comp is Comparison) and (lnt.issigned != rnt.issigned)
+		if (comp is Ordering) and (lnt.issigned != rnt.issigned)
 			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
 			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
 				error (MsgRel, "Unclear signed vs unsigned comparison.")
 
-		if comp is Comparison
+		if comp is Ordering
 			|| always = 0
 			if lc.iszero and !rnt.IsSigned
 				always = (comp is LessOrEqual) - (comp is more)
