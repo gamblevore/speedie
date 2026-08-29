@@ -1639,7 +1639,6 @@ JB_bin_StartAdd
 JB_bin_TmpArg
 JB_bin_WriteType
 JB_bool_Render0
-JB_byte_IsConso
 JB_byte_IsHex
 JB_byte_IsVowel
 JB_byte_LowerCase
@@ -2010,6 +2009,7 @@ log10
 log10f
 log2f
 logf
+memcmp
 memcpy
 memzero
 pow
