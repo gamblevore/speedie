@@ -3,7 +3,7 @@
 struct FatASM
 	linkage
 		cpp_part FAT
-		sort_properties true
+//		sort_properties true // no... we must have it this order.
 	
 	|ASMParam[5]|		Prms
 	|uint16|			BasicBlock
@@ -15,7 +15,7 @@ struct FatASM
 	|byte|				OutputPrms		// Not just dependant on µform. For example RD1U can increment or not.
 	|byte|				_Op
 	|byte|				JumpPrm
-	|uint16[5]|			Inputs // can overwrite const if we want to go further, for functions
+	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
 	|uint64|			_Const
 	|byte[64]|			ExtraSpace
 	

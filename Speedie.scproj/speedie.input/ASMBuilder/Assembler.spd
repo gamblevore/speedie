@@ -35,6 +35,7 @@ struct Assembler
 	|byte|						InlineDepthLimit
 	|byte|						EntireInlineFailed
 	|byte|						CurrFuncGrab
+	|byte|						DelayedNopCount
 	|bool|						NeedsRework				// hoisting
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
@@ -46,6 +47,7 @@ struct Assembler
 	target debug
 		|(Message--)[32]|		Declarations
 
+	|uint16[32]|				DelayedNops
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
 	|&FatASM|					TotalStart

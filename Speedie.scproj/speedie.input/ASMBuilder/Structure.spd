@@ -15,8 +15,8 @@ extend assembler
 			|| T = .BackupTotal
 			if (T+Amount < 64K)
 				.BackupTotal = T + Amount
-				|| dest = Backupspace! + T
 				target debug
+					|| dest = Backupspace! + T
 					Memory.Copy(dest, Start, Amount*–sizeof fatasm)			// Save the old stuff here.
 			  else
 				error ""
@@ -187,8 +187,11 @@ extend assembler
 //		if !fat.IsStateless						// Can't nop something that does something.
 ///			return								// Also should never happen!
 
-//		if !.IsWithinCurrInline(fat)			// Could be reverted, but too late by then
-///			return								// we'll need to back it up first.
+		if !.IsWithinCurrInline(fat)
+			|| C = .DelayedNopCount++
+			if C < –count .DelayedNops
+				.DelayedNops[C] = fat.Index
+			return
 
 		|| HasBreak = .nop_sub_keep(fat, nopmode)
 		if !HasBreak

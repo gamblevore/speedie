@@ -63,16 +63,16 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 	// Doesn't yet handle:   x[1] = a - b 
 	if  !vara  and  (dest is temp)
 		|| party = dest.fat
-			if party.IsPartyAble
+			if party.IsPartyAble and .redest(party, base)
 				party.prms[3] |= k
-				return .redest(party, base)
+				return base
 		
 			|| op = party.op|asm|
 			|| vop = op.VecIntMathPart
-				if party.prms[3] == 0							// no shift or 3rd part in mul
+				if (party.prms[3] == 0) and .ReDest(party, base)							// no shift or 3rd part in mul
 					party._op = vop
 					party.Prms[3] |= k
-					return .ReDest(party, base)
+					return base
 			
 			if 0: exp.psub
 			if (op isa asm.VGET) and (party.prms[2] == 0)		// vset+vget...

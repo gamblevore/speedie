@@ -1027,7 +1027,7 @@ function CanUseName (|SCNode| l, |bool|)
 
 function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	rz = @arg.msg
-/	|| fn = s.Identifyfunc
+	|| fn = s.Identifyfunc
 	if msg == @name
 		if purpose == "display"  and  s istmp "prototype"
 			return s

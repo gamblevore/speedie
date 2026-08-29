@@ -31,17 +31,18 @@ function assembler.CloseInline (|&inlinestate| st)
 function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| OV = .OpenVars
-
 	|| st = .StartInlineState(prms, dest, fn)
+
 	target debug
 		|| TrapInline = ++asmtrapper
-			if  TrapInline == 172701
+			if  TrapInline == -1
 				printprogress()
-				refcounttrap = .curr - 1
+				refcounttrap = .funcstart + 6
 				refcounttrap.debugprint
-				printline 
+				printline
+				debugger
 	  else
-		|| trapinline = 0
+		|| TrapInline = 0
 		
 	.backupfat(.curr)
 	|fatrange| LL
@@ -49,10 +50,18 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.ASMReach(des)
+
 	.RevertFAT(r==nil, TrapInline)
-	
 	.CloseInline(st)
-	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
+
+	if r and !.InlineDepth
+		for i in (32 min .DelayedNopCount)
+			|| f = .DelayedNops[i]|uint|.fat!
+			.DelayedNops[i] = 0
+			.nop(f)
+		.DelayedNopCount = 0
+	
+	return .CloseVars(OV, nil, r)				// Should CloseVars come before restore?
 
 
 
@@ -96,6 +105,7 @@ struct InlineInfo
 
 	function assembler.SafeDecr (|&fatasm| f)
 		f.µrefcount = f.refcount - 1
+
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
 		return true // remove later
