@@ -16,15 +16,15 @@ extend assembler
 			if (T+Amount < 64K)
 				.BackupTotal = T + Amount
 				|| dest = Backupspace! + T
-//				target debug
-///					Memory.Copy(dest, Start, Amount*–sizeof fatasm)			// Save the old stuff here.
+				target debug
+					Memory.Copy(dest, Start, Amount*–sizeof fatasm)			// Save the old stuff here.
 			  else
 				error ""
 				amount = 0
 		.state.BackupAmount = Amount
 	
 	
-	function RevertFAT (|bool| Check)
+	function RevertFAT (|bool| Check, |int| TrapCount)
 		|| st = .state
 		|| Amount = st.BackupAmount|int|
 		st.BackupAmount = 0
@@ -35,16 +35,23 @@ extend assembler
 		|| T0 = T - Amount
 		.BackupTotal = T0
 
-		require check
+		target debug
+			require check
+			
+			|| Live = .FuncStart
+			|| Backup = BackupSpace! + T0
+			|| after = live+amount
+			while live < after
+				if !memory.equals(live, backup, –sizeof fatasm)
+					printprogress()
+					live.DebugPrint
+					Backup.DebugPrint
+					printline trapcount
+					debugger 
+					live[0] = backup[0]
+				Backup++
+				live++
 
-		|| Live = .FuncStart + T0
-		|| Backup = BackupSpace! + T0
-		|| after = live+amount
-//		while live < after
-//			if !memory.equals(live, backup, –sizeof fatasm)
-//			Backup++
-//			live++
-				
 		
 		
 	function ParentBlock (|uint16| B, |uint16|)
@@ -193,8 +200,9 @@ extend assembler
 		if depth > 7
 		
 		for f.FatInputs in fat
-			.Decr(f, NopMode, depth)
-		
+			if f
+				.Decr(f, NopMode, depth)
+
 		for v.RegOutputs in fat
 			v &= 31
 			if .Register(v) == fat
@@ -255,7 +263,7 @@ extend assembler
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if (old.µRefCount <= 0) and .IsCurrBlock(old)
+			if (old.RefCount <= 0) and .IsCurrBlock(old)
 				.nop_sub(old, fatnopmode.hard)
 		
 		(NopDest isnt AllowNopDest)
@@ -268,24 +276,23 @@ extend assembler
 			return f.const == k
 	
 	
-	function Decr (|?&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
-		if f
-			|| C = f.µrefcount
-			C -= (C > 0)
-			f.µrefcount = C
-			if (mode isnt soft) and C <= 0
-				.nop_sub(f, mode, depth)
+	function Decr (|&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
+		|| C = f.refcount
+		C -= (C > 0)
+		f.µrefcount = C
+		if (mode isnt soft) and C <= 0
+			.nop_sub(f, mode, depth)
 	
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
-		if ToNop.µRefCount <= 0
+		if ToNop.RefCount <= 0
 			|| br = ToNop.BreakInfo
 			.nop(ToNop)
 			replace.BreakInfo = br
 
 	
 	function AskNop (|fatasm| ToNop)
-		if ToNop.µRefCount <= 0
+		if ToNop.RefCount <= 0
 			.nop(ToNop)
 	
 	

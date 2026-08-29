@@ -57,7 +57,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc.prms[2] = 0
 	Fnc.OutputPrms = 0
 	Fnc._op = asm.tail
-	fnc.µRefCount++
+	fnc.incr
 	(Fnc is exit)
 // can't do this as its too late. Something can jump to it.
 // we'd have to do this at the time we created the fnc in the first place.

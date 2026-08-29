@@ -7,18 +7,17 @@ struct FatASM
 	
 	|ASMParam[5]|		Prms
 	|uint16|			BasicBlock
-	|int16|				µRefCount
+	|int16|				RefCount
 	|ASMReg|			Info
 	|Message--|			Msg
-	|uint64|			_Const
 	|uint16|			ASMIndex
 	|byte|				BreakInfo
-	|byte|				InputFats		// Could merge with inputprms... easy and better probably. Do later
-	|byte|				InputPrms	
 	|byte|				OutputPrms		// Not just dependant on µform. For example RD1U can increment or not.
 	|byte|				_Op
 	|byte|				JumpPrm
-	|byte[72]|			ExtraSpace
+	|uint16[5]|			Inputs // can overwrite const if we want to go further, for functions
+	|uint64|			_Const
+	|byte[64]|			ExtraSpace
 	
 	
 	function Op (|byte|)
@@ -31,7 +30,7 @@ struct FatASM
 		|| b = .BasicBlock
 		self[0] = nil
 		.Msg = m
-		._Const = k
+		.Const = k
 		._op = value
 		.BasicBlock = b
 	
@@ -178,11 +177,13 @@ struct FatASM
 				return f
 
 
-	function CopyFrom (|fatasm| D, |bool|)
+	function CopyJump (|fatasm| D, |bool|)
+		// only jumps were using this... So I named it so its obvious
+		// So no need to worry about it being used for asm.func, which has 8 inputs.
 		(self)[0] = (d)[0]
 		for i.FatInputs in self
 			if i 
-				i.µRefCount++
+				i.incr
 	
 
 	// i doubt we'd change their inputs, only their output or our inputs
@@ -331,20 +332,30 @@ struct FatASM
 	function JumpInput (|int| a, assigns:|int| v)
 		.prms[a] = v
 		.JumpPrm = a + 1
-		.µRefCount += !.µRefCount // control flow is always used?
+		.RefCount += !.RefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
 	
+	function µRefCount (|int|)
+		return .RefCount
+	
+	function Incr
+		.µRefCount = .refcount + 1
+	
+	function µRefCount (assigns:|int|)
+		target debug
+			if self == RefCountTrap
+		.RefCount = value
 	
 	function RegInput (|int| a, assigns:|asmreg|)
 		cpp_part Prm		
 		.prms[a] = value.Prm
-		.InputPrms |= 1<<a
 		|| i = value.FatIndex
-			|| src = i.fat
+		|| src = i.fat
 			if src < self
-				.InputFats |= 1<<a
-				if src
-					src.µRefCount++
+//				target debug
+//					if src == refcounttrap
+				.Inputs[a] = i
+				src.incr
 			  else
 				debugger // what?
 	
@@ -652,7 +663,7 @@ struct FatASM
 		|asm| m = .op
 		if  m == asm.jump
 			if  d.IsFinisher
-				return .CopyFrom(d)		// jumping to a function-exit.
+				return .CopyJump(d)		// jumping to a function-exit.
 
 		  elseif (d == self + 2) and (m != asm.LUPU and asm.LUPD)
 			|| mid = self + 1
@@ -693,24 +704,16 @@ struct FatASM
 			printline fs
 		}
 
-	iterator RegInputs
-		|| ir = .InputPrms
-		|| i = 0
-		while (i < –count .prms)
-			ifn ir & (1 << i)
-				i++
-				continue
-			yield i
-			i++
 			
 	iterator FatInputs
-		|| ir = .InputFats
+		|| inputs = &.Inputs[0]
 		|| i = 0
-		while (i < –count .prms)
-			ifn ir & (1 << i)
-				continue
-			yield (.inputfat(i))
-			i++
+		|| n = –count .Inputs
+		if self.isfunc
+			n = .prms[4] min 8
+		while (i < n)
+			yield inputs[i++]|uint|.fat
+
 			
 	iterator RegOutputs
 		// maybe going up to 128bytes, and simply doing it as a map... is better?
@@ -763,6 +766,8 @@ function asmreg.Prm	(|asmparam|)
 	return r ||| t ||| i
 
 
+target debug
+	|&fatasm| RefCountTrap
 
 datatype FatNopMode	(byte)
 	default 0

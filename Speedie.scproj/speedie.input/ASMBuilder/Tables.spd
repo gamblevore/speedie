@@ -97,7 +97,7 @@ function Debugger (fn_asm)
 	if !fat
 		fat = exp.TRAP(num)
 	
-	fat.µRefCount++
+	fat.incr
 
 
 function Swap (fn_asm)
@@ -111,7 +111,7 @@ function Swap (fn_asm)
 	.assign(exp, A, B)
 	.assign(exp, B, T)
 	|| f = T.fat
-	if f and f.µrefcount <= 0
+	if f and f.refcount <= 0
 		.SoftNop(F)
 	return asmreg()
 
@@ -222,7 +222,7 @@ function Return (fn_asm)
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0
 	|| fat = exp.RET(dest*!HasK, K * HasK)
-	fat.µRefCount = 1
+	fat.RefCount = 1
 	return fat * asmreg.Exit
 	
 
@@ -352,7 +352,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 function AllocBearStruct (|int| Dir, |message| Exp, |asmreg| Dest, |int| Size, |asmreg|)
 	size = (size+15)>>4
 	|| fat = exp.ALLO(dest, size*dir)
-	fat.µRefCount++ // makes sense it is always reffed
+	fat.incr // makes sense it is always reffed
 	return fat * dest
 
 	
@@ -383,7 +383,7 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 	|| Incr = (.InlineDepth > 0)			// tail
 	rz = .µInto(rel, dest)
 	if incr					// and rel isnt Inserted // what about deliberate syntactic sugar?
-		rz = rz.incr		// either way... SOME things could go. like the appinit decls.
+		rz = rz.incrfat		// either way... SOME things could go. like the appinit decls.
 	
 	
 	
@@ -683,7 +683,7 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	addr = .InlineOffsetOpt(addr, bc, offset, 6, glob, exp)
 	
 	|| fat = exp.CNTD(dest, Addr, offset, amount, bc)
-	fat.µRefCount++					// memory alteration!
+	fat.incr					// memory alteration!
 	(dest is set)
 	if !dest.reg
 		fat.OutputPrms &= ~1			// clear output

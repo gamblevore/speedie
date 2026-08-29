@@ -123,7 +123,7 @@ function WhileSub (|message| exp,  |asmreg|)
 		InitialJump.JumpTo(loop_test.start)
 		loop_test.JumpTo(InitialJump+1)
 		if loop_Test.length == 1									// loop opt!
-			InitialJump.copyfrom(loop_test.Start)
+			InitialJump.CopyJump(loop_test.Start)
 			InitialJump.JumpTo(loop_test.After)
 			InitialJump.JumpNegate
 		returns = nil
@@ -212,24 +212,10 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	|| Exit = exp.jump
 	Branch.jumpto(.curr)
 	|| mB = .µInto(B, dest)	
-
-	.WritePhis(T)
 	
-	
-	rz = .TernRefCount(ma, mb)						
+	|| fat = exp.phi(dest, ma, mb)
 	Exit.jumpto(.curr)
-
-
-function TernRefCount (|asmreg| A, |asmreg| B, |asmreg|)
-	// use phi instead.
-	rz = B
-	|| fa = A.fat
-	|| fb = B.fat
-		if fa
-			fa.µrefcount++ // can't be helped until we have phi
-		// fb.reginput(4) = A			// refcount A, save from disposal
-	  elseif fa
-		rz = A
+	return fat * dest
 
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)

@@ -276,24 +276,6 @@ datatype ASMReg (uint64)
 		.fatindex = value.fatindex
 		return self
 
-
-	function SCDecl.ASMReg (assigns:|asmreg|)
-		target debug
-			if !value.reg and self is alteredorref
-		
-		isnt const
-		.ExportPosition = 0		// this is for a local. locals store their consts in fats...
-		if value is Const
-			value.incr
-			value.ConstCheck
-			if self isnt Altered
-				is const
-		
-		(value isnt temp)		// i don't think a decl can be temp?
-		(value isnt okastemp)
-		value.µType = .mu.DataType
-		.WholeType = value
-	
 	
 	operator mul (|bool| b, |asmreg|)
 		return (b)(self, nil)

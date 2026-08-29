@@ -33,7 +33,15 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	|| OV = .OpenVars
 
 	|| st = .StartInlineState(prms, dest, fn)
-	target debug: || TrapInline = ++asmtrapper, if  TrapInline == -1
+	target debug
+		|| TrapInline = ++asmtrapper
+			if  TrapInline == 172701
+				printprogress()
+				refcounttrap = .curr - 1
+				refcounttrap.debugprint
+				printline 
+	  else
+		|| trapinline = 0
 		
 	.backupfat(.curr)
 	|fatrange| LL
@@ -41,7 +49,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.ASMReach(des)
-	.RevertFAT(r==nil)
+	.RevertFAT(r==nil, TrapInline)
 	
 	.CloseInline(st)
 	return .CloseVars(OV, nil, r)				// Should closevars come before restore?
@@ -51,7 +59,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 
 
 struct InlineInfo
-	|asmreg[10]|	Items
+	|asmreg[8]|		Items
 	|uint|			Altered
 	|uint|			References
 	|uint|			Normal
@@ -72,18 +80,22 @@ struct InlineInfo
 		while  --n >= 0
 			|| r = .Items[n]
 			|| v = r.reg
+			|| f = r.fat
 			if (!v) or (.CantNop & 1<<n)
-				0
+				if v  and  (r is const)
+					sh.safedecr(f!)
+					
 			  elseif r is Const
 				if r iz ret // allowed? shouldn't be?
-				// why is it OK if r iz ret here?
-				sh.Decr(r.needfat, fatnopmode.hard)
+				sh.Decr(f!, fatnopmode.hard)
 			  elseif !(r iz Ret)
-				|| f = r.fat
-				if f  and  !f.µrefcount  and  f.GuessSize
+				if f  and  !f.refcount  and  f.GuessSize
 					if sh.IsWithinCurrInline(f)
 						sh.nop(f)
 
+
+	function assembler.SafeDecr (|&fatasm| f)
+		f.µrefcount = f.refcount - 1
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
 		return true // remove later
@@ -244,6 +256,25 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 		p = p.next!
 
 
+
+function SCDecl.ASMReg (assigns:|asmreg|)
+	target debug
+		if !value.reg and self is alteredorref
+	
+	isnt const
+	.ExportPosition = 0		// this is for a local. locals store their consts in fats...
+	if value is Const
+		value.incrfat
+		value.ConstCheck
+		if self isnt Altered
+			is const
+	
+	(value isnt temp)		// i don't think a decl can be temp?
+	(value isnt okastemp)
+	value.µType = .mu.DataType
+	.WholeType = value
+
+
 	
 function CurrGain (|&fatasm| Start, |int|)
 	|| C = .curr
@@ -302,14 +333,19 @@ function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
 			sv.ReturnCount++
 		  elseif op == asm.ret
 			sv.ReturnCount++
+			|| dest = s.inputfat(0)
 			if rz
 				rz = rz.simplify
+			  elseif dest
+				rz = dest.info
 			  else
-				|| dest = s.inputfat(0)
-					rz = dest.info
-				  else
-					rz.reg = s.asmreg(0) // what about the temp?
-					rz.µType = .state.return.µType
+				rz.reg = s.asmreg(0) // what about the temp?
+				rz.µType = .state.return.µType
+
+			
+			if dest
+				.SafeDecr(dest)
+			// this is an issue. we need to decr the input reg... but without destroying it
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)

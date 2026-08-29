@@ -167,7 +167,7 @@ function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 	|| fat = .RefCountSub(exp, prms, fn)
 		|| saved = fat.RegOnly(2)
 			.Trash(saved)
-		fat.µrefcount++
+		fat.incr
 		return fat.info as asmreg() // fat * asmreg() // unneeded???
 
 
@@ -185,7 +185,7 @@ function Assembler.DecrObj (|asmreg|)
 			return upon
 
 
-function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
+function Assembler.SafeObjDecr (|asmreg| Match=nil, |asmreg|)
 	|| fat = .last(asm.RFUN)$
 	|| upon = (fat)(1)$
 
@@ -197,7 +197,7 @@ function Assembler.SafeDecr (|asmreg| Match=nil, |asmreg|)
 
 
 function FinalDecrements (fn_asm)
-	|| D0 = .SafeDecr(dest)$
+	|| D0 = .SafeObjDecr(dest)$
 	|| D1 = .DecrObj
 //  i think this is overkill. its possible, but decrementing 3 objects in 1 instruction is madness.
 //	|| D2 = .DecrObj

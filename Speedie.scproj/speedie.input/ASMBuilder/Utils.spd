@@ -205,9 +205,9 @@ function SCFunction.ASMReturn (|ASMReg| Dest, |asmreg|)
 	return dest
 
 
-function asmreg.incr (|asmreg|)
+function asmreg.IncrFat (|asmreg|)
 	|| f = .fat
-		f.µrefcount++
+		f.incr
 		return self
 	target debug
 		if .reg and self is Const  // sigh

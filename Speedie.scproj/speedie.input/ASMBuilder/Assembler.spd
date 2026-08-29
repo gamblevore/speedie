@@ -369,7 +369,7 @@ struct Assembler
 		|| r = .µGetPrms(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
 			error (exp, errorreceiver.InternalError)
-		return r.incr
+		return r
 
 
 	function µTrin (|message| exp, |asmreg|)
@@ -552,7 +552,7 @@ struct Assembler
 		.CloseVars(1, arg)
 		ASMType.ReturnOpt(self, nil)
 		|| FatRat = arg.ret
-		fatrat.µRefCount = 1
+		fatrat.RefCount = 1
 		fatrat.BreakInfo = Breakable
 		arg.Position = old		
 

@@ -12,19 +12,19 @@ function IsASMConst (|message| exp, |bool|)
 		return ASMType.ThgSub(self, exp, ASMReg.ConstRequest)
 
 
-function PrmCollectSpd (|&int64| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
+function PrmCollectSpd (|&asmreg| prms,  |SCFunction| fn,  |uint64|)		// paramcollect, paramscollect
 	opt norefcounts
 	|int64| sh
 	|| i = 0
 	|| n = fn.args.Length
 	while i < n
-		|| v = prms[i++]
+		|| v = prms[i++].reg
 		sh += 5
 		rz |= v << sh
 	rz |= i
 
 
-function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Regs,  |uint64|)
+function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&asmreg| Regs,  |uint64|)
 	opt norefcounts
 	if !Cpp
 		rz = .PrmCollectSpd(regs, fn)
@@ -43,7 +43,7 @@ function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&int64| Re
 		for p.fast in prms
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| == floats
-				|| v = regs[i]
+				|| v = regs[i].reg
 				sh -= 5
 				rz  |=  v << sh
 				ic += !floats
@@ -103,7 +103,7 @@ function fatasm.CurrGrabID (|byte|)
 	return ._const
 
 function fatasm.CurrGrabID (assigns:|byte|)
-	._const = value
+	.const = value
 
 
 function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
@@ -212,14 +212,14 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	
 	dest = .FunctionDestination(exp, dest, fn)
 	|| Start = .curr
-	|int64[8]| Regs
+	|asmreg[8]| Regs
 
 	{
 		|| Closer = .OpenVars
 		|| i = 0
 		|| args = fn.args
 		for	p.fast in prms
-			regs[i] = .µFuncPrms(p!, args[i]!).reg
+			regs[i] = .µFuncPrms(p!, args[i]!)
 			i++
 		.CloseVars(Closer)
 	}
@@ -244,13 +244,25 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	return fn2 * dest
 
 
-function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&int64| Regs, |bool| Cpp, |&fatasm|)
+
+function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&asmreg| Regs, |bool| Cpp, |&fatasm|)
 	opt norefcounts
 	|| P = .EncodeParams(exp.last!, fn, Cpp, regs)
 	|| PExt = P >> 32
 	(dest is statelessfunc) = (fn is Stateless)
 	
 	|| fat = exp.FNC(dest, TableID, P, PExt)
+	|| NArgs = fn.args.Length
+	|| inputs = &fat.Inputs[0]
+
+	fat.numinput(4) = nargs
+	for i in nargs
+		|| r = regs[i]
+			|| fati = r.FatIndex
+			|| input = fati.fat
+				inputs++[] = fati
+				input.incr
+	
 	if Cpp
 		fat._op = asm.FNCX
 		if PExt > 0
@@ -263,7 +275,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	fat.µRefCount += fn isnt STATELESS				// NOICE!
 	if fn is Killer
 		dest = asmreg.exit
-		fat.µrefcount++
+		fat.incr
 	return fat
 
 
