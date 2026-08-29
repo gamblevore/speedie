@@ -18,7 +18,7 @@ function PrmCollectSpd (|&asmreg| prms,  |SCFunction| fn,  |uint64|)		// paramco
 	|| i = 0
 	|| n = fn.args.Length
 	while i < n
-		|| v = prms[i++].reg
+		|uint64| v = prms[i++].reg
 		sh += 5
 		rz |= v << sh
 	rz |= i
@@ -43,25 +43,24 @@ function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&asmreg| R
 		for p.fast in prms
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| == floats
-				|| v = regs[i].reg
-				sh -= 5
+				|uint64| v = regs[i].reg
+/				sh -= 5
 				rz  |=  v << sh
 				ic += !floats
 				fc += floats
 			i++
 	
 	rz >>= 64-((n*5)+12)
-	if fc>8 or ic>8			// hmmm
 	if fc
 		rz |= (8-fc) << 6
 		rz |= (8-ic) << 0
 	  else
 		rz |= (17-ic) << 6
 
-	|| v = 1|uint64| << ((n*5)+12)			// uint64 cos C++ sucks
-	if rz & ~(v-1) // oof?
+	|| kReturnFloat = 1|uint64| << ((n*5)+12)			// uint64 cos C++ sucks
+	if rz & ~(kReturnFloat-1) // oof?
 	if fn.ASMReturn.SpecialReg
-		rz |= v
+		rz |= kReturnFloat
 											// I'd need to update my compiler to add ull to this...
 											// do later.
 
