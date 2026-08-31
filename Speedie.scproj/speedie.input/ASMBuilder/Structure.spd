@@ -193,7 +193,7 @@ extend assembler
 				.DelayedNops[C] = fat.Index
 			return
 
-		|| HasBreak = .nop_sub_keep(fat, nopmode)
+		|| HasBreak = .nop_sub_keep(fat, NopMode)
 		if !HasBreak
 			|| C = .curr - 1
 			if fat == C
@@ -234,10 +234,7 @@ extend assembler
 		.regs.KnownMap = M
 			
 			
-	function Trash (|uint| Reg)									// refcounting needs to set this
-		// What about tests? what if it gets out of sync?
-		// Surely this is a map of anything with remaining values set?
-		
+	function Trash (|uint| Reg)
 		|uint| A = .regs.alterations &~ ((1<<(Reg+1))-1)
 		while A
 			|| r = a.log2
@@ -256,7 +253,7 @@ extend assembler
 			N = Alterer - .FuncStart_							// set value
 
 		|| oldi = .regs.Setters[changed]
-		.regs.Alterations = A
+		.regs.alterations = A
 		.regs.Setters[changed] = n
 		.KnownValues(changed) = Alterer is Const
 		

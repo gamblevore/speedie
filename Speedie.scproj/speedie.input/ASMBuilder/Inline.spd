@@ -56,7 +56,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 
 	if r and !.InlineDepth
 		for i in (32 min .DelayedNopCount)
-			|| f = .DelayedNops[i]|uint|.fat!
+			|| f = .DelayedNops[i].fat!
 			.DelayedNops[i] = 0
 			.nop(f)
 		.DelayedNopCount = 0

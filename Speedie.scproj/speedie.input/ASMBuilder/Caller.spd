@@ -44,7 +44,7 @@ function EncodeParams (|message| prms,  |SCFunction| fn, |bool| Cpp, |&asmreg| R
 			|| ty = p.ASMDecl
 			if ty.SpecialReg|int| == floats
 				|uint64| v = regs[i].reg
-/				sh -= 5
+				sh -= 5
 				rz  |=  v << sh
 				ic += !floats
 				fc += floats

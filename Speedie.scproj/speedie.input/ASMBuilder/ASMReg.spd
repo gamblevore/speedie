@@ -351,3 +351,7 @@ datatype ASMReg (uint64)
 		function New (|int| reg, |asmreg|)
 			rz.reg = reg
 		
+		function New (|int| reg, |uint16| Index, |asmreg|)
+			rz.reg = reg
+			rz.fatindex = index
+		

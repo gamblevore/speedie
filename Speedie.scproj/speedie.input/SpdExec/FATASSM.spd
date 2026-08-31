@@ -150,6 +150,9 @@ struct FatASM
 		visible
 		return self - Assembler.sh.TotalStart
 
+	function uint16.fat (|&fatasm|)
+		return self|uint|.fat
+
 	function uint.FAT (|&FATASM|)
 		if self
 			rz = Assembler.sh.funcstart_ + self
@@ -445,7 +448,7 @@ struct FatASM
 		if (.GuessSize == 0)
 			if .msg.func == @sheb
 				return false
-			if self isa asm.mark or asm.phi
+			if self isa asm.mark
 				return false
 		return true
 	
@@ -712,7 +715,7 @@ struct FatASM
 		if self.isfunc
 			n = .prms[4] min 8
 		while (i < n)
-			yield inputs[i++]|uint|.fat
+			yield inputs[i++].fat
 
 			
 	iterator RegOutputs

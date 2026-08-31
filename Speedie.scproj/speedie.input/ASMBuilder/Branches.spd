@@ -203,19 +203,18 @@ function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 
 
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
-	|| T = .BranchInit
+	|| Phi = .BranchInit
 	|| mA = .µInto(A, dest)
 
-	.BranchA(T)
-	
+	.BranchA(Phi)
 	
 	|| Exit = exp.jump
 	Branch.jumpto(.curr)
 	|| mB = .µInto(B, dest)	
 	
-	|| fat = exp.phi(dest, ma, mb)
 	Exit.jumpto(.curr)
-	return fat * dest
+	dest = exp.phi(dest, ma, mb) * dest
+	return .BranchMerge(exp, Phi, dest)
 
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)

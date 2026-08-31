@@ -5,165 +5,52 @@
 
 struct BranchPHITracker
 	|RegFile|					Start
-	|RegFile|					A
+	|RegFile|					Middle
 
 
 
 function assembler.BranchInit (|BranchPhiTracker|)
-//	rz.Start = .regs
-//	.regs.Alterations = 0
+	rz.Start = .regs
+	.regs.Alterations = 0
 
 
 
 function assembler.BranchA (|BranchPhiTracker| T)
-//	t.A = .regs
-//	.regs = T.Start // restore
-//	.regs.Alterations = 0
+	t.Middle = .regs
+	.regs = T.Start				// restore
+	.regs.Alterations = 0
 
 
-
-function assembler.WritePHIs (|BranchPhiTracker| T)
-//	|| XA = T.A.Alterations
-//	|| XB = .regs.Alterations
-//	|| Phis = XA & XB
-//	for (P.bits in Phis) (i)
-//		|| S = T.Start.Setters[i]
-//		|| A = T.A.Setters[i]
-//		|| B = .regs.Setters[i]
-//	
-//	.regs.Alterations = XB ||| XA ||| T.Start.Alterations
-
-
-
-function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Type)
-	// Perhaps we can do a "pending phi" map? for setregister?
-	// and map them on branchclose? i guess based on the parentblock?
-	// x = 1, if y: y++, x = 2
+function assembler.BranchMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both)
+	for (Bit.bits in both) (i)
+		|| F1 = A.Setters[i]
+		|| F2 = B.Setters[i]
+		expect (F1 and F2) and (F1 != F2) // should always exist, and not be the same!
+		exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
 	
-	// even if we have one pending caught... we still have to go backwards, to capture the old. Or use the regfile.
-	// The thing is, if we are going backwards, why not just... go backwards? Most functions aren't so big.
-	// and we might find it nearby.
-	// Regfiles still need to be saved, so thats overhead...
-	// theres also register trashing to take care of... we can't just read a register if something trashed it.
-	// And theres branching, although we hope to find phi nodes to counteract that.
-	// Also, we don't need to merge ALL the outputs, just the last from any block... in fact from the same parentblock
 	
-	// thats a lot of... work.
 	
-	/*
-	// lets start with the most basic thing
-		x = 1
-		if y
-			x = 2
-//	 so we just need to look at the setter, and the thing doing the setting.
-//	 now what about this?
+function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest, |asmreg|)
+	|| XS = T.Start.Alterations
+	|| XM = T.Middle.Alterations
+	|| XC = .regs.Alterations
+	|uint| Avoid = 1<<dest.reg
+	.regs.Alterations = XC|||XM|||XS
 
-		x = 1
-		if y
-			x = 2
-			G = x
-			x = 3
-		// merge two only
-			
-	OK, so we can't go back over the instructions... that won't work. I guess we gotta use the new regfile instead.
-	OK, so thats fine. Some kind of regfile merge?
-	
-	Now, what about something more complex.
+	|| B = (XM & XC) &~ Avoid
+		Avoid |= B
+		.BranchMergeSub(exp, T.Middle,	.regs,		B)
 
-		x = 1
-		if y
-			x = 2
-			G = x
-			x = 1
-			if y<0
-				x = 4
-				G = x
-				x = 5
-			// merge two only
-		// merge two only
-		
-	seems simple? We only need to look at two regfiles, to merge two ops into one phi... although we can do it
-	at multiple points. We could merge phi merges, but nvm that. Do AFTER everything is working.
-	
-	OK, what about else?
-	
-		x = 1
-		if y
-			x = 2
-		  else
-			x = 3
-		
-	So... here we ALSO merge two sets, BUT we don't need it from the original x = 1	
-	I'm thinking, we can do the merge in the ifsub function, its the only thing that knows about the else block	
-		
-	Ternaries are the same	
+	B = (XS & XM) &~ Avoid
+	if B
+		.BranchMergeSub(exp, T.Start,	T.Middle,	B)
 
-	while... has no else block	
+	B = (XS & XC) &~ Avoid
+	if B
+		.BranchMergeSub(exp, T.Start,	.regs,		B)
 	
-	and/or also!!! ({A = 1, x}) or ({A=2, y})
-	
-	OK, so lets look at the elseif
-	
-		
-		x = 1
-		if y == 1
-			x = 2
-		  elseif y == 2
-			x = 3
-		
-	Kinda tricky. Lets look at this:
+	return dest
 
-		x = 1
-		if y == 1
-			x = 2
-		  else
-			if y == 2
-				x = 3
-			// merge: x = 3/1
-		// merge: x = 3/1/2
-	
-	Not so simple!
-	
-	So the issue, is that we need to merge x=3 and x=1
-	
-	How to merge them?
-	
-	Well... on the else branch, we need to get the old regfile, then pass it up. Seems... reasonable? lets see?
-	
-	Why not start with something simpler? the ternary? see how we get on?
-		
-		
-	*/
-
-	
-//	|| Curr = .curr
-//	|| StartIndex = Start - .FuncStart_
-//	while Start < Curr
-//		for Out.RegOutputs in start
-//			|| R = out.Reg
-//			|| OrigSet = OrigRegs.Setters[r]
-//				|| OrigFat = .FuncStart_ + OrigSet
-//				if OrigSet < StartIndex					// was altered before branch start, or not altered
-//					
-//				  else
-//					debugger							// wait how? Originally set AFTER the branch started?
-//			  else
-//				if type isnt VerySpecial				// wow. its not a ternary?
-//					
-//			
-//				
-//			// now what? well... WE altered it, and in a branch. So... lets get the branch start, huh?
-//			
-//			
-//		
-//		Start++
-
-
-
-
-
-
-	// so... we need to check the outputs
 /*
 	|| x = 1
 	if y
@@ -176,77 +63,5 @@ function assembler.BranchEnded (|regfile| OrigRegs, |&fatasm| Start, |Asmreg| Ty
 		if y
 			x = 2
 		// phi
-	// 
-
-
+	//
 */
-	
-/*
-// Not possible without phi-nodes:
-	z = 3
-	if x == 1
-		z = 8
-	  elseif x == 2
-		z = 5
-	if x
-		return z
-	z = 6
-	return z
-
-We are going to need some phi-node tests. Its a large-system
-So when/where do we add this test? Getting it correct will be
-harder than actually... writing the system.
-
-Lets make some examples
-
-function ...
-	z = 3
-	if x == 1
-		z = 8
-	  elseif x == 2
-		z = 5
-	// merge 3/5/8
-	if x
-		return z // incr all 3
-	return 0
-
-
-function ...
-	z = 3
-	if x == 1
-		z = 8
-	// merge 8/3
-	z = 6 // erases both sets, making them useless.
-	return z
-
-
-function ...
-	z = 3
-	if x == 1
-		z = 8
-	  elseif x == 2
-		z = 5
-	if x
-		return z
-	z = 6
-	return z
-	
-
-function ...
-	
-	z = 1
-	// z is altered in loop, so premake a phi-node
-	while
-		if x
-			return z // refer to phi-node, not z=1
-		z = 2
-
-*/
-
-
-
-	// while/ifsub already have regfiles saved, in argumentsub... however those regs COULD be altered, by the branch
-	// so I guess we gotta save it here too. Shame. Theres enough fiddly logic to waste time on saving memory/CPU	
-	// on this. or delete this... hhaha
-
-
