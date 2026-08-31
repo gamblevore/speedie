@@ -33,23 +33,23 @@ function IfSub (fn_asm) // function If (fn_asm)
 	if b.Always
 		return ASMType.Argument(self, FirstBranch)			// if k1: return 
 
-	|| Phi = .BranchInit
+	|| Phi = .PhiInit
 	|| Arg1Return = ASMType.Argument(self, FirstBranch)
-	.BranchA(Phi)
 	|| Other = FirstBranch.next	
 	if !other.HasAsmStuff									// if (x): func()
 		|| Clamped = .MiniClampOpt(exp, b.start)
 			return Clamped
 		.ExpectOneMore = true
 		b.JumpTo(.curr)
-		.BranchMerge(exp, Phi, nil)
+		.PhiMerge(exp, Phi)
 		return asmreg()
 	
+	.PhiMiddle(Phi)
 	|| AfterFirst = other.jump								// Basicblock ++
 	b.JumpTo(.curr)	
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
-	.BranchMerge(exp, Phi, nil)
+	.PhiMerge(exp, Phi)
 
 
 
@@ -102,15 +102,18 @@ function While (fn_asm)
 	.loopdepth--
 	
 
-function WhileSub (|message| exp,  |asmreg|)
+function WhileSub (|message| exp, |asmreg|)
 	opt norefcounts
-	// we need to make PHI nodes for vars that are altered in a loop.
+	// We need to make PHI nodes for vars that are altered in a loop.
 	// I'm assuming its only for vars already declared?
 	
 	|| InitialJump = exp.JUMP										// test goes after loop
+	|| Phi = .PhiMiniInit()
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
-	.breakrequest |= assembler.breakable ||| InitialJump.BreakInfo
+	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo
+	.PhiMerge(exp, Phi)
+
 	.Branch(exp.first!, loop_test, true)
 	require !.EntireInlineFailed
 
@@ -205,12 +208,11 @@ function TernarySub	(|message| exp, |asmreg| dest,  |asmreg|)
 	return .RealTernary(exp, dest, a, b, br)
 
 
-
 function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |fatrange| Branch, |asmreg|)
-	|| Phi = .BranchInit
+	|| Phi = .PhiInit
 	|| mA = .µInto(A, dest)
 
-	.BranchA(Phi)
+	.PhiMiddle(Phi)
 	
 	|| Exit = exp.jump
 	Branch.jumpto(.curr)
@@ -218,7 +220,7 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	
 	Exit.jumpto(.curr)
 	dest = exp.phi(dest, ma, mb) * dest
-	return .BranchMerge(exp, Phi, dest)
+	return .PhiMerge(exp, Phi, dest)
 
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
@@ -434,11 +436,16 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	if AndTest.never
 		return first
 
+	|| Phi = .PhiMiniInit()
 	|| Second = .Branch(B, AndTest, dest is negate)
 	if  first isnt Const
 		// a and b
 		// a and 1
 		// a and 0
+		if AndTest.Never // a and 0
+			return Second
+
+		.PhiMerge(A.parent!, phi)
 		return first
 
 	// 1 and 1
@@ -453,12 +460,13 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| KF = OrTest.Constness.negate
 	if kf.knowntrue
 		|| fake = A.noop
-		fake.const = KF|int|
+		fake.const = 1
 		(first is CondAnswer)
 		first.fatindex = fake.index
-		return first.boolanswerok						// only way around this. Cos we got asm-reg(0)
+		return first.boolanswerok						// only way around this. Cos we got asmreg(0)
 
 	|fatrange| Br2
+	|| Phi = .PhiMiniInit()
 	|| second = .Branch(B, Br2, dest is negate)
 	OrTest.JumpTo(.curr)
 
@@ -475,7 +483,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	// a or 0
 	// a or b
-	
+	.phimerge(A.parent!, phi)
 	return first
 
 
@@ -593,7 +601,7 @@ extend Assembler
 	
 
 target debug
-	function @assembler.PrintProgress (|scfunction| fn)
+	function @assembler.PrintProgress (|scfunction| fn, |int| Level)
 		cpp_name adb2
 		"---"
 		printline fn
@@ -601,19 +609,19 @@ target debug
 			|| Base = assembler.sh.TotalStart + Start
 			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
 			for n in amount
-				base[n].debugprint
+				base[n].debugprint(Level)
 			
 			.PrintRegs
 
 
 
-function @assembler.PrintProgress
+function @assembler.PrintProgress (|int| Level)
 	cpp_name adb
 	visible
 	opt norefcounts
 	target debug
 		if !compiler.inperry
-			.PrintProgress(scfunction.currfunc!)
+			.PrintProgress(scfunction.currfunc!, level)
 	
 
 

@@ -44,10 +44,6 @@ extend assembler
 			|| after = live+amount
 			while live < after
 				if !memory.equals(live, backup, –sizeof fatasm)
-					printprogress()
-					live.DebugPrint
-					Backup.DebugPrint
-					printline trapcount
 					debugger 
 					live[0] = backup[0]
 				Backup++

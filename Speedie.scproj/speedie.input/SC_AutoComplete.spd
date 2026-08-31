@@ -1265,7 +1265,7 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 				bb = fat.BasicBlock
 				out <~ bb
 			fs <~ (' ', fat.msg.asmindent(top)*2)
-			fat.RenderFat(fs, true)
+			fat.RenderFat(fs, 0)
 			|| tmp = out.msg(@tmp, fs)
 			|| msg = fat.msg
 			|| p =  (msg!=nil)(msg.Position, 0)//(msg?) // could be nil due to the length set wrongly...

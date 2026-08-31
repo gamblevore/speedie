@@ -35,12 +35,6 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 
 	target debug
 		|| TrapInline = ++asmtrapper
-			if  TrapInline == -1
-				printprogress()
-				refcounttrap = .funcstart + 6
-				refcounttrap.debugprint
-				printline
-				debugger
 	  else
 		|| TrapInline = 0
 		

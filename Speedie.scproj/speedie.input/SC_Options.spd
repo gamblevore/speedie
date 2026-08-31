@@ -108,13 +108,13 @@ module Feedback
 				i.AsFloat
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
-				Assembler.PrintProgress
+				Assembler.PrintProgress(-1)
 				target !cake
 					m.PrintLocate
 				nil|asmreg|.DebugPrint
 				nil|message|!.TIME // stop strip
 				|fatasm| X
-				X.DebugPrint
+				X.DebugPrint(-1)
 		if 0
 			m.FEET // for when you can't dance
 	

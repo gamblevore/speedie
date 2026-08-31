@@ -278,9 +278,9 @@ struct FatASM
 	
 	Syntax Expect (|string| Error)
 		target debug
-			assembler.PrintProgress
+			assembler.PrintProgress(0)
 			"----"
-			.DebugPrint
+			.DebugPrint(-1)
 		error (.msg, error)
 
 	
@@ -471,17 +471,13 @@ struct FatASM
 				fs <~ "\n"
 	
 	
-	function RenderFat (|FastString| fs, |bool| Simpler=false)
-		opt norefcounts		
-		target debug
-			if self is debugvars
-				.RendaOpenClose(fs)
-		if !.WillRenderFat
-			target debug
-				ifn self isa asm.phi
-					.RendaMsg(fs, 0)
-			return
-		
+	function RenderFat (|FastString| fs, |int| Level, |bool|)
+		opt norefcounts
+		if (self isa asm.phi) and !(level & 1)
+			return false
+		if (self isa asm.mark) and !(level & 2)
+			return false
+
 		|| M = fs.StreamLength
 		|| op = instruction.typelist[.BaseOp]!
 		if .baseop != asm.noop
@@ -532,9 +528,10 @@ struct FatASM
 			fs <~ "..."
 			n += 2
 
-		if !Simpler
+		if Level&8
 			target debug
 				.RendaMsg(fs, n)
+		return true
 	
 	
 	function Next (|&FatASM|)
@@ -710,7 +707,7 @@ struct FatASM
 		return .IsFinisher(.info)
 
 
-	function DebugPrint 
+	function DebugPrint (|int| Level)
 		target debug {
 		visible
 		nil self
@@ -719,7 +716,7 @@ struct FatASM
 			return
 		if asm.NoisyASM >= 3
 			|| fs = faststring()
-			.RenderFat(fs)
+			.RenderFat(fs, Level)
 			printline fs
 		}
 

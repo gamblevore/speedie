@@ -79,23 +79,6 @@ extend SCFunction
 					fat.FillLabelRequest(where, rz, r-1)	
 	
 	
-	target debug
-		render µRender (|bool| RenderBlocks = false)
-			fs <~ "asm ${.exportname}   ${.µASMLength*4}\n"
-			|| bb = 0
-			for µ.fat in self
-				if RenderBlocks and µ.BasicBlock != bb
-					bb = µ.BasicBlock
-					fs <~ "//$bb\n"
-				µ.RenderFat(fs)
-				fs <~ '\n'
-
-
-	function µPrint 
-		target debug
-			printline self
-			printline .µRender
-
 
 	iterator fat
 		|| FirstInst = .FatFirst
@@ -138,7 +121,8 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 				if !glob.type.IsInterface
 					bmr.appendhint(glob.ExportPosition)
 					bmr.appendhint(Start)
-			fn.µprint
+			target debug
+				assembler.PrintProgress(fn, 0)
 	return true
 
 

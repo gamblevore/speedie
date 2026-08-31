@@ -149,6 +149,7 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	|| v_bits = 1<<v
 	|| Result = Curr &~ v_bits
 	.Regs.KnownMap &=~ v_bits
+	.regs.phi &=~ v_bits
 	
 	if IsReal
 		.vdecls = Result

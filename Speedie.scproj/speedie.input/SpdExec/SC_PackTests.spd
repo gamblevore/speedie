@@ -89,7 +89,7 @@ function SCFunction.TestObesity (|!&ivec4|)
 	target debug
 		|| mu = .µFATLength
 			|(memory of asm)--| mu2 = .µTest
-			.µprint
+			assembler.printprogress(self,0)
 			testvm.Load(mu2.ptr, mu2.length)
 			return testvm.Run(0)
 	return butter

@@ -316,7 +316,7 @@ datatype ASMReg (uint64)
 			print .render
 			|| f = .fat
 				print " - "
-				f.DebugPrint
+				f.DebugPrint(-1)
 			  else
 				""
 	}

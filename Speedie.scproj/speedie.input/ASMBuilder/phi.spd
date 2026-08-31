@@ -1,25 +1,13 @@
 
-	// Need to capture alterations using PHI nodes here
-	// how to deal with already captured changes?
-	
+
+// AND/OR need phi capturing also!!
+
 
 struct BranchPHITracker
 	|RegFile|					Start
 	|RegFile|					Middle
 	|uint16|					StartIndex
 	|uint16|					MiddleIndex
-
-
-
-function assembler.BranchInit (|BranchPhiTracker|)
-	rz.Start = .regs
-	rz.StartIndex = .curr.index
-
-
-function assembler.BranchA (|BranchPhiTracker| T)
-	t.Middle = .regs
-	T.MiddleIndex = .curr.index
-	.regs = T.Start
 
 
 function regfile.ActualPhi (|uint16| From, |uint|)
@@ -31,25 +19,27 @@ function regfile.ActualPhi (|uint16| From, |uint|)
 		P &=~ i
 		if Actual >= From
 			rz |= i
-		
-	
 
-|| PhiCount = 0	
-function assembler.BranchMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both)
-	for (Bit.bits in both) (i)
-		|| F1 = A.Setters[i]
-			|| F2 = B.Setters[i]
-				expect (F1 != F2) // can't be the same!
-				exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
-				// disabling this, leads to compiles a little (tiny amount) smaller.
-				// why? Surely its the other way around? What diferences?
-				// how to compare?
-				// perhaps some kind of dump?
-				
+
+function assembler.PhiInit (|BranchPhiTracker|)
+	rz.Start = .regs
+	|| i = .curr.index
+	rz.StartIndex = i
+	rz.MiddleIndex = i
+
+
+
+function assembler.PhiMiniInit (|BranchPhiTracker|)
+	return .PhiInit() // for now. later it could return a different struct with less info
+
+
+function assembler.PhiMiddle (|BranchPhiTracker| T)
+	t.Middle = .regs
+	T.MiddleIndex = .curr.index
+	.regs = T.Start
+
 	
-	
-	
-function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest, |asmreg|)
+function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest=nil, |asmreg|)
 	|| XS = T.Start.phi
 	|| XM = T.Middle.ActualPhi(T.StartIndex)
 	|| XC = .regs.ActualPhi(T.MiddleIndex)
@@ -58,15 +48,15 @@ function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| de
 
 	|| B = (XM & XC) &~ Avoid
 		Avoid |= B
-		.BranchMergeSub(exp, T.Middle,	.regs,		B)
+		.PhiMergeSub(exp, T.Middle,	.regs,		B)
 
 	B = (XS & XM) &~ Avoid
 	if B
-		.BranchMergeSub(exp, T.Start,	T.Middle,	B)
+		.PhiMergeSub(exp, T.Start,	T.Middle,	B)
 
 	B = (XS & XC) &~ Avoid
 	if B
-		.BranchMergeSub(exp, T.Start,	.regs,		B)
+		.PhiMergeSub(exp, T.Start,	.regs,		B)
 	
 	|| S = &.regs.Setters[0]
 	|| M = &(t.middle.Setters[0])
@@ -76,17 +66,12 @@ function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| de
 		S[i] = S[i]|uint| max M[i]
 	return dest
 
-/*
-	|| x = 1
-	if y
-		x = 2
-	// (phi) // OK, that works... but what about this?
+	
 
-	|| x = 0
-	if z
-		x = 1
-		if y
-			x = 2
-		// phi
-	//
-*/
+function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both)
+	for (Bit.bits in both) (i)
+		|| F1 = A.Setters[i]
+			|| F2 = B.Setters[i]
+				expect (F1 != F2) // can't be the same!
+				exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
+	
