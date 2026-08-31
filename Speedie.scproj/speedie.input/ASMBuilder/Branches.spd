@@ -431,6 +431,8 @@ function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asm
 
 
 function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
+	opt norefcounts
+	
 	|fatrange| AndTest
 	|| First = .Branch(A, andtest, dest is negate)
 	if AndTest.never
@@ -455,6 +457,8 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 
 function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
+	opt norefcounts
+
 	|FatRange| OrTest
 	|| First = .Branch(A, OrTest, dest isnt negate)
 	|| KF = OrTest.Constness.negate

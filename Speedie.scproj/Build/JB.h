@@ -775,7 +775,8 @@ struct RandomXOR {
 struct RegFile {
 	u16 Setters[32];
 	uint KnownMap;
-	uint Alterations;
+	uint Altered;
+	uint Phi;
 };
 
 struct TerminalDisplay {
@@ -821,7 +822,9 @@ struct Assembler {
 
 struct BranchPHITracker {
 	RegFile Start;
-	RegFile A;
+	RegFile Middle;
+	u16 StartIndex;
+	u16 MiddleIndex;
 };
 
 struct SavedRegisters {
@@ -4469,11 +4472,15 @@ uint JB_uint_LowestBit(uint Self);
 
 bool JB_uint_OperatorIsa(uint Self, uint N);
 
+uint JB_uint_OperatorMax(uint Self, uint Other);
+
 uint JB_uint_OperatorMin(uint Self, uint Other);
 
 
 
 // uint16
+FatASM* SC_uint16_fat(uint /*u16*/ Self);
+
 
 
 // uint64
@@ -4596,6 +4603,8 @@ ASM SC_ASM_JCmpK_JmpSet(ASM Self, uint Value);
 ASM SC_ASM_JCmpK_KSet(ASM Self, uint Value);
 
 ASM SC_ASM_Jump_JUMPSet(ASM Self, uint Value);
+
+bool SC_ASM_JumpNegatable(ASM Self);
 
 ASM SC_ASM_Loop_JmpSet(ASM Self, uint Value);
 
@@ -4800,6 +4809,8 @@ ASMReg SC_Reg_xC2xB5TypeSetWithReg(ASMReg Self, ASMReg Value);
 ASMReg SC_Reg__NewWith0();
 
 ASMReg SC_Reg__NewWithInt(int Reg);
+
+ASMReg SC_Reg__New(int Reg, uint /*u16*/ Index);
 
 
 
@@ -5914,6 +5925,8 @@ int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
+FatASM* SC_FAT_Next(FatASM* Self);
+
 void SC_FAT_NumInputSet(FatASM* Self, int A, int V);
 
 byte SC_FAT_Op(FatASM* Self);
@@ -5952,7 +5965,7 @@ int SC_FAT_RegOnly(FatASM* Self, int I);
 
 void SC_FAT_RendaKnst(FatASM* Self, FastString* Fs, int SoFar);
 
-void SC_FAT_RenderFat(FatASM* Self, FastString* Fs, bool Simpler);
+bool SC_FAT_RenderFat(FatASM* Self, FastString* Fs, int Level);
 
 bool SC_FAT_RotateConst(FatASM* Self, uint64 V);
 
@@ -6112,6 +6125,8 @@ int JB_Rnd__InitCode_();
 
 
 // JB_RegFile
+uint SC_RegFile_ActualPhi(RegFile* Self, uint /*u16*/ From);
+
 
 
 // JB_RetroFloat
@@ -6209,11 +6224,7 @@ FatASM* SC_Pac_BoolTestAndJump(Assembler* Self, Message* Exp, ASMReg Req, OpMode
 
 ASMReg SC_Pac_Branch(Assembler* Self, Message* Cond, FatRange* Range, bool Neg);
 
-void SC_Pac_BranchA(Assembler* Self, BranchPHITracker* T);
-
 ASMReg SC_Pac_BranchAnd(Assembler* Self, Message* A, Message* B, ASMReg Dest);
-
-void SC_Pac_BranchInit(Assembler* Self, BranchPHITracker* Rz);
 
 ASMReg SC_Pac_BranchOr(Assembler* Self, Message* A, Message* B, ASMReg Dest);
 
@@ -6475,6 +6486,16 @@ u16 SC_Pac_ParentBlock(Assembler* Self, uint /*u16*/ B);
 
 void SC_Pac_ParentSanity(Assembler* Self);
 
+void SC_Pac_PhiInit(Assembler* Self, BranchPHITracker* Rz);
+
+ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+
+void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both);
+
+void SC_Pac_PhiMiddle(Assembler* Self, BranchPHITracker* T);
+
+void SC_Pac_PhiMiniInit(Assembler* Self, BranchPHITracker* Rz);
+
 ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_PlusSub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6627,7 +6648,7 @@ ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp);
 
 int SC_Pac__Init_();
 
-void adb();
+void adb(int Level);
 
 
 
@@ -10847,8 +10868,6 @@ int SC_Func_VisibleArgs(SCFunction* Self);
 void SC_Func_WantAs(SCFunction* Self, uint /*NilState*/ NS);
 
 JB_String* SC_Func_WrappedName(SCFunction* Self);
-
-void SC_Func_xC2xB5Print(SCFunction* Self);
 
 Message* SC_Func__AlterPostCond(Message* PostCond, Message* IterPostCond, Message* NodeSrc);
 
