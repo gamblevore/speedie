@@ -4,7 +4,8 @@
 struct RegFile
 	|uint16[32]|				Setters
 	|uint|						KnownMap
-	|uint|						Alterations
+	|uint|						Altered
+	|uint|						Phi
 
 
 
@@ -211,11 +212,8 @@ extend assembler
 			if .Register(v) == fat
 				.SetRegister(v, nil, fat.FindOlder)
 		
-//		(fat is nopped) // doesn't work... things can still read .op and .OutputPrms
 		fat.setop = asm.noop
 		if HasBreak
-			// asmtodo: why not ALWAYS nop this? nops could be generated IF they have breakpoints?
-			// then addb isnt a nop anymore.
 			fat.BreakInfo = breakpoint ||| Breakable
 							
 		
@@ -235,7 +233,7 @@ extend assembler
 			
 			
 	function Trash (|uint| Reg)
-		|uint| A = .regs.alterations &~ ((1<<(Reg+1))-1)
+		|uint| A = .regs.altered &~ ((1<<(Reg+1))-1)
 		while A
 			|| r = a.log2
 			a &= ~(1<<r)
@@ -246,14 +244,17 @@ extend assembler
 		// does grabbed need to be changed?
 		// its setting a register but... which? adn why does the outputmap not get updated?
 		
-		|| A = .regs.Alterations &~ (1<<Changed)
+		|| A = .regs.Altered &~ (1<<Changed)
+		|| P = .regs.Phi &~ (1<<Changed)
 		|| N = 0
 		if Alterer
 			A |= 1 << Changed
+			P |= 1 << Changed
 			N = Alterer - .FuncStart_							// set value
 
 		|| oldi = .regs.Setters[changed]
-		.regs.alterations = A
+		.regs.Altered = A
+		.regs.Phi = P
 		.regs.Setters[changed] = n
 		.KnownValues(changed) = Alterer is Const
 		

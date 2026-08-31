@@ -6,36 +6,55 @@
 struct BranchPHITracker
 	|RegFile|					Start
 	|RegFile|					Middle
+	|uint16|					StartIndex
+	|uint16|					MiddleIndex
 
 
 
 function assembler.BranchInit (|BranchPhiTracker|)
 	rz.Start = .regs
-	.regs.Alterations = 0
-
+	rz.StartIndex = .curr.index
 
 
 function assembler.BranchA (|BranchPhiTracker| T)
 	t.Middle = .regs
-	.regs = T.Start				// restore
-	.regs.Alterations = 0
+	T.MiddleIndex = .curr.index
+	.regs = T.Start
 
 
+function regfile.ActualPhi (|uint16| From, |uint|)
+	|| P = .phi
+	while P
+		|| i = p.log2
+		|| Actual = .setters[i]
+		i = 1 << i
+		P &=~ i
+		if Actual >= From
+			rz |= i
+		
+	
+
+|| PhiCount = 0	
 function assembler.BranchMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both)
 	for (Bit.bits in both) (i)
 		|| F1 = A.Setters[i]
-		|| F2 = B.Setters[i]
-		expect (F1 and F2) and (F1 != F2) // should always exist, and not be the same!
-		exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
+			|| F2 = B.Setters[i]
+				expect (F1 != F2) // can't be the same!
+				exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
+				// disabling this, leads to compiles a little (tiny amount) smaller.
+				// why? Surely its the other way around? What diferences?
+				// how to compare?
+				// perhaps some kind of dump?
+				
 	
 	
 	
 function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest, |asmreg|)
-	|| XS = T.Start.Alterations
-	|| XM = T.Middle.Alterations
-	|| XC = .regs.Alterations
+	|| XS = T.Start.phi
+	|| XM = T.Middle.ActualPhi(T.StartIndex)
+	|| XC = .regs.ActualPhi(T.MiddleIndex)
 	|uint| Avoid = 1<<dest.reg
-	.regs.Alterations = XC|||XM|||XS
+	.regs.phi = XC|||XM|||XS
 
 	|| B = (XM & XC) &~ Avoid
 		Avoid |= B
@@ -49,6 +68,12 @@ function assembler.BranchMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| de
 	if B
 		.BranchMergeSub(exp, T.Start,	.regs,		B)
 	
+	|| S = &.regs.Setters[0]
+	|| M = &(t.middle.Setters[0])
+
+	// maybe just go over XM bits?
+	for i in 32
+		S[i] = S[i]|uint| max M[i]
 	return dest
 
 /*

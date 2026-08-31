@@ -16,7 +16,7 @@ function Assembler.FinishASM
 		|| op = s.op
 		if op == asm.knst
 			S.ConstFinish
-//			.AskNop(s) // this is not good for consts even... needs PHIs
+//			.AskNop(s) // could this work now that we have phi?
 		  elseif S.JumpPrm
 			s.JumpImprove(self)
 		  elseif op == asm.FNC3 or asm.FNC
@@ -43,7 +43,7 @@ function Assembler.FinishASM
 
 function assembler.TryTail (|fatasm| FNC)
 	opt norefcounts
-	|| Ret = Fnc + 1
+	|| Ret = Fnc.next
 	require (ret isa asm.ret) and (!fnc.p3)	// no pext, won't fit in tail.
 	|| rr = ret.regonly
 	|| ReturnType = .out.ReturnType

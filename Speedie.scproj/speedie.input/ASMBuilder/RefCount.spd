@@ -143,6 +143,7 @@ function assembler.CanOptRFUN (|message| exp, |asmreg| Obj, |&fatasm| last, |&fa
 	// So by now its incr only.
 	
 	|| UponFat = last.InputFat(2)
+		// this branch doesn't seem to occur?
 		if uponfat.IsRead and (uponfat.basicblock == .basicblock)
 			// incr + decr = nothing... assuming it wasn't needed
 			.SoftNop(Last)

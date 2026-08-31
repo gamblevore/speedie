@@ -448,7 +448,7 @@ struct FatASM
 		if (.GuessSize == 0)
 			if .msg.func == @sheb
 				return false
-			if self isa asm.mark
+			if self isa asm.mark or asm.phi
 				return false
 		return true
 	
@@ -478,7 +478,8 @@ struct FatASM
 				.RendaOpenClose(fs)
 		if !.WillRenderFat
 			target debug
-				.RendaMsg(fs, 0)
+				ifn self isa asm.phi
+					.RendaMsg(fs, 0)
 			return
 		
 		|| M = fs.StreamLength
@@ -535,7 +536,15 @@ struct FatASM
 			target debug
 				.RendaMsg(fs, n)
 	
-
+	
+	function Next (|&FatASM|)
+		real self
+		while
+			self = self + 1
+			if .GuessSize
+				return self
+	
+	
 	function IsChanger (|bool|)
 		return !.IsStateless
 	
@@ -653,23 +662,30 @@ struct FatASM
 		.prms[j] += mid.Jump
 		sh.nop(mid)
 		return true
-		
 	
+	function asm.JumpNegatable (|bool|)
+		return self != asm.LUPU and asm.LUPD and asm.jump
+		
 	function JumpImprove (|assembler| sh, |bool|)
 		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
 		|| n = 0
 		
-		while d isa asm.jump
-			d = d.JumpTo!
-			expect (++n < 30) (.msg)
+		while 
+			if d.GuessSize == 0
+				d++
+			  elseif d isa asm.jump
+				d = d.JumpTo!
+				expect (++n < 30) (.msg)
+			  else
+				exit
 		
 		|asm| m = .op
 		if  m == asm.jump
 			if  d.IsFinisher
-				return .CopyJump(d)		// jumping to a function-exit.
+				return .CopyJump(d)						// jumping to a function-exit.
 
-		  elseif (d == self + 2) and (m != asm.LUPU and asm.LUPD)
-			|| mid = self + 1
+		  elseif (d == self + 2) and m.JumpNegatable
+			|| mid = self + 1							// asmtodo: doesnt take into account .GuessSize == 0
 			if mid isa asm.JUMP
 				return .JumpNegate(sh, mid)
 		
