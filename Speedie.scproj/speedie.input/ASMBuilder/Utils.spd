@@ -40,7 +40,6 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 
 		.ExpectOneMore = false
 		p.BasicBlock = .BasicBlock
-		//if p.id == 66980
 		return p
 
 	error (exp, "Function too large (over 64K)")
@@ -148,8 +147,9 @@ function Assembler.CloseOneVar (|message?| exp,  |uint| Missing,  |bool|)
 	|| v = extra.Log2
 	|| v_bits = 1<<v
 	|| Result = Curr &~ v_bits
-	.Regs.KnownMap &=~ v_bits
+	.regs.KnownMap &=~ v_bits
 	.regs.phi &=~ v_bits
+	.regs.altered &=~ v_bits
 	
 	if IsReal
 		.vdecls = Result
