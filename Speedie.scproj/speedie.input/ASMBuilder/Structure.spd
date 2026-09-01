@@ -81,8 +81,20 @@ extend assembler
 			if !Us
 				return false
 			Us = .ParentBlock(Us)
-			
-
+	
+	
+	function EnterBranch
+		|| s = .state
+		s.BranchDepth++
+		s.RealBranchDepth++
+	
+	
+	function ExitBranch
+		|| s = .state
+		s.BranchDepth--
+		s.RealBranchDepth--
+	
+	
 	function IsCurrBranch (|&fatasm| f, |bool|)
 		return .BasicParent == .ParentBlock(f.basicblock)
 
@@ -103,7 +115,6 @@ extend assembler
 	function IsCurrBlock (|&fatasm| f, |bool|)
 		// can these use .within?
 		return .basicblock == f.basicblock
-
 	
 	
 	function AskNopTemp (|asmreg| R)
