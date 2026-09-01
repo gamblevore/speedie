@@ -16,7 +16,7 @@ function ElseSub (|message?| other, |asmreg|)
 		other = other.first!
 	  else
 		debugger
-	rz = ASMType.Argument(self, other)
+	rz = ASMType.ArgumentSub(self, other)
 
 
 
@@ -31,9 +31,11 @@ function IfSub (fn_asm) // function If (fn_asm)
 		return .ElseSub(Firstbranch.next)					// if k0 {b()} else {return}
 
 	if b.Always
-		return ASMType.Argument(self, FirstBranch)			// if k1: return 
+		return ASMType.ArgumentSub(self, FirstBranch)		// if k1: return
 
-	|| Phi = .PhiInit
+	|| Phi = .PhiInit	// I think we are solving the wrong problem. its quite simple
+						// no need to make a tangle. Make it direct. Its better.
+	
 	|| Arg1Return = ASMType.Argument(self, FirstBranch)
 	|| Other = FirstBranch.next	
 	if !other.HasAsmStuff									// if (x): func()
@@ -41,7 +43,7 @@ function IfSub (fn_asm) // function If (fn_asm)
 			return Clamped
 		.ExpectOneMore = true
 		b.JumpTo(.curr)
-		.PhiMerge(exp, Phi)
+		.PhiMergeDeeper(exp, Phi)
 		return asmreg()
 	
 	.PhiMiddle(Phi)
@@ -49,7 +51,7 @@ function IfSub (fn_asm) // function If (fn_asm)
 	b.JumpTo(.curr)	
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
-	.PhiMerge(exp, Phi)
+	.PhiMergeDeeper(exp, Phi)
 
 
 
@@ -73,9 +75,7 @@ function MainBrancher (fn_asm)
 	|| BreakReq = .BreakRequest
 	|| Old = .BasicParent
 
-	|| s = .state
-	s.BranchDepth++
-	s.RealBranchDepth++
+	.EnterBranch
 	
 	if dest == nil
 		rz = .WhileSub(exp)
@@ -83,12 +83,13 @@ function MainBrancher (fn_asm)
 		rz = .IfSub(exp, nil)
 	  else
 		rz = .TernarySub(Exp, dest)
-	
-	s.BranchDepth--
-	s.RealBranchDepth--
+
+	.ExitBranch	
 	
 	if old != .basicparent
 		.nextbasicblock
+
+	.PhiFix // they were created at a point that should have been here...
 	
 
 	.BreakRequest = nil
@@ -102,18 +103,41 @@ function While (fn_asm)
 	.loopdepth--
 	
 
-function WhileSub (|message| exp, |asmreg|)
+function WhileSub (|message| exp,   |asmreg|)
 	opt norefcounts
-	// We need to make PHI nodes for vars that are altered in a loop.
-	// I'm assuming its only for vars already declared?
+
+/*
+	|| x = 1
+	if y or ++x
+		// where to do the phi?
+		// the OR will merge x=1 and ++x, by the time the OR ended.
+		// so we'll be starting a phi BEFORE we did our work! thats... gay?
 	
+	// ok, but what about the argument?
+	
+	|| x = 1
+	while
+		++x
+		loop x
+		
+	the merge needs to be done.... after the wait what actually?
+	we can't merge until the loop ends.
+	well, thats exactly what we do?
+	the thing is... the branch actually gets the FAT of the new phi
+	even though... the new phi has NOT yet run! which... is kinda gay.
+	
+	perhaps we can make use of the phi then?
+	
+	do the middle part before the branch??
+*/
+
 	|| InitialJump = exp.JUMP										// test goes after loop
-	|| Phi = .PhiMiniInit()
+	|| phi = .PhiInit()
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
 	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo
-	.PhiMerge(exp, Phi)
 
+	// .phimiddle here???
 	.Branch(exp.first!, loop_test, true)
 	require !.EntireInlineFailed
 
@@ -136,12 +160,7 @@ function WhileSub (|message| exp, |asmreg|)
 		returns = nil
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
-
-//	I can't underrstand this.
-//	|| BB = .BasicBlock												// just do it always?
-//	.BlockParents[BB] = .ParentBlock(.ParentBlock(BB))				// we need to move it up.
-// looks hard. and broken.
-	
+	.PhiMergeDeeper(exp, phi)
 	return returns
 
 
@@ -213,14 +232,14 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	|| mA = .µInto(A, dest)
 
 	.PhiMiddle(Phi)
-	
 	|| Exit = exp.jump
 	Branch.jumpto(.curr)
 	|| mB = .µInto(B, dest)	
 	
 	Exit.jumpto(.curr)
+	
 	dest = exp.phi(dest, ma, mb) * dest
-	return .PhiMerge(exp, Phi, dest)
+	return .PhiMergeDeeper(exp, Phi, dest)
 
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
@@ -438,8 +457,10 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	if AndTest.never
 		return first
 
-	|| Phi = .PhiMiniInit()
+	.EnterBranch
+	|| Phi = .PhiInit()
 	|| Second = .Branch(B, AndTest, dest is negate)
+	.ExitBranch
 	if  first isnt Const
 		// a and b
 		// a and 1
@@ -447,7 +468,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		if AndTest.Never // a and 0
 			return Second
 
-		.PhiMerge(A.parent!, phi)
+		.PhiMergeNormal(A.parent!, phi)
 		return first
 
 	// 1 and 1
@@ -470,9 +491,11 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		return first.boolanswerok						// only way around this. Cos we got asmreg(0)
 
 	|fatrange| Br2
-	|| Phi = .PhiMiniInit()
+	|| Phi = .PhiInit()
+	.EnterBranch
 	|| second = .Branch(B, Br2, dest is negate)
 	OrTest.JumpTo(.curr)
+	.ExitBranch
 
 	// why do we not call .boolanswerok on these though?
 	if Br2.always
@@ -487,7 +510,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	// a or 0
 	// a or b
-	.phimerge(A.parent!, phi)
+	.PhiMergeNormal(A.parent!, phi)
 	return first
 
 

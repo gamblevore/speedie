@@ -1,7 +1,5 @@
 
 
-// AND/OR need phi capturing also!!
-
 
 struct BranchPHITracker
 	|RegFile|					Start
@@ -28,9 +26,9 @@ function assembler.PhiInit (|BranchPhiTracker|)
 	rz.MiddleIndex = i
 
 
-
-function assembler.PhiMiniInit (|BranchPhiTracker|)
-	return .PhiInit() // for now. later it could return a different struct with less info
+function assembler.PhiFix
+	// what about phis from andor?
+	// we could just mark them...? somehow? info?const?
 
 
 function assembler.PhiMiddle (|BranchPhiTracker| T)
@@ -39,7 +37,7 @@ function assembler.PhiMiddle (|BranchPhiTracker| T)
 	.regs = T.Start
 
 	
-function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest=nil, |asmreg|)
+function assembler.PhiMergeNormal (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
 	|| XS = T.Start.phi
 	|| XM = T.Middle.ActualPhi(T.StartIndex)
 	|| XC = .regs.ActualPhi(T.MiddleIndex)
@@ -65,6 +63,12 @@ function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| dest=
 	for i in 32
 		S[i] = S[i]|uint| max M[i]
 	return dest
+
+
+function assembler.PhiMergeDeeper (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
+	// handle depth stuff...
+	// at least mark the phis?
+	return .PhiMergeNormal(exp, t, dest)
 
 	
 
