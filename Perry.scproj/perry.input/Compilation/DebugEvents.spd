@@ -490,7 +490,7 @@ function perryide.TryReselectASM (|bool|)
 	.DuringASMEvent = false
 
 
-function perryide.ReselectASM
+function PerryIde.ReselectASM
 	opt norefcounts
 	|| AV = .ASMView
 	|| Sel = AV.FirstSelected

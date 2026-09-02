@@ -30,7 +30,6 @@ function perry.IdeAddProj (|string| Path, |PerryIDE!|) // initide
 		|| o = old.ide
 			ClickedTabs(nil, old)
 			return o
-//	ide ?= PerryIDE.EmptyBase
 	return PerryIDE(path.file)
 
 
@@ -351,11 +350,13 @@ function PerryIDE.DoReplacement (|error| File, |string| Replace, |string| Srch, 
 	|| Last = first
 	
 	for curr.fast in file
-		if !t[curr.position, Srch]	// Now... we need to check that the thing is the same
+		|| P = Curr.Position
+		|| Found = t.StretchyFind(Srch, P)
+		if Found != (P, P+curr.rangelength)
 			rz = -rz
 			exit
 		
-		fs.AppendRange(t, last, curr.position)
+		fs.AppendRange(t, last, p)
 		fs <~ Replace
 		last = curr.after
 		curr.Position = fs.length + first
@@ -384,20 +385,21 @@ function PerryIDE.DoReplacements (|bool|)
 	|| f = l.first
 	|| src = .MassSearchField.text
 	require .CanReplace(r, l, src)
-	|| Missing = ""
-	
+	|| Missing = 0
 	|| n = 0
 	while  f
 		|| fr = f.obj as FileRow
 		if f.HasAny and .EditFile(fr) and (f isa error)
 			|| Done = .DoReplacement(f, r, src)
-			if done < 0
+			if done <= 0
 				done = -done
-				Missing += "\nCan't replace in: " + fr.Name
+				Missing++
 			n += done
 		f++
 	
-	.DidReplace(n, r + Missing)
+	if Missing
+		r += ("\nCan't replace " + missing) + " items"
+	.DidReplace(n, r)
 	return true
 	
 
