@@ -805,7 +805,7 @@ POS 5
 #!						(((((Integer VecMath)))))
 /**/ QADD  (Shift)
 		iv1 = iv2 + (iv3 << Shift_Shu)
-/**/ QSUB  (Shift)              						// must come after ADD
+/**/ QSUB  (Shift)											// must come after ADD
 		iv1 = (iv2 - iv3) >> Shift_Shu
 /**/ QMUL  (U4)
 		iv1 = (iv2 * iv3) + iv4

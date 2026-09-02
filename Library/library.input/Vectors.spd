@@ -77,6 +77,29 @@ datatype ivec4
 	
 	function Length (|bool| d, |int|)
 		return self[2+d|int|] - self[0+d|int|]
+
+	function Clamp (|int| L, |int| H, |ivec4|)
+		cpp_wrapper
+
+//	function Clamp (|ivec4| L, |ivec4| H, |ivec4|)
+//		cpp_wrapper
+//		asm qclm(dest, p1, p2, p3)
+	
+	function Max (|int| L, |ivec4|)
+		return (.x max L, .y max L, .z max L, .w max L )
+	
+	function Min (|int| L, |ivec4|)
+		return (.x min L, .y min L, .z min L, .w min L )
+	
+	inline CenterVec2 (|vec2|)
+		return .vec4.center
+		
+	function Center (|ivec2|)
+		rz.x = (.x2 + .x)
+		rz.y = (.y2 + .y)
+		rz >>= 1
+	
+	
 	
 	inline H (|ivec2|)
 		return .x1x2
@@ -778,24 +801,6 @@ inline ivecmix (|int|a, |ivec2|b, |ivec3|)
 
 function ivec2.Abs (|ivec2|)
 	return (.x.abs, .y.abs)
-
-function ivec4.Clamp (|int| L, |int| H, |ivec4|)
-	cpp_wrapper
-
-function ivec4.Max (|int| L, |ivec4|)
-	return (.x max L, .y max L, .z max L, .w max L )
-
-function ivec4.Min (|int| L, |ivec4|)
-	return (.x min L, .y min L, .z min L, .w min L )
-
-inline ivec4.CenterVec2 (|vec2|)
-	return .vec4.center
-	
-function ivec4.Center (|ivec2|)
-	rz.x = (.x2 + .x)
-	rz.y = (.y2 + .y)
-	rz >>= 1
-
 
 function vec4.Center (|vec2|)
 	return (.x+.x2, .y+.y2)*0.5

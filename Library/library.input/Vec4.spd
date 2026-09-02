@@ -167,8 +167,8 @@ datatype vec4
 	operator absmax (|vec4| M, |vec4|)
 		return (.x longer m.x, .y longer m.y, .z longer m.z, .w longer m.w)
 
-	function CosR (|vec4|)
-		return (self * math.iTau).cos
+//	function CosR (|vec4|)
+//		return (self * math.iTau).cos
 
 	function iVec4 (|ivec4|)
 		return (.x|int|, .y|int|, .z|int|, .w|int|)	
