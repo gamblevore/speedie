@@ -52,14 +52,12 @@ function message.FNCX (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |
 }
 
 
-function message.PHI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |asmreg| r4 = nil, |asmreg| r5 = nil, |&fatasm|) {
+function message.PHI (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.PHI, self)
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
-	rz.reginput(3) = r4
-	rz.reginput(4) = r5
 	rz.dest(0, r1, a)
 }
 

@@ -69,6 +69,7 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		C++
 
 
+
 function MainBrancher (fn_asm)
 	.ParentSanity
 	|| StartOfBranch = .curr
@@ -86,16 +87,16 @@ function MainBrancher (fn_asm)
 
 	.ExitBranch	
 	
-	if old != .basicparent
-		.nextbasicblock
+	if old != .BasicParent
+		.NextBasicBlock
 
-	.PhiFix // they were created at a point that should have been here...
-	
+	.PhiFix(StartOfBranch) // they were created at a point that should have been here...	
 
 	.BreakRequest = nil
 	if StartOfBranch == .curr // nothing done
 		.BreakRequest = BreakReq
-	
+
+
 
 function While (fn_asm)
 	.LoopDepth++
@@ -106,38 +107,13 @@ function While (fn_asm)
 function WhileSub (|message| exp,   |asmreg|)
 	opt norefcounts
 
-/*
-	|| x = 1
-	if y or ++x
-		// where to do the phi?
-		// the OR will merge x=1 and ++x, by the time the OR ended.
-		// so we'll be starting a phi BEFORE we did our work! thats... gay?
-	
-	// ok, but what about the argument?
-	
-	|| x = 1
-	while
-		++x
-		loop x
-		
-	the merge needs to be done.... after the wait what actually?
-	we can't merge until the loop ends.
-	well, thats exactly what we do?
-	the thing is... the branch actually gets the FAT of the new phi
-	even though... the new phi has NOT yet run! which... is kinda gay.
-	
-	perhaps we can make use of the phi then?
-	
-	do the middle part before the branch??
-*/
-
 	|| InitialJump = exp.JUMP										// test goes after loop
 	|| phi = .PhiInit()
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
 	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo
 
-	// .phimiddle here???
+	.PhiMiddle(phi)
 	.Branch(exp.first!, loop_test, true)
 	require !.EntireInlineFailed
 
@@ -238,7 +214,9 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	
 	Exit.jumpto(.curr)
 	
-	dest = exp.phi(dest, ma, mb) * dest
+	|| FatPhi = exp.phi(dest, ma, mb)
+	FatPhi.prms[3] = 1
+	dest = FatPhi * dest
 	return .PhiMergeDeeper(exp, Phi, dest)
 
 

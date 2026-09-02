@@ -1165,8 +1165,6 @@ datatype ASM_Phi (ASM) {
 			mu.r1 = .prms[0]
 			mu.r2 = .prms[1]
 			mu.r3 = .prms[2]
-			mu.r4 = .prms[3]
-			mu.r5 = .prms[4]
 			if curr < after {
 				curr++[] = mu
 			}
