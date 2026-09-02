@@ -199,7 +199,7 @@ function PressedSearchKeys (GUIKeyEvent)
 	if self isa TextView
 		|| sr = .Selection
 		if (key is down) and (sr == .text.length)
-			|| Repl = w.MassreplaceField
+			|| Repl = w.MassReplaceField
 			if (self == Srch) and (repl is Enabled and Editable)
 				repl.setfocus
 			  else

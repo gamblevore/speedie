@@ -468,7 +468,7 @@ class String
 		description "Returns 0 if the value can't be found. Pass negative index to read from the end, unlike str.byte(index)"
 		cpp_wrapper JB_Str_ByteValue
 	
-	syntax Access (|int| start, |int| after, |bool| ShareAlways=false, |string|)
+	syntax Access (|int| Start, |int| After, |bool| ShareAlways=false, |string|)
 		cpp_wrapper JB_Str_Range
 		
 	function Right (|int| N, |string|)
@@ -481,7 +481,7 @@ class String
 		
 	syntax Access (|ivec2| r, |string|)
 		cpp_part RangeVec
-		opt noinline // I kinda prefer this... makes trimextandpath compile nicer
+		opt noinline // I kinda prefer this... makes TrimExtAndPath compile nicer
 		return self[r.x, r.x2]
 
 	syntax Access (|int| index, |string| Compare, |bool| Aware=false, |bool|)

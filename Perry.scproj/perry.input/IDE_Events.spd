@@ -344,17 +344,22 @@ function PerryIDE.MassSearch (|bool|)
 
 			
 	
-function PerryIDE.DoReplacement (|error| File, |string| r, |int|)
+function PerryIDE.DoReplacement (|error| File, |string| Replace, |string| Srch, |int|)
 	|| fs = faststring()
 	|| t = .EditMe.Text
 	|| First = file.first!.position
-	|| last = first
+	|| Last = first
+	
 	for curr.fast in file
-		fs.appendRange(t, last, curr.position)
+		if !t[curr.position, Srch]	// Now... we need to check that the thing is the same
+			rz = -rz
+			exit
+		
+		fs.AppendRange(t, last, curr.position)
+		fs <~ Replace
 		last = curr.after
-		curr.position = fs.length
-		curr.rangelength = R.Length
-		fs <~ R
+		curr.Position = fs.length + first
+		curr.RangeLength = Replace.Length
 		rz++
 
 	.editme.InsertText(fs, (first, last), false, false)
@@ -366,7 +371,7 @@ function PerryIDE.DidReplace (|int| n, |string| dest)
 
 function PerryIDE.CanReplace (|string| r,  |listviewrow| root,  |string| src,  |bool|)
 	|| n = 0
-	for f in root
+	for f.fast in root
 		n += f.Count
 	return "Replace $n matches of: \"$src\"\n\nWith: \"$r\" ?".Confirm
 
@@ -379,15 +384,20 @@ function PerryIDE.DoReplacements (|bool|)
 	|| f = l.first
 	|| src = .MassSearchField.text
 	require .CanReplace(r, l, src)
-
+	|| Missing = ""
+	
 	|| n = 0
 	while  f
 		|| fr = f.obj as FileRow
-		if f.HasAny and .EditFile(fr) and f isa error
-			n += .DoReplacement(f, r)
+		if f.HasAny and .EditFile(fr) and (f isa error)
+			|| Done = .DoReplacement(f, r, src)
+			if done < 0
+				done = -done
+				Missing += "\nCan't replace in: " + fr.Name
+			n += done
 		f++
 	
-	.DidReplace(n, r)
+	.DidReplace(n, r + Missing)
 	return true
 	
 
