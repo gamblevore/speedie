@@ -80,7 +80,11 @@ datatype ivec4
 
 	function Clamp (|int| L, |int| H, |ivec4|)
 		cpp_wrapper
-
+	// should we redefine this for int range, rather than ivec4 range?
+	// int is more common. For bytes for example, we clamp to 0,255
+	// on the other hand... the only thing we use it for is to do RGB / vec4 conversions
+	// it might be better to have a hard-coded conversion for that.
+	
 //	function Clamp (|ivec4| L, |ivec4| H, |ivec4|)
 //		cpp_wrapper
 //		asm qclm(dest, p1, p2, p3)
