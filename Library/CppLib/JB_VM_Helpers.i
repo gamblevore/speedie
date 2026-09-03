@@ -191,7 +191,7 @@ static __boiling ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* se
 		auto OldStack = (CakeStack*)(r-1);
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		if_rare (NewStack >= End) {					// Stackoverflow
-			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
+			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV|128);
 			vm.Registers[2] = {.Int = errno};		// Clear stack. Its gone. And we already reported it.
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
@@ -664,7 +664,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		auto OldStack = (CakeStack*)(r-1);
 		if_rare (NewStack >= End) {				// Stackoverflow
-			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV);
+			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV|128);
 			vm.Registers[2] = {.Int = errno};	// Clear stack. Its gone. And we already reported it.
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}

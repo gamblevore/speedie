@@ -277,7 +277,7 @@ VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 }
 
 
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal) {
+static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Error) {
 	char ErrorBuff[40];
 	const char* ErrStr = "Run CakeVM";					SubCrash = 3;
 	if (Stack) {
@@ -286,12 +286,11 @@ static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Si
 		ErrStr = ErrorBuff;
 	}
 	
-	Signal |= 128;
-	V->CakeFail = Signal;
+	V->CakeFail = Error;
 	Stack = VMClearHigh(Stack);
-	(V->__VIEW__)(V, Stack, Signal, 0);					SubCrash = 30;
-	JB_ErrorHandleFileC(nil, Signal, ErrStr);			SubCrash = 40;
-	V->Registers[2] = {.Int = Signal};
+	(V->__VIEW__)(V, Stack, Error, 0);					SubCrash = 30;
+	JB_ErrorHandleFileC(nil, Error, ErrStr);			SubCrash = 40;
+	V->Registers[2] = {.Int = Error};
 	
 	return 0; 
 }
@@ -318,7 +317,6 @@ static ivec4* CakeCrashed (CakeVM* V, int Signal) {
 		printf("Crashed inside crash handler, at point: %i\n", SubCrash);
 		return 0;
 	}													SubCrash = 2;
-	Signal |= 128;
 	errno = Signal;
 	
 	CakeCrashedSub(V, kStillInRange, GetMaxStack(V), Signal);
@@ -339,7 +337,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 
 	int Signal = setjmp(CakeRestore);
-	ivec4* Reg =  Signal  ?  CakeCrashed(V, Signal)  :  JB_ASM_Run_(*V, Code);
+	ivec4* Reg =  Signal  ?  CakeCrashed(V, Signal | 128)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	SubCrash = 0;
