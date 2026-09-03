@@ -203,12 +203,60 @@ function String.ParseClean (|Message|)
 		rz.PrepareAST
 
 
+extend message {
+function AAACC (|message--| QEscape=nil, |message| IgnoreArg=nil)
+	opt norefcounts
+	opt noinline
+	|| curr = .first
+	while curr
+		|| f = curr.func
+
+//		if (f == @msg)
+//			curr = IgnoreArg
+//		
+//		  elseif (f == @tmp)
+//			curr = QEscape
+
+		if (f == @msg)
+			curr = IgnoreArg
+		
+		  elseif (f == @tmp)
+			0
+		  elseif (f == @tmp)
+			curr = QEscape
+			// phi1 (|| curr = .first, curr = QEscape)
+		// phi (curr = IgnoreArg, phi1 ^^^ )
+		
+		curr = curr.next
+	// phi (curr++, curr = .first)
+//	for (curr.fast in self)
+//		|| f = curr.func
+//		if (f == @arg)
+//			0
+//		  elseif (f == @msg)
+//			continue_with IgnoreArg
+//		
+//		  elseif (f == @arel)
+//			if curr == IgnoreArg
+//				continue_with QEscape
+//
+//		  elseif (f == @decl)
+//			0
+//		  elseif (f == @adj)
+//			0
+//		  elseif (f == @tmp)
+//			if curr != IgnoreArg
+//				if curr == QEscape
+//					continue_with IgnoreArg
+}
 
 function Message.Clean (|bool| erl = false)
+	if 0
+		.AAACC
 	|| pos		= parser.using.position
 
 	|message--| QEscape
-	|message| IgnoreArg 
+	|message| IgnoreArg
 	if ((message).layer == (message).defaultlayer)
 		pos = -1
 	

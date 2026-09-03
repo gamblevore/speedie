@@ -47,8 +47,8 @@ function IfSub (fn_asm) // function If (fn_asm)
 		return asmreg()
 	
 	.PhiMiddle(Phi)
-	|| AfterFirst = other.jump								// Basicblock ++
-	b.JumpTo(.curr)	
+	|| AfterFirst = other.jump	// if the firstbranch always returns, we shouldn't be making the jump
+	b.JumpTo(.curr)				// also, if both return, AfterFirst has nowhere to go to!
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	AfterFirst.JumpTo(.curr)
 	.PhiMergeDeeper(exp, Phi)

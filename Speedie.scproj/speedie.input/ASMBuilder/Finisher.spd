@@ -1,11 +1,18 @@
 
 
 // MiniOptimisations, miniopts, optimize, finishmost 
+function Assembler.LastReal (|&fatasm|)
+	|| L = .last
+	while L.guesssize == 0
+		L--
+	return L
+ 
+ 
 function Assembler.FinishASM 
-	if (.FnLength <= 0) or !.Last.IsFinisher or .ExpectOneMore
+	|| Last = .LastReal
+	if (.FnLength <= 0) or !Last.IsFinisher or .ExpectOneMore
 		.MissingReturn
 
-	|| Last = .Last
 	|| S = .FuncStart
 	|| Length = 0
 	

@@ -1,6 +1,5 @@
 
 
-
 struct BranchPHITracker
 	|RegFile|					Start
 	|RegFile|					Middle
@@ -78,12 +77,24 @@ function assembler.PhiMergeNormal  (|message| Exp, |BranchPhiTracker| T, |asmreg
 
 
 function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both, |uint| Liftup)
-	for (Bit.bits in both) (i)
-		|| F1 = A.Setters[i]
-			|| F2 = B.Setters[i]
+	for (Bit.bits in both) (reg)
+		|| I1 = A.Setters[reg]
+		|| I2 = B.setters[reg]
+		|| F1 = I1.fat
+			|| F2 = I2.fat
 				expect (F1 != F2) // can't be the same!
-				|| phi = exp.phi(asmreg(i), asmreg(i,f1), asmreg(i, f2))
-				phi.prms[3] = Liftup
-	
+				if f1.phiAlready(I2) or f2.phiAlready(i1)
+					0
+				  else
+					|| phi = exp.phi(asmreg(reg), asmreg(reg, f1.index), asmreg(reg, f2.index))
+					phi.prms[3] = Liftup
 
+
+function fatasm.PhiAlready (|int| Index, |bool|)
+	if self isa asm.phi
+		|| p1 = .prms[1].fatindex
+		|| p2 = .prms[2].fatindex
+		return Index == p1 or p2
+	
+	
 

@@ -765,9 +765,11 @@ datatype ASMParam (uint)
 	function ASMReg (|asmreg|)
 		|asmreg| R = ((self>>31)<<10)|asmreg|
 		R.reg = self&31
-		|uint64| fatindex = (self >> 15)&0xFFFF
-		R = R as (fatindex << 48)|asmreg|
+		R = R as (.fatindex|uint64| << 48)|asmreg|
 		return R
+	
+	function FatIndex (|uint|)
+		return (self >> 15)&0xFFFF
 	
 	function Reg (|int|)
 		return self&31

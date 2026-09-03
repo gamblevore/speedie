@@ -408,7 +408,7 @@ struct Assembler
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
 			if µtrap == -1 or stacksize > 30 // ugh
-				
+			TestFatSanity()
 		  else
 			opt inline
 		
@@ -416,6 +416,7 @@ struct Assembler
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
+			TestFatSanity()
 			.StackSize--
 			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"
@@ -567,7 +568,9 @@ struct Assembler
 		target debug
 			if ret.position < 0
 				ret.position = 0 // skip error detection
-		ret.HALT.BasicBlock = -1
+		|| halt = ret.halt
+		halt.BasicBlock = -1
+		halt.Const = 123456789 
 
 /* The .asint/.asfloat functions should be recognised as working on constants? Or is that just a general case of inline functions? Technically, its an inline func that does nothing, just returns the original... with a different type. */
 
@@ -607,12 +610,18 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 	opt norefcounts
 	scfunction.currfunc = fn
 	
+	testfatsanity()
 	.InitAndStartFunc(fn)
+	testfatsanity()
 	.RootGen(fn)
+	testfatsanity()
 	.FinishASM
+	testfatsanity()
 	if .NeedsRework
 		.Rework(fn)
+	testfatsanity()
 	.CapASM
+	testfatsanity()
 	
 	target false
 		ifn options.silent or compiler.InPerry or options.perryoutput

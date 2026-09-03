@@ -203,7 +203,7 @@ extend assembler
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
 		if !HasBreak
-			|| C = .curr - 1
+			|| C = .Last
 			if fat == C
 				.curr_ = C						// Do it before both kinds of nop...
 
@@ -309,3 +309,4 @@ extend assembler
 		while start < After
 			.nop_sub(--After, mode, 0)
 	
+

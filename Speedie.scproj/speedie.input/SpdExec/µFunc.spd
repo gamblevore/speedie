@@ -55,7 +55,8 @@ extend SCFunction
 			
 			|| Curr = rz
 			rz = fat.µBakeInto(rz, after)
-			
+			debugat 0
+			if (curr < rz) and !curr[0] // what?
 			if Positions
 				|| pos = fat.msg.SrcMap
 				if pos >> 21 == 0						// init code... has no file
