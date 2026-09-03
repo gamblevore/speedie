@@ -669,7 +669,7 @@ struct FatASM
 		
 		while 
 			if d.GuessSize == 0
-				d++
+				d++ // need to check for where the func ends
 			  elseif d isa asm.jump
 				d = d.JumpTo!
 				expect (++n < 30) (.msg)
