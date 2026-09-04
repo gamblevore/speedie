@@ -1205,10 +1205,11 @@ struct SCArg_Behaviour: SCNode_Behaviour {
 };
 
 JBClass ( SCArg , SCNode , 
-	Message* TmpMovedOutFor;
-	bool IsClassArg;
-	bool IsStatementExpr;
 	SCFunction* ParentFunc;
+	bool IsStatementExpr;
+	bool IsClassArg;
+	bool HasEscape;
+	Message* TmpMovedOutFor;
 );
 
 struct SCBehaviour_Behaviour: SCNode_Behaviour {
@@ -4695,6 +4696,8 @@ void SC_ASM__TestASMText();
 // ASMParam
 ASMReg SC_ASMParam_ASMReg(ASMParam Self);
 
+uint SC_ASMParam_FatIndex(ASMParam Self);
+
 bool SC_ASMParam_OperatorIz(ASMParam Self, ASMReg M);
 
 int SC_ASMParam_Reg(ASMParam Self);
@@ -5911,7 +5914,7 @@ int SC_FAT_Jump(FatASM* Self);
 
 void SC_FAT_JumpFix(FatASM* Self, FatASM* Curr);
 
-bool SC_FAT_JumpImprove(FatASM* Self, Assembler* Sh);
+bool SC_FAT_JumpImprove(FatASM* Self, Assembler* Sh, FatASM* Last);
 
 void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
 
@@ -5956,6 +5959,8 @@ void SC_FAT_p2Set(FatASM* Self, uint Value);
 ASMParam SC_FAT_p3(FatASM* Self);
 
 void SC_FAT_p3Set(FatASM* Self, uint Value);
+
+bool SC_FAT_PhiAlready(FatASM* Self, int Index);
 
 void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs);
 
@@ -6306,6 +6311,8 @@ ASMReg SC_Pac_ElseSub(Assembler* Self, Message* Other);
 
 uint64 SC_Pac_EncodeParams(Assembler* Self, Message* Prms, SCFunction* Fn, bool Cpp, ASMReg* Regs);
 
+void SC_Pac_EnterBranch(Assembler* Self);
+
 ASMReg SC_Pac_Equals(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_EqualsInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6313,6 +6320,8 @@ ASMReg SC_Pac_EqualsInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, AS
 ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_Exit(Assembler* Self, Message* Exp, ASMReg Dest);
+
+void SC_Pac_ExitBranch(Assembler* Self);
 
 void SC_Pac_FailInline(Assembler* Self);
 
@@ -6402,6 +6411,8 @@ FatASM* SC_Pac_LastWith0(Assembler* Self);
 
 FatASM* SC_Pac_LastWithASM(Assembler* Self, ASM Type);
 
+FatASM* SC_Pac_LastReal(Assembler* Self);
+
 ASMReg SC_Pac_Less(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_LessEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6486,15 +6497,19 @@ u16 SC_Pac_ParentBlock(Assembler* Self, uint /*u16*/ B);
 
 void SC_Pac_ParentSanity(Assembler* Self);
 
+void SC_Pac_PhiFix(Assembler* Self, FatASM* Start);
+
 void SC_Pac_PhiInit(Assembler* Self, BranchPHITracker* Rz);
 
-ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest, int Liftup);
 
-void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both);
+ASMReg SC_Pac_PhiMergeDeeper(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+
+ASMReg SC_Pac_PhiMergeNormal(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+
+void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both, uint Liftup);
 
 void SC_Pac_PhiMiddle(Assembler* Self, BranchPHITracker* T);
-
-void SC_Pac_PhiMiniInit(Assembler* Self, BranchPHITracker* Rz);
 
 ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -8119,6 +8134,8 @@ void JB_bin_WriteType(FastString* Self, Syntax Type, bool GoIn);
 // JB_Message
 void JB_Msg__Trap(Message* Self);
 
+void SC_Msg_AAACC(Message* Self, Message* QEscape, Message* IgnoreArg);
+
 void JB_Msg_Acc__(Message* Self, FastString* Fs);
 
 Message* JB_Msg_AccessAdd(Message* Self, JB_String* Key);
@@ -8965,7 +8982,7 @@ FatASM* SC_Msg_PADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
 FatASM* SC_Msg_PDIV(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Mode);
 
-FatASM* SC_Msg_PHI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, ASMReg R5);
+FatASM* SC_Msg_PHI(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3);
 
 void JB_Msg_pinn__(Message* Self, FastString* Fs);
 
