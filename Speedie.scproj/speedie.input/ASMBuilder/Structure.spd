@@ -180,7 +180,6 @@ extend assembler
 		return .nop_sub(ToNop, fatnopmode.soft, 0)
 	
 	
-	
 	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
 		require NopMode isnt Rewind
 		|| Break = fat.breakinfo$
@@ -192,8 +191,11 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-//		if !fat.IsStateless						// Can't nop something that does something.
-///			return								// Also should never happen!
+		if NopMode isnt Rewind
+			if !fat.IsStateless						// Can't nop something that does something.
+				PrintProgress()
+				fat.DebugPrint()
+/				return								// Also should never happen!
 
 		if !.IsWithinCurrInline(fat)
 			|| C = .DelayedNopCount++

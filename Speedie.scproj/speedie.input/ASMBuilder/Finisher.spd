@@ -1,12 +1,6 @@
 
 
 // MiniOptimisations, miniopts, optimize, finishmost 
-function Assembler.LastReal (|&fatasm|)
-	|| L = .last
-	while L.GuessSize == 0
-		L--
-	return L
-
 
 function Assembler.FinishASM
 	|| Last = .LastReal

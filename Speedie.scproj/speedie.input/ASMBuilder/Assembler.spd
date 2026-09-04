@@ -91,21 +91,27 @@ struct Assembler
 	function FuncIndex (|int|)
 		return .curr_ - .FuncStart
 	
+	function LastReal (|asm| type, |&FatASM|)
+		|| L = .LastReal
+		if .IsCurrBlock(L, type)
+			return L
+
 	function Last (|&FatASM|)
 		return .curr_ - 1
+
+	function LastReal (|&fatasm|)
+		|| L = .last
+		while L.GuessSize == 0
+			L--
+		return L
+
 
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
 		for a in fn.Args
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
-
-	function Last (|asm| type, |&FatASM|)
-		|| L = .curr_ - 1
-		if .IsCurrBlock(L, type)
-			return L
-
-
+	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
@@ -408,7 +414,6 @@ struct Assembler
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
 			if µtrap == -1 or stacksize > 30 // ugh
-			TestFatSanity()
 		  else
 			opt inline
 		
@@ -416,7 +421,6 @@ struct Assembler
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
-			TestFatSanity()
 			.StackSize--
 			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"

@@ -41,7 +41,7 @@ extend Assembler
 		
 		dest = .TempMe(dest)		
 		if dest isnt Always
-			|| K = .Last(asm.knst)
+			|| K = .lastreal(asm.knst)
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		

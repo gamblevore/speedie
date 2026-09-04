@@ -538,8 +538,17 @@ struct FatASM
 	
 	function Next (|&FatASM|)
 		real self
+		return .move(1)
+	
+	function Prev (|&FatASM|)
+		real self
+		return .move(-1)
+	
+	
+	function Move (|int| Dir, |&FatASM|)
+		real self
 		while
-			self = self + 1
+			self = self + dir
 			if .GuessSize
 				return self
 	
@@ -668,7 +677,6 @@ struct FatASM
 	
 	
 	function JumpImprove (|assembler| sh, |fatasm| Last, |bool|)
-		debugat 883
 		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
 		|| n = 0
 		
@@ -714,7 +722,7 @@ struct FatASM
 		return .IsFinisher(.info)
 
 
-	function DebugPrint (|int| Level)
+	function DebugPrint (|int| Level=-1)
 		target debug {
 		visible
 		nil self

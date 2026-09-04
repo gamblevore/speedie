@@ -120,7 +120,7 @@ function GrabbedRegisters (|message| AllPrms, |&fatasm| Start, |!&fatasm| Fn)
 	if 0: AllPrms.FNC3, AllPrms.FNCX3			// MARK USED
 
 	.CurrFuncGrab--
-	|| c = .Last - 1
+	|| c = .Lastreal - 1
 	while C >= Start
 		if c isa asm.GRAB
 			if c.CurrGrabID == .CurrFuncGrab

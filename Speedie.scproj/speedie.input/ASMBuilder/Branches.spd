@@ -531,7 +531,7 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 	// its actually very good for floats and vectors
 	// and someday we'll have our own hardware... Might as well do this now then.
 	
-	|| bflg = .last(asm.bflg)!
+	|| bflg = .lastreal(asm.bflg)!
 	require (bflg - 1) == compare  // phi doesnt seem to bother this... not done yet.
 	require (compare isa asm.jmpi or asm.jmpf)
 	
@@ -622,7 +622,7 @@ target debug
 
 
 
-function @assembler.PrintProgress (|int| Level)
+function @assembler.PrintProgress (|int| Level=-1)
 	cpp_name adb
 	visible
 	opt norefcounts

@@ -108,7 +108,7 @@ function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
 	|| Before = bs isa asm.addk
 	require before or (bs isa asm.ADAK)
 	if base isnt temp
-		require  .last == bs
+		require  .lastreal == bs
 		require  bs.RegOnly(0) == bs.RegOnly(1)
 	
 	rz = bs.prms[2]|int| >> bytes

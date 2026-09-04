@@ -467,7 +467,7 @@ extend Assembler
 //			-->
 //		x = y + 2
 
-		|| XY1 = .Last(asm.addk)			#require
+		|| XY1 = .lastreal(asm.addk)			#require
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
 		require xinreg == XY1.RegOnly
@@ -898,7 +898,7 @@ extend Assembler
 		|| bflg = .Register(src.reg)
 		require bflg and .IsCurrBlock(bflg, asm.bflg)
 		|| PrevInput = bflg.ASMReg(1)
-		if (.last != bflg)
+		if (.lastreal != bflg)
 			|| Intefere = .register(previnput.reg)
 			require Intefere <= bflg
 		

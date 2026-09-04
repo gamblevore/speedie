@@ -145,7 +145,7 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	if !rr or !.state.TailInlineable
 		return ret
 
-	|| BFLG = .last(asm.bflg)
+	|| BFLG = .lastreal(asm.bflg)
 	if !bflg or (BFLG.RegOnly != rr)
 		return ret
 
