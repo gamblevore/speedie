@@ -832,6 +832,7 @@ struct SavedRegisters {
 	byte ReturnCount;
 	byte BasicDepth;
 	byte BreakRequest;
+	byte DelayedNops;
 	u16 BasicBlock;
 	u16 BasicParent;
 	bool ExpectOneMore;
@@ -5868,6 +5869,8 @@ byte SC_FAT_CurrGrabID(FatASM* Self);
 
 void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value);
 
+void SC_FAT_DebugPrint(FatASM* Self, int Level);
+
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
 
 ASM* SC_FAT_DoNotEncode(FatASM* Self, ASM* Curr, ASM* After);
@@ -5910,6 +5913,8 @@ bool SC_FAT_IsPartyAble(FatASM* Self);
 
 bool SC_FAT_IsRead(FatASM* Self);
 
+bool SC_FAT_IsStateless(FatASM* Self);
+
 int SC_FAT_Jump(FatASM* Self);
 
 void SC_FAT_JumpFix(FatASM* Self, FatASM* Curr);
@@ -5927,6 +5932,8 @@ FatASM* SC_FAT_JumpTo(FatASM* Self);
 int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value);
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After);
+
+FatASM* SC_FAT_Move(FatASM* Self, int Dir);
 
 FatASM* SC_FAT_Next(FatASM* Self);
 
@@ -5962,7 +5969,11 @@ void SC_FAT_p3Set(FatASM* Self, uint Value);
 
 bool SC_FAT_PhiAlready(FatASM* Self, int Index);
 
+FatASM* SC_FAT_Prev(FatASM* Self);
+
 void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs);
+
+ASMReg SC_FAT_RefCountFinish(FatASM* Self);
 
 void SC_FAT_Prm(FatASM* Self, int A, ASMReg Value);
 
@@ -5991,8 +6002,6 @@ ASMReg SC_FAT_Vectorise(FatASM* Self, ASMReg Dest, ASM VOpp);
 ASMReg SC_FAT_VectoriseSmall(FatASM* Self, ASMReg Dest, ASM VOpp, ASM SOpp);
 
 bool SC_FAT_WillRenderFat(FatASM* Self);
-
-int SC_FAT_xC2xB5RefCount(FatASM* Self);
 
 void SC_FAT_xC2xB5RefCountSet(FatASM* Self, int Value);
 
@@ -6289,8 +6298,6 @@ void SC_Pac_DeclReset(Assembler* Self, SCDecl* D);
 
 void SC_Pac_Decr(Assembler* Self, FatASM* F, uint /*FatNopMode*/ Mode, int Depth);
 
-ASMReg SC_Pac_DecrObj(Assembler* Self);
-
 ASMReg SC_Pac_DivFloat(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_Divide(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6407,11 +6414,11 @@ void SC_Pac_KnownValuesSet(Assembler* Self, int Changed, bool Value);
 
 void SC_Pac_Knst(Assembler* Self, ASM Op);
 
-FatASM* SC_Pac_LastWith0(Assembler* Self);
+FatASM* SC_Pac_Last(Assembler* Self);
 
-FatASM* SC_Pac_LastWithASM(Assembler* Self, ASM Type);
+FatASM* SC_Pac_LastRealWithASM(Assembler* Self, ASM Type);
 
-FatASM* SC_Pac_LastReal(Assembler* Self);
+FatASM* SC_Pac_LastRealWith0(Assembler* Self);
 
 ASMReg SC_Pac_Less(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -6551,7 +6558,7 @@ FatASM* SC_Pac_RefCountIncrMemory(Assembler* Self, Message* Exp, Message* Prms);
 
 FatASM* SC_Pac_RefCountSet(Assembler* Self, Message* Exp, Message* Prms);
 
-FatASM* SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunction* Fn);
+ASMReg SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunction* Fn);
 
 int SC_Pac_RefSaveWithReg(Assembler* Self, ASMReg Reg);
 
@@ -6572,8 +6579,6 @@ void SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 void SC_Pac_RootGen(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_SafeDecr(Assembler* Self, FatASM* F);
-
-ASMReg SC_Pac_SafeObjDecr(Assembler* Self, ASMReg Match);
 
 ASMReg SC_Pac_SelfDivide(Assembler* Self, ASMReg Dest, Message* Exp);
 
