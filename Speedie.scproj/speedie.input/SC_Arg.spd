@@ -15,9 +15,9 @@ class SCArg (SCNode)
 	|bool|			HasEscape
 	
 	constructor (|Message| node)
-	// shouldn't be necessary!
 		super.Constructor(node)
 		is AllowLinkedLists
+		.hasescape = true
 
 	render
 		fs <~ "SCArg: (\n"

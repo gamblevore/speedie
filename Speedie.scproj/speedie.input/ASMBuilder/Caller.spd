@@ -271,7 +271,9 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	
 	.Trash(dest.reg)
 
-	fat.µRefCount += fn isnt STATELESS				// NOICE!
+	if fn isnt stateless
+		fat.incr					// NOICE!
+	
 	if fn is Killer
 		dest = asmreg.exit
 		fat.incr

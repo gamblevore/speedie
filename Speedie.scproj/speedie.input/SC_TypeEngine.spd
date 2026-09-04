@@ -1261,7 +1261,7 @@ function scobject.TheIsFunc2 (|message| err, |scfunction|)
 		expect (.IsMostlyNormal) (err, "Can't use 'is' on this type.")
 		rz = .type.theisfunc
 		if !rz
-			error (err, .name + " doesn‘t have 'syntax is' specified.")
+			error (err, .type.name + " doesn‘t have 'syntax is' specified.")
 	  elseif self isa scmodule
 		rz = .FindFunction("syntaxis", err)
 		

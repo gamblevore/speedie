@@ -198,7 +198,8 @@ extend assembler
 /				return								// Also should never happen!
 
 		if !.IsWithinCurrInline(fat)
-			|| C = .DelayedNopCount++
+//			if fat.id == 31972
+			|| C = .DelayedNopCount++ // needs to be rewound?
 			if C < –count .DelayedNops
 				.DelayedNops[C] = fat.Index
 			return
@@ -284,6 +285,8 @@ extend assembler
 		|| f = .register(r.reg)
 		if f is Const
 			return f.const == k
+		if r.reg == 0
+			return !K
 	
 	
 	function Decr (|&fatasm| f, |fatnopmode| Mode, |int| Depth=0)

@@ -24,8 +24,6 @@ struct LoopInfo
 		
 		|| Last = msg.last
 		|| arg = last.scarg(nil)							#debug_require
-		arg.HasEscape = true
-
 		if !.HasEscape
 			arg.HasEscape = false
 			last!.blocks = SCBlockage.return

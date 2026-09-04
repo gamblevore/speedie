@@ -3,14 +3,6 @@
 	Speedie Internals. By Theodore H. Smith...
 */
 
-//datatype DotUseType (int) // replace entire thing with a bool?
-//	flags					// sigh. i wish i had made this unused stuff earlier
-//		|DotUseType|
-//		Property
-//		
-//	syntax is (|DotUseType| d, |bool|)
-//		return self == d
-
 
 datatype FunctionType (uint)
 	flags
@@ -52,8 +44,9 @@ datatype FunctionType (uint)
 		ConOrDes = Constructor + Destructor
 		NoInline = CantInline + cpp + DirectlyRecursive
 		
-//	syntax is (|functiontype| t, |bool|)
-//		return self&t
+	syntax is (|functiontype| t, |bool|)
+	// used for debug
+		return self&t
 	function TestParts
 		|| P = UsedByASM
 
@@ -109,6 +102,7 @@ syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", th
 
 
 syntax is (|FunctionType| k, assigns:|bool|)
+//	if (k is stateless) and "makedir".trap
 	if value
 		.FuncInfo |= k
 	  else

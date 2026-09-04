@@ -48,11 +48,12 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	.RevertFAT(r==nil, TrapInline)
 	.CloseInline(st)
 
-	if r and !.InlineDepth
-		for i in (32 min .DelayedNopCount)
-			|| f = .DelayedNops[i].fat!
-			.DelayedNops[i] = 0
-			.nop(f)
+	if !.InlineDepth
+		if r
+			for i in (32 min .DelayedNopCount)
+				|| f = .DelayedNops[i].fat!
+				.DelayedNops[i] = 0
+				.nop(f)
 		.DelayedNopCount = 0
 	
 	return .CloseVars(OV, nil, r)				// Should CloseVars come before restore?

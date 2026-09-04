@@ -7,5 +7,10 @@ function SCFunction.StatelessAccumulate
 	require c and c is Stateless
 	for p in .args
 		require p.Type is Stateless
-	is Stateless
+	// is Stateless
+	// what about the code inside?
+	// this assumes that fiels are stateless? no good!
+
+	// BUIULD UP THIS ENTIRE SYSTEM LATER!!
+	// building blocks (glass, lair, and wator)
 

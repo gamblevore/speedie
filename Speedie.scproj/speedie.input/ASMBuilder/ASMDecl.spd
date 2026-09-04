@@ -6,6 +6,7 @@ struct SavedRegisters
 	|byte|					ReturnCount
 	|byte|					BasicDepth
 	|byte|					BreakRequest
+	|byte|					DelayedNops
 	|uint16|				BasicBlock
 	|uint16|				BasicParent
 	|bool|					ExpectOneMore
@@ -15,6 +16,7 @@ struct SavedRegisters
 	function Collect (|[scdecl]| args, |assembler| sh)
 		opt norefcounts
 		
+		.DelayedNops = sh.DelayedNopCount
 		.BreakRequest = sh.BreakRequest
 		.BasicDepth = sh.BasicDepth
 		.BasicBlock = sh.BasicBlock
@@ -27,6 +29,8 @@ struct SavedRegisters
 
 
 	function Rewind	(|assembler| sh)
+//		if sh.DelayedNopCount > .DelayedNops
+		sh.DelayedNopCount = .DelayedNops
 		sh.BreakRequest = .BreakRequest
 		sh.BasicDepth = .BasicDepth
 		sh.BasicBlock = .BasicBlock

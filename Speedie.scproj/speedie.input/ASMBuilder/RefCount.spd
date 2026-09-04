@@ -1,5 +1,5 @@
-/*
 
+/*
 
 function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
@@ -301,44 +301,56 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 
 
 
-function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |&FatASM|)
+function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, |asmreg|)
 	opt	NoRefCounts
 
 	if fn == compiler.RefClear
-		return .RefCountClear(exp, prms)
+		return .RefCountClear(exp, prms).RefCountFinish
 
 	if fn == Compiler.RefSetRef
-		return .RefCountSet(exp, prms)
+		return .RefCountSet(exp, prms).RefCountFinish
 
 	if fn == Compiler.RefIncr2
-		return .RefCountIncrMemory(exp, prms)
+		return .RefCountIncrMemory(exp, prms).RefCountFinish
 
 	|| Obj = .µ(prms.first!)
 	require !.RegIsConst(Obj, 0)
 
-	target debug: if Obj is ContainsAddr						// always a reg!
+	target debug: if Obj is ContainsAddr							// always a reg!
 
 	if fn == Compiler.RefFreeIfDead
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
 		#! Then we will never freeifdead within if-branch or other tests.
 		#! needs understanding of disowners!
-		return exp.rfun(Obj, asmreg(), .RefSave(Obj), asmreg())
+		|| fat = exp.rfun(Obj, asmreg(), .RefSave(Obj), asmreg())
+		fat.RefCountFinish
+		return fat*Obj
 
 	if fn == Compiler.RefIncr
-		return .RefCountIncr(exp, Obj)
+		return .RefCountIncr(exp, Obj).RefCountFinish
 
 	if fn == Compiler.RefEarlyDecr
-		return exp.RFST(Obj, asmreg(), .RefSave)				// reg to 0
+		Return exp.RFST(Obj, asmreg(), .RefSave).RefCountFinish		// reg to 0
 
 	if fn == Compiler.RefDecr
 		|| fat = .RefCountDecr(exp, obj)
 		.CloseOneVar(nil, 1<<Obj.reg)
-		return fat
+		return fat.RefCountFinish
 
 	if fn == Compiler.RefSafeDecr
-		return exp.rfun(ASMReg(), Obj)
+		return exp.rfun(ASMReg(), Obj).RefCountFinish
 
-	debugger
+	debugger 
+	return asmreg()
+
+
+function fatasm.RefCountFinish (|asmreg|)
+	if self
+		|| saved = .RegOnly(2)
+			assembler.sh.Trash(saved)
+		.incr
+		return .info as asmreg()
+	
 
 
 // dead-code stripping means this is better in ASM, than at c-level phase.
@@ -374,36 +386,30 @@ function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 		|| A = .µ(pf!) // merge gtab into ralo?
 		return exp.RALO(dest, A) * Dest
 
-	|| fat = .RefCountSub(exp, prms, fn)
-		|| saved = fat.RegOnly(2)
-			.Trash(saved)
-		fat.incr
-		return fat.info as asmreg() // fat * asmreg() // unneeded???
-
+	return .RefCountSub(exp, prms, fn)
 
 
 function fatasm.IsDecr (|asmreg|)
-	if self
-		|| upon = (self)(0)
-			if ((self)(1) == upon) and !(self)(2)
-				return upon
+	|| upon = (self)(0)
+		if ((self)(1) == upon) and !(self)(2)
+			return upon
 
 
 function FinalDecrements (fn_asm)
-	if "JB_Rec_SyntaxUsing".trap
 	|| rfun = .lastreal(asm.RFUN)$
 	|| D0 = (rfun)(1)$
 
 	require  (dest == nil)  or  (dest iz d0)
 	require !(rfun)(0) and !(rfun)(2)
 
-	rfun.RegInput(0) = d0
 	|asmreg| d1
 
 	|| rfun2 = rfun.prev
 	if (rfun2 isa asm.rfun) and .IsCurrBlock(rfun2)
-/		d1 = rfun2.IsDecr
-		rfun.RegInput(1) = d1
+		d1 = rfun2.IsDecr
+
+	rfun.RegInput(0) = d0
+	rfun.RegInput(1) = d1
 
 	rfun._op = asm.rfrt
 	rz = rfun * asmreg.Exit
@@ -411,9 +417,6 @@ function FinalDecrements (fn_asm)
 		.nop(rfun2)
 
 	//  decrementing 3 objects in 1 instruction is madness. 2 is a lot already.
-
-
-
 
 
 

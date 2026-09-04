@@ -427,8 +427,12 @@ struct Assembler
 				.µdebug(exp, dest)
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
+
 			// dest discard means "we are telling you that we don't need the result"
 			// return discard means "the result is unused, so reg0 isn't actually being set to"
+
+			if .EntireInlineFailed
+				return ss // doesnt matter
 			if !ss  or  (dest is set)  or  (ss is set or discard)
 				return ss // no need test.
 			if !ss.reg and (ss isnt condanswer)
