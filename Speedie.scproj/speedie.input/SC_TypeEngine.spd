@@ -375,10 +375,10 @@ function TypeOfUnit (ExprResolver)
 		  elseif unit == "ms"
 			mul = 64.0
 		  elseif unit == "π"
-			mul = π
+			mul = π							// defined in InitBasicStuff ??
 			type = typefloat64!
 		  elseif unit == "τ"
-			mul = τ
+			mul = τ							// also?
 			type = typefloat64!
 		  elseif exp.UnitMatch("days", "day")
 			mul = 86400.0 * s4

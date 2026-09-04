@@ -6,8 +6,8 @@ module font
 		opt norefcounts
 		return .small_ init ( img://SmallFont.png ).fontload
 	constants
-		Width = 6 
-		Height = 9 
+		Width = 6
+		Height = 9
 
 	|ImagePixel[2]| Char
 	.Char[1] = -1
@@ -26,7 +26,9 @@ function image.DrawFont (|string| Str, |ivec2| xy, |vec4| Col, |bool| DrawInvis,
 
 	|| i = 0	
 	for (c.codepoints in str) (ptr)
-		|codepoint| pc = c.SetSign(drawinvis)
+		|codepoint| pc = c
+		if DrawInvis
+			pc = -c
 		pc = pc.ImproveDraw(str, ptr - str.addr)
 		.DrawChar(pc, Where, xy, Col)
 

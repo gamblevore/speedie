@@ -9,7 +9,7 @@ function Message.ASMType (|ASMType|)
 // if we can fix this... we can get a bigger ASMType table!
 function Message.ASMType (assigns:|ASMType|)
 	value = (.FLAGS &~ 63) ||| value
-	.FLAGS = value 
+	.FLAGS = value
 
 
 
@@ -23,7 +23,7 @@ datatype ASMType (uint16)
 
 	constants
 		|ASMType|
-		kUnusedFirst = 47 // other values come after 
+		kUnusedFirst = 47						// other values come after
 		kTern
 		kStatExpr
 		kIf

@@ -7,19 +7,28 @@
 module Math
 	constants
 		// these should go into binary form...
-		E = 2.7182818284590452353602874713526
-		iTau = 0.15915494309
+		E = 2.7182818284590452353602874713526		// 0x4005bf0a8b145769
+		iTau = 0.15915494309						// 0x3fc45f306dc9c883
+
+		// need some way to specify floats in terms of hex...
 		// Maths is just a place to put constants on...
 		// So autocomplete shows you constants.
 	
 	function Pi (|float|)
 		disabled "Use π for pi, or 2π for PI*2"
 
+// these are just internally used. Not for auto complete.
+// perhaps move them to the float class? LLATTERRRRR
+	libinternal UnCosBad (|float| f, |float|)
+		// this are all marked "Bad" because they use radians instead of 2PI (tau)
+		// radians make no sense. "pi radians in a circle" is just ridiculous
+		// 1 rotation in a circle makes more sense.
+		// however, they get used somehow so we need to wrap them.
+		// until the c++ committee decide to release pi versions of their trig funcs
+		cpp_wrapper (acosf)
+
 	libinternal UnSineBad (|float| f, |float|)
 		cpp_wrapper (asinf)
-
-	libinternal UnCosBad (|float| f, |float|)
-		cpp_wrapper (acosf) // we don't want the half version!
 
 	libinternal UnTan2Bad (|float| f1, |float| f2, |float|)
 		cpp_wrapper (atan2f)
@@ -35,19 +44,19 @@ module Math
 	
 
 inline int64.Hash (|uint64|)
-	return self|uint64|.hash 
+	return self|uint64|.hash
 
 inline int.Hash (|uint|)
-	return self|uint|.hash 
+	return self|uint|.hash
 
 function uint64.Hash (|uint64|)
 	cpp_wrapper JB_uint64_hash
 	
 inline uint64.LowestBit (|uint64|)
-	return self & -self 
+	return self & -self
 
 inline uint.LowestBit (|uint|)
-	return self & -self 
+	return self & -self
 
 inline uint64.RemoveOneBit (|uint64|)
 	return self & (self-1)
@@ -84,7 +93,7 @@ extend int
 		return r
 			
 	inline LowestBit (|int|)
-		return self & -self 
+		return self & -self
 	
 	inline RemoveOneBit (|int|)
 		return self & (self-1)
@@ -113,42 +122,9 @@ extend int
 		  elseif self > high
 			self = high
 		return self
-	
-	// seems to assume positive ints. No good. What if its negative?
-	function SetSign (|bool| IsNeg, |int|)
-		description "bool.dir is better. Try that?"
-		if (IsNeg)
-			self = -self
-		return self
-	
+		
 	inline SignBit (|int|)
 		return self|uint| >> 31
-		
-//	function Reduce1 (|int|)
-//		disabled "seems buggy, doesnt work for 0"
-//		return self + (.signbit << 1) - 1
-//	
-//	function Reduce (|int| d=1, |int|)
-//		// what if this goes past 0?
-//		// why not use .towards(0)?
-//		
-//		if (self > d)
-//			return self - d
-//		  elseif (self < -d)
-//			return self + d
-//
-//
-//	function Towards (|int| Dest, |int| N, |int|)
-//		if (self >= dest)
-//			self -= N
-//			if (self <= dest)
-//				return dest 
-//		  else
-//			self += N
-//			if (self >= dest)
-//				return dest
-//		return self	
-
 
 
 			

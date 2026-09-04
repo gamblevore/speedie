@@ -229,13 +229,13 @@ function ApparantArgCount (|int|)
 
 function CheckNotBadName
 	if (!.ApparantArgCount and .cls)
-		|| W = .cls.NumericCount 
+		|| W = .cls.NumericCount
 		if (W > 1) and .name.isswizzle(w)
 			error (.source, "Can't use a swizzle-name (xyzw/rgba) on a vector-type!")
 
 
 function CollectStats
-	FuncStats[.args.length min 11]++ 
+	FuncStats[.args.length min 11]++
 //	|| i = (self is HasInt) ||| ((self is hasfloat)<<1) ||| (self is hasvector) << 2
 	// what about simds? :O
 //	FuncArgAndReturnTypes[i]++
@@ -243,7 +243,7 @@ function CollectStats
 //		FuncArgAndReturnTypes[4]++
 	
 
-function FuncParamsLoad 
+function FuncParamsLoad
 	opt norefcounts
 	scfunction.CurrFunc = self // perhaps this should set the curr proj along with it.
 	|| old = scimport.curr
@@ -281,12 +281,12 @@ function SubFuncParamsLoad (|message| P)
 	if .FuncInfo
 		|| r = .ReturnType
 			if r == r.Type.TypeNormal	// why do we copy?
-				r = r.copydecl		 	// is it for nilchecking?
+				r = r.copydecl			// is it for nilchecking?
 				.ReturnType = r
 			r.AllocSource = .FuncInfo
 	
 
-function @scfunction.NameList (|string|) 
+function @scfunction.NameList (|string|)
 	|| fs = faststring()
 	for fn in compiler.FuncList
 		fs <~ fn.exportname
@@ -294,7 +294,7 @@ function @scfunction.NameList (|string|)
 	return fs
 
 
-function @scfunction.TransformAll 
+function @scfunction.TransformAll
 	opt norefcounts
 	|| globinits = compiler.AppInitGlobals
 	if !globinits.HasActualCode 
@@ -318,9 +318,9 @@ function message.MacroFixSub (|SCDecl?| contains)
 function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incoming, |scdecl|)
 	|| Orig = incoming.exp
 		|| R = incoming.MacroCopyArgs
-		orig.BecomeMacro(.ismacro!, r) // just use .run?
-		orig.MacroFixSub(contains) 
-		rz = TypeOfExpr(orig, name_space) 
+		orig.BecomeMacro(.ismacro!, r)				// just use .run?
+		orig.MacroFixSub(contains)
+		rz = TypeOfExpr(orig, name_space)
 		rz ?= typevoid!
 	  else
 		debugger 
@@ -1054,6 +1054,7 @@ function CountCallsToParentAlloc (|Message| root, |message|)
 	
 	Each destructor must call a parent destructor, which can be JB_Obj_Destructor
 */
+
 
 function Borked (|bool|)
 	return .Badness & 128

@@ -142,11 +142,9 @@ function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64
 		return .CalculateConstRel(value, ty)
 	
 	error value
-	
-	
-		
-	
-	
+
+
+
 
 
 function SCNode.CollectConstantsSub (|Message| ch)

@@ -418,7 +418,9 @@ class Image (memory)
 		|| W = .Width,       || H = .Height
 		|| DH = into.Height, || DW = into.Width
 		require DH >= W and DW >= H
-		|| step = DW.SetSign(Right)
+		|| step = DW
+		if right
+			step = -step
 		|| h1 = H-1
 		|| dh1 = dh-1
 
