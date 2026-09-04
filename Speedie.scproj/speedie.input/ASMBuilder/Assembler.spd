@@ -610,18 +610,12 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 	opt norefcounts
 	scfunction.currfunc = fn
 	
-	testfatsanity()
 	.InitAndStartFunc(fn)
-	testfatsanity()
 	.RootGen(fn)
-	testfatsanity()
 	.FinishASM
-	testfatsanity()
 	if .NeedsRework
 		.Rework(fn)
-	testfatsanity()
 	.CapASM
-	testfatsanity()
 	
 	target false
 		ifn options.silent or compiler.InPerry or options.perryoutput

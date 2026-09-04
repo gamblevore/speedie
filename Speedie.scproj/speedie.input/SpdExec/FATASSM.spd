@@ -276,11 +276,13 @@ struct FatASM
 			return .prms[o.log2]
 
 	
-	Syntax Expect (|string| Error)
+	Syntax Expect (|string?| Error=nil)
 		target debug
 			assembler.PrintProgress(0)
 			"----"
 			.DebugPrint(-1)
+			if !error
+				error = errorreceiver.internalerror
 		error (.msg, error)
 
 	
@@ -660,14 +662,17 @@ struct FatASM
 		sh.nop(mid)
 		return true
 	
+	
 	function asm.JumpNegatable (|bool|)
 		return self != asm.LUPU and asm.LUPD and asm.jump
-		
-	function JumpImprove (|assembler| sh, |bool|)
+	
+	
+	function JumpImprove (|assembler| sh, |fatasm| Last, |bool|)
+		debugat 883
 		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
 		|| n = 0
 		
-		while 
+		while
 			if d.GuessSize == 0
 				d++ // need to check for where the func ends
 			  elseif d isa asm.jump
@@ -675,6 +680,8 @@ struct FatASM
 				expect (++n < 30) (.msg)
 			  else
 				exit
+			target debug
+				expect (d <= Last) (d, "")
 		
 		|asm| m = .op
 		if  m == asm.jump

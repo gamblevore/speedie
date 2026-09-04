@@ -3,15 +3,18 @@
 // MiniOptimisations, miniopts, optimize, finishmost 
 function Assembler.LastReal (|&fatasm|)
 	|| L = .last
-	while L.guesssize == 0
+	while L.GuessSize == 0
 		L--
 	return L
- 
- 
-function Assembler.FinishASM 
+
+
+function Assembler.FinishASM
 	|| Last = .LastReal
 	if (.FnLength <= 0) or !Last.IsFinisher or .ExpectOneMore
 		.MissingReturn
+		last = .LastReal
+	target debug
+		expect last >= .FuncStart	
 
 	|| S = .FuncStart
 	|| Length = 0
@@ -25,7 +28,7 @@ function Assembler.FinishASM
 			S.ConstFinish
 //			.AskNop(s) // could this work now that we have phi?
 		  elseif S.JumpPrm
-			s.JumpImprove(self)
+			s.JumpImprove(self, last)
 		  elseif op == asm.FNC3 or asm.FNC
 			if s < last
 				.TryTail(s)

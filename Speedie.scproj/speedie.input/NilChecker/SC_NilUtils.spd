@@ -16,13 +16,22 @@ struct LoopInfo
 	
 	
 	function FinishLoop (|message| msg)
+		opt norefcounts
 		|| Ex = .ExitRecord
 		ArchonPurger.t.value = Ex
 		if !ex
 			ErrorReceiver.NewCritical(msg, "Loop never exits.")
+		
+		|| Last = msg.last
+		|| arg = last.scarg(nil)							#debug_require
+		arg.HasEscape = true
 
-		if !.HasEscape and !msg.islast
-			msg.KinderRemoveAfter
+		if !.HasEscape
+			arg.HasEscape = false
+			last!.blocks = SCBlockage.return
+			msg.Blocks = SCBlockage.return
+			if msg.next
+				msg.KinderRemoveAfter
 	
 	
 	function NextLoop 

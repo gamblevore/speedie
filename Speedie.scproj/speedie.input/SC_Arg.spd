@@ -12,6 +12,7 @@ class SCArg (SCNode)
 	|Message?|		TmpMovedOutFor
 	|bool|			IsClassArg
 	|bool|			IsStatementExpr
+	|bool|			HasEscape
 	
 	constructor (|Message| node)
 	// shouldn't be necessary!

@@ -34,14 +34,16 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		p.info = Info|asmreg|
 		p._op = op
 		p.msg = exp
-		if op != asm.noop					// what about mark?
+		
+		if (op != asm.noop and asm.mark and asm.phi)
 			p.BreakInfo = .BreakRequest
 			.breakrequest = nil
+			.ExpectOneMore = false
 
-		.ExpectOneMore = false
 		p.BasicBlock = .BasicBlock
-		if p.id == 33261
-			FatSanity = p
+		target debug
+			if p.id == -1
+			
 		return p
 
 	error (exp, "Function too large (over 64K)")
@@ -231,8 +233,7 @@ function message.CallChainError (|string| name)
 
 
 
-|&fatasm| FatSanity
-function TestFatSanity
-	|| f = FatSanity
-	if f and f.op == asm.halt
-		if f <= Assembler.sh.FuncStart
+//|&fatasm| FatSanity
+//function TestFatSanity
+//	|| f = FatSanity
+//	if f and f.op == asm.halt

@@ -1609,13 +1609,24 @@ function Tran_Once (TranFunc)
 		node.first = brel
 		
 	tran_if(fn, node, name_space)
-  
+
 
 
 function message.Blocks (|SCBlockage|)
 	if self
 		return .TAG & SCBlockage.Bits
 
+
+function blocktest (|int| x)
+	visible
+	if x
+		while
+			x++
+			if x == 2
+				return
+//		app.no(nil)
+	"maybe"
+	
 
 function message.Blocks (assigns:|int|)
 	.TAG = (.TAG & ~SCBlockage.bits) ||| Value

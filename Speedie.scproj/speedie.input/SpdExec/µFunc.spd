@@ -49,7 +49,6 @@ extend SCFunction
 			HasLabel |= fat.JumpPrm
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
-			|| Break = fat.BreakInfo
 			fat.ASMIndex = rz - where
 			fat.CheckHasOutput
 			
@@ -66,6 +65,7 @@ extend SCFunction
 						Pos = PrevFatMap
 				PrevFatMap = Pos
 				if curr < rz
+					|| Break = fat.BreakInfo
 					Positions[] = pos
 					while (Curr++ < rz)
 						Positions++
