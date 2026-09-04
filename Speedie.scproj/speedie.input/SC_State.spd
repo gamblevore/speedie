@@ -9,7 +9,7 @@ function SCFunction.StatelessAccumulate
 		require p.Type is Stateless
 	// is Stateless
 	// what about the code inside?
-	// this assumes that fiels are stateless? no good!
+	// this assumes that files are stateless? no good!
 
 	// BUIULD UP THIS ENTIRE SYSTEM LATER!!
 	// building blocks (glass, lair, and wator)

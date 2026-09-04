@@ -9,7 +9,7 @@ module LibStability
 		.StabiliseSub("stable_id_bank.txt", packmaker.libfuncs, true)
 	
 	
-	function StabiliseGlobs 
+	function StabiliseGlobs
 		return .StabiliseSub("stable_glob_bank.txt", packmaker.libglobs, false)
 	
 	

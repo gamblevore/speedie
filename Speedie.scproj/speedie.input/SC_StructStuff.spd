@@ -73,16 +73,6 @@ function SCFunction.StructReturned (|scdecl|)
 			return f
 
 
-function scparamarray.StructExtract (|scdecl| type)
-	// Remove this?
-	debugat
-	|| s = .exp
-		|| where = s.UseNonRefChangers(True)!
-		|| fn = where.func
-		if fn != @rel
-			scfunction.TempMoveOut(s, type)
-
-
 function scparamarray.StructReturner (|SCDecl| type, |SCFunction| fn)
 	opt norefcounts
 	|| s = .exp											#require
