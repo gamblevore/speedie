@@ -52,7 +52,7 @@ dispatch FuncPreReader (fnPreReader)
 		.MakeLibInternal(msg)
 
 	+'embedded'
-		.SetLibOrEmbed(msg, scnodeinfo.embeddedonly)
+		.SetLibOrEmbed(msg, SCObjInfo.embeddedonly)
 
 	+'numeric'
 		opt norefcounts
@@ -118,6 +118,8 @@ dispatch FuncPreReader (fnPreReader)
 		if (self isnt disabled)
 			.ReadDescription(msg)
 		
+	+'stateless'			SCObject.StatelessFn
+	+'stateful'				SCObject.StatelessFn
 	
 
 function message.RefFallback (|bool|)

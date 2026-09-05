@@ -227,7 +227,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	if !fn.ProtoType or (fn.ASMAndCpp != 3)
 		|| fat = .ASMCall(exp, dest, fn, tableid, regs, C)
 		.GrabbedRegisters(exp, Start, fat)
-		return fat * dest
+		return fat.info // already set in asmcall
 
 	|| HighBit = .TempMe(datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(asmreg(tableid), 63)
@@ -240,7 +240,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	branch.JumpTo(fn2)
 	
 	.GrabbedRegisters(exp, Start,  fn2)
-	return fn2 * dest
+	return fn2.info
 
 
 
@@ -248,7 +248,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	opt norefcounts
 	|| P = .EncodeParams(exp.last!, fn, Cpp, regs)
 	|| PExt = P >> 32
-	(dest is statelessfunc) = (fn is Stateless)
+	(dest is statelessfunc) = (fn|scobject| is Stateless)
 	
 	|| fat = exp.FNC(dest, TableID, P, PExt)
 	|| NArgs = fn.args.Length
@@ -271,12 +271,13 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	
 	.Trash(dest.reg)
 
-	if fn isnt stateless
+	if fn|scobject| isnt stateless
 		fat.incr					// NOICE!
 	
 	if fn is Killer
 		dest = asmreg.exit
 		fat.incr
+	dest = (fat * dest)
 	return fat
 
 

@@ -121,9 +121,9 @@ linkage
 |SCModule|					DisamModules
 
 |byte|						InPerry
-|SCNodeInfo|				InBuiltType
+|SCObjInfo|					InBuiltType
 |bool|						HasFunny
-|byte|						During // unused but i don't want to remove. it could be useful?
+|byte|						During						// unused but i don't want to remove. it could be useful?
 |bool|						InitedOK = true
 |bool|						DuringConstructorFillIn
 |byte|						Successfulness
@@ -240,7 +240,7 @@ function Reached (|string| s, |bool|)
 
 
 function InitTypes (|bool|)
-	.InBuiltType = SCNodeInfo.InBuiltDataType
+	.InBuiltType = SCObjInfo.InBuiltDataType
 	TypeInt				= compiler["int"]
 	TypeInt16			= compiler["int16"]
 	TypeInt64			= compiler["int64"]

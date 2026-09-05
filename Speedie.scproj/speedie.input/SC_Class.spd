@@ -17,8 +17,6 @@ datatype ClassInfo (int)
 		Banned
 		HasNilChecker
 		DefaultsToReal
-		Stateless
-		Stateful
 		Builtin
 		SortsProperties
 		Dylib
@@ -143,7 +141,6 @@ function CreateAutoConstructor (|scfunction|)
 	|| node = rz.source
 	|| prms = node.Second
 	|| arg	= prms.next
-	
 		for prop in .sourcearg
 			if prop == @decl
 				|| name = prop.declname.name
@@ -1012,7 +1009,7 @@ module
 			(cls is SortsProperties)
 			cls.typeinfo = datatypecode._Voidptr
 		  elseif cls.IsDataTypeOrFP
-			(cls is stateless)
+			(cls|scnode| is stateless)
 			if base is prototype
 				cls.Typeinfo = DataTypeCode._voidptr
 		cls.ASMTypeInfo = cls.TypeInfo

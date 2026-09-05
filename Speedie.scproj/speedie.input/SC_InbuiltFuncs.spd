@@ -73,13 +73,6 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 	  else
 		error (self)
 
-
-target false
-	function Message.InBuiltTypeOf (|scdecl| dcl, |string| Kind, |message|)
-		opt norefcounts
-		if kind != "typeof"
-			dcl = dcl.contains #expect (self, "No contained type") // shouldn't fail but does? nilbug!
-		return @thg + dcl.type.Name
 		
 
 function Message.InBuiltContained (|scdecl| dcl, |message|)

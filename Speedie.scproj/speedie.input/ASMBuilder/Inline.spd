@@ -92,8 +92,9 @@ struct InlineInfo
 			  elseif r is Const
 				if r iz ret // allowed? shouldn't be?
 				sh.Decr(f!, fatnopmode.hard)
+
 			  elseif !(r iz Ret)
-				if f  and  !f.refcount  and  f.GuessSize
+				if f  and  !f.refcount  and  f.GuessSize  and  f.isstateless
 					if sh.IsWithinCurrInline(f)
 						sh.nop(f)
 
@@ -211,6 +212,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		|| InlineTrap = ++asmtrapper
 		if InlineTrap == -1
 	asmtype.ArgumentSub(self, fn.SourceArg!)
+	
 	info.NopParams(fn.args.length, .state.return, self)
 	svregs.Restore(fn.args)
 	

@@ -101,7 +101,7 @@ dispatch ClassOrModuleLinkage (TranFunc)
 	+'noearlyfree'			{}
 		
 	+'embedded'
-		name_Space.SetLibOrEmbed(node, scnodeinfo.embeddedonly)
+		name_Space.SetLibOrEmbed(node, SCObjInfo.embeddedonly)
 		
 	+'libinternal'
 		|| v = node.first.yes(true)
@@ -131,15 +131,8 @@ dispatch ClassOrModuleLinkage (TranFunc)
 				  else
 					error (f)
 	
-	+'stateless'
-		if name_space.mustbe(scclass, node)
-			(name_space is stateless)
-			name_space.CheckStateful(node)
-
-	+'stateful'
-		if name_space.mustbe(scclass, node)
-			(name_space is stateful)
-			name_space.CheckStateful(node)
+	+'stateless'			SCObject.Stateless
+	+'stateful'				SCObject.Stateless
 		
 
 	+'datatype'
@@ -184,21 +177,15 @@ function SCNode.ProcessLinkage (|message| node,  |{tranfunc}| Table,  |bool| Str
 	return compiler.program
 
 
-function scclass.CheckStateful	(|message| node)
-	expect (self isnt stateful or self isnt stateless) (node, "Can't be both stateful and stateless")
-
-
-function Scnode.SetLibOrEmbed	(|message| node, |scnodeinfo| info)
+function scobject.SetLibOrEmbed	(|message| node, |SCObjInfo| info)
 	opt norefcounts
 	while self
-		|| I = .nodeinfo ||| Info
-		|| Clash = SCNodeInfo.clash
+		|| I = .SCObjInfo ||| Info
+		|| Clash = SCObjInfo.clash
 		expect ((I&Clash) != Clash) (node, "internal/embedded conflict")
-		.nodeinfo = I
+		.SCObjInfo = I
 		if self isa scclass
 			self = .modul|scclass|
 		  else
 			return
-
-
 

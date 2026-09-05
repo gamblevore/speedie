@@ -11,13 +11,13 @@ class SCObject
 	|message?|					Source
 	|byte|						NoAutoComplete
 	|byte|						AllocSource
-	|SCNodeInfo|				NodeInfo
+	|SCObjInfo|					SCObjInfo
 	|uint16|					CurrFuncLink
 	|uint16|					GPackID
 	|uint16|					FPackID
 	
 	constructor
-		.NodeInfo = Compiler.InBuiltType
+		.SCObjInfo = Compiler.InBuiltType
 		.linkfrom = nil
 	
 	
@@ -45,19 +45,19 @@ class SCObject
 			|| c = .cls
 				return c.file
 
-	syntax is (|SCNodeInfo| i, |bool|)
-		return .NodeInfo&i
+	syntax is (|SCObjInfo| i, |bool|)
+		return .SCObjInfo&i
 
-//	function TestASM (|SCNodeInfo| i, |bool|)
-//		return .NodeInfo[i]
+//	function TestASM (|SCObjInfo| i, |bool|)
+//		return .SCObjInfo[i]
 	
-	syntax is (|SCNodeInfo| i, assigns:|bool|)
-		|| x = .NodeInfo
+	syntax is (|SCObjInfo| i, assigns:|bool|)
+		|| x = .SCObjInfo
 		if value
 			x |= i
 		  else
 			x &=~ i
-		.NodeInfo = x
+		.SCObjInfo = x
 
 	function IsVisible (|bool|)
 		return self is visible

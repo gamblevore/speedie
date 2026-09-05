@@ -35,7 +35,8 @@ extend assembler
 		|| T = .BackupTotal
 		|| T0 = T - Amount
 		.BackupTotal = T0
-
+		(check)
+		(trapcount)
 		target debug
 			require check
 			
@@ -44,6 +45,10 @@ extend assembler
 			|| after = live+amount
 			while live < after
 				if !memory.equals(live, backup, –sizeof fatasm)
+					target debug
+						printprogress()
+						live.debugprint
+						backup.debugprint
 					debugger 
 					live[0] = backup[0]
 				Backup++
@@ -193,13 +198,15 @@ extend assembler
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
-				PrintProgress()
-				fat.DebugPrint()
-/				return								// Also should never happen!
+				target debug						// but also, it shouldn't even happen
+					PrintProgress()
+					fat.DebugPrint()
+					debugger
+				return
 
 		if !.IsWithinCurrInline(fat)
 //			if fat.id == 31972
-			|| C = .DelayedNopCount++ // needs to be rewound?
+			|| C = .DelayedNopCount++
 			if C < –count .DelayedNops
 				.DelayedNops[C] = fat.Index
 			return
@@ -208,7 +215,7 @@ extend assembler
 		if !HasBreak
 			|| C = .Last
 			if fat == C
-				.curr_ = C						// Do it before both kinds of nop...
+				.curr_ = C							// Do it before both kinds of nop...
 
 		depth++
 		if depth > 7

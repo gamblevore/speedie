@@ -297,7 +297,9 @@ function NilFunction (NilTrackerFn)
 	if fn Is Killer
 		.DeclKill
 		if (.t.BranchDepth == 0)  and  !.t.AnyReturns // also if no returns happened...
-			(scfunction.currfunc! is killer)
+			|| F = scfunction.currfunc!
+			expect (f|scnode| isnt Stateless) (msg, "Killer func used in a stateless func")
+			(F is killer)
 		msg.LastInBlock(SCBlockage.Quit) // may happen later than expected
 		return nilstate.Killer
 	

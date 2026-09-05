@@ -31,7 +31,6 @@ datatype FunctionType (uint)
 		Killer
 		Disabled
 		API
-		Stateless
 		HidesProperties
 		StoresSelf
 		Cpp
@@ -48,7 +47,7 @@ datatype FunctionType (uint)
 	// used for debug
 		return self&t
 	function TestParts
-		|| P = UsedByASM
+		|| P = Dylib
 
 
 

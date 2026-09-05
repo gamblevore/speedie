@@ -3,14 +3,27 @@
 function SCFunction.StatelessAccumulate
 	opt norefcounts
 	require self is cpp
-	|| c = .cls
+	require self|scobject| isnt stateful
+	|scobject| c = .cls
 	require c and c is Stateless
 	for p in .args
-		require p.Type is Stateless
-	// is Stateless
-	// what about the code inside?
-	// this assumes that files are stateless? no good!
+		require p.Type|scobject| is Stateless
+	(self|scobject| is Stateless)
 
-	// BUIULD UP THIS ENTIRE SYSTEM LATER!!
-	// building blocks (glass, lair, and wator)
+
+function scobject.CheckStateful	(|message| node)
+	expect (self isnt stateful or self isnt stateless) (node, "Can't be both stateful and stateless")
+
+
+function @scobject.StatelessFn (fnPreReader)
+	return Stateless(nil, msg, self)
+
+
+function @scobject.Stateless (TranFunc)
+	if node ~= "stateless"
+		(name_space is stateless)
+	  else
+		(name_Space is stateful)
+	name_space.CheckStateful(node)
+	return true
 

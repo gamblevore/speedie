@@ -45,7 +45,7 @@ function MakeLibInternal (|message| node)
 	if self != Interact.AnonFn
 		check (.IsLibrary) (node, "libinternal is only used by library functions")
 	.NoAutoComplete = 2
-	.SetLibOrEmbed(node, scnodeinfo.LibInternal)		// limited to internal within a project
+	.SetLibOrEmbed(node, SCObjInfo.LibInternal)		// limited to internal within a project
 
 
 function FuncSrc (|Message|)
@@ -1109,7 +1109,7 @@ dispatch ClsCollectTable (CollectFunc)
 
 
 
-datatype SCNodeInfo (byte)
+datatype SCObjInfo (uint16)
 	Flags
 		ExplicitExport
 		Visible
@@ -1118,6 +1118,8 @@ datatype SCNodeInfo (byte)
 		LibInternal
 		LibInternalAll
 		EmbeddedOnly
+		Stateless
+		Stateful
 		Clash = LibInternal + EmbeddedOnly
 		
 
