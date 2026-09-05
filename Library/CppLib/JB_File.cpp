@@ -553,12 +553,11 @@ static bool CrashLogSub (const char* c) {
 		mkdir("/tmp/logs", kDefaultMode);
 		int flags = O_RDWR | O_CREAT | O_TRUNC;
 		CrashLogFile = open(JB_CrashLogFileName, flags, kDefaultMode);
-		chmod(JB_CrashLogFileName, 777);
+		fchmod(CrashLogFile, kDefaultMode);
 
 		int GID; int UID;
-		if (SmartGetUID(GID, UID, nil) > 0) {		// our logs should not be root!
-			chown(JB_CrashLogFileName, UID, GID);	// even if we did 'sudo speedie'
-		}
+		if (SmartGetUID(GID, UID, nil) > 0)					// our logs should not be root!
+			chown(JB_CrashLogFileName, UID, GID);			// even if we did 'sudo speedie'
 
 		if (CrashLogFile > 0)
 			fprintf(stderr, "Log At: %s\n", JB_CrashLogFileName);
