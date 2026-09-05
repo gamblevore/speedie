@@ -16,6 +16,7 @@ extend String
 
 	function FileExists (|bool|)
 		nil checker
+		stateful
 		cpp_wrapper JB_File_Exists
 	
 	function FileSize (|int64|)
@@ -89,6 +90,7 @@ extend String
 
 	function Resolve (|bool| AllowMissing = false, |string|) 
 		description "Calls the unix realpath() function, and also fixes filepaths a little. Returns an empty string if not found. If AllowMissing is true, then this will never return an empty string."
+		stateful
 		cpp_wrapper JB_Str_ResolvePath
 
 	function IsVolume (|bool|)
@@ -144,11 +146,13 @@ extend String
 	
 	function AbsolutePath (|StringZeroTerminated|)
 		cpp_wrapper JB_File_PathFix
+		stateful
 		description `Replaces "~/" with the username.
 Relative paths take the current working directory.`
 
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
+		stateful
 
 	libinternal TrimLastSub (|Byte| b, |int|)
 		// replace with .outbyte(-1,0,b)?
@@ -286,6 +290,7 @@ Relative paths take the current working directory.`
 		
 function @file.OSXMaxCaseWarnings_ (|&int|)
 	cpp_wrapper JB_File__Compar
+	stateful
 
 
 function string.ShellPath (|string|)

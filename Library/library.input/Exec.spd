@@ -92,6 +92,7 @@ target !minilib {
 extend string	
 	function Execute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |ProcessMode| Mode=ProcessMode.StdOutPassThru, |date| timeout=0, |ExitCode|)
 		cpp_wrapper JB_Str_Execute
+		stateful
 
 	function SilentExecute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
 		return .execute(args, out, errs, ProcessMode.Silence, timeout)
@@ -101,6 +102,9 @@ extend string
 		if .execute(args, fs).Successful
 			rz = fs
 
-	function System (|int|)
-		cpp_wrapper	// bad? execute is better?
+//	function System (|int|)
+//		cpp_wrapper	// bad? execute is better?
+//		stateful
 }
+
+

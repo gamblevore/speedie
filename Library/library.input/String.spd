@@ -114,7 +114,10 @@ class String
 			require self[i++].IsInt
 		return true
 	
-	function Unshare	(|string|)					{ cpp_wrapper }
+	function Unshare	(|string|)
+		cpp_wrapper
+		stateful
+	
 	function Copy		(|string|)					{ cpp_wrapper }
 
 // altering
