@@ -6339,8 +6339,6 @@ ASMReg SC_Pac_FloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 
 ASMReg SC_Pac_FloatPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-SCFunction* SC_Pac_fn(Assembler* Self);
-
 int SC_Pac_FnLength(Assembler* Self);
 
 bool SC_Pac_FoundReg(Assembler* Self, Message* All, int R);
