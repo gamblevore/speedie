@@ -1512,7 +1512,7 @@ function TypeOfRel (ExprResolver)
 		return LN.NiceIsFlagSyntax(opch, RN, name_space, side)
 	
 	side = nil
-	|| P = exp.niceParent
+	|| P = exp.NiceParent
 	|| ParentFunc = P.func
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl)
 
@@ -1531,7 +1531,7 @@ function TypeOfRel (ExprResolver)
 	
 	|SCDecl--| RC
 	|SCDecl--| LC
-	
+
 	if (side)
 		RC = TypeOfExprNeeded( RN, name_space )
 		if rc

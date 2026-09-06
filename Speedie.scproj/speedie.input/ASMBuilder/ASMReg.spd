@@ -329,13 +329,16 @@ datatype ASMReg (uint64)
 		|| R = v.reg
 		if !r and AllowZero
 			return true
+		
 		|| IsTmp = V is temp and V isnt OKAsTemp
 		|| Big = R >= asmreg.DontWantTempsHere
-		if big == IsTmp or (big and V is temp)
+		if (big == IsTmp) or (big and V is temp)
 			return true
+		
 		if .InlineDepth > 0 // just fail?
 			.FailInline
 			return false
+		
 		target debug
 			if big
 				"big reg $R unmarked"

@@ -101,11 +101,9 @@ syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", th
 
 
 syntax is (|FunctionType| k, assigns:|bool|)
-//	if (k is stateless) and "makedir".trap
-	if value
-		.FuncInfo |= k
-	  else
-		.FuncInfo &= ~k
+	|| f = .funcinfo &~ k
+	f |= k*value
+	.funcinfo = f
 
 
 

@@ -65,27 +65,28 @@ extend Assembler
 		|| mr = ASMReg()
 		require !.EntireInlineFailed
 		|| First = exp.first!
+		|| Last = exp.last!
 		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 
 		|| Closer = .OpenVars
-		
+				
 		if First.islast
 			ml = .µGetASM(first, dest)
 		  else
 			if dest isnt NewlyDeclared
-				ml = .µGetPrms(First, exp.last.ASMAllowsTemp)
+				ml = .µGetPrms(First, last.ASMAllowsTemp)
 			  else
-				ml = .µgetasm(first, dest.µtype(0))
+				ml = .µGetASM(first, dest.µtype(0))
 				ifn ml iz dest
 					mr = dest.µtype(0)
 			require !.EntireInlineFailed
-			mr = .µGetASM(exp.last!, mr)
+			mr = .µGetASM(last, mr)
 
 
 		if dest is Discard
 			.AskNopTemp(ml)
 			.AskNopTemp(mr)
-			return dest // returning from inline, into func that discards result.
+			return dest									// Returning from inline, into func that discards result.
 	
 		
 		if (!first.IsLast) and (ml.IsVec != mr.IsVec)
@@ -99,11 +100,10 @@ extend Assembler
 		dest = .TempTyped(exp, dest)
 		(dest is Const) = (ml&mr is Const)
 		
-		|| op = exp.second ?? exp.first!
 		target debug: || MathTrap2 = ++ASMTrapper, if MathTrap2 == -1
-		rz = (fn)(self, op, dest, ml, mr)
+		rz = (fn)(self, exp.second!, dest, ml, mr)
 		
-		target debug: if rz.IsVec != ml.IsVec			// argh?
+		target debug: if rz.IsVec != ml.IsVec			// Argh?
 		
 		rz = rz.ExpectSameType(dest)
 
@@ -558,14 +558,31 @@ extend Assembler
 		return fat.Vectorise(dest, asm.vadd)
 	
 	
-	function OptFMul (|asmreg| dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
-		|| fat = mul.FAT!
-		require .IsCurrBlock(fat, asm.fmul)
-		require (fat is temp) or (dest iz fat.info)
-		|| P3 = fat.p3
-		if !p3.reg
-			fat.reginput(3) = add
-			return fat * dest
+	function OptFMul (|asmreg| Dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
+		|| FatMul = mul.FAT!
+		require .IsCurrBlock(fatmul, asm.fmul)
+		require (fatmul is temp) or (dest iz fatmul.info)
+		require !fatmul.regonly(3)
+		
+		// (a*b) + c
+		// So... a*b gets multiplied first, then we try to add something
+		// but this const has not been made yet. So... then what?
+		// i think we could swap them? I mean, mul is a temp
+		// so... either add is before, OR, we should move it, but only if add is a temp.
+
+		|| FatAdd = add.fat
+		if fatadd and fatadd > fatmul					// Oof
+			require (add is temp)						// Not possible otherwise. other things using it.
+			|fatasm| swap = fatmul[0]
+			fatmul[0] = fatadd[0]
+			fatadd[0] = swap
+			// OK... its swapped. now what?
+			add.fatindex = mul.fatindex
+			fatmul = fatadd
+		
+		
+		fatmul.reginput(3) = add
+		return fatmul * dest
 	
 	
 	function Plus (fn_opasm)
