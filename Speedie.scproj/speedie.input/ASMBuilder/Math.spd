@@ -101,7 +101,9 @@ extend Assembler
 		(dest is Const) = (ml&mr is Const)
 		
 		target debug: || MathTrap2 = ++ASMTrapper, if MathTrap2 == -1
-		rz = (fn)(self, exp.second!, dest, ml, mr)
+		first = exp.second
+		first ?= exp.first! // for "-x"
+		rz = (fn)(self, first, dest, ml, mr)
 		
 		target debug: if rz.IsVec != ml.IsVec			// Argh?
 		

@@ -7,13 +7,13 @@ extend Assembler
 		// asm oof (9)
 		opt NoRefCounts
 		|| name = m[@thg]$
-		.fn.exportname = name.name
-		.fn.name = name.name
+		.out.exportname = name.name
+		.out.name = name.name
 		|| bra = name.Next(@bra)$
 		|| n = bra[@num].int
 		expect (n>=0 and n<=10) (m, "Too many arguments")
 		for n
-			.fn.args <~ TypeInt64!.TypeNormal // :) just ints!
+			.out.args <~ TypeInt64!.TypeNormal // :) just ints!
 
 		rz = bra.Next(@arg)
 		rz.expectlast

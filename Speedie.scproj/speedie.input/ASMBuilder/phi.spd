@@ -81,13 +81,14 @@ function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint
 		|| I1 = A.Setters[reg]
 		|| I2 = B.setters[reg]
 		|| F1 = I1.fat
-			|| F2 = I2.fat
-				expect (F1 != F2) // can't be the same!
-				if f1.phiAlready(I2) or f2.phiAlready(i1)
-					0
-				  else
-					|| phi = exp.phi(f1.info, asmreg(reg, f1.index), asmreg(reg, f2.index))
-					phi.prms[3] = Liftup
+		|| F2 = I2.fat
+		if f1 and f2
+			expect (F1 != F2) // can't be the same!
+			if !f1.phiAlready(I2) and !f2.phiAlready(i1)
+				|| r = f1.info
+				(r isnt const)
+				|| phi = exp.phi(r, asmreg(reg, f1.index), asmreg(reg, f2.index))
+				phi.prms[3] = Liftup
 
 
 function fatasm.PhiAlready (|int| Index, |bool|)

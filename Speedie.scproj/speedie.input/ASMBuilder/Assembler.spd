@@ -73,7 +73,7 @@ struct Assembler
 	function State (|&InlineState|)
 		return .inlinestate[.inlinedepth]
 	
-	function fn (|scfunction!--|)
+	function inline_fn (|scfunction!--|)
 		return .state.fn
 	
 	function Curr (|&fatasm|)
@@ -254,7 +254,7 @@ struct Assembler
 		if .InlineDepth > 0
 			.FailInline
 		  else
-			error (.fn.sourcearg, "No free local variables.")	// entirely full
+			error (.out.sourcearg, "No free local variables.")	// entirely full
 		return t
 
 /////////////////////////////////////////////////////////////////
@@ -555,8 +555,8 @@ struct Assembler
 	
 	function MissingReturn
 		opt norefcounts
-		debugger !.fn.ASMReturn
-		|| arg = .fn.source!
+		debugger !.out.ASMReturn
+		|| arg = .out.source!
 		|| Faked = arg.FrenchSpyReturn
 		|| old = arg.position
 		arg.Position = Faked
@@ -570,7 +570,7 @@ struct Assembler
 
 	function Guard
 		opt norefcounts
-		|| ret = .fn.SourceArg!
+		|| ret = .out.SourceArg!
 		|| l = ret.last
 			ret = l
 		target debug

@@ -2037,18 +2037,18 @@ function message.MainFix (|message|)
 function NeuMain (CollectFunc)
 	opt norefcounts
 	
-	expect  (name_space == compiler.program)  (node, "Can’t have main inside here.")
+	expect  (name_space == compiler.program)			(node, "Can’t have main inside here.")
 	if scimport.CurrIsManuallyImported
-		return Compiler.program			// ignore imported mains
+		return Compiler.program							// ignore imported mains
 	
-	|| fn_src = node.MainFix
-		|| app = fn_src.first.first!
-		|| m = compiler.FindModuleMsg(app)
-		
-		rz = SCFunction.NewFunc( fn_Src, m, ErrPlace )
-		if rz isa scmodule // sigh. Not ideal.
-			compiler.MainFunc = scclass.ProcessExtend(fn_Src, false, m)
-			fn_src.remove
+	|| fn_src = node.MainFix							#require
+	|| app = fn_src.first.first!
+	|| m = compiler.FindModuleMsg(app)
+	
+	rz = SCFunction.NewFunc( fn_src, m, ErrPlace )
+	if rz isa scmodule									// sigh. Not ideal.
+		compiler.MainFunc = scclass.ProcessExtend(fn_src, false, m)
+		fn_src.remove
 
 
 function NeuLibrary (CollectFunc)

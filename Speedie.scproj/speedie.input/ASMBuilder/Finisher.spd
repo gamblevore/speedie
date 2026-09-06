@@ -47,11 +47,16 @@ function Assembler.FinishASM
 
 function assembler.TryTail (|fatasm| FNC)
 	opt norefcounts
+	require !fnc.p3
 	|| Ret = Fnc.next
-	require (ret isa asm.ret) and (!fnc.p3)	// no pext, won't fit in tail.
+	require  ret isa asm.ret								// no pext, won't fit in tail.
+	
+	require .out != compiler.MainFunc						// tail in main is kind of a btch...
+															// the program closes and we have no idea why.
+	
 	|| rr = ret.regonly
 	|| ReturnType = .out.ReturnType
-	require !returntype or fnc.RegOnly == rr					// returning same var, or nothing at all.
+	require !returntype or fnc.RegOnly == rr				// returning same var, or nothing at all.
 
 	// If this overwrites params... then we need to copy params
 	// We could adapt the TAIL encoder! That should do it.
@@ -63,6 +68,7 @@ function assembler.TryTail (|fatasm| FNC)
 	Fnc._op = asm.tail
 	fnc.incr
 	(Fnc is exit)
+	
 // can't do this as its too late. Something can jump to it.
 // we'd have to do this at the time we created the fnc in the first place.
 //	if (fnc.BasicBlock == ret.BasicBlock)
