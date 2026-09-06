@@ -131,9 +131,9 @@ typedef uint SCDeclInfo;
 
 typedef int SCNodeFindMode;
 
-typedef byte SCNodeInfo;
-
 typedef byte SCNodeType;
+
+typedef u16 SCObjInfo;
 
 typedef int SizeInt;
 
@@ -998,12 +998,12 @@ struct SCObject_Behaviour: Object_Behaviour {
 };
 
 JBClass ( SCObject , JB_Object , 
+	SCObjInfo SCObjInfo;
 	u16 CurrFuncLink;
-	u16 GPackID;
 	Array* LinkFrom;
 	byte NoAutoComplete;
 	byte AllocSource;
-	SCNodeInfo NodeInfo;
+	u16 GPackID;
 	u16 FPackID;
 	Message* Source;
 	JB_String* Name;
@@ -1393,7 +1393,7 @@ extern Array* SC__Comp_FuncList;
 extern bool SC__Comp_HasFunny;
 extern Array* SC__Comp_ImportedList;
 extern Dictionary* SC__Comp_ImportedNames;
-extern SCNodeInfo SC__Comp_InBuiltType;
+extern SCObjInfo SC__Comp_InBuiltType;
 extern bool SC__Comp_InitedOK;
 extern byte SC__Comp_InPerry;
 extern Dictionary* SC__Comp_InsecureWords;
@@ -2114,22 +2114,20 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__CharSet_White ((CharSet)24)
 #define kJB__CharSet_XMLNameMid ((CharSet)61664)
 #define kSC__ClassInfo_Banned ((ClassInfo)64)
-#define kSC__ClassInfo_Builtin ((ClassInfo)2048)
+#define kSC__ClassInfo_Builtin ((ClassInfo)512)
 #define kSC__ClassInfo_ContainsParentClass ((ClassInfo)1)
 #define kSC__ClassInfo_DefaultsToReal ((ClassInfo)256)
-#define kSC__ClassInfo_DownGradeToString ((ClassInfo)16384)
-#define kSC__ClassInfo_Dylib ((ClassInfo)8192)
-#define kSC__ClassInfo_Flags ((ClassInfo)65536)
+#define kSC__ClassInfo_DownGradeToString ((ClassInfo)4096)
+#define kSC__ClassInfo_Dylib ((ClassInfo)2048)
+#define kSC__ClassInfo_Flags ((ClassInfo)16384)
 #define kSC__ClassInfo_HasEqualsFunc ((ClassInfo)4)
 #define kSC__ClassInfo_HasNilChecker ((ClassInfo)128)
 #define kSC__ClassInfo_HasSubClass ((ClassInfo)8)
 #define kSC__ClassInfo_IgnoreContainedSelf ((ClassInfo)2)
 #define kSC__ClassInfo_NoEarlyFree ((ClassInfo)16)
-#define kSC__ClassInfo_NumericReduction ((ClassInfo)98304)
-#define kSC__ClassInfo_SortsProperties ((ClassInfo)4096)
-#define kSC__ClassInfo_Stateful ((ClassInfo)1024)
-#define kSC__ClassInfo_Stateless ((ClassInfo)512)
-#define kSC__ClassInfo_Symbol ((ClassInfo)32768)
+#define kSC__ClassInfo_NumericReduction ((ClassInfo)24576)
+#define kSC__ClassInfo_SortsProperties ((ClassInfo)1024)
+#define kSC__ClassInfo_Symbol ((ClassInfo)8192)
 #define kSC__ClassInfo_TreatAsBaseType ((ClassInfo)32)
 #define kSC__CompilerStage_Baking ((CompilerStage)8)
 #define kSC__CompilerStage_CppExporting ((CompilerStage)9)
@@ -2247,33 +2245,32 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FunctionType_CantInline ((FunctionType)262144)
 #define kSC__FunctionType_ConOrDes ((FunctionType)3)
 #define kSC__FunctionType_Constructor ((FunctionType)1)
-#define kSC__FunctionType_Cpp ((FunctionType)134217728)
+#define kSC__FunctionType_Cpp ((FunctionType)67108864)
 #define kSC__FunctionType_Destructor ((FunctionType)2)
 #define kSC__FunctionType_DirectlyRecursive ((FunctionType)512)
 #define kSC__FunctionType_Disabled ((FunctionType)4194304)
 #define kSC__FunctionType_DontCheckInCakeLib ((FunctionType)4194432)
-#define kSC__FunctionType_Dylib ((FunctionType)536870912)
+#define kSC__FunctionType_Dylib ((FunctionType)268435456)
 #define kSC__FunctionType_EmptyConstructor ((FunctionType)1024)
 #define kSC__FunctionType_ExpectsRealVars ((FunctionType)8192)
 #define kSC__FunctionType_ExternalLib ((FunctionType)131072)
 #define kSC__FunctionType_FlowDisabled ((FunctionType)65536)
-#define kSC__FunctionType_HidesProperties ((FunctionType)33554432)
+#define kSC__FunctionType_HidesProperties ((FunctionType)16777216)
 #define kSC__FunctionType_InitFunc ((FunctionType)128)
 #define kSC__FunctionType_Killer ((FunctionType)2097152)
 #define kSC__FunctionType_LinkInline ((FunctionType)1048576)
 #define kSC__FunctionType_NewStruct ((FunctionType)16)
 #define kSC__FunctionType_NoExport ((FunctionType)5243008)
-#define kSC__FunctionType_NoInline ((FunctionType)134480384)
+#define kSC__FunctionType_NoInline ((FunctionType)67371520)
 #define kSC__FunctionType_NotRefCounted ((FunctionType)8)
 #define kSC__FunctionType_NumberCreator ((FunctionType)32)
 #define kSC__FunctionType_OptInline ((FunctionType)524288)
 #define kSC__FunctionType_Recursive ((FunctionType)256)
 #define kSC__FunctionType_Reffer ((FunctionType)4)
 #define kSC__FunctionType_Render ((FunctionType)32768)
-#define kSC__FunctionType_Stateless ((FunctionType)16777216)
-#define kSC__FunctionType_StoresSelf ((FunctionType)67108864)
+#define kSC__FunctionType_StoresSelf ((FunctionType)33554432)
 #define kSC__FunctionType_TypeTest ((FunctionType)64)
-#define kSC__FunctionType_UsedByASM ((FunctionType)268435456)
+#define kSC__FunctionType_UsedByASM ((FunctionType)134217728)
 #define kSC__FunctionType_VirtualCaller ((FunctionType)2048)
 #define kJB__MaybeBool_False ((MaybeBool)0)
 #define kJB__MaybeBool_MaybeFalse ((MaybeBool)8)
@@ -2435,20 +2432,22 @@ extern Array* SC__NilReason_values;
 #define kSC__SCNodeFindMode_ForClass ((SCNodeFindMode)8)
 #define kSC__SCNodeFindMode_NoErrors ((SCNodeFindMode)1)
 #define kSC__SCNodeFindMode_WantAType ((SCNodeFindMode)4)
-#define kSC__SCNodeInfo_AllowLinkedLists ((int)4)
-#define kSC__SCNodeInfo_Clash ((int)80)
-#define kSC__SCNodeInfo_EmbeddedOnly ((int)64)
-#define kSC__SCNodeInfo_ExplicitExport ((int)1)
-#define kSC__SCNodeInfo_InBuiltDataType ((int)8)
-#define kSC__SCNodeInfo_LibInternal ((int)16)
-#define kSC__SCNodeInfo_LibInternalAll ((int)32)
-#define kSC__SCNodeInfo_Visible ((int)2)
 #define kSC__SCNodeType_DataType ((SCNodeType)1)
 #define kSC__SCNodeType_Module ((SCNodeType)0)
 #define kSC__SCNodeType_Object ((SCNodeType)4)
 #define kSC__SCNodeType_Pointer ((SCNodeType)5)
 #define kSC__SCNodeType_ProtoType ((SCNodeType)3)
 #define kSC__SCNodeType_Struct ((SCNodeType)2)
+#define kSC__SCObjInfo_AllowLinkedLists ((int)4)
+#define kSC__SCObjInfo_Clash ((int)80)
+#define kSC__SCObjInfo_EmbeddedOnly ((int)64)
+#define kSC__SCObjInfo_ExplicitExport ((int)1)
+#define kSC__SCObjInfo_InBuiltDataType ((int)8)
+#define kSC__SCObjInfo_LibInternal ((int)16)
+#define kSC__SCObjInfo_LibInternalAll ((int)32)
+#define kSC__SCObjInfo_Stateful ((int)256)
+#define kSC__SCObjInfo_Stateless ((int)128)
+#define kSC__SCObjInfo_Visible ((int)2)
 #define JB__Syx_CurrFuncID_ JB__.Syx_CurrFuncID_
 #define kJB__TaskState_Animation ((TaskState)16)
 #define kJB__TaskState_Finished ((TaskState)64)
@@ -3996,10 +3995,6 @@ bool SC_ClassOrModuleLinkage_numeric(SCFunction* Fn, Message* Node, SCNode* Name
 
 bool SC_ClassOrModuleLinkage_sort_properties(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
-bool SC_ClassOrModuleLinkage_stateful(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
-bool SC_ClassOrModuleLinkage_stateless(SCFunction* Fn, Message* Node, SCNode* Name_space);
-
 bool SC_ClassOrModuleLinkage_tighten(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
 bool SC_ClassOrModuleLinkage_visible(SCFunction* Fn, Message* Node, SCNode* Name_space);
@@ -5198,9 +5193,6 @@ bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode Self, SCNodeFindMode M);
 
 
 
-// SCNodeInfo
-
-
 // SCNodeType
 bool SC_SCNodeType_HasASMPtrs(SCNodeType Self);
 
@@ -5208,6 +5200,9 @@ bool SC_SCNodeType_HasPtrs(SCNodeType Self);
 
 bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D);
 
+
+
+// SCObjInfo
 
 
 // SizeInt
@@ -5868,8 +5863,6 @@ bool SC_FAT_CopyJump(FatASM* Self, FatASM* D);
 byte SC_FAT_CurrGrabID(FatASM* Self);
 
 void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value);
-
-void SC_FAT_DebugPrint(FatASM* Self, int Level);
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
 
@@ -7593,6 +7586,8 @@ JB_String* SC_SCObject_CanAutoSub(SCObject* Self, JB_String* Search);
 
 bool SC_SCObject_CanLinkFrom(SCObject* Self, SCFunction* Fn);
 
+void SC_SCObject_CheckStateful(SCObject* Self, Message* Node);
+
 SCObject* SC_SCObject_Constructor(SCObject* Self);
 
 void SC_SCObject_Destructor(SCObject* Self);
@@ -7623,13 +7618,15 @@ bool SC_SCObject_RehomeExport(SCObject* Self);
 
 JB_String* SC_SCObject_Render(SCObject* Self, FastString* Fs_in);
 
+void SC_SCObject_SetLibOrEmbed(SCObject* Self, Message* Node, uint /*SCObjInfo*/ Info);
+
 bool SC_SCObject_syntaxequals(SCObject* Self, JB_String* Name);
 
 void SC_SCObject_Fail(SCObject* Self, JB_String* Error);
 
-bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCNodeInfo*/ I);
+bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCObjInfo*/ I);
 
-void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCNodeInfo*/ I, bool Value);
+void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCObjInfo*/ I, bool Value);
 
 SCFunction* SC_SCObject_TheIsFunc2(SCObject* Self, Message* Err);
 
@@ -7638,6 +7635,10 @@ JB_String* SC_SCObject_UniquifyExport(SCObject* Self, JB_String* S);
 JB_String* SC_SCObject_UnusedReason(SCObject* Self);
 
 JB_String* SC_SCObject_UnusedStr(SCObject* Self, JB_String* Name);
+
+bool SC_SCObject__Stateless(SCFunction* Fn, Message* Node, SCNode* Name_space);
+
+bool SC_SCObject__StatelessFn(SCFunction* Self, Message* Msg);
 
 
 
@@ -10007,8 +10008,6 @@ SCDecl* SC_Base_RequireContained(SCNode* Self, Message* Errplace);
 
 Message* SC_Base_Route(SCNode* Self, JB_String* Name);
 
-void SC_Base_SetLibOrEmbed(SCNode* Self, Message* Node, uint /*SCNodeInfo*/ Info);
-
 SCClass* SC_Base_ShouldBeClass(SCNode* Self, Message* Errplace);
 
 Message* SC_Base_SourceArg(SCNode* Self);
@@ -10352,8 +10351,6 @@ void SC_Class_CheckAllocVsWrapper(SCClass* Self, SCFunction* F, bool IsConstruct
 bool SC_Class_CheckBehaviours(SCClass* Self);
 
 void SC_Class_CheckItersAndVirtuals(SCClass* Self);
-
-void SC_Class_CheckStateful(SCClass* Self, Message* Node);
 
 void SC_Class_CheckUnusedClass(SCClass* Self, Message* Feedback);
 

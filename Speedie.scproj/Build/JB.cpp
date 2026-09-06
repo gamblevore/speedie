@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2415];
+extern JB_StringC* JB_LUB[2416];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1977,7 +1977,7 @@ void SC_Comp__InitCompiler() {
 }
 
 bool SC_Comp__InitTypes() {
-	SC__Comp_InBuiltType = kSC__SCNodeInfo_InBuiltDataType;
+	SC__Comp_InBuiltType = kSC__SCObjInfo_InBuiltDataType;
 	JB_SetRef(SC_TypeInt, SC_Comp__FindClassName(JB_LUB[1628], 0));
 	JB_SetRef(SC_TypeInt16, SC_Comp__FindClassName(JB_LUB[1632], 0));
 	JB_SetRef(SC_TypeInt64, SC_Comp__FindClassName(JB_LUB[1633], 0));
@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026090417));
+	JB_FS_AppendInt32(_fsf0, (2026090614));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -4079,7 +4079,7 @@ void SC_AC__AutoSub2(SCNode* Scope, JB_String* Name, Array* Found, int Types, Me
 		JB_String* Key = JB_Nav_Name(Within);
 		SC_AC__AutoSub3(Value, Key, Found, Name, Types, TypeLimiter);
 	};
-	if (SC_SCObject_SyntaxIs(Scope, kSC__SCNodeInfo_AllowLinkedLists)) {
+	if (SC_SCObject_SyntaxIs(Scope, kSC__SCObjInfo_AllowLinkedLists)) {
 		SCDecl* Value = Scope->LocalVarList;
 		while (Value) {
 			SC_AC__AutoSub3(Value, Value->Name, Found, Name, Types, TypeLimiter);
@@ -5654,7 +5654,7 @@ void SC_LibStability__StabiliseSub2(FastString* Fs, Array* List, bool IsFunc) {
 			if (Obj == nil) {
 				break;
 			}
-			if (((!SC_SCObject_SyntaxIs(Obj, kSC__SCNodeInfo_LibInternal))) and ((!IsFunc) or SC_Func_NeedsStableID(((SCFunction*)Obj)))) {
+			if (((!SC_SCObject_SyntaxIs(Obj, kSC__SCObjInfo_LibInternal))) and ((!IsFunc) or SC_Func_NeedsStableID(((SCFunction*)Obj)))) {
 				SC_SCObject_MakeID(Obj, Fs, Table, IsFunc);
 			}
 			(++_if0);
@@ -6334,7 +6334,7 @@ bool SC_PackMaker__NeedsPackExport(SCClass* Self, int LibOrPack) {
 	if (!(SC_Class_IsObject(Self) and ((!Self->IsRole) and (!SC_Class_IsBehaviourTable(Self))))) {
 		return nil;
 	}
-	bool IsLibLike = SC_Base_IsLibrary(Self) and ((!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_EmbeddedOnly)));
+	bool IsLibLike = SC_Base_IsLibrary(Self) and ((!SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_EmbeddedOnly)));
 	if (IsLibLike) {
 		if (!(LibOrPack & kSC__PackMaker_kLib)) {
 			return nil;
@@ -10229,7 +10229,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026090417));
+	JB_FS_AppendInt32(_fsf0, (2026090614));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -11586,6 +11586,8 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[3], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_nil)))));
 	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[56], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_real)))));
 	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1505], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_description)))));
+	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1998], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCObject__StatelessFn)))));
+	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1999], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCObject__StatelessFn)))));
 	JB_SetRef(SC_FuncLinkageTable, (JB_Dict_Constructor(nil)));
 	(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1483], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncLinkageTable_cpp_wrapper)))));
 	(JB_Dict_ValueSet(SC_FuncLinkageTable, JB_LUB[1481], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncLinkageTable_cpp_part)))));
@@ -11606,8 +11608,8 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1994], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_sort_properties)))));
 	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1996], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_tighten)))));
 	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1997], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_wrapper)))));
-	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1998], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_stateless)))));
-	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1999], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_stateful)))));
+	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1998], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCObject__Stateless)))));
+	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1999], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCObject__Stateless)))));
 	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1491], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_datatype)))));
 	(JB_Dict_ValueSet(SC_ClassOrModuleLinkage, JB_LUB[1793], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClassOrModuleLinkage_numeric)))));
 	JB_SetRef(SC_RootCollectTable, (JB_Dict_Constructor(nil)));
@@ -11840,7 +11842,7 @@ bool SC_ClassOrModuleLinkage_datatype(SCFunction* Fn, Message* Node, SCNode* Nam
 }
 
 bool SC_ClassOrModuleLinkage_embedded(SCFunction* Fn, Message* Node, SCNode* Name_space) {
-	SC_Base_SetLibOrEmbed(Name_space, Node, kSC__SCNodeInfo_EmbeddedOnly);
+	SC_SCObject_SetLibOrEmbed(Name_space, Node, kSC__SCObjInfo_EmbeddedOnly);
 	return false;
 }
 
@@ -11853,7 +11855,7 @@ bool SC_ClassOrModuleLinkage_libinternal(SCFunction* Fn, Message* Node, SCNode* 
 	JB_Incr(_tmPf0);
 	bool V = JB_Msg_Yes(_tmPf0, true);
 	JB_Decr(_tmPf0);
-	((SC_SCObject_SyntaxIsSet(Name_space, kSC__SCNodeInfo_LibInternalAll, V)));
+	((SC_SCObject_SyntaxIsSet(Name_space, kSC__SCObjInfo_LibInternalAll, V)));
 	return false;
 }
 
@@ -11893,22 +11895,6 @@ bool SC_ClassOrModuleLinkage_sort_properties(SCFunction* Fn, Message* Node, SCNo
 		JB_Incr(_tmPf0);
 		((SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_SortsProperties, JB_Msg_Yes(_tmPf0, true))));
 		JB_Decr(_tmPf0);
-	}
-	return false;
-}
-
-bool SC_ClassOrModuleLinkage_stateful(SCFunction* Fn, Message* Node, SCNode* Name_space) {
-	if (JB_Object_MustBe(Name_space, &SCClassData, Node)) {
-		(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Stateful, true));
-		SC_Class_CheckStateful(((SCClass*)Name_space), Node);
-	}
-	return false;
-}
-
-bool SC_ClassOrModuleLinkage_stateless(SCFunction* Fn, Message* Node, SCNode* Name_space) {
-	if (JB_Object_MustBe(Name_space, &SCClassData, Node)) {
-		(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Stateless, true));
-		SC_Class_CheckStateful(((SCClass*)Name_space), Node);
 	}
 	return false;
 }
@@ -12696,7 +12682,7 @@ bool SC_FuncPreReader_disabled(SCFunction* Self, Message* Msg) {
 }
 
 bool SC_FuncPreReader_embedded(SCFunction* Self, Message* Msg) {
-	SC_Base_SetLibOrEmbed(Self, Msg, kSC__SCNodeInfo_EmbeddedOnly);
+	SC_SCObject_SetLibOrEmbed(Self, Msg, kSC__SCObjInfo_EmbeddedOnly);
 	return false;
 }
 
@@ -16837,7 +16823,7 @@ ASMReg SC_ASMType__ASMFunction(Assembler* Self, Message* Exp, ASMReg Dest) {
 	if ((!Fn->ProtoType) or (Fn->ASMAndCpp != 3)) {
 		FatASM* Fat = SC_Pac_ASMCall(Self, Exp, Dest, Fn, TableID, Regs, C);
 		SC_Pac_GrabbedRegisters(Self, Exp, Start, Fat);
-		return SC_FAT_AsReg(Fat, Dest);
+		return Fat->Info;
 	}
 	ASMReg HighBit = SC_Pac_TempMe(Self, ((ASMReg)kJB__TC_uint64));
 	FatASM* Branch = SC_Msg_JTST(Exp, SC_Reg__NewWithInt(TableID), 63, nil);
@@ -16848,7 +16834,7 @@ ASMReg SC_ASMType__ASMFunction(Assembler* Self, Message* Exp, ASMReg Dest) {
 	SC_FAT_JumpToSet(J, SC_Pac_Curr(Self));
 	SC_FAT_JumpToSet(Branch, Fn2);
 	SC_Pac_GrabbedRegisters(Self, Exp, Start, Fn2);
-	return SC_FAT_AsReg(Fn2, Dest);
+	return Fn2->Info;
 }
 
 ASMReg SC_ASMType__BoolNot(Assembler* Self, Message* Exp, ASMReg Dest) {
@@ -18236,7 +18222,6 @@ bool SC_SCNodeFindMode_SyntaxIs(SCNodeFindMode Self, SCNodeFindMode M) {
 }
 
 
-
 bool SC_SCNodeType_HasASMPtrs(SCNodeType Self) {
 	return Self >= kSC__SCNodeType_Struct;
 }
@@ -18248,6 +18233,7 @@ bool SC_SCNodeType_HasPtrs(SCNodeType Self) {
 bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D) {
 	return Self == D;
 }
+
 
 
 
@@ -20010,7 +19996,12 @@ NilState SC_nil__NilFunction(Message* Msg, NilCheckMode Test) {
 	if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_Killer)) {
 		SC_nil__DeclKill();
 		if ((SC_nil_BranchDepth((&SC__nil_T)) == 0) and (!SC__nil_T.AnyReturns)) {
-			(SC_Func_SyntaxIsSet(SC_Func__CurrFunc(), kSC__FunctionType_Killer, true));
+			SCFunction* F = SC_Func__CurrFunc();
+			if (SC_SCObject_SyntaxIs(((SCNode*)F), kSC__SCObjInfo_Stateless)) {
+				JB_Msg_Fail(Msg, JB_LUB[2415]);
+				return 0;
+			}
+			(SC_Func_SyntaxIsSet(F, kSC__FunctionType_Killer, true));
 		}
 		SC_Msg_LastInBlock(Msg, kSC__SCBlockage_Quit);
 		return kSC__NilState_Killer;
@@ -20790,9 +20781,6 @@ byte SC_FAT_CurrGrabID(FatASM* Self) {
 
 void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value) {
 	(SC_FAT_ConstSet(Self, Value));
-}
-
-void SC_FAT_DebugPrint(FatASM* Self, int Level) {
 }
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh) {
@@ -21736,7 +21724,7 @@ void SC_InlineInfo_NopParams(InlineInfo* Self, int N, ASMReg Ret, Assembler* Sh)
 			SC_Pac_Decr(Sh, F, kSC__FatNopMode_Hard, 0);
 		}
 		 else if (!(SC_Reg_OperatorIz(R, Ret))) {
-			if (F and ((!F->RefCount) and SC_FAT_GuessSize(F))) {
+			if (F and ((!F->RefCount) and (SC_FAT_GuessSize(F) and SC_FAT_IsStateless(F)))) {
 				if (SC_Pac_IsWithinCurrInline(Sh, F)) {
 					SC_Pac_Nop(Sh, F);
 				}
@@ -22320,7 +22308,7 @@ ASMReg SC_Pac_ASMBoolMaker(Assembler* Self, Message* Exp, ASMReg Dest, OpMode Op
 FatASM* SC_Pac_ASMCall(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* Fn, int TableID, ASMReg* Regs, bool Cpp) {
 	uint64 P = SC_Pac_EncodeParams(Self, ((Message*)JB_Ring_Last(Exp)), Fn, Cpp, Regs);
 	uint64 PExt = P >> 32;
-	Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_StatelessFunc, (SC_Func_SyntaxIs(Fn, kSC__FunctionType_Stateless))));
+	Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_StatelessFunc, (SC_SCObject_SyntaxIs(((SCObject*)Fn), kSC__SCObjInfo_Stateless))));
 	FatASM* Fat = SC_Msg_FNC(Exp, Dest, TableID, P, PExt);
 	int NArgs = JB_Array_Size(Fn->Args);
 	u16* Inputs = (&Fat->Inputs[0]);
@@ -22351,13 +22339,14 @@ FatASM* SC_Pac_ASMCall(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* F
 		(SC_FAT__opSet(Fat, kSC__ASM_FNC3));
 	}
 	SC_Pac_Trash(Self, SC_Reg_Reg(Dest));
-	if (!SC_Func_SyntaxIs(Fn, kSC__FunctionType_Stateless)) {
+	if (!SC_SCObject_SyntaxIs(((SCObject*)Fn), kSC__SCObjInfo_Stateless)) {
 		SC_FAT_Incr(Fat);
 	}
 	if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_Killer)) {
 		Dest = kSC__Reg_Exit;
 		SC_FAT_Incr(Fat);
 	}
+	Dest = (SC_FAT_AsReg(Fat, Dest));
 	return Fat;
 }
 
@@ -23351,13 +23340,14 @@ ASMReg SC_Pac_DoMathSub(Assembler* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn)
 		return nil;
 	}
 	Message* First = ((Message*)JB_Ring_First(Exp));
+	Message* Last = ((Message*)JB_Ring_Last(Exp));
 	uint64 Closer = SC_Pac_OpenVars(Self);
 	if (JB_Tree_IsLast(First)) {
 		Ml = SC_Pac_GetASM(Self, First, Dest);
 	}
 	 else {
 		if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_NewlyDeclared)) {
-			Ml = SC_Pac_xC2xB5GetPrms(Self, First, SC_Msg_ASMAllowsTemp(((Message*)JB_Ring_Last(Exp))));
+			Ml = SC_Pac_xC2xB5GetPrms(Self, First, SC_Msg_ASMAllowsTemp(Last));
 		}
 		 else {
 			Ml = SC_Pac_GetASM(Self, First, SC_Reg_xC2xB5TypeSetWithTC(Dest, 0));
@@ -23368,7 +23358,7 @@ ASMReg SC_Pac_DoMathSub(Assembler* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn)
 		if (Self->EntireInlineFailed) {
 			return nil;
 		}
-		Mr = SC_Pac_GetASM(Self, ((Message*)JB_Ring_Last(Exp)), Mr);
+		Mr = SC_Pac_GetASM(Self, Last, Mr);
 	}
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Discard)) {
 		SC_Pac_AskNopTempWithReg(Self, Ml);
@@ -23386,14 +23376,7 @@ ASMReg SC_Pac_DoMathSub(Assembler* Self, Message* Exp, ASMReg Dest, fn_OpASM Fn)
 	SC_Pac_CloseVars(Self, Closer, nil, nil);
 	Dest = SC_Pac_TempTypedWithMsgReg(Self, Exp, Dest);
 	Dest = (SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Const, (SC_Reg_SyntaxIs(SC_Reg_OperatorBitand(Ml, Mr), kSC__Reg_Const))));
-	Message* Op = ({
-		Message* _t = ((Message*)((Message*)JB_Tree_Second(Exp)));
-		if (!_t) {
-			_t = ((Message*)JB_Ring_First(Exp));
-		}
-		 (_t);
-	});
-	Rz = (Fn)(Self, Op, Dest, Ml, Mr);
+	Rz = (Fn)(Self, ((Message*)JB_Tree_Second(Exp)), Dest, Ml, Mr);
 	Rz = SC_Reg_ExpectSameType(Rz, Dest);
 	return Rz;
 }
@@ -24886,9 +24869,6 @@ void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B) {
 void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, int Depth) {
 	if (!SC_FatNopMode_SyntaxIs(NopMode, kSC__FatNopMode_Rewind)) {
 		if (!SC_FAT_IsStateless(Fat)) {
-			adb(-1);
-			SC_FAT_DebugPrint(Fat, -1);
-			JB_DoAt(1);
 			return;
 		}
 	}
@@ -25020,19 +25000,29 @@ uint64 SC_Pac_OpenVars(Assembler* Self) {
 }
 
 ASMReg SC_Pac_OptFMul(Assembler* Self, ASMReg Dest, ASMReg Mul, ASMReg Add) {
-	FatASM* Fat = SC_Reg_FAT(Mul);
-	if (!SC_Pac_IsCurrBlockWithFATASM(Self, Fat, kSC__ASM_FMUL)) {
+	FatASM* FatMul = SC_Reg_FAT(Mul);
+	if (!SC_Pac_IsCurrBlockWithFATASM(Self, FatMul, kSC__ASM_FMUL)) {
 		return nil;
 	}
-	if (!((SC_FAT_SyntaxIs(Fat, kSC__Reg_Temp)) or (SC_Reg_OperatorIz(Dest, Fat->Info)))) {
+	if (!((SC_FAT_SyntaxIs(FatMul, kSC__Reg_Temp)) or (SC_Reg_OperatorIz(Dest, FatMul->Info)))) {
 		return nil;
 	}
-	ASMParam P3 = SC_FAT_p3(Fat);
-	if (!SC_ASMParam_Reg(P3)) {
-		(SC_FAT_Prm(Fat, 3, Add));
-		return SC_FAT_AsReg(Fat, Dest);
+	if (SC_FAT_RegOnly(FatMul, 3)) {
+		return nil;
 	}
-	return ((ASMReg)0);
+	FatASM* FatAdd = SC_Reg_FAT(Add);
+	if (FatAdd and (FatAdd > FatMul)) {
+		if (!SC_Reg_SyntaxIs(Add, kSC__Reg_Temp)) {
+			return nil;
+		}
+		FatASM Swap = FatMul[0];
+		FatMul[0] = FatAdd[0];
+		FatAdd[0] = Swap;
+		Add = SC_Reg_FatIndexSet(Add, SC_Reg_FatIndex(Mul));
+		FatMul = FatAdd;
+	}
+	(SC_FAT_Prm(FatMul, 3, Add));
+	return SC_FAT_AsReg(FatMul, Dest);
 }
 
 ASMReg SC_Pac_PackGlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest, int64 ExportPos) {
@@ -25145,7 +25135,7 @@ void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, u
 						0;
 					}
 					 else {
-						FatASM* Phi = SC_Msg_PHI(Exp, SC_Reg__NewWithInt(Reg), SC_Reg__New(Reg, SC_FAT_Index(F1)), SC_Reg__New(Reg, SC_FAT_Index(F2)));
+						FatASM* Phi = SC_Msg_PHI(Exp, F1->Info, SC_Reg__New(Reg, SC_FAT_Index(F1)), SC_Reg__New(Reg, SC_FAT_Index(F2)));
 						Phi->Prms[3] = Liftup;
 					}
 				}
@@ -25642,6 +25632,8 @@ void SC_Pac_RevertFAT(Assembler* Self, bool Check, int TrapCount) {
 	uint T = Self->BackupTotal;
 	int T0 = T - Amount;
 	Self->BackupTotal = T0;
+	;
+	;
 }
 
 void SC_Pac_Rewind(Assembler* Self, FatASM* Start, FatASM* After) {
@@ -32026,19 +32018,26 @@ bool SC_SCObject_CanLinkFrom(SCObject* Self, SCFunction* Fn) {
 	return true;
 }
 
+void SC_SCObject_CheckStateful(SCObject* Self, Message* Node) {
+	if (!((!SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_Stateful)) or (!SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_Stateless)))) {
+		JB_Msg_Fail(Node, JB_LUB[523]);
+		return;
+	}
+}
+
 SCObject* SC_SCObject_Constructor(SCObject* Self) {
 	if (Self == nil) {
 		Self = ((SCObject*)JB_NewClass(&SCObjectData));
 	}
 	Self->CurrFuncLink = 0;
-	Self->GPackID = 0;
 	Self->NoAutoComplete = 0;
 	Self->AllocSource = 0;
+	Self->GPackID = 0;
 	Self->FPackID = 0;
 	Self->Source = nil;
 	JB_Incr2(Self->Name, JB_LUB[0]);
 	JB_Incr2(Self->ExportName, JB_LUB[0]);
-	Self->NodeInfo = SC__Comp_InBuiltType;
+	Self->SCObjInfo = SC__Comp_InBuiltType;
 	Self->LinkFrom = nil;
 	return Self;
 }
@@ -32095,11 +32094,11 @@ SCFile* SC_SCObject_File(SCObject* Self) {
 }
 
 bool SC_SCObject_IsVisible(SCObject* Self) {
-	return SC_SCObject_SyntaxIs(Self, kSC__SCNodeInfo_Visible);
+	return SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_Visible);
 }
 
 void SC_SCObject_IsVisibleSet(SCObject* Self, bool Value) {
-	((SC_SCObject_SyntaxIsSet(Self, kSC__SCNodeInfo_Visible, Value)));
+	((SC_SCObject_SyntaxIsSet(Self, kSC__SCObjInfo_Visible, Value)));
 }
 
 void SC_SCObject_MakeID(SCObject* Self, FastString* Fs, void** Table, bool IsFunc) {
@@ -32220,6 +32219,24 @@ JB_String* SC_SCObject_Render(SCObject* Self, FastString* Fs_in) {
 	return _tmPf0;
 }
 
+void SC_SCObject_SetLibOrEmbed(SCObject* Self, Message* Node, uint /*SCObjInfo*/ Info) {
+	while (Self) {
+		uint I = Self->SCObjInfo | Info;
+		int Clash = kSC__SCObjInfo_Clash;
+		if ((I & Clash) == Clash) {
+			JB_Msg_Fail(Node, JB_LUB[1604]);
+			return;
+		}
+		Self->SCObjInfo = I;
+		if (JB_Object_FastIsa(Self, &SCClassData)) {
+			Self = ((SCClass*)((SCClass*)Self)->Modul);
+		}
+		 else {
+			return;
+		}
+	};
+}
+
 bool SC_SCObject_syntaxequals(SCObject* Self, JB_String* Name) {
 	;
 	//visible;
@@ -32231,19 +32248,19 @@ void SC_SCObject_Fail(SCObject* Self, JB_String* Error) {
 	JB_Rec__NewError(Self->Source, Error, nil);
 }
 
-bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCNodeInfo*/ I) {
-	return ((bool)(Self->NodeInfo & I));
+bool SC_SCObject_SyntaxIs(SCObject* Self, uint /*SCObjInfo*/ I) {
+	return ((bool)(Self->SCObjInfo & I));
 }
 
-void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCNodeInfo*/ I, bool Value) {
-	uint X = Self->NodeInfo;
+void SC_SCObject_SyntaxIsSet(SCObject* Self, uint /*SCObjInfo*/ I, bool Value) {
+	uint X = Self->SCObjInfo;
 	if (Value) {
 		X = (X | I);
 	}
 	 else {
 		X = (X & (~I));
 	}
-	Self->NodeInfo = X;
+	Self->SCObjInfo = X;
 }
 
 SCFunction* SC_SCObject_TheIsFunc2(SCObject* Self, Message* Err) {
@@ -32334,6 +32351,21 @@ JB_String* SC_SCObject_UnusedStr(SCObject* Self, JB_String* Name) {
 	JB_EarlyDecr(Fs);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
+}
+
+bool SC_SCObject__Stateless(SCFunction* Fn, Message* Node, SCNode* Name_space) {
+	if (JB_Msg_SyntaxEquals(Node, JB_LUB[1998], true)) {
+		(SC_SCObject_SyntaxIsSet(Name_space, kSC__SCObjInfo_Stateless, true));
+	}
+	 else {
+		(SC_SCObject_SyntaxIsSet(Name_space, kSC__SCObjInfo_Stateful, true));
+	}
+	SC_SCObject_CheckStateful(Name_space, Node);
+	return true;
+}
+
+bool SC_SCObject__StatelessFn(SCFunction* Self, Message* Msg) {
+	return SC_SCObject__Stateless(nil, Msg, Self);
 }
 
 
@@ -45321,11 +45353,11 @@ bool SC_Decl_AddToGlobs(SCDecl* Self) {
 	if (SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Library) and (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_ClassObj))) {
 		SCFunction* Fn = SC_Decl_Func(Self);
 		if (Fn) {
-			if (SC_SCObject_SyntaxIs(((SCNode*)Fn), kSC__SCNodeInfo_LibInternal)) {
+			if (SC_SCObject_SyntaxIs(((SCNode*)Fn), kSC__SCObjInfo_LibInternal)) {
 				return true;
 			}
 		}
-		if ((!Fn) or ((!SC_SCObject_SyntaxIs(((SCNode*)Fn), kSC__SCNodeInfo_EmbeddedOnly)))) {
+		if ((!Fn) or ((!SC_SCObject_SyntaxIs(((SCNode*)Fn), kSC__SCObjInfo_EmbeddedOnly)))) {
 			JB_Array_SyntaxAppend(SC__PackMaker_LibGlobs, Self);
 			return true;
 		}
@@ -45407,7 +45439,7 @@ bool SC_Decl_ASMIsPack(SCDecl* Self) {
 	}
 	JB_Object* Fn = Self->IsLookupOnly;
 	if (JB_Object_FastIsa(Fn, &SCFunctionData)) {
-		return SC_SCObject_SyntaxIs(((SCNode*)((SCFunction*)Fn)), kSC__SCNodeInfo_EmbeddedOnly);
+		return SC_SCObject_SyntaxIs(((SCNode*)((SCFunction*)Fn)), kSC__SCObjInfo_EmbeddedOnly);
 	}
 	return false;
 }
@@ -48312,7 +48344,7 @@ SCIterator* SC_Iter__SimpleIter(JB_String* Src) {
 
 
 void SC_Base_ActualAdd(SCNode* Self, JB_String* Name, SCObject* IncObj) {
-	if (SC_SCObject_SyntaxIs(Self, kSC__SCNodeInfo_AllowLinkedLists) and JB_Object_FastIsa(IncObj, &SCDeclData)) {
+	if (SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_AllowLinkedLists) and JB_Object_FastIsa(IncObj, &SCDeclData)) {
 		JB_SetRef(((SCDecl*)IncObj)->LocalVarList, Self->LocalVarList);
 		JB_SetRef(Self->LocalVarList, IncObj);
 		return;
@@ -49148,7 +49180,7 @@ void SC_Base_ImportFile(SCNode* Self, SCFile* File) {
 bool SC_Base_IsLibrary(SCNode* Self) {
 	SCImport* P = Self->Project;
 	if (P) {
-		if (!SC_SCObject_SyntaxIs(Self, kSC__SCNodeInfo_EmbeddedOnly)) {
+		if (!SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_EmbeddedOnly)) {
 			return P->IsLibraryImp;
 		}
 	}
@@ -49510,7 +49542,7 @@ void SC_Base_MakeLibInternal(SCNode* Self, Message* Node) {
 		}
 	}
 	Self->NoAutoComplete = 2;
-	SC_Base_SetLibOrEmbed(Self, Node, kSC__SCNodeInfo_LibInternal);
+	SC_SCObject_SetLibOrEmbed(Self, Node, kSC__SCObjInfo_LibInternal);
 }
 
 SCModule* SC_Base_Module(SCNode* Self) {
@@ -49641,24 +49673,6 @@ Message* SC_Base_Route(SCNode* Self, JB_String* Name) {
 	return Rz;
 }
 
-void SC_Base_SetLibOrEmbed(SCNode* Self, Message* Node, uint /*SCNodeInfo*/ Info) {
-	while (Self) {
-		uint I = Self->NodeInfo | Info;
-		int Clash = kSC__SCNodeInfo_Clash;
-		if ((I & Clash) == Clash) {
-			JB_Msg_Fail(Node, JB_LUB[1604]);
-			return;
-		}
-		Self->NodeInfo = I;
-		if (JB_Object_FastIsa(Self, &SCClassData)) {
-			Self = ((SCClass*)((SCClass*)Self)->Modul);
-		}
-		 else {
-			return;
-		}
-	};
-}
-
 SCClass* SC_Base_ShouldBeClass(SCNode* Self, Message* Errplace) {
 	SCClass* _tmPf0 = SC_Base_IsNormalObject(Self);
 	JB_Incr(_tmPf0);
@@ -49710,7 +49724,7 @@ SCObject* SC_Base_SyntaxAccessWithMsg(SCNode* Self, Message* S) {
 }
 
 SCObject* SC_Base_SyntaxAccessWithStr(SCNode* Self, JB_String* S) {
-	if (SC_SCObject_SyntaxIs(Self, kSC__SCNodeInfo_AllowLinkedLists)) {
+	if (SC_SCObject_SyntaxIs(Self, kSC__SCObjInfo_AllowLinkedLists)) {
 		SCDecl* V = Self->LocalVarList;
 		while (V) {
 			if (JB_Str_Equals(V->Name, S, true)) {
@@ -49730,7 +49744,7 @@ JB_String* SC_Base_TestExportName(SCNode* Self, JB_String* S, bool Explicit) {
 		return S;
 	}
 	if (!Explicit) {
-		if ((!SC_SCObject_SyntaxIs(O, kSC__SCNodeInfo_ExplicitExport))) {
+		if ((!SC_SCObject_SyntaxIs(O, kSC__SCObjInfo_ExplicitExport))) {
 			SC_SCObject_RehomeExport(O);
 		}
 		//AAAA;
@@ -49744,7 +49758,7 @@ JB_String* SC_Base_TestExportName(SCNode* Self, JB_String* S, bool Explicit) {
 		JB_Decr(It);
 		//BBBB;
 	}
-	 else if (!SC_SCObject_SyntaxIs(O, kSC__SCNodeInfo_ExplicitExport)) {
+	 else if (!SC_SCObject_SyntaxIs(O, kSC__SCObjInfo_ExplicitExport)) {
 		if (SC_SCObject_RehomeExport(O)) {
 			JB_EarlyDecr(O);
 			return S;
@@ -51282,7 +51296,7 @@ SCArg* SC_Arg_Constructor(SCArg* Self, Message* Node) {
 	Self->IsStatementExpr = false;
 	Self->IsClassArg = false;
 	Self->TmpMovedOutFor = nil;
-	(SC_SCObject_SyntaxIsSet(Self, kSC__SCNodeInfo_AllowLinkedLists, true));
+	(SC_SCObject_SyntaxIsSet(Self, kSC__SCObjInfo_AllowLinkedLists, true));
 	Self->HasEscape = true;
 	return Self;
 }
@@ -51745,7 +51759,7 @@ void SC_SCBetterNode_SetExportName(SCBetterNode* Self, JB_String* Name, bool Exp
 		}
 		(JB_Dict_ValueSet(SC__Comp_ExportNames, S, Self));
 	}
-	((SC_SCObject_SyntaxIsSet(Self, kSC__SCNodeInfo_ExplicitExport, Explicit)));
+	((SC_SCObject_SyntaxIsSet(Self, kSC__SCObjInfo_ExplicitExport, Explicit)));
 	JB_SetRef(Self->ExportName, S);
 	JB_Decr(S);
 }
@@ -52214,13 +52228,6 @@ void SC_Class_CheckItersAndVirtuals(SCClass* Self) {
 	}
 	;
 	SC_Class_CheckBehaviours(Self);
-}
-
-void SC_Class_CheckStateful(SCClass* Self, Message* Node) {
-	if (!((!SC_Class_SyntaxIs(Self, kSC__ClassInfo_Stateful)) or (!SC_Class_SyntaxIs(Self, kSC__ClassInfo_Stateless)))) {
-		JB_Msg_Fail(Node, JB_LUB[523]);
-		return;
-	}
 }
 
 void SC_Class_CheckUnusedClass(SCClass* Self, Message* Feedback) {
@@ -54171,7 +54178,7 @@ SCClass* SC_Class__NeuClassSub(Message* Node, SCNode* Parent, Message* ErrPlace,
 		Cls->TypeInfo = kJB__TC__voidptr;
 	}
 	 else if (SC_Class_IsDataTypeOrFP(Cls)) {
-		(SC_Class_SyntaxIsSet(Cls, kSC__ClassInfo_Stateless, true));
+		(SC_SCObject_SyntaxIsSet(((SCNode*)Cls), kSC__SCObjInfo_Stateless, true));
 		if (SC_SCNodeType_SyntaxIs(Base, kSC__SCNodeType_ProtoType)) {
 			Cls->TypeInfo = kJB__TC__voidptr;
 		}
@@ -55591,7 +55598,7 @@ void SC_Func_CheckUnusedArgs(SCFunction* Self, Message* Feedback) {
 }
 
 void SC_Func_CheckUsedProperly(SCFunction* Self, Message* Exp) {
-	if ((SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibInternal)) or ((SC_Func_SyntaxIs(Self, kSC__FunctionType_ExternalLib)) and SC_Options__ModeCake())) {
+	if ((SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_LibInternal)) or ((SC_Func_SyntaxIs(Self, kSC__FunctionType_ExternalLib)) and SC_Options__ModeCake())) {
 		SCFunction* Curr = SC_Func__CurrFunc();
 		if (Curr and ((!SC_Base_IsLibrary(Curr)) and (Self->Project != Curr->Project))) {
 			if (true) {
@@ -56075,7 +56082,7 @@ SCDecl* SC_Func_DeclsProtoTypeAdd(SCFunction* Self, SCClass* fpType) {
 	SCFunction* Orig = fpType->FuncProto;
 	if (Orig) {
 		bool Cpp = SC_Func_HasCVersion(Self);
-		if (SC_SCObject_SyntaxIs(((SCNode*)Orig), kSC__SCNodeInfo_LibInternal)) {
+		if (SC_SCObject_SyntaxIs(((SCNode*)Orig), kSC__SCObjInfo_LibInternal)) {
 			if ((!Cpp)) {
 				SC_SCObject_Fail(Self, JB_Str_OperatorPlus(fpType->Name, JB_LUB[2346]));
 			}
@@ -56289,13 +56296,13 @@ void SC_Func_DoLinkToDecl(SCFunction* Self, SCDecl* Decl) {
 }
 
 void SC_Func_DoLinkToNode(SCFunction* Self, SCNode* To) {
-	if (SC_SCObject_SyntaxIs(To, kSC__SCNodeInfo_InBuiltDataType)) {
+	if (SC_SCObject_SyntaxIs(To, kSC__SCObjInfo_InBuiltDataType)) {
 		return;
 	}
 	if (!SC_SCObject_CanLinkFrom(To, Self)) {
 		return;
 	}
-	if (SC_Base_IsLibrary(To) and ((SC_SCObject_SyntaxIs(To, kSC__SCNodeInfo_LibInternal)) and SC_Base_IsLibrary(Self))) {
+	if (SC_Base_IsLibrary(To) and ((SC_SCObject_SyntaxIs(To, kSC__SCObjInfo_LibInternal)) and SC_Base_IsLibrary(Self))) {
 		if (SC_Func_SyntaxIs(Self, kSC__FunctionType_LinkInline)) {
 			SC_SCObject_Fail(Self, JB_LUB[2183]);
 		}
@@ -56924,10 +56931,10 @@ void SC_Func_Init_Sub(SCFunction* Self, Message* Node, SCNode* Name_space) {
 	}
 	SC_Func_ParseName(Self, Node);
 	if (Name_space) {
-		if (SC_SCObject_SyntaxIs(Name_space, kSC__SCNodeInfo_EmbeddedOnly)) {
-			(SC_SCObject_SyntaxIsSet(((SCNode*)Self), kSC__SCNodeInfo_EmbeddedOnly, true));
+		if (SC_SCObject_SyntaxIs(Name_space, kSC__SCObjInfo_EmbeddedOnly)) {
+			(SC_SCObject_SyntaxIsSet(((SCNode*)Self), kSC__SCObjInfo_EmbeddedOnly, true));
 		}
-		if (SC_SCObject_SyntaxIs(Name_space, kSC__SCNodeInfo_LibInternalAll)) {
+		if (SC_SCObject_SyntaxIs(Name_space, kSC__SCObjInfo_LibInternalAll)) {
 			SC_Base_MakeLibInternal(Self, Node);
 		}
 	}
@@ -57043,7 +57050,7 @@ bool SC_Func_IsUnused(SCFunction* Self) {
 	if (MR and (MR != SC__Comp_VisibleFuncs)) {
 		return false;
 	}
-	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_EmbeddedOnly)) {
+	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_EmbeddedOnly)) {
 		return false;
 	}
 	if (SC_SCObject_IsVisible(Self) and SC_Base_IsLibrary(Self)) {
@@ -57206,10 +57213,10 @@ bool SC_Func_NeedsLibExport(SCFunction* Self) {
 	if (Self->IsMacro) {
 		return nil;
 	}
-	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibInternal)) {
+	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_LibInternal)) {
 		return nil;
 	}
-	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_EmbeddedOnly)) {
+	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_EmbeddedOnly)) {
 		return nil;
 	}
 	if (Self->IsCppInBuilt >= 2) {
@@ -57227,11 +57234,11 @@ bool SC_Func_NeedsLibExport(SCFunction* Self) {
 }
 
 bool SC_Func_NeedsStableID(SCFunction* Self) {
-	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_EmbeddedOnly)) {
+	if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_EmbeddedOnly)) {
 		return nil;
 	}
 	if (((!Self->IsMacro)) and ((!SC_Func_SyntaxIs(Self, kSC__FunctionType_Disabled)) and (!SC_Func_SyntaxIs(Self, kSC__FunctionType_LinkInline)))) {
-		if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCNodeInfo_LibInternal)) {
+		if (SC_SCObject_SyntaxIs(((SCNode*)Self), kSC__SCObjInfo_LibInternal)) {
 		}
 		return true;
 	}
@@ -57730,8 +57737,11 @@ void SC_Func_StatelessAccumulate(SCFunction* Self) {
 	if (!SC_Func_SyntaxIs(Self, kSC__FunctionType_Cpp)) {
 		return;
 	}
-	SCClass* C = Self->Cls;
-	if (!(C and SC_Class_SyntaxIs(C, kSC__ClassInfo_Stateless))) {
+	if (SC_SCObject_SyntaxIs(((SCObject*)Self), kSC__SCObjInfo_Stateful)) {
+		return;
+	}
+	SCObject* C = Self->Cls;
+	if (!(C and SC_SCObject_SyntaxIs(C, kSC__SCObjInfo_Stateless))) {
 		return;
 	}
 	{
@@ -57742,12 +57752,14 @@ void SC_Func_StatelessAccumulate(SCFunction* Self) {
 			if (P == nil) {
 				break;
 			}
-			if (!SC_Class_SyntaxIs(P->Type, kSC__ClassInfo_Stateless)) {
+			if (!SC_SCObject_SyntaxIs(((SCObject*)P->Type), kSC__SCObjInfo_Stateless)) {
 				return;
 			}
 			(++_if0);
 		};
-	};
+	}
+	;
+	(SC_SCObject_SyntaxIsSet(((SCObject*)Self), kSC__SCObjInfo_Stateless, true));
 }
 
 void SC_Func_StoreExport(SCFunction* Self) {
@@ -57820,12 +57832,9 @@ bool SC_Func_SyntaxIs(SCFunction* Self, FunctionType K) {
 }
 
 void SC_Func_SyntaxIsSet(SCFunction* Self, FunctionType K, bool Value) {
-	if (Value) {
-		Self->FuncInfo = (Self->FuncInfo | K);
-	}
-	 else {
-		Self->FuncInfo = (Self->FuncInfo & (~K));
-	}
+	FunctionType F = Self->FuncInfo & (~K);
+	F = (F | (K * Value));
+	Self->FuncInfo = F;
 }
 
 void SC_Func_Transform(SCFunction* Self) {
@@ -58423,7 +58432,7 @@ SCNode* SC_Func__NewHelper(Message* Node, SCNode* Name_space, Message* ErrPlace)
 	SCNode* Rz = nil;
 	Rz = SC_Func__NewFunc(Node, Name_space, ErrPlace);
 	if (Rz) {
-		(SC_SCObject_SyntaxIsSet(Rz, kSC__SCNodeInfo_Visible, (!true)));
+		(SC_SCObject_SyntaxIsSet(Rz, kSC__SCObjInfo_Visible, (!true)));
 	}
 	return Rz;
 }
@@ -61157,4 +61166,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 2697041787940101025 -6104737243472973047
+// 2841942127082389977 4984237536472928160
