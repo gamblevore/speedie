@@ -325,6 +325,7 @@ datatype vec3
 		return (self * other).sum
 
 	function Reflect (|vec3| plane, |vec3|)
+		opt noinline // make debugging speedie easier
 		return self - 2.0 * (self • plane) * plane
 
 	function Sum (|float|)

@@ -88,27 +88,41 @@ u64 JB_msize(const void* M) {
 #endif
 }
 
-u64 JB_MemUsedString() {
+u64 JB_MemUsedString () {
 	return TotalStringBytes;
 }
 
-u64 JB_MemUsedOther() {
+u64 JB_MemUsedOther () {
 	return TotalOtherBytes;
 }
 
-void JB_Free(const void* Arr) {
+void JB_Free (const void* Arr) {
 	if (Arr) {
 		TotalOtherBytes -= JB_msize(Arr);
 		free((void*)Arr);
     }
 }
 
-void JB_FreeString(const void* Arr) {
+void JB_FreeString (const void* Arr) {
 	if (Arr) {
 		TotalStringBytes -= JB_msize(Arr);
 		free((void*)Arr);
     }
 }
+
+
+//void JB_MemSwap (const void* A, const void* B, int Bytes) {
+//	// could be a faster version but its possible the compiler will optimise this.
+//	// also rarely needed!
+//	byte* a = (byte*)A;
+//	byte* b = (byte*)B;
+//	while (--Bytes >= 0) {
+//		byte aa = *a;
+//		byte bb = *b;
+//		*a++ = bb;
+//		*b++ = aa;
+//	}
+//}
 
 
 
