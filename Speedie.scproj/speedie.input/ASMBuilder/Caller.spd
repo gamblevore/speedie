@@ -283,7 +283,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 
 function assembler.ASMReach (|SCFunction| fn)
 	opt norefcounts
-	|| orig = .out
+	|| orig = .Root_Fn
 	if Orig.MyReacher and !orig.IsLibrary
 		(fn is usedbyasm)
 		if fn is Constructor // gotta reach the destructor also

@@ -43,7 +43,7 @@ struct Assembler
 	target debug
 		|byte|					StackSize
 	|InlineState[8]|			InlineState
-	|scfunction--|				Out
+	|scfunction--|				Root_Fn
 	target debug
 		|(Message--)[32]|		Declarations
 
@@ -254,7 +254,7 @@ struct Assembler
 		if .InlineDepth > 0
 			.FailInline
 		  else
-			error (.out.sourcearg, "No free local variables.")	// entirely full
+			error (.Root_Fn.sourcearg, "No free local variables.")	// entirely full
 		return t
 
 /////////////////////////////////////////////////////////////////
@@ -526,7 +526,7 @@ struct Assembler
 		
 		
 		.inlinestate[0].TailInlineable = true
-		.out = fn
+		.Root_Fn = fn
 		.state.fn = fn
 		SCFunction.CurrFunc = fn
 		.InlineDepthLimit = 3
@@ -539,7 +539,7 @@ struct Assembler
 
 	function CapASM
 		opt norefcounts
-		|| fn = .out
+		|| fn = .Root_Fn
 		|| After = .curr_
 		|| Start = .funcstart
 		fn.µfatlength = After - Start
@@ -555,8 +555,8 @@ struct Assembler
 	
 	function MissingReturn
 		opt norefcounts
-		debugger !.out.ASMReturn
-		|| arg = .out.source!
+		debugger !.Root_Fn.ASMReturn
+		|| arg = .Root_Fn.source!
 		|| Faked = arg.FrenchSpyReturn
 		|| old = arg.position
 		arg.Position = Faked
@@ -570,7 +570,7 @@ struct Assembler
 
 	function Guard
 		opt norefcounts
-		|| ret = .out.SourceArg!
+		|| ret = .Root_Fn.SourceArg!
 		|| l = ret.last
 			ret = l
 		target debug

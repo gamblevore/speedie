@@ -7,13 +7,13 @@ extend Assembler
 		// asm oof (9)
 		opt NoRefCounts
 		|| name = m[@thg]$
-		.out.exportname = name.name
-		.out.name = name.name
+		.Root_Fn.exportname = name.name
+		.Root_Fn.name = name.name
 		|| bra = name.Next(@bra)$
 		|| n = bra[@num].int
 		expect (n>=0 and n<=10) (m, "Too many arguments")
 		for n
-			.out.args <~ TypeInt64!.TypeNormal // :) just ints!
+			.Root_Fn.args <~ TypeInt64!.TypeNormal // :) just ints!
 
 		rz = bra.Next(@arg)
 		rz.expectlast
@@ -69,7 +69,7 @@ extend Assembler
 
 	function LoadLabelJumps (|bool|)
 		opt norefcounts
-		for A.fat in .out
+		for A.fat in .Root_Fn
 			require textassembler.GetLabel(a)
 		return true
 	

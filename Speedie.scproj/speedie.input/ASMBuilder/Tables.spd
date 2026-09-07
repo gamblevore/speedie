@@ -217,7 +217,7 @@ function Return (fn_asm)
 	|| SafeDecr = FinalDecrements(self, exp, Dest)
 		return SafeDecr
 
-	dest = ExpandBits2(self, exp, dest, .out.ASMReturn)	
+	dest = ExpandBits2(self, exp, dest, .Root_Fn.ASMReturn)	
 			
 	|| K = .Const(dest, 8, true)
 	|| HasK = K>=0

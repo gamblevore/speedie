@@ -326,10 +326,14 @@ datatype vec3
 
 	function Reflect (|vec3| plane, |vec3|)
 		opt noinline // make debugging speedie easier
-		return self - 2.0 * (self • plane) * plane
+		|| dot = (self • plane) * 2.0
+		return self - dot * plane
 
 	function Sum (|float|)
-		return .x + .y + .z
+		|| s = .x + .y
+		s = s + .z
+		return s
+//		return .x + .y + .z
 
 	operator x (|vec3| V, |vec3|)
 		cpp_part Cross

@@ -41,7 +41,7 @@ function Assembler.FinishASM
 			if Actual != Predicted		// uugh		
 		S++
 		
-	.out.µASMLength = Length
+	.Root_Fn.µASMLength = Length
 
 
 
@@ -51,11 +51,13 @@ function assembler.TryTail (|fatasm| FNC)
 	|| Ret = Fnc.next
 	require  ret isa asm.ret								// no pext, won't fit in tail.
 	
-	require .out != compiler.MainFunc						// tail in main is kind of a btch...
+	require .Root_Fn != compiler.MainFunc					// tail in main is kind of a btch...
 															// the program closes and we have no idea why.
+	require compiler.MainFunc != interact.OrigFn						// autocomplete also
+	
 	
 	|| rr = ret.regonly
-	|| ReturnType = .out.ReturnType
+	|| ReturnType = .Root_Fn.ReturnType
 	require !returntype or fnc.RegOnly == rr				// returning same var, or nothing at all.
 
 	// If this overwrites params... then we need to copy params
