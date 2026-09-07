@@ -625,7 +625,7 @@ class TextView (GUIControl)
 		return .WrappedLines.last
 	
 		
-	function ShowLine (|int| LineNum, |TextViewJumpMode| Mode=0, |bool| Explode=false)
+	function ShowLine (|int| LineNum, |bool| Explode=false)
 		opt norefcounts
 		|| D = .LineInfo(LineNum)
 			.ShowAndSelect(D.position, Explode)
