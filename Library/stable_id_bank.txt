@@ -631,6 +631,7 @@ GUI_ctrl_SlideOpen_Constructor
 GUI_ctrl_SyntaxEquals
 GUI_ctrl_SyntaxIs
 GUI_ctrl_SyntaxIsSet
+GUI_ctrl_TaskGUI_CancelOthers
 GUI_ctrl_TaskGUI_Constructor
 GUI_ctrl_TaskGUI_TaskProgress
 GUI_ctrl_TaskGUI_interface_SyntaxCall
@@ -1494,7 +1495,6 @@ JB_Str_Squeeze
 JB_Str_StreamWithHeader
 JB_Str_StretchyFind
 JB_Str_SuffixSize
-JB_Str_System
 JB_Str_TabsToSpaces
 JB_Str_TextDouble
 JB_Str_TextIntegerSection
@@ -1742,7 +1742,6 @@ JB_int_OperatorPow
 JB_int_Render
 JB_int_RenderFS
 JB_int_RenderZeros
-JB_int_SetSign
 JB_int_Shrink
 JB_int_Sqrt
 JB_int_SyntaxAccessSet
@@ -1876,7 +1875,6 @@ JB_vec4_Clip
 JB_vec4_CompareVec4
 JB_vec4_CopySign
 JB_vec4_Cos
-JB_vec4_CosR
 JB_vec4_Cross
 JB_vec4_Dot
 JB_vec4_Exists
