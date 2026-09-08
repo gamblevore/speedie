@@ -222,7 +222,7 @@ class TextView (GUIControl)
 	behaviour LostFocus
 		opt norefcounts
 		|| c = .IsInline
-			c.clear(False)
+			c.Clear(False)
 		
 		|| d = .Document
 		if d and !d.FilePath and ((self isnt editable) or .isinline)

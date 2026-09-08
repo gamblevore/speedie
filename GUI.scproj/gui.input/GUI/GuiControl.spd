@@ -615,7 +615,9 @@ class GUIControl (list)
 
 	task SlideOpen (TaskGUI, |movecode| Dir = MoveCode.Open)
 		constructor
-			is animation  // doing this seems to break the system? no idea why.
+			is animation
+			(upon is visible)
+			.CancelOthers(upon)
 		run
 			libinternal
 			|| hide = (progress >= 1.0 and .dir is close)
@@ -641,7 +643,14 @@ class GUIControl (list)
 		constructor						// upon,  StartTime,  duration are automatically set
 			stores_self
 			upon.addtask(self)
-		
+
+		function CancelOthers (|guicontrol| upon)
+			opt norefcounts
+			|| w = upon.window
+				for s in w.tasks
+					if (s != self) and (s._func == ._func) and (s.upon == .upon)
+						s.remove
+			
 		function TaskProgress (|date| now=gui.framestart, |float|)
 			|| d = .duration
 				|| Over = ((Now - .StartTime) max 256)|duration|
