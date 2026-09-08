@@ -2412,3 +2412,4 @@
 "Can't compare two bare-structs."
 "PHI"
 "Multiple-of-4 white-space indent required here."
+"Killer func used in a stateless func"
