@@ -811,7 +811,7 @@ struct Assembler {
 	uint VDecls_;
 	uint VTemps_;
 	InlineState InlineState[8];
-	SCFunction* Out;
+	SCFunction* Root_Fn;
 	u16 DelayedNops[32];
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
