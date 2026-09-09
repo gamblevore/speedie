@@ -380,10 +380,9 @@ function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, 
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
 	
 	rel = rel.last!
-	|| Incr = (.InlineDepth > 0)			// tail
 	rz = .µInto(rel, dest)
-	if incr					// and rel isnt Inserted // what about deliberate syntactic sugar?
-		rz = rz.incrfat		// either way... SOME things could go. like the appinit decls.
+	if !.InlineDepth		// and rel isnt Inserted // would allow syntactic sugars to be nopped, but what about deliberate ones?
+		rz = rz.incrfat		// SOME things should allowed to be nopped. like appinit decls.
 	
 	
 	

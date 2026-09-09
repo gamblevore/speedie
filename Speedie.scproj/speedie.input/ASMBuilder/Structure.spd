@@ -282,6 +282,8 @@ extend assembler
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
 			if (old.RefCount <= 0) and .IsCurrBlock(old)
+				if alterer and old is DebugVarOpen				// like: || a = 1, a = 2 // still needs open!
+					(alterer is DebugVarOpen)
 				.nop_sub(old, fatnopmode.hard)
 		
 		(NopDest isnt AllowNopDest)
