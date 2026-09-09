@@ -3512,7 +3512,7 @@ void SC_FB__CheckSelfModifying() {
 bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026090819));
+	JB_FS_AppendInt32(_fsf0, (2026090913));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -10229,7 +10229,7 @@ int SC_Ext__Init_() {
 void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026090819));
+	JB_FS_AppendInt32(_fsf0, (2026090913));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_PrintLine(_tmPf1);
@@ -16956,9 +16956,8 @@ ASMReg SC_ASMType__DeclSub(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* T
 		return SC_ASMType__AllocBearStruct(1, Exp, Dest, SC_Decl_SizeOfQuery(Ty));
 	}
 	Rel = ((Message*)JB_Ring_Last(Rel));
-	bool Incr = (Self->InlineDepth > 0);
 	Rz = SC_Pac_xC2xB5Into(Self, Rel, Dest);
-	if (Incr) {
+	if (!Self->InlineDepth) {
 		Rz = SC_Reg_IncrFat(Rz);
 	}
 	return Rz;
@@ -25718,6 +25717,9 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Changed, ASMReg NopDest, FatASM* 
 	if (Oldi and (SC_Reg_SyntaxIs(NopDest, kSC__Reg_AllowNopDest))) {
 		FatASM* Old = Self->FuncStart_ + Oldi;
 		if ((Old->RefCount <= 0) and SC_Pac_IsCurrBlockWithFAT(Self, Old)) {
+			if (Alterer and SC_FAT_SyntaxIs(Old, kSC__Reg_DebugVarOpen)) {
+				(SC_FAT_SyntaxIsSet(Alterer, kSC__Reg_DebugVarOpen, true));
+			}
 			SC_Pac_nop_sub(Self, Old, kSC__FatNopMode_Hard, 0);
 		}
 	}
