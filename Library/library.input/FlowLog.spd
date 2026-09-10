@@ -58,7 +58,7 @@ module FlowLog
 	
 	syntax append (|byte| value)
 		visible,  flow off,  opt norefcounts
-		if ._Enabled == 1
+		if .Enabled
 			._Enabled = 0
 			|| f = .flowout
 				f <~ value
@@ -80,8 +80,8 @@ module FlowLog
 	syntax append (|string| value)
 		cpp_part Input, visible, flow off
 
-		require ._Enabled == 0
-		._Enabled = 1
+		require .Enabled
+		._Enabled = 0
 		|| f = .flowout
 			f <~ value
 		  else
@@ -89,7 +89,7 @@ module FlowLog
 			|| b = a.str(value.length)
 			if b != value
 				.fail(value, b)
-		._Enabled = 0
+		._Enabled = 1
 				
 
 	function ForceStart (|string| name,  |bool|)
