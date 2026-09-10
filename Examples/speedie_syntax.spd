@@ -18,8 +18,7 @@ class Person
 
 
 main
-	using flowlog.Attempt("maybe")
-		app.TestSyntax
+	app.TestSyntax
 
 
 function PrintNum (|int64| b1)
