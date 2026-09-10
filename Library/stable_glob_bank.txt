@@ -23,14 +23,12 @@ GUI__Key_Debug
 GUI__SystemCursor_Curr
 JB__TerminalColor_RainbowTerm
 GUI__SDL_Cursor_Nothing
-JB__Flow_Active
-JB__Flow_AlwaysMove
-JB__Flow_BreakOnFail
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
 JB__API_NilHappened_
 JB__Tk__StopBars
+JB__Flow__Enabled
 GUI__App_EventCount
 GUI__App_Scale
 GUI__ScrollInfo_InDrag_
@@ -78,6 +76,8 @@ JB__App__StdOut
 JB__App_Usage
 GUI__Clip__Clip2
 GUI__Clip__InternalCopy
+JB__Flow_CompareAgainst
+JB__Flow_FlowOut
 GUI__App_DrawDrag
 GUI__App_LastSearch
 GUI__App_PendingAlerts
@@ -105,7 +105,6 @@ GUI_xC2xA5
 JB__ErrorSeverity__ErrorNames
 GUI__SDL_Cursor__Empty
 GUI__Sch_DefaultColors
-JB__Flow_Flow
 GUI__Doc_Cache_
 GUI__Img_CurlieQue_
 GUI__SpaceTree_Holders
