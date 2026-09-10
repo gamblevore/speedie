@@ -11,8 +11,6 @@
 		AC454A80297FE9E400DF8748 /* JB_Compress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A67297FE9E200DF8748 /* JB_Compress.cpp */; };
 		AC454A81297FE9E400DF8748 /* JB_MSR.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A68297FE9E200DF8748 /* JB_MSR.cpp */; };
 		AC454A82297FE9E400DF8748 /* JB_Main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A69297FE9E200DF8748 /* JB_Main.cpp */; };
-		AC454A83297FE9E400DF8748 /* JB_RingTree.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A6A297FE9E200DF8748 /* JB_RingTree.cpp */; };
-		AC454A84297FE9E400DF8748 /* JB_ObjArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A6B297FE9E200DF8748 /* JB_ObjArray.cpp */; };
 		AC454A85297FE9E400DF8748 /* JB_Dictionary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A6C297FE9E300DF8748 /* JB_Dictionary.cpp */; };
 		AC454A86297FE9E400DF8748 /* JB_Errors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A6D297FE9E300DF8748 /* JB_Errors.cpp */; };
 		AC454A87297FE9E400DF8748 /* JB_Run.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A6E297FE9E300DF8748 /* JB_Run.cpp */; };
@@ -25,7 +23,6 @@
 		AC454A8E297FE9E400DF8748 /* JB_Vectors.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A75297FE9E300DF8748 /* JB_Vectors.cpp */; };
 		AC454A8F297FE9E400DF8748 /* JB_FastString.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A76297FE9E300DF8748 /* JB_FastString.cpp */; };
 		AC454A90297FE9E400DF8748 /* JB_PNG.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A77297FE9E300DF8748 /* JB_PNG.cpp */; };
-		AC454A91297FE9E400DF8748 /* JB_Saveable.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A78297FE9E300DF8748 /* JB_Saveable.cpp */; };
 		AC454A92297FE9E400DF8748 /* JB_File.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A79297FE9E300DF8748 /* JB_File.cpp */; };
 		AC454A93297FE9E400DF8748 /* JB_DirReaderUnix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A7A297FE9E300DF8748 /* JB_DirReaderUnix.cpp */; };
 		AC454A94297FE9E400DF8748 /* JB_LibraryFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC454A7B297FE9E300DF8748 /* JB_LibraryFile.cpp */; };
@@ -88,8 +85,6 @@
 		AC454A67297FE9E200DF8748 /* JB_Compress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Compress.cpp; path = ../../Library/CppLib/JB_Compress.cpp; sourceTree = "<group>"; };
 		AC454A68297FE9E200DF8748 /* JB_MSR.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_MSR.cpp; path = ../../Library/CppLib/JB_MSR.cpp; sourceTree = "<group>"; };
 		AC454A69297FE9E200DF8748 /* JB_Main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Main.cpp; path = ../../Library/CppLib/JB_Main.cpp; sourceTree = "<group>"; };
-		AC454A6A297FE9E200DF8748 /* JB_RingTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_RingTree.cpp; path = ../../Library/CppLib/JB_RingTree.cpp; sourceTree = "<group>"; };
-		AC454A6B297FE9E200DF8748 /* JB_ObjArray.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_ObjArray.cpp; path = ../../Library/CppLib/JB_ObjArray.cpp; sourceTree = "<group>"; };
 		AC454A6C297FE9E300DF8748 /* JB_Dictionary.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Dictionary.cpp; path = ../../Library/CppLib/JB_Dictionary.cpp; sourceTree = "<group>"; };
 		AC454A6D297FE9E300DF8748 /* JB_Errors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Errors.cpp; path = ../../Library/CppLib/JB_Errors.cpp; sourceTree = "<group>"; };
 		AC454A6E297FE9E300DF8748 /* JB_Run.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Run.cpp; path = ../../Library/CppLib/JB_Run.cpp; sourceTree = "<group>"; };
@@ -102,7 +97,6 @@
 		AC454A75297FE9E300DF8748 /* JB_Vectors.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Vectors.cpp; path = ../../Library/CppLib/JB_Vectors.cpp; sourceTree = "<group>"; };
 		AC454A76297FE9E300DF8748 /* JB_FastString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_FastString.cpp; path = ../../Library/CppLib/JB_FastString.cpp; sourceTree = "<group>"; };
 		AC454A77297FE9E300DF8748 /* JB_PNG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_PNG.cpp; path = ../../Library/CppLib/JB_PNG.cpp; sourceTree = "<group>"; };
-		AC454A78297FE9E300DF8748 /* JB_Saveable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Saveable.cpp; path = ../../Library/CppLib/JB_Saveable.cpp; sourceTree = "<group>"; };
 		AC454A79297FE9E300DF8748 /* JB_File.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_File.cpp; path = ../../Library/CppLib/JB_File.cpp; sourceTree = "<group>"; };
 		AC454A7A297FE9E300DF8748 /* JB_DirReaderUnix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_DirReaderUnix.cpp; path = ../../Library/CppLib/JB_DirReaderUnix.cpp; sourceTree = "<group>"; };
 		AC454A7B297FE9E300DF8748 /* JB_LibraryFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_LibraryFile.cpp; path = ../../Library/CppLib/JB_LibraryFile.cpp; sourceTree = "<group>"; };
@@ -196,12 +190,9 @@
 				AC454A69297FE9E200DF8748 /* JB_Main.cpp */,
 				AC454A7E297FE9E300DF8748 /* JB_Math.cpp */,
 				AC454A68297FE9E200DF8748 /* JB_MSR.cpp */,
-				AC454A6B297FE9E200DF8748 /* JB_ObjArray.cpp */,
 				AC454A74297FE9E300DF8748 /* JB_Pipe.cpp */,
 				AC454A77297FE9E300DF8748 /* JB_PNG.cpp */,
-				AC454A6A297FE9E200DF8748 /* JB_RingTree.cpp */,
 				AC454A6E297FE9E300DF8748 /* JB_Run.cpp */,
-				AC454A78297FE9E300DF8748 /* JB_Saveable.cpp */,
 				AC454A6F297FE9E300DF8748 /* JB_String.cpp */,
 				AC454A71297FE9E300DF8748 /* JB_Tokeniser.cpp */,
 				AC454A72297FE9E300DF8748 /* JB_Utils.cpp */,
@@ -362,16 +353,13 @@
 				AC454A86297FE9E400DF8748 /* JB_Errors.cpp in Sources */,
 				AC454A81297FE9E400DF8748 /* JB_MSR.cpp in Sources */,
 				AC454A93297FE9E400DF8748 /* JB_DirReaderUnix.cpp in Sources */,
-				AC454A83297FE9E400DF8748 /* JB_RingTree.cpp in Sources */,
 				AC454A87297FE9E400DF8748 /* JB_Run.cpp in Sources */,
 				AC454A89297FE9E400DF8748 /* JB_Child.cpp in Sources */,
 				AC454A8D297FE9E400DF8748 /* JB_Pipe.cpp in Sources */,
 				AC454A98297FE9E400DF8748 /* JB_DirReaderWin32.cpp in Sources */,
 				AC454A92297FE9E400DF8748 /* JB_File.cpp in Sources */,
-				AC454A91297FE9E400DF8748 /* JB_Saveable.cpp in Sources */,
 				AC454A94297FE9E400DF8748 /* JB_LibraryFile.cpp in Sources */,
 				AC454A8F297FE9E400DF8748 /* JB_FastString.cpp in Sources */,
-				AC454A84297FE9E400DF8748 /* JB_ObjArray.cpp in Sources */,
 				AC454A85297FE9E400DF8748 /* JB_Dictionary.cpp in Sources */,
 				AC7CD502227F07F300C3F69A /* test.cpp in Sources */,
 				AC454A8A297FE9E400DF8748 /* JB_Tokeniser.cpp in Sources */,
