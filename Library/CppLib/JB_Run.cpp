@@ -80,7 +80,6 @@ JB_StringC*         	ErrorString_;
 JBObject_Behaviour  	JB_Object_FuncTable_;
 JB_Class*           	ClassList;
 extern char**			environ;
-uint					Flow_Disabled;
 static Array*			Obj_Args;
 const char**			JB_Main__Args;
 byte					StringVersionNum;
@@ -201,7 +200,6 @@ int JB_SP_Init (_cstring* Args, bool IsThread) {
 
 	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
-	Flow_Disabled = 0x7fffFFFF;
 	JB_CollectClassDepths();
 
 #if __APPLE__
@@ -274,9 +272,7 @@ int JB_SP_Run (_cstring* Args, int Mode)	{ // JB_SP_Main
 }
 
 
-void JB_Flow__DisabledIncr(int i)	{	Flow_Disabled += i; }
-void JB_Flow__DisabledSet (int i)	{ 	Flow_Disabled = i; }
-bool JB_Flow__IsDisabled  ()		{ return Flow_Disabled; }
+bool JB_Flow__IsDisabled  ()		{ return 1; }
 
 
 byte* JB_App__ErrorNumber () {

@@ -574,7 +574,7 @@ function ImportAll
 
 	.Timer( "Transform" )
 	.Stage( "Transforming Functions" )
-	FlowLog.InputLine(scfunction.NameList, "Funcs: ")
+	FlowLog <~ scfunction.NameList
 	scfunction.TransformAll
 
 	.Stage( "Building Function Link Map" )

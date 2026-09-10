@@ -30,7 +30,7 @@ datatype byte
 			self -= 32
 		return self
 
-	 operator in (|charset| c, |bool|)
+	operator in (|charset| c, |bool|)
 		inlined
 		return c[self]
 
@@ -39,11 +39,27 @@ datatype byte
 
 	inline IsInt (|bool|)
 		return .In('0', '9')
-		
+
+//	function test		
+//		|| a = 'a'
+//		|| b = 'b'
+//		if a ~= b		
+//	syntax equals (|byte| b, |bool| Aware,  |bool|)
+//		// I want this to be called but not the other... too messy.
+//		// needs more compiler upgrades
+//		cpp_part EqualsAware
+//		self = .lowercase
+//		b = b.lowercase
+//		return self == b
+//	syntax equals (|byte| b,  |bool|)
+//		inlined
+//		return self == b
+
 	operator eq (|byte| b, |bool|)
 		self = .lowercase
 		b = b.lowercase
 		return self == b
+		
 	inline IsLetter (|bool|)
 		return self|codepoint|.isletter
 	inline IsAlphaNum (|bool|)

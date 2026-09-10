@@ -138,7 +138,7 @@ void JB_App__SetThreadName(JB_String* self) {
 }
 
 
-void JB_Flow__ReportStringData(u8* Addr, int Length, u8* Name, int NameLen);
+void JB_Flow__Report (u8* Addr, int Length);
 #ifndef ARG_MAX
 	#define ARG_MAX 128 * 1024
 #endif
@@ -178,7 +178,7 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 	
 	PtrSpace++;
 #ifndef AS_LIBRARY
-	JB_Flow__ReportStringData((u8*)Orig2, (int)(ByteSpace-Orig2), (u8*)"pipe", 4);
+	JB_Flow__Report((u8*)Orig2, (int)(ByteSpace-Orig2));
 #endif
 	
 	if ((char*)PtrSpace != Orig2) // ouch

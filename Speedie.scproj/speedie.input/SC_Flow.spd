@@ -1,43 +1,66 @@
 
+// this doesn't do what I want. I should just take it out, right?
+// we should do it on the AST instead? Its simpler!
+// the ternary is a little... harder. Perhaps we can log the result
+// of the tern?
+// the problem, is that we don't want to make it like: if test --> if (loggingfunc(test))
+// then we lose all the various ASMs generated. JBAN, JBOR, JMPI, JMPF, JMKN, etc
+// only one will be generated.
+// so we need to put it in the branch itself
+// so... thats not so bad for if/while
+// but for ternaries... how?
+// log the result?
+
+// Soooo...    if ((f)(a,b)) --> if ((f)(a,b)).flowlog
+// so a function that returns the input, after logging the result
+
 
 function Tran_Flow (TranFunc)
+	opt norefcounts
 	expect (fn) (node, "Only use this on functions")
-	|| msg = node[@thg] #require
-	msg.ExpectLast
-	node.SafeRemove
-	check (msg == "off")  (msg, "Only allowed value is 'off'.")
-	(fn is FlowDisabled)
+	|| msg = node[@thg, "off"]
+		msg.ExpectLast
+		node.SafeRemove
+		(fn is FlowDisabled)
 
 	
 insertion
 	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
 
 
-target Debug
-	function scobject.syntaxequals (|string| name, |bool|)
-		opt norefcounts
-		require (self)	
-		if .Name.SyntaxEquals( name, true )		// never needs !aware.
-			return true
-		|| x = .ExportName
-		if x.syntaxequals( name, true )
-			return true
-		if x.endswith(name, true) and x[x.length - (name.length+1)] == '_'
-			return true
+//	if Options.GenFlowLogCode
+//		ElseArg.GenBranchFlow
 
 
-	function string.trap (|message| msg=nil, |bool|)
-		if scfunction.currfunc == self
-			if msg
-				printline msg
-			return true
-  else
-	function scobject.syntaxequals (|string| name, |bool|)
-		(name), visible
-	function string.trap (|message| msg=nil, |bool|)
-		(msg), visible
+function message.GenBranchFlow
+	require  SCFunction.CurrFunc isnt FlowDisabled
+	// if x {} --> if x {'a'.flowlog}
 
 
-function scobject.syntaxequals (|string| name, |bool| Aware,  |bool|)
-	disabled "Just use =="
+function message.GenWhileFlow
+	require  SCFunction.CurrFunc isnt FlowDisabled
+	// while x {} --> while x {app.flowlog}, 'a'.flowlog
+	
+
+function message.GenTernFlow
+	require  SCFunction.CurrFunc isnt FlowDisabled
+	// x = ((a)(b,c))
+	// -->
+	// x = ((a)(b,c)).flowlog
+	
+
+	
+	
+
+//			ifn (while.first!.unbra isthing "true") // inf loop, no log
+// where to do this? in AST/Nil/ASM?
+// ASm is too late.
+// so AST or nil
+// Nil can be redone... so no good.
+// ast then?
+
+//	if Options.GenFlowLogCode and (f isnt FlowDisabled)
+//		"if"
+//		"while"
+//		"JB_Ternary"
 

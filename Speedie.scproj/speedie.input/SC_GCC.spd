@@ -139,7 +139,8 @@ function NoGoodObject ( |string| Cpp,  |File| h,  |File| o,  |int| )
 
 
 function NeedNewObjForSrc ( |string| cpp, |file| objects, |int| )
-	FlowLog.input(cpp, "objtest")
+	FlowLog <~ "objtest"
+	FlowLog<~cpp
 	|| aslib = options.projectislibrary
 	require ! (aslib and (cpp contains "/JB_Main.")) // .o and .cpp
 	require ! (!(SC_Targets["gui"] or options.makeexec) and cpp contains "/JB_OSX.")  // should be "JB_Native.o"

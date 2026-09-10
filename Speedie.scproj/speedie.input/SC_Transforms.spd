@@ -253,7 +253,8 @@ function Tran_Swap (TranFunc)
 function Tran_If (TranFunc)
 	node.ASMType = ASMType.kIf // for the ASM
 	SCFunction.InBranch++
-	Tran_IfSub(node, name_space)
+	using node
+		Tran_IfSub(node, name_space)
 	Tran_All_Final(fn, node, name_space, @arg) // also for the ASM
 	SCFunction.InBranch--
 	return true // Stop caller redoing Tran_All_Final!
@@ -301,6 +302,10 @@ function Tran_WhileSub (|SCNode| name_space, |Message| node)
 	
 	Cond.NeedBra
 	arg.CheckContinuesAndExits
+	
+	if Options.GenFlowLogCode
+		node.GenWhileFlow
+	
 	
 	Tran_Isa(node, name_space)	
 

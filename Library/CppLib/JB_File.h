@@ -93,7 +93,6 @@ bool JB_File_HardLinkTo( JB_File* self, JB_String* Link );
 JB_String* JB_File_LinkToGet( JB_File* self );
 void JB_File_Destructor( JB_File* self );
 void JB_File_Close( JB_File* self );
-void JB_Flow__Report (JB_String* data, JB_String* name);
 
 
 

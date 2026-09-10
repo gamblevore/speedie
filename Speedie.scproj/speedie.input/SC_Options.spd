@@ -286,7 +286,7 @@ module Feedback
 			Options.Compile = 0
 			Options.Mode = 0
 		
-		+'flowmode'
+		+'flowlog'
 			0 // placeholder
 			
 		+'flow'

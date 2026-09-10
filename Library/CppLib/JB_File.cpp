@@ -135,35 +135,26 @@ extern const char* JB_CrashLogFileName;
 
 
 int JB_ErrorHandleFileC (const char* Path, int err, const char* Operation);
-extern uint Flow_Disabled;
+bool JB_Flow__Enabled   ();
+void JB_Flow__Input     (JB_String* data);
 
-void JB_Flow__ReportStringData (u8* Addr, int Length, u8* Name, int NameLen) {
+
+void JB_Flow__Report (u8* Addr, int Length) {
 #ifndef AS_LIBRARY
-	if (!Flow_Disabled) {
+	if (JB_Flow__Enabled()) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
 		Hash = Hash xor (Hash >> 32);
 		JB_String A;
-		JB_String B;
 		A.Addr = (u8*)(&Hash);
 		A.Length = 8;
-		B.Addr = Name;
-		B.Length = NameLen;
-		void JB_Flow__Input(JB_String* data, JB_String* name);
 		int p = 8;
 		for (int i = 0; i < 4; i++) {
 			auto C = (Hash >> i*8)&255;
 			A.Addr[--p] = '@' + (C&15);
 			A.Addr[--p] = '@' + (C>>4);
 		}
-		JB_Flow__Input(&A, &B);
+		JB_Flow__Input(&A);
 	}
-#endif
-}
-
-void JB_Flow__Report (JB_String* data, JB_String* name) {
-#ifndef AS_LIBRARY
-	if (!Flow_Disabled)
-		JB_Flow__ReportStringData(data->Addr, data->Length, name->Addr, name->Length);
 #endif
 }
 
@@ -630,7 +621,6 @@ JB_String* JB_File_ReadAll ( JB_File* self, int lim, bool AllowMissing ) {
 			}
 		}
 	}
-//	JB_Flow__Report(Result, self); JB_File_Read already does this
 	return Result;
 }
 
@@ -763,6 +753,7 @@ int JB_App__SetEnv (JB_StringC* name, JB_StringC* value) {
 	return -999;
 }
 
+void JB_Flow__Report (u8* Addr, int Length);
 
 JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 	if (Length <= 0)
@@ -784,7 +775,8 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 			JB_ErrorHandleFile(self, nil, ENOMEM, nil, "reading");
 		}
 	}
-	JB_Flow__Report(Result, self);
+	JB_Flow__Report(self->Addr, self->Length);
+	JB_Flow__Report(Result->Addr, Result->Length);
 	return Result;
 }
 

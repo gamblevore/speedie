@@ -934,8 +934,9 @@ function SameTypeSub (|message| first,  |message| second,  |SCNode| name_space, 
 	
 
 
-function TypeOfTernary3 (ExprResolver)
+function TypeOfTernary (ExprResolver)
 	opt norefcounts
+	// a(b,c) --> JB_Ternary(a,b,c)
 	
 	|| cond	= exp.first
 	|| params = cond.next!
@@ -953,24 +954,10 @@ function TypeOfTernary3 (ExprResolver)
 	exp.ASMType = ASMType.ktern
 	using exp
 		exp.first = @thg + "JB_Ternary"
+		if Options.GenFlowLogCode
+			exp.GenTernFlow
+		
 	return Result
-	// a(b,c) --> JB_Ternary(a,b,c)
-/*	«func 
-		«thg "a"»
-		«prm 
-			«thg "b"»
-			«thg "c"»
-		»
-	»
-	«func 
-		«thg "JB_Ternary"»
-		«prm 
-			«thg "a"»
-			«thg "b"»
-			«thg "c"»
-		»
-	»
-*/
 
 
 function ArrayInOrderCheck (|int| InOrder, |message| msg, |int|)
@@ -1851,7 +1838,7 @@ function TypeOfFuncSub (|Message| exp, |SCNode| name_space, |Message| side, |SCO
 		ThgDecl = TypeOfExpr( ch, name_space )			#require
 
 	if ThgDecl.MiniMatch(typebool!.typenormal)			// called a bool as if it were a function.
-		return TypeOfTernary3(exp, name_space, side)
+		return TypeOfTernary(exp, name_space, side)
 		
 		
 	fn = ThgDecl.Type.FuncProto

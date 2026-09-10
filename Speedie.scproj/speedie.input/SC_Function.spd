@@ -1281,9 +1281,9 @@ function CurrFunc (assigns:|scfunction?|)
 
 	._Info = (value!=nil)(value.FuncInfo, 0)
 		
-	if FlowLog.active
-		FlowLog.inputline("function: ", value.name)
-		FlowLog.inputline("stage: ", compiler.stagename)
+	if FlowLog()
+		FlowLog <~ value.name
+		FlowLog <~ compiler.stagename
 
 
 function CurrFunc (|scfunction|)
@@ -1613,19 +1613,24 @@ function message.Blocks (assigns:|int|)
 	.TAG = (.TAG & ~SCBlockage.bits) ||| Value
 
 
+	
 function Tran_IfSub (|message| node, |SCNode| name_space)
 	opt norefcounts
 	|| cond = node.NeedFirst						#require
 	|| arg = cond.next
 		require arg.expect(@arg)
 	  else
-		using node
 		arg = @arg.msg
 		if node == "if"
 			arg <~ (@tmp, "debugger")				// better than debugat
 		cond.next = arg
 	
 	|| SubTest = arg.next
+	if Options.GenFlowLogCode
+		if !SubTest
+			subtest = node.msg(@tmp, "else")
+		arg.GenBranchFlow
+	if SubTest
 		expect (SubTest isTmp "elseif" or "else")  ( SubTest )
 		SubTest.ExpectLast
 		
@@ -1637,10 +1642,11 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 				check (ElseArg ~!= "if")			(ElseArg, "Use 'elseif' instead.")
 				elsearg.expect(@arg)
 			  else
-				SubTest.msg(@arg)
+				elsearg = SubTest.msg(@arg)
+				if Options.GenFlowLogCode
+					ElseArg.GenBranchFlow
 	
-	name_space = arg.scarg(name_space) #require
-	using (node)	
+	name_space = arg.scarg(name_space)				#require
 	cond = cond.ExpandToBool( name_space )
 	if !cond
 		0 //

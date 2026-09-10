@@ -95,7 +95,7 @@ class SCFile (file)
 		
 		
 	function ASTSub (|bool| Orig, |Message|)
-		FlowLog.input(self, "AST")
+		FlowLog <~ self
 		
 		FlowLog.DisabledIncr		// i want it a bit less sensitive to random file-cleanups
 		|| str = .Readall(true).decompress // like: x() --> x() // comment
