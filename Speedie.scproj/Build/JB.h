@@ -95,8 +95,6 @@ typedef vec4 FloatRangeConverter;
 
 typedef vec2 FloatRangeConverterBasic;
 
-typedef int FlowLogStopper;
-
 typedef uint FunctionType;
 
 typedef int Ind;
@@ -361,8 +359,6 @@ struct FastString_Behaviour;
 
 struct FixedDict_Behaviour;
 
-struct FlowLog_Behaviour;
-
 struct InputStream_Behaviour;
 
 struct Instruction_Behaviour;
@@ -446,8 +442,6 @@ struct DTWrap;
 struct JB_ErrorReceiver;
 
 struct FixedDict;
-
-struct FlowLog;
 
 struct InputStream;
 
@@ -920,16 +914,6 @@ JBClass ( JB_ErrorReceiver , JB_Object ,
 
 struct FastString_Behaviour: Object_Behaviour {
 };
-
-struct FlowLog_Behaviour: Object_Behaviour {
-};
-
-JBClass ( FlowLog , JB_Object , 
-	bool CanDoErrors;
-	FastString* Write;
-	InputStream* ReadInput;
-	FastBuff Buff;
-);
 
 struct InputStream_Behaviour: Object_Behaviour {
 };
@@ -1461,6 +1445,9 @@ extern int SC__FastStringOpts_InitedOK;
 extern int SC__FastStringOpts_StrRemoved;
 extern int SC__FastStringOpts_VargCount;
 extern Dictionary* SC__FB_AppOptions;
+#define JB__Flow__Enabled JB__.Flow__Enabled
+#define JB__Flow_CompareAgainst JB__.Flow_CompareAgainst
+#define JB__Flow_FlowOut JB__.Flow_FlowOut
 extern Message* SC__AC_all_tmp_src;
 extern SCFunction* SC__AC_AnonFn;
 extern SCNode* SC__AC_AnonParent;
@@ -2524,12 +2511,10 @@ extern SCClass* SC__Cpp_CurrClass;
 extern JB_String* SC__Cpp_FindGlobalsCpp;
 extern Array* SC__Cpp_H_Input;
 extern Array* SC__Cpp_H_PostInput;
-extern JB_String* SC__Cpp_IfName;
 #define kSC__Cpp_kNeedsInnerBrackets ((int)1)
 #define kSC__Cpp_kNeedsNoBrackets ((int)2)
 #define kSC__Cpp_kNeedsOuterBrackets ((int)0)
 extern uint64 SC__Cpp_LubHash;
-extern JB_String* SC__Cpp_WhileName;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
@@ -2538,13 +2523,6 @@ extern bool SC__Cpp_WriteAPI;
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
 #define kJB__fix_TypeValue ((int)0)
-#define JB__Flow_Active JB__.Flow_Active
-#define JB__Flow_AlwaysMove JB__.Flow_AlwaysMove
-#define JB__Flow_BreakOnFail JB__.Flow_BreakOnFail
-#define JB__Flow_Flow JB__.Flow_Flow
-#define kJB__Flow_Log ((int)1)
-#define kJB__Flow_Off ((int)0)
-#define kJB__Flow_Validate ((int)2)
 #define kSC__Instruction_kTypeConst ((int)2)
 extern Dictionary* SC__Instruction_OpDict;
 extern Instruction* SC__Instruction_TypeList[256];
@@ -2615,34 +2593,33 @@ struct JB_Globals {
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
 	bool TerminalColor_RainbowTerm;
-	bool Flow_AlwaysMove;
-	bool Flow_BreakOnFail;
-	byte Flow_Active;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
-	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	u16 Tk__StopBars;
+	int Flow__Enabled;
 	int Syx_CurrFuncID_;
-	JB_ErrorReceiver* StdErr;
-	JB_File* Platform_Logger_;
-	JB_String* App_Usage;
-	Dictionary* TC_Types_Dict;
+	InputStream* Flow_CompareAgainst;
+	Dictionary* Constants__SyxDict;
 	Dictionary* Constants_EscapeStr;
-	Message* Tk__EndOfLineMarker;
-	Dictionary* Constants_EscapeChr;
-	Dictionary* Constants_XML_UnEscapeStr;
-	Dictionary* Constants_JS_UnEscapeStr;
-	Dictionary* Constants_UnEscapeStr;
-	Dictionary* Constants_JS_EscapeStr;
-	Message* App__Conf;
-	FlowLog* Flow_Flow;
-	Message* App__Prefs;
-	JB_File* App__StdOut;
-	JB_File* App__stdin;
 	Dictionary* Constants_XML_EscapeStr;
+	Dictionary* Constants_JS_EscapeStr;
+	Dictionary* Constants_UnEscapeStr;
+	Dictionary* Constants_JS_UnEscapeStr;
+	Dictionary* Constants_XML_UnEscapeStr;
+	Dictionary* Constants_EscapeChr;
+	Message* Tk__EndOfLineMarker;
+	FastString* Flow_FlowOut;
+	Dictionary* TC_Types_Dict;
+	JB_String* App_Usage;
+	JB_File* Platform_Logger_;
+	JB_ErrorReceiver* StdErr;
+	JB_File* App__stdin;
+	Message* App__Conf;
+	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
-	Dictionary* Constants__SyxDict;
+	JB_File* App__StdOut;
 	JB_String* File__Speedie;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
@@ -2987,7 +2964,7 @@ bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpos
 
 bool SC_FB__AppOptions_flow(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_flowmode(JB_String* Name, JB_String* Value, FastString* Purpose);
+bool SC_FB__AppOptions_flowlog(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_force(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -3062,6 +3039,31 @@ void SC_FB__SetOutputPath(JB_String* Path);
 void SC_FB__StopStripping();
 
 JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript);
+
+
+
+// Flow
+bool JB_Flow__Disabled();
+
+void JB_Flow__DisabledIncr(int Value);
+
+bool JB_Flow__Enabled();
+
+void JB_Flow__Fail(JB_String* Found, JB_String* Expected);
+
+int JB_Flow__Init_();
+
+bool JB_Flow__New();
+
+bool JB_Flow__Start(JB_String* Name);
+
+void JB_Flow__Stop();
+
+void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
+
+void JB_Flow__InputStrings(Array* Lines);
+
+void JB_Flow__Input(JB_String* Value);
 
 
 
@@ -4265,7 +4267,7 @@ SCDecl* SC_TypeOfSyntaxCall(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfSyx(Message* Exp, SCNode* Name_space, Message* Side);
 
-SCObject* SC_TypeOfTernary3(Message* Exp, SCNode* Name_space, Message* Side);
+SCObject* SC_TypeOfTernary(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfThg(Message* Exp, SCNode* Name_space, Message* Side);
 
@@ -5081,13 +5083,6 @@ bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F);
 // FloatRangeConverterBasic
 
 
-// FlowLogStopper
-FlowLogStopper JB_flow_SyntaxUsing(FlowLogStopper Self);
-
-void JB_flow_SyntaxUsingComplete(FlowLogStopper Self, JB_Object* Dummy);
-
-
-
 // FunctionType
 
 
@@ -5814,8 +5809,6 @@ void JB_FastBuff_Destructor(FastBuff* Self);
 bool JB_FastBuff_Has(FastBuff* Self, int N);
 
 bool JB_FastBuff_HasAny(FastBuff* Self);
-
-int JB_FastBuff_Length(FastBuff* Self);
 
 int JB_FastBuff_Position(FastBuff* Self);
 
@@ -6693,9 +6686,6 @@ void adb(int Level);
 // JB_FixedDict_Behaviour
 
 
-// JB_FlowLog_Behaviour
-
-
 // JB_InputStream_Behaviour
 
 
@@ -7032,8 +7022,6 @@ void SC_Cpp_PreRun(Cpp_Export* Self);
 
 void SC_Cpp_Run(Cpp_Export* Self);
 
-void SC_Cpp_SetupFlow(Cpp_Export* Self, SCFunction* F);
-
 FastStringCpp* SC_Cpp_StreamChild(Cpp_Export* Self, JB_String* S);
 
 void SC_Cpp_TestCakeProp(Cpp_Export* Self, FastString* Fs, JB_String* Name, SCDecl* Prop);
@@ -7303,8 +7291,6 @@ void JB_FS_AppendInfoNum(FastString* Self, JB_String* Name, int64 Data);
 
 void JB_FS_FieldStart(FastString* Self, JB_String* Name);
 
-void JB_FS_FlowPrintNicely(FastString* Self, JB_String* S);
-
 void SC_FS_IncludeH(FastString* Self, JB_String* Name);
 
 void JB_FS_MemoryReport(FastString* Self, _cstring Name, JB_String* Name2, int64 Amount);
@@ -7333,8 +7319,6 @@ void JB_FS_AppendInt32(FastString* Self, int Data);
 
 void JB_FS_AppendBool(FastString* Self, bool B);
 
-void JB_FS_AppendBuff(FastString* Self, FastBuff* B);
-
 void JB_FS_AppendTermCol(FastString* Self, TerminalColor Col);
 
 void JB_FS_SyntaxAppend(FastString* Self, Message* Msg);
@@ -7350,41 +7334,6 @@ FastString* JB_FS__UseAsOutput(JB_Object* Other);
 
 
 // JB_FixedDict
-
-
-// JB_FlowLog
-void JB_Flow_AddByte(FlowLog* Self, uint /*byte*/ Value);
-
-void JB_Flow_Destructor(FlowLog* Self);
-
-void JB_Flow_Fail(FlowLog* Self, JB_String* Found, JB_String* Expected, JB_String* InputName);
-
-void JB_Flow_Flush(FlowLog* Self);
-
-bool JB_Flow_TestByte(FlowLog* Self, uint /*byte*/ Value);
-
-FlowLogStopper JB_Flow__Attempt(JB_String* Name);
-
-bool JB_Flow__Cond(bool Value);
-
-void JB_Flow__GetActiveFlow();
-
-int JB_Flow__Init_();
-
-int JB_Flow__InitCode_();
-
-void JB_Flow__InputStrings(Array* Lines, JB_String* Name);
-
-void JB_Flow__Input(JB_String* Data, JB_String* Name);
-
-void JB_Flow__InputLine(JB_String* Data, JB_String* Name);
-
-void JB_Flow__Stop();
-
-void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
-
-bool JB_Flow__Cond2(bool Value);
-
 
 
 // JB_InputStream
@@ -7782,8 +7731,6 @@ ivec2 JB_Str_FindExt(JB_String* Self);
 Ind JB_Str_FindSlash(JB_String* Self, int From);
 
 int JB_Str_FindTrailingSlashes(JB_String* Self);
-
-int JB_Str_FlowUnPrintable(JB_String* Self);
 
 SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err);
 
@@ -8639,6 +8586,12 @@ FatASM* SC_Msg_FXNF(Message* Self, ASMReg R1, ASMReg R2);
 FatASM* SC_Msg_FXNN(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_FXP2(Message* Self, ASMReg R1, ASMReg R2);
+
+void SC_Msg_GenBranchFlow(Message* Self);
+
+void SC_Msg_GenTernFlow(Message* Self);
+
+void SC_Msg_GenWhileFlow(Message* Self);
 
 Message* SC_Msg_GetAddrButNicer(Message* Self);
 
@@ -11119,8 +11072,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
 
-inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V);
-
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self);
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
@@ -11214,12 +11165,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
 	return Self != ((int)kJB__FailableInt_Fail);
-}
-
-inline bool JB_FastBuff_AppendU8(FastBuff* Self, uint /*byte*/ V) {
-	//cpp_part;
-	Self->Curr++[0] = V;
-	return Self->Curr >= Self->End;
 }
 
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self) {
@@ -11456,34 +11401,33 @@ struct JB_Globals {
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
 	bool TerminalColor_RainbowTerm;
-	bool Flow_AlwaysMove;
-	bool Flow_BreakOnFail;
-	byte Flow_Active;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
-	u16 Tk__StopBars;
 	u16 API_NilHappened_;
+	u16 Tk__StopBars;
+	int Flow__Enabled;
 	int Syx_CurrFuncID_;
-	JB_Object* StdErr;
-	JB_Object* Platform_Logger_;
-	JB_Object* App_Usage;
-	JB_Object* TC_Types_Dict;
+	JB_Object* Flow_CompareAgainst;
+	JB_Object* Constants__SyxDict;
 	JB_Object* Constants_EscapeStr;
-	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Constants_EscapeChr;
-	JB_Object* Constants_XML_UnEscapeStr;
-	JB_Object* Constants_JS_UnEscapeStr;
-	JB_Object* Constants_UnEscapeStr;
-	JB_Object* Constants_JS_EscapeStr;
-	JB_Object* App__Conf;
-	JB_Object* Flow_Flow;
-	JB_Object* App__Prefs;
-	JB_Object* App__StdOut;
-	JB_Object* App__stdin;
 	JB_Object* Constants_XML_EscapeStr;
+	JB_Object* Constants_JS_EscapeStr;
+	JB_Object* Constants_UnEscapeStr;
+	JB_Object* Constants_JS_UnEscapeStr;
+	JB_Object* Constants_XML_UnEscapeStr;
+	JB_Object* Constants_EscapeChr;
+	JB_Object* Tk__EndOfLineMarker;
+	JB_Object* Flow_FlowOut;
+	JB_Object* TC_Types_Dict;
+	JB_Object* App_Usage;
+	JB_Object* Platform_Logger_;
+	JB_Object* StdErr;
+	JB_Object* App__stdin;
+	JB_Object* App__Conf;
+	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
-	JB_Object* Constants__SyxDict;
+	JB_Object* App__StdOut;
 	JB_Object* File__Speedie;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
