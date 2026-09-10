@@ -170,7 +170,7 @@
 		AC7D3C9629A27C1D00148ADB /* JB_MSR.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = JB_MSR.cpp; path = ../Library/CppLib/JB_MSR.cpp; sourceTree = "<group>"; };
 		AC7D3CB729A27C9900148ADB /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = Build/JB_Globals.cpp; sourceTree = "<group>"; };
 		AC7D3CB829A27C9900148ADB /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = Build/JB.cpp; sourceTree = "<group>"; };
-		AC7D3DA929A280A700148ADB /* uwu */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = uwu; sourceTree = BUILT_PRODUCTS_DIR; };
+		AC7D3DA929A280A700148ADB /* Speedie */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Speedie; sourceTree = BUILT_PRODUCTS_DIR; };
 		AC7D3E0629A2822B00148ADB /* JB_Globals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Globals.cpp; path = ../exec.scproj/Cpp/JB_Globals.cpp; sourceTree = "<group>"; };
 		AC7D3E0729A2822B00148ADB /* JB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB.cpp; path = ../exec.scproj/Cpp/JB.cpp; sourceTree = "<group>"; };
 		AC7D3E0D29A2844100148ADB /* JB_DirReaderUnix.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = JB_DirReaderUnix.h; path = ../Library/CppLib/JB_DirReaderUnix.h; sourceTree = "<group>"; };
@@ -327,7 +327,7 @@
 			isa = PBXGroup;
 			children = (
 				AC6ADAE729872AA8009CFFBB /* Speedie */,
-				AC7D3DA929A280A700148ADB /* uwu */,
+				AC7D3DA929A280A700148ADB /* Speedie */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -610,7 +610,7 @@
 			);
 			name = "Direct Test";
 			productName = speedie2;
-			productReference = AC7D3DA929A280A700148ADB /* uwu */;
+			productReference = AC7D3DA929A280A700148ADB /* Speedie */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -930,11 +930,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__VM__",
+					"-lcurl",
 				);
-				PRODUCT_NAME = uwu;
+				PRODUCT_NAME = Speedie;
 			};
 			name = Debug;
 		};
@@ -942,11 +944,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				OTHER_CFLAGS = (
 					"-Wno-return-type-c-linkage",
 					"-D__VM__",
+					"-lcurl",
 				);
-				PRODUCT_NAME = uwu;
+				PRODUCT_NAME = Speedie;
 			};
 			name = Release;
 		};
