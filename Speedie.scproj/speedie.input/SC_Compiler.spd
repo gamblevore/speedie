@@ -200,8 +200,6 @@ function CompileAll
 			.Timer( "Export_Cpp" )
 			Cpp_Export.ExportAllSource
 
-		SCImport.ExportShaders
-
 		if .Stage( "Finished" )
 			.TimerSub("Parse", .stParseTimeTotal)
 			.Timer( "" )
