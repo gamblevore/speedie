@@ -48,6 +48,8 @@ static bool ShouldFlush_ (JB_String* s) {
 	// kinda makes more sense that a thread would check the buffer.
 	// it would only have to check like 64-bytes anyhow.
 	// or none, if the buffer over 64-bytes big.
+	
+	// this will do for now though.
 	int n = s->Length;
 	if (n > 64)
 		return true;
