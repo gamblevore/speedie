@@ -9608,20 +9608,20 @@ int SC_SourceMap__Init_() {
 }
 
 uint* SC_SourceMap__Reserve(int T) {
-	uint* Rz = nil;
 	FastString* P = SC__SourceMap_Positions;
-	if (P) {
-		if (!SC__SourceMap_BreakPoints) {
-			JB_SetRef(SC__SourceMap_BreakPoints, JB_FS_Constructor(nil));
-		}
-		if (!SC__SourceMap_Breakable) {
-			JB_SetRef(SC__SourceMap_Breakable, JB_FS_Constructor(nil));
-		}
-		SC__SourceMap_LastLength = P->Length;
-		Rz = ((uint*)JB_FS_WriteAlloc_(P, T));
-		memzero(Rz, T);
+	if (!P) {
+		return nil;
 	}
-	return Rz;
+	if (!SC__SourceMap_BreakPoints) {
+		JB_SetRef(SC__SourceMap_BreakPoints, JB_FS_Constructor(nil));
+	}
+	if (!SC__SourceMap_Breakable) {
+		JB_SetRef(SC__SourceMap_Breakable, JB_FS_Constructor(nil));
+	}
+	SC__SourceMap_LastLength = P->Length;
+	byte* Data = JB_FS_WriteAlloc_(P, T);
+	memzero(Data, T);
+	return ((uint*)Data);
 }
 
 void SC_SourceMap__SortBreaks(FastString* B) {
