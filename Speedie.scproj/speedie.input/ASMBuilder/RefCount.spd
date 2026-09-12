@@ -173,7 +173,6 @@ function Assembler.RefCount (fn_asm)						// JB_SetRef(a, b)
 	|| fn = prms.obj|SCFunction|!
 	|| pf = prms.first
 	if fn == compiler.RefNew
-		if "TestSyntax".trap
 		|| A = .µ(pf!) // merge gtab into ralo?
 		return exp.RALO(dest, A) * Dest
 

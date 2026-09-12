@@ -151,7 +151,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	dot <~ (@Thg, "FastString")
 	dot <~ @emb
 	
-	|| decl = MakeDecl( "FastString", fsName, Dot, scdeclinfo.Borrowed )
+	|| decl = MakeDecl( "FastString", fsName, Dot, /*scdeclinfo.Borrowed*/ ) // borrowed destroys refcounting and causes bugs
 	point.Prev = decl
 	|| errpos = msg
 	for item in msg
