@@ -31,11 +31,12 @@ function PressingTabs (guiaction)
 		|| p = .submenu|listview|
 			|| ide = row.ide
 				p.ListSource.clear
-				p <~ ("Copy " + ide.projname,	MenuCopyProject, self)
-				p <~ ("Show In Desktop",		MenuShowProject, self)
-				p <~ ("Close",					MenuCloseProject, self)
+				|| obj = ide.lineinfo // prevent leak, by not refering to the IDE but a thing inside of it
+				p <~ ("Copy " + ide.projname,	MenuCopyProject, obj)
+				p <~ ("Show In Desktop",		MenuShowProject, obj)
+				p <~ ("Close",					MenuCloseProject, obj)
 				if ide.RunningProd.Status.IsRunning
-					p <~ ("Kill",				MenuKillProject, self)
+					p <~ ("Kill",				MenuKillProject, obj)
 					
 				.OpenMenu(row)
 
@@ -43,12 +44,15 @@ function PressingTabs (guiaction)
 function message.IDE (|perryide|)
 	opt norefcounts
 	if self
-		|| o = .MenuIDE
-			return o
+		|| o = .Obj
+		if o isa GuiControl
+			return o.ide
+	
 		for w in window.all
 			if w isa PerryIDE
 				if .name ~= w.Project
 					return w
+
 
 function ClickedOpenRecent (GUIaction)
 	if self isa Button
