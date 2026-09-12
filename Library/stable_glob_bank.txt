@@ -29,6 +29,7 @@ GUI__App_DrawFrameLength
 JB__API_NilHappened_
 JB__Tk__StopBars
 JB__Flow__Enabled
+JB__Flow_FlowWhile
 GUI__App_EventCount
 GUI__App_Scale
 GUI__ScrollInfo_InDrag_
