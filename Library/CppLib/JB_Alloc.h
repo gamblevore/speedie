@@ -285,7 +285,9 @@ u32 JB_ObjCount();
 			debugger;
 	}
     #define JBTestSanityOK 1
-    #define JB_TotalSanity_Force 0
+    #ifndef JB_TotalSanity_Force
+		#define JB_TotalSanity_Force 0
+	#endif
 #else
     #define JBObjRefTest(obj)
     #define JBTestSanityOK 0
