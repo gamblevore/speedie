@@ -1448,6 +1448,7 @@ extern Dictionary* SC__FB_AppOptions;
 #define JB__Flow__Enabled JB__.Flow__Enabled
 #define JB__Flow_CompareAgainst JB__.Flow_CompareAgainst
 #define JB__Flow_FlowOut JB__.Flow_FlowOut
+#define JB__Flow_FlowWhile JB__.Flow_FlowWhile
 extern Message* SC__AC_all_tmp_src;
 extern SCFunction* SC__AC_AnonFn;
 extern SCNode* SC__AC_AnonParent;
@@ -1669,6 +1670,7 @@ extern fn_asm SC_fn_asm_table[64];
 extern FastString* SC_fs_tmp_num;
 extern Dictionary* SC_FuncLinkageTable;
 extern Dictionary* SC_FuncPreReader;
+extern int SC_GenFlowCount;
 #define kJB_kActualTypecasts ((int)-16545)
 #define kJB_kAddressOfMatch ((int)12582912)
 #define kJB_kCastedMatch ((int)25165824)
@@ -2597,9 +2599,10 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
+	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Syx_CurrFuncID_;
-	InputStream* Flow_CompareAgainst;
+	FastString* Flow_FlowOut;
 	Dictionary* Constants__SyxDict;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* Constants_XML_EscapeStr;
@@ -2609,12 +2612,12 @@ struct JB_Globals {
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	Message* Tk__EndOfLineMarker;
-	FastString* Flow_FlowOut;
+	JB_File* App__stdin;
 	Dictionary* TC_Types_Dict;
 	JB_String* App_Usage;
 	JB_File* Platform_Logger_;
 	JB_ErrorReceiver* StdErr;
-	JB_File* App__stdin;
+	InputStream* Flow_CompareAgainst;
 	Message* App__Conf;
 	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
@@ -2962,8 +2965,6 @@ bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpos
 
 bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_flow(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_flowlog(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_force(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -3032,8 +3033,6 @@ bool SC_FB__ParseArgs();
 
 void SC_FB__ParseOption(JB_String* Arg);
 
-void SC_FB__SetFlow();
-
 void SC_FB__SetOutputPath(JB_String* Path);
 
 void SC_FB__StopStripping();
@@ -3049,9 +3048,11 @@ void JB_Flow__DisabledIncr(int Value);
 
 bool JB_Flow__Enabled();
 
-void JB_Flow__Fail(JB_String* Found, JB_String* Expected);
+void JB_Flow__Fail(JB_String* Found);
 
 int JB_Flow__Init_();
+
+void JB_Flow__Input(JB_String* Str, int64 Num);
 
 bool JB_Flow__New();
 
@@ -3059,11 +3060,9 @@ bool JB_Flow__Start(JB_String* Name);
 
 void JB_Flow__Stop();
 
-void JB_Flow__SyntaxAppend(uint /*byte*/ Value);
+void JB_Flow__AppendStr(JB_String* Value);
 
 void JB_Flow__InputStrings(Array* Lines);
-
-void JB_Flow__Input(JB_String* Value);
 
 
 
@@ -4474,6 +4473,8 @@ bool JB_uint_OperatorIsa(uint Self, uint N);
 uint JB_uint_OperatorMax(uint Self, uint Other);
 
 uint JB_uint_OperatorMin(uint Self, uint Other);
+
+JB_String* JB_uint_Render(uint Self, FastString* Fs_in);
 
 
 
@@ -7355,6 +7356,8 @@ int JB_SS_Find(InputStream* Self, uint /*byte*/ C);
 
 bool JB_SS_HasAny(InputStream* Self);
 
+bool JB_SS_HasHeader(InputStream* Self, JB_String* Header);
+
 int JB_SS_HInt(InputStream* Self);
 
 bool JB_SS_NextChunk(InputStream* Self);
@@ -7476,8 +7479,6 @@ void SC_Imp_Use(SCImport* Self);
 int SC_Imp__CurrFileNum();
 
 SCNode* SC_Imp__DoImport(Message* Node, SCNode* Name_space, Message* ErrPlace);
-
-void SC_Imp__ExportShaders();
 
 SCImport* SC_Imp__FindImport(JB_String* S);
 
@@ -7828,7 +7829,7 @@ Ind JB_Str_OutWhite(JB_String* Self, int Start, int After);
 
 JB_String* JB_Str_Parent(JB_String* Self);
 
-Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool AllowDecomp);
+Message* JB_Str_Parse(JB_String* Self, Syntax Owner, bool NoDecomp);
 
 Message* SC_Str_ParseClean(JB_String* Self);
 
@@ -8589,7 +8590,11 @@ FatASM* SC_Msg_FXP2(Message* Self, ASMReg R1, ASMReg R2);
 
 void SC_Msg_GenBranchFlow(Message* Self);
 
-void SC_Msg_GenTernFlow(Message* Self);
+Message* SC_Msg_GenFlow(Message* Self);
+
+void SC_Msg_GenProtoFlow(Message* Self);
+
+void SC_Msg_GenTernFlow(Message* Self, SCDecl* Type, SCNode* Name_space);
 
 void SC_Msg_GenWhileFlow(Message* Self);
 
@@ -10843,6 +10848,8 @@ Message* SC_Func__AlterPostCond(Message* PostCond, Message* IterPostCond, Messag
 
 Message* SC_Func__ArgToFunc(JB_String* NewName, Message* Params, Message* Arg);
 
+bool SC_Func__CanGenFlow();
+
 bool SC_Func__CanKeepAsSource(Message* List, Message* Arg, SCDecl* D);
 
 bool SC_Func__CanKeepAsValue(SCIterator* Iter, Message* Arg, SCDecl* Dcl, Message* Value);
@@ -11405,9 +11412,10 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
+	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Syx_CurrFuncID_;
-	JB_Object* Flow_CompareAgainst;
+	JB_Object* Flow_FlowOut;
 	JB_Object* Constants__SyxDict;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* Constants_XML_EscapeStr;
@@ -11417,12 +11425,12 @@ struct JB_Globals {
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Flow_FlowOut;
+	JB_Object* App__stdin;
 	JB_Object* TC_Types_Dict;
 	JB_Object* App_Usage;
 	JB_Object* Platform_Logger_;
 	JB_Object* StdErr;
-	JB_Object* App__stdin;
+	JB_Object* Flow_CompareAgainst;
 	JB_Object* App__Conf;
 	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
