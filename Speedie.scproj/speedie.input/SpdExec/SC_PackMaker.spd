@@ -174,7 +174,7 @@ module PackMaker
 		compiler.During = 0
 	
 	
-	function BakePackToDisk 
+	function BakePackToDisk
 		|jbin| j = Compiler.ProductPath.OutputStream$
 		|| boomerang = FastString() // callback? Or is it a throwback? 
 		(Compiler is Baking)
