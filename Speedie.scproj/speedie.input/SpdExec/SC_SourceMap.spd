@@ -35,8 +35,7 @@ module SourceMap
 			.breakable ?= faststring()
 			.lastlength = p.length
 			rz = p.Reserve(T)|&uint|
-			for i in t
-				rz[i] = 0
+			Memory.Zero(rz, t)
 
 
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
