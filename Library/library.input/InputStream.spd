@@ -38,8 +38,8 @@ class InputStream
 		return .str(.length - .startfrom)
 
 
-	function Parse (|syntax| owner = @arg, |bool| AllowDecomp=true, |message|)
-		return .ReadAll.parse(owner, allowdecomp)
+	function Parse (|syntax| owner = @arg, |bool| NoDecomp=false, |message|)
+		return .ReadAll.parse(owner, NoDecomp)
 
 	
 	libinternal ReadChunk (|file| f, |bool|)
@@ -147,12 +147,12 @@ class InputStream
 	inline Int32BE (|int|)
 		return .uintbe(4)
 
-	function UIntBE (|int| Size, |uint64|)
+	function UIntBE (|int| Size=4, |uint64|)
 		for Size
 			rz <<= 8
 			rz += .byte max 0
 
-	function UInt (|int| size, |uint64|)
+	function UInt (|int| size=4, |uint64|)
 		for i in size
 			|| b = .byte max 0
 			rz += b << (i<<3)

@@ -157,7 +157,7 @@ class File (StringShared)
 			s = s.Decompress(lim, nil)
 		if s
 			(Message).CreateLayerAndUse(self, s)
-			rz = S.parse(owner, false) // already decompressed.
+			rz = S.parse(owner, true) // already decompressed.
 			(message).restore
 
 	

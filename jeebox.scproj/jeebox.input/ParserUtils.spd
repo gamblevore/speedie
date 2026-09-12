@@ -71,7 +71,7 @@ function String.IsJbin (|ind|)
 
 
 
-function String.Parse (|syntax| owner = @nil, |bool| AllowDecomp=true,  |MessageRoot|)
+function String.Parse (|syntax| owner = @nil, |bool| NoDecomp=false,  |MessageRoot|)
 	description `Use this to parse jeebox text into a message. Full explanation at file:///usr/local/speedie/Documentation/Jeebox.md and file:///usr/local/speedie/Documentation/Message.md
 
 Single-line strings with single-node output, will take that node as the root.
@@ -95,7 +95,7 @@ To get around this, just do:  x = str.parse(@arg)
 `
 	|| J1 = .IsJbin
 	|| data = self[J1 max 0, int.max]
-	if AllowDecomp and data.iscompressed
+	if !NoDecomp and data.iscompressed
 		data = data.decompress(int.max)
 		J1 = data.IsJbin
 	|MessageRoot--| Doc
