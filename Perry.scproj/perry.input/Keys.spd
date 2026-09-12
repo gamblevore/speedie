@@ -20,8 +20,7 @@ extend PerryIDE
 	function RunKey (|bool|)
 		opt norefcounts
 		if .RunningProd  and  .DebugMode is CakeMode // Run key
-			if .DebugMode is Crashed
-				.MakeNothingRunning
+			.MakeNothingRunning
 			return .ViewRun
 		ClickedDebug(.RunButton)
 		return true

@@ -137,20 +137,23 @@ function fnStillRunning (fnConfirmCanceller)
 		return !.RunningProd
 
 
-function PerryIDE.Stop (|unixprocess| prod, |bool|)
+function PerryIDE.Stop (|unixprocess| prod)
 	if prod
 		prod.kill(-1)
 		.UpdateDebuggedApp(true)
-	return true
 
 
 function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 	|| prod = .RunningProd
-		.showide
-		|| str = "Kill running product '".append(.projName, "'", Reason) // should be automatic but isnt FN
-		// from a + b + c + d --> a.append...
-		if .confirm(str, fnStillRunning)
-			if .stop(prod)
+		if (.DebugMode is Crashed) or !fnStillRunning(self)
+			.stop(prod)
+			prod = nil
+		  else
+			.showide
+			|| str = "Kill running product '".append(.projName, "'", Reason) // should be automatic but isnt FN
+			// from a + b + c + d --> a.append...
+			if .confirm(str, fnStillRunning)
+				.stop(prod)
 				prod = nil
 	return !prod
 
