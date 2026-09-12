@@ -10,8 +10,9 @@ module FlowLog
 	linkage: cpp_part Flow
 
 	|InputStream?|			CompareAgainst
-	|faststring?|			FlowOut
+	|FastString?|			FlowOut
 	|int|					_Enabled
+	|uint|					FlowWhile
 	
 	function Enabled (|bool|)
 		visible
@@ -24,75 +25,89 @@ module FlowLog
 	inline New (|bool|)
 		return ._Enabled == 1
 
-	inline DisabledIncr (|int| value=1)
+	inline DisabledIncr (|int| Value=1)
 		._Enabled -= Value
 
 
 	function Stop
 		flow off, opt norefcounts
 		
-		._Enabled = 0
+		require .Enabled
+		self <~ "end-of-line"
 		|| w = .FlowOut
 			w.Flush
 			.FlowOut = nil
 		
 		if .CompareAgainst!=nil
-			"Flow: Occurred equally."
+			if ._Enabled == 0
+				"Flow: Occurred equally."
 			.CompareAgainst = nil
+		._Enabled = 0
 
 	
-	libinternal Fail (|string| found, |string| expected)
+	libinternal Fail (|string| Found)
 		flow off
 		
 		._Enabled = -1
-		|| fs = FastString()
-		fs <~ "Expected "
-		fs.AppendHexData(expected)
-		fs <~ " but found "
-		fs.AppendHexData(found)
-		app.StackTrace(3, fs)
-		printline fs
 		.CompareAgainst = nil
+		"Flow: Differed\n"
+		printline app.StackTrace(3)
 		debugger
 	
 	
-	syntax append (|byte| value)
-		visible,  flow off,  opt norefcounts
-		if .Enabled
-			._Enabled = 0
-			|| f = .flowout
-				f <~ value
-			  else
-				|| a = .CompareAgainst!
-				|| b = a.byte
-				if b != value
-					.fail(string.byte(value), string.byte(b))
-			._Enabled = 1
+	syntax append (|int64| Value)
+		inlined
+		.input(nil, value)
+
+
+	syntax append (|string| Value)
+		cpp_part AppendStr
+		inlined
+		.input(value, -1)
 	
-	syntax append (|[string]| lines)
-		cpp_part InputStrings, opt norefcounts, flow off
-		
-		if .Enabled
-			for s in lines
-				self <~ s
-				self <~ '\n'
-
-	syntax append (|string| value)
-		cpp_part Input, visible, flow off
-
+	
+	autogen Input (|string?| Str, |int64| Num)
+		visible,  flow off,  opt norefcounts
 		require .Enabled
+
 		._Enabled = 0
-		|| f = .flowout
-			f <~ value
+
+		|| w = .FlowWhile
+			.FlowWhile = 0
+
+		|| out = .FlowOut
+			if w
+				out.AppendHInt(w)
+			if str != nil
+				out <~ str
+			if num >= 0
+				out.AppendHInt(num)
 		  else
-			|| a = .CompareAgainst!
-			|| b = a.str(value.length)
-			if b != value
-				.fail(value, b)
+			|| input = .CompareAgainst!
+			
+			if w
+				|| v = input.HInt
+				if v != w
+					return .fail(w.render)
+					
+			if (str != nil) and !input.HasHeader(str)
+				return .fail(str)
+
+			if (num >= 0) and (input.hint != num)
+				return .fail(num.render)
+			
 		._Enabled = 1
+		
+	
+	syntax append (|[string]| Lines)
+		embedded,  cpp_part InputStrings,  opt norefcounts,  flow off
+		
+		require .Enabled
+		for s in lines
+			.input(s, '\n')
 				
 
-	function ForceStart (|string| name,  |bool|)
+	function ForceStart (|string| name, |bool|)
 		flow off
 		|string--| str = app["flowlog"]
 		if !str
@@ -119,30 +134,43 @@ module FlowLog
 			return .ForceStart(name)
 
 
+inline app.FlowLog
+	FlowLog.FlowWhile++
 
-function uint64.FlowLog (|uint64|)
-	embedded
-	|| str = self|int64|.render
-	FlowLog <~ str
-	return self
+/*
+// for ternaries
+// not so sure its a good idea just yet. kinda tricky
+
+	// x = ((a)(b,c)).flowlog
+
+// what about ASM or other types? only do it on a few?
+
+	x = ((a)(b,c)).flowlog
+*/
 
 
-function bool.FlowLog (|bool|)
-	embedded
-	|| str = .render
-	FlowLog <~ str
-	return self
-
-
-function string.FlowLog (|string|)
-	embedded
+inline byte.FlowLog (|byte|)
 	FlowLog <~ self
 	return self
 
 
-function object.FlowLog (|object|)
-	embedded
-	.ObjectID|uint64|.FlowLog
+inline int.FlowLog (|int|)
+	FlowLog <~ self
+	return self
+
+
+inline bool.FlowLog (|bool|)
+	FlowLog <~ self|int|
+	return self
+
+
+inline string.FlowLog (|string|)
+	FlowLog <~ self
+	return self
+
+
+inline object.FlowLog (|object|)
+	flowlog <~ .ObjectID|int|
 	return self
 
 

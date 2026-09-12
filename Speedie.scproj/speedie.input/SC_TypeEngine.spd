@@ -954,8 +954,8 @@ function TypeOfTernary (ExprResolver)
 	exp.ASMType = ASMType.ktern
 	using exp
 		exp.first = @thg + "JB_Ternary"
-		if Options.GenFlowLogCode
-			exp.GenTernFlow
+		if result and Options.GenFlowLogCode
+			exp.GenTernFlow(result, name_Space)
 		
 	return Result
 

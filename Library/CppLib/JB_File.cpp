@@ -136,24 +136,14 @@ extern const char* JB_CrashLogFileName;
 
 int JB_ErrorHandleFileC (const char* Path, int err, const char* Operation);
 bool JB_Flow__Enabled   ();
-void JB_Flow__Input     (JB_String* data);
+void JB_Flow__Input     (JB_String* data, uint64 Number);
 
 
 void JB_Flow__Report (u8* Addr, int Length) {
 #ifndef AS_LIBRARY
 	if (JB_Flow__Enabled()) {
 		uint64 Hash = JB_CRC(Addr, Length, 0);
-		Hash = Hash xor (Hash >> 32);
-		JB_String A;
-		A.Addr = (u8*)(&Hash);
-		A.Length = 8;
-		int p = 8;
-		for (int i = 0; i < 4; i++) {
-			auto C = (Hash >> i*8)&255;
-			A.Addr[--p] = '@' + (C&15);
-			A.Addr[--p] = '@' + (C>>4);
-		}
-		JB_Flow__Input(&A);
+		JB_Flow__Input(nil, Hash>>1);
 	}
 #endif
 }

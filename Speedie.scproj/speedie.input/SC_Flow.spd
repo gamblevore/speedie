@@ -1,17 +1,6 @@
 
-// this doesn't do what I want. I should just take it out, right?
-// we should do it on the AST instead? Its simpler!
-// the ternary is a little... harder. Perhaps we can log the result
-// of the tern?
-// the problem, is that we don't want to make it like: if test --> if (loggingfunc(test))
-// then we lose all the various ASMs generated. JBAN, JBOR, JMPI, JMPF, JMKN, etc
-// only one will be generated.
-// so we need to put it in the branch itself
-// so... thats not so bad for if/while
-// but for ternaries... how?
-// log the result?
 
-// Soooo...    if ((f)(a,b)) --> if ((f)(a,b)).flowlog
+// Soooo...		if ((f)(a,b)) --> if ((f)(a,b)).flowlog
 // so a function that returns the input, after logging the result
 
 
@@ -28,39 +17,76 @@ insertion
 	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
 
 
-//	if Options.GenFlowLogCode
-//		ElseArg.GenBranchFlow
+/*
+«dot "flowlog"
+	«emb »
+»
+*/
 
+
+|| GenFlowCount = 0
+
+function message.GenFlow (|message|)
+	opt norefcounts
+	|| dot = @dot + "flowlog"
+	dot <~ ++GenFlowCount
+	dot <~ @emb
+	return dot
+
+
+function @SCFunction.CanGenFlow (|bool|)
+	return SCFunction.CurrFunc isnt FlowDisabled
+	
 
 function message.GenBranchFlow
-	require  SCFunction.CurrFunc isnt FlowDisabled
-	// if x {} --> if x {'a'.flowlog}
+	// {} --> {'a'.flowlog}
+	opt norefcounts
+	if scfunction.CanGenFlow
+		.first = .GenFlow
 
 
 function message.GenWhileFlow
-	require  SCFunction.CurrFunc isnt FlowDisabled
 	// while x {} --> while x {app.flowlog}, 'a'.flowlog
-	
+	opt norefcounts
+	if SCFunction.CanGenFlow
+		.next = .GenFlow
+		ifn (.first!.unbra isthing "true")			// inf loop, no log
+			|| arg = .second
+			arg ?= .arg
+			|| g = .GenFlow
+			arg.first = g
+			g = g.first!
+			g.func = @thg
+			g.name = "app"
 
-function message.GenTernFlow
-	require  SCFunction.CurrFunc isnt FlowDisabled
+
+
+function message.GenProtoFlow
+	// {} --> {'a'.flowlog}
+	opt norefcounts
+	if scfunction.CanGenFlow
+		using self
+		.first = .GenFlow
+
+
+function message.GenTernFlow (|scdecl| Type, |scnode| name_space)
 	// x = ((a)(b,c))
 	// -->
 	// x = ((a)(b,c)).flowlog
-	
+	opt norefcounts
+	require scfunction.CanGenFlow
+	ifn type.MiniMatch(typestring!.typenormal)
+		|| ty = type.type.BaseType
+		require ty is DataType // or Struct or Pointer
 
-	
-	
+	|| dot = .WrapWith(@dot, "flowlog")
+	dot <~ @emb
+	TypeOfExpr(dot, name_space)
+	dot.obj = type
+	|| bra = dot.WrapWith(@bra)
+/	bra.obj = type
 
-//			ifn (while.first!.unbra isthing "true") // inf loop, no log
-// where to do this? in AST/Nil/ASM?
-// ASm is too late.
-// so AST or nil
-// Nil can be redone... so no good.
-// ast then?
 
-//	if Options.GenFlowLogCode and (f isnt FlowDisabled)
-//		"if"
-//		"while"
-//		"JB_Ternary"
+
+
 

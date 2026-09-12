@@ -885,7 +885,7 @@ function scdecl.DeclToDot (|SCDecl| P0, |Message|)
 
 function scdecl.RefDestructor (|message|)
 	opt norefcounts
-	|| m = .DeclToDot(scfunction.currfunc!.self)
+	|| m = .DeclToDot(SCFunction.currfunc!.self)
 	if .IsCArray
 		return screfs.DecrMulti(self, m, false)
 	return SCRefs.RefClearMsg( m )

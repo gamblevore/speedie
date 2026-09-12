@@ -66,25 +66,10 @@ module Options
 module Feedback
 	linkage
 		cpp_part FB
-	
-	
-	function SetFlow
-		if app["flow"] 	// options.GenFlowLogCode specified by --flow
-			|| v = options.GenFlowLogCode.string
-			if app.prefs["self_flow"] != v
-				// update current self_flow pref
-				app.prefs["self_flow"] = v
-				app.Prefs.Save
-		  else
-			// load from prefs unless overwritten by --flow
-			Options.GenFlowLogCode = app.prefs["self_flow"].yes
 		
-		// update current target
-		SC_Targets["flow"] = options.GenFlowLogCode
-	
 	
 	function CheckSelfModifying
-		require !options.SingleFileInput
+		require !Options.SingleFileInput
 		require !Options.SelfReplacement
 		
 		|| p = compiler.BaseProjectPath$
@@ -93,7 +78,6 @@ module Feedback
 			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			options.ForceRecompile = true
-			.SetFlow
 			SC_Targets["self"] = true
 		  elseif p ~= compiler.jeebox
 			Options.ProjectIsMiniLib = true
@@ -287,13 +271,9 @@ module Feedback
 			Options.Mode = 0
 		
 		+'flowlog'
-			0 // placeholder
-			
-		+'flow'
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
-			|| b = value.optionbool
-			Options.GenFlowLogCode = b 
-			SC_Targets["flow"] = b
+			Options.GenFlowLogCode = true
+			SC_Targets["flow"] = true
 			
 		+'noisy'
 			Explain(Purpose, "Prints more stuff")$
