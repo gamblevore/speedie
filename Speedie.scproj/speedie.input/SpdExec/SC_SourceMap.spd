@@ -30,12 +30,16 @@ module SourceMap
 
 	function Reserve (|int| T, |&uint|)
 		opt norefcounts
-		|| p = .positions
-			.breakpoints ?= faststring()
-			.breakable ?= faststring()
-			.lastlength = p.length
-			rz = p.Reserve(T)|&uint|
-			Memory.Zero(rz, t)
+		|| p = .positions$
+
+		.breakpoints ?= faststring()
+		.breakable ?= faststring()
+		.lastlength = p.length
+		|| data = p.Reserve(T)
+		Memory.Zero(data, t)
+		return data|&uint| // cleaner to type-cast it after... considering last time
+		// I wrote a for-loop zeroing it, as uint instead of byte which corrupted memory.
+		// I mean, its OK now either way, but as a "good habit" to remember, this is better.
 
 
 	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
