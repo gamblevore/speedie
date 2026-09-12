@@ -26,7 +26,7 @@ function PrintNum (|int64| b1)
 
 
 function app.TestSyntax
-	|| L2 = "(a,b,c,d)".parse
+//	|| L2 = "(a,b,c,d)".parse
 	printnum(60GB)
 	printnum(7.9MB|int|)
 	printnum(9524600)
