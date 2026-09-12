@@ -346,23 +346,3 @@ class SCImport
 	// clean AST
 		// apply target to prefix AST
 
-
-		function ExportShaders
-			require .shaders
-			
-			Compiler.stage( "Copying_Shaders" )
-			compiler.Timer( "Copying_Shaders" )
-			
-			|| P = compiler.BuildFolder["Resources/Shaders"]
-			P.MakeAndGoInto
-			
-			for (f in .shaders) (sh_name)
-				if (f isa File)
-					|| name = f.name
-					|| Dest = P[name]!
-					dest.writeall("\n// (Copy of original)\n" + f.readall)
-				  elseif (f isa string)
-					|| Dest = P[sh_name]!
-					debugger /// what?
-					Dest.writeall(f)
-
