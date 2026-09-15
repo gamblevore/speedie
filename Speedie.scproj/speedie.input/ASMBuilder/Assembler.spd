@@ -427,7 +427,7 @@ struct Assembler
 				.µdebug(exp, dest)
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
-			if dest isnt negate and ss is negate
+			if dest isnt negate and ss is alreadynegated
 				ss.negatefail(dest)
 			// dest discard means "we are telling you that we don't need the result"
 			// return discard means "the result is unused, so reg0 isn't actually being set to"

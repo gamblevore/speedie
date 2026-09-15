@@ -287,7 +287,7 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	if dest isnt CondRequest								// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		return .BoolAndOrSmartValue(A, B, dest, opp)
 
-	debugat 7
+	debugat 20
 	if "LoopTest2".trap or "LoopTest1".trap
 	rz = dest
 	if rz is negate
@@ -509,6 +509,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	|FatRange| OrTest
 	|| First = .Branch(A, OrTest, dest isnt negate)
+	(first is alreadynegated) = dest is negate			// fix :]
 	|| KF = OrTest.Constness.negate
 	if kf.knowntrue
 		|| fake = A.noop
@@ -524,7 +525,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	OrTest.JumpTo(.curr)
 	.ExitBranch
 
-	// why do we not call .boolanswerok on these though?
+	// why do we not call .BoolAnswerOK on these though?
 	if Br2.always
 		// a or 1
 		// 0 or 1
