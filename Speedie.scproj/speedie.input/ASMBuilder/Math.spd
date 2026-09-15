@@ -167,13 +167,18 @@ extend Assembler
 	
 
 	function Exists (|message| exp, |ASMReg| dest, |ASMReg| L, |ASMReg|)
-		opt inline		
-		return .Equals(exp, dest.negate, l, ASMReg())
+		opt inline
+		return .Equals(exp, dest.negate, l, ASMReg()).negafix(dest)
+		
+		
+	function NotEq  (fn_opasm)			// same issue, right?
+		return .Equals(exp, dest.negate, l, r).negafix(Dest)
 	
 	
-	function NotEq  (fn_opasm)
-		return .Equals(exp, dest.negate, l, r)
-
+	function asmreg.NegaFix	(|asmreg| Dest, |asmreg|)
+		isnt negate
+		(self is alreadynegated) = (dest is negate)
+		return self
 	
 	function Equals (fn_opasm)
 		|| rr = r.reg,  || ll = l.reg
