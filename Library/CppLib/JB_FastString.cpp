@@ -114,6 +114,13 @@ uint8* JB_FS_WriteAlloc_(FastString* fs, int GrowBy) {
 	return JB_FS_WriteAlloc_Inline_(fs, GrowBy);
 }
 
+uint8* JB_FS_Reserve(FastString* fs, int GrowBy) {
+	u8* Where = JB_FS_WriteAlloc_Inline_(fs, GrowBy);
+	if (Where)
+		memset(Where, 0, GrowBy);
+	return Where;
+}
+
 int JB_FS_FreeSize(FastString* fs) {
 	return fs->_Size - fs->Length;
 }

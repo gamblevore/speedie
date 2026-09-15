@@ -111,18 +111,23 @@ void JB_FreeString (const void* Arr) {
 }
 
 
-//void JB_MemSwap (const void* A, const void* B, int Bytes) {
-//	// could be a faster version but its possible the compiler will optimise this.
-//	// also rarely needed!
-//	byte* a = (byte*)A;
-//	byte* b = (byte*)B;
-//	while (--Bytes >= 0) {
-//		byte aa = *a;
-//		byte bb = *b;
-//		*a++ = bb;
-//		*b++ = aa;
-//	}
-//}
+void JB_MemSwap (const void* A, const void* B, int Bytes) {
+	// could be a faster version but its possible the compiler will optimise this.
+	// also rarely needed!
+	while (Bytes >= 8) {
+		Bytes-=8;
+		uint64 aa = *(uint64*)A;
+		uint64 bb = *(uint64*)B;
+		*(uint64*)A = bb; A = (void*)((byte*)A + 8); // hopefully compiles into *A++ = bb;
+		*(uint64*)B = aa; B = (void*)((byte*)B + 8); // same
+	}
+	while (Bytes-- >= 1) { // just do last 7 bytes here.
+		byte aa = *(byte*)A;
+		byte bb = *(byte*)B;
+		*(byte*)A = bb; A = (void*)((byte*)A + 1); // sameee...
+		*(byte*)B = aa; B = (void*)((byte*)B + 1); // same
+	}
+}
 
 
 

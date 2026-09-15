@@ -35,7 +35,7 @@ target debug
 		
 		function A (|&int| a)
 			
-		function B
+		function BB
 			visible
 			.a(.items)
 

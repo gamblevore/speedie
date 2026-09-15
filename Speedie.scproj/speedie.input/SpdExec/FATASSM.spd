@@ -806,7 +806,7 @@ datatype FatNopMode	(byte)
 	default 0
 	flags
 		Hard = 0
-		Soft
+		KeepInputs
 		Rewind
 	
 	Syntax Is (|fatnopmode| f, |bool|)

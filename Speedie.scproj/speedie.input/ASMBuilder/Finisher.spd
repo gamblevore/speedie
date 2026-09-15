@@ -4,13 +4,13 @@
 
 function Assembler.FinishASM
 	|| Last = .LastReal
-	if (.FnLength <= 0) or !Last.IsFinisher or .ExpectOneMore
+	|| S = .FuncStart
+	if (last < S) or !Last.IsFinisher or .ExpectOneMore
 		.MissingReturn
 		last = .LastReal
 	target debug
-		expect last >= .FuncStart	
+		expect last >= S
 
-	|| S = .FuncStart
 	|| Length = 0
 	
 	target debug

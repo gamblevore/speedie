@@ -39,6 +39,9 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 	(dest isnt AddrRequest)
+	target debug
+		|| readtrap = ++asmtrapper
+		if readtrap == -1
 	|| T = dest.µtype
 	|| byte_shift = t.ByteCount.log2	
 	if  (byte_shift|uint| > 4)

@@ -172,6 +172,9 @@ syntax access (|string| s, |SCObject|)
 
 function ActualAdd (|string| name, |scobject| IncObj)
 	opt norefcounts
+	
+	while .name and 0
+	
 	// could we use scdecl linked-lists... at least for scargs?
 	// we'd have to modify upcheck, I assume? to read from linked-lists?
 	if  self is AllowLinkedLists  and  incobj isa SCDecl
@@ -197,7 +200,7 @@ function UpCheck (|string| name, |bool| LookUp=true, |SCObject|) {
 	
 	|| curr = self					// avoid bugs like || a = 1, {|| a = 1}
 	while curr isa SCArg			// So... check upwards...
-		|| found = curr[name] 
+		|| found = curr[name]
 			return found
 		require lookup
 		curr = curr.parent|scarg|

@@ -2008,3 +2008,5 @@ sqrtf
 strcmp
 strlen
 strnlen
+JB_FS_Reserve
+JB_MemSwap

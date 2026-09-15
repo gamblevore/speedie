@@ -182,7 +182,8 @@ extend assembler
 	
 	
 	function SoftNop (|FATASM| ToNop)
-		return .nop_sub(ToNop, fatnopmode.soft, 0)
+		// means we still want to use the inputs of tonop, later, evne if they get derecremented down to 0
+		return .nop_sub(ToNop, fatnopmode.KeepInputs, 0)
 	
 	
 	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
@@ -196,6 +197,7 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
+		if "LoopTest1".trap
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -222,7 +224,7 @@ extend assembler
 		
 		for f.FatInputs in fat
 			if f
-				.Decr(f, NopMode, depth)
+				.Decr(f, FatNopMode.KeepInputs, depth)
 
 		for v.RegOutputs in fat
 			v &= 31
@@ -299,10 +301,13 @@ extend assembler
 	
 	
 	function Decr (|&fatasm| f, |fatnopmode| Mode, |int| Depth=0)
-		|| C = f.refcount
-		C -= (C > 0)
-		f.µrefcount = C
-		if (mode isnt soft) and C <= 0
+		|| R = f.refcount - 1
+		if r < 0
+			return
+
+		f.µRefCount = R
+		require (R <= 0)
+		if (mode isnt KeepInputs) // even temp inputs need to be kept // or (f is temp)
 			.nop_sub(f, mode, depth)
 	
 	
@@ -319,7 +324,7 @@ extend assembler
 	
 	
 	function Rewind (|fatasm| Start, |fatasm| After)
-		|| Mode = fatnopmode.soft|||fatnopmode.rewind
+		|| Mode = fatnopmode.KeepInputs|||fatnopmode.rewind
 		while start < After
 			.nop_sub(--After, mode, 0)
 	

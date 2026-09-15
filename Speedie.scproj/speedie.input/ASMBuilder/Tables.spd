@@ -901,12 +901,12 @@ function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
-	if t is temp // how can a declared variable be a temp?
+	if t is temp						// how can a declared variable be a temp?
 	
 	(t is param) = d is param
-	|| f = .Register(t.reg)	// consts must have fats! both in and out. unless r0.
+	|| f = .Register(t.reg)				// consts must have fats! both in and out. unless r0.
+		t.FatIndex = f.index			// why did I not do it always?
 		if .CanConstLocalThg(d, f)
-			t.FatIndex = f.index
 			(T is Const) = (f is Const)	
 	
 	
@@ -991,3 +991,24 @@ function message.DeclFunc (|scfunction|)
 	|| D = .obj
 	if D isa SCDecl
 		return d.Func
+
+
+/*
+	while a and b
+		c()
+	
+	-->
+	
+	jump+1:
+	c()
+	
+	if !(a and b)
+		jump-1:
+		
+ // !(a and b) --> !a or !b --> !a or !0 --> !a or 1 --> always_true(!a)
+
+*/
+
+
+
+

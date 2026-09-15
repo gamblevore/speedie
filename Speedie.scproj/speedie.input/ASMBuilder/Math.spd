@@ -468,8 +468,8 @@ extend Assembler
 //		x = t + 1
 //			-->
 //		x = y + 2
-
-		|| XY1 = .lastreal(asm.addk)			#require
+		
+		|| XY1 = .LastReal(asm.addk)			#require
 		if XOut.IsVec // now what?
 		|| xinreg = XIn.reg
 		require xinreg == XY1.RegOnly

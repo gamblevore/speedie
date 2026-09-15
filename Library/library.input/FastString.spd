@@ -92,7 +92,7 @@ class FastString {
 		cpp_wrapper JB_FS_SmartResult
 	
 	function Reserve (|int| N, |&byte|)
-		cpp_wrapper JB_FS_WriteAlloc_
+		cpp_wrapper JB_FS_Reserve
 
 	function AppendHInt (|int64| n)
 		|| s = (n>=0)(n, -n)				// what about int.min?

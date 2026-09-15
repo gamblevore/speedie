@@ -49,6 +49,7 @@ uint8*  JB__WriteIntToBuffer (uint8* wp, u64 LeftOver);
 bool JB_FS_SizeIf_( FastString* fs, int InitLength);
 void JB_FS_ByteSet(FastString* self, int offset, byte Val);
 uint8*  JB_FS_WriteAlloc_(FastString* fs, int GrowBy);
+uint8*  JB_FS_Reserve(FastString* fs, int GrowBy);
 void JB_FS_AppendString(FastString* self, JB_String* u);
 int JB_FS_AppendURL(FastString* self, JB_StringC* URL, uint64 TimeoutSeconds, JB_StringC* Cookie );
 void JB_FS_AppendRange(FastString* self, JB_String* u, int Start, int After);

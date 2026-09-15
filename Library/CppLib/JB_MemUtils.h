@@ -65,6 +65,7 @@ void JB_ReportMemoryError(const char* A, int64 N, const char* B);
 uint8* JB_AllocateString (const void* Arr, int N);
 void JB_FreeString(const void* Arr);
 
+void JB_MemSwap (const void* A, const void* B, int Bytes);
 uint8* JB_Realloc (const void* Arr, int N);
 void JB_Free(const void* Arr);
 u64 JB_msize(const void* Arr);
