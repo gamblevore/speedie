@@ -167,17 +167,7 @@ extend Assembler
 	
 
 	function Exists (|message| exp, |ASMReg| dest, |ASMReg| L, |ASMReg|)
-		opt inline
-		// if we already wanted to negate the result...
-		// well... we are comparing this vs 0, so we negate some that was already negated.
-		// so negate is cleared.
-		// and then we DON'T set alreadynegated
-		// so we lose it.
-		// seems either way... we should return alreadynegated???
-		
-		// i mean... if its negate, we want already negated
-		// if its NOT negate, we negate it, so it will be alreadynegated
-		
+		opt inline		
 		return .Equals(exp, dest.negate, l, ASMReg())
 	
 	
@@ -201,9 +191,10 @@ extend Assembler
 			rz = .CompareFloat(dest, l, r, exp, 2)						
 			
 		rz = rz.boolanswerok		// all of these handle negate!
-		(rz is alreadynegated)		// in case of double negation but the original wants to check that it is negated
+//		(rz is already negated)		// in case of double negation but the original wants to check that it is negated
 									// I'd need to add a "really tell us that we want negation" flag otherwise.
-	
+//		maybe try double-negation some other way.							
+//		do we mean: !!x    or do we mean:  if (!x or b)
 
 	function JumpIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
 		require  l is Const  or  r is Const

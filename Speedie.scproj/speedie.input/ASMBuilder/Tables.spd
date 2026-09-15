@@ -640,6 +640,10 @@ function AddressOf (fn_asm)
 function BoolNot (fn_asm)							// !a
 	dest = dest.negate
 	|| src = .µGetASM(exp, dest)
+	if dest isnt Negate
+		if src is AlreadyNegated // what?
+		return src
+	
 	if src is AlreadyNegated
 		return src
 	return .Exists(exp, dest, src)
