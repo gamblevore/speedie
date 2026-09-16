@@ -691,7 +691,6 @@ struct FatASM {
 struct FatRange {
 	FatASM* Start;
 	FatASM* After;
-	u16 FirstBlock;
 	MaybeBool Constness;
 };
 
@@ -2217,8 +2216,8 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FailableInt_Max ((int)2147483647)
 #define kJB__FailableInt_Min ((int)2147483649)
 #define kSC__FatNopMode_Hard ((int)0)
+#define kSC__FatNopMode_KeepInputs ((int)1)
 #define kSC__FatNopMode_Rewind ((int)2)
-#define kSC__FatNopMode_Soft ((int)1)
 #define kJB__FileDes_StdErr ((FileDes)2)
 #define kJB__FileDes_StdIn ((FileDes)0)
 #define kJB__FileDes_StdOut ((FileDes)1)
@@ -2492,6 +2491,9 @@ extern ArchonPurger SC__nil_T;
 #define kJB__dylib_Now ((int)2)
 #define kSC__FAT_kTrashedByFunction ((int)1)
 #define kSC__FAT_kTrashedByRefCounting ((int)2)
+#define kSC__FatRange_kEmptyFail ((int)0)
+#define kSC__FatRange_kEmptyKeep ((int)2)
+#define kSC__FatRange_kEmptyRemove ((int)1)
 extern IsaTester SC__IsaTester_T;
 #define kJB__TerminalDisplay_h ((int)35)
 #define kJB__TerminalDisplay_w ((int)80)
@@ -4754,7 +4756,11 @@ int SC_Reg_LeftScore(ASMReg Self);
 
 FatASM* SC_Reg_NeedFAT(ASMReg Self);
 
+ASMReg SC_Reg_NegaFix(ASMReg Self, ASMReg Dest);
+
 ASMReg SC_Reg_Negate(ASMReg Self, bool Neg);
+
+bool SC_Reg_NegateFail(ASMReg Self, ASMReg Dest);
 
 ASMReg SC_Reg_OperatorAs(ASMReg Self, ASMReg A);
 
@@ -5997,13 +6003,7 @@ bool SC_FAT__VerifyNumbers();
 
 
 // JB_FatRange
-bool SC_FatRange_Always(FatRange* Self);
-
-void SC_FatRange_JumpTo(FatRange* Self, FatASM* Curr);
-
-int SC_FatRange_Length(FatRange* Self);
-
-bool SC_FatRange_Never(FatRange* Self);
+void SC_FatRange_JumpTo(FatRange* Self, FatASM* Curr, int Allowed);
 
 
 
@@ -6209,7 +6209,7 @@ ASMReg SC_Pac_BitOr(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg
 
 ASMReg SC_Pac_BitXor(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-ASMReg SC_Pac_BoolAndOrOpt(Assembler* Self, Message* A, Message* B, ASMReg Dest, OpMode Opp);
+ASMReg SC_Pac_BoolAndOrSmartValue(Assembler* Self, Message* A, Message* B, ASMReg Dest, OpMode Opp);
 
 ASMReg SC_Pac_BoolAndOrValue(Assembler* Self, Message* A, Message* B, ASMReg Dest, OpMode Opp);
 
@@ -9948,6 +9948,10 @@ SCDecl* SC_Base_LookUpVarDecl(SCNode* Self, JB_String* Name);
 
 SCObject* SC_Base_LookUpVarRootDecl(SCNode* Self, JB_String* Name, Message* Exp);
 
+void SC_Base_LoopTest1(SCNode* Self, JB_String* Name, int A, int B);
+
+SCObject* SC_Base_LoopTest2(SCNode* Self, JB_String* Name);
+
 void SC_Base_MakeLibInternal(SCNode* Self, Message* Node);
 
 SCModule* SC_Base_Module(SCNode* Self);
@@ -11095,6 +11099,8 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
 
 inline bool JB_int_OperatorInRange(int Self, int Length);
 
+inline int SC_FatRange_Length(FatRange* Self);
+
 inline uint SC_Msg_SrcMap(Message* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
@@ -11118,6 +11124,12 @@ inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After);
+
+inline bool SC_FatRange_Always(FatRange* Self);
+
+inline bool SC_FatRange_Const(FatRange* Self);
+
+inline bool SC_FatRange_Never(FatRange* Self);
 
 inline bool SC_Pac_DepthOK(Assembler* Self, SCFunction* Fn);
 
@@ -11221,6 +11233,10 @@ inline bool JB_int_OperatorInRange(int Self, int Length) {
 	return false;
 }
 
+inline int SC_FatRange_Length(FatRange* Self) {
+	return Self->After - Self->Start;
+}
+
 inline uint SC_Msg_SrcMap(Message* Self) {
 	int P = Self->Position;
 	uint FileNum = ((uint)Self->Tag) >> 5;
@@ -11280,6 +11296,18 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After) {
 	return (SC__ASM_Encoders[SC_FAT_Op(Self)])(Self, Where, After);
+}
+
+inline bool SC_FatRange_Always(FatRange* Self) {
+	return JB_MaybeBool_KnownTrue(Self->Constness);
+}
+
+inline bool SC_FatRange_Const(FatRange* Self) {
+	return JB_MaybeBool_IsKnown(Self->Constness);
+}
+
+inline bool SC_FatRange_Never(FatRange* Self) {
+	return JB_MaybeBool_KnownFalse(Self->Constness);
 }
 
 inline bool SC_Pac_DepthOK(Assembler* Self, SCFunction* Fn) {
@@ -11380,7 +11408,7 @@ inline Message* JB_Macro_Run(Message* Self, Array* Prms) {
 }
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L) {
-	return SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__NewWith0());
+	return SC_Reg_NegaFix(SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__NewWith0()), Dest);
 }
 
 inline FatASM* SC_Pac_Read(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg Ptr, ASMReg VarAdd, SCDecl* ReadDecl, int Index) {
