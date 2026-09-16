@@ -41,13 +41,13 @@ function IfSub (fn_asm) // function If (fn_asm)
 		|| Clamped = .MiniClampOpt(exp, b.start)
 			return Clamped
 		.ExpectOneMore = true
-		b.JumpTo(.curr)
+		b.JumpTo(.curr, fatrange.kEmptyRemove)
 		.PhiMergeDeeper(exp, Phi)
 		return asmreg()
 	
 	.PhiMiddle(Phi)
 	|| AfterFirst = (!firstbranch.blocks)(other.jump, nil) // no need.
-	b.JumpTo(.curr)
+	b.JumpTo(.curr, fatrange.kEmptyRemove)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	if afterfirst
 		AfterFirst.JumpTo(.curr)
@@ -147,7 +147,7 @@ function WhileSub (|message| exp,   |asmreg|)
 		loop_test.after++
 	  else
 		InitialJump.JumpTo(loop_test.start)
-		loop_test.JumpTo(InitialJump+1)
+		loop_test.JumpTo(InitialJump+1, 0)
 		if loop_Test.length == 1									// loop opt!
 			InitialJump.CopyJump(loop_test.Start)
 			InitialJump.JumpTo(loop_test.After)
@@ -230,7 +230,7 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 
 	.PhiMiddle(Phi)
 	|| Exit = exp.jump
-	Branch.jumpto(.curr)
+	Branch.jumpto(.curr, 0)
 	|| mB = .µInto(B, dest)	
 	
 	Exit.jumpto(.curr)
@@ -515,18 +515,18 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		fake.const = 1
 		(first is CondAnswer)
 		first.fatindex = fake.index
-		return first.boolanswerok						// only way around this. Cos we got asmreg(0)
+		return first.BoolAnswerOK						// only way around this. Cos we got asmreg(0)
 
 	|fatrange| Br2
 	|| Phi = .PhiInit()
 	.EnterBranch
 	|| second = .Branch(B, Br2, dest is negate)
+
 	// if this branch... creates no instructions (fully known)
 	// then... the jump, gets destroyed... but it shouldn't be.
 	// so... we need to test for that... and also, make sure
 	// that its only no instructions, if br2.const
-	if "LoopTest1".trap
-	OrTest.JumpTo(.curr, br2.constness.isknown)
+	OrTest.JumpTo(.curr, br2.Const * fatrange.kEmptyKeep)
 	.ExitBranch
 
 	// why do we not call .BoolAnswerOK on these though?
@@ -630,15 +630,22 @@ Struct FatRange
 	|&FatASM|		After
 //	|uint16|		FirstBlock
 	|maybebool|		Constness
-	
+
 	function Length (|int|)
+		opt inline
 		return .after - .Start
 	
 	function Always (|bool|)
+		opt inline
 		return .Constness.KnownTrue
 	
 	function Never (|bool|)
+		opt inline
 		return .Constness.KnownFalse
+
+	function Const (|bool|)
+		opt inline
+		return .Constness.IsKnown
 	
 	iterator
 		|| curr = .after!
@@ -647,23 +654,34 @@ Struct FatRange
 			yield curr
 
 
-extend Assembler
-	function fatasm.JumpFix (|&fatasm| curr)
-		isnt CondAnswer
-		.JumpTo(curr)									// shouldn't (s isnt CondAnswer) go inside .jumpto?
-	
-	
-	function FatRange.JumpTo (|&FatAsm| curr, |bool| AllowNone=false)
-		|| Empty = curr == .After
-			if !AllowNone								// this is an issue.
-				error (curr, errorreceiver.internalerror)
+	constants
+		kEmptyFail
+		kEmptyRemove
+		kEmptyKeep
 
-		for s in self
-			if (s is CondAnswer) and !(s isa asm.knst)
-				if empty
-					s.JumpNegate
-				  else
-					s.JumpFix(curr)
+		
+
+function fatasm.JumpFix (|&fatasm| curr)
+	isnt CondAnswer
+	.JumpTo(curr)									// shouldn't (s isnt CondAnswer) go inside .jumpto?
+	
+
+function FatRange.JumpTo (|&FatAsm| curr, |int| Allowed=FatRange.kNeverEmpty)
+	|| Empty = curr == .After
+		if Allowed == kEmptyFail
+			if !assembler.sh.EntireInlineFailed
+				error (curr, ErrorReceiver.InternalError)
+			return
+
+	for s in self
+		if (s is CondAnswer) and !(s isa asm.knst)
+			target debug
+				if (empty and Allowed == kEmptyRemove)
+					if !assembler.sh.EntireInlineFailed
+			if empty and (allowed == kEmptyKeep)
+				s.JumpNegate
+			  else
+				s.JumpFix(curr)
 	
 
 target debug

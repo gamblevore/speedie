@@ -510,24 +510,26 @@ function Dot (fn_asm)										// a.b
 	if prop is global
 		return DoGlobal(self, dest, exp, prop)
 	
-	|| OV = .OpenVars				// is this safe? Not sure! delete if it causes problems.
+	|| OV = .OpenVars						// Is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
 	|| TyA = prop.ASMRegType
 	dest.µtype = tya
-	.CloseVars(ov)					// in terms of anything simple... I can't see problems.
+	.CloseVars(ov)							// In terms of anything simple... I can't see problems.
 	
-	|| Index = prop.ExportPosition 
+	|| Index = prop.ExportPosition
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
 		debugger
 		prop.typeinfo
+	
+	if dest isnt set
+		if (!dest.reg) and (obj is temp)
+			dest.reg = obj					// Keeps the const. not what we want
+			(dest isnt Const)
 		
-	if (dest isnt set) and !dest.reg and (obj is temp)
-		dest.reg = obj // keeps the const. not what we want
-		(dest isnt Const)
-	
-	if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
-		return .DotAddr(exp, dest, Index, prop, obj)
-	
+											// We can't return an address if we are setting?
+		if (dest is AddrRequest) or prop.IsCarray or prop.IsBareStruct
+			return .DotAddr(exp, dest, Index, prop, obj)
+
 	index >>= dest.ByteShift
 	return .ReadOrWrite(Dest, exp, obj, ASMReg(), prop, Index)
 
