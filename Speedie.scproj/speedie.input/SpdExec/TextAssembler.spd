@@ -26,6 +26,6 @@ module TextAssembler
 		for ch.fast in msg
 			if ch istmp "asm"
 				.textfunc(ch)
-			  elseif ch istmp "data"
-				.textdata(ch)
+//			  elseif ch istmp "data"
+//				.textdata(ch)
 
