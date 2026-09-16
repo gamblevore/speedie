@@ -173,8 +173,6 @@ syntax access (|string| s, |SCObject|)
 function ActualAdd (|string| name, |scobject| IncObj)
 	opt norefcounts
 	
-	while .name and 0
-	
 	// could we use scdecl linked-lists... at least for scargs?
 	// we'd have to modify upcheck, I assume? to read from linked-lists?
 	if  self is AllowLinkedLists  and  incobj isa SCDecl

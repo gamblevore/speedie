@@ -287,8 +287,7 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	if dest isnt CondRequest								// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		return .BoolAndOrSmartValue(A, B, dest, opp)
 
-	debugat 20
-	if "LoopTest2".trap or "LoopTest1".trap
+	if "LoopTest2".trap
 	rz = dest
 	if rz is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
@@ -485,7 +484,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	.EnterBranch
 	|| Phi = .PhiInit()
-	if "LoopTest2".trap or "LoopTest1".trap
+	if "LoopTest2".trap
 	|| Second = .Branch(B, AndTest, dest is negate)
 	.ExitBranch
 	if  first isnt Const
@@ -522,7 +521,12 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	|| Phi = .PhiInit()
 	.EnterBranch
 	|| second = .Branch(B, Br2, dest is negate)
-	OrTest.JumpTo(.curr)
+	// if this branch... creates no instructions (fully known)
+	// then... the jump, gets destroyed... but it shouldn't be.
+	// so... we need to test for that... and also, make sure
+	// that its only no instructions, if br2.const
+	if "LoopTest1".trap
+	OrTest.JumpTo(.curr, br2.constness.isknown)
 	.ExitBranch
 
 	// why do we not call .BoolAnswerOK on these though?
@@ -646,13 +650,20 @@ Struct FatRange
 extend Assembler
 	function fatasm.JumpFix (|&fatasm| curr)
 		isnt CondAnswer
-		.JumpTo(curr)							// shouldn't (s isnt CondAnswer) go inside .jumpto?
+		.JumpTo(curr)									// shouldn't (s isnt CondAnswer) go inside .jumpto?
 	
 	
-	function FatRange.JumpTo (|&FatAsm| curr)
+	function FatRange.JumpTo (|&FatAsm| curr, |bool| AllowNone=false)
+		|| Empty = curr == .After
+			if !AllowNone								// this is an issue.
+				error (curr, errorreceiver.internalerror)
+
 		for s in self
 			if (s is CondAnswer) and !(s isa asm.knst)
-				s.JumpFix(curr)
+				if empty
+					s.JumpNegate
+				  else
+					s.JumpFix(curr)
 	
 
 target debug

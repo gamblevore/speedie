@@ -41,6 +41,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	.backupfat(.curr)
 	|fatrange| LL
 	|| r = .TryInlineSub(prms, fn, AllowedGain, LL)
+		r = r.negafix(dest)
 		if fn is constructor
 			|| des = fn.cls!.DestructorFunc
 				.ASMReach(des)

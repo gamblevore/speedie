@@ -638,18 +638,23 @@ function AddressOf (fn_asm)
 
 
 function BoolNot (fn_asm)							// !a
-	if "AndOrTest".trap
 	dest = dest.negate
 	|| src = .µGetASM(exp, dest)
-	if dest isnt Negate and dest isnt condrequest
+	if src is condanswer
+		src.negatefail(dest)
+		return src.negafix(dest.negate)
+		
+	if dest isnt Negate
 		if src is AlreadyNegated // what?
-		return src
+		return src.negafix(dest.negate)
 	
 	if src is AlreadyNegated
 		src.negatefail(dest)
-		return src
-	return .Exists(exp, dest, src)
+		return src.negafix(dest.negate)
+	return .Exists(exp, dest, src).negafix(dest.negate)
 	
+//	if dest isnt negate and dest isnt condrequest // should be OK, it was passed unnegated
+//		return src
 
 
 function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
