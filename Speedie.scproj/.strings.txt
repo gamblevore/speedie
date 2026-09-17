@@ -1237,7 +1237,7 @@
 "Perhaps use == instead of ~= ?"
 "self_test.txt can’t be found."
 "Unable to get size"
-"Under 2 items in vector."
+"Bad loop. Always false but actually does stuff."
 "to "
 "Unexpected Params. This variable is not a function."
 "printline"
