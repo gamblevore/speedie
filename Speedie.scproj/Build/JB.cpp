@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2394];
+extern JB_StringC* JB_LUB[2393];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3503,7 +3503,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026091714));
+	JB_FS_AppendInt32(_fsf0, (2026091719));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10306,7 +10306,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026091714));
+	JB_FS_AppendInt32(_fsf0, (2026091719));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -13005,7 +13005,7 @@ int JB_InitCode_() {
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_ARel__)), JB_LUB[2388], JB_LUB[2389], 21);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Name__)), JB_LUB[305], JB_LUB[0], 22);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Dot__)), JB_LUB[2390], JB_LUB[2391], 23);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_SDot__)), JB_LUB[2392], JB_LUB[2393], 24);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_SDot__)), JB_LUB[2392], JB_LUB[1735], 24);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Func__)), JB_LUB[1584], JB_LUB[68], 25);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_BRel__)), JB_LUB[813], JB_LUB[1081], 26);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Adj__)), JB_LUB[1908], JB_LUB[504], 27);
@@ -32823,13 +32823,7 @@ JB_String* JB_Str_AfterByte(JB_String* Self, uint /*byte*/ B, int Last) {
 
 JB_String* JB_Str_ArgName(JB_String* Self) {
 	if (JB_Str_Exists(Self) and (JB_Str_First(Self) == '-')) {
-		Ind I = ({
-			Ind _t = ((Ind)JB_Str_FindByte(Self, '=', 0, kJB__int_Max));
-			if (!JB_Ind_SyntaxCast(_t)) {
-				_t = kJB__int_Max;
-			}
-			 (_t);
-		});
+		Ind I = JB_Str_Find2(Self, '=', 0, kJB__int_Max);
 		JB_String* S = JB_Str_Range(Self, 0, I, false);
 		JB_Incr(S);
 		JB_SetRef(S, JB_Str_TrimFirst(S, '-'));
@@ -32909,13 +32903,7 @@ Array* JB_Str_Components(JB_String* Self) {
 	JB_Incr(Rz);
 	int I = 0;
 	while (JB_int_SyntaxCompare(I, Self) <= -1) {
-		Ind N = ({
-			Ind _t = ((Ind)JB_Str_FindByte(Self, '/', I, kJB__int_Max));
-			if (!JB_Ind_SyntaxCast(_t)) {
-				_t = Self->Length;
-			}
-			 (_t);
-		});
+		Ind N = JB_Str_Find2(Self, '/', I, kJB__int_Max);
 		if ((I == 0) or (N > I)) {
 			JB_String* _tmPf0 = JB_Str_Range(Self, I, N, false);
 			JB_Incr(_tmPf0);
@@ -33177,6 +33165,14 @@ Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After) {
 	return -1;
 }
 
+Ind JB_Str_Find2(JB_String* Self, uint /*byte*/ Find, int Start, int After) {
+	Ind I = JB_Str_FindByte(Self, Find, Start, After);
+	if (JB_Ind_SyntaxCast(I)) {
+		return I;
+	}
+	return Self->Length;
+}
+
 ivec2 JB_Str_FindExt(JB_String* Self) {
 	int End = Self->Length;
 	if (End) {
@@ -33202,17 +33198,6 @@ ivec2 JB_Str_FindExt(JB_String* Self) {
 		};
 	}
 	return ((ivec2){});
-}
-
-Ind JB_Str_FindSlash(JB_String* Self, int From) {
-	Ind Rz = -1;
-	if (From < Self->Length) {
-		Rz = JB_Str_FindByte(Self, '/', From, kJB__int_Max);
-		if (!JB_Ind_SyntaxCast(Rz)) {
-			Rz = Self->Length;
-		}
-	}
-	return Rz;
 }
 
 int JB_Str_FindTrailingSlashes(JB_String* Self) {
@@ -33566,7 +33551,7 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last) {
 	{
 		JB_String* _Pf0 = JB_Str_RegularPath(P);
 		JB_Incr(_Pf0);
-		Ind _if1 = JB_Str_FindSlash(_Pf0, 1);
+		Ind _if1 = JB_Str_Find2(_Pf0, '/', 1, kJB__int_Max);
 		while (_if1 > 0) {
 			JB_String* S = JB_Str_Range(_Pf0, 0, _if1, false);
 			JB_Incr(S);
@@ -33576,7 +33561,10 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last) {
 				Rz = Err;
 				break;
 			}
-			_if1 = JB_Str_FindSlash(_Pf0, _if1 + 1);
+			if (_if1 >= _Pf0->Length) {
+				break;
+			}
+			_if1 = JB_Str_Find2(_Pf0, '/', _if1 + 1, kJB__int_Max);
 		};
 		JB_Decr(_Pf0);
 	}
@@ -50832,13 +50820,7 @@ Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing, Syntax Owner) 
 }
 
 JB_File* JB_File_Sibling(JB_File* Self, JB_String* Name) {
-	JB_String* _tmPf0 = JB_Str_Sibling(Self, Name);
-	JB_Incr(_tmPf0);
-	JB_File* _tmPf1 = JB_Str_AsFile(_tmPf0);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
+	return JB_Str_AsFile(JB_Str_Sibling(Self, Name));
 }
 
 bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu) {
@@ -61067,4 +61049,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 4142693325539125322 -3553162947685385611
+// -6182576332035341082 7096431023419015668

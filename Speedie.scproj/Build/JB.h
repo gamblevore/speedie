@@ -7730,9 +7730,9 @@ Ind JB_Str_FindByte(JB_String* Self, uint /*byte*/ Find, int Start, int After);
 
 Ind JB_Str_FindCharset(JB_String* Self, CharSet Find, int From, int After);
 
-ivec2 JB_Str_FindExt(JB_String* Self);
+Ind JB_Str_Find2(JB_String* Self, uint /*byte*/ Find, int Start, int After);
 
-Ind JB_Str_FindSlash(JB_String* Self, int From);
+ivec2 JB_Str_FindExt(JB_String* Self);
 
 int JB_Str_FindTrailingSlashes(JB_String* Self);
 

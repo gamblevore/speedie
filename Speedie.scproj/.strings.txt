@@ -1732,7 +1732,7 @@
 "://"
 "vmin"
 "mz\n\02"
-"\\ "
+"Self_Dot"
 "hint"
 "child"
 "-e"
@@ -2390,4 +2390,3 @@
 "dot"
 "Dot"
 "sdot"
-"Self_Dot"
