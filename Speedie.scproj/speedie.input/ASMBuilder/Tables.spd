@@ -314,10 +314,12 @@ function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| F = exp.first!.ASMUnbra
 	|| X = .ExistingVar(F)
-		(x is setalways)
+		|| D = F.ASMDecl
+		if d.IsBareStruct or d.IsCArray
+			(x is SetAlways)
 		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
 
-	// Probably x.y = z, or x[y] = z 
+	// Probably x.y = z,  or x[y] = z
 
 	dest = f.ASMAllowsTemp
 	|| Src = .µGetPrms(exp.last!, dest)

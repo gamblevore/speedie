@@ -1191,27 +1191,7 @@ function scnode.LoopTest1 (|string| name, |int| a, |int| b)
 //	if 1 and b: b = 5
 //
 //	if b or 1: a = 2					// nops the 5??? its a different branch! (and a different reg!)
-
-//	if !(.name and 0)		// ok?
-//	if .name and 0			// ok
-	if .name or 0			// missing jban
-//	if .name				// seems ok!
+//	while .name and 0		// seems ok!
 //		""
-//	while .name				// seems ok!
-//		""
-
-	
-//	if !(.name and 0)		// no jbor needed, should always trap
-//	if .name and 0			// entirely missing
-//	if .name or 0			// missing jban
-//	if .name				// seems ok!
-//	"hi"
-//	while .name and 0
-
-
-
-// jumpback  !(self   and --n >= 0)
-// jumpback  (!self)  or  (!(--n >= 0))
-
 
 

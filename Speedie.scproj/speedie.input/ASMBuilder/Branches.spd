@@ -112,22 +112,7 @@ function WhileSub (|message| exp,   |asmreg|)
 	|| phi = .PhiInit()
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
-	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo
-
-
-	// this is a little bit different. So... we have a branch, if we revert it in phimiddle
-	// the branch only takes the input.
-	// but surely... the branch should take the phi? i mean... it should right?
-	// so... for the branch to take the phi, the branch has to happen AFTER the phi, right?
-	// so why am i doing the phi before the branch?
-	// i shouldn't, right?
-	// OK, so lets say we do the phimerge first.
-	// what about if it is known false?
-	// well... ok lets check the 3 conditions
-	// variable:	whatever
-	// false:		we should cancel or rewind
-	// true:		theres no branch
-	
+	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo	
 	
 	.Branch(exp.first!, loop_test, true)
 	require !.EntireInlineFailed
