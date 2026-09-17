@@ -91,7 +91,6 @@ struct InlineInfo
 					sh.safedecr(f!)
 					
 			  elseif r is Const
-				if r iz ret // allowed? shouldn't be?
 				sh.Decr(f!, fatnopmode.hard)
 
 			  elseif !(r iz Ret)

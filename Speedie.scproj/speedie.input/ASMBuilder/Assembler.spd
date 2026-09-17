@@ -289,7 +289,7 @@ struct Assembler
 		if s.CanReturnAnyReg and (A is ReturnedLocal)
 			|| r = s.Return.reg
 				dest.reg = r
-/				return dest
+				return dest
 		return .DeclareBody(exp, a) as dest
 
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
@@ -418,7 +418,7 @@ struct Assembler
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
-			if µtrap == 337867 or stacksize > 30 // ugh
+			if µtrap == -1 or stacksize > 30 // ugh
 		  else
 			opt inline
 		
