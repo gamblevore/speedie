@@ -336,26 +336,36 @@ class FileViewer (ListView)
 		
 		if rz
 			rz.sort(FileRowScoreSorter)
+			if copy
+				for (f in rz) (i)
+					f._NameClash = i
+			
 			|{filerow}| D = dictionary.new
-			for f in rz
-				f.SameNameAsPrev = false
+			for (f.backwards in rz) (i)
 				|| old = D[f.name]
-					old.SameNameAsPrev = true
-					f.SameNameAsPrev = true
+					if !copy
+						rz.Remove(i)
+					  else
+						|| fcl = f._NameClash
+							rz[fcl] = f.NameClash
+							f._NameClash = -1
+						|| ocl = old._NameClash
+							rz[ocl] = old.NameClash
+							old._NameClash = -1
+						
 				d[f.name] = f
-		
-		for (f.backwards in rz) (i)
-			if f.SameNameAsPrev
-				if copy
-					|| name = f.name + "  --  " + f.FilePath.neatenpath
-					f = filerow(f)
-					f.name = name
-					rz[i] = f
-				  else
-					rz.remove(i)
-		
+				
 	
-	function Listviewrow.FileSort
+	libinternal filerow.NameClashJoin (|[string]| C, |string|)
+		opt norefcounts
+		return .name.append( "  --  ", c.last(2), "/", c.last(1))
+
+	libinternal fileRow.NameClash (|FileRow|)
+		|| c = .FilePath.Components
+		|string--| str = .NameClashJoin(c)
+		return filerow(self, str)
+		
+	libinternal Listviewrow.FileSort
 		.sort(&fileviewer.FileRowNameSorter)
 	
 	
@@ -514,6 +524,14 @@ class FileViewer (ListView)
 		.Select(rz)
 
 
+	function FindSearchWithin (|filerow|)
+		opt norefcounts
+		|| s = .FirstSelected as filerow
+			while (s isa filerow) and !s.AsDir
+				s = s.parent
+		return s
+
+
 	module
 		libinternal FileRowCell (listview.columnfinder)
 			if Value == nil
@@ -617,6 +635,7 @@ class FileViewer (ListView)
 				return (font.width*2, 0)
 
 
+
 libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 	require self[0] != '.'
 	if !AtRoot
@@ -626,36 +645,27 @@ libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 	return true
 
 
-function FileRow.Modifier (|byte|)
+libinternal FileRow.Modifier (|byte|)
 	if .DoesntExist
 		return '?'
 	return FileIcon(.FilePath, "", self is expanded, !.asdir)
 
 
-extend_module filerow
-	function FileIcon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |CodePoint|)
-		|| n = .name
-		|| ext = n.ext
-		if (.last == '/') and !notdir
-			if types and types.TypeContains(ext + "/")
-				rz = '\19'
-			  elseif expanded
-				rz = '\1A'
-			  else
-				rz = '\10'
-		  elseif (ext == "app" or "scproj" or "uwuz")
+function @filerow.FileIcon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |CodePoint|)
+	|| n = .name
+	|| ext = n.ext
+	if (.last == '/') and !notdir
+		if types and types.TypeContains(ext + "/")
 			rz = '\19'
+		  elseif expanded
+			rz = '\1A'
 		  else
-			rz = '\11'
+			rz = '\10'
+	  elseif (ext == "app" or "scproj" or "uwuz")
+		rz = '\19'
+	  else
+		rz = '\11'
 
-
-
-function fileviewer.FindSearchWithin (|filerow|)
-	opt norefcounts
-	|| s = .FirstSelected as filerow
-		while (s isa filerow) and !s.AsDir
-			s = s.parent
-	return s
 
 
 libinternal fileviewer.ReturnFileList (GUIListEvent)
@@ -694,7 +704,7 @@ libinternal FileViewerCMMShow (GuiMenuEvent)
 
 libinternal FileViewerRenameFile (GuiMenuEvent)
 	if clicked and self isa FileViewer
-		.editcell(clicked)
+		.EditCell(clicked)
 	
 
 libinternal FileViewerCreateFile (GuiMenuEvent)

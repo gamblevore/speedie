@@ -17,22 +17,25 @@ class FileRow (ListViewRow)
 	|bool|							InMainProj
 	|bool|							AsDir
 	|bool|							DoesntExist
-	|bool|							SameNameAsPrev
+	|ind|							_NameClash
 	contains FileRow
 	
 	
-	constructor (|FileRow| R)
+	constructor (|FileRow| R, |string?--| OverRideName = nil)
 		cpp_Part ConstructorCopy
 		.func = r.func
 		.FilePath = R.FilePath
 		.dirfile	= r.DirFile
 		.asdir		= r.asdir
-		.name		= r.name
+		if !OverRideName
+			OverRideName = r.name
+		.name		= OverRideName
 		.lastsize	= r.lastsize
 		.rangelength = r.rangelength // for the sorter
 		.lastfilecount = r.lastfilecount
 		.DoesntExist = r.DoesntExist
 		.InMainProj = r.InMainProj
+	
 	
 	constructor (|string| path, |string| name, |string| DirFile="")
 		.func		= @file
