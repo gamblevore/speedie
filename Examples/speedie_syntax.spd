@@ -54,7 +54,8 @@ function app.TestSyntax
 
 	FlowLog.DisabledIncr(1)
 	for i in 4
-		mesayer("hello")
+		|| fn = (0.5[])(mesayer, shesayer)
+		(fn)("hello")
 	Flowlog.DisabledIncr(-1)
 
 	bug()

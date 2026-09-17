@@ -194,8 +194,8 @@ class Document (list)
 		opt norefcounts
 		|| v = .Viewers[i]
 			if !v.Window
-				.Viewers.Remove(i)
-				return nil
+//				.Viewers.Remove(i)	// perhaps don't?
+				return nil			// makes tests harder
 			if v isa TextView
 				return v
 	
@@ -325,15 +325,16 @@ datatype DocumentJeeboxMode (byte)
 
 
 extend TextView
-	libinternal SimpleInsert (|string| NewText, |ivec2| NewSel)
+	libinternal SimpleInsert (|string| NewText, |ivec2| NewSel, |string|)
 		super.textset(NewText)
 		is modified
 		.touch
 		.TrySelect(NewSel, true, nil)
 		(.OnTextChanged)(self, documentaction.TextInserted, true)?
+		return NewText
 
 
-	libinternal InsertionCapture (|string| GainedText, |ivec4| Point, |string| NewText, |ivec2| NewSel)
+	libinternal InsertionCapture (|string| GainedText, |ivec4| Point, |string| NewText, |ivec2| NewSel, |string|)
 		opt NoRefCounts
 		|| u = .undoer
 		if !u
@@ -360,6 +361,7 @@ extend TextView
 			if v
 				v.UpdateToDocument(u, documentaction.TextInserted)
 		u._DuringInsert = 0
+		return NewText
 
 
 	autogen DontMergeUndo

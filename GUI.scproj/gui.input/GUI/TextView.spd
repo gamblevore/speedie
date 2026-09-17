@@ -1459,9 +1459,6 @@ class TextView (GUIControl)
 	behaviour TypedString
 		require  self is Editable and Enabled
 
-//		if (input == "§") and !(keys.option or keys.shift)
-//			return false// can't even remember what this is for.
-
 		if (keys.option and input == " ") or input == " "
 			return .SwapChars
 			
@@ -1537,8 +1534,7 @@ class TextView (GUIControl)
 			.InsertionClutter(s)								// clutter...
 			
 			|| nt = .text.insert(s, p)
-			
-			.InsertionCapture(s, (p, s.length, 0), nt, NewSel)
+			super.text = .InsertionCapture(s, (p, s.length, 0), nt, NewSel) // set super-text in case of nil-window fail.
 			|| it = .isinline
 			if it Is Searching
 				it.UpdateSearch(nt)
