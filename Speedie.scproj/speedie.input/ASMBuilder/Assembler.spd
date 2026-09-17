@@ -73,9 +73,6 @@ struct Assembler
 	function State (|&InlineState|)
 		return .inlinestate[.inlinedepth]
 	
-	function inline_fn (|scfunction!--|)
-		return .state.fn
-	
 	function Curr (|&fatasm|)
 		return .curr_
 
@@ -292,6 +289,7 @@ struct Assembler
 				return dest
 		return .DeclareBody(exp, a) as dest
 
+	
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		// we just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
