@@ -3,7 +3,7 @@
 
 struct SavedRegisters
 	|byte|					RegCount
-	|byte|					ReturnCount
+	|byte|					ReturnedCount
 	|byte|					BasicDepth
 	|byte|					BreakRequest
 	|byte|					DelayedNops
@@ -52,7 +52,7 @@ struct DeclAlterable
 	|uint64|			ExportPosition
 	|SCDeclInfo|		Info
 	|DataTypeCode|		DataType
-	|uint16| 			ModuleNum
+	|uint16|			ModuleNum
 
 
 function assembler.DeclReset (|scdecl| D)

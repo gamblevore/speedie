@@ -856,24 +856,27 @@ function EqualOrMoreSpecific (|SCFunction| f, |bool|)
 
 
 function CheckReturnValue (|Message| msg, |scnode| name_space)
-	|| c = msg.first
-	
-	if (!c)
-		|| t = .ReturnType
-			check (t is returnedstruct) (msg, "Missing return value")
+	|scdecl--| r = .ReturnType
+	if (!msg.hasany)
+		if r
+			check (r is returnedstruct)		(msg, "Missing return value")
 		return
 
-	expect ( c.IsOnlyChild ) ( msg, "Can’t return multiple values" )
-	
-	if !.ReturnType and (c == "nil") and (c==@thg or @ques) // auto-generated in many places :)
+	|| c = msg.first!
+	expect ( c.IsOnlyChild )				( msg, "Can’t return multiple values" )
+
+	if !r and (c == "nil") and (c==@thg or @ques) // auto-generated in many places :)
 		c.Remove
 		return
 	
-	|| FoundReturnType = TypeOfExpr( c, name_space )
+	|scdecl--| FoundReturnType = TypeOfExpr( c, name_space )
 	if (FoundReturnType == TypeVoid)
 		FoundReturnType = nil
+	if FoundReturnType is local
+		(foundreturntype is ReturnedLocal)
 
-	|| r = .ReturnType
+
+	if r
 		expect FoundReturnType (msg, "Has no return type.")
 		
 		if (FoundReturnType == TypeNil) and (r.CantBeNilInCpp)  // OK so what if we can’t return nil?
@@ -1734,7 +1737,7 @@ function Tran_Return (TranFunc)  // exitter
 	node.obj = fn.returntype
 	ifn node.islast and (node in fn.sourcearg)
 		expect (fn isnt ConOrDes)   (node, "You can’t return in a constructor or destructor")
-
+	
 	if fn.StructReturnPos // we can't return anything
 		node.StructReturnCleanup(fn, name_space)
 

@@ -120,8 +120,7 @@ function WhileSub (|message| exp,   |asmreg|)
 	|| Known = loop_test.Constness.negate							// loops are weird :]
 	if Known.knownfalse
 		if (loop_test.length)
-			problem (exp.first!, "Bad loop. Always false but actually does stuff.")
-			// make this an error eventually. some ASM bug did this.
+			error (exp.first!, "Bad loop. Always false but actually does stuff.")
 		.nop(InitialJump)
 		return ASMReg()
 
@@ -272,7 +271,6 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	if dest isnt CondRequest								// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		return .BoolAndOrSmartValue(A, B, dest, opp)
 
-	if "LoopTest2".trap
 	rz = dest
 	if rz is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
@@ -469,7 +467,6 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	.EnterBranch
 	|| Phi = .PhiInit()
-	if "LoopTest2".trap
 	|| Second = .Branch(B, AndTest, dest is negate)
 	.ExitBranch
 	if  first isnt Const

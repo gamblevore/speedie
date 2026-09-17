@@ -11,10 +11,10 @@ struct InlineState
 	|byte|				ID
 	|byte|				RealBranchDepth
 	|bool|				TailInlineable
-	|bool|				MustReturnInto
+	|bool|				NeedsµInto
 
 	function CanReturnAnyReg (|bool|)
-		return !.MustReturnInto and (.fn.ReturnCount == 1)
+		return !.NeedsµInto and (.fn.ReturnCount == 1)
 
 
 
@@ -284,6 +284,14 @@ struct Assembler
 		return ASMReg.temp
 	
 	
+	function µInlineImproveDest (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
+		|| s = .state
+		if s.CanReturnAnyReg and (A is ReturnedLocal)
+			|| r = s.Return.reg
+				dest.reg = r
+/				return dest
+		return .DeclareBody(exp, a) as dest
+
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		// we just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
@@ -292,11 +300,8 @@ struct Assembler
 		if exp is BreakPoint
 			.Breakrequest |= BreakPoint
 		|| OV = .OpenVars
-		Dest = .DeclareBody(exp, a) as dest
 
-		// possible opt, if we are returning dest, we can the returned variable as dest
-		// (Assuming we aren't altering dest AND passing it twice.)
-		
+		dest = .µInlineImproveDest(exp, a, dest)		
 		(dest is NewlyDeclared)
 		|| Closer = .OpenVars
 

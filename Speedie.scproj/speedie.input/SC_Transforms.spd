@@ -157,9 +157,9 @@ function Tran_Using (TranFunc)
 
 function Tran_Array (|Message| S, |SCNode| name_space) {
 	opt norefcounts
-	// || x = [("a", "b", "c"):d()] 	// wouldve been better? than my 'dispatch' thing...
+	// || x = [("a", "b", "c"):d()]			// wouldve been better? than my 'dispatch' thing...
 	// || tmp = d(), || x = ["a":tmp, "b":tmp, "c":tmp] 	// wouldve been better? than my 'dispatch' thing...
-	|| Type = S.AsDecl #require
+	|| Type = S.AsDecl					#require
 	|| thg = s.IsSetIntoVar
 		
 	if (!thg)
@@ -180,7 +180,7 @@ function Tran_Array (|Message| S, |SCNode| name_space) {
 
 
 	if P in @Decl
-		|| d = p.AsDecl #require
+		|| d = p.AsDecl					#require
 		d.Default = dotnew
 
 
@@ -425,10 +425,10 @@ function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f)
 //		printline self // its making it do different behaviour. perhaps... refcounting?
 
 
-function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space, |message| arg)
+function Tran_ResultFinish (|SCFunction| fn, |message| r_z, |SCNode| name_space, |message| arg)
 	opt norefcounts
-	if f is constructor
-		require f.ReturnsObject
+	if fn is constructor
+		require fn.ReturnsObject
 	|| d = r_z.MsgDecl
 		(d is CompilerCreated)
 	|| Used = d and (d is readfrom or setto)
@@ -437,17 +437,20 @@ function Tran_ResultFinish (|SCFunction| f, |message| r_z, |SCNode| space, |mess
 	if !used
 		r_z.Remove
 	  elseif d isnt setto
-		r_z.NotNilRZ(f.ReturnType!, space)
+		r_z.NotNilRZ(fn.ReturnType!, name_space)
+	
+	require !arg.returns
 
-	if !arg.returns
-		|| last = arg.FlatLast
-		using last
-		|| ret = arg.AddReturn
-		f.ReturnCount++
-		if used
-			ret.msg(@thg, "rz").obj = d
-		  else
-			ret <~ f.ReturnType!.CreateDefault(arg)
+	|| last = arg.FlatLast
+	using last
+	|| ret = arg.AddReturn
+	if used
+		ret.msg(@thg, "rz")
+	  else
+		ret <~ fn.ReturnType!.CreateDefault(arg)
+
+	ret.ASMType = 0 // force tran_Return to work
+	Tran_Return(fn, ret, name_space)
 
 
 function Tran_Result (|SCFunction| f, |message|)

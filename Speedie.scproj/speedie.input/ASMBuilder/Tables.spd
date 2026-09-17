@@ -163,32 +163,6 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	.SoftNop(BFLG)
 	return ret
 	
-		
-function InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|) // inlinereturn
-	opt norefcounts
-	// What about getting the address of registers?
-	|| Extras = asmreg.ExitAtAll
-	if .state.TailInlineable
-		(extras is ExitFunction)
-	
-	(dest as= extras)
-	|| f = exp.first
-		if !dest.reg
-			dest = .µ(f, asmreg.discard)
-		  elseif .state.CanReturnAnyReg
-			dest = .µ(f, dest)
-		  else
-			dest = .µinto(f, dest)
-	
-	(dest as= extras) // it can get lost... sadly.
-	if .state.TailInlineable
-		.ClearAllStructs(exp)
-		dest = ReturnOpt(self, dest)
-	
-	|| fat = exp.RET(Dest)
-	fat.µRefCount = 1
-	(dest is CondAnswer) // discard surely?
-	return fat * Dest
 
 
 function ExpandBits2 (|&assembler| self, |message| exp, |asmreg| dest, |scdecl| ty,  |asmreg|)

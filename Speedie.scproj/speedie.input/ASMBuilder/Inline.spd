@@ -151,17 +151,18 @@ struct InlineInfo
 		// this should handle altered params like in vecmix31
 		
 		|| A = .Altered$
-		/*
-			Easy: Could return param that we are altering
-			OMG:  Could return new local, despite altering param, AND despite that we expected to receive the altered param!
-		*/
+/*
+	Situations to handle:
+	* Could return param that we are altering (Easy)
+	* Could return new local, despite altering param, AND despite that we expected to receive the altered param! (hard!)
+*/
 
 		|| Ret = 1<<Dest.reg
 		|| AR = .References & A
 		|| AN = .Normal & A
-		|| MustReturnInto = (Ret&A)!=A
-		if MustReturnInto or (AR ||| AN)
-			sh.state.MustReturnInto = MustReturnInto
+		|| NeedsMoveReg = (Ret&A)!=A
+		if NeedsMoveReg or (AR ||| AN)
+			sh.state.NeedsµInto = NeedsMoveReg
 			.ClearInlineParamClash(args, AR, AN, ~ret&A)
 
 
@@ -182,6 +183,8 @@ struct InlineInfo
 
 
 extend assembler {
+
+
 function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|)
 	opt norefcounts
 	require .TempCheck(dest)
@@ -229,7 +232,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		.Rewind(ll.start, .curr)					// rewind
 		return nil
 	
-	if svregs.ReturnCount > 1
+	if svregs.ReturnedCount > 1
 		.NextBasicBlock
 	if !rz
 		(rz is Const)								// no longer zero
@@ -238,6 +241,33 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		if RealStart isnt DebugVars					// dont break the type
 			realstart.msg = prms.parent!			// cleanup
 
+
+
+function @ASMType.InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|) // inlinereturn
+	opt norefcounts
+	// What about getting the address of registers?
+	|| Extras = asmreg.ExitAtAll
+	if .state.TailInlineable
+		(extras is ExitFunction)
+
+	(dest as= extras)
+	|| f = exp.first
+		if !dest.reg
+			dest = .µ(f, asmreg.discard)
+		  elseif .state.CanReturnAnyReg
+			dest = .µ(f, dest)
+		  else
+			dest = .µinto(f, dest)
+	
+	(dest as= extras) // it can get lost... sadly.
+	if .state.TailInlineable
+		.ClearAllStructs(exp)
+		dest = ReturnOpt(self, dest)
+	
+	|| fat = exp.RET(Dest)
+	fat.µRefCount = 1
+	(dest is CondAnswer) // discard surely?
+	return fat * Dest
 
 	
 function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
@@ -250,6 +280,8 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 	// does not need it, it can nop the thing. However... its NOT a temp here.
 	// So we should not be getting temps, right? I mean... the thing COULD just...
 	// call another func. It shouldn't be so hard, just give it a good dest?
+	
+	// did I fix this already?
 	
 	|| args = fn.args
 	info.DoImmediates(p, args, self)
@@ -335,25 +367,25 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	target debug: || InlineTrap = ++ASMTrapper,  if InlineTrap == -1
+	|| dest = .state.return
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
-			sv.ReturnCount++
+			sv.ReturnedCount++
 		  elseif op == asm.ret
-			sv.ReturnCount++
-			|| dest = s.inputfat(0)
+			sv.ReturnedCount++
+			|| value = s.inputfat(0)
 			if rz
 				rz = rz.simplify
-			  elseif dest
-				rz = dest.info
+			  elseif value
+				rz = value.info
 			  else
-				rz.reg = s.asmreg(0) // what about the temp?
+				rz.reg = s.asmreg(0)
 				rz.µType = .state.return.µType
 
 			
-			if dest
-				.SafeDecr(dest)
-			// this is an issue. we need to decr the input reg... but without destroying it
+			if value
+				.SafeDecr(value) // will get incremented later.
 			s.SetOp = asm.jump
 			s.JumpPrm = 1
 			s.JumpFix(.curr)
@@ -363,7 +395,6 @@ function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
 			(s is FromInline) // whyy???? this blocks consts, but why?
 	
 	rz &= ~ASMReg.Exit
-	|| dest = .state.return
 	(rz as= dest&asmreg.exit)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg

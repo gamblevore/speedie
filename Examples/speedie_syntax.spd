@@ -10,10 +10,9 @@ class Person
 	setter Age (|int|)
 		expect (value > 0 and value < 300) "Age $value out of range on ${.name}"
 		.age = value
-
+	
 	render
 		fs <~ "$.name's age is $.age"
-
 
 
 
@@ -26,10 +25,10 @@ function PrintNum (|int64| b1)
 
 
 function app.TestSyntax
-	|| L2 = "(a,b,c,d)".parse
-	printnum(60GB)
-	printnum(7.9MB|int|)
-	printnum(9524600)
+//	|| L2 = "(a,b,c,d)".parse
+//	printnum(60GB)
+//	printnum(7.9MB|int|)
+//	printnum(9524600)
 		
 	|| P = person(12, "fred")
 	P.age = -2 // try to corrupt the age

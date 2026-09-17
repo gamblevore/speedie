@@ -1713,7 +1713,7 @@ function TypeOfList (ExprResolver)
 	
 	
 	expect Numeric      (exp, "Expected numbers in this vector.")
-	expect (count >= 2) (exp, "Under 2 items in vector.")
+	expect (count >= 2) (exp)
 
 	FoundType ?= Allowtype
 	|| IsFloat = (Foundtype == 2)
