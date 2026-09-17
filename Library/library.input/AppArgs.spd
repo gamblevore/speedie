@@ -4,7 +4,7 @@ function string.ArgName (|string|)
 	// "--Name=Value" --> "Name"
 	// "--Name" --> "Name"
 	if (self and self[] == '-') 
-		|| i = .find( '=' ) ?? int.max
+		|| i = .find2( '=' )
 		|| S = self[ 0, i ]
 		S = S.TrimFirst('-')
 		return S.lowercase

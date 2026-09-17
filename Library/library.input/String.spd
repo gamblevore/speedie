@@ -56,13 +56,19 @@ class String
 
 
 // searching
-	function Find (|string| find, |int| Start=0, |int| After=int.max, |bool| CaseAware=false, |ind|)
+	function Find (|string| Str, |int| Start=0, |int| After=int.max, |bool| CaseAware=false, |ind|)
 		nil checker
 		cpp_wrapper JB_Str_InStr
 
-	inline Find (|Byte| find, |int| Start=0, |int| After=int.max, |ind| )
+	inline Find (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
 		cpp_part FindByte
 		return ._inbyte(start, after, find)
+	
+	function Find2 (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
+		description "Same as .Find, but returns the length if we can't find the byte."
+		|| i = .find(find, start, after)
+			return i
+		return .Length
 
 	inline OutByte (|Byte| find, |int| Start=0, |int| After=int.max, |ind|)
 		return ._outbyte(Start, after, find)

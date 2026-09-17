@@ -443,9 +443,6 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			|| bb = b.size
 			return bb - aa
 			
-		function string.NeatenPath (|string|)
-			if self starts file.HomePath
-				return "~" + self[file.HomePath.length ...]
 
 		function NewPipe (|filedes| Pipe, |file|)
 			cpp_wrapper JB_File__NewPipe

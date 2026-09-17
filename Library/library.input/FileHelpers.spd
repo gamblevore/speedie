@@ -37,21 +37,31 @@ extend String
 			return self + "/"
 		return self
 
-	function Sibling (|string| name, |string|)
-		inlined
+	inline Sibling (|string| name, |string|)
 		return .ReplacePathComponent(-1, Name)
 		
-	function file.Sibling (|string| name, |file|)
-		return super.sibling(name).file
+	inline file.Sibling (|string| name, |file|)
+		opt norefcounts
+		return super.sibling(name).file // .file should store the path as it doesn't need correction
 	
 	function Components (|[string]|)
 		|| i = 0
 		while i < self
-			|| n = .find('/', i) ?? .length
-			if i == 0 or n > i
+			|| n = .find2('/', i)
+			if (i == 0) or (n > i)
 				rz <~ self[i, n]
 			i = n + 1
-
+	
+	function GetComponent (|int| item, |string|)
+		|| i = 0
+		while (i < self) and (item > 0)
+			|| n = .find2('/', i)
+			if (i == 0) or (n > i)
+				item--
+				if !item
+					return self[i, n]
+			i = n + 1
+		
 
 	function ReplacePathComponent (|int| i, |string| With, |string|)
 		|| R = .components
@@ -99,14 +109,13 @@ extend String
 		|| p = .parent.pathdir
 		rz = p == "/Volumes/" or "/vol/" or "/media/" or "/mnt/"
 
-	function TrimExt (|string|)
-		inlined
+	inline TrimExt (|string|)
 		return .TrimExtAndPath(false)
 
 	function NamePart (|bool| RemovePath=true, |ivec2|)
 		|| N	 = .FindTrailingSlashes
-		|| slash = .find('/', n-1, 0) + 1
-		|| dot	 = .find('.', n-1, slash)
+		|| slash = .Find('/', n-1, 0) + 1
+		|| dot	 = .Find('.', n-1, slash)
 		dot ?= n
 		if !RemovePath
 			slash = 0
@@ -209,8 +218,9 @@ Relative paths take the current working directory.`
 					return (i, end)
 	
 	
-	function Ext (|string|)
+	inline Ext (|string|)
 		return self[.FindExt]
+
 
 	function BackToApp (|string|)
 		|| s = .TrimSlashes
@@ -225,20 +235,15 @@ Relative paths take the current working directory.`
 		return .AfterByte('/', Last)
 	
 
-	autogen String.FindSlash (|int| from, |ind|)
-		if from < .length
-			rz = .find('/', from)
-			if !rz
-				rz = .length		
-
-
 	iterator Paths
 		|| P = .regularpath
-		|| i = p.FindSlash(1)
+		|| i = p.find2('/', 1)
 
 		while i > 0
 			yield P[0, i]
-			i = p.FindSlash(i+1)
+			if i >= p.length
+				exit
+			i = p.find2('/', i+1)
 
 
 
@@ -293,8 +298,8 @@ function @file.OSXMaxCaseWarnings_ (|&int|)
 	stateful
 
 
-function string.ShellPath (|string|)
-	return .replaceall(" ", `\ `)
+//inline string.ShellPath (|string|)
+//	return .replaceall(" ", `\ `) // don't use system()! use .execute
 
 
 role StringThatWasReadSafely (string)
