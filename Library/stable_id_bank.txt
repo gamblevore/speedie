@@ -116,7 +116,6 @@ GUI_FR_Destructor
 GUI_FR_DirSize
 GUI_FR_Document
 GUI_FR_FileData
-GUI_FR_Modifier
 GUI_FR_ReadFrom
 GUI_FR_ReadName
 GUI_FR_Render
@@ -392,7 +391,6 @@ GUI_Row_AsCell
 GUI_Row_CellValueSet
 GUI_Row_Constructor
 GUI_Row_ConstructorNamed
-GUI_Row_FileSort
 GUI_Row_NextSelected
 GUI_Row_SyntaxIsSet
 GUI_Row__NewSeparator
@@ -746,7 +744,6 @@ JB_App__Sudo
 JB_App__Switches
 JB_App__TimeID
 JB_App__TurnInto
-JB_Array_Active
 JB_Array_AppendCount
 JB_Array_AppendMany
 JB_Array_Clear
@@ -755,16 +752,13 @@ JB_Array_Copy
 JB_Array_Destructor
 JB_Array_FastRemove
 JB_Array_Find
-JB_Array_First
 JB_Array_GlobExpand
 JB_Array_Insert
 JB_Array_Last
 JB_Array_Next
-JB_Array_NextSet
 JB_Array_Now
 JB_Array_OperatorPlus
 JB_Array_Pop
-JB_Array_Prev
 JB_Array_Remove
 JB_Array_Render
 JB_Array_Reverse
@@ -775,7 +769,6 @@ JB_Array_Size
 JB_Array_SizeSet
 JB_Array_Sort
 JB_Array_Swap
-JB_Array_Trim
 JB_Array_Value
 JB_Array_ValueSet
 JB_Array_Wipe
@@ -913,12 +906,12 @@ JB_FS_MsgErrorName
 JB_FS_NeedSpare
 JB_FS_RemoveByte
 JB_FS_Render
+JB_FS_Reserve
 JB_FS_Size
 JB_FS_SizeSet
 JB_FS_SmartResult
 JB_FS_StreamLength
 JB_FS_SyntaxAppend
-JB_FS_WriteAlloc_
 JB_FS_Zalgo
 JB_FS__FastNew
 JB_FS__UseAsOutput
@@ -990,7 +983,6 @@ JB_File_Read
 JB_File_ReadAll
 JB_File_RelaxPath
 JB_File_Render
-JB_File_Sibling
 JB_File_Size
 JB_File_SizeSet
 JB_File_SmartDataSet
@@ -1014,9 +1006,7 @@ JB_FloatRange_Constructor
 JB_Flow__Enabled
 JB_Flow__ForceStart
 JB_Flow__Input
-JB_Flow__InputStrings
 JB_Flow__Stop
-JB_Flow__SyntaxAppend
 JB_Fn_Constructor
 JB_Fn_Destructor
 JB_Fn_Render
@@ -1065,6 +1055,7 @@ JB_Mat4_reset
 JB_Math__RangeConv2
 JB_Math__RangeConv4
 JB_MemCount
+JB_MemSwap
 JB_MemUsedOther
 JB_MemUsedString
 JB_Mem_AppendPlace
@@ -1396,15 +1387,15 @@ JB_Str_Equals
 JB_Str_Execute
 JB_Str_ExecuteStr
 JB_Str_Exists
-JB_Str_Ext
 JB_Str_ExtractPathAndLine
 JB_Str_Fail
 JB_Str_FileSize
 JB_Str_FileThatExists
+JB_Str_Find2
 JB_Str_FindCharset
 JB_Str_FindExt
-JB_Str_FindSlash
 JB_Str_First
+JB_Str_GetComponent
 JB_Str_GlobExpand
 JB_Str_HasName
 JB_Str_Hex
@@ -1435,7 +1426,6 @@ JB_Str_Moat
 JB_Str_MultiReplaceAll
 JB_Str_Name
 JB_Str_NamePart
-JB_Str_NeatenPath
 JB_Str_New
 JB_Str_NextField
 JB_Str_OpInByte
@@ -1477,7 +1467,6 @@ JB_Str_Reveal
 JB_Str_Reverse
 JB_Str_Rotate
 JB_Str_SetExt
-JB_Str_ShellPath
 JB_Str_SilentExecute
 JB_Str_Sort
 JB_Str_SpacesToTabs
@@ -2008,5 +1997,3 @@ sqrtf
 strcmp
 strlen
 strnlen
-JB_FS_Reserve
-JB_MemSwap
