@@ -39,6 +39,7 @@ void JB_Array_Swap(Array* self, uint i, uint j);
 
 void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value );
 JB_Object* JB_Array_Value( Array* self, int Pos );
+JB_Object* JB_Array_Last( Array* self, int Pos );
 JB_Object* JB_Array_Pop(Array* self);
 int JB_Array_Find( Array* self, JB_Object* Obj );
 void JB_FillInts(int* Start, int N, int Value);

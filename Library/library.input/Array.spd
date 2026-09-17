@@ -28,34 +28,28 @@ class Array
 		cpp_wrapper JB_Array_Destructor
 
 	function Shuffle
+		description "Shuffles. Also Resets the marker." // but should it?
 		cpp_wrapper JB_Array_Shuffle
 
-	function Last (||)
-		return self[.length - 1]
+	function Last (|int| Backwards=0, ||)
+		cpp_wrapper JB_Array_Last
 	
-	function First (||)
+	inline First (||)
 		return self[0]		
 
 	function Next (||)
 		if .marker < .length
 			return self[.marker++]
 	
-	setter Next (|...!|)
-		self[.marker++] = value
-
-	function Prev (||)
-		if .marker > 0
-			return self[--.marker]
-
-	function Active (|bool|)
+	inline Active (|bool|)
 		return .marker < .length
 
 	function Reset
 		inlined
 		.marker = 0
 	
-	function Trim
-		.length = .length - 1
+//	function Trim
+//		.length = .length - 1
 	
 	function Pop (||)
 		nil checker

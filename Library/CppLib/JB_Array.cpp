@@ -321,6 +321,17 @@ JB_Object* JB_Array_Value( Array* self, int Pos ) {
     }
     return 0;
 }
+
+JB_Object* JB_Array_Last( Array* self, int Pos ) {
+    if (self) {
+		int N = self->Length;
+		Pos = N - (Pos+1);
+		if (Pos < N)
+			return self->_Ptr[ Pos ];
+    }
+    return 0;
+}
+
     
 void JB_FillInts(int* Start, int N, int Value) {
 	std::fill(Start, Start+N, Value);
