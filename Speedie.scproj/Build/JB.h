@@ -718,7 +718,7 @@ struct InlineState {
 	byte ID;
 	byte RealBranchDepth;
 	bool TailInlineable;
-	bool MustReturnInto;
+	bool NeedsxC2xB5Into;
 };
 
 struct IsaTester {
@@ -822,7 +822,7 @@ struct BranchPHITracker {
 
 struct SavedRegisters {
 	byte RegCount;
-	byte ReturnCount;
+	byte ReturnedCount;
 	byte BasicDepth;
 	byte BreakRequest;
 	byte DelayedNops;
@@ -2405,6 +2405,7 @@ extern Array* SC__NilReason_values;
 #define kSC__SCDeclInfo_Referable ((SCDeclInfo)30720)
 #define kSC__SCDeclInfo_Reference ((SCDeclInfo)1048576)
 #define kSC__SCDeclInfo_Return ((SCDeclInfo)32768)
+#define kSC__SCDeclInfo_ReturnedLocal ((SCDeclInfo)1024)
 #define kSC__SCDeclInfo_ReturnedStruct ((SCDeclInfo)134217728)
 #define kSC__SCDeclInfo_Self ((SCDeclInfo)4194304)
 #define kSC__SCDeclInfo_SelfImplicit ((SCDeclInfo)4200448)
@@ -6644,6 +6645,8 @@ ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest);
 ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A);
 
 ASMReg SC_Pac_xC2xB5GetPrms(Assembler* Self, Message* Exp, ASMReg Dest);
+
+ASMReg SC_Pac_xC2xB5InlineImproveDest(Assembler* Self, Message* Exp, SCDecl* A, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5InlineOneParam(Assembler* Self, Message* Exp, SCDecl* A, ASMReg Dest);
 
@@ -10976,7 +10979,7 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls);
 
 Message* SC_Func__Tran_Result(SCFunction* F);
 
-void SC_Func__Tran_ResultFinish(SCFunction* F, Message* R_z, SCNode* Space, Message* Arg);
+void SC_Func__Tran_ResultFinish(SCFunction* Fn, Message* R_z, SCNode* Name_space, Message* Arg);
 
 bool SC_Func__Tran_Return(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
