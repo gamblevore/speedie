@@ -734,6 +734,15 @@ extend Assembler
 	function ModInt		(fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
+		
+//		|| K = .Const(R, 31, true)
+//		if k.IsPow2
+//			.NopTempConst(R)
+//			// if we make a const of the log... we can then, do a bitand... which can use bflg... which can chain!
+//			// wow!
+//			|| fat = exp.bank
+//			return 64 - k.Log2			
+			
 		|| fat = exp.DIV(nil, dest, L, R, dest.signed|int|)
 		fat.OutputPrms &= ~1 // clear unused output 
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
