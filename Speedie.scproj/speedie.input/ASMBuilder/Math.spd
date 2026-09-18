@@ -315,7 +315,7 @@ extend Assembler
 
 		
 	function Compare (|asmreg| dest,  |asmreg| L,  |asmreg| R,  |message| exp,  |int| Mode,  |asmreg|)
-		if L.fat(asm.vget) or R.fat(asm.vget)
+		if (L.fat(asm.vget) is temp) and (R.fat(asm.vget) is temp)
 			|| subdest = dest.µType(L.µtype)		// sub-part is a float/int not a bool!
 			L = .Subtract(exp, subdest, L, R)
 			R = ASMReg()
