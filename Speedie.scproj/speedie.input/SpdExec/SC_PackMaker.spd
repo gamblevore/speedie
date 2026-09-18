@@ -333,6 +333,8 @@ module PackMaker
 			return
 		.Enter(@name, fn.name)
 		|| id = fn.fPackID							#check ( fn.source,  "Missing PackID[2]" )
+		if !fn.ShouldBake	// damn. So we need a fake ID? like a destructor that is unused because the class is.
+			id = 32K		// 3K max funcs anyhow
 		id = (id << 1) + fn.IsLibrary
 		.AddHint(id)
 		.exit
@@ -412,7 +414,7 @@ struct HairyMan
 
 	function AddOrShrink (|jbin| j, |scfunction| F, |bool|)
 		.Total++
-		if (f is usedbyasm) or f.isbehaviour
+		if f.ShouldBake
 			|| c = .curr
 				j.addhint(c)
 			.curr = 0
@@ -423,6 +425,9 @@ struct HairyMan
 	function Churn (|faststring| fs)
 		fs <~ "$.Savings / $.Total"
 
+
+function scfunction.ShouldBake (|bool|)
+	return (self is usedbyasm) or .isbehaviour
 
 
 function Message.IsCake (|bool|)

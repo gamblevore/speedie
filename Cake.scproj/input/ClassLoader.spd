@@ -25,6 +25,9 @@ function CakeRun.Virtual (|message| V, |uint64|)
 	opt norefcounts
 	|| Info = V.int(0, 1, 64K)$
 	|| Index = Info >> 1
+	if index == 32K // Destructor of an unused class, or similar.
+		return 0
+
 	|| Spd = 1|uint64|<<63
 	if Info&FuncIsLib
 		expect (index|uint64| < 8K)							(V, "VirtualEscaped")

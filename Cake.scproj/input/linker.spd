@@ -46,23 +46,24 @@ module SpdTable
 	
 	function InitialiseFuncs (|message| code)
 		opt norefcounts
-		.funcs <~ SpdFunc()							// null func
+		|| NullFunc = SpdFunc()
+		.funcs <~ NullFunc
 		|| CodeLength = 0
 				
 		for spd.fast in code
 			if spd == @num or @hint
 				for spd.int
-					.funcs <~ .funcs[0]
+					.funcs <~ NullFunc
 			  else
 				spd.tag = .funcs.Length
 				spd.Position = CodeLength
 				.funcs <~ spd
 				CodeLength += spd.PreLoadLength>>2
-			expect (.funcs < 32K)		(spd, "Too many functions. An entire compiler would only need 3K funcs!")
+			expect (.funcs < 32K)			(spd, "Too many functions. An entire compiler would only need 3K funcs!")
 
 		.Funcs.Shrink		
-		check  (CodeLength < 1MB)					(code, "Oversized code: " + CodeLength)
-		check  (.funcs >= 3)						(code, "Missing 'main'")
+		check  (CodeLength < 1MB)			(code, "Oversized code: " + CodeLength)
+		check  (.funcs >= 3)				(code, "Missing 'main'")
 		
 		.CodeLength = CodeLength
 
