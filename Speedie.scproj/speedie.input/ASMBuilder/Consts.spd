@@ -98,7 +98,7 @@ function Assembler.CanAddK (|asmreg| R, |int64| T, |bool|) // used to be used fr
 	require t.CanStoreAsAddK
  
 	if r is Const
-		.nopconst(r)
+		.NopTempConst(r)
 	return true
 
 

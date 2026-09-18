@@ -143,10 +143,10 @@ extend assembler
 	
 	function Nop2Consts (|asmreg| A, |asmreg| B)
 		|| Further = a.FatIndex > b.FatIndex
-			.NopConst(A)
-		.NopConst(B)
+			.NopTempConst(A)
+		.NopTempConst(B)
 		if !Further
-			.NopConst(A)					// in case of swapped order
+			.NopTempConst(A)					// in case of swapped order
 	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
@@ -159,17 +159,17 @@ extend assembler
 		if rf and .IsWithin(RF)
 			|| k = RF.const
 			if k.fits(bits, signed)
-				.NopConst(R)
+				.NopTempConst(R)
 				return k|uint64|.trim(bits)
 	
 	
-	function NopConst (|asmreg| R, |int64| K, |bool|)
+	function NopTempConst (|asmreg| R, |int64| K, |bool|)
 		if r.Const == K
-			.NopConst(R)
+			.NopTempConst(R)
 			return true
 	
 	
-	function NopConst (|asmreg| R)
+	function NopTempConst (|asmreg| R)
 		require r.reg
 		target debug: if r isnt Const		// hah
 

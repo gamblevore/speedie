@@ -115,11 +115,11 @@ struct Assembler
 		|| v = r.const
 		if v == -1
 			if sub
-			.NopConst(r)
+			.NopTempConst(r)
 			return v
 		v -= Sub
 		if !v or v.IsPow2
-			.NopConst(r)
+			.NopTempConst(r)
 			if !v
 				return 0
 			return v.Log2+1

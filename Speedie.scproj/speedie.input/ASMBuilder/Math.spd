@@ -210,7 +210,7 @@ extend Assembler
 
 		|| k = f.const - swapped
 		require l.issmall and k.fits(9, true)	
-		.NopConst(R)
+		.NopTempConst(R)
 		k = k|uint64|.trim(9)
 		|| J = exp.JMKM(l, k)
 		if 0: exp.JMKL
@@ -352,7 +352,7 @@ extend Assembler
 		|| k = r.Const|uint64|
 		k ^= (l is Subtract)<<31
 		require (k >> 18) << 18 == k
-		.NopConst(r)
+		.NopTempConst(r)
 		if 0: exp.VADK
 		return exp.FADK(dest, l, k>>18).Vectorise(dest, asm.vadk)
 
@@ -369,7 +369,7 @@ extend Assembler
 		if v2 == 1.0 or 0.0
 			if v2 == 0.0
 				Exp.DivByZero
-			.nopconst(r)
+			.NopTempConst(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 
 
@@ -403,17 +403,17 @@ extend Assembler
 		require r is Const	
 		|| v = r.float
 		if  v == 1.0 or 0.0 or -1.0
-			.nopconst(r)
+			.NopTempConst(r)
 			return .Quick1Or1Sub(dest, l, v|int|, exp)
 		if  v == 2.0
-			.nopconst(r)
+			.NopTempConst(r)
 			return .plus(exp, dest, l, l)
 		
 		if r.Fourbytes
 			|| x = r.const
 			|| y = x >> 18
 			if x == y << 18
-				.Nopconst(r)
+				.NopTempConst(r)
 				if 0: exp.VMLK
 				return exp.FMLK(dest, l, x).Vectorise(dest, asm.VMLK)
 
@@ -731,7 +731,7 @@ extend Assembler
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
-	function ModInt    (fn_opasm)
+	function ModInt		(fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
 		|| fat = exp.DIV(nil, dest, L, R, dest.signed|int|)
@@ -811,7 +811,7 @@ extend Assembler
 	function BitAndOpt (|assembler| self, |message| exp,  |asmreg| dest,  |asmreg| L, |asmreg| R, |asmreg|)
 		if l is Const
 			|| k = l.const
-			if .NopConst(l, -1)
+			if .NopTempConst(l, -1)
 				return r
 			if k == 0
 				return dest.zero
@@ -841,7 +841,7 @@ extend Assembler
 		if R is Const
 			|| k = R.const
 			if k and (++k).IsPow2
-				.NopConst(R)
+				.NopTempConst(R)
 				return 64 - k.Log2
 
 		
@@ -1069,6 +1069,6 @@ function int64.Fits (|int| amount, |bool| signed=true, |bool|)
 	if signed
 		x >>= sh
 	  else
-		x = X|uint64| >> sh
+		x = x|uint64| >> sh
 	return x == self
 

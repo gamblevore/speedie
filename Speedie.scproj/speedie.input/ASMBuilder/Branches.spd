@@ -239,7 +239,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 	|| T = B
 	if (C.Const)
 		T = A
-	.NopConst(C)
+	.NopTempConst(C)
 	return t
 
 

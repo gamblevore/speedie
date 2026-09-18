@@ -279,7 +279,7 @@ function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg
 	if srf._const == K // haha.
 		return srf.info
 	
-	.NopConst(from)
+	.NopTempConst(from)
 	return .NumToReg(exp, dest, K, new)
 
 
