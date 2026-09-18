@@ -3503,7 +3503,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026091719));
+	JB_FS_AppendInt32(_fsf0, (2026091818));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10306,7 +10306,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026091719));
+	JB_FS_AppendInt32(_fsf0, (2026091818));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -21186,24 +21186,20 @@ FatASM* SC_FAT_JumpTo(FatASM* Self) {
 int64 SC_FAT_JumpToSet(FatASM* Self, FatASM* Value) {
 	//cpp_part;
 	uint J = Self->JumpPrm;
-	if (J) {
-		int64 D = (Value - Self) - 1;
-		if (D == -1) {
-			SC_FAT_SyntaxExpect(Self, JB_LUB[513]);
-		}
-		Self->Prms[J - 1] = D;
-		if (D == 0) {
-			Self->_Op = kSC__ASM_NOOP;
-			Self->JumpPrm = 0;
-		}
+	if (!J) {
+		SC_FAT_SyntaxExpect(Value, kJB__Rec_InternalError);
+		return 0;
+	}
+	int64 D = (Value - Self) - 1;
+	if (D == -1) {
+		SC_FAT_SyntaxExpect(Self, JB_LUB[513]);
+	}
+	Self->Prms[J - 1] = D;
+	if (D) {
 		return D;
 	}
-	 else {
-		if (true) {
-			SC_FAT_SyntaxExpect(Value, kJB__Rec_InternalError);
-		}
-	}
-	return 0;
+	Self->JumpPrm = 0;
+	return SC_FAT_SaferNoop(Self);
 }
 
 ASM* SC_FAT_KNST_Encoder(FatASM* Self, ASM* Curr, ASM* After) {
@@ -21567,6 +21563,15 @@ bool SC_FAT_RotateConst(FatASM* Self, uint64 V) {
 	return false;
 }
 
+int64 SC_FAT_SaferNoop(FatASM* Self) {
+	ASM O = kSC__ASM_NOOP;
+	if (SC_FAT_SyntaxIs(Self, kSC__Reg_DebugVarClose) or SC_FAT_SyntaxIs(Self, kSC__Reg_DebugVarOpen)) {
+		O = kSC__ASM_MARK;
+	}
+	Self->_Op = O;
+	return 0;
+}
+
 void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value) {
 	Message* M = Self->Msg;
 	uint64 K = Self->_Const;
@@ -21721,7 +21726,7 @@ void SC_FatRange_JumpTo(FatRange* Self, FatASM* Curr, int Allowed) {
 
 bool SC_HairyMan_AddOrShrink(HairyMan* Self, FastString* J, SCFunction* F) {
 	(++Self->Total);
-	if ((SC_Func_SyntaxIs(F, kSC__FunctionType_UsedByASM)) or SC_Func_IsBehaviour(F)) {
+	if (SC_Func_ShouldBake(F)) {
 		uint C = Self->Curr;
 		if (C) {
 			JB_bin_AddHint(J, C);
@@ -23130,9 +23135,9 @@ ASMReg SC_Pac_CloseVars(Assembler* Self, uint64 Orig, Message* Exp, ASMReg Retur
 }
 
 ASMReg SC_Pac_Compare(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode) {
-	if (SC_Reg_Fat(L, kSC__ASM_VGET) or SC_Reg_Fat(R, kSC__ASM_VGET)) {
+	if ((SC_FAT_SyntaxIs(SC_Reg_Fat(L, kSC__ASM_VGET), kSC__Reg_Temp)) and (SC_FAT_SyntaxIs(SC_Reg_Fat(R, kSC__ASM_VGET), kSC__Reg_Temp))) {
 		ASMReg Subdest = SC_Reg_xC2xB5TypeSetWithTC(Dest, SC_Reg_xC2xB5Type(L));
-		L = SC_Pac_Subtract(Self, Exp, Subdest, R, L);
+		L = SC_Pac_Subtract(Self, Exp, Subdest, L, R);
 		R = SC_Reg__NewWith0();
 	}
 	if (SC_Reg_IsInt(L)) {
@@ -24210,6 +24215,10 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 			(--S);
 			uint Op = SC_FAT_Op(S);
 			if (Op == kSC__ASM_RFRT) {
+				if (true) {
+					SC_FAT_SyntaxExpect(S, nil);
+				}
+				JB_DoAt(1);
 				(++Sv->ReturnedCount);
 			}
 			 else if (Op == kSC__ASM_RET) {
@@ -24228,8 +24237,10 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 				if (Value) {
 					SC_Pac_SafeDecr(Self, Value);
 				}
+				ASMReg Old = SC_Reg_OperatorBitand(S->Info, kSC__Reg_DebugVars);
 				(SC_FAT_SetOpSet(S, kSC__ASM_JUMP));
 				S->JumpPrm = 1;
+				S->Info = Old;
 				SC_FAT_JumpFix(S, SC_Pac_Curr(Self));
 			}
 			if (SC_FAT_GuessSize(S)) {
@@ -35117,6 +35128,9 @@ void SC_bin_Cakeify(FastString* Self, SCFunction* Fn) {
 	uint Id = Fn->FPackID;
 	if (!Id) {
 		JB_Msg_Fail(Fn->Source, JB_LUB[1719]);
+	}
+	if (!SC_Func_ShouldBake(Fn)) {
+		Id = 32768;
 	}
 	Id = ((Id << 1) + SC_Base_IsLibrary(Fn));
 	JB_bin_AddHint(Self, Id);
@@ -46582,6 +46596,7 @@ bool SC_Decl_IsUnknownParam(SCDecl* Self) {
 }
 
 bool SC_Decl_IsUsedAfter(SCDecl* Self, Message* Thg) {
+	;
 	return true;
 }
 
@@ -57586,6 +57601,10 @@ void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space) {
 	}
 }
 
+bool SC_Func_ShouldBake(SCFunction* Self) {
+	return (SC_Func_SyntaxIs(Self, kSC__FunctionType_UsedByASM)) or SC_Func_IsBehaviour(Self);
+}
+
 Message* SC_Func_SourceArg(SCFunction* Self) {
 	Message* Arg = ((Message*)JB_Ring_Last(Self->Source));
 	if (JB_Msg_EqualsSyx(Arg, kJB_SyxArg)) {
@@ -61049,4 +61068,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -6182576332035341082 7096431023419015668
+// -3690838856587563504 7096431023419015668

@@ -5979,6 +5979,8 @@ bool SC_FAT_RenderFat(FatASM* Self, FastString* Fs, int Level);
 
 bool SC_FAT_RotateConst(FatASM* Self, uint64 V);
 
+int64 SC_FAT_SaferNoop(FatASM* Self);
+
 void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value);
 
 bool SC_FAT_SimpleConst(FatASM* Self, uint64 V, int Space);
@@ -10812,6 +10814,8 @@ bool SC_Func_ReturnsObject(SCFunction* Self);
 SCDecl* SC_Func_Self(SCFunction* Self);
 
 void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
+
+bool SC_Func_ShouldBake(SCFunction* Self);
 
 Message* SC_Func_SourceArg(SCFunction* Self);
 
