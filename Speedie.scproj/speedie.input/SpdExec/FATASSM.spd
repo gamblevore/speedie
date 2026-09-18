@@ -43,7 +43,7 @@ struct FatASM
 	
 	function IsRead (|bool|)
 		|| op = .op
-		return op >= asm.RD1U and op <= asm.RD16 
+		return op >= asm.RD1U and op <= asm.RD16
 	
 	function IsFunc (|bool|)
 		|| b = .BaseOp
@@ -295,20 +295,24 @@ struct FatASM
 		|| j = .JumpPrm
 			return self + 1 + .prms[j-1]|int|
 	
+	function SaferNoop (|int64|)
+		// should nop_sub use this?
+		|| o = asm.noop
+		if self is debugvarclose or debugvaropen
+			o = asm.mark
+		._op = o
 	
 	function JumpTo (|&fatasm| Value, |int64|)
 		cpp_Part JumpToSet
-		|| j = .JumpPrm
-			|| D = (value - self) - 1
-			check (D != -1) (self, "Infinite loop")
-			.prms[j-1] = D
-			if d == 0
-				._op = asm.noop
-				.JumpPrm = 0 // safer for jump calculations
-//				assembler.sh.nop(self)
-			return D
-		  else
-			error (value, errorreceiver.internalerror)
+		|| j = .JumpPrm									#expect (value, errorreceiver.internalerror)
+		
+		|| D = (value - self) - 1
+		check (D != -1) (self, "Infinite loop")
+		.prms[j-1] = D
+		if d
+			return d
+		.JumpPrm = 0 // safer for jump calculations
+		return .SaferNoop
 
 ////////////////////////////////////////////////////////////
 	function p0 (|ASMParam|): return .prms[0]
@@ -697,7 +701,7 @@ struct FatASM
 				return .CopyJump(d)						// jumping to a function-exit.
 
 		  elseif (d == self + 2) and m.JumpNegatable
-			|| mid = self + 1							// asmtodo: doesnt take into account .GuessSize == 0
+			|| mid = self + 1
 			if mid isa asm.JUMP
 				return .JumpNegate(sh, mid)
 		

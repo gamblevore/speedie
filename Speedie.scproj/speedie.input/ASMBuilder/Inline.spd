@@ -104,6 +104,7 @@ struct InlineInfo
 
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
+		(thg)
 		return true // remove later
 		// its a good opt, but can make debugging harder
 
@@ -370,7 +371,8 @@ function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
-			sv.ReturnedCount++
+			error (s)
+/			sv.ReturnedCount++			// Should never get this instruction! not inlined anyway.
 		  elseif op == asm.ret
 			sv.ReturnedCount++
 			|| value = s.inputfat(0)
@@ -381,23 +383,24 @@ function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
 			  else
 				rz.reg = s.asmreg(0)
 				rz.µType = .state.return.µType
-
 			
 			if value
-				.SafeDecr(value) // will get incremented later.
-			s.SetOp = asm.jump
+				.SafeDecr(value)		// Will get incremented later.
+			
+			|| Old = s.info & asmreg.DebugVars // or else we lose our MARK close.
+			s.setOp = asm.jump
 			s.JumpPrm = 1
+			s.info = old
 			s.JumpFix(.curr)
 
-
 		if s.GuessSize
-			(s is FromInline) // whyy???? this blocks consts, but why?
+			(s is FromInline)			// Whyy???? this blocks consts, but why?
 	
 	rz &= ~ASMReg.Exit
 	(rz as= dest&asmreg.exit)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg
-		(rz is const) // make compiler happy
+		(rz is const)					// Make compiler happy
 
 
 }

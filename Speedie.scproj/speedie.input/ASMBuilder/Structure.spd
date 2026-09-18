@@ -223,6 +223,8 @@ extend assembler
 		
 		for f.FatInputs in fat
 			if f
+				// why are we keeping the inputs?
+				// asmtodo: what about temps? or things whose output was replaced in the same block.
 				.Decr(f, FatNopMode.KeepInputs, depth)
 
 		for v.RegOutputs in fat
