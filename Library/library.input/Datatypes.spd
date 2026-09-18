@@ -20,7 +20,7 @@ datatype int
 		cpp_wrapper
 
 	inline IsPow2 (|bool|)
-		if self
+		if self > 0
 			return !(self&(self-1))
 
 	inline AlignUp (|int| To, |int|)
@@ -250,7 +250,7 @@ datatype uint
 		return !(self mod n)
 
 	inline IsPow2 (|bool|)
-		if self
+		if self > 0
 			return !(self&(self-1))
 		
 	function Hash (|uint|)
@@ -750,7 +750,7 @@ datatype int64
 		
 	
 	inline IsPow2 (|bool|)
-		if self
+		if self > 0
 			return !(self&(self-1))
 
 	function AsFloat (|Float64|)
@@ -827,7 +827,7 @@ datatype uint64
 		cpp_wrapper (__builtin_bswap64)
 
 	inline IsPow2 (|bool|)
-		if self
+		if self > 0
 			return !(self&(self-1))
 		
 	syntax access (|int| bit, |bool|)
