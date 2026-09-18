@@ -60,7 +60,7 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 	if dest isnt set
 		return exp.VGET(dest, base, vara, k) * dest
 
-	// Doesn't yet handle:   x[1] = a - b 
+	// Doesn't yet handle:   x[0] = a - b
 	if  !vara  and  (dest is temp)
 		|| party = dest.fat
 			if party.IsPartyAble and .redest(party, base)
