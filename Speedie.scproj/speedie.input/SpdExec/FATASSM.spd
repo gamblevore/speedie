@@ -811,6 +811,7 @@ datatype FatNopMode	(byte)
 		Hard = 0
 		KeepInputs
 		Rewind
+		NopTemp
 	
 	Syntax Is (|fatnopmode| f, |bool|)
 		return self&f

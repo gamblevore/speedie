@@ -222,14 +222,11 @@ extend assembler
 		
 		for f.FatInputs in fat
 			if f
-				// why are we keeping the inputs?
-				// asmtodo: what about temps? or things whose output was replaced in the same block.
-				// nopping temps is a bit awkward, because sometimes we want to nop something, then 
-				// replace it with another thing.
-				// so keep nop_sub should not nop temps
-				// however... isnt that only for keepinput, nopmode here?
-//				if NopMode is KeepInputs
-				.Decr(f, fatnopmode.keepinputs, depth)
+				if (NopMode isnt KeepInputs)
+					NopMode = FatNopMode.NopTemp
+				  else
+					NopMode = FatNopMode.KeepInputs
+				.Decr(f, NopMode, depth)
 
 		for v.RegOutputs in fat
 			v &= 31
@@ -311,9 +308,10 @@ extend assembler
 			return
 
 		f.µRefCount = R
-		require (R <= 0)
-		if (mode isnt KeepInputs)
-			.nop_sub(f, mode, depth)
+		require (R <= 0) and (mode isnt KeepInputs)
+		if (mode is NopTemp)
+			require (f is temp)
+		.nop_sub(f, mode, depth)
 	
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
