@@ -714,6 +714,7 @@ extend Assembler
 	function DivInt    (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntDiv)
+
 		|| q = .QuickIntDiv(exp, dest, l, r)
 			return q
 
@@ -731,18 +732,23 @@ extend Assembler
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
 
 
+	function ModOpt (fn_opasm)
+		require r is const
+		|| fat = r.fat$
+		|| K = fat.const
+		require k.IsPow2 and (k <= 2GB)
+		.NopTempConst(R)
+		|| R2 = .LoadNumber(exp, K-1, false)
+		return .BitAnd(exp, dest, L, R2) // uses bflg, or at least bank
+
+
 	function ModInt		(fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, L, R, ConstifyIntMod)
 		
-//		|| K = .Const(R, 31, true)
-//		if k.IsPow2
-//			.NopTempConst(R)
-//			// if we make a const of the log... we can then, do a bitand... which can use bflg... which can chain!
-//			// wow!
-//			|| fat = exp.bank
-//			return 64 - k.Log2			
-			
+		|| Opt = .ModOpt(exp, dest, L, R)
+			return Opt
+
 		|| fat = exp.DIV(nil, dest, L, R, dest.signed|int|)
 		fat.OutputPrms &= ~1 // clear unused output 
 		return fat.Vectorisesmall(dest, asm.qdiv, asm.divs)
