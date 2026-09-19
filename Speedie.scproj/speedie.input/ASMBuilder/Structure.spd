@@ -156,7 +156,7 @@ extend assembler
 		require R is Const
 
 		|| RF = R.fat
-		if rf and .IsWithin(RF)
+//		if rf and .IsWithin(RF)		// the .iswithin is already used by CanConstLocalThg
 			|| k = RF.const
 			if k.fits(bits, signed)
 				.NopTempConst(R)
@@ -206,7 +206,6 @@ extend assembler
 				return
 
 		if !.IsWithinCurrInline(fat)
-//			if fat.id == 31972
 			|| C = .DelayedNopCount++
 			if C < –count .DelayedNops
 				.DelayedNops[C] = fat.Index
@@ -225,7 +224,12 @@ extend assembler
 			if f
 				// why are we keeping the inputs?
 				// asmtodo: what about temps? or things whose output was replaced in the same block.
-				.Decr(f, FatNopMode.KeepInputs, depth)
+				// nopping temps is a bit awkward, because sometimes we want to nop something, then 
+				// replace it with another thing.
+				// so keep nop_sub should not nop temps
+				// however... isnt that only for keepinput, nopmode here?
+//				if NopMode is KeepInputs
+				.Decr(f, fatnopmode.keepinputs, depth)
 
 		for v.RegOutputs in fat
 			v &= 31
@@ -284,7 +288,7 @@ extend assembler
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if (old.RefCount <= 0) and .IsCurrBlock(old)
+			if (old.RefCount <= 0) and .IsCurrBlock(old)		// asmtodo: could also set it if its in a parent block
 				if alterer and old is DebugVarOpen				// like: || a = 1, a = 2 // still needs open!
 					(alterer is DebugVarOpen)
 				.nop_sub(old, fatnopmode.hard)
@@ -308,7 +312,7 @@ extend assembler
 
 		f.µRefCount = R
 		require (R <= 0)
-		if (mode isnt KeepInputs) // even temp inputs need to be kept // or (f is temp)
+		if (mode isnt KeepInputs)
 			.nop_sub(f, mode, depth)
 	
 	
