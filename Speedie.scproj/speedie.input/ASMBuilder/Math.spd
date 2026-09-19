@@ -482,8 +482,8 @@ extend Assembler
 	function IntPlus     (fn_opasm)
 		if dest is Const									// perhaps we can do this in domathsub?
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyIntPlus)
-		
-		|| swapped = false
+
+		|| Swapped = false
 		if l isnt alternate
 			|| LS = l.LeftScore
 			|| RS = r.LeftScore
@@ -497,6 +497,7 @@ extend Assembler
 		|| LMul = 1
 		if (l isnt noscale) and l.SomePointer
 			lmul = l.PointerMul(exp, swapped)
+		
 		if r is Const
 			|| RR = r.const
 			if l is Subtract
