@@ -17,7 +17,6 @@ struct FatASM
 	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
 	|uint64|			_Const
-	|byte[64]|			ExtraSpace
 	
 	
 	function Op (|byte|)
