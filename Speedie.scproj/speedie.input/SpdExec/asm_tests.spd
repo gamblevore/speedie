@@ -117,9 +117,10 @@ function Uint64Trim (|uint64|)
 function AndOrTest (|int| a, |int| b, |bool| c,  |int|)	/// Active ///
 	opt norefcounts
 	visible
-	|| five = 5, || min = -1
 	if a or b
 		rz = 4
+	rz = 3
+	|| five = 5, || min = -1
 	if !a and b
 		rz = 3
 	if a and b

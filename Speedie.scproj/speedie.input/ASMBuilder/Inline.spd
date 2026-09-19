@@ -222,7 +222,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	
 	ll.after = .curr
 	if !.EntireInlineFailed
-		rz = .InlineFinish(ll, svregs)
+		rz = .InlineFinish(prms, ll, svregs)
 	
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain) or .EntireInlineFailed
@@ -234,6 +234,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	
 	if svregs.ReturnedCount > 1
 		.NextBasicBlock
+
 	if !rz
 		(rz is Const)								// no longer zero
 
@@ -365,21 +366,26 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 
-function InlineFinish (|FatRange| R, |SavedRegisters| sv, |ASMReg|)
+function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
+	if old.FatIndex
+		return exp.phi(new, new, old) * new
+	return new
+	
+	
+function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	target debug: || InlineTrap = ++ASMTrapper,  if InlineTrap == -1
 	|| dest = .state.return
+
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
 			error (s)
 /			sv.ReturnedCount++			// Should never get this instruction! not inlined anyway.
+
 		  elseif op == asm.ret
 			sv.ReturnedCount++
 			|| value = s.inputfat(0)
-			if rz
-				rz = rz.simplify
-			  elseif value
-				rz = value.info
+				rz = .PerhapsPhi(exp, value.info, rz)
 			  else
 				rz.reg = s.asmreg(0)
 				rz.µType = .state.return.µType

@@ -448,7 +448,7 @@ struct FatASM
 
 		fs <~ ")"
 	
-	
+
 	function WillRenderFat (|bool|)
 		if (.GuessSize == 0)
 			if .msg.func == @sheb
@@ -492,11 +492,10 @@ struct FatASM
 				fs <~ op.name
 			fs <~ ':'
 			target debug
-				|int| bb = .basicblock
 				fs <~ "("
-				fs <~ bb
+				fs <~ .basicblock
 				fs <~ "/"
-				fs <~ assembler.sh.parentblock(bb)
+				fs <~ assembler.sh.parentblock(self)
 				fs <~ ")"
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""

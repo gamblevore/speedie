@@ -78,6 +78,13 @@ struct Assembler
 
 	function FuncStart (|&fatasm|)
 		return .FuncStart_ + 1
+
+	function Fat (|uint16| Index, |&fatasm|)
+		if index
+			return .funcstart_ + index
+		
+	function Fat (|asmreg| F, |&fatasm|)
+		return .fat(f.fatindex)
 		
 	function FnLength (|int|)
 		return .curr_ - .funcstart
