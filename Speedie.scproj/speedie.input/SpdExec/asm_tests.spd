@@ -314,7 +314,7 @@ function Clamp (|uint64| u1, |uint64| u2)
 
 function ClampVec (|vec4| a, |vec4| b, |vec4| c)
 	cpp_part CV
-	|| d = a.clamp(b, c) 
+	|| d = a.clamp(b, c)
 	b = b + 1.0
 
 
