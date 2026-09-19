@@ -25,10 +25,10 @@ function PrintNum (|int64| b1)
 
 
 function app.TestSyntax
-//	|| L2 = "(a,b,c,d)".parse
-//	printnum(60GB)
-//	printnum(7.9MB|int|)
-//	printnum(9524600)
+	|| L2 = "(a,b,c,d)".parse
+	printnum(60GB)
+	printnum(7.9MB|int|)
+	printnum(9524600)
 		
 	|| P = person(12, "fred")
 	P.age = -2 // try to corrupt the age
@@ -42,12 +42,15 @@ function app.TestSyntax
 	|| L = "(a,b,c,d)".parse
 	if L == 4
 		"The list $L has four items!"
+	
 /	|| zz = 0
 	for i in 1 to 6
 		if i isa 2
 			"$i is even"
 			zz[i] = true
 		  else
+			zz++
+			zz--
 			"$i is odd"
 	"zz is $zz"
 
@@ -58,15 +61,15 @@ function app.TestSyntax
 		(fn)("hello")
 	Flowlog.DisabledIncr(-1)
 
-	bug()
+	FunctionPointers()
 
 
-function Bug (|fn_doaction!|)
+function FunctionPointers (|fn_doaction!|)
 	opt norefcounts
 	|| G = RPGHero("fred")
-	|dictionary of fn_doaction| dict
-	|| x = dict["hello"]	
-		(x[])(G, "no reason")
+	|dictionary of fn_doaction| EmptyDict
+	|| x = EmptyDict["hello"]
+		(x[])(G, "no reason")		// will never run
 	|| j = DoAction["jump"]
 		j[](G, "hes scared")
 	if x
@@ -98,12 +101,15 @@ dispatch DoAction (|rpghero|self, |string| Reason)
 		"$.Name jumped because $Reason"
 		if .OnGround
 			.YSpeed = (.YSpeed max 0) + 2 
+			.IsDucking = false
 
 	run
 		"$.Name ran because $Reason"
 		.GroundSpeed = .GroundSpeed min 5
+		.IsDucking = false
 
 	duck
 		"$.Name ducked because $Reason"
 		.IsDucking = true
+
 
