@@ -685,7 +685,6 @@ struct FatASM {
 	byte JumpPrm;
 	u16 Inputs[5];
 	uint64 _Const;
-	byte ExtraSpace[64];
 };
 
 struct FatRange {
@@ -2217,6 +2216,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FailableInt_Min ((int)2147483649)
 #define kSC__FatNopMode_Hard ((int)0)
 #define kSC__FatNopMode_KeepInputs ((int)1)
+#define kSC__FatNopMode_NopTemp ((int)4)
 #define kSC__FatNopMode_Rewind ((int)2)
 #define kJB__FileDes_StdErr ((FileDes)2)
 #define kJB__FileDes_StdIn ((FileDes)0)
@@ -6372,7 +6372,7 @@ void SC_Pac_InitAndStartFunc(Assembler* Self, SCFunction* Fn);
 
 bool SC_Pac_InlineAddK(Assembler* Self, ASMReg XIn, int64 Add, ASMReg XOut);
 
-ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv);
+ASMReg SC_Pac_InlineFinish(Assembler* Self, Message* Exp, FatRange* R, SavedRegisters* Sv);
 
 ASMReg SC_Pac_InlineOffsetOpt(Assembler* Self, ASMReg Base, int Bytes, int& Index, uint MaxBits, SCDecl* Decl, Message* Exp);
 
@@ -6450,6 +6450,8 @@ ASMReg SC_Pac_ModFloat(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 
 ASMReg SC_Pac_ModInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
+ASMReg SC_Pac_ModOpt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
+
 ASMReg SC_Pac_More(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_MoreEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
@@ -6472,11 +6474,11 @@ bool SC_Pac_nop_sub_keep(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMo
 
 void SC_Pac_NopBranch(Assembler* Self, FatASM* Start);
 
-bool SC_Pac_NopConstWithRegInt64(Assembler* Self, ASMReg R, int64 K);
-
-void SC_Pac_NopConstWithReg(Assembler* Self, ASMReg R);
-
 void SC_Pac_NopReg(Assembler* Self, ASMReg R);
+
+bool SC_Pac_NopTempConstWithRegInt64(Assembler* Self, ASMReg R, int64 K);
+
+void SC_Pac_NopTempConstWithReg(Assembler* Self, ASMReg R);
 
 ASMReg SC_Pac_NotEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -6488,9 +6490,13 @@ ASMReg SC_Pac_OptFMul(Assembler* Self, ASMReg Dest, ASMReg Mul, ASMReg Add);
 
 ASMReg SC_Pac_PackGlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest, int64 ExportPos);
 
-u16 SC_Pac_ParentBlock(Assembler* Self, uint /*u16*/ B);
+u16 SC_Pac_ParentBlockWithFAT(Assembler* Self, FatASM* F);
+
+u16 SC_Pac_ParentBlockWithUint16(Assembler* Self, uint /*u16*/ B);
 
 void SC_Pac_ParentSanity(Assembler* Self);
+
+ASMReg SC_Pac_PerhapsPhi(Assembler* Self, Message* Exp, ASMReg New, ASMReg Old);
 
 void SC_Pac_PhiFix(Assembler* Self, FatASM* Start);
 

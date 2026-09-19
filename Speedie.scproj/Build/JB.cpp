@@ -3503,7 +3503,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026091818));
+	JB_FS_AppendInt32(_fsf0, (2026091919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10306,7 +10306,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026091818));
+	JB_FS_AppendInt32(_fsf0, (2026091919));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -15664,7 +15664,7 @@ bool SC_int_IsNormalMatch(int Self) {
 }
 
 bool JB_int_IsPow2(int Self) {
-	if (Self) {
+	if (Self > 0) {
 		return (!(Self & (Self - 1)));
 	}
 	return false;
@@ -15773,7 +15773,7 @@ bool SC_int64_Fits(int64 Self, int Amount, bool Signed) {
 }
 
 bool JB_int64_IsPow2(int64 Self) {
-	if (Self) {
+	if (Self > 0) {
 		return (!(Self & (Self - 1)));
 	}
 	return false;
@@ -16990,7 +16990,7 @@ ASMReg SC_ASMType__ConstConvert(Assembler* Self, Message* Exp, ASMReg Dest, ASMR
 	if (Srf->_Const == K) {
 		return Srf->Info;
 	}
-	SC_Pac_NopConstWithReg(Self, From);
+	SC_Pac_NopTempConstWithReg(Self, From);
 	return SC_Pac_NumToReg(Self, Exp, Dest, K, New);
 }
 
@@ -21680,7 +21680,7 @@ bool SC_FAT__VerifyNumbers() {
 	if ((kSC__ASM_JBOR ^ 1) != kSC__ASM_JBAN) {
 		return nil;
 	}
-	int S = (128);
+	int S = (64);
 	if (!((S == 128) or (S == 64))) {
 		return nil;
 	}
@@ -22648,7 +22648,7 @@ ASMReg SC_Pac_BitAnd(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 ASMReg SC_Pac_BitAndOpt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
 	if (SC_Reg_SyntaxIs(L, kSC__Reg_Const)) {
 		int64 K = SC_Reg_Const(L);
-		if (SC_Pac_NopConstWithRegInt64(Self, L, -1)) {
+		if (SC_Pac_NopTempConstWithRegInt64(Self, L, -1)) {
 			return R;
 		}
 		if (K == 0) {
@@ -22952,7 +22952,7 @@ bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T) {
 		return nil;
 	}
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 	}
 	return true;
 }
@@ -22961,7 +22961,7 @@ int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R) {
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
 		int64 K = SC_Reg_Const(R);
 		if (K and JB_int64_IsPow2(((++K)))) {
-			SC_Pac_NopConstWithReg(Self, R);
+			SC_Pac_NopTempConstWithReg(Self, R);
 			return 64 - JB_int64_Log2(K);
 		}
 	}
@@ -23192,10 +23192,10 @@ Ind SC_Pac_Const(Assembler* Self, ASMReg R, int Bits, bool Signed) {
 		return -1;
 	}
 	FatASM* RF = SC_Reg_FAT(R);
-	if (RF and SC_Pac_IsWithin(Self, RF)) {
+	if (RF) {
 		int64 K = SC_FAT_Const(RF);
 		if (SC_int64_Fits(K, Bits, Signed)) {
-			SC_Pac_NopConstWithReg(Self, R);
+			SC_Pac_NopTempConstWithReg(Self, R);
 			return SC_uint64_Trim(((uint64)K), Bits);
 		}
 	}
@@ -23342,12 +23342,15 @@ void SC_Pac_Decr(Assembler* Self, FatASM* F, uint /*FatNopMode*/ Mode, int Depth
 		return;
 	}
 	(SC_FAT_xC2xB5RefCountSet(F, R));
-	if (R > 0) {
+	if (!((R <= 0) and ((!SC_FatNopMode_SyntaxIs(Mode, kSC__FatNopMode_KeepInputs))))) {
 		return;
 	}
-	if ((!SC_FatNopMode_SyntaxIs(Mode, kSC__FatNopMode_KeepInputs))) {
-		SC_Pac_nop_sub(Self, F, Mode, Depth);
+	if (SC_FatNopMode_SyntaxIs(Mode, kSC__FatNopMode_NopTemp)) {
+		if (!SC_FAT_SyntaxIs(F, kSC__Reg_Temp)) {
+			return;
+		}
 	}
+	SC_Pac_nop_sub(Self, F, Mode, Depth);
 }
 
 ASMReg SC_Pac_DivFloat(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
@@ -24068,7 +24071,7 @@ ASMReg SC_Pac_InbuiltTernary(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, M
 	if (SC_Reg_Const(C)) {
 		T = A;
 	}
-	SC_Pac_NopConstWithReg(Self, C);
+	SC_Pac_NopTempConstWithReg(Self, C);
 	return T;
 }
 
@@ -24158,7 +24161,7 @@ void SC_Pac_InitAndStartFunc(Assembler* Self, SCFunction* Fn) {
 	Self->Curr_ = (Self->TotalStart + J->Length);
 	Self->FuncStart_ = SC_Pac_Curr(Self);
 	if (!SC__Pac_BackupSpace) {
-		SC__Pac_BackupSpace = ((FatASM*)JB_Mem__Zalloc(((128)) * 65536));
+		SC__Pac_BackupSpace = ((FatASM*)JB_Mem__Zalloc(((64)) * 65536));
 		if (!SC__Pac_BackupSpace) {
 			JB_Object_Fail(nil);
 			return;
@@ -24206,7 +24209,7 @@ bool SC_Pac_InlineAddK(Assembler* Self, ASMReg XIn, int64 Add, ASMReg XOut) {
 	return false;
 }
 
-ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
+ASMReg SC_Pac_InlineFinish(Assembler* Self, Message* Exp, FatRange* R, SavedRegisters* Sv) {
 	ASMReg Rz = ((ASMReg)0);
 	ASMReg Dest = SC_Pac_State(Self)->Return;
 	{
@@ -24224,11 +24227,8 @@ ASMReg SC_Pac_InlineFinish(Assembler* Self, FatRange* R, SavedRegisters* Sv) {
 			 else if (Op == kSC__ASM_RET) {
 				(++Sv->ReturnedCount);
 				FatASM* Value = SC_FAT_InputFat(S, 0);
-				if (Rz) {
-					Rz = SC_Reg_Simplify(Rz);
-				}
-				 else if (((bool)Value)) {
-					Rz = Value->Info;
+				if (Value) {
+					Rz = SC_Pac_PerhapsPhi(Self, Exp, Value->Info, Rz);
 				}
 				 else {
 					Rz = SC_Reg_RegSetWithReg(Rz, SC_FAT_ASMReg(S, 0));
@@ -24360,14 +24360,12 @@ ASMReg SC_Pac_IntPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMR
 FailableInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub) {
 	int64 V = SC_Reg_Const(R);
 	if (V == -1) {
-		if (Sub) {
-		}
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		return V;
 	}
 	V = (V - Sub);
 	if ((!V) or JB_int64_IsPow2(V)) {
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		if (!V) {
 			return 0;
 		}
@@ -24399,12 +24397,11 @@ bool SC_Pac_IsCurrBlockWithFAT(Assembler* Self, FatASM* F) {
 }
 
 bool SC_Pac_IsCurrBranch(Assembler* Self, FatASM* F) {
-	return Self->BasicParent == SC_Pac_ParentBlock(Self, F->BasicBlock);
+	return Self->BasicParent == SC_Pac_ParentBlockWithUint16(Self, F->BasicBlock);
 }
 
 bool SC_Pac_IsWithin(Assembler* Self, FatASM* F) {
-	uint B = F->BasicBlock;
-	uint ToFind = SC_Pac_ParentBlock(Self, B);
+	uint ToFind = SC_Pac_ParentBlockWithFAT(Self, F);
 	uint Us = Self->BasicParent;
 	while (true) {
 		if (Us == ToFind) {
@@ -24413,7 +24410,7 @@ bool SC_Pac_IsWithin(Assembler* Self, FatASM* F) {
 		if (!Us) {
 			return false;
 		}
-		Us = SC_Pac_ParentBlock(Self, Us);
+		Us = SC_Pac_ParentBlockWithUint16(Self, Us);
 	};
 }
 
@@ -24440,7 +24437,7 @@ ASMReg SC_Pac_JumpIntK(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message
 	if (!(SC_Reg_IsSmall(L) and SC_int64_Fits(K, 9, true))) {
 		return nil;
 	}
-	SC_Pac_NopConstWithReg(Self, R);
+	SC_Pac_NopTempConstWithReg(Self, R);
 	K = SC_uint64_Trim(((uint64)K), 9);
 	FatASM* J = SC_Msg_JMKM(Exp, L, K, nil);
 	if (0) {
@@ -24883,9 +24880,30 @@ ASMReg SC_Pac_ModInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Const)) {
 		return SC_Pac_MakeConstFromTwo(Self, Exp, Dest, L, R, ((fn_ASMConstifier)(SC_ConstifyIntMod)));
 	}
+	ASMReg Opt = SC_Pac_ModOpt(Self, Exp, Dest, L, R);
+	if (Opt) {
+		return Opt;
+	}
 	FatASM* Fat = SC_Msg_DIV(Exp, nil, Dest, L, R, ((int)SC_Reg_Signed(Dest)));
 	Fat->OutputPrms = (Fat->OutputPrms & (~1));
 	return SC_FAT_VectoriseSmall(Fat, Dest, kSC__ASM_QDIV, kSC__ASM_DIVS);
+}
+
+ASMReg SC_Pac_ModOpt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
+	if (!SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
+		return nil;
+	}
+	FatASM* Fat = SC_Reg_FAT(R);
+	if (!Fat) {
+		return nil;
+	}
+	int64 K = SC_FAT_Const(Fat);
+	if (!(JB_int64_IsPow2(K) and (K <= 2147483648))) {
+		return nil;
+	}
+	SC_Pac_NopTempConstWithReg(Self, R);
+	ASMReg R2 = SC_Pac_LoadNumber(Self, Exp, K - 1, false, nil);
+	return SC_Pac_BitAnd(Self, Exp, Dest, L, R2);
 }
 
 ASMReg SC_Pac_More(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
@@ -24942,7 +24960,7 @@ void SC_Pac_NextBasicBlock(Assembler* Self) {
 				P = B;
 			}
 			 else {
-				P = SC_Pac_ParentBlock(Self, P);
+				P = SC_Pac_ParentBlockWithUint16(Self, P);
 			}
 			Self->BasicParent = P;
 		}
@@ -24967,11 +24985,11 @@ void SC_Pac_Nop(Assembler* Self, FatASM* ToNop) {
 void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B) {
 	bool Further = SC_Reg_FatIndex(A) > SC_Reg_FatIndex(B);
 	if (Further) {
-		SC_Pac_NopConstWithReg(Self, A);
+		SC_Pac_NopTempConstWithReg(Self, A);
 	}
-	SC_Pac_NopConstWithReg(Self, B);
+	SC_Pac_NopTempConstWithReg(Self, B);
 	if (!Further) {
-		SC_Pac_NopConstWithReg(Self, A);
+		SC_Pac_NopTempConstWithReg(Self, A);
 	}
 }
 
@@ -25008,7 +25026,13 @@ void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, i
 		while (_if1 < _nf2) {
 			FatASM* F = SC_uint16_fat(_inputsf0[_if1++]);
 			if (F) {
-				SC_Pac_Decr(Self, F, kSC__FatNopMode_KeepInputs, Depth);
+				if ((!SC_FatNopMode_SyntaxIs(NopMode, kSC__FatNopMode_KeepInputs))) {
+					NopMode = kSC__FatNopMode_NopTemp;
+				}
+				 else {
+					NopMode = kSC__FatNopMode_KeepInputs;
+				}
+				SC_Pac_Decr(Self, F, NopMode, Depth);
 			}
 		};
 	}
@@ -25063,27 +25087,27 @@ void SC_Pac_NopBranch(Assembler* Self, FatASM* Start) {
 	}
 }
 
-bool SC_Pac_NopConstWithRegInt64(Assembler* Self, ASMReg R, int64 K) {
+void SC_Pac_NopReg(Assembler* Self, ASMReg R) {
+	FatASM* F = SC_Reg_FAT(R);
+	if (F) {
+		return SC_Pac_Nop(Self, F);
+	}
+}
+
+bool SC_Pac_NopTempConstWithRegInt64(Assembler* Self, ASMReg R, int64 K) {
 	if (SC_Reg_Const(R) == K) {
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		return true;
 	}
 	return false;
 }
 
-void SC_Pac_NopConstWithReg(Assembler* Self, ASMReg R) {
+void SC_Pac_NopTempConstWithReg(Assembler* Self, ASMReg R) {
 	if (!SC_Reg_Reg(R)) {
 		return;
 	}
 	if (SC_Reg_SyntaxIs(R, kSC__Reg_Temp) and (!SC_Reg_SyntaxIs(R, kSC__Reg_BlockNop))) {
 		SC_Pac_AskNopWithFAT(Self, SC_Reg_NeedFAT(R));
-	}
-}
-
-void SC_Pac_NopReg(Assembler* Self, ASMReg R) {
-	FatASM* F = SC_Reg_FAT(R);
-	if (F) {
-		return SC_Pac_Nop(Self, F);
 	}
 }
 
@@ -25155,13 +25179,24 @@ ASMReg SC_Pac_PackGlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest
 	return Rz;
 }
 
-u16 SC_Pac_ParentBlock(Assembler* Self, uint /*u16*/ B) {
+u16 SC_Pac_ParentBlockWithFAT(Assembler* Self, FatASM* F) {
+	return SC_Pac_ParentBlockWithUint16(Self, F->BasicBlock);
+}
+
+u16 SC_Pac_ParentBlockWithUint16(Assembler* Self, uint /*u16*/ B) {
 	if (B >= 16384) {
 	}
 	return SC__Pac_BlockParents[B & (16384 - 1)];
 }
 
 void SC_Pac_ParentSanity(Assembler* Self) {
+}
+
+ASMReg SC_Pac_PerhapsPhi(Assembler* Self, Message* Exp, ASMReg New, ASMReg Old) {
+	if (SC_Reg_FatIndex(Old)) {
+		return SC_FAT_AsReg(SC_Msg_PHI(Exp, New, New, Old), New);
+	}
+	return New;
 }
 
 void SC_Pac_PhiFix(Assembler* Self, FatASM* Start) {
@@ -25333,7 +25368,7 @@ ASMReg SC_Pac_QuickFloatDiv(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L
 		if (V2 == 0.0f) {
 			SC_Msg_DivByZero(Exp);
 		}
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		return SC_Pac_Quick1Or1Sub(Self, Dest, L, ((int)V), Exp);
 	}
 	return ((ASMReg)0);
@@ -25345,18 +25380,18 @@ ASMReg SC_Pac_QuickFloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L
 	}
 	Float64 V = SC_Reg_float(R);
 	if ((V == 1.0f) or ((V == 0.0f) or (V == -1.0f))) {
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		return SC_Pac_Quick1Or1Sub(Self, Dest, L, ((int)V), Exp);
 	}
 	if (V == 2.0f) {
-		SC_Pac_NopConstWithReg(Self, R);
+		SC_Pac_NopTempConstWithReg(Self, R);
 		return SC_Pac_Plus(Self, Exp, Dest, L, L);
 	}
 	if (SC_Reg_FourBytes(R)) {
 		int64 X = SC_Reg_Const(R);
 		int64 Y = X >> 18;
 		if (X == (Y << 18)) {
-			SC_Pac_NopConstWithReg(Self, R);
+			SC_Pac_NopTempConstWithReg(Self, R);
 			if (0) {
 				SC_Msg_VMLK(Exp, nil, nil, nil);
 			}
@@ -25372,7 +25407,7 @@ ASMReg SC_Pac_QuickFloatPlusConstSub(Assembler* Self, Message* Exp, ASMReg Dest,
 	if (((K >> 18) << 18) != K) {
 		return nil;
 	}
-	SC_Pac_NopConstWithReg(Self, R);
+	SC_Pac_NopTempConstWithReg(Self, R);
 	if (0) {
 		SC_Msg_VADK(Exp, nil, nil, nil);
 	}
@@ -26122,7 +26157,7 @@ ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int A
 	SC_SavedRegisters_Restore((&Svregs), Fn->Args);
 	LL->After = SC_Pac_Curr(Self);
 	if (!Self->EntireInlineFailed) {
-		Rz = SC_Pac_InlineFinish(Self, LL, (&Svregs));
+		Rz = SC_Pac_InlineFinish(Self, Prms, LL, (&Svregs));
 	}
 	int Grown = SC_Pac_CurrGain(Self, RealStart);
 	if ((Grown > AllowedGain) or Self->EntireInlineFailed) {
@@ -26476,8 +26511,8 @@ ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp) {
 
 int SC_Pac__Init_() {
 	{
-		JB_SetRef(SC__Pac_JSM, JB_Mem__Object(0, 128));
-		JB_SetRef(SC__Pac_HoistSpace, JB_Mem__Object(0, 128));
+		JB_SetRef(SC__Pac_JSM, JB_Mem__Object(0, 64));
+		JB_SetRef(SC__Pac_HoistSpace, JB_Mem__Object(0, 64));
 	}
 	;
 	return 0;
@@ -61068,4 +61103,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -3690838856587563504 7096431023419015668
+// -2970746069219785413 7096431023419015668
