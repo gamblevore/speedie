@@ -101,6 +101,14 @@ datatype ASMReg (uint64)
 		
 	function Const (|int64|)
 		// every single caller must check for Const (and does!)
+
+		// what if it came from a different branch?
+		// x = func()
+		// if y: x = 4
+		// x = y / x
+		// this seems to apply to everything using .const!
+		// or perhaps my localthg func already handles this. I think so.
+		
 		|| F = .FAT
 			return f.const
 
