@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2392];
+extern JB_StringC* JB_LUB[2394];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3503,7 +3503,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026092015));
+	JB_FS_AppendInt32(_fsf0, (2026092016));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10306,7 +10306,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026092015));
+	JB_FS_AppendInt32(_fsf0, (2026092016));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -11653,6 +11653,8 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[1519], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_CppRefTable_disturbs)))));
 	(JB_Dict_ValueSet(SC_CppRefTable, JB_LUB[2180], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__Tran_CppRefs)))));
 	JB_SetRef(SC_ErrorDelayer, JB_Rec_Constructor(nil));
+	JB_SetRef(SC_FlowMacro, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[2392])), 1073741824), false));
+	JB_SetRef(SC_FlowObjMacro, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[2393])), 1073741824), false));
 	JB_SetRef(SC_FuncPreReader, (JB_Dict_Constructor(nil)));
 	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[1398], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_asm)))));
 	(JB_Dict_ValueSet(SC_FuncPreReader, JB_LUB[2000], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FuncPreReader_trin)))));
@@ -15087,6 +15089,7 @@ SCObject* SC_TypeOfTernary(Message* Exp, SCNode* Name_space, Message* Side) {
 	(JB_Ring_FirstSet(Params, Cond));
 	JB_SetRef(Params->Obj, SC__Comp_TernaryFunc);
 	(SC_Msg_ASMTypeSet(Exp, kSC__ASMType_kTern));
+	JB_SetRef(Exp->Obj, Result);
 	if (true) {
 		MessagePosition _usingf0 = ((MessagePosition){});
 		JB_Msg_SyntaxUsing(Exp, (&_usingf0));
@@ -39308,18 +39311,22 @@ void SC_Msg_GenTernFlow(Message* Self, SCDecl* Type, SCNode* Name_space) {
 	if (!SC_Func__CanGenFlow()) {
 		return;
 	}
+	Message* M = SC_FlowObjMacro;
 	if (!SC_Decl_MiniMatch(Type, SC_TypeString->TypeNormal, 0)) {
 		SCNodeType Ty = Type->Type->BaseType;
-		if (!SC_SCNodeType_SyntaxIs(Ty, kSC__SCNodeType_DataType)) {
+		if (!((SC_SCNodeType_SyntaxIs(Ty, kSC__SCNodeType_DataType)) and (SC_Decl_IsNumeric(Type) <= 1))) {
 			return;
 		}
+		M = SC_FlowMacro;
 	}
-	Message* Dot = SC_Msg_WrapWith(Self, kJB_SyxDot, JB_LUB[501]);
-	JB_Msg_AppendSyx(Dot, kJB_SyxEmb, JB_LUB[0]);
-	JB_FreeIfDead(SC_TypeOfExpr(Dot, Name_space, nil));
-	JB_SetRef(Dot->Obj, Type);
-	Message* Bra = SC_Msg_WrapWith(Dot, kJB_SyxBra, JB_LUB[0]);
-	JB_SetRef(Bra->Obj, Type);
+	Message* Wrap = JB_Syx_Msg(kJB_SyxEmb, nil);
+	(JB_Ring_NextSibSet(Self, Wrap));
+	Array* Prms = JB_Macro__TmpPrms();
+	JB_Array_SyntaxAppend(Prms, Self);
+	JB_Msg_BecomeMacro(Wrap, M, Wrap, Prms);
+	(JB_Array_SizeSet(Prms, 0));
+	JB_FreeIfDead(SC_TypeOfExpr(Wrap, Name_space, nil));
+	JB_SetRef(Wrap->Obj, Type);
 }
 
 void SC_Msg_GenWhileFlow(Message* Self) {
@@ -59739,7 +59746,7 @@ void SC_Func__Tran_IfSub(Message* Node, SCNode* Name_space) {
 	if (SC_Func__CanGenFlow()) {
 		SC_Msg_GenBranchFlow(Arg);
 		if (JB_Tree_IsLast(Arg)) {
-			(JB_Ring_NextSibSet(Node, SC_Msg_GenFlow(Node, Name_space)));
+			(JB_Ring_NextSibSet(SC_Msg_UpToArg(Node), SC_Msg_GenFlow(Node, Name_space)));
 		}
 	}
 	Message* SubTest = ((Message*)JB_Ring_NextSib(Arg));
@@ -61106,4 +61113,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1599083638796353402 3671333573637543280
+// 1258700382690045049 9079142866776235325

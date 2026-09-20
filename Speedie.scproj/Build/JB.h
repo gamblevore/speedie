@@ -1664,6 +1664,8 @@ extern JB_ErrorReceiver* SC_ErrorDelayer;
 extern int SC_ExportPosFails;
 extern FP_ExprResolver SC_ExprFuncs[64];
 extern SCDecl* SC_FalseBool;
+extern Message* SC_FlowMacro;
+extern Message* SC_FlowObjMacro;
 extern fn_asm SC_fn_asm_table[64];
 extern FastString* SC_fs_tmp_num;
 extern Dictionary* SC_FuncLinkageTable;
