@@ -1,6 +1,9 @@
 
 
 // Logs flow decisions... very useful.
+	
+insertion
+	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
 
 
 function Tran_Flow (TranFunc)
@@ -11,12 +14,21 @@ function Tran_Flow (TranFunc)
 		node.SafeRemove
 		(fn is FlowDisabled)
 
-	
-insertion
-	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
-
 
 || GenFlowCount = 0
+
+|| FlowMacro = `({
+	|| _flow_ = _0
+	_flow_|int|.FlowLog
+	(_flow_)
+})`.macro
+
+|| FlowObjMacro = `({
+	|| _flow_ = _0
+	_flow_.FlowLog
+	(_flow_)
+})`.macro
+
 
 function message.GenFlow (|scnode| name_space=nil, |message|)
 	opt norefcounts
@@ -57,7 +69,6 @@ function message.GenWhileFlow
 			g.name = "app"
 
 
-
 function message.GenProtoFlow
 	// {} --> {'a'.flowlog}
 	opt norefcounts
@@ -72,18 +83,21 @@ function message.GenTernFlow (|scdecl| Type, |scnode| name_space)
 	// x = ((a)(b,c)).flowlog
 	opt norefcounts
 	require scfunction.CanGenFlow
+
+	|| M = FlowObjMacro
 	ifn type.MiniMatch(typestring!.typenormal)
 		|| ty = type.type.BaseType
-		require ty is DataType // or Struct or Pointer
+		require (ty is DataType) and (type.isnumeric <= 1)			// or Struct or Pointer
+		M = FlowMacro
 
-	|| dot = .WrapWith(@dot, "flowlog")
-	dot <~ @emb
-	TypeOfExpr(dot, name_space)
-	dot.obj = type
-	|| bra = dot.WrapWith(@bra)
-	bra.obj = type
+	|| Wrap = @emb.msg
+	.next = wrap
+	|| prms = Macro.TmpPrms
+	prms <~ self
+	
+	wrap.BecomeMacro(M, wrap, prms)
+	prms.Length = 0
 
-
-
-
+	TypeOfExpr(wrap, name_space)
+	wrap.obj = type
 

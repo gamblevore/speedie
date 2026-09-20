@@ -1631,7 +1631,7 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 	if scfunction.CanGenFlow
 		arg.GenBranchFlow
 		if arg.islast
-			node.next = node.GenFlow(name_space)
+			node.UpToArg.next = node.GenFlow(name_space)
 
 	|| SubTest = arg.next
 		expect (SubTest isTmp "elseif" or "else")  ( SubTest )

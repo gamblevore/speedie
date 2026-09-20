@@ -952,6 +952,8 @@ function TypeOfTernary (ExprResolver)
 	params.first = cond
 	params.obj = compiler.TernaryFunc
 	exp.ASMType = ASMType.ktern
+	exp.obj = result // for GenTernFlow
+	
 	using exp
 		exp.first = @thg + "JB_Ternary"
 		if result and Options.GenFlowLogCode
