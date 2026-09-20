@@ -2,34 +2,37 @@
 
 // MiniOptimisations, miniopts, optimize, finishmost 
 
-function Assembler.FinishASM
+function Assembler.AddMissingReturn (|&fatasm|)
 	|| Last = .LastReal
 	|| S = .FuncStart
 	if (last < S) or !Last.IsFinisher or .ExpectOneMore
 		.MissingReturn
 		last = .LastReal
-	target debug
-		expect last >= S
 
+	if last < S // huh?
+
+	return Last
+
+	
+function Assembler.FinishASM
+	.AddMissingReturn
 	|| Length = 0
 	
 	target debug
 		|ASM[4]| TestSpace
 
-	while Last >= S
+	|| S = .FuncStart
+	while S < .curr
 		|| op = s.op
 		if op == asm.knst
-			S.ConstFinish
-//			.AskNop(s) // could this work now that we have phi?
+			S.FinishConst
+//			.AskNop(s)							// Could this work now that we have phi?
 		  elseif S.JumpPrm
-			s.JumpImprove(self, last)
-		  elseif op == asm.FNC3 or asm.FNC
-			if s < last
-				.TryTail(s)
-		  elseif (op == asm.noop) and (s.breakinfo&breakpoint)
-			s._op = asm.addb
-			for i in (–count s.prms)
-				s.prms[i] = 0
+			.FinishJump(S)
+		  elseif (op == asm.noop)
+			s.FinishNoop
+		  elseif (op == asm.FNC3 or asm.FNC) and (s < .last)
+			.TryTail(s)
 
 		|| Predicted = s.GuessSize
 		length += Predicted
@@ -38,11 +41,51 @@ function Assembler.FinishASM
 			|| Start = &TestSpace[0]
 			|| After = s.µBakeInto(Start, start+4)
 			|| Actual = After - Start
-			if Actual != Predicted		// uugh		
+			if Actual != Predicted				// Uugh		
 		S++
 		
 	.Root_Fn.µASMLength = Length
 
+
+function assembler.FinishJump (|fatasm| Jump, |bool|)
+	|| D = jump.JumpTo!						// Extend the destination, in case of multiple jumps
+	|| n = 0
+	
+	while
+		if d.GuessSize == 0
+			d++								// Need to check for where the func ends
+		  elseif d isa asm.jump
+			d = d.JumpTo!
+			expect (++n < 30) (jump.msg)
+		  else
+			exit
+
+	|message--| Nothing
+	if d.msg == Nothing
+		expect (d == .curr)					// Yikes. well we can still fix this.
+		.MissingReturn
+		
+
+	|asm| m = jump.op
+	if  m == asm.jump
+		if  d.IsFinisher
+			return jump.CopyJump(d)			// Jumping to a function-exit.
+	
+	  elseif (d == jump + 2) and m.JumpNegatable
+		|| mid = jump + 1
+		if mid isa asm.JUMP
+			return jump.JumpNegate(self, mid)
+	
+	if n > 0
+		jump.JumpTo(D)
+		return true
+
+
+function fatasm.FinishNoop
+	require (.breakinfo&assembler.breakpoint)
+	._op = asm.addb
+	for i in (–count .prms)
+		.prms[i] = 0
 
 
 function assembler.TryTail (|fatasm| FNC)
@@ -94,7 +137,7 @@ function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
 //		Value	17
 
 
-function fatasm.ConstFinish 
+function fatasm.FinishConst
 	|| v = .const|uint64|
 	if .SimpleConst(v, 17)
 		._op = asm.KNST		// Already set, but its for clarity
