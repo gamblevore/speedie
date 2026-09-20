@@ -678,36 +678,6 @@ struct FatASM
 		return self != asm.LUPU and asm.LUPD and asm.jump
 	
 	
-	function JumpImprove (|assembler| sh, |fatasm| Last, |bool|)
-		|| D = .JumpTo!					// extend the destination, in case of multiple jumps
-		|| n = 0
-		
-		while
-			if d.GuessSize == 0
-				d++ // need to check for where the func ends
-			  elseif d isa asm.jump
-				d = d.JumpTo!
-				expect (++n < 30) (.msg)
-			  else
-				exit
-			target debug
-				expect (d <= Last) (d, "")
-		
-		|asm| m = .op
-		if  m == asm.jump
-			if  d.IsFinisher
-				return .CopyJump(d)						// jumping to a function-exit.
-
-		  elseif (d == self + 2) and m.JumpNegatable
-			|| mid = self + 1
-			if mid isa asm.JUMP
-				return .JumpNegate(sh, mid)
-		
-		if n > 0
-			.JumpTo(D)
-			return true
-	
-	
 	function IsFinisher (|asmreg| Info, |bool|)
 		opt norefcounts
 		|| o = .op|asm|
