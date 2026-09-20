@@ -1,7 +1,6 @@
 
 
-// Soooo...		if ((f)(a,b)) --> if ((f)(a,b)).flowlog
-// so a function that returns the input, after logging the result
+// Logs flow decisions... very useful.
 
 
 function Tran_Flow (TranFunc)
@@ -17,25 +16,23 @@ insertion
 	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
 
 
-/*
-«dot "flowlog"
-	«emb »
-»
-*/
-
-
 || GenFlowCount = 0
 
-function message.GenFlow (|message|)
+function message.GenFlow (|scnode| name_space=nil, |message|)
 	opt norefcounts
 	|| dot = @dot + "flowlog"
 	dot <~ ++GenFlowCount
 	dot <~ @emb
+	if name_space
+		TypeOfExpr(dot, name_space)
 	return dot
 
 
-function @SCFunction.CanGenFlow (|bool|)
-	return SCFunction.CurrFunc isnt FlowDisabled
+function  @SCFunction.CanGenFlow (|bool|)
+	opt norefcounts
+	if Options.GenFlowLogCode and (compiler isnt Importing)
+		|| fn = SCFunction.CurrFunc
+		return fn isnt FlowDisabled and cpp
 	
 
 function message.GenBranchFlow
@@ -84,7 +81,7 @@ function message.GenTernFlow (|scdecl| Type, |scnode| name_space)
 	TypeOfExpr(dot, name_space)
 	dot.obj = type
 	|| bra = dot.WrapWith(@bra)
-/	bra.obj = type
+	bra.obj = type
 
 
 

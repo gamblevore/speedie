@@ -337,7 +337,8 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 	|| AllowedGain = 5 + (fn is OptInline) * 18		// Assume that functions have 5 instruction overhead.
 	|| Grace = 2 + (fn isnt constructor)*3			// 2 grace for constructors, 5 for others.
 	if fn is LinkInline
-		allowedgain += 2
+		AllowedGain += 2
+		AllowedGain += Options.GenFlowLogCode << 4
 	  elseif fn.IsLibrary
 		AllowedGain -= (fn is OptInline)<<2
 

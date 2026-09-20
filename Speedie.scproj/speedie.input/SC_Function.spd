@@ -1628,12 +1628,12 @@ function Tran_IfSub (|message| node, |SCNode| name_space)
 			arg <~ (@tmp, "debugger")				// better than debugat
 		cond.next = arg
 	
-	|| SubTest = arg.next
-	if Options.GenFlowLogCode
-		if !SubTest
-			subtest = node.msg(@tmp, "else")
+	if scfunction.CanGenFlow
 		arg.GenBranchFlow
-	if SubTest
+		if arg.islast
+			node.next = node.GenFlow(name_space)
+
+	|| SubTest = arg.next
 		expect (SubTest isTmp "elseif" or "else")  ( SubTest )
 		SubTest.ExpectLast
 		

@@ -106,32 +106,35 @@ module FlowLog
 		for s in lines
 			.input(s, '\n')
 				
-
-	function ForceStart (|string| name, |bool|)
-		flow off
-		|string--| str = app["flowlog"]
-		if !str
-			"#!Use --flowlog or --flowlog=validate to activate FlowLog"
-			return nil
+	
+	libinternal FlowPath (|string| name, |string|)
+		return "/tmp/Speedie/FlowLog".append( name, ".txt" )
 		
-		|| path = "/tmp/Speedie/FlowLog".child( name + ".txt" )
-		if str ~= "validate"
-			.CompareAgainst = path.InputStream
-			._Enabled = 1
-		  elseif str.yes
-			.flowout = path.OutputStream
-			._Enabled = 1
-		  else
-			error "#!Use --flowlog or --flowlog=validate to activate FlowLog"
+		
+	function ForceGen (|string| name, |bool|)
+		flow off,  opt norefcounts, embedded
+		|| path = .flowpath(name)
+		.flowout = path.OutputStream
+		._Enabled = 1
+		return true
 
-		return FlowLog()
+	
+	function ForceTest (|string| name, |bool|)
+		flow off,  opt norefcounts
+		|| path = .flowpath(name)
+		.CompareAgainst = path.InputStream
+		._Enabled = 1
+		return true
 
 
-	inline Start (|string| name, |bool|)
+	inline Start (|string| name=__project__, |bool|)
 		flow off
 		(name)
 		target flow
-			return .ForceStart(name)
+			target cake
+				return .ForceTest(name)
+			  else
+				return .ForceGen(name)
 
 
 inline app.FlowLog
@@ -149,18 +152,9 @@ inline app.FlowLog
 */
 
 
-inline byte.FlowLog (|byte|)
-	FlowLog <~ self
-	return self
-
-
 inline int.FlowLog (|int|)
+	// bools/bytes go in here
 	FlowLog <~ self
-	return self
-
-
-inline bool.FlowLog (|bool|)
-	FlowLog <~ self|int|
 	return self
 
 
