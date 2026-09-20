@@ -181,19 +181,26 @@ class TextViewLine (list)
 	libinternal ColoriseSub (|message| srch, |message|)
 		opt norefcounts
 		rz = .ColoriseSub2(srch)
+		if !rz
+			isnt breakpoint
+			return nil
+
 		|| range = .range
 
-		if rz and rz.StartsAfter(range)
+		if rz.StartsAfter(range)
 			is ColoriseUsingPosition
 			isnt BreakPoint
+			srch = rz
+			while srch and srch.startsafter(range)
+				srch = srch.parent
+			if srch and srch.iscontainer and !srch.isroot
+				.message = srch
 			return rz
-
-		if rz and !rz.StartsAfter(range)
+				
+		  else
 			(self is CodeBreak) = rz is breakpoint
 			is ColoriseUsingPosition
 			.message = rz
-		  else
-			isnt breakpoint
 	
 		
 	libinternal ColoriseSub2 (|message| srch, |message|)
