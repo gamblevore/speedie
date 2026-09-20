@@ -2,7 +2,7 @@
 
 function textview.RangeCheck (|int| r, |message| func_name, |message| prms, |bool|)
 	|| l = func_name.position
-	|| a = func_name.after 
+	|| a = func_name.after
 	if prms and prms != @arg
 		a  = prms.after
 		a += !self[a].IsTextLine
@@ -496,3 +496,4 @@ function guicontrol.IDE (|perryide!|)
 	opt norefcounts
 	real self
 	return (.window as perryide)!
+
