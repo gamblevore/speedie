@@ -292,14 +292,14 @@ extend assembler
 			N = Alterer - .FuncStart_							// Set value
 
 		|| oldi = .regs.Setters[changed]
-		.regs.Altered = A
+		.regs.Altered = A // works really well with PHI nodes!
 		.regs.Phi = P
 		.regs.Setters[changed] = n
 		.KnownValues(changed) = Alterer is Const
 		
 		target debug
 			if .Register(changed) != alterer					// huh?
-		
+				
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
