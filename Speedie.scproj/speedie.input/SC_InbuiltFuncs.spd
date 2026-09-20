@@ -47,6 +47,9 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 				
 		.become(@bra)
 
+	  elseif self == "project"
+		.become(@str, compiler.projectname)
+
 	  elseif (self == "compress")
 		|| f = self[@sstr]
 			f.name = f.name.Compress
