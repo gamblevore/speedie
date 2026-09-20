@@ -569,15 +569,14 @@ struct Assembler
 		opt norefcounts
 		debugger !.Root_Fn.ASMReturn
 		|| arg = .Root_Fn.source!
-		|| Faked = arg.FrenchSpyReturn
-		|| old = arg.position
-		arg.Position = Faked
+//		|| Faked = arg.FrenchSpyReturn // cant use it here... unless we make a new return message.
+// why not... just add a new message? the thing is, I HAD that. and it crashes the compiler. No idea why.
+// in transform()
 		.CloseVars(1, arg)
 		ASMType.ReturnOpt(self, nil)
 		|| FatRat = arg.ret
 		fatrat.RefCount = 1
 		fatrat.BreakInfo = Breakable
-		arg.Position = old		
 
 
 	function Guard

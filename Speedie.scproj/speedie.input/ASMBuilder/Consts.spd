@@ -70,7 +70,7 @@ extend Assembler
 		reg.reg = regmsg.reg
 		|| src = .NumToReg(orig, Reg, value, datatypecode.uint64)
 		|| fat = src.fat
-			fat.ConstFinish
+			fat.FinishConst
 		return true
 	
 	
