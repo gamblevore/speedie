@@ -9,7 +9,7 @@ main // main {
 	Compiler.SetupEnv
 	Compiler.MiniTests
 	if compiler.EnterCompile
-		FlowLog.Start("Speedie"+options.variant)
+		FlowLog.TryStart("Speedie"+options.variant)
 		compiler.CompileTime
 		FlowLog.Stop
 	Compiler.PrintResults
