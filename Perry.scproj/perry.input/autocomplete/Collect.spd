@@ -62,6 +62,8 @@ function PerryIDE.DateWrap (|message| msg, |date| d, |message|)
 
 function PerryIDE.SendFeedback (|message| msg, |spdprocess|)
 	opt norefcounts
+	require .IsFront // save memory on startup :]
+	
 	if msg ~= "asm"
 		|| fb = .FeedbackInit(.ASMProcess)
 			.ASMProcess = fb
