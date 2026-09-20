@@ -15,6 +15,7 @@
 
 
 					// Future ASM opts (more relaxing NOT do at release!) //
+* add fake instructions for params too, and no asmreg can return, or be inserted, without a fatindex!
 * if ((self&M) == M)...  M = 1,2,4,8,etc  -->   if self&m
 * int.max seems to use knst2? isnt there a knsr or something that can do it?
 * a pixel instruction to convert floats/ints so don't need knst+div+conv to turn a float into an int? with clamping too!
@@ -42,5 +43,6 @@
 * 3-instruction static allocator instruction... good for modding
 * Once we do OpenCL... make Perry more creative, more and more creative. Left-brain activation.
 	* maybe offer shader functions for various things?
+* Line.text remove?
 
 
