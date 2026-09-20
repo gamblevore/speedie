@@ -270,7 +270,7 @@ module Feedback
 			Options.Compile = 0
 			Options.Mode = 0
 		
-		+'flowlog'
+		+'flow'
 			explain(Purpose, "Adds control-flow logging to generated compiles")$
 			Options.GenFlowLogCode = true
 			SC_Targets["flow"] = true

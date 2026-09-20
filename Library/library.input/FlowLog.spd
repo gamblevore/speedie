@@ -9,7 +9,7 @@
 module FlowLog
 	linkage: cpp_part Flow
 
-	|InputStream?|			CompareAgainst
+	|InputStream?|			FlowIn
 	|FastString?|			FlowOut
 	|int|					_Enabled
 	|uint|					FlowWhile
@@ -38,21 +38,26 @@ module FlowLog
 			w.Flush
 			.FlowOut = nil
 		
-		if .CompareAgainst!=nil
+		if .FlowIn!=nil
 			if ._Enabled == 0
 				"Flow: Occurred equally."
-			.CompareAgainst = nil
+			.FlowIn = nil
 		._Enabled = 0
 
 	
 	libinternal Fail (|string| Found)
+		// Cake needs to break into the debugger here.  How?
 		flow off
 		
 		._Enabled = -1
-		.CompareAgainst = nil
-		"Flow: Differed\n"
-		printline app.StackTrace(3)
-		debugger
+		.FlowIn = nil
+		target __PROJECT_CAKE__
+			cake.vm.Pause
+			(found)
+		  else
+			"Flow: Differed\n"
+			printline Found
+			debugger
 	
 	
 	syntax append (|int64| Value)
@@ -71,30 +76,30 @@ module FlowLog
 		require .Enabled
 
 		._Enabled = 0
-
 		|| w = .FlowWhile
 			.FlowWhile = 0
 
-		|| out = .FlowOut
-			if w
-				out.AppendHInt(w)
-			if str != nil
-				out <~ str
-			if num >= 0
-				out.AppendHInt(num)
+		target !__PROJECT_CAKE__
+			|| out = .FlowOut
+				if w
+					out.AppendHInt(w)
+				if str != nil
+					out <~ str
+				if num >= 0
+					out.AppendHInt(num)
+		
 		  else
-			|| input = .CompareAgainst!
-			
-			if w
-				|| v = input.HInt
-				if v != w
-					return .fail(w.render)
-					
-			if (str != nil) and !input.HasHeader(str)
-				return .fail(str)
-
-			if (num >= 0) and (input.hint != num)
-				return .fail(num.render)
+			|| input = .FlowIn
+				if w
+					|| v = input.HInt
+					if v != w
+						return .fail(w.render)
+						
+				if (str != nil) and !input.HasHeader(str)
+					return .fail(str)
+		
+				if (num >= 0) and (input.hint != num)
+					return .fail(num.render)
 			
 		._Enabled = 1
 		
@@ -108,23 +113,23 @@ module FlowLog
 				
 	
 	libinternal FlowPath (|string| name, |string|)
-		return "/tmp/Speedie/FlowLog/".append( name, ".txt" )
+		return "/tmp/logs/SpeedieFlow/" + name
 		
 		
-	function StartGen (|string| name, |bool|)
+	function StartGen (|string| name)
 		flow off,  opt norefcounts, embedded
-		|| path = .flowpath(name)
-		.flowout = path.OutputStream
-		._Enabled = 1
-		return true
+		|| path = .FlowPath(name)
+		|| O = path.OutputStream
+		.FlowOut = O
+		._Enabled = (O!=nil)|int|
 
 	
-	function StartTest (|string| name, |bool|)
+	function StartTest (|string| name)
 		flow off,  opt norefcounts
-		|| path = .flowpath(name)
-		.CompareAgainst = path.InputStream
-		._Enabled = 1
-		return true
+		|| path = .FlowPath(name)
+		|| I = path.InputStream
+		.FlowIn = I
+		._Enabled = (I!=nil)|int|
 
 
 	inline TryStart (|string| name=–project, |bool|)
@@ -132,13 +137,16 @@ module FlowLog
 		(name)
 		target flow
 			target cake
-				return .StartTest(name)
+				.StartTest(name)
 			  else
-				return .StartGen(name)
+				.StartGen(name)
+			return true
+
 
 
 inline app.FlowLog
 	FlowLog.FlowWhile++
+
 
 /*
 // for ternaries
@@ -166,9 +174,6 @@ inline string.FlowLog (|string|)
 inline object.FlowLog (|object|)
 	flowlog <~ .ObjectID|int|
 	return self
-
-
-
 
 
 

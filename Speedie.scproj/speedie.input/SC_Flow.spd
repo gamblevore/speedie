@@ -18,15 +18,15 @@ function Tran_Flow (TranFunc)
 || GenFlowCount = 0
 
 || FlowMacro = `({
-	|| _flow_ = _0
-	_flow_|int|.FlowLog
-	(_flow_)
+	|| _flow = _0
+	_flow|int|.FlowLog
+	(_flow)
 })`.macro
 
 || FlowObjMacro = `({
-	|| _flow_ = _0
-	_flow_.FlowLog
-	(_flow_)
+	|string--| _flow = _0
+	_flow.FlowLog
+	(_flow)
 })`.macro
 
 
@@ -44,7 +44,8 @@ function  @SCFunction.CanGenFlow (|bool|)
 	opt norefcounts
 	if Options.GenFlowLogCode and (compiler isnt Importing)
 		|| fn = SCFunction.CurrFunc
-		return fn isnt FlowDisabled and cpp
+		if fn and !fn.IsLibrary
+			return fn isnt FlowDisabled and cpp and dylib
 	
 
 function message.GenBranchFlow
