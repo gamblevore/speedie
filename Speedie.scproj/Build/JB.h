@@ -3059,13 +3059,13 @@ void JB_Flow__Input(JB_String* Str, int64 Num);
 
 bool JB_Flow__New();
 
-bool JB_Flow__Start(JB_String* Name);
-
 void JB_Flow__Stop();
 
 void JB_Flow__AppendStr(JB_String* Value);
 
 void JB_Flow__InputStrings(Array* Lines);
+
+bool JB_Flow__TryStart(JB_String* Name);
 
 
 
@@ -5857,8 +5857,6 @@ void SC_FAT_ConstSet(FatASM* Self, int64 Value);
 
 ASMReg SC_FAT_ConstFill(FatASM* Self, ASMReg Dest, int64 K);
 
-void SC_FAT_ConstFinish(FatASM* Self);
-
 bool SC_FAT_CopyJump(FatASM* Self, FatASM* D);
 
 byte SC_FAT_CurrGrabID(FatASM* Self);
@@ -5876,6 +5874,10 @@ Float64 SC_FAT_F64(FatASM* Self);
 void SC_FAT_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 FatASM* SC_FAT_FindOlder(FatASM* Self);
+
+void SC_FAT_FinishConst(FatASM* Self);
+
+void SC_FAT_FinishNoop(FatASM* Self);
 
 int64 SC_FAT_FloatConvConst(FatASM* Self, int DestBitSize);
 
@@ -5912,8 +5914,6 @@ bool SC_FAT_IsStateless(FatASM* Self);
 int SC_FAT_Jump(FatASM* Self);
 
 void SC_FAT_JumpFix(FatASM* Self, FatASM* Curr);
-
-bool SC_FAT_JumpImprove(FatASM* Self, Assembler* Sh, FatASM* Last);
 
 void SC_FAT_JumpInputSet(FatASM* Self, int A, int V);
 
@@ -6168,6 +6168,8 @@ ASMReg SC_Pac_AddConst(Assembler* Self, int Add, Message* Exp, ASMReg Base);
 
 void SC_Pac_AddFuncParams(Assembler* Self, SCFunction* Fn);
 
+FatASM* SC_Pac_AddMissingReturn(Assembler* Self);
+
 ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount, ASMReg Stronger);
 
 ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L, ASMReg Zero);
@@ -6331,6 +6333,8 @@ void SC_Pac_FillOneTrinParam(Assembler* Self, ASMReg* Collection, FatASM* Fat, M
 Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
 
 void SC_Pac_FinishASM(Assembler* Self);
+
+bool SC_Pac_FinishJump(Assembler* Self, FatASM* Jump);
 
 ASMReg SC_Pac_FloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -8097,8 +8101,6 @@ void JB_bin_WriteType(FastString* Self, Syntax Type, bool GoIn);
 // JB_Message
 void JB_Msg__Trap(Message* Self);
 
-void SC_Msg_AAACC(Message* Self, Message* QEscape, Message* IgnoreArg);
-
 void JB_Msg_Acc__(Message* Self, FastString* Fs);
 
 Message* JB_Msg_AccessAdd(Message* Self, JB_String* Key);
@@ -8601,7 +8603,7 @@ FatASM* SC_Msg_FXP2(Message* Self, ASMReg R1, ASMReg R2);
 
 void SC_Msg_GenBranchFlow(Message* Self);
 
-Message* SC_Msg_GenFlow(Message* Self);
+Message* SC_Msg_GenFlow(Message* Self, SCNode* Name_space);
 
 void SC_Msg_GenProtoFlow(Message* Self);
 
