@@ -108,10 +108,10 @@ module FlowLog
 				
 	
 	libinternal FlowPath (|string| name, |string|)
-		return "/tmp/Speedie/FlowLog".append( name, ".txt" )
+		return "/tmp/Speedie/FlowLog/".append( name, ".txt" )
 		
 		
-	function ForceGen (|string| name, |bool|)
+	function StartGen (|string| name, |bool|)
 		flow off,  opt norefcounts, embedded
 		|| path = .flowpath(name)
 		.flowout = path.OutputStream
@@ -119,7 +119,7 @@ module FlowLog
 		return true
 
 	
-	function ForceTest (|string| name, |bool|)
+	function StartTest (|string| name, |bool|)
 		flow off,  opt norefcounts
 		|| path = .flowpath(name)
 		.CompareAgainst = path.InputStream
@@ -127,14 +127,14 @@ module FlowLog
 		return true
 
 
-	inline Start (|string| name=__project__, |bool|)
+	inline TryStart (|string| name=–project, |bool|)
 		flow off
 		(name)
 		target flow
 			target cake
-				return .ForceTest(name)
+				return .StartTest(name)
 			  else
-				return .ForceGen(name)
+				return .StartGen(name)
 
 
 inline app.FlowLog

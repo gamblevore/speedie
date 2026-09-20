@@ -5,12 +5,14 @@ import "GameExamples/tetris.spd"
 
 
 main
+	FlowLog.TryStart
 	if .Yes("crash")
 		.Crash
 	
 	GUI.Init
 	Perry.Startup
 	notifications.ShowTip( file://tips.box )
+	FlowLog.stop
 	return GUI.Run
 	
 
