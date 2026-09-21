@@ -7,24 +7,22 @@
 datatype Date (int64)
 	description "Total range is +- 4.46 million years. Resolution is 64K/s.
 
-Being a plain data-type, this can never be nil, which is useful. Represents Unix-time."
+Being a plain data-type, this can never be nil, which is useful. Represents Unix-time.
+
+Unix time does not have leap-seconds, so one day is always 86400 seconds."
+
 	constants
-		Highest = 0x7FFFffffFFFFffff_
-		kSecondsPerDay = 86400
-		kSecondsPerWeek = 604800
-		kSecondsPerMonthApprox = 2628000
-		|float64|
-		kOneStep = 0.000015258789 // 1.0 / 64.0K
+		|int64|
+		Highest	=  0x7FFFffffFFFFffff_
 		
 	function Seconds (|float|)
-		disabled "Use .float or .float64"
+		disabled "Use .float64"
 	
 	function Float (|float|)
 		disabled "This loses seconds precision"
-		return .float64|float| // better. Or else we lose too much precision
 	
 	function Float64 (|Float64|)
-		return self|Float64| * kOneStep
+		return self|Float64| / (64.0*1024.0)|float64|
 	
 	syntax Compare (|float| Other, |int|)
 		|| oof = other.date
@@ -33,9 +31,6 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 	inline WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
 	
-//	function Rate (|Float64|) // per what, though? per-second is common, but if we are talking about per-day its another thing.
-//		return 1.0 / .Seconds 
-
 	operator Minus (|date| D, |duration|)
 		inlined
 		return self|int64| - D|int64|
@@ -44,14 +39,6 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		inlined
 		return self|int64| mod D|int64|
 
-//	function ReportAgo (|string|)
-//		|| s = .Float64
-//		|| unit = "s"
-//		if s < 0.01
-//			s *= 1000.0
-//			unit = "ms"
-//		return s.Render + unit
-		
 	function Ago (|Duration|)
 		if self
 			return now() - self
@@ -76,30 +63,20 @@ Being a plain data-type, this can never be nil, which is useful. Represents Unix
 		if self != 0
 			return self < date.now
 	
-	function Days (|int64|)
-		return .wholeSeconds / date.kSecondsPerDay
+	inline Weeks (|int64|)
+		return self  /  604800s
 	
-	inline Minutes (|int64|) // needs 48 bits!
-		return .wholeSeconds / 60
+	inline Days (|int64|)
+		return self  /  86400s // 86400 seconds in a day (Always. Even leapseconds are ignored in unixtime)
 
-	inline DayOfWeekApprox (|int|)
-		return .Days mod 7
+	inline Minutes (|int64|) // needs 48 bits!
+		return self / 60s
 	
-	inline MonthsApprox (|int64|)
-		return .WholeSeconds / date.kSecondsPerMonthApprox
-	
-	inline WeekOfYear (|int|)
-		return .Weeks mod 52
-	
+	inline WithinDay (|date|)
+		return self mod 86400s
+
 	function TimeID (|uint64|)
 		cpp_wrapper
-
-	function Weeks (|int64|)
-		return (.wholeSeconds / kSecondsPerWeek)
-
-	inline int64.ToSeconds (|date|)
-		return self << 16
-
 
 	function Cycle (|duration| Length, |float|)
 		description "Returns a number between 0 and 1. This number cycles back and forth in a sinusoidal fashion."
