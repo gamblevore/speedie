@@ -111,14 +111,6 @@ class InputStream
 
 	setter Position (|int|)
 		.data.position = value - .StartFrom
-
-
-	function HIntMax (|int| MaxBits=31, |int64|)
-		|uint64| v = .hint
-		ifn v >> MaxBits
-			return v
-		error (self, "Value out of range")
-	
 	
 	function HInt (|int64|)
 		|uint64| v = .byte

@@ -23,7 +23,7 @@ module Globals
 		expect (!(Glob_Size&7)) (size_msg, "Unaligned")		// always a multiple of 8.
 		
 		|| input		= InputStream(.strings)
-		|| n_strs		= input.HIntMax()|int|
+		|| n_strs		= input.HInt|int|
 		expect (n_strs <= 1000_000) ("Too many strings in program: " + n_strs)
 		|| Alloc_Size	= glob_size + (n_strs+1)*(platform.PointerBytes)
 		|| g = Memory.Zalloc(alloc_size)								#require

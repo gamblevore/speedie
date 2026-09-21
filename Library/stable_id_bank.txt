@@ -800,7 +800,6 @@ JB_DDA_Caster_Constructor
 JB_DDA_Caster_Next
 JB_Date_Ago
 JB_Date_Cycle
-JB_Date_Days
 JB_Date_Fired
 JB_Date_Float64
 JB_Date_LocalTime
@@ -809,7 +808,6 @@ JB_Date_RenderDurr
 JB_Date_RenderInt
 JB_Date_SyntaxCompare
 JB_Date_TimeID
-JB_Date_Weeks
 JB_Date__Hash
 JB_Date__Now
 JB_Date__Sleep
@@ -1003,6 +1001,7 @@ JB_Float64_SyntaxCall
 JB_FloatPrint
 JB_FloatRangeConverter_Convert
 JB_FloatRange_Constructor
+JB_Flow__AppendStr
 JB_Flow__Enabled
 JB_Flow__Input
 JB_Flow__StartTest
