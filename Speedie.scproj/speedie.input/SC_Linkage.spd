@@ -57,7 +57,7 @@ module Linkage
 				print "output_path was set by: '"
 				print node.OriginalFilePath
 				print "' to: "
-				printline path
+				printline path.value
 			if !options.HideawayScripts
 				feedback.SetOutputPath path
 

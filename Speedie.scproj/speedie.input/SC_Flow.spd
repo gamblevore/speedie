@@ -3,7 +3,7 @@
 // Logs flow decisions... very useful.
 	
 insertion
-	quietly	({FlowLog.DisabledIncr, (_0), FlowLog.DisabledIncr(-1), rejoin 0})
+	quietly	({FlowLog.disable, (_0), FlowLog.enable, rejoin 0})
 
 
 function Tran_Flow (TranFunc)
@@ -15,7 +15,7 @@ function Tran_Flow (TranFunc)
 		(fn is FlowDisabled)
 
 
-|| GenFlowCount = 0
+|| GenFlowCount = 1
 
 || FlowMacro = `({
 	|| _flow = _0
@@ -33,7 +33,9 @@ function Tran_Flow (TranFunc)
 function message.GenFlow (|scnode| name_space=nil, |message|)
 	opt norefcounts
 	|| dot = @dot + "flowlog"
-	dot <~ ++GenFlowCount
+	|| g = GenFlowCount
+	GenFlowCount = g+2
+	dot <~ g
 	dot <~ @emb
 	if name_space
 		TypeOfExpr(dot, name_space)

@@ -37,7 +37,7 @@ autogen @int.MainArg		(|int| Pos, |string| name, |int|)
 	opt norefcounts
 	embedded
 	|| big = int64.mainarg(pos, name)
-	expect (big <= int.max and big >= int.min) ("Int out of range")
+	expect (big <= int.max and big >= int.min) ("Value out of range")
 	return big
 
 

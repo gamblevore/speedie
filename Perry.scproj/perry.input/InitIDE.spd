@@ -85,6 +85,9 @@ extend PerryIDE
 	
 	
 	function perry.AddRecent (|file| project)
+		flow off
+		require !flowlog.enabled // time-based stuff and flow dont play
+
 		|| f = .Findrecent(project)
 			f.name = project // fix case
 			return

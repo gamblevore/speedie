@@ -583,8 +583,8 @@ function message.LoadXVars (|?&xvar| Registers, |[xvar]| out)
 	while (|| Section = input.byte)
 		|| StartPos = input.Position
 		|| ReadEnd = StartPos + Section
-		|| Pos = Input.hint
-		|| Reg = Input.hint
+		|| Pos = Input.hintmax|int|
+		|| Reg = Input.hintmax|int|
 		|| OK = !Reg
 		if registers
 			OK = (reg-1)|uint| < 31

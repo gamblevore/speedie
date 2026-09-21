@@ -343,9 +343,9 @@ function ClearThis
 function IsCompilerAndNeedsInstall (|bool|)
 	require (Options.SelfReplacement)
 	require (StdErr.OK and !Compiler.IsTest)
-	FlowLog.DisabledIncr
+	FlowLog.disable
 	rz = (.TestNewCompiler and .BackupCompiler)
-	FlowLog.DisabledIncr(-1)
+	FlowLog.enable
 
 
 function ExportAndInstall (|date| Elapsed)
@@ -495,7 +495,7 @@ function ReplaceOld (|file| input, |File| Backs)
 
 
 function MakeDailyProductPath (|File| B, |string|)
-	|| D = Date.Now.DayOfWeekApprox
+	|| D = (Date.Now.days mod 7)+1
 	return B.Path.child( D.Render + "_Speedie" )
 
 
@@ -535,11 +535,11 @@ function InstallCompiler
 	options.output_path = Compiler.Projects.child("Terminal/Speedie")
 	OldProd.File.MoveTo( options.output_path )
 
-	FlowLog.DisabledIncr
+	FlowLog.disable
 	.InstallOne Cpp_Export.CppProduct
 	.InstallOne Cpp_Export.HProduct
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
-	FlowLog.DisabledIncr(-1)
+	FlowLog.enable
 	
 //	if options.Makelib
 //		.MakeLib

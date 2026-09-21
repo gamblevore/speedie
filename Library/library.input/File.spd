@@ -27,6 +27,7 @@ class File (StringShared)
 		AllowInvisible
 		AllowSymLinks
 		WantFileObjects
+		Unsorted
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -395,10 +396,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				  else
 					rz <~ name
 		
-		rz.sort
-		if FlowLog()
-			FlowLog<~self
-			FlowLog<~rz
+		ifn mode & Unsorted
+			rz.sort
+			if FlowLog()			// can't flowlog unsorted files!
+				FlowLog<~self
+				FlowLog<~rz
 		
 	
 	function MoveTo (|string| Path, |ErrorInt|)

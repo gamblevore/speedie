@@ -67,7 +67,7 @@ class µForm
 	function LoadParam (|string| pl, |message| place)
 		if (pl.isint)
 			|| i = pl.int
-			check (i > 0 and i <= 24) (place, "Number out of range (1-24)")
+			check (i > 0 and i <= 24) (place, "Value out of range") // 1-24
 			.addp(i, µparam.Number)
 			return
 		expect (pl == 1) (self)

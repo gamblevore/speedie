@@ -14,8 +14,7 @@ role config (message)
 	syntax cast (|string|)
 		cpp_part AsString
 		inlined
-		if self
-			return .Value
+		return .Value
 			
 	syntax cast (|int64|)
 		cpp_part AsInt
@@ -33,10 +32,13 @@ role config (message)
 		return .Dict(true)
 	
 	function Save (|bool|)
+		flow off
+		flowlog.disable
 		|file--| f = .path
 			|| r = .render
 			|| p = r.parse(@arg)
 				rz = f.smartdata(r)
+		flowlog.enable
 	
 	inline Path (|file|)
 		return .obj as file
@@ -57,7 +59,9 @@ function file.Config (|int| Limit = 1MB, |config|)
 // why would a conf-file be so big?
 	opt NoRefCounts
 	if .Exists
+		flowlog.disable
 		rz = .Parse(Limit, @arg)|config|
+		flowlog.enable
 	rz ?= message()
 	rz.obj = self
 

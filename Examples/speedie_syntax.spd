@@ -55,11 +55,11 @@ function app.TestSyntax
 	"zz is $zz"
 
 
-	FlowLog.DisabledIncr(1)
+	FlowLog.disable
 	for i in 4
 		|| fn = (0.5[])(mesayer, shesayer)
 		(fn)("hello")
-	Flowlog.DisabledIncr(-1)
+	Flowlog.enable
 
 	FunctionPointers()
 

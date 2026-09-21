@@ -27,7 +27,7 @@ extend String
 		visible class~file
 		|| p = (last)(self, .parent)
 		
-		for S.Paths in p
+		for S.FullPaths in p
 			|| err = S.MakeDir|int|
 				rz = err
 				exit
@@ -64,6 +64,14 @@ extend String
 		
 
 	function ReplacePathComponent (|int| i, |string| With, |string|)
+//		|| fs = FastString() // doesn't handle negative values.
+//		for (s.component in self) (num)
+//			if (i == num)
+//				fs <~ with
+//			  else
+//				fs <~ s
+//			fs <~ '/'
+//		return fs
 		|| R = .components
 		if (i < 0)
 			i += R.length
@@ -235,7 +243,8 @@ Relative paths take the current working directory.`
 		return .AfterByte('/', Last)
 	
 
-	iterator Paths
+	iterator FullPaths
+		// returns each fullpath section, starting from the beginning each time.
 		|| P = .regularpath
 		|| i = p.find2('/', 1)
 
@@ -244,6 +253,17 @@ Relative paths take the current working directory.`
 			if i >= p.length
 				exit
 			i = p.find2('/', i+1)
+
+
+	iterator Component
+		// returns each path component
+		|| i = 0
+		|| Counter = 0
+
+		while self > i
+			|| next = .find2('/', i)
+			yield (self[i, next]) (++Counter)
+			i = next+1
 
 
 

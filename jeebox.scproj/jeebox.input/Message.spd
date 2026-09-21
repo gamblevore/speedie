@@ -1143,7 +1143,7 @@ Message is also:
 		|| n = .Length
 		|| i = StrStart
 		require n or i
-		expect (i|uint| < n|uint|) (Error, "Bad Length")
+		expect (i|uint| < n|uint|) (Error, "Value out of range")
 
 		// size-oriented, not speed. HInt is great at this.
 		// speed-orient needs final-app-specific knowledge

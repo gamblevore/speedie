@@ -13,6 +13,7 @@ module FlowLog
 	|FastString?|			FlowOut
 	|int|					_Enabled
 	|uint|					FlowWhile
+	|int|					LastCodePoint
 	
 	function Enabled (|bool|)
 		visible
@@ -25,8 +26,11 @@ module FlowLog
 	inline New (|bool|)
 		return ._Enabled == 1
 
-	inline DisabledIncr (|int| Value=1)
-		._Enabled -= Value
+	inline Disable
+		._Enabled -= 1
+
+	inline Enable
+		._Enabled += 1
 
 
 	function Stop
@@ -39,39 +43,48 @@ module FlowLog
 			.FlowOut = nil
 		
 		if .FlowIn!=nil
-			if ._Enabled == 0
+			if ._Enabled > 0
 				"Flow: Occurred equally."
 			.FlowIn = nil
 		._Enabled = 0
 
 	
-	libinternal Fail (|string| Found)
-		// Cake needs to break into the debugger here.  How?
+	libinternal Test (|inputstream| Input, |int64| Found, |bool|)
 		flow off
+		
+		|| Expected = input.hint
+		if Expected == Found
+			if Expected & 1
+				.LastCodePoint = Expected
+			return true
 		
 		._Enabled = -1
 		.FlowIn = nil
+
 		target __PROJECT_CAKE__
 			cake.vm.Pause
 			(found)
 		  else
-			"Flow: Differed\n"
-			printline Found
-			debugger
+			print "Flow: Differed. Last Codepoint: "
+			printline .LastCodePoint
+			printline app.StackTrace
+			target debug
+				debugger
+			  else
+				app.crash
 	
 	
-	syntax append (|int64| Value)
+	syntax append (|int64| CodePoint)
 		inlined
-		.input(nil, value)
+		.input(nil, CodePoint)
 
 
 	syntax append (|string| Value)
 		cpp_part AppendStr
-		inlined
-		.input(value, -1)
+		.input(value.hash>>1, 0)
 	
 	
-	autogen Input (|string?| Str, |int64| Num)
+	autogen Input (|int64| Hash, |int64| CodePoint)
 		visible,  flow off,  opt norefcounts
 		require .Enabled
 
@@ -81,25 +94,20 @@ module FlowLog
 
 		target !__PROJECT_CAKE__
 			|| out = .FlowOut
+				if CodePoint > 0 // always odd
+					out.AppendHInt(CodePoint)
 				if w
-					out.AppendHInt(w)
-				if str != nil
-					out <~ str
-				if num >= 0
-					out.AppendHInt(num)
+					out.AppendHInt(w&~1)
+				if Hash
+					out.AppendHInt(Hash&~1)
 		
-		  else
-			|| input = .FlowIn
-				if w
-					|| v = input.HInt
-					if v != w
-						return .fail(w.render)
-						
-				if (str != nil) and !input.HasHeader(str)
-					return .fail(str)
-		
-				if (num >= 0) and (input.hint != num)
-					return .fail(num.render)
+		|| input = .FlowIn
+			if CodePoint > 0
+				.Test(input, CodePoint)
+			if w
+				.Test(input, w&~1)
+			if Hash
+				.Test(input, Hash&~1)
 			
 		._Enabled = 1
 		
@@ -109,16 +117,24 @@ module FlowLog
 		
 		require .Enabled
 		for s in lines
-			.input(s, '\n')
+			.input(s.hash>>1, '\n')
 				
 	
-	libinternal FlowPath (|string| name, |string|)
-		return "/tmp/logs/SpeedieFlow/" + name
+	libinternal FlowPath (|string| name, |file|)
+		return ("/tmp/logs/SpeedieFlow/" + name).file
 		
 		
 	function StartGen (|string| name)
-		flow off,  opt norefcounts, embedded
+		flow off, opt norefcounts, embedded
+
 		|| path = .FlowPath(name)
+		if path.Size > 0
+			// Copy to a new location, then use the new location as input.
+			|| Copied = .FlowPath(name + date.now.withinday.Minutes)
+			path.CopyTo(Copied)
+			.FlowIn = Copied.InputStream
+			path.close
+		
 		|| O = path.OutputStream
 		.FlowOut = O
 		._Enabled = (O!=nil)|int|
@@ -145,7 +161,7 @@ module FlowLog
 
 
 inline app.FlowLog
-	FlowLog.FlowWhile++
+	FlowLog.FlowWhile += 2
 
 
 /*

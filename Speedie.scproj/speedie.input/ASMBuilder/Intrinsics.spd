@@ -62,8 +62,8 @@ module Intrinsics
 			|| AsmName = num.next.name
 			|| RetType = fn.ReturnType!.trin
 			
-			check  !(ID &~63)		(num, "ID out of range")
-			check  !((1<<ID) & map)	(num, "ID already used")
+			check  !(ID &~63)		(num, "Value out of range")
+			check  !((1<<ID) & map)	(num, "Value already used")
 			map |= 1<<id
 			|| C = fn.Args.Length
 			|| T2 = t.LowerCase
