@@ -1284,7 +1284,7 @@ function CurrFunc (assigns:|scfunction?|)
 
 	._Info = (value!=nil)(value.FuncInfo, 0)
 		
-	if FlowLog()
+	if FlowLog.Enabled
 		FlowLog <~ value.name
 		FlowLog <~ compiler.stagename
 

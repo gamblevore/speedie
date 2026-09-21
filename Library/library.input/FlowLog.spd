@@ -23,10 +23,8 @@ module FlowLog
 		visible
 		return ._Enabled <= 0
 
-	inline New (|bool|)
-		return ._Enabled == 1
-
 	inline Disable
+		description "Each disable must be matched with an enable. Can nest disable calls, and it will stay disabled till the last enable."
 		._Enabled -= 1
 
 	inline Enable
@@ -66,7 +64,7 @@ module FlowLog
 			(found)
 		  else
 			print "Flow: Differed. Last Codepoint: "
-			printline .LastCodePoint
+			printline .LastCodePoint.render
 			printline app.StackTrace
 			target debug
 				debugger
@@ -129,11 +127,10 @@ module FlowLog
 
 		|| path = .FlowPath(name)
 		if path.Size > 0
-			// Copy to a new location, then use the new location as input.
+			// Copy to a new location, before using as input.
 			|| Copied = .FlowPath(name + date.now.withinday.Minutes)
-			path.CopyTo(Copied)
+			path.CopyTo(Copied) // auto-closes if already closed.
 			.FlowIn = Copied.InputStream
-			path.close
 		
 		|| O = path.OutputStream
 		.FlowOut = O
@@ -156,7 +153,8 @@ module FlowLog
 				.StartTest(name)
 			  else
 				.StartGen(name)
-			return true
+			return true // return true here, as a constant, for better inlining of consts
+						// better than doing a tail-call that returns true, which might not opt so well.
 
 
 
