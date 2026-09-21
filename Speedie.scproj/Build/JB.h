@@ -1444,9 +1444,10 @@ extern int SC__FastStringOpts_StrRemoved;
 extern int SC__FastStringOpts_VargCount;
 extern Dictionary* SC__FB_AppOptions;
 #define JB__Flow__Enabled JB__.Flow__Enabled
-#define JB__Flow_CompareAgainst JB__.Flow_CompareAgainst
+#define JB__Flow_FlowIn JB__.Flow_FlowIn
 #define JB__Flow_FlowOut JB__.Flow_FlowOut
 #define JB__Flow_FlowWhile JB__.Flow_FlowWhile
+#define JB__Flow_LastCodePoint JB__.Flow_LastCodePoint
 extern Message* SC__AC_all_tmp_src;
 extern SCFunction* SC__AC_AnonFn;
 extern SCNode* SC__AC_AnonParent;
@@ -2185,10 +2186,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__TC_Vec3 ((DataTypeCode)170)
 #define kJB__TC_Vec4 ((DataTypeCode)171)
 #define kJB__Date_Highest ((int64)9223372036854775807)
-#define kJB__Date_kOneStep (0.000015258789f)
-#define kJB__Date_kSecondsPerDay ((int)86400)
-#define kJB__Date_kSecondsPerMonthApprox ((int)2628000)
-#define kJB__Date_kSecondsPerWeek ((int)604800)
 #define kSC__DeclMode_Always ((DeclMode)64)
 #define kSC__DeclMode_FuncParam ((DeclMode)4)
 #define kSC__DeclMode_FunctionBody ((DeclMode)8)
@@ -2575,6 +2572,7 @@ extern bool SC__Base_CurrVisibility;
 #define kJB__File_ReadMode ((int)0x000)
 #define kJB__File_ReadWriteMode ((int)2)
 #define kJB__File_TruncateMode ((int)1024)
+#define kJB__File_Unsorted ((int)8)
 #define kJB__File_WantFileObjects ((int)4)
 #define kJB__File_WriteMode ((int)1)
 #define JB__Macro_TmpPrms_ JB__.Macro_TmpPrms_
@@ -2604,10 +2602,11 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
-	uint Flow_FlowWhile;
+	int Flow_LastCodePoint;
 	int Flow__Enabled;
+	uint Flow_FlowWhile;
 	int Syx_CurrFuncID_;
-	FastString* Flow_FlowOut;
+	JB_File* App__stdin;
 	Dictionary* Constants__SyxDict;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* Constants_XML_EscapeStr;
@@ -2617,12 +2616,12 @@ struct JB_Globals {
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	Message* Tk__EndOfLineMarker;
-	JB_File* App__stdin;
+	InputStream* Flow_FlowIn;
 	Dictionary* TC_Types_Dict;
 	JB_String* App_Usage;
 	JB_File* Platform_Logger_;
 	JB_ErrorReceiver* StdErr;
-	InputStream* Flow_CompareAgainst;
+	FastString* Flow_FlowOut;
 	Message* App__Conf;
 	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
@@ -2970,7 +2969,7 @@ bool SC_FB__AppOptions_elf(JB_String* Name, JB_String* Value, FastString* Purpos
 
 bool SC_FB__AppOptions_env(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_flowlog(JB_String* Name, JB_String* Value, FastString* Purpose);
+bool SC_FB__AppOptions_flow(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_force(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -3047,25 +3046,25 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript);
 
 
 // Flow
+void JB_Flow__Disable();
+
 bool JB_Flow__Disabled();
 
-void JB_Flow__DisabledIncr(int Value);
+void JB_Flow__Enable();
 
 bool JB_Flow__Enabled();
 
-void JB_Flow__Fail(JB_String* Found);
-
 int JB_Flow__Init_();
 
-void JB_Flow__Input(JB_String* Str, int64 Num);
-
-bool JB_Flow__New();
+void JB_Flow__Input(int64 Hash, int64 CodePoint);
 
 void JB_Flow__Stop();
 
 void JB_Flow__AppendStr(JB_String* Value);
 
 void JB_Flow__InputStrings(Array* Lines);
+
+bool JB_Flow__Test(InputStream* Input, int64 Found);
 
 bool JB_Flow__TryStart(JB_String* Name);
 
@@ -4479,8 +4478,6 @@ uint JB_uint_OperatorMax(uint Self, uint Other);
 
 uint JB_uint_OperatorMin(uint Self, uint Other);
 
-JB_String* JB_uint_Render(uint Self, FastString* Fs_in);
-
 
 
 // uint16
@@ -5014,8 +5011,6 @@ Dictionary* JB_TC__Types();
 // Date
 JB_Duration JB_Date_Ago(Date Self);
 
-int JB_Date_DayOfWeekApprox(Date Self);
-
 int64 JB_Date_Days(Date Self);
 
 Float64 JB_Date_Float64(Date Self);
@@ -5023,8 +5018,6 @@ Float64 JB_Date_Float64(Date Self);
 JB_Duration JB_Date_OperatorMinus(Date Self, Date D);
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
-
-int64 JB_Date_WholeSeconds(Date Self);
 
 
 
@@ -7373,9 +7366,7 @@ int JB_SS_Find(InputStream* Self, uint /*byte*/ C);
 
 bool JB_SS_HasAny(InputStream* Self);
 
-bool JB_SS_HasHeader(InputStream* Self, JB_String* Header);
-
-int JB_SS_HInt(InputStream* Self);
+int64 JB_SS_HInt(InputStream* Self);
 
 bool JB_SS_NextChunk(InputStream* Self);
 
@@ -11388,10 +11379,7 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 
 inline JB_String* JB_config_AsString(Message* Self) {
 	//cpp_part;
-	if (Self) {
-		return JB_Msg_Value(Self);
-	}
-	return JB_LUB[0];
+	return JB_Msg_Value(Self);
 }
 
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
@@ -11457,10 +11445,11 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
-	uint Flow_FlowWhile;
+	int Flow_LastCodePoint;
 	int Flow__Enabled;
+	uint Flow_FlowWhile;
 	int Syx_CurrFuncID_;
-	JB_Object* Flow_FlowOut;
+	JB_Object* App__stdin;
 	JB_Object* Constants__SyxDict;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* Constants_XML_EscapeStr;
@@ -11470,12 +11459,12 @@ struct JB_Globals {
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* App__stdin;
+	JB_Object* Flow_FlowIn;
 	JB_Object* TC_Types_Dict;
 	JB_Object* App_Usage;
 	JB_Object* Platform_Logger_;
 	JB_Object* StdErr;
-	JB_Object* Flow_CompareAgainst;
+	JB_Object* Flow_FlowOut;
 	JB_Object* App__Conf;
 	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
