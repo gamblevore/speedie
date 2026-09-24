@@ -209,6 +209,7 @@ class FileRow (ListViewRow)
 	
 	function FileData (|bool| Binary=false, |string|)
 		|document--| d = ._Document
+			d.SimpleUpdateFromDisk // :]
 			return d.text
 		
 		|| f = .readfrom.file
