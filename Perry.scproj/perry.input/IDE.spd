@@ -42,7 +42,7 @@ class PerryIDE (Window)
 	|TextView|					MassReplaceField
 	|TextView|					EditMe
 	|listview|					ASMView
-	|StretchControl|			ASMStretch
+	|SplitView|				ASMStretch
 	|GraphicsEditor|			DrawMe
 	|TextView|					EditStatus
 	|TextView|					ProjectInfo
@@ -51,8 +51,8 @@ class PerryIDE (Window)
 	|TextView|					UnNeededLabel
 	|TextView|					PopupDisplay
 	|message?|					LastExtraInfo
-	|StretchControl|			ProductSep
-	|StretchControl|			FileSep
+	|SplitView|				ProductSep
+	|SplitView|				FileSep
 	|listviewrow|				LogComms
 	|listviewrow|				LogActions
 	|listviewrow|				LogCake

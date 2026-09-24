@@ -1,7 +1,7 @@
 
 
-role StretchControl (GuiControl)
-	contains stretchdivider
+role SplitView (GuiControl)
+	contains SplitDivider
 	linkage
 		cpp_part SC
 	
@@ -52,37 +52,37 @@ role StretchControl (GuiControl)
 		opt norefcounts
 		.Divider.low! <~ g
 
-	inline Divider (|stretchdivider!|)
-		return .last|stretchdivider|!
+	inline Divider (|SplitDivider!|)
+		return .last|SplitDivider|!
 	
-	inline Open
+	function Open
 		.divider.open
 		
 	module
-		inline Horz (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+		inline Horz (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |SplitView|)
 			return .Build(p, start, LowGap, HighGap, 0)
 
-		inline Vert (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |stretchcontrol|)
+		inline Vert (|guicontrol| p, |ControlPoint| Start, |int| LowGap=0, |int| HighGap=0, |SplitView|)
 			return .Build(p, start, LowGap, HighGap, 1)
 
-		function Build (|guicontrol| p, |ControlPoint| start, |int| LowGap, |int| HighGap, |int| D, |stretchcontrol|)
+		function Build (|guicontrol| p, |ControlPoint| start, |int| LowGap, |int| HighGap, |int| D, |SplitView|)
 			opt norefcounts
-			|StretchControl| sG = StretchControl(p)
-			(sg is PassThru)
-			sG.AddPane((d!=nil)("bottom", "left"))
-			sG.AddPane((d!=nil)("top", "right"))
-			|| SD   = StretchDivider(sG, d)
+			|SplitView| sv = guicontrol(p)
+			(sv is PassThru)
+			sv.AddPane((d!=nil)("bottom", "left"))
+			sv.AddPane((d!=nil)("top", "right"))
+			|| SD   = SplitDivider(sv, d)
 			SD.Initial= start.Length.abs
 			SD.LowGap  = LowGap
 			SD.HighGap  = HighGap
 			sd.CollapseToRight = start is high
 			sd.InitGroup
-			return sG
+			return sv
 
 
 
 
-class StretchDivider (GuiControl)
+class SplitDivider (GuiControl)
 	linkage:cpp_part Div
 	|guiAction?|				OnHide
 	|guiAction?|				OnShow
@@ -122,7 +122,7 @@ class StretchDivider (GuiControl)
 		.ResizeDivider
 
 
-	function ResizeDivider
+	libinternal ResizeDivider
 		// puts divider overlapping the panes... unless collapsed.
 		|| W = 3~before for 6
 		if .DistanceToEdge <= 0
@@ -181,13 +181,13 @@ class StretchDivider (GuiControl)
 	libinternal ActiveEnd (|controlpoint|)
 		opt NoRefCounts
 		|| l = .low
-			return l.sizer[2+(.d&1)]
+			return l.edge(2+(.d&1))
 	
 	
 	libinternal ActiveEnd (assigns:|controlpoint|)
 		opt NoRefCounts
 		|| l = .low
-			l.sizer.g(2+(.d&1), self) = value
+			l.edge(2+(.d&1)) = value
 			.ResizeDivider
 	
 
@@ -220,7 +220,7 @@ class StretchDivider (GuiControl)
 		return v
 	
 	
-	function Open
+	libinternal Open
 		opt norefcounts
 		|| p = .parent$
 		|| M = .Edge max 10
@@ -238,7 +238,7 @@ class StretchDivider (GuiControl)
 	
 	behaviour MouseDown
 		require .InTest(P, false)
-		if keys.cmd or (clicks == 2)
+		if (clicks == 2) or ((clicks == -1) and keys.cmd)
 			.Flip
 			return MouseDragging.handled
 		

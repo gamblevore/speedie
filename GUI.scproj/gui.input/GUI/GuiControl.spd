@@ -17,7 +17,7 @@ class GUIControl (list)
 	|Drawstyle|					GNormal
 	
 	|TimeFader|					Declutterer
-	|ControlSize|				Sizer
+	|ControlRect|				_Size
 	|uint16|					TabIndex
 	|ControlClipMode|			ClipMode
 	|GuiControlFlags|			State
@@ -117,21 +117,21 @@ class GUIControl (list)
 	virtual TypedString (|string| Input, |bool|)
 		0
 
-	function Size (|ivec2|)
-		inlined
-		return .lastrect.size
 
+	setter Size (|controlrect|)
+		isnt blocksized
+		if ._size != value
+			._size = value
+			GUI.resized(self)
+	
 	setter Size (|ivec2|)
 		cpp_part Size2
 		.lastrect = value.rect
 		.size = .lastrect.layout
 
-	setter Size (|controlrect|)
-		isnt blocksized
-		if .sizer.gsize != value
-			.sizer.GSize = value
-			GUI.resized(self)
-	
+	function Size (|ivec2|)
+		inlined
+		return .lastrect.size
 
 	function BlockSize (|float| X, |float| Width, |float| Y, |float| Height)
 		.size = VObject.Size2d(x, width, y, height)
@@ -379,16 +379,16 @@ class GUIControl (list)
 		return .lastrect.width
 	
 	setter Width (|controlline|)
-		.sizer.g(0, self) = value[0]|controlpoint|
-		.sizer.g(2, self) = value[1]|controlpoint|
+		.edge(0) = value[0]|controlpoint|
+		.edge(2) = value[1]|controlpoint|
 
 	function Height (|int|)
 		inlined
 		return .lastrect.Height
 	
 	setter Height (|controlline|)
-		.sizer.g(1, self) = value[0]|controlpoint|
-		.sizer.g(3, self) = value[1]|controlpoint|
+		.edge(1) = value[0]|controlpoint|
+		.edge(3) = value[1]|controlpoint|
 	
 	libinternal GetCopy (|object?| item=nil, |string|)
 		return (.oncopy$)(self, item)
@@ -414,7 +414,7 @@ class GUIControl (list)
 	
 	setter Size (|int| i, |ControlPoint|)
 		cpp_Part SizePart
-		.sizer.g(i, self) = value
+		.edge(i) = value
 	
 	function Right (|int|)
 		disabled "Use .lastright"
@@ -442,9 +442,9 @@ class GUIControl (list)
 		return .lastrect.y2
 
 	inline Left (|controlpoint|)
-		return .sizer.GSize[0]|controlpoint|
+		return .edge(0)
 	inline Bottom (|controlpoint|)
-		return .sizer.GSize[1]|controlpoint|
+		return .edge(1)
 
 	inline Horz (|intrange|)
 		return .lastrect.x1x2
@@ -496,18 +496,26 @@ class GUIControl (list)
 			where.DrawEdge(R, g, ~.FindAttachedEdge)
 		where.controlclip = oldclip
 
+	inline Edge (|int| x, |controlpoint|)
+		return ._Size[x&3]|controlpoint|
+	
+	setter Edge (|int| i, |controlpoint|)
+		inlined
+		if .edge(i) != value
+			._Size[i] = value
+			GUI.resized(self)
 	
 	libinternal FindAttachedEdge (|MoveCode|) // .EdgeAllow
 		opt norefcounts
 		|| a = .AttachedFrom
 			return a
-		if .Sizer[0] is high
+		if .Edge(0) is high
 			return MoveCode.right
-		if .sizer[1] is high
+		if .edge(1) is high
 			return MoveCode.bottom
-		if .sizer[2] is low
+		if .edge(2) is low
 			return MoveCode.left
-		if .sizer[3] is low
+		if .edge(3) is low
 			return MoveCode.top
 		
 	

@@ -55,6 +55,17 @@ datatype ControlRect (ivec4)
 	
 	function IsBasic (|bool|)
 		return .syntaxequals(.BasicSize.Layout)
+
+	syntax access (|int| i, |ControlPoint|)
+		inlined
+		return self[i&3]|controlpoint|
+	
+	inline Mode (|int|i, |int|)
+		return self[i&3]&15
+
+	inline Size (|int| i,  |int|)
+		return self[i&3]>>4
+
 		
 	render
 		opt norefcounts
@@ -65,6 +76,7 @@ datatype ControlRect (ivec4)
 		self[1]|controlpoint|.AppendInto(fs)
 		fs <~ " to "
 		self[3]|controlpoint|.AppendInto(fs)
+
 
 
 
@@ -194,7 +206,7 @@ function movecode.Corner (|int| W, |int| H, |ControlRect|)
 	return (X1 back W) by (Y1 back H)
 	
 	
-function ivec4.Layout (|ControlRect|)
+inline ivec4.Layout (|ControlRect|)
 	return (self<<4)|ControlRect|
 
 function int.OperatorBy (|int| h, |controlrect|)

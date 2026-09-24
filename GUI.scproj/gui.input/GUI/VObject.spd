@@ -127,11 +127,6 @@ datatype VObjectInfo (uint)
 		Dead			// to remove
 
 
-function controlsize.CalculateBlocks (|ivec4|)
-	|| V = .gsize.vec4 * 16th
-	return V.Screen
-
-
 function vec4.ScreenFloat (|vec4|)
 	return (self + VObject.Drawmovement.xyxy) * VObject.DrawScale
 
