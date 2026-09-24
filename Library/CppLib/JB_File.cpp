@@ -149,7 +149,7 @@ void JB_Flow__Report (u8* Addr, int Length) {
 }
 
 
-bool HasFD (JB_File* f) {
+static bool HasFD (JB_File* f) {
     return (f->Descriptor >= 0);
 }
 
