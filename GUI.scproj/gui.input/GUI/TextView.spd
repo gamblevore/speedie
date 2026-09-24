@@ -1822,7 +1822,7 @@ class TextView (GUIControl)
 		if !t.width or keys.shift
 			x = d.xOfChar(Pos)
 		  else
-			x = d.xofchar(t.lower)
+			x = d.xofchar(t.min)
 		|| movedCount = 0
 		d = d.MoveCapped(i, movedCount)
 		if MovedCount

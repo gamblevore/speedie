@@ -396,9 +396,6 @@ datatype IntRange (ivec2)
 	linkage
 		cpp_part Rg
 	
-	inline Width (|int|)
-		return .x2 - .x
-	
 	operator Inside (|ivec4| R, |bool|)
 		inlined
 		return R.Contains(.x, .y)
@@ -419,13 +416,7 @@ datatype IntRange (ivec2)
 		return true
 		
 	function Resolve (|intrange|)
-		return (.lower, .higher)
-	inline Higher (|int|)
-		return .x1 max .x2
-	inline Lower (|int|)
-		return .x1 min .x2
-	inline Mid (|int|)
-		return (.x1 + .x2)/2
+		return (.min, .max)
 	function LimitTo (|int| i, |ivec2|)
 		if (.x  < 0):		.x  = 0
 		if (.x2 < 0):		.x2 = 0
@@ -463,6 +454,12 @@ datatype ivec2
 		
 	inline Width (|int|)
 		return .x2 - .x
+
+	inline Max (|int|)
+		return .x1 max .x2
+
+	inline Min (|int|)
+		return .x1 min .x2
 	
 	operator Sign (|ivec2| C, |ivec2|)
 		return (.x.copysign(c.x), .y.copysign(c.y))
@@ -492,9 +489,6 @@ datatype ivec2
 		p.y = .y.clamp(p.y)
 		return p
 			
-	inline Mid (|int|)
-		return (.x1+.x2)/2
-		
 	operator contains (|int| x, |bool|)
 		return (x >= .x1) and (x <= .x2)
 
@@ -819,8 +813,8 @@ function vec4.Center (|vec2|)
 datatype Plane3D (vec4)
 	module
 		function New (|vec3| A, |vec3| B, |vec3| C, |vec4|)
-		    || N = (B-A) x (C-B)
-		    n = n.normal
+			|| N = (B-A) x (C-B)
+			n = n.normal
 			return (N, N • A)
 
 		function Normals (|vec3| D1, |vec3| D2, |vec3| Start, |vec4|)

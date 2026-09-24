@@ -90,7 +90,7 @@ class Menu (ListView)
 		opt norefcounts
 		|| mw = .CmmWidth(owner)
 		|| W = (x)~right for mw
-		if (x < 0) and (.MouseXY.x > .Horz.mid)
+		if (x < 0) and (.MouseXY.x > .Horz.sum/2)
 			w = the~right back mw
 		|| CP = ControlPoint.low
 		if y
