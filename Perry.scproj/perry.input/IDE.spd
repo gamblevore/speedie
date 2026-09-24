@@ -386,15 +386,15 @@ class PerryIDE (Window)
 		app.prefs["currproj"] = p
 		|| rec = Perry.RecentProjects.Find(@tmp, p)
 			rec.Parent.first = rec
-		if FromClick
-			if .islast
-				.ClickedTodo
-			  else
-				.recheck
-		if !.IsFront
+		|| IsFront = .IsFront
+			if FromClick
+				.clickedtodo
+		  else
 			.ProjectTabs.selected = .ProjectTab
 			.editme.SetFocus				// Make it simple
 			super.show
+			if FromClick
+				.ReCheck
 		.id = .projname
 		GUI.Title = .id
 
