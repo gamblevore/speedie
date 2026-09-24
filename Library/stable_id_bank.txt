@@ -55,6 +55,7 @@ GUI_Btn_SelectedSet
 GUI_Btn_SubMenu
 GUI_Btn_TrimWidth
 GUI_Btn_XOfItem
+GUI_CL4_CalculateSize
 GUI_CaP_Constructor
 GUI_CaP_DeRef
 GUI_CaP_Destructor
@@ -75,8 +76,6 @@ GUI_Div_Draw
 GUI_Div_InitGroup
 GUI_Div_MouseDown
 GUI_Div_MouseMove
-GUI_Div_Open
-GUI_Div_ResizeDivider
 GUI_Div_Resized
 GUI_Doc_CheckModified
 GUI_Doc_Constructor
@@ -398,6 +397,7 @@ GUI_SC_AddHigh
 GUI_SC_AddLow
 GUI_SC_Collapsed
 GUI_SC_CollapsedSet
+GUI_SC_Open
 GUI_SC_Reset
 GUI_SC_StretchTo
 GUI_SC__Build
@@ -583,9 +583,6 @@ GUI_bin_AddImage
 GUI_cncl_ConstructorAuto
 GUI_cncl_Destructor
 GUI_cncl_SyntaxCall
-GUI_csiz_CalculateBlocks
-GUI_csiz_CalculateSize
-GUI_csiz_Constructor
 GUI_ctrl_AppForeGroundChange
 GUI_ctrl_BlockSize
 GUI_ctrl_ClearFocus
@@ -1762,7 +1759,6 @@ JB_ivec4_Horz
 JB_ivec4_HorzSet
 JB_ivec4_IsNegative
 JB_ivec4_IsPositive
-JB_ivec4_Layout
 JB_ivec4_Length
 JB_ivec4_Load
 JB_ivec4_Max
@@ -1990,4 +1986,3 @@ sqrtf
 strcmp
 strlen
 strnlen
-GUI_CL4_CalculateSize
