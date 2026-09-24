@@ -20,7 +20,7 @@ class StretchButton (GUIControl)
 			.StartClick = p
 		|| D = .StartClick - p
 			|| r = .parent
-				|| s = r._Size
+				|| s = r.Size
 			
 		Notifications <~ p.Render
 		return mousedragging.DragEvenIfStill
