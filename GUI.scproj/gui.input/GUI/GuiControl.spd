@@ -412,25 +412,21 @@ class GUIControl (list)
 			if p isa Window
 				return p
 	
-	setter Size (|int| i, |ControlPoint|)
-		cpp_Part SizePart
-		.edge(i) = value
-	
 	function Right (|int|)
 		disabled "Use .lastright"
 
 	setter Left (|ControlPoint|)
 		inlined
-		.size(0) = value
+		.edge(0) = value
 	setter Bottom (|ControlPoint|)
 		inlined
-		.size(1) = value
+		.edge(1) = value
 	setter Right (|ControlPoint|)
 		inlined
-		.size(2) = value
+		.edge(2) = value
 	setter Top (|ControlPoint|)
 		inlined
-		.size(3) = value
+		.edge(3) = value
 		
 	inline LastBottom (|int|)
 		return .lastrect.y

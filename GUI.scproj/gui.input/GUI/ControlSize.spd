@@ -18,7 +18,7 @@
 		window = window ± upon.Padding
 		|| PS = parent.size
 		for i in 4
-			|| sz = .size(i)
+			|| sz = .length(i)
 			|| m = .Mode(i)
 			if m <= ControlPoint.Centered
 				|int| d = (m&2) + (i&1)
@@ -42,7 +42,7 @@
 				if .mode(i) == ControlPoint.Length
 					|| other = i xor 2
 					|| ro = rz[other]
-					|| sz = .size(i)
+					|| sz = .length(i)
 					
 					sz = upon.Transition(sz, i, e)
 					rz[i] = ro + (sz * (i>=2).dir)

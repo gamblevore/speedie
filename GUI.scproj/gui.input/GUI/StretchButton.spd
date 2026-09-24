@@ -2,25 +2,36 @@
 
 class StretchButton (GUIControl)
 	|ivec2|		StartClick
+	|ivec2|		Min
+	// i can extend it to stretch other corners... later
+	// for now it is bottom-right
 	
-	constructor (|GUIControl| parent, |movecode| Corner)
+	constructor (|GUIControl| parent)
 		super.constructor(parent)
 		.size =  the~right back 12  by  the~bottom for 12
-		.Text = "?"
+		.Text = "x"
 		|| px = parent.GNormal.bg
 		.GNormal.bg = px
 		px = -1
 		px.a = 32
 		.GNormal.edge = px
 		.GNormal.TextColor = -1
-	
+		.Min = ivec2(200, 100)
+		
+		
 	behaviour MouseDown	
-		opt norefcounts
-		if clicks >= 0
-			.StartClick = p
-		|| D = .StartClick - p
-			|| r = .parent
-				|| s = r.Size
+		|| pp = .parent$
+		|| Diff = p - .StartClick
+		if Diff and (clicks < 0)
+			|| s = pp._Size
+			|| x = (s[2] >> 4) + diff.x
+			|| y = (s[1] >> 4) - diff.y
+			if (x >= .min.x) and (y >= .min.y)
+				s.length(2) = x // max .min.x
+				s.length(1) = y //max .min.y
+				pp.size = s
+				.StartClick = P
+		  else
+			.StartClick = P
 			
-		Notifications <~ p.Render
 		return mousedragging.DragEvenIfStill

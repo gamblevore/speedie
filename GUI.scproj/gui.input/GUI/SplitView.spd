@@ -238,7 +238,7 @@ class SplitDivider (GuiControl)
 	
 	behaviour MouseDown
 		require .InTest(P, false)
-		if (clicks == 2) or ((clicks == -1) and keys.cmd)
+		if (clicks == 2) or ((clicks == 1) and keys.cmd)
 			.Flip
 			return MouseDragging.handled
 		
