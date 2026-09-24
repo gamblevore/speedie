@@ -297,10 +297,10 @@ class TextViewLine (list)
 		return colors.white(0.35)
 
 	
-	libinternal TrySetError (|error| e, |bool|)
+	libinternal TrySetError (|error!| e, |bool|)
 		opt norefcounts
 		|| old = .LineError
-			e.when = old.when
+			require (e.Severity >= old.Severity) or (e is parse)
 		.LineError = e
 		e.Obj = self
 		return e != old
@@ -358,6 +358,7 @@ libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine|
 	|| r = .lastrect
 	y++
 	r.y	= y
+	
 	r.y2 = y + .lineheight
 	|| lm= 0.225
 	|| v = e.Textcolor(lm)

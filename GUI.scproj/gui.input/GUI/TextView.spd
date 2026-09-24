@@ -1094,7 +1094,7 @@ class TextView (GUIControl)
 		opt norefcounts
 		if err
 			.showandselect(err.position)
-			.AddErrorToLine( err, true )
+			.AddErrorToLine( err )
 	
 
 	inline ClearParseErrors

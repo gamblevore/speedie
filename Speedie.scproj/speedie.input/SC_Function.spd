@@ -903,7 +903,6 @@ function Message.SelfUsedForProperty (|int|)
 
 function ConstructParentProperties
 	opt norefcounts
-	return
 	|| cls = .cls!.super
 	while cls
 		for p in cls.properties

@@ -11,6 +11,7 @@ class StretchButton (GUIControl)
 		.size =  the~right back 12  by  the~bottom for 12
 		.Text = "x"
 		|| px = parent.GNormal.bg
+//		|| g = .GNormal
 		.GNormal.bg = px
 		px = -1
 		px.a = 32
