@@ -619,7 +619,6 @@ GUI_ctrl_Search
 GUI_ctrl_SetFocus
 GUI_ctrl_Size2
 GUI_ctrl_SizeFractionSet
-GUI_ctrl_SizePart
 GUI_ctrl_SizeSet
 GUI_ctrl_SlideOpen_Constructor
 GUI_ctrl_SyntaxEquals
@@ -770,8 +769,7 @@ JB_Array_join
 JB_CL1_AppendInto
 JB_CL1_Expand
 JB_CL2_By
-JB_CL4_AbsSize
-JB_CL4_IsBasic
+JB_CL4_LengthSet
 JB_CL4_Render
 JB_CP_IsAlphaNum
 JB_CP_IsLetter
