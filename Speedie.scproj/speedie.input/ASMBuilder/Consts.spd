@@ -4,7 +4,7 @@ extend Assembler
 	function MakeConstFromTwo (|&Assembler| self,  |message| exp,  || dest,  || L,  || R,  |fn_ASMConstifier| fn,  ||)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
-		.Nop2Consts(r, l)
+		.Nop2TempConsts(r, l)
 		return .NumToReg(exp, dest, k, dest.µtype)
 	
 	
@@ -35,13 +35,24 @@ extend Assembler
 			
 	
 	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)
+		if v ==1
+			if "GUI_ctrl_SizeSet".trap
 		if !Dest.reg
 			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found
 		
 		dest = .TempMe(dest)		
 		if dest isnt Always
-			|| K = .lastreal(asm.knst)
+
+			//	1) Why would ~Always~ affect nopping?
+			//	2) It seems we can nop this better.
+			//		* lastreal only checks if its the current block, rather than are we 'within' it.
+			//		* It should happen even if its not a temp... considering its in the same block!?
+			//		* Couldn't it be moved to setregister?
+			//		* NumToReg is having similar issues
+			
+			
+			|| K = .LastReal(asm.knst)
 				if (k.p0 == dest.reg) and (k is temp)
 					.nop(k)
 		

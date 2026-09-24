@@ -614,7 +614,6 @@ function AddressOf (fn_asm)
 	(rz isnt AddrForceRequest)
 
 
-
 function BoolNot (fn_asm)							// !a
 	dest = dest.negate
 	|| src = .µGetASM(exp, dest)

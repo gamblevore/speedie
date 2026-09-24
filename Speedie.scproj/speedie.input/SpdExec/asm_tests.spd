@@ -43,6 +43,11 @@ function ivec4.CenterBroken (|ivec2|)
 	rz.y = (.y2 - .y)
 	
 
+function VecTest2 (|ivec2| V, |bool|)
+	visible
+	if !v.width
+		return true
+	
 function VecTest (|&vec2| A, |&vec4| B, |structwithobj| C, |int| n)
 	visible
 	|| f = 0.0

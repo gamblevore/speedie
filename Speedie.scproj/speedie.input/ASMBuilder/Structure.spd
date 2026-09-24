@@ -159,25 +159,25 @@ extend assembler
 			return .Nop(f)
 		target debug
 			if r.reg and r isnt param
-				debugat						// we don't know what made it, but we should!!
+				debugat							// We don't know what made it, but we should!!
 	
 	
-	function Nop2Consts (|asmreg| A, |asmreg| B)
+	function Nop2TempConsts (|asmreg| A, |asmreg| B)
 		|| Further = a.FatIndex > b.FatIndex
 			.NopTempConst(A)
 		.NopTempConst(B)
 		if !Further
-			.NopTempConst(A)					// in case of swapped order
+			.NopTempConst(A)					// In case of swapped order
 	
 	
 	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
 		if r.reg == 0
-			return 0						// sigh. I DIE.
+			return 0							// Sigh. I DIE.
 		
 		require R is Const
 
 		|| RF = R.fat
-//		if rf and .IsWithin(RF)		// the .iswithin is already used by CanConstLocalThg
+//		if rf and .IsWithin(RF)					// The .iswithin is already used by CanConstLocalThg
 			|| k = RF.const
 			if k.fits(bits, signed)
 				.NopTempConst(R)
@@ -333,6 +333,7 @@ extend assembler
 	
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
+		if "GUI_ctrl_SizeSet".trap
 		if ToNop.RefCount <= 0
 			|| br = ToNop.BreakInfo
 			.nop(ToNop)
@@ -340,6 +341,7 @@ extend assembler
 
 	
 	function AskNop (|fatasm| ToNop)
+		if "GUI_ctrl_SizeSet".trap
 		if ToNop.RefCount <= 0
 			.nop(ToNop)
 	

@@ -414,7 +414,14 @@ struct Assembler
 			m.debugprint
 			debugger
 
-		
+	
+	function µGetTemp (|message| exp, |asmreg| Dest, |asmreg|)
+		// this allows consts to be nopped more easily.
+		// I'm surprised I haven't done this already. YES we CAN put things into proper registers
+		// when needed, but it leads to problems like this:
+		// x(!true) // --> knst(1), x(0) // and one  involved!
+
+	
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM

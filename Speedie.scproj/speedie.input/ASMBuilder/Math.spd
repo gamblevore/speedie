@@ -124,7 +124,7 @@ extend Assembler
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswerOK						// Hmmm... so what should it be?
 		if  L is Const  and  R is Const
-			.Nop2Consts(r, l)
+			.Nop2TempConsts(r, l)
 			|| num = ((l.const==r.const) != negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
@@ -250,7 +250,7 @@ extend Assembler
 
 
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		.Nop2Consts(r, l)
+		.Nop2TempConsts(r, l)
 		|| Result = .ConstCompareFloatSub(l, r, mode)
 		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
 		
@@ -280,7 +280,7 @@ extend Assembler
 
 
 	function ConstCompareInt (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)
-		.Nop2Consts(r, l)
+		.Nop2TempConsts(r, l)
 		|| Result = .ConstCompareIntSub(l, r, mode)
 		return .NumToReg(exp, dest.BoolAnswerMaybeBugged, result|int|, datatypecode.bool)
 		
@@ -809,7 +809,7 @@ extend Assembler
 				return r
 
 
-	function BitOr (fn_opasm) 
+	function BitOr (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r,  ConstifyBitOr)
 

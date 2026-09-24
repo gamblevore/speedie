@@ -41,7 +41,7 @@ datatype ASMReg (uint64)
 //		NotNil				// probably a big addition. Will need tests...
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
-		SetAlways		= Always	||| Set			// reuse const
+		SetAlways		= always|||Set
 		TempFlags		= OKAsTemp	||| Temp
 		FlagsToRemove	= Const		||| Discard
 		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
