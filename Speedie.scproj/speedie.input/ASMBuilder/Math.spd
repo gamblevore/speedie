@@ -111,13 +111,19 @@ extend Assembler
 
 
 	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
-		require Zero.IsZero
-		|| B = L.Fat
-			if .IsCurrBlock(b, asm.bflg)
-				if b.prms[4] == 0  and  b.prms[3] == 63
-					L.µType = DataTypeCode.bool
-					B.info = L
-					return L
+		for i in 2
+			if Zero.IsZero
+				|| B = L.Fat
+				if b and .IsCurrBlock(b, asm.bflg)
+					if (b.prms[4] == 0  and  b.prms[3] == 63)
+						L.µType = DataTypeCode.bool
+						B.info = L
+						return L
+			swap (L) (Zero)
+
+		
+	function BankOpt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+		|| x = (L|uint64|&2)==2
 		
 
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
@@ -129,11 +135,11 @@ extend Assembler
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
 		if dest isnt CondRequest
+			|| Bank = .BankOpt(exp, dest, L, R)
+				return Bank
 			if negate
 				|| B = .AlreadyABool(l, R)
 					return B
-				|| B2 = .AlreadyABool(R, L)
-					return B2
 			dest = .TempTyped(TypeBool!.TypeNormal, dest)
 			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
 			|| fat = exp.EQUL(dest, L, R, Mode)

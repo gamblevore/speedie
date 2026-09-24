@@ -32,8 +32,8 @@ extend Assembler
 					if info.µType.SpecialReg == Special
 						(info is blocknop) // the value might have not been used yet:   x[1] = 1
 						return info
-			
 	
+			
 	function LoadNumber (|message| exp, |int64| V, |bool| Special, |asmreg| Dest=nil, |asmreg|)
 		if v ==1
 			if "GUI_ctrl_SizeSet".trap
@@ -42,10 +42,8 @@ extend Assembler
 				return Found
 		
 		dest = .TempMe(dest)		
-		if dest isnt Always
-
-			//	1) Why would ~Always~ affect nopping?
-			//	2) It seems we can nop this better.
+		if dest isnt blocknop
+			//	It seems we can nop this better.
 			//		* lastreal only checks if its the current block, rather than are we 'within' it.
 			//		* It should happen even if its not a temp... considering its in the same block!?
 			//		* Couldn't it be moved to setregister?

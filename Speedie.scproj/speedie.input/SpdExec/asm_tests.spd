@@ -245,11 +245,17 @@ function BitTest (|int| i, |bool| Value)
 	.glob = M 
 
 
+
 function SwapTest
 	maxasm 5				// Allows checking that opts are working properly!
 	|| x = 1				// speedie isnt returning errors properly... via autocompletes
 	|| y = 2
 	swap (x) (y)
+
+
+function SwapTest2 (|int| x, |int| y)
+	swap (x) (y)
+
 	
 function GlobRead  
 	|| s = Compiler.OriginalInputPath
@@ -1199,5 +1205,4 @@ function scnode.LoopTest1 (|string| name, |int| a, |int| b)
 //	if b or 1: a = 2					// nops the 5??? its a different branch! (and a different reg!)
 //	while .name and 0		// seems ok!
 //		""
-
 

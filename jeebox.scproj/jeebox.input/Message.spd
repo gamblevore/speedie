@@ -350,7 +350,7 @@ Message is also:
 		fs <~ ch.Next
 	
 	
-	syx BRel (PreDecorator)
+	syx BRel (Prefix)
 		opt norefcounts
 		fs <~ .name
 		fs <~ .First

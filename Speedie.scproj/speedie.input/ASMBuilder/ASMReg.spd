@@ -20,14 +20,12 @@ datatype ASMReg (uint64)
 		Param
 		Alternate
 		Subtract = Alternate
-		Set
 		NewlyDeclared
 		DebugVars = [DebugVarOpen, DebugVarClose]
 		ParamNeedsCopy
 		NoScale
 		FromInline			// remove?
 		ContainsAddr
-		Always
 		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest
 		CondRequest			// Perhaps the responses could also be merged into a number, all exclusive.
 		CondAnswer
@@ -39,9 +37,9 @@ datatype ASMReg (uint64)
 		Const
 		StatelessFunc
 //		NotNil				// probably a big addition. Will need tests...
+		SetAlways		= [Always, Set]
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
-		SetAlways		= always|||Set
 		TempFlags		= OKAsTemp	||| Temp
 		FlagsToRemove	= Const		||| Discard
 		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
