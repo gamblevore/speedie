@@ -23,7 +23,7 @@ class list
 
 	
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
-	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor }
+	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor, stores_self }
 
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	

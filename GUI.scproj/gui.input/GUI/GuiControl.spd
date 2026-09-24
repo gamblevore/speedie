@@ -23,13 +23,13 @@ class GUIControl (list)
 	|GuiControlFlags|			State
 	|TakesFocusFlag|			TakesFocus
 	|uint16|					_TransitionFraction
+	|bool|						_CanSeeAllLines
+	|bool|						_CanSeeLastLine
 	|movecode|					AttachedFrom
 	|byte|						TextAlteredForDraw
 	|byte|						Padding
 	|byte|						ExpandOnMouseOver
 	|bool|						ClickOutsideCloses
-	|bool|						_CanSeeAllLines
-	|bool|						_CanSeeLastLine
 	|CopyPasteFlags|			CopyPaste
 
 
@@ -127,27 +127,15 @@ class GUIControl (list)
 		.size = .lastrect.layout
 
 	setter Size (|controlrect|)
-		.sizer.setsize(self, value)
-		if value.IsBasic
-			.MiniSizeSet(value.basicsize)
+		isnt blocksized
+		if .sizer.gsize != value
+			.sizer.GSize = value
+			GUI.resized(self)
+	
 
 	function BlockSize (|float| X, |float| Width, |float| Y, |float| Height)
+		.size = VObject.Size2d(x, width, y, height)
 		is blocksized
-		|| Sz = VObject.Size2d(x, width, y, height)
-		.sizer.setsize(self, sz)
-
-
-	libinternal MiniSizeSet (|ivec4| Rect)
-		opt norefcounts
-		|| p = .parent
-		// not sure this should happen? its going to be set later, anyhow, right?
-			|| l = p.lastrect
-			if p isa window
-				l = l.soothe
-			rect += l.xyxy
-			if .lastrect != rect
-				.LastRect = rect // right?
-				gui.Resized(self)
 
 
 	libinternal LoadTabIndex (|uint16|)

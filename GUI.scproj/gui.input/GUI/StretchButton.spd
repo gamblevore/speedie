@@ -1,0 +1,26 @@
+
+
+class StretchButton (GUIControl)
+	|ivec2|		StartClick
+	
+	constructor (|GUIControl| parent, |movecode| Corner)
+		super.constructor(parent)
+		.size =  the~right back 12  by  the~bottom for 12
+		.Text = "?"
+		|| px = parent.GNormal.bg
+		.GNormal.bg = px
+		px = -1
+		px.a = 32
+		.GNormal.edge = px
+		.GNormal.TextColor = -1
+	
+	behaviour MouseDown	
+		opt norefcounts
+		if clicks >= 0
+			.StartClick = p
+		|| D = .StartClick - p
+			|| r = .parent
+				|| s = r.Sizer
+			
+		Notifications <~ p.Render
+		return mousedragging.DragEvenIfStill

@@ -66,7 +66,7 @@ class ListView (GUIControl) {
 	libinternal Init
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
-		.gnormal.Separator		<~ ((0.5, 0.5, 0.5, 0.65))
+		.gnormal.Separator	<~ ((0.5, 0.5, 0.5, 0.65))
 		.GNormal.TextColor = -1 // oof
 
 

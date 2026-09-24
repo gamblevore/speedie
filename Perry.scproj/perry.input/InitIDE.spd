@@ -126,6 +126,9 @@ extend PerryIDE
 			.AttachedFrom = movecode.top
 			.ClickOutsideCloses = true		
 
+		stretchbutton(self.RunArgsText, movecode.bottom+movecode.right)
+
+
 
 		with .ViewButtons
 			.ID				= "LBorder"
