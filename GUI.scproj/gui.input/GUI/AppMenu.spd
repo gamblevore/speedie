@@ -26,8 +26,8 @@ class AppMenu (Window)
 //		it <~ ("Go FullScreen",				MenuScreen) // doesn't quite work yet. locks up the mac!
 		it <~ ("Help",						MenuHelp)
 		it <~ ("Quit",						MenuQuit)
-		it.gnormal = ¥.Menus 
-		it.gRowSel = ¥.MenuRowSel 
+		it.gnormal = ¥.Menus
+		it.gRowSel = ¥.MenuRowSel
 
 
 	behaviour KeyDown
