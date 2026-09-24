@@ -443,6 +443,9 @@ GUI_Str_FixLineEndings
 GUI_Str_LoadQOI
 GUI_Str_TextLineCount
 GUI_Str_TypeContains
+GUI_StretchButton_Constructor
+GUI_StretchButton_Destructor
+GUI_StretchButton_MouseDown
 GUI_Sty_Constructor
 GUI_Sty_ConstructorCopy
 GUI_Sty_Destructor
@@ -583,10 +586,6 @@ GUI_cncl_SyntaxCall
 GUI_csiz_CalculateBlocks
 GUI_csiz_CalculateSize
 GUI_csiz_Constructor
-GUI_csiz_Mode
-GUI_csiz_SetSize
-GUI_csiz_Size
-GUI_csiz_SyntaxAccess
 GUI_ctrl_AppForeGroundChange
 GUI_ctrl_BlockSize
 GUI_ctrl_ClearFocus
@@ -674,9 +673,7 @@ GUI_inl_SyntaxIsSet
 GUI_ivec2_SDLXY
 GUI_ivec4_DistToCorner
 GUI_ivec4_Msg
-GUI_ivec4_OperatorEquals
 GUI_ivec4_TextCorner
-GUI_ivec4__EdgeName
 GUI_vec4_BoxVsPlane
 GUI_vec4_PreMul
 GUI_vec4_Screen
@@ -775,7 +772,6 @@ JB_Array_Wipe
 JB_Array_join
 JB_CL1_AppendInto
 JB_CL1_Expand
-JB_CL1_OperatorPlus
 JB_CL2_By
 JB_CL4_AbsSize
 JB_CL4_IsBasic
@@ -794,19 +790,17 @@ JB_Class_Layer
 JB_Class_MemoryUsed
 JB_CompFreeNow
 JB_Constants__TestJB
-JB_ControlClipMode_SyntaxIs
 JB_CrashTracer
 JB_DDA_Caster_Constructor
 JB_DDA_Caster_Next
 JB_Date_Ago
 JB_Date_Cycle
 JB_Date_Fired
-JB_Date_Float64
+JB_Date_Float
 JB_Date_LocalTime
 JB_Date_Loop
 JB_Date_RenderDurr
 JB_Date_RenderInt
-JB_Date_SyntaxCompare
 JB_Date_TimeID
 JB_Date__Hash
 JB_Date__Now
@@ -1996,3 +1990,4 @@ sqrtf
 strcmp
 strlen
 strnlen
+GUI_CL4_CalculateSize
