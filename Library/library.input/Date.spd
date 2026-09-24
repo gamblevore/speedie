@@ -16,17 +16,10 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 		Highest	=  0x7FFFffffFFFFffff_
 		
 	function Seconds (|float|)
-		disabled "Use .float64"
+		disabled "Use .float64 for fractional seconds, or .WholeSeconds for integer seconds"
 	
-	function Float (|float|)
-		disabled "This loses seconds precision"
-	
-	function Float64 (|Float64|)
+	function Float (|Float64|)
 		return self|Float64| / (64.0*1024.0)|float64|
-	
-	syntax Compare (|float| Other, |int|)
-		|| oof = other.date
-		return (self > oof) - (self < oof)  // -1, 0, or +1
 	
 	inline WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
@@ -34,10 +27,6 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 	operator Minus (|date| D, |duration|)
 		inlined
 		return self|int64| - D|int64|
-
-	operator Mod (|duration| D, |duration|)
-		inlined
-		return self|int64| mod D|int64|
 
 	function Ago (|Duration|)
 		if self
@@ -64,16 +53,16 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 			return self < date.now
 	
 	inline Weeks (|int64|)
-		return self  /  604800s
+		return self  /  1weeks
 	
 	inline Days (|int64|)
-		return self  /  86400s // 86400 seconds in a day (Always. Even leapseconds are ignored in unixtime)
+		return self  /  1days
 
-	inline Minutes (|int64|) // needs 48 bits!
-		return self / 60s
+	inline Minutes (|int64|)
+		return self / 1mins
 	
-	inline WithinDay (|date|)
-		return self mod 86400s
+	inline WithinDay (|duration|)
+		return self mod 1days
 
 	function TimeID (|uint64|)
 		cpp_wrapper
@@ -88,9 +77,8 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 	function Loop (|duration| Length, |float|)
 		description "Returns a number between 0 and 1. This number increases linearly, then resets"
 		opt min 3
-		return (self mod Length)|int| div Length
+		return (self mod Length)|float| / Length|float|
 
-	
 	iterator
 		|| StartDate = date.now()
 		|| EndDate = StartDate + self
@@ -124,8 +112,9 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 datatype Duration (date)
 	linkage
 		cpp_class JB_Duration
+
 	function Float (|float|)
-		return .float64|float| // better. Or else we lose too much precision
+		return (self|Float64| / (64.0*1024.0)|float64|)|float|
 
 	inline WholeSeconds (|int64|) // needs 48 bits!
 		return self >> 16
