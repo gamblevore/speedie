@@ -284,14 +284,14 @@ function SetRel (fn_asm)						// function relset (
 	|| X = .ExistingVar(F)
 		|| D = F.ASMDecl
 		if d.IsBareStruct or d.IsCArray
-			(x is SetAlways)
+			(x is Set)
 		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
 
 	// Probably x.y = z,  or x[y] = z
 
 	dest = f.ASMAllowsTemp
 	|| Src = .µGetPrms(exp.last!, dest)
-	(Src is SetAlways)
+	(Src is Set)
 	.µ(F, Src)
 	return asmreg.discard
 

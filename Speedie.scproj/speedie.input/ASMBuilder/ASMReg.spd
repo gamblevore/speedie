@@ -37,12 +37,11 @@ datatype ASMReg (uint64)
 		Const
 		StatelessFunc
 //		NotNil				// probably a big addition. Will need tests...
-		SetAlways		= [Always, Set]
+		Set
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
 		TempFlags		= OKAsTemp	||| Temp
 		FlagsToRemove	= Const		||| Discard
-		InlineCopyable	= Negate	||| CondRequest	||| ConstRequest ||| AddrForceRequest
 		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
 		// don't go above 47
 
