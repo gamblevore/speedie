@@ -73,11 +73,12 @@ extend Assembler
 		opt norefcounts								// set1: r1, 123
 		|| RegMsg = list[@thg]
 		|| ValMsg = RegMsg.Next						#require
-		|| Value  = ValMsg.ASMConst
+		|| K  = ValMsg.ASMConst
 		
-		|| Reg = asmreg.Always
+		|| Reg = asmreg.BlockNop
 		reg.reg = regmsg.reg
-		|| src = .NumToReg(orig, Reg, value, datatypecode.uint64)
+		|| src = .LoadNumber(orig, K, false, Reg)
+		(src isnt blocknop)
 		|| fat = src.fat
 			fat.FinishConst
 		return true

@@ -822,9 +822,8 @@ extend Assembler
 		if (l is Const)
 			swap (l) (r)
 
-		if dest isnt Always
-			|| F = .MiniBOR(l, r, dest)
-				return F
+		|| F = .MiniBOR(l, r, dest)
+			return F
 		
 		if 0: exp.BORR, exp.qorr
 		return .BitMaker(dest, l, r, exp, asm.borr, asm.qorr)
