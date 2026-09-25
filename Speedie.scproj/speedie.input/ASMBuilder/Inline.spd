@@ -34,7 +34,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 
 	target debug
 		|| TrapInline = ++asmtrapper
-		if trapinline == 26168
+		if trapinline == -1
 	  else
 		|| TrapInline = 0
 	|| st = .StartInlineState(prms, dest, fn)
@@ -186,9 +186,10 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	opt norefcounts
 	require .TempCheck(dest)
 	|| dest2 = dest
-	if (dest isnt discard) and (Dest is ExitAtAll) and (!dest.reg or dest is temp)
-		dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
-		require .TempCheck(dest)
+	if dest isnt discard
+		if !dest.reg or (dest is temp and ExitAtAll)
+			dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
+			require .TempCheck(dest)
 	
 	dest2 = dest2.simplify
 	dest2.µtype = fn.ASMReturn.ASMRegType
