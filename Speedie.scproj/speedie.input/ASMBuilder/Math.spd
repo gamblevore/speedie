@@ -1035,19 +1035,19 @@ extend Assembler
 			
 		require !f.isfunc
 
+		if src isnt temp
+			require .IsCurrBranch(f)
+			|| vdecls = .state.ParentAllocated
+			|| Find = 1<<src.reg
+			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
+										// we can fuck around with it as much as we like >:3
+
 		target debug
 			if IntoTrap
 				f.debugprint
 				DebugPrint()
 				debugger
 		
-		if src isnt temp
-			require .IsCurrBlock(f)
-/			|| vdecls = .state.ParentAllocated
-			|| Find = 1<<src.reg
-			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
-										// we can fuck around with it as much as we like >:3
-
 		return .redest(f, dest)
 	
 	
