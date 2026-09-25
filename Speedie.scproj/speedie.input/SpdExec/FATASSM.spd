@@ -228,8 +228,9 @@ struct FatASM
 		require !f.isfunc
 		
 		if f isa asm.phi // bruh. Would need to redest it's inputs, and their inputs inputs.
-			f.asmreg(1).debugprint
-			f.asmreg(2).debugprint
+			target debug
+				f.asmreg(1).debugprint
+				f.asmreg(2).debugprint
 /			return nil // do another day.
 
 		|uint| o = f.OutputPrms
