@@ -147,9 +147,10 @@ struct Assembler
 		where.µType = T // why so much fiddling?
 
 		|| K = .NumToReg(exp, where, amount, T)
+		|| Start = .curr
 		rz = .Plus(exp, dest, Orig, K)
 		if Stronger and !(rz iz dest) // Took a shortcut: adding 1 to 0, it returned the 1 in the available constants
-			rz = .assign(exp, dest, rz) // but we don't want that here.
+			rz = .assign(exp, dest, rz, start) // but we don't want that here.
 			
 	
 	function IncrPre (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
@@ -261,9 +262,9 @@ struct Assembler
 
 /////////////////////////////////////////////////////////////////
 	
-	function µBoolInto (|message| exp, |AsmReg| Dest, |asmreg|)
+	function µBoolInto (|message| exp, |AsmReg| Dest, |bool| Force, |asmreg|)
 		dest.µType = DataTypeCode.bool
-		|| x = .µ(exp, dest)
+		|| x = (force)(.µinto(exp, dest), .µ(exp, dest))
 		if x.IsBool
 			return x
 		return .Exists(exp, dest, X)
@@ -308,9 +309,10 @@ struct Assembler
 		(dest is NewlyDeclared)
 		|| Closer = .OpenVars
 
+		|| Curr = .curr
 		|| r = .µGetASM(Exp, dest)
 		if !(r iz dest) and r.reg
-			r = .Assign(exp, dest, r)
+			r = .Assign(exp, dest, r, curr)
 		r = .CloseVars(Closer, nil, r)
 		
 		if r is temp
@@ -395,9 +397,10 @@ struct Assembler
 
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| Closer = .OpenVars
+		|| start = .curr
 		|| v = .µGetASM(Exp, dest)
 		ifn v iz dest
-			v = .Assign(exp, dest, v)
+			v = .Assign(exp, dest, v, start)
 		return .CloseVars(Closer, nil, v)
 		
 	

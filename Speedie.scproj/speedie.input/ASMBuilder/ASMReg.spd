@@ -263,13 +263,9 @@ datatype ASMReg (uint64)
 	
 		
 	function Reg (assigns:|int|, |AsmReg|)
-		|| Bugged = value&31
+		|| R = (value&31) << 11
 		self &= ~(31 << 11)|asmreg|
-		(self as= (Bugged << 11)|asmreg|)
-		if value >> 31
-			(self is temp)
-			if value < 26
-				(self is okastemp) // no other way.
+		(self as= R|asmreg|)
 		return self
 
 	

@@ -92,7 +92,8 @@ extend assembler
 	
 
 /*
-	PHI makes this unnececessary.
+	PHI makes this unnececessary. Or does it? Blocks can get broken up.
+	We can still test the parentblock instead?
 	function WouldReplace (|&fatasm| f, |bool|)
 		/*
 			while y < 2
@@ -202,9 +203,10 @@ extend assembler
 		return .nop_sub(ToNop, fatnopmode.hard, 0)
 	
 	
-	function SoftNop (|FATASM| ToNop)
-		// means we still want to use the inputs of tonop, later, evne if they get derecremented down to 0
-		return .nop_sub(ToNop, fatnopmode.KeepInputs, 0)
+	function SoftNop (|FATASM| ToNop, |fatnopmode| mode = 0)
+		// means we still want to use the inputs of tonop, later, even if they get derecremented down to 0
+		mode |= fatnopmode.KeepInputs
+		return .nop_sub(ToNop, mode, 0)
 	
 	
 	function nop_sub_keep (|FATASM| Fat, |fatnopmode| NopMode, |bool|)
@@ -233,7 +235,10 @@ extend assembler
 			return
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
-		if !HasBreak
+		if (nopmode is rewind)
+		// the problem is jumps, if something jumped to a point, and then we nop the jump-dest
+		// it goes wrong. It happens during returnopt. But could it happen elsewhere? who knows
+		// might as well play safe.
 			|| C = .Last
 			if fat == C
 				.curr_ = C							// Do it before both kinds of nop...
@@ -282,6 +287,25 @@ extend assembler
 			.SetRegister(R, nil, nil)
 	
 	
+	function CanNop (|fatasm| F, |int| Changed, |bool|)
+		// what about... using .IsCurrBranch
+		
+		require (f.RefCount <= 0) and .IsCurrBranch(f)
+		|| m = f.OutputMap
+
+		m &= ~(1<<changed)
+		if !m
+			return true
+
+		// Alters two registers. But might be replaced already.
+		// I can't get this case to occur, but it could in theory.
+		// I guess this is just me being "extra safe".
+/		|| i = m.Log2
+		if .regs.Setters[i] == F.index
+			return false
+		return true
+	
+	
 	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
 		|| A = .regs.Altered &~ (1<<Changed)
 		|| P = .regs.Phi &~ (1<<Changed)
@@ -303,9 +327,10 @@ extend assembler
 		if oldi and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if (old.RefCount <= 0) and .IsCurrBlock(Old)
-				if alterer and old is DebugVarOpen				// like: || a = 1, a = 2 // still needs open!
-					(alterer is DebugVarOpen)
+			if .CanNop(old, changed)
+				if alterer and old is DebugVarOpen
+					(alterer is DebugVarOpen)					// like: || a = 1, a = 2
+
 				.nop_sub(old, fatnopmode.hard)
 		
 		(NopDest isnt AllowNopDest)
@@ -333,7 +358,6 @@ extend assembler
 	
 	
 	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
-		if "GUI_ctrl_SizeSet".trap
 		if ToNop.RefCount <= 0
 			|| br = ToNop.BreakInfo
 			.nop(ToNop)
@@ -341,7 +365,6 @@ extend assembler
 
 	
 	function AskNop (|fatasm| ToNop)
-		if "GUI_ctrl_SizeSet".trap
 		if ToNop.RefCount <= 0
 			.nop(ToNop)
 	

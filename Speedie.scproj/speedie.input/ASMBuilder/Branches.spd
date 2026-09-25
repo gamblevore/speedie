@@ -326,11 +326,8 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	// a = a or b, can   directly set 'a' (But code isnt't smart enough?)
 	// a = b or a, can't directly set 'a'
 	// a = b or c, can   directly set 'a'
-	if dest.reg
-		if .Unchanged(A, dest, B)
-			return dest
-		  else
-			debugger 
+	if dest.reg and .Unchanged(A, dest, B)
+		return dest
 	rz = .TempMe()
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
@@ -400,25 +397,23 @@ function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, 
 function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
 	opt norefcounts
 	
-	target debug
-		if ASMTrapper == -1
-	|| first = .µBoolInto(A, dest)
+	|| first = .µBoolInto(A, dest, dest isnt temp)
 	if first is Const
 		return .BoolConst1(b, dest, opp, first).BoolAnswerMaybeBugged	// x = 5 or Y() --> x = Y()
 	
 	|| JUMP = .BoolTestAndJump(a, first, opp)							// AND/OR
-	|| Second = .µBoolInto(B, dest)
+
+	dest.reg = first
+	|| Second = .µBoolInto(B, dest, true)
 	if Second is Const
 		return .BoolConst2(first, second, opp, jump).BoolAnswerMaybeBugged
 	
-	dest = dest asnt asmreg.const
+	target debug
+		if !first.IsBool or !Second.IsBool
+	
 	JUMP.JumpTo(.curr)
 	
-	if first.IsBool and Second.IsBool
-		return dest.BoolAnswerMaybeBugged
-
-	// exists always handles negate...
-	return .Exists(A.next!, dest, dest)
+	return second.BoolAnswerMaybeBugged
 
 
 

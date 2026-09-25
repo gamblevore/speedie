@@ -96,7 +96,7 @@ function assembler.TryTail (|fatasm| FNC)
 	
 	require .Root_Fn != compiler.MainFunc					// tail in main is kind of a btch...
 															// the program closes and we have no idea why.
-	require compiler.MainFunc != interact.OrigFn						// autocomplete also
+	require compiler.MainFunc != interact.OrigFn			// autocomplete also
 	
 	
 	|| rr = ret.regonly
@@ -114,10 +114,6 @@ function assembler.TryTail (|fatasm| FNC)
 	fnc.incr
 	(Fnc is exit)
 	
-// can't do this as its too late. Something can jump to it.
-// we'd have to do this at the time we created the fnc in the first place.
-//	if (fnc.BasicBlock == ret.BasicBlock)
-//		ret._op = asm.noop // nice
 	if 0: nil|message|!.TAIL
 
 

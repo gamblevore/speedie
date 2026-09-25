@@ -88,7 +88,7 @@ struct InlineInfo
 			|| f = r.fat
 			if (!v) or (.CantNop & 1<<n)
 				if v  and  (r is const)
-					sh.safedecr(f!)
+					f!.safedecr
 					
 			  elseif r is Const
 				sh.Decr(f!, fatnopmode.hard)
@@ -97,10 +97,6 @@ struct InlineInfo
 				if f  and  !f.refcount  and  f.GuessSize  and  f.isstateless
 					if sh.IsWithinCurrInline(f)
 						sh.nop(f)
-
-
-	function assembler.SafeDecr (|&fatasm| f)
-		f.µrefcount = f.refcount - 1
 
 
 	function scdecl.IsUsedAfter (|message| thg, |bool|)
@@ -392,7 +388,7 @@ function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg
 				rz.µType = .state.return.µType
 			
 			if value
-				.SafeDecr(value)		// Will get incremented later.
+				value.safedecr		// Will get incremented later.
 			
 			|| Old = s.info & asmreg.DebugVars // or else we lose our MARK close.
 			s.setOp = asm.jump

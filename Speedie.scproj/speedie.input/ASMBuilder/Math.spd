@@ -1028,9 +1028,10 @@ extend Assembler
 		return fat.Vectorise(dest, asm.QFLG)
 
 	
-	function ImproveAssign (|asmreg| dest, |asmreg| src, |asmreg|)
+	function ImproveAssign (|asmreg| dest, |asmreg| src, |?&Fatasm| Start,   |asmreg|)
 		opt inline
-		|| f = src.fat$
+		|| f = src.fat
+		require f and start and f>=start
 		
 		if src isnt temp
 			require .IsCurrBlock(f) and (dest is exitatall)
@@ -1042,7 +1043,7 @@ extend Assembler
 		return .redest(f, dest)
 	
 	
-	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |asmreg|)  // assigns (
+	function Assign (|message| exp, |asmreg| dest, |asmreg| src, |&fatasm| Start=nil,  |asmreg|)  // assigns (
 		if src iz dest
 			return src													// return src makes more sense? type-wise?
 		
@@ -1053,7 +1054,7 @@ extend Assembler
 			
 		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
-		|| improve = .ImproveAssign(dest, src)
+		|| improve = .ImproveAssign(dest, src, start)
 			return improve
 		
 		if dest.IsVec

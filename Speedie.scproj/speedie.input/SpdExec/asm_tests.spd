@@ -1177,6 +1177,9 @@ helper asm_test_flow (|int| a, |int| b, |int|)
 }}}
 
 
+
+
+	
 function StructTest2 (|&fatasm| A)
 	|fatasm| B
 	B = A
@@ -1184,25 +1187,20 @@ function StructTest2 (|&fatasm| A)
 
 
 
-// im not sure what other tests need doing? We'll think of some... over time!!
 
-
-function scnode.LoopTest2 (|string| name, |scobject|)
-	opt norefcounts
-	real self
+function TestMultiFat (|int| i)
 	visible
-	while self isa SCArg
-		self = .parent|scarg|
-
-
-function scnode.LoopTest1 (|string| name, |int| a, |int| b)
 	opt norefcounts
-	visible
+	|| Start = i++
+	i = 1
+	start = 3
+	
+	// OK so we added the stuff together.
+	// we want two changes, then replace both of them.
 
 
-//	if 1 and b: b = 5
-//
-//	if b or 1: a = 2					// nops the 5??? its a different branch! (and a different reg!)
-//	while .name and 0		// seems ok!
-//		""
+
+
+
+
 

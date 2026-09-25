@@ -223,7 +223,11 @@ struct FatASM
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
 		if !.IsWithinCurrInline(f)
 			// all the callers assume this works... but it fails here
-/			return nil
+/			return nil // seems to never be called
+		
+		require !f.isfunc
+		
+		if f isa asm.phi // bruh. need to redest it's inputs, and their inputs inputs.
 		|uint| o = f.OutputPrms
 			|| a = o.log2
 			target debug: if 1<<a != o
@@ -342,12 +346,13 @@ struct FatASM
 		.JumpPrm = a + 1
 		.RefCount += !.RefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
-	
-	function µRefCount (|int|)
-		return .RefCount
-	
+		
 	function Incr
 		.µRefCount = .refcount + 1
+
+	function SafeDecr
+		.µrefcount = .refcount - 1
+
 	
 	function µRefCount (assigns:|int|)
 		target debug
@@ -355,17 +360,22 @@ struct FatASM
 		.RefCount = value
 	
 	function RegInput (|int| a, assigns:|asmreg|)
-		cpp_part Prm		
 		.prms[a] = value.Prm
 		|| i = value.FatIndex
-		|| src = i.fat
-			if src < self
-//				target debug
-//					if src == refcounttrap
-				.Inputs[a] = i
-				src.incr
-			  else
-				debugger // what?
+		|| sh = Assembler.sh
+		if !i // oof
+			if "ClassOfObjForC".trap
+				i = sh.regs.setters[value.reg]
+			if !i
+				return
+/			0 // why?
+		
+		|| src = sh.funcstart_+i
+		if src < self
+			.Inputs[a] = i
+			src.incr
+		  else
+			debugger // what?
 	
 	
 ////////////////////////////////////////////////////////////
@@ -781,6 +791,7 @@ datatype FatNopMode	(byte)
 		KeepInputs
 		Rewind
 		NopTemp
+		NoBackStep
 	
 	Syntax Is (|fatnopmode| f, |bool|)
 		return self&f

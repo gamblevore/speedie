@@ -106,7 +106,8 @@ function Swap (fn_asm)
 	|| A = .ExistingVar(prms.first!)
 	|| B = .ExistingVar(prms.second!)
 	expect (A.reg and B.reg)
-	exp.swap(A,B)
+	|| swap = exp.swap(A,B)
+	swap.Incr
 	return asmreg()
 
 

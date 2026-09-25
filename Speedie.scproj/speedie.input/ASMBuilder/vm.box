@@ -229,7 +229,7 @@ forms
 	MemoryCopy
 		r1		r		// dest
 		r2		r		// src
-		Length  14
+		Length	14
 		
 	AddB
 		r1		P
@@ -287,8 +287,8 @@ forms
 	/// yeeeet
 	
 	SWAP
-		r1		R
-		r2		R
+		r1		P
+		r2		P
 	
 	VecMix
 		r1		R

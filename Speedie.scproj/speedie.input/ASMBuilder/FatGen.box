@@ -501,6 +501,8 @@ function message.SWAP (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.SWAP, self)
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
 	rz.dest(0, r1, a)
 	rz.dest(1, r2, a)
 }
