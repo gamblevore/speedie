@@ -281,7 +281,7 @@ struct FatASM
 	
 	Syntax Expect (|string?| Error=nil)
 		target debug
-			assembler.PrintProgress(0)
+			assembler.DebugPrint(0)
 			"----"
 			.DebugPrint(-1)
 			if !error

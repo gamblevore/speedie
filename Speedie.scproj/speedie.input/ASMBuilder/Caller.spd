@@ -77,7 +77,7 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 	|uint| v = 0
 	
 	|| ret = .state.return
-	if ret and (dest is ExitAtAll)
+	if ret and (dest is ExitAtAll) // inlined return
 		v = ret.reg
 		v ?= .state.parentvars|uint|.log2 + 1
 		dest = dest.Temp(ret)

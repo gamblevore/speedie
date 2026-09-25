@@ -31,12 +31,13 @@ function assembler.CloseInline (|&inlinestate| st)
 function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |int| AllowedGain, |asmreg|)
 	opt norefcounts
 	|| OV = .OpenVars
-	|| st = .StartInlineState(prms, dest, fn)
 
 	target debug
 		|| TrapInline = ++asmtrapper
+		if trapinline == 26168
 	  else
 		|| TrapInline = 0
+	|| st = .StartInlineState(prms, dest, fn)
 		
 	.backupfat(.curr)
 	|fatrange| LL
@@ -185,7 +186,7 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	opt norefcounts
 	require .TempCheck(dest)
 	|| dest2 = dest
-	if (dest isnt discard) and (!dest.reg or dest is temp)
+	if (dest isnt discard) and (Dest is ExitAtAll) and (!dest.reg or dest is temp)
 		dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
 		require .TempCheck(dest)
 	

@@ -114,7 +114,7 @@ extend Assembler
 		for i in 2
 			if Zero.IsZero
 				|| B = L.Fat
-				if (b isa asm.bflg) and .IsCurrBranch(b)
+				if b and .IsCurrBlock(b, asm.bflg)
 					if (b.prms[4] == 0  and  b.prms[3] == 63)
 						L.µType = DataTypeCode.bool
 						B.info = L
@@ -565,8 +565,7 @@ extend Assembler
 	
 	function OptFMul (|asmreg| Dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
 		|| FatMul = mul.FAT!
-		require fatmul isa asm.fmul
-		require .IsCurrBranch(fatmul)
+		require .IsCurrBlock(fatmul, asm.fmul)
 		require (fatmul is temp) or (dest iz fatmul.info)
 		require !fatmul.regonly(3)
 		
@@ -1029,23 +1028,26 @@ extend Assembler
 		return fat.Vectorise(dest, asm.QFLG)
 
 	
-	function ImproveAssign (|asmreg| dest, |asmreg| src, |?&Fatasm| Start,   |asmreg|)
+	function ImproveAssign (|asmreg| dest, |asmreg| src, |?&Fatasm| Start, |asmreg|)
 		opt inline
 		|| f = src.fat
 		require f and start and f>=start
-		
-		if IntoTrap
-			f.debugprint
-			"----------------------------"
-			debugger
+			
+		require !f.isfunc
+
+		target debug
+			if IntoTrap
+				f.debugprint
+				DebugPrint()
+				debugger
 		
 		if src isnt temp
-			require .IsCurrBranch(f) and (dest is exitatall)
-			|| vdecls = .state.parentvars|uint|
-			|| find = 1<<src.reg
-			require (vdecls & find) // the decl is out of range! IE... it won't be missed.
-									// we can fuck around with it as much as we like >:3
-		
+			require .IsCurrBlock(f)
+/			|| vdecls = .state.ParentAllocated
+			|| Find = 1<<src.reg
+			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
+										// we can fuck around with it as much as we like >:3
+
 		return .redest(f, dest)
 	
 	
@@ -1058,7 +1060,6 @@ extend Assembler
 				(src is const)
 			(Dest is const) = (src is const)
 			
-		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
 		|| improve = .ImproveAssign(dest, src, start)
 			return improve

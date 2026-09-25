@@ -46,7 +46,7 @@ extend assembler
 			while live < after
 				if !memory.equals(live, backup, –sizeof fatasm)
 					target debug
-						printprogress()
+						DebugPrint()
 						live.debugprint
 						backup.debugprint
 					debugger 
@@ -110,10 +110,11 @@ extend assembler
 			B = PB
 */
 	
-	function EnterBranch
+	function EnterBranch (|uint16|)
 		|| s = .state
 		s.BranchDepth++
 		s.RealBranchDepth++
+		return .BasicParent
 	
 	
 	function ExitBranch
@@ -121,6 +122,12 @@ extend assembler
 		s.BranchDepth--
 		s.RealBranchDepth--
 	
+	
+	function ExitBranch (|uint16| Old)
+		.ExitBranch
+		if old != .BasicParent
+			.NextBasicBlock
+		
 	
 	function IsCurrBranch (|&fatasm| f, |bool|)
 		return .BasicParent == .ParentBlock(f.basicblock)
@@ -223,7 +230,7 @@ extend assembler
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
-					PrintProgress()
+					DebugPrint()
 					fat.DebugPrint()
 					debugger
 				return

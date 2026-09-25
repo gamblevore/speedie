@@ -74,9 +74,7 @@ function MainBrancher (fn_asm)
 	.ParentSanity
 	|| StartOfBranch = .curr
 	|| BreakReq = .BreakRequest
-	|| Old = .BasicParent
-
-	.EnterBranch
+	|| old = .EnterBranch
 	
 	if dest == nil
 		rz = .WhileSub(exp)
@@ -85,10 +83,7 @@ function MainBrancher (fn_asm)
 	  else
 		rz = .TernarySub(Exp, dest)
 
-	.ExitBranch	
-	
-	if old != .BasicParent
-		.NextBasicBlock
+	.ExitBranch(old)
 
 	.PhiFix(StartOfBranch) // they were created at a point that should have been here...	
 
@@ -295,7 +290,7 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 function asmreg.NegateFail (|asmreg| dest, |bool|)
 	target debug
 		if (self is AlreadyNegated) != (dest is negate)
-			assembler.printprogress
+			assembler.DebugPrint
 			if dest isnt negate
 				"// alreadynegated on unnegatable"
 			  else
@@ -399,30 +394,28 @@ function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, 
 	if dest is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
 
-	|| Tmp = .UniqueLocation(a, dest, B)
-	return .BoolAndOrValueSub(a,b,Tmp,opp)
-		
-	
-function BoolAndOrValueSub (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
-	opt norefcounts
+	Dest = .UniqueLocation(a, dest, B)
+
 	
 	|| first = .µBoolInto(A, dest, dest isnt temp)
 	if first is Const
 		return .BoolConst1(b, dest, opp, first).BoolAnswerMaybeBugged	// x = 5 or Y() --> x = Y()
 	
+	|| old = .EnterBranch
 	|| JUMP = .BoolTestAndJump(a, first, opp)							// AND/OR
 
 	dest.reg = first
 	|| Second = .µBoolInto(B, dest, true)
 	if Second is Const
-		return .BoolConst2(first, second, opp, jump).BoolAnswerMaybeBugged
-	
-	target debug
-		if !first.IsBool or !Second.IsBool
-	
-	JUMP.JumpTo(.curr)
-	
-	return second.BoolAnswerMaybeBugged
+		second = .BoolConst2(first, second, opp, jump).BoolAnswerMaybeBugged
+	  else
+		target debug
+			if !first.IsBool or !Second.IsBool
+		
+		JUMP.JumpTo(.curr)
+		second = second.BoolAnswerMaybeBugged
+	.ExitBranch(old)
+	return second
 
 
 
@@ -451,8 +444,8 @@ function BoolConst1 (|message| B, |asmreg| dest, |opmode| Opp, |asmreg| ml, |asm
 function BoolConst2 (|asmreg| ml, |asmreg| kr, |opmode| Opp, |FATASM| Jump, |asmreg|)
 	|| V = kr.const!=0
 	if v == (opp is AND)
-		.softnop jump
 		.NopReg(kr)
+		.softnop jump
 		return ml
 		
 	.nop jump			// this also nops ml!
@@ -467,10 +460,11 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	if AndTest.never
 		return first
 
-	.EnterBranch
+	|| Old = .EnterBranch
 	|| Phi = .PhiInit()
 	|| Second = .Branch(B, AndTest, dest is negate)
-	.ExitBranch
+	.ExitBranch(old)
+	
 	if  first isnt Const
 		// a and b
 		// a and 1
@@ -503,15 +497,15 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	|fatrange| Br2
 	|| Phi = .PhiInit()
-	.EnterBranch
-	|| second = .Branch(B, Br2, dest is negate)
+	|| Old = .EnterBranch
+	|| Second = .Branch(B, Br2, dest is negate)
 
 	// if this branch... creates no instructions (fully known)
 	// then... the jump, gets destroyed... but it shouldn't be.
 	// so... we need to test for that... and also, make sure
 	// that its only no instructions, if br2.const
 	OrTest.JumpTo(.curr, br2.Const * fatrange.kEmptyKeep)
-	.ExitBranch
+	.ExitBranch(old)
 
 	// why do we not call .BoolAnswerOK on these though?
 	if Br2.always
@@ -669,7 +663,7 @@ function FatRange.JumpTo (|&FatAsm| curr, |int| Allowed=FatRange.kNeverEmpty)
 	
 
 target debug
-	function @assembler.PrintProgress (|scfunction| fn, |int| Level)
+	function @assembler.DebugPrint (|scfunction| fn, |int| Level)
 		cpp_name adb2
 		"---"
 		printline fn
@@ -683,13 +677,13 @@ target debug
 
 
 
-function @assembler.PrintProgress (|int| Level=-1)
+function @assembler.DebugPrint (|int| Level=-1)
 	cpp_name adb
 	visible
 	opt norefcounts
 	target debug
 		if !compiler.inperry
-			.PrintProgress(scfunction.currfunc!, level)
+			.DebugPrint(scfunction.currfunc!, level)
 	
 
 

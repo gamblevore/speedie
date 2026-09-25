@@ -15,6 +15,11 @@ struct InlineState
 
 	function CanReturnAnyReg (|bool|)
 		return !.NeedsµInto and (.fn.ReturnCount == 1)
+		
+	function ParentAllocated (|uint|)
+		|| p = .ParentVars
+		P |= p>>32
+		return P
 
 
 
@@ -400,6 +405,9 @@ struct Assembler
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| Closer = .OpenVars
 		|| start = .curr
+		target debug
+			|| intotrap = asmtrapper
+			if intotrap == 26166
 		|| v = .µGetASM(Exp, dest)
 		ifn v iz dest
 			v = .Assign(exp, dest, v, start)
@@ -410,7 +418,7 @@ struct Assembler
 		function µDebug (|message| exp, |asmreg| dest)
 			|| fn = fn_asm_table[exp.ASMType]!
 			dest.DebugPrint
-			PrintProgress(-1)
+			DebugPrint(-1)
 			debugger
 			|| m = (fn)(self, exp, dest)
 			m.debugprint
@@ -433,7 +441,7 @@ struct Assembler
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
-			if µtrap == -1 or stacksize > 30 // ugh
+			if µtrap == 25082 or stacksize > 30 // ugh
 		  else
 			opt inline
 		
