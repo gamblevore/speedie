@@ -114,7 +114,7 @@ extend Assembler
 		for i in 2
 			if Zero.IsZero
 				|| B = L.Fat
-				if b and .IsCurrBlock(b, asm.bflg)
+				if (b isa asm.bflg) and .IsCurrBranch(b)
 					if (b.prms[4] == 0  and  b.prms[3] == 63)
 						L.µType = DataTypeCode.bool
 						B.info = L
@@ -565,7 +565,8 @@ extend Assembler
 	
 	function OptFMul (|asmreg| Dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
 		|| FatMul = mul.FAT!
-		require .IsCurrBlock(fatmul, asm.fmul)
+		require fatmul isa asm.fmul
+		require .IsCurrBranch(fatmul)
 		require (fatmul is temp) or (dest iz fatmul.info)
 		require !fatmul.regonly(3)
 		
@@ -1033,8 +1034,13 @@ extend Assembler
 		|| f = src.fat
 		require f and start and f>=start
 		
+		if IntoTrap
+			f.debugprint
+			"----------------------------"
+			debugger
+		
 		if src isnt temp
-			require .IsCurrBlock(f) and (dest is exitatall)
+			require .IsCurrBranch(f) and (dest is exitatall)
 			|| vdecls = .state.parentvars|uint|
 			|| find = 1<<src.reg
 			require (vdecls & find) // the decl is out of range! IE... it won't be missed.

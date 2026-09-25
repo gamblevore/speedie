@@ -854,7 +854,7 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 
 
 function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
-	if .IsCurrBlock(f)
+	if .IsCurrBranch(f)
 		// K = 1
 		// X += K				// Can const
 		return true

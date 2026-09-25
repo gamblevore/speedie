@@ -264,7 +264,9 @@ struct Assembler
 	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |bool| Force, |asmreg|)
 		dest.µType = DataTypeCode.bool
+		IntoTrap++
 		|| x = (force)(.µinto(exp, dest), .µ(exp, dest))
+		IntoTrap--
 		if x.IsBool
 			return x
 		return .Exists(exp, dest, X)
@@ -659,3 +661,4 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 
 
 
+|| IntoTrap = 0
