@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2390];
+extern JB_StringC* JB_LUB[2394];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3503,7 +3503,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026092113));
+	JB_FS_AppendInt32(_fsf0, (2026092512));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10316,7 +10316,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026092113));
+	JB_FS_AppendInt32(_fsf0, (2026092512));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -12966,12 +12966,12 @@ int JB_SP_AppInit() {
 	SC__ASM_Forms[46] = (&SC_ASM_AddAK__Encode);
 	SC__ASM_Forms[47] = (&SC_ASM_Div2__Encode);
 	SC__ASM_Forms[48] = (&SC_ASM_Shift__Encode);
-	SC__ASM_Forms[49] = (&SC_ASM_Swap__Encode);
-	SC__ASM_Forms[50] = (&SC_ASM_RefReturn__Encode);
-	SC__ASM_Forms[51] = (&SC_ASM_RefSetApart__Encode);
-	SC__ASM_Forms[52] = (&SC_ASM_RefSet1__Encode);
-	SC__ASM_Forms[53] = (&SC_ASM_RefSet2__Encode);
-	SC__ASM_Forms[54] = (&SC_ASM_RefSet3__Encode);
+	SC__ASM_Forms[49] = (&SC_ASM_RefReturn__Encode);
+	SC__ASM_Forms[50] = (&SC_ASM_RefSetApart__Encode);
+	SC__ASM_Forms[51] = (&SC_ASM_RefSet1__Encode);
+	SC__ASM_Forms[52] = (&SC_ASM_RefSet2__Encode);
+	SC__ASM_Forms[53] = (&SC_ASM_RefSet3__Encode);
+	SC__ASM_Forms[54] = (&SC_ASM_SWAP__Encode);
 	SC__ASM_Forms[55] = (&SC_ASM_VecMix__Encode);
 	SC__ASM_Forms[56] = (&SC_ASM_VecGet__Encode);
 	SC__ASM_Forms[57] = (&SC_ASM_VecOpPart__Encode);
@@ -17450,16 +17450,10 @@ ASMReg SC_ASMType__Swap(Assembler* Self, Message* Exp, ASMReg Dest) {
 	ASMReg A = SC_Pac_ExistingVar(Self, ((Message*)JB_Ring_First(Prms)));
 	ASMReg B = SC_Pac_ExistingVar(Self, ((Message*)JB_Tree_Second(Prms)));
 	if (!(SC_Reg_Reg(A) and SC_Reg_Reg(B))) {
-		JB_Msg_Fail(Exp, JB_LUB[234]);
+		JB_Object_Fail(nil);
 		return nil;
 	}
-	ASMReg T = SC_Pac_Assign(Self, Exp, SC_Pac_TempMe(Self, kSC__Reg_Temp), A);
-	SC_Pac_Assign(Self, Exp, A, B);
-	SC_Pac_Assign(Self, Exp, B, T);
-	FatASM* F = SC_Reg_FAT(T);
-	if (F and (F->RefCount <= 0)) {
-		SC_Pac_SoftNop(Self, F);
-	}
+	SC_Msg_SWAP(Exp, A, B);
 	return SC_Reg__NewWith0();
 }
 
@@ -18015,10 +18009,6 @@ int64 JB_Date_Days(Date Self) {
 	return Self / 5662310400;
 }
 
-Float64 JB_Date_Float64(Date Self) {
-	return ((Float64)Self) / ((Float64)(64.0f * 1024.0f));
-}
-
 JB_Duration JB_Date_OperatorMinus(Date Self, Date D) {
 	return ((int64)Self) - ((int64)D);
 }
@@ -18140,10 +18130,6 @@ bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F) {
 bool JB_Rg_Contains1(IntRange Self, int I) {
 	//cpp_part;
 	return (I >= Self[0]) and (I < Self[1]);
-}
-
-int JB_Rg_Width(IntRange Self) {
-	return Self[1] - Self[0];
 }
 
 
@@ -19065,13 +19051,11 @@ ASM* SC_ASM_RotateConst__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 }
 
 
-ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
+ASM* SC_ASM_SWAP__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
 	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
 	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
 	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
-	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
-	Mu = SC_ASM_Shift_ShSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
 		Curr++[0] = Mu;
 	}
@@ -19079,11 +19063,13 @@ ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 }
 
 
-ASM* SC_ASM_Swap__Encode(FatASM* Self, ASM* Curr, ASM* After) {
+ASM* SC_ASM_Shift__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 	//visible;
 	ASM Mu = ((ASM)SC_FAT_Op(Self)) << 24;
 	Mu = SC_ASM_R1Set(Mu, Self->Prms[0]);
 	Mu = SC_ASM_R2Set(Mu, Self->Prms[1]);
+	Mu = SC_ASM_R3Set(Mu, Self->Prms[2]);
+	Mu = SC_ASM_Shift_ShSet(Mu, Self->Prms[3]);
 	if (Curr < After) {
 		Curr++[0] = Mu;
 	}
@@ -19325,7 +19311,7 @@ ASM* SC_ASM_Write__Encode(FatASM* Self, ASM* Curr, ASM* After) {
 
 
 float JB_Duration_Float(JB_Duration Self) {
-	return ((float)JB_Date_Float64(Self));
+	return ((float)(((Float64)Self) / ((Float64)(64.0f * 1024.0f))));
 }
 
 
@@ -22276,19 +22262,24 @@ ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, 
 }
 
 ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L, ASMReg Zero) {
-	if (!SC_Reg_IsZero(Zero)) {
-		return nil;
-	}
-	FatASM* B = SC_Reg_FAT(L);
-	if (B) {
-		if (SC_Pac_IsCurrBlockWithFATASM(Self, B, kSC__ASM_BFLG)) {
-			if ((B->Prms[4] == 0) and (B->Prms[3] == 63)) {
-				L = SC_Reg_xC2xB5TypeSetWithTC(L, kJB__TC_bool);
-				B->Info = L;
-				return L;
+	{
+		int I = 0;
+		while (I < 2) {
+			if (SC_Reg_IsZero(Zero)) {
+				FatASM* B = SC_Reg_FAT(L);
+				if (B and SC_Pac_IsCurrBlockWithFATASM(Self, B, kSC__ASM_BFLG)) {
+					if ((B->Prms[4] == 0) and (B->Prms[3] == 63)) {
+						L = SC_Reg_xC2xB5TypeSetWithTC(L, kJB__TC_bool);
+						B->Info = L;
+						return L;
+					}
+				}
 			}
-		}
+			JB_Swap((L), (Zero));
+			(++I);
+		};
 	}
+	;
 	return ((ASMReg)0);
 }
 
@@ -22348,6 +22339,8 @@ ASMReg SC_Pac_AskForInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFuncti
 }
 
 void SC_Pac_AskNopWithFATFAT(Assembler* Self, FatASM* ToNop, FatASM* Replace) {
+	if (SC_Str_trap(JB_LUB[2390], nil)) {
+	}
 	if (ToNop->RefCount <= 0) {
 		uint Br = ToNop->BreakInfo;
 		SC_Pac_Nop(Self, ToNop);
@@ -22356,6 +22349,8 @@ void SC_Pac_AskNopWithFATFAT(Assembler* Self, FatASM* ToNop, FatASM* Replace) {
 }
 
 void SC_Pac_AskNopWithFAT(Assembler* Self, FatASM* ToNop) {
+	if (SC_Str_trap(JB_LUB[2390], nil)) {
+	}
 	if (ToNop->RefCount <= 0) {
 		SC_Pac_Nop(Self, ToNop);
 	}
@@ -22556,6 +22551,11 @@ void SC_Pac_BackupFAT(Assembler* Self, FatASM* Curr) {
 		}
 	}
 	SC_Pac_State(Self)->BackupAmount = Amount;
+}
+
+ASMReg SC_Pac_BankOpt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
+	bool X = (((uint64)L) & 2) == 2;
+	return ((ASMReg)0);
 }
 
 ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down) {
@@ -23193,7 +23193,7 @@ Ind SC_Pac_Const(Assembler* Self, ASMReg R, int Bits, bool Signed) {
 }
 
 ASMReg SC_Pac_ConstCompareFloat(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode) {
-	SC_Pac_Nop2Consts(Self, R, L);
+	SC_Pac_Nop2TempConsts(Self, R, L);
 	bool Result = SC_Pac_ConstCompareFloatSub(Self, L, R, Mode);
 	return SC_Pac_NumToReg(Self, Exp, SC_Reg_BoolAnswerMaybeBugged(Dest), ((int)Result), kJB__TC_bool);
 }
@@ -23229,7 +23229,7 @@ bool SC_Pac_ConstCompareFloatSub(Assembler* Self, ASMReg L, ASMReg R, int Mode) 
 }
 
 ASMReg SC_Pac_ConstCompareInt(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message* Exp, int Mode) {
-	SC_Pac_Nop2Consts(Self, R, L);
+	SC_Pac_Nop2TempConsts(Self, R, L);
 	bool Result = SC_Pac_ConstCompareIntSub(Self, L, R, Mode);
 	return SC_Pac_NumToReg(Self, Exp, SC_Reg_BoolAnswerMaybeBugged(Dest), ((int)Result), kJB__TC_bool);
 }
@@ -23618,19 +23618,19 @@ ASMReg SC_Pac_EqualsInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, AS
 	bool Negate = SC_Reg_SyntaxIs(Dest, kSC__Reg_Negate);
 	ASMReg Res = SC_Reg_BoolAnswerOK(Dest);
 	if (SC_Reg_SyntaxIs(L, kSC__Reg_Const) and SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
-		SC_Pac_Nop2Consts(Self, R, L);
+		SC_Pac_Nop2TempConsts(Self, R, L);
 		int Num = ((int)((SC_Reg_Const(L) == SC_Reg_Const(R)) != Negate));
 		return SC_Pac_NumToReg(Self, Exp, Res, Num, kJB__TC_bool);
 	}
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_CondRequest)) {
+		ASMReg Bank = SC_Pac_BankOpt(Self, Exp, Dest, L, R);
+		if (Bank) {
+			return Bank;
+		}
 		if (Negate) {
 			ASMReg B = SC_Pac_AlreadyABool(Self, L, R);
 			if (B) {
 				return B;
-			}
-			ASMReg B2 = SC_Pac_AlreadyABool(Self, R, L);
-			if (B2) {
-				return B2;
 			}
 		}
 		Dest = SC_Pac_TempTypedWithDeclReg(Self, SC_TypeBool->TypeNormal, Dest);
@@ -24516,6 +24516,10 @@ ASMReg SC_Pac_LessEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 }
 
 ASMReg SC_Pac_LoadNumber(Assembler* Self, Message* Exp, int64 V, bool Special, ASMReg Dest) {
+	if (V == 1) {
+		if (SC_Str_trap(JB_LUB[2390], nil)) {
+		}
+	}
 	if (!SC_Reg_Reg(Dest)) {
 		ASMReg Found = SC_Pac_MegaNumFinder(Self, V, Special, SC_Reg_xC2xB5Type(Dest));
 		if (Found) {
@@ -24523,7 +24527,7 @@ ASMReg SC_Pac_LoadNumber(Assembler* Self, Message* Exp, int64 V, bool Special, A
 		}
 	}
 	Dest = SC_Pac_TempMe(Self, Dest);
-	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Always)) {
+	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_BlockNop)) {
 		FatASM* K = SC_Pac_LastRealWithASM(Self, kSC__ASM_KNST);
 		if (K) {
 			if ((SC_FAT_p0(K) == SC_Reg_Reg(Dest)) and (SC_FAT_SyntaxIs(K, kSC__Reg_Temp))) {
@@ -24609,7 +24613,7 @@ ASMReg SC_Pac_MainBrancher(Assembler* Self, Message* Exp, ASMReg Dest) {
 
 ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R, fn_ASMConstifier Fn) {
 	int64 K = (Fn)(L, R);
-	SC_Pac_Nop2Consts(Self, R, L);
+	SC_Pac_Nop2TempConsts(Self, R, L);
 	return SC_Pac_NumToReg(Self, Exp, Dest, K, SC_Reg_xC2xB5Type(Dest));
 }
 
@@ -25000,7 +25004,7 @@ void SC_Pac_Nop(Assembler* Self, FatASM* ToNop) {
 	return SC_Pac_nop_sub(Self, ToNop, kSC__FatNopMode_Hard, 0);
 }
 
-void SC_Pac_Nop2Consts(Assembler* Self, ASMReg A, ASMReg B) {
+void SC_Pac_Nop2TempConsts(Assembler* Self, ASMReg A, ASMReg B) {
 	bool Further = SC_Reg_FatIndex(A) > SC_Reg_FatIndex(B);
 	if (Further) {
 		SC_Pac_NopTempConstWithReg(Self, A);
@@ -29847,9 +29851,9 @@ void JB_Rec_AppendErr(JB_ErrorReceiver* Self, JB_Error* Err) {
 			JB_SetRef(Err->StackTrace, JB_App__StackTrace(2, nil));
 		}
 	}
-	uint CanPrint = Self->PrintNewErrors;
-	if (CanPrint and JB_Err_IsBad(Err)) {
-		if ((CanPrint != kJB__ErrorFlags_PrintFirst) or (!Self->ErrorCount)) {
+	if (JB_Err_IsBad(Err)) {
+		uint CanPrint = Self->PrintNewErrors;
+		if (CanPrint and ((CanPrint != kJB__ErrorFlags_PrintFirst) or (!Self->ErrorCount))) {
 			JB_String* _tmPf0 = JB_Err_Render(Err, nil);
 			JB_Incr(_tmPf0);
 			JB_PrintLine(_tmPf0);
@@ -30728,143 +30732,145 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[442], 66);
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[443], 67);
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[460], 68);
-	SC_Instruction__Add(JB_LUB[785], JB_LUB[697], 69);
-	SC_Instruction__Add(JB_LUB[775], JB_LUB[798], 70);
-	SC_Instruction__Add(JB_LUB[776], JB_LUB[803], 71);
-	SC_Instruction__Add(JB_LUB[780], JB_LUB[804], 72);
-	SC_Instruction__Add(JB_LUB[780], JB_LUB[805], 73);
-	SC_Instruction__Add(JB_LUB[525], JB_LUB[486], 74);
-	SC_Instruction__Add(JB_LUB[525], JB_LUB[728], 75);
-	SC_Instruction__Add(JB_LUB[525], JB_LUB[839], 76);
-	SC_Instruction__Add(JB_LUB[525], JB_LUB[937], 77);
-	SC_Instruction__Add(JB_LUB[1428], JB_LUB[806], 78);
-	SC_Instruction__Add(JB_LUB[1428], JB_LUB[1300], 79);
-	SC_Instruction__Add(JB_LUB[187], JB_LUB[879], 80);
-	SC_Instruction__Add(JB_LUB[187], JB_LUB[878], 81);
-	SC_Instruction__Add(JB_LUB[2349], JB_LUB[2350], 82);
-	SC_Instruction__Add(JB_LUB[474], JB_LUB[767], 83);
-	SC_Instruction__Add(JB_LUB[474], JB_LUB[444], 84);
-	SC_Instruction__Add(JB_LUB[770], JB_LUB[774], 85);
-	SC_Instruction__Add(JB_LUB[474], JB_LUB[570], 86);
-	SC_Instruction__Add(JB_LUB[479], JB_LUB[569], 87);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1055], 88);
-	SC_Instruction__Add(JB_LUB[1659], JB_LUB[884], 89);
-	SC_Instruction__Add(JB_LUB[1664], JB_LUB[827], 90);
-	SC_Instruction__Add(JB_LUB[831], JB_LUB[870], 91);
-	SC_Instruction__Add(JB_LUB[871], JB_LUB[882], 92);
-	SC_Instruction__Add(JB_LUB[1704], JB_LUB[1705], 93);
-	SC_Instruction__Add(JB_LUB[1393], JB_LUB[8], 94);
-	SC_Instruction__Add(JB_LUB[901], JB_LUB[1012], 95);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1059], 96);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1058], 97);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1061], 98);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1060], 99);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1063], 100);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1062], 101);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1064], 102);
-	SC_Instruction__Add(JB_LUB[903], JB_LUB[1057], 103);
-	SC_Instruction__Add(JB_LUB[907], JB_LUB[1275], 104);
-	SC_Instruction__Add(JB_LUB[907], JB_LUB[1276], 105);
-	SC_Instruction__Add(JB_LUB[907], JB_LUB[1277], 106);
-	SC_Instruction__Add(JB_LUB[907], JB_LUB[1278], 107);
-	SC_Instruction__Add(JB_LUB[907], JB_LUB[1274], 108);
-	SC_Instruction__Add(JB_LUB[1457], JB_LUB[572], 109);
-	SC_Instruction__Add(JB_LUB[1457], JB_LUB[911], 110);
-	SC_Instruction__Add(JB_LUB[1088], JB_LUB[1333], 111);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[757], 112);
-	SC_Instruction__Add(JB_LUB[951], JB_LUB[952], 113);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[759], 114);
-	SC_Instruction__Add(JB_LUB[951], JB_LUB[953], 115);
-	SC_Instruction__Add(JB_LUB[2351], JB_LUB[758], 116);
-	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1937], 117);
-	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1938], 118);
-	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1939], 119);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[729], 120);
-	SC_Instruction__Add(JB_LUB[788], JB_LUB[873], 121);
-	SC_Instruction__Add(JB_LUB[641], JB_LUB[1706], 122);
-	SC_Instruction__Add(JB_LUB[877], JB_LUB[1021], 123);
-	SC_Instruction__Add(JB_LUB[1024], JB_LUB[1097], 124);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[875], 125);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[895], 126);
-	SC_Instruction__Add(JB_LUB[951], JB_LUB[1020], 127);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1161], 128);
-	SC_Instruction__Add(JB_LUB[951], JB_LUB[1318], 129);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1328], 130);
-	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1940], 131);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1942], 132);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1943], 133);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2327], 134);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2328], 135);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2329], 136);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2330], 137);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[1370], 138);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[1421], 139);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1436], 140);
-	SC_Instruction__Add(JB_LUB[1520], JB_LUB[1525], 141);
-	SC_Instruction__Add(JB_LUB[689], JB_LUB[734], 142);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1600], 143);
-	SC_Instruction__Add(JB_LUB[193], JB_LUB[31], 144);
-	SC_Instruction__Add(JB_LUB[1418], JB_LUB[1477], 145);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[1566], 146);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[1567], 147);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[1327], 148);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[727], 149);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[739], 150);
-	SC_Instruction__Add(JB_LUB[709], JB_LUB[784], 151);
-	SC_Instruction__Add(JB_LUB[2325], JB_LUB[1023], 152);
-	SC_Instruction__Add(JB_LUB[685], JB_LUB[1399], 153);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2331], 154);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2332], 155);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2333], 156);
-	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2318], 157);
-	SC_Instruction__Add(JB_LUB[689], JB_LUB[514], 158);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[956], 159);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1944], 160);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1945], 161);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1946], 162);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1947], 163);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1948], 164);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1949], 165);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1950], 166);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1951], 167);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1952], 168);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1953], 169);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1954], 170);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1955], 171);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1956], 172);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1957], 173);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1958], 174);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1959], 175);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1960], 176);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1961], 177);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1962], 178);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1963], 179);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1964], 180);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1330], 181);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1965], 182);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1966], 183);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1967], 184);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1968], 185);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1969], 186);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1970], 187);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1971], 188);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1972], 189);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1973], 190);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1974], 191);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1975], 192);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1976], 193);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1977], 194);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1978], 195);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1979], 196);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1980], 197);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1981], 198);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1367], 199);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1982], 200);
-	SC_Instruction__Add(JB_LUB[647], JB_LUB[1983], 201);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1984], 202);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1985], 203);
-	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1986], 204);
-	SC_Instruction__Add(JB_LUB[675], JB_LUB[1054], 205);
+	SC_Instruction__Add(JB_LUB[689], JB_LUB[2392], 69);
+	SC_Instruction__Add(JB_LUB[244], JB_LUB[2393], 70);
+	SC_Instruction__Add(JB_LUB[785], JB_LUB[697], 71);
+	SC_Instruction__Add(JB_LUB[775], JB_LUB[798], 72);
+	SC_Instruction__Add(JB_LUB[776], JB_LUB[803], 73);
+	SC_Instruction__Add(JB_LUB[780], JB_LUB[804], 74);
+	SC_Instruction__Add(JB_LUB[780], JB_LUB[805], 75);
+	SC_Instruction__Add(JB_LUB[525], JB_LUB[486], 76);
+	SC_Instruction__Add(JB_LUB[525], JB_LUB[728], 77);
+	SC_Instruction__Add(JB_LUB[525], JB_LUB[839], 78);
+	SC_Instruction__Add(JB_LUB[525], JB_LUB[937], 79);
+	SC_Instruction__Add(JB_LUB[1428], JB_LUB[806], 80);
+	SC_Instruction__Add(JB_LUB[1428], JB_LUB[1300], 81);
+	SC_Instruction__Add(JB_LUB[187], JB_LUB[879], 82);
+	SC_Instruction__Add(JB_LUB[187], JB_LUB[878], 83);
+	SC_Instruction__Add(JB_LUB[2349], JB_LUB[2350], 84);
+	SC_Instruction__Add(JB_LUB[474], JB_LUB[767], 85);
+	SC_Instruction__Add(JB_LUB[474], JB_LUB[444], 86);
+	SC_Instruction__Add(JB_LUB[770], JB_LUB[774], 87);
+	SC_Instruction__Add(JB_LUB[474], JB_LUB[570], 88);
+	SC_Instruction__Add(JB_LUB[479], JB_LUB[569], 89);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1055], 90);
+	SC_Instruction__Add(JB_LUB[1659], JB_LUB[884], 91);
+	SC_Instruction__Add(JB_LUB[1664], JB_LUB[827], 92);
+	SC_Instruction__Add(JB_LUB[831], JB_LUB[870], 93);
+	SC_Instruction__Add(JB_LUB[871], JB_LUB[882], 94);
+	SC_Instruction__Add(JB_LUB[1704], JB_LUB[1705], 95);
+	SC_Instruction__Add(JB_LUB[1393], JB_LUB[8], 96);
+	SC_Instruction__Add(JB_LUB[901], JB_LUB[1012], 97);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1059], 98);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1058], 99);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1061], 100);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1060], 101);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1063], 102);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1062], 103);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1064], 104);
+	SC_Instruction__Add(JB_LUB[903], JB_LUB[1057], 105);
+	SC_Instruction__Add(JB_LUB[907], JB_LUB[1275], 106);
+	SC_Instruction__Add(JB_LUB[907], JB_LUB[1276], 107);
+	SC_Instruction__Add(JB_LUB[907], JB_LUB[1277], 108);
+	SC_Instruction__Add(JB_LUB[907], JB_LUB[1278], 109);
+	SC_Instruction__Add(JB_LUB[907], JB_LUB[1274], 110);
+	SC_Instruction__Add(JB_LUB[1457], JB_LUB[572], 111);
+	SC_Instruction__Add(JB_LUB[1457], JB_LUB[911], 112);
+	SC_Instruction__Add(JB_LUB[1088], JB_LUB[1333], 113);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[757], 114);
+	SC_Instruction__Add(JB_LUB[951], JB_LUB[952], 115);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[759], 116);
+	SC_Instruction__Add(JB_LUB[951], JB_LUB[953], 117);
+	SC_Instruction__Add(JB_LUB[2351], JB_LUB[758], 118);
+	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1937], 119);
+	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1938], 120);
+	SC_Instruction__Add(JB_LUB[2351], JB_LUB[1939], 121);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[729], 122);
+	SC_Instruction__Add(JB_LUB[788], JB_LUB[873], 123);
+	SC_Instruction__Add(JB_LUB[641], JB_LUB[1706], 124);
+	SC_Instruction__Add(JB_LUB[877], JB_LUB[1021], 125);
+	SC_Instruction__Add(JB_LUB[1024], JB_LUB[1097], 126);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[875], 127);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[895], 128);
+	SC_Instruction__Add(JB_LUB[951], JB_LUB[1020], 129);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1161], 130);
+	SC_Instruction__Add(JB_LUB[951], JB_LUB[1318], 131);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1328], 132);
+	SC_Instruction__Add(JB_LUB[1570], JB_LUB[1940], 133);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1942], 134);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1943], 135);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2327], 136);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2328], 137);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2329], 138);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2330], 139);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[1370], 140);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[1421], 141);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1436], 142);
+	SC_Instruction__Add(JB_LUB[1520], JB_LUB[1525], 143);
+	SC_Instruction__Add(JB_LUB[689], JB_LUB[734], 144);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1600], 145);
+	SC_Instruction__Add(JB_LUB[193], JB_LUB[31], 146);
+	SC_Instruction__Add(JB_LUB[1418], JB_LUB[1477], 147);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[1566], 148);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[1567], 149);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[1327], 150);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[727], 151);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[739], 152);
+	SC_Instruction__Add(JB_LUB[709], JB_LUB[784], 153);
+	SC_Instruction__Add(JB_LUB[2325], JB_LUB[1023], 154);
+	SC_Instruction__Add(JB_LUB[685], JB_LUB[1399], 155);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2331], 156);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2332], 157);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2333], 158);
+	SC_Instruction__Add(JB_LUB[2326], JB_LUB[2318], 159);
+	SC_Instruction__Add(JB_LUB[689], JB_LUB[514], 160);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[956], 161);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1944], 162);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1945], 163);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1946], 164);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1947], 165);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1948], 166);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1949], 167);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1950], 168);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1951], 169);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1952], 170);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1953], 171);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1954], 172);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1955], 173);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1956], 174);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1957], 175);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1958], 176);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1959], 177);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1960], 178);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1961], 179);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1962], 180);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1963], 181);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1964], 182);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1330], 183);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1965], 184);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1966], 185);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1967], 186);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1968], 187);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1969], 188);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1970], 189);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1971], 190);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1972], 191);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1973], 192);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1974], 193);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1975], 194);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1976], 195);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1977], 196);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1978], 197);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1979], 198);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1980], 199);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1981], 200);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1367], 201);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1982], 202);
+	SC_Instruction__Add(JB_LUB[647], JB_LUB[1983], 203);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1984], 204);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1985], 205);
+	SC_Instruction__Add(JB_LUB[1941], JB_LUB[1986], 206);
+	SC_Instruction__Add(JB_LUB[675], JB_LUB[1054], 207);
 	SC_Instruction__Add(JB_LUB[492], JB_LUB[867], 254);
 	SC_Instruction__Add(JB_LUB[700], JB_LUB[2306], 255);
 	Instruction* ERR = SC__Instruction_TypeList[0];
@@ -35970,6 +35976,17 @@ FatASM* SC_Msg_BAND(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh) {
 	(SC_FAT_Prm(Rz, 1, R2));
 	(SC_FAT_Prm(Rz, 2, R3));
 	(SC_FAT_NumInputSet(Rz, 3, Sh));
+	SC_FAT_Dest(Rz, 0, R1, A);
+	return Rz;
+}
+
+FatASM* SC_Msg_BANG(Message* Self, ASMReg R1, ASMReg R2, int K) {
+	FatASM* Rz = nil;
+	//visible;
+	Assembler* A = (&SC__Pac_Sh);
+	Rz = SC_Pac_RequestOp(A, kSC__ASM_BANG, Self);
+	(SC_FAT_Prm(Rz, 1, R2));
+	(SC_FAT_NumInputSet(Rz, 2, K));
 	SC_FAT_Dest(Rz, 0, R1, A);
 	return Rz;
 }
@@ -42257,7 +42274,7 @@ IntRange JB_Msg_Range(Message* Self) {
 
 void JB_Msg_RangeSet(Message* Self, IntRange R) {
 	Self->Position = R[0];
-	Self->RangeLength = JB_Rg_Width(R);
+	Self->RangeLength = JB_ivec2_Width(R);
 }
 
 int SC_Msg_RC_HasTemporary(Message* Self) {
@@ -42835,15 +42852,15 @@ FatASM* SC_Msg_RFST(Message* Self, ASMReg R1, ASMReg R2, int Save) {
 	return Rz;
 }
 
-FatASM* SC_Msg_RFUN(Message* Self, ASMReg FreeIfDead, ASMReg SafeDecr, int Save, ASMReg Incr) {
+FatASM* SC_Msg_RFUN(Message* Self, ASMReg R1, ASMReg R2, int Save, ASMReg R4) {
 	FatASM* Rz = nil;
 	//visible;
 	Assembler* A = (&SC__Pac_Sh);
 	Rz = SC_Pac_RequestOp(A, kSC__ASM_RFUN, Self);
-	(SC_FAT_Prm(Rz, 0, FreeIfDead));
-	(SC_FAT_Prm(Rz, 1, SafeDecr));
+	(SC_FAT_Prm(Rz, 0, R1));
+	(SC_FAT_Prm(Rz, 1, R2));
 	(SC_FAT_NumInputSet(Rz, 2, Save));
-	(SC_FAT_Prm(Rz, 3, Incr));
+	(SC_FAT_Prm(Rz, 3, R4));
 	return Rz;
 }
 
@@ -43194,6 +43211,16 @@ FatASM* SC_Msg_SUBM(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Sh) {
 	(SC_FAT_Prm(Rz, 2, R3));
 	(SC_FAT_NumInputSet(Rz, 3, Sh));
 	SC_FAT_Dest(Rz, 0, R1, A);
+	return Rz;
+}
+
+FatASM* SC_Msg_SWAP(Message* Self, ASMReg R1, ASMReg R2) {
+	FatASM* Rz = nil;
+	//visible;
+	Assembler* A = (&SC__Pac_Sh);
+	Rz = SC_Pac_RequestOp(A, kSC__ASM_SWAP, Self);
+	SC_FAT_Dest(Rz, 0, R1, A);
+	SC_FAT_Dest(Rz, 1, R2, A);
 	return Rz;
 }
 
@@ -55300,6 +55327,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 						SCDecl* Pfdecl = ((SCDecl*)JB_Object_FastAs(Pf->Obj, &SCDeclData));
 						if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_Constructor) and SC_Decl_SyntaxIs(Pfdecl, kSC__SCDeclInfo_Self)) {
 							GotSuperConstructor = true;
+							SC_Func_ConstructParentProperties(Self);
 							if (SC_Func_SyntaxIs(Fn, kSC__FunctionType_StoresSelf)) {
 								(SC_Func_SyntaxIsSet(Self, kSC__FunctionType_StoresSelf, true));
 							}
@@ -55326,14 +55354,18 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 							JB_Msg_Fail(Dot, JB_LUB[578]);
 						}
 						if (!(JB_Tree_IsFirst(Dot) and IsSet)) {
-							if (!SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_PropertyWasConstructed)) {
-								JB_Msg_Fail(Dot, JB_LUB[1005]);
+							if (!SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_SuperConstructed)) {
+								if (!SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_PropertyWasConstructed)) {
+									JB_Msg_Fail(Dot, JB_LUB[1005]);
+								}
 							}
 						}
 						if (IsSet) {
 							SC_Msg_SelfUsedForProperty(Dot);
-							if (SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_PropertyWasConstructed)) {
-								JB_Msg_Fail(Dot, JB_LUB[645]);
+							if (!SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_SuperConstructed)) {
+								if (SC_Decl_SyntaxIs(T, kSC__SCDeclInfo_PropertyWasConstructed)) {
+									JB_Msg_Fail(Dot, JB_LUB[645]);
+								}
 							}
 							if (!JB_Tree_OperatorIn(((Message*)JB_Ring_Parent(Dot)), Root)) {
 								JB_Msg_Fail(Dot, NoNesting);
@@ -55345,7 +55377,7 @@ void SC_Func_CheckConstructorAndDestructor(SCFunction* Self, Message* Root, bool
 							JB_Msg_Fail(Dot, JB_LUB[644]);
 						}
 					}
-					if (IsConstructor) {
+					if (IsSet and IsConstructor) {
 						(SC_Decl_SyntaxIsSet(T, kSC__SCDeclInfo_PropertyWasConstructed, true));
 					}
 				}
@@ -55693,6 +55725,26 @@ Message* SC_Func_ConstructorLinePlace(SCFunction* Self) {
 		return C->Source;
 	}
 	return nil;
+}
+
+void SC_Func_ConstructParentProperties(SCFunction* Self) {
+	SCClass* Cls = Self->Cls->Super;
+	while (Cls) {
+		{
+			Array* _LoopSrcf2 = Cls->Properties;
+			int _if0 = 0;
+			while (true) {
+				SCDecl* P = ((SCDecl*)JB_Array_Value(_LoopSrcf2, _if0));
+				if (P == nil) {
+					break;
+				}
+				(SC_Decl_SyntaxIsSet(P, kSC__SCDeclInfo_SuperConstructed, true));
+				(++_if0);
+			};
+		}
+		;
+		Cls = Cls->Super;
+	};
 }
 
 void SC_Func_CopyParams(SCFunction* Self, Message* List) {
@@ -60188,6 +60240,10 @@ bool SC_Func__Tran_Swap(SCFunction* Fn, Message* Node, SCNode* Name_space) {
 			JB_Msg_Fail(Node, JB_LUB[1132]);
 			return nil;
 		}
+		if (!(SC_Decl_SyntaxIs(Lc, kSC__SCDeclInfo_Local) and SC_Decl_SyntaxIs(Rc, kSC__SCDeclInfo_Local))) {
+			JB_Msg_Fail(Node, JB_LUB[234]);
+			return nil;
+		}
 		SC_Decl_ExpectRelMatch(Lc, Rc, Rn, nil, Node);
 		SC_Decl_ExpectRelMatch(Rc, Lc, Ln, nil, Node);
 		SC_Func__Tran_PrintSub(Fn, Node, Name_space);
@@ -61111,4 +61167,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1569647708945631446 4732430989632873358
+// 5553710367860429632 -7344876257135220379
