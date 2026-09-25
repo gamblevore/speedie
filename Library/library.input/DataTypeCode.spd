@@ -108,7 +108,7 @@ datatype DataTypeCode (uint16)
 	
 	// Can replace datatype code with this, eventually.
 	// this makes more sense, with the bitcount.
-	inline DebugCode (|uint|)
+	libinternal DebugCode (|uint|)
 		if self is bool
 			return 64			// bools are unsigned
 		
@@ -131,13 +131,13 @@ datatype DataTypeCode (uint16)
 		return self&M == M
 	
 	syntax is (|datatypecode| M, assigns:|bool|, |datatypecode|)
-		opt inline
-		if value
-			return self|||m
-		return self&~M
+		opt inline		
+		self &= ~M
+		self |= m*value
+		return self
 	
 	inline Floatness (|int|)
-		return .isfloat*.bytecount // makes sense
+		return .isfloat * .bytecount // makes sense
 
 	inline IsFloat (|bool|)
 		return (self >> 7) & 1

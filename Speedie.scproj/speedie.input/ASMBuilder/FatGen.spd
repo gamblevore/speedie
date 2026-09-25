@@ -487,6 +487,25 @@ function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fa
 }
 
 
+function message.BANG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.BANG, self)
+	rz.reginput(1) = r2
+	rz.numinput(2) = K
+	rz.dest(0, r1, a)
+}
+
+
+function message.SWAP (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
+	visible
+	|| a = assembler.sh
+	rz = a.RequestOp(asm.SWAP, self)
+	rz.dest(0, r1, a)
+	rz.dest(1, r2, a)
+}
+
+
 function message.JUMP (|int| JUMP = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
@@ -742,14 +761,14 @@ function message.RALO (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.RFUN (|asmreg| FreeIfDead = nil, |asmreg| SafeDecr = nil, |int| Save = nil, |asmreg| Incr = nil, |&fatasm|) {
+function message.RFUN (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |asmreg| r4 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RFUN, self)
-	rz.reginput(0) = FreeIfDead
-	rz.reginput(1) = SafeDecr
+	rz.reginput(0) = r1
+	rz.reginput(1) = r2
 	rz.numinput(2) = Save
-	rz.reginput(3) = Incr
+	rz.reginput(3) = r4
 }
 
 

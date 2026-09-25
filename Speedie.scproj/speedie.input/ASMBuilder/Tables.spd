@@ -105,14 +105,8 @@ function Swap (fn_asm)
 	|| prms = exp.last
 	|| A = .ExistingVar(prms.first!)
 	|| B = .ExistingVar(prms.second!)
-	expect (A.reg and B.reg) (Exp, "Can only swap registers")
-	
-	|| T = .assign(exp, .TempMe, A)
-	.assign(exp, A, B)
-	.assign(exp, B, T)
-	|| f = T.fat
-	if f and f.refcount <= 0
-		.SoftNop(F)
+	expect (A.reg and B.reg)
+	exp.swap(A,B)
 	return asmreg()
 
 

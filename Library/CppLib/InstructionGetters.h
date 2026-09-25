@@ -184,7 +184,6 @@
 #define	Shift_Shu		(((uint)((Op)<<23))>>23)
 
 
-
 #define	RefSetApart_Savei		((( int)((Op)<<18))>>27)
 #define	RefSetApart_Saveu		(((uint)((Op)<<18))>>27)
 
@@ -200,6 +199,7 @@
 #define	RefSet3_Saveu		(((uint)((Op)<<18))>>27)
 #define	RefSet3_Offseti		((( int)((Op)<<23))>>23)
 #define	RefSet3_Offsetu		(((uint)((Op)<<23))>>23)
+
 
 #define	VecMix_Modei		((( int)((Op)<<28))>>29)
 #define	VecMix_Modeu		(((uint)((Op)<<28))>>29)

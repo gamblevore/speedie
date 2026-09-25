@@ -112,6 +112,10 @@
 	u1 = u2 | AddK_Ki;
 ı BXRK:;
 	u1 = u2 ^ AddK_Ki;
+ı BANG:;
+	u1 = u2 & (1 << AddK_Ki);
+ı SWAP:;
+	std_swap(u1, u2);
 ı JUMP:;
 	Code += Jump_JUMPi;
 ı JMPI:;

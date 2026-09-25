@@ -257,13 +257,6 @@ forms
 		r3		r
 		Sh		9
 	
-	Swap
-		r1		R
-		r2		R
-//		r3		R
-//		r4		R
-	
-
 	// refcounting
 	RefReturn
 		r1		r
@@ -292,6 +285,10 @@ forms
 		Save	5
 		Offset	l
 	/// yeeeet
+	
+	SWAP
+		r1		R
+		r2		R
 	
 	VecMix
 		r1		R
@@ -544,6 +541,10 @@ POS 5
 		u1 = u2 ||| AddK_Ki
 /**/ BXRK  (AddK)
 		u1 = u2  ^  AddK_Ki
+/**/ BANG  (AddK)
+		u1 = u2  &  (1<<AddK_Ki)
+/**/ SWAP (SWAP)
+		std_swap(u1,u2)
 
 
 

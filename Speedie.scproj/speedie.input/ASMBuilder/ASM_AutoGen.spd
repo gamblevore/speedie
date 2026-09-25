@@ -892,23 +892,6 @@ datatype ASM_Shift (ASM) {
 }
 
 ASM.Forms[48] = &ASM_Shift.Encode
-datatype ASM_Swap (ASM) {
-	module {
-		function Encode (ASM_Encoder, ) {
-			visible true
-			|asm| mu = .op|asm| << 24
-			mu.r1 = .prms[0]
-			mu.r2 = .prms[1]
-			if curr < after {
-				curr++[] = mu
-			}
-
-			return curr
-		}
-	}
-}
-
-ASM.Forms[49] = &ASM_Swap.Encode
 datatype ASM_RefReturn (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -925,7 +908,7 @@ datatype ASM_RefReturn (ASM) {
 	}
 }
 
-ASM.Forms[50] = &ASM_RefReturn.Encode
+ASM.Forms[49] = &ASM_RefReturn.Encode
 datatype ASM_RefSetApart (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -944,7 +927,7 @@ datatype ASM_RefSetApart (ASM) {
 	}
 }
 
-ASM.Forms[51] = &ASM_RefSetApart.Encode
+ASM.Forms[50] = &ASM_RefSetApart.Encode
 datatype ASM_RefSet1 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -962,7 +945,7 @@ datatype ASM_RefSet1 (ASM) {
 	}
 }
 
-ASM.Forms[52] = &ASM_RefSet1.Encode
+ASM.Forms[51] = &ASM_RefSet1.Encode
 datatype ASM_RefSet2 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -981,7 +964,7 @@ datatype ASM_RefSet2 (ASM) {
 	}
 }
 
-ASM.Forms[53] = &ASM_RefSet2.Encode
+ASM.Forms[52] = &ASM_RefSet2.Encode
 datatype ASM_RefSet3 (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
@@ -1000,7 +983,24 @@ datatype ASM_RefSet3 (ASM) {
 	}
 }
 
-ASM.Forms[54] = &ASM_RefSet3.Encode
+ASM.Forms[53] = &ASM_RefSet3.Encode
+datatype ASM_SWAP (ASM) {
+	module {
+		function Encode (ASM_Encoder, ) {
+			visible true
+			|asm| mu = .op|asm| << 24
+			mu.r1 = .prms[0]
+			mu.r2 = .prms[1]
+			if curr < after {
+				curr++[] = mu
+			}
+
+			return curr
+		}
+	}
+}
+
+ASM.Forms[54] = &ASM_SWAP.Encode
 datatype ASM_VecMix (ASM) {
 	module {
 		function Encode (ASM_Encoder, ) {
