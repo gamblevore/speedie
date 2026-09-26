@@ -953,7 +953,7 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	self->_Parent = JB_Incr(Path);
 	
     self->Descriptor = -1;
-    self->MyFlags = 0;
+    self->FileFlags = 0;
     self->OpenMode = 0;
         
 	if (WorthTestingCase())
@@ -997,10 +997,10 @@ void JB_File_Destructor (JB_File* self) {
 
 void JB_File_StopSHM (JB_File* self) {
 	#ifndef AS_LIBRARY
-	if (self->MyFlags & 1) { // 1 == server!
+	if (self->FileFlags & 1) { // 1 == server!
 //		printf("unlinking %s\n", self->Addr);
 		shm_unlink((const char*)(self->Addr));
-		self->MyFlags &= ~1;
+		self->FileFlags &= ~1;
 	}
 	#endif
 }
@@ -1323,13 +1323,13 @@ JB_File* JB_File__NewPipe (int Pipe) {
 		return nil;
 	JB_File* F = JB_File_Constructor( 0, JB_Str__Error() );
 	F->Descriptor = Pipe;
-	F->MyFlags |= 2;
+	F->FileFlags |= 2;
 	return F;
 }
 
 
 bool JB_File_IsPipe (JB_File* f) {
-	return f->MyFlags & 2;
+	return f->FileFlags & 2;
 }
 
 

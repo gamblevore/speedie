@@ -291,7 +291,7 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 function asmreg.NegateFail (|asmreg| dest, |bool|)
 	target debug
 		if (self is AlreadyNegated) != (dest is negate)
-			assembler.DebugPrint
+			assembler.ASMDebug
 			if dest isnt negate
 				"// alreadynegated on unnegatable"
 			  else

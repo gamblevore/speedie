@@ -17,6 +17,7 @@ JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in);
 struct MiniStr;
 struct JB_StringExternal;
 struct JB_StringC;
+struct JB_File;
 JB_String* JB_Str_New(int64 Len);
 JB_String* JB_Str_NewCStr (int64 Length);
 JB_String* Str_Shrink(JB_String* self, int Length);
@@ -34,6 +35,7 @@ void JB_PrintCString (const char* c);
 FastString** JB_Str_PrintCapturer();
 void JB_Str_PrintError(JB_String* s);
 void JB_Str_PrintConsole(JB_String* s);
+void JB_File_UseAsStdOut (JB_File* f);
 void JB_Str_Clone(JB_StringShared* self, JB_String* Name);
 
 int JB_LogOpen_(const char* s);

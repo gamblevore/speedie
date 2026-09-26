@@ -46,7 +46,7 @@ extend assembler
 			while live < after
 				if !memory.equals(live, backup, –sizeof fatasm)
 					target debug
-						DebugPrint()
+						ASMDebug()
 						live.debugprint
 						backup.debugprint
 					debugger 
@@ -230,7 +230,7 @@ extend assembler
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
-					DebugPrint()
+					ASMDebug()
 					fat.DebugPrint()
 					debugger
 				return

@@ -5,6 +5,7 @@
 
 
 #include "JB_Umbrella.hpp"
+#include "JB_File.h"
 #include <stdio.h>
 #include <unistd.h>
 
@@ -16,12 +17,24 @@ extern "C" {
 
 static int PrintFile = STDOUT_FILENO;
 
-void JB_Str_PrintError(JB_String* s) {
+void JB_File_UseAsStdOut (JB_File* f) {
+	if (f) {
+		int D = f->Descriptor;
+		if (D >= 0) {
+			f->FileFlags |= 4;
+			PrintFile = D;
+		}
+	} else {
+		PrintFile = STDOUT_FILENO;
+	}
+}
+
+void JB_Str_PrintError (JB_String* s) {
 	int n = JB_Str_Length(s);
     if (n) {
 		JB_Write_(STDERR_FILENO, s->Addr, n);
 		if (!JB_ErrorNumber)
-			JB_ErrorNumber = 1; // terminals complain if printerror without return -1;
+			JB_ErrorNumber = 1; // terminals complain if printerror without return error
 		fsync(STDERR_FILENO);
     }
 }

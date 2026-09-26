@@ -92,7 +92,7 @@ module Feedback
 				i.AsFloat
 				nil|datatypecode|.DebugPrint
 				"".debugprint // stop from being stripped
-				Assembler.DebugPrint(-1)
+				Assembler.ASMDebug(-1)
 				target !cake
 					m.PrintLocate
 				nil|asmreg|.DebugPrint

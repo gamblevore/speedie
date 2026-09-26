@@ -122,7 +122,7 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 					bmr.appendhint(glob.ExportPosition)
 					bmr.appendhint(Start)
 			target debug
-				assembler.debugprint(fn, -1)
+				assembler.ASMDebug(fn, -1)
 	return true
 
 

@@ -286,7 +286,7 @@ struct FatASM
 	
 	Syntax Expect (|string?| Error=nil)
 		target debug
-			assembler.DebugPrint(0)
+			assembler.ASMDebug(0)
 			"----"
 			.DebugPrint(-1)
 			if !error
@@ -506,7 +506,7 @@ struct FatASM
 			  else
 				fs <~ op.name
 			fs <~ ':'
-			target debug
+			if level & 4
 				fs <~ "("
 				fs <~ .basicblock
 				fs <~ "/"
@@ -548,8 +548,7 @@ struct FatASM
 			n += 2
 
 		if Level&8
-			target debug
-				.RendaMsg(fs, n)
+			.RendaMsg(fs, n)
 		return true
 	
 	
@@ -598,7 +597,6 @@ struct FatASM
 			return 1
 	
 	
-	target debug {
 	function TmpRender (|faststring| fs, |message| msg)
 		opt norefcounts
 		|| arg = msg.Find(@arg)
@@ -650,7 +648,7 @@ struct FatASM
 		
 		fs <~ " "						// reuse "*/" string
 		fs <~ "*/"
-	}
+	
 	
 	
 	function RendaKnst (|faststring| fs, |int| SoFar)
@@ -708,19 +706,17 @@ struct FatASM
 	function IsFinisher (|bool|)
 		return .IsFinisher(.info)
 
-
+	
 	function DebugPrint (|int| Level=-1)
-		target debug {
 		visible
 		nil self
-		if !self
-			"(nil)"
-			return
-		if asm.NoisyASM >= 3
-			|| fs = faststring()
+		if (self)
+			|| fs = FastString()
 			.RenderFat(fs, Level)
 			printline fs
-		}
+		  else
+			 "(nil)"
+		
 
 			
 	iterator FatInputs

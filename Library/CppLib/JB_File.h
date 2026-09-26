@@ -17,7 +17,7 @@ struct JB_DirReader {
 JBClass( JB_File, JB_StringShared,
 	int				Descriptor;
 	byte			OpenMode;
-	byte			MyFlags;
+	byte			FileFlags;
 );
 
 

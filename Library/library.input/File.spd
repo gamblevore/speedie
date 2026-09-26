@@ -179,11 +179,8 @@ class File (StringShared)
 	function IsPipe (|bool|)
 		cpp_wrapper JB_File_IsPipe
 
-//	function Peek (|int| n, |string|)
-//		|| i = .offset
-//		rz = .read(n)
-//		.offset = i
-	
+	function UseAsStdOut
+		cpp_wrapper JB_File_UseAsStdOut
 
 	render 
 		cpp_wrapper
