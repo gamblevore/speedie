@@ -975,6 +975,7 @@ JB_File_SizeSet
 JB_File_SmartDataSet
 JB_File_Touch
 JB_File_UniqueChild
+JB_File_UseAsStdOut
 JB_File_Write
 JB_File__CWD
 JB_File__Compar
