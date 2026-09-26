@@ -6,41 +6,48 @@
 
 #include "JB_Umbrella.hpp"
 #include <stdio.h>
+#include <unistd.h>
 
 
 extern "C" {
 
-#ifndef AS_LIBRARY
-	#define MyWrite(s,n,c)		fwrite(s, 1, n, c) // faster?
-#else
-	#define MyWrite(s,n,c)		fprintf(c, "%.*s", n, s)
-#endif
+// Mixing write() with printf/etc causes buffering issues.
+// write is a lot simpler and I can redirect it easier.
 
-
-// Mixing write() with printf/puts/etc causes buffering issues.
-// This is why I don't use write() here.
- 
+static int PrintFile = STDOUT_FILENO;
 
 void JB_Str_PrintError(JB_String* s) {
 	int n = JB_Str_Length(s);
     if (n) {
-		MyWrite(s->Addr, n, stderr);
+		JB_Write_(STDERR_FILENO, s->Addr, n);
 		if (!JB_ErrorNumber)
 			JB_ErrorNumber = 1; // terminals complain if printerror without return -1;
-		fflush(stderr);
+		fsync(STDERR_FILENO);
     }
 }
 
 void JB_PrintCString (const char* c) {
-	printf("%s", c);
+	if (c) {
+		int n = strlen(c);
+		if (n)
+			JB_Write_(PrintFile, (u8*)c, n);
+	}
 }
 
 void JB_Str_PrintLine (JB_String* s) {
+	byte Buf[256];
 	int n = JB_Str_Length(s);
-	if (n)
-		MyWrite(s->Addr, n, stdout);
-	putchar(10);
-	fflush(stdout);
+	if (n < sizeof(Buf)) {
+		if (n)
+			memcpy(Buf, s->Addr, n);
+		Buf[n++] = 10;
+		JB_Write_(PrintFile, Buf, n);
+	} else {
+		JB_Write_(PrintFile, s->Addr, n);
+		Buf[0] = 10;
+		JB_Write_(PrintFile, Buf, 1);
+	}
+	fsync(PrintFile);
 }
 
 
@@ -66,9 +73,9 @@ static bool ShouldFlush_ (JB_String* s) {
 void JB_Str_Print(JB_String* s) {
 	int n = JB_Str_Length(s);
 	if (n) {
-		MyWrite(s->Addr, n, stdout);
+		JB_Write_(PrintFile, s->Addr, n);
 		if (ShouldFlush_(s))
-			fflush(stdout);
+			fsync(PrintFile);
 	}
 }
 

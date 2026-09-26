@@ -241,18 +241,17 @@ function message.CallChainError (|string| name)
 
 
 
-target debug
-	function @assembler.DebugPrint (|scfunction| fn, |int| Level)
-		cpp_name adb2
-		"---"
-		printline fn
-		|| Start = fn.µStart
-			|| Base = assembler.sh.TotalStart + Start
-			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-			for n in amount
-				base[n].debugprint(Level)
-			
-			.PrintRegs
+function @assembler.DebugPrint (|scfunction| fn, |int| Level)
+	cpp_name adb2
+	"---"
+	printline fn
+	|| Start = fn.µStart
+		|| Base = assembler.sh.TotalStart + Start
+		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+		for n in amount
+			base[n].debugprint(Level)
+		
+		.PrintRegs
 
 
 
@@ -260,9 +259,7 @@ function @assembler.DebugPrint (|int| Level=-1)
 	cpp_name adb
 	visible
 	opt norefcounts
-	target debug
-//		if !compiler.inperry
-		.DebugPrint(scfunction.currfunc!, level)
+	.DebugPrint(scfunction.currfunc!, level)
 	
 
 

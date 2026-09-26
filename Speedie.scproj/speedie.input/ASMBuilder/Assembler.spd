@@ -258,6 +258,7 @@ struct Assembler
 		if .InlineDepth > 0
 			.FailInline
 		  else
+			DebugPrint()
 			error (.Root_Fn.sourcearg, "No free local variables.")	// entirely full
 		return t
 
