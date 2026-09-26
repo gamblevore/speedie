@@ -44,7 +44,7 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 	  else
 		|| cake = spdprocess.spawn(CakeExec, args, ProcessMode.OwnGroup, f.name)
 
-	.LogOneCake("Starting: " + args.render)
+	.LogOneCake(args, "Starting")
 	.RunCompileSub(cake)	
 
 

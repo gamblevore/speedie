@@ -68,7 +68,7 @@ function PerryIDE.DebugArgs (|message|)
 
 
 function PerryIDE.GUIIsCompiling (|[string]| args)
-	.LogOneAction(speedie + " " + args.render)
+	.LogOneAction(args, speedie)
 	.SpeedieText.text = ""
 	
 	(.BuildButton isnt enabled)

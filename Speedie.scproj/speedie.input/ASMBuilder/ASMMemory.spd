@@ -96,7 +96,6 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]
-		if "ExpandBits".trap
 	
 	
 	rz._op = op

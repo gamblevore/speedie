@@ -45,12 +45,10 @@ struct Assembler
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
-	target debug
-		|byte|					StackSize
+	|byte|					StackSize
 	|InlineState[8]|			InlineState
 	|scfunction--|				Root_Fn
-	target debug
-		|(Message--)[32]|		Declarations
+	|(Message--)[32]|		Declarations
 
 	|uint16[32]|				DelayedNops
 	|?&FatASM|					InlineEnd
@@ -179,12 +177,11 @@ struct Assembler
 							
 	function DeclareMe (|Message| where, |asmreg| V=nil, |asmreg|)
 		|| d = .VDecls
-		|| FreeBit = (~d).LowestBit		// Find lowest free bit.
+		|| FreeBit = (~d).LowestBit							// Find lowest free bit.
 		d |= FreeBit
 		|| Index = freeBit.log2
 		v.reg = index
-		target debug
-			.Declarations[index] = where
+		.Declarations[index] = where
 
 		.Vdecls = d
 		if freebit and !(d & .VTemps)
@@ -196,7 +193,7 @@ struct Assembler
 		if .InlineDepth > 0
 			.FailInline
 		  else
-			error (where, "No free local variables.")	// entirely full
+			error (where, "No free local variables.")		// entirely full
 		return v
 	
 
@@ -307,14 +304,14 @@ struct Assembler
 
 	
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
-		// we just want to avoid passing a register twice, once as a reference
+		// We just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
 		// that will alter the actual reg.
 
 		if exp is BreakPoint
 			.Breakrequest |= BreakPoint
-		|| OV = .OpenVars
 
+		|| OV = .OpenVars // why am i opening this twice? And closing it twice?
 		dest = .µInlineImproveDest(exp, a, dest)		
 		|| Closer = .OpenVars
 
@@ -322,7 +319,7 @@ struct Assembler
 		|| r = .µGetASM(Exp, dest)
 		if !(r iz dest) and r.reg
 			r = .Assign(exp, dest, r, curr)
-		r = .CloseVars(Closer, nil, r)
+		r = .CloseParams(Closer, nil, r)
 		
 		if r is temp
 			target debug
@@ -332,7 +329,8 @@ struct Assembler
 		if r iz dest
 			return r
 		if (dest isnt ParamNeedsCopy) and !(a is AlteredOrRef and r.reg == 0)
-			return .CloseVars(ov, nil, r)
+			return .CloseParams(ov, exp, r)
+		
 		(dest isnt ParamNeedsCopy)
 		return .Assign(exp, dest, r)
 
@@ -380,7 +378,7 @@ struct Assembler
 		|| r = .µGetASM(Exp, Dest)
 		ov = ov.AddReg(R)
 		// This will close all vars, except the one we just got back!
-		return .CloseVars(ov, nil, r)
+		return .CloseParams(ov, nil, r)
 	
 		
 	function µ (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -426,13 +424,6 @@ struct Assembler
 			|| m = (fn)(self, exp, dest)
 			m.debugprint
 			debugger
-
-	
-	function µGetTemp (|message| exp, |asmreg| Dest, |asmreg|)
-		// this allows consts to be nopped more easily.
-		// I'm surprised I haven't done this already. YES we CAN put things into proper registers
-		// when needed, but it leads to problems like this:
-		// x(!true) // --> knst(1), x(0) // and one  involved!
 
 	
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
@@ -604,9 +595,8 @@ struct Assembler
 		|| ret = .Root_Fn.SourceArg!
 		|| l = ret.last
 			ret = l
-		target debug
-			if ret.position < 0
-				ret.position = 0 // skip error detection
+		if ret.position < 0
+			ret.position = 0 // skip error detection
 		|| halt = ret.halt
 		halt.BasicBlock = -1
 		halt.Const = 123456789 

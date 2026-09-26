@@ -36,7 +36,7 @@ function CakeTalk (|SpdProcess| Cake)
 		.SetAppInfo		
 	
 	|| root = cake.Get$							// getmsg
-	.LogOneCake(root, "\1B ")
+	.LogOneCake(root, "\1B")
 	if root != @arg
 		.HandleCake(root)
 	  else

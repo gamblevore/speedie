@@ -81,7 +81,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
 	|| d = gui.framestart
 	|| record = .DateWrap(msg, d)
 	fb <~ record
-	.LogOneComm(msg, "\1C ")
+	.LogOneComm(msg, "\1C")
 	.SpeedieMsgReceive(fb)
 	return d
 
@@ -109,6 +109,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			if !.UsingSpdLib
 				.UsingSpdLib = true
 				f.name = .projname.TrimExt + "()"
+			.LogOneComm(p, "feedback")
 			|| spd = (Speedie_Main).Spawn(f.name, p)
 				return spd
 
@@ -117,6 +118,8 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		|| Mode = ProcessMode.CaptureAll
 		if !noisy
 			mode = ProcessMode.silence
+		
+		.LogOneComm(p, "feedback")
 		|| spd = SpdProcess.spawn(spd_on_disk, p, mode, f.name)
 			spd.pico.name = .project.name
 			return spd

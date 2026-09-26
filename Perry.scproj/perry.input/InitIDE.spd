@@ -636,7 +636,7 @@ extend PerryIDE
 		g.gnormal.Separator.alpha *= 0.8
 		
 		g.OnKeyDown = LogAreaKeys
-		.AddBaseLog("-- speedie comms --", .logcomms)
+		.AddBaseLog("-- feedback comms --", .logcomms)
 		.AddBaseLog("-- perry actions --", .logactions)
 		.AddBaseLog("-- cake actions --", .logcake)
 	
@@ -657,10 +657,11 @@ extend PerryIDE
 		  else
 			|| fs = FastString()
 			fs <~ type
-			if msg isa Message
-				msg.Render(fs)
-			  elseif msg isa string
+			fs <~ " "
+			if msg isa string
 				fs <~ msg
+			  else
+				msg.Render(fs)
 			m <~ @emb + fs.GetResult
 		m.position++
 		

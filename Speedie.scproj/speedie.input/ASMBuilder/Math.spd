@@ -1041,7 +1041,6 @@ extend Assembler
 			|| Find = 1<<src.reg
 			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
 										// we can fuck around with it as much as we like >:3
-
 		/*
 		target debug
 			if BoolTrap

@@ -608,7 +608,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 			ParamsHere.obj = f // for auto-complete
 		Return f
 
-	|| ErrMsg = "" // can't find "" on something "".
+	|| ErrMsg = ""
 	if (paramsarray.found)
 		ErrMsg = "Unexpected Params. This variable is not a function."
 	  elseif (!ParamsHere)
@@ -616,9 +616,13 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 	  elseif (ParamsArray.IsDot)
 		ErrMsg = "Can’t find “${OrigName}” on ${ParamsArray.RenderKind} “${ParamsArray.ModuleName}”."
 		if self isa SCModule
-			|| cls = .cls
-				|| found = cls.UpCheck(origname)
+			|scclass--| cls = .cls
+				|scobject--| found = cls.UpCheck(origname)
 					ErrMsg += " (But it does exist on the class.)"
+		  elseif self isa SCClass
+			|scobject--| found = .Modul.UpCheck(origname)
+				ErrMsg += " (But it does exist on the module.)"
+				
 	  else
 		ErrMsg = "Can’t find function “${OrigName}”."
 	error ( exp, ErrMsg )

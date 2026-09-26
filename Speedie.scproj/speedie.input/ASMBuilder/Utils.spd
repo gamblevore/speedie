@@ -100,7 +100,12 @@ function Assembler.OpenVars (|uint64|)
 	return (.VDecls|uint64| << 0) ||| (.VTemps|uint64| << 32)
 
 
-function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |asmreg|)
+function Assembler.CloseParams (|uint64| Orig,  |message| exp,  |asmreg| Return, |asmreg|)
+	// cant remove params property, and rely on exp being real, as argumentsub passes an exp.
+	return .CloseVars(Orig, Exp, Return, true)
+
+
+function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Return=nil, |bool| Params=false, |asmreg|)
 	opt NoRefCounts
 	
 	|| OrigTemps = (Orig >> 32)
@@ -110,11 +115,13 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	while .CloseOneVar(exp, Missing)
 		0
 
-	Missing = OrigDecls &~ .VDecls
-	if !exp or !missing
-		return return
+	OrigDecls = OrigDecls &~ .VDecls
+	OrigTemps = OrigTemps &~ .VTemps
 	
-	.VDecls |= Missing	
+	if OrigDecls and (exp or params)
+		.VDecls |= OrigDecls
+	if OrigTemps and params
+		.VTemps |= OrigTemps
 	
 	return return
 
@@ -233,7 +240,70 @@ function message.CallChainError (|string| name)
 
 
 
+
+target debug
+	function @assembler.DebugPrint (|scfunction| fn, |int| Level)
+		cpp_name adb2
+		"---"
+		printline fn
+		|| Start = fn.µStart
+			|| Base = assembler.sh.TotalStart + Start
+			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+			for n in amount
+				base[n].debugprint(Level)
+			
+			.PrintRegs
+
+
+
+function @assembler.DebugPrint (|int| Level=-1)
+	cpp_name adb
+	visible
+	opt norefcounts
+	target debug
+//		if !compiler.inperry
+		.DebugPrint(scfunction.currfunc!, level)
+	
+
+
+function @assembler.PrintRegs
+	target debug
+		|| i = 0
+		|| D = .sh.vdecls_
+		|| T = .sh.vtemps
+		|| X = D|||T
+		|| Prev = false
+		print "Regs: "
+		while ++i <= 31
+			|| test = 1<<i
+			if X&Test
+				if Prev
+					print ",  "
+				Prev = true
+
+				ifn D&Test
+					print "t"
+				  elseif T&Test
+					print "x"
+				  else
+					print "r"
+				print i
+
+		printline "\n"
+		i = 0
+		while ++i <= 31
+			|| test = 1<<i
+			if X&Test
+				print "$i = "
+				|| msg = .sh.declarations[i]
+					printline msg
+				  else
+					printline "?"
+
+
 //|&fatasm| FatSanity
 //function TestFatSanity
 //	|| f = FatSanity
 //	if f and f.op == asm.halt
+
+

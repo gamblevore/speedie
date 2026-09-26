@@ -18,8 +18,8 @@ datatype CompileMode (int)
 		return (self&M) == M
 	
 	syntax is (|CompileMode| M, assigns:|bool|, |CompileMode|)
-		self &=~M
-		self|=Value*M
+		self &= ~M
+		self |= Value*M
 		return self
 	
 
@@ -445,7 +445,7 @@ function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
 	|perryide--| i = .ide
 	|unixprocess--| r = i.RunningProd
 	if r isa SpdProcess
-		i.LogOneCake(s.parse, "\1C ")
+		i.LogOneCake(s.parse, "\1C")
 		if (r <~ s)
 			if PressingAButton
 				i.AppInfo.SetFocus

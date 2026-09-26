@@ -353,7 +353,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	if msg ~= "error"
 		if msg.last == "define"
 			beep
-		.LogOneComm(msg, "\1b ")
+		.LogOneComm(msg, "\1b")
 		if date.int == .sectionkeytime
 			.sectionkeytime = 0
 			.editme.insertautocomplete

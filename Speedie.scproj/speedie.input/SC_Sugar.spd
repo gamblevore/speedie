@@ -67,8 +67,6 @@ function message.MsgFix (|message!|)	// «
 		self = .WrapWith(@rel)
 		self <~ (@opp, "~>")
 		self <~ n
-		target debug // can't see whats going on!
-			self = .WrapWith(@bra)
 		n = n.unbra
 		if n == @msg
 			n.msgfix

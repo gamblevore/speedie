@@ -654,71 +654,13 @@ function FatRange.JumpTo (|&FatAsm| curr, |int| Allowed=FatRange.kNeverEmpty)
 
 	for s in self
 		if (s is CondAnswer) and !(s isa asm.knst)
-			target debug
-				if (empty and Allowed == kEmptyRemove)
-					if !assembler.sh.EntireInlineFailed
+//			target debug
+//				if (empty and Allowed == kEmptyRemove)
+//					if !assembler.sh.EntireInlineFailed
+//						assembler.debugprint
+//						debugger
 			if empty and (allowed == kEmptyKeep)
 				s.JumpNegate
 			  else
 				s.JumpFix(curr)
 	
-
-target debug
-	function @assembler.DebugPrint (|scfunction| fn, |int| Level)
-		cpp_name adb2
-		"---"
-		printline fn
-		|| Start = fn.µStart
-			|| Base = assembler.sh.TotalStart + Start
-			|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-			for n in amount
-				base[n].debugprint(Level)
-			
-			.PrintRegs
-
-
-
-function @assembler.DebugPrint (|int| Level=-1)
-	cpp_name adb
-	visible
-	opt norefcounts
-	target debug
-		if !compiler.inperry
-			.DebugPrint(scfunction.currfunc!, level)
-	
-
-
-function @assembler.PrintRegs
-	target debug
-		|| i = 0
-		|| D = .sh.vdecls_
-		|| T = .sh.vtemps
-		|| X = D|||T
-		|| Prev = false
-		print "Regs: "
-		while ++i <= 31
-			|| test = 1<<i
-			if X&Test
-				if Prev
-					print ",  "
-				Prev = true
-
-				ifn D&Test
-					print "t"
-				  elseif T&Test
-					print "x"
-				  else
-					print "r"
-				print i
-
-		printline "\n"
-		i = 0
-		while ++i <= 31
-			|| test = 1<<i
-			if X&Test
-				print "$i = "
-				|| msg = .sh.declarations[i]
-					printline msg
-				  else
-					printline "?"
-
