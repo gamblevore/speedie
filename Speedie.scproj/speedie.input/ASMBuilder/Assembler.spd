@@ -193,7 +193,7 @@ struct Assembler
 		if .InlineDepth > 0
 			.FailInline
 		  else
-			error (where, "No free local variables.")		// entirely full
+			error (where, "Decl and temp clash.")		// entirely full
 		return v
 	
 
@@ -231,25 +231,25 @@ struct Assembler
 		return .TempMe(t)
 	
 	
-	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)		// .needreg
+	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
 		t.µtype = where.asmdecl.mu.DataType
 		return .TempMe(t)
 
 
-	function TempMe (|asmreg| T=asmreg.Temp, |asmreg|)						// .needreg
+	function TempMe (|asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
 		if t.reg
 			return t
 
 		|| r = .VTemps
-		target debug: if r&1: r&=~1 // how?
+		target debug: if r&1: r&=~1	// how?
 		
-		|| Free = (~r).Log2		// Find lowest free bit.
+		|| Free = (~r).Log2			// Find lowest free bit.
 		r |= 1<<Free
 		t.reg = Free
 		.VTemps = r
-		(t isnt Const) // why would it be?
+		(t isnt Const)				// why would it be?
 		(t is temp)
 		t.fatindex = 0
 		if !(.vdecls & .VTemps)
@@ -259,7 +259,16 @@ struct Assembler
 			.FailInline
 		  else
 			ASMDebug()
-			error (.Root_Fn.sourcearg, "No free local variables.")	// entirely full
+			|| D = .vdecls
+			for i in 32
+				|| ii = 1<<i
+				if r & ii
+					print "t"
+				if D & ii
+					print "r"
+				if (D|||r)&ii
+					printline i
+			error (.Root_Fn.sourcearg, "Decl and temp clash.")	// entirely full
 		return t
 
 /////////////////////////////////////////////////////////////////

@@ -54,11 +54,11 @@ void JB_Str_PrintLine (JB_String* s) {
 		if (n)
 			memcpy(Buf, s->Addr, n);
 		Buf[n++] = 10;
-		JB_Write_(PrintFile, Buf, n);
+		JB_Write_(PrintFile, Buf, n);		// only one write() call
 	} else {
 		JB_Write_(PrintFile, s->Addr, n);
 		Buf[0] = 10;
-		JB_Write_(PrintFile, Buf, 1);
+		JB_Write_(PrintFile, Buf, 1);		// two write() calls
 	}
 	fsync(PrintFile);
 }

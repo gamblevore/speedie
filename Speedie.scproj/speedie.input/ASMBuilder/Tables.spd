@@ -200,9 +200,9 @@ function TypeCast (fn_asm)
 	opt norefcounts
 	|| f = exp.first!
 	|| NewDecl = exp.ASMDecl
-	if newdecl.isbarestruct
+	if newdecl.IsBareStruct
 		return asmreg() as asmreg.discard
-
+	
 	dest.µtype = newdecl.mu.DataType
 	|| From = .µGetASM(F, dest)
 	if From.µtype == dest.µtype
@@ -213,7 +213,7 @@ function TypeCast (fn_asm)
 		from.µtype = NewType
 		return from
 
-	|| OldType = from.µtype	
+	|| OldType = from.µtype
 	if oldtype is bool // bools are normally considered bitcorrect. it would be impossible to do jbor otherwise.
 		from.µtype = newtype
 		return from

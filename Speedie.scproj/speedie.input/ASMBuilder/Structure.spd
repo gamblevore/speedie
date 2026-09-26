@@ -111,20 +111,18 @@ extend assembler
 */
 	
 	function EnterBranch (|uint16|)
+		if "IsSelfCon".trap
 		|| s = .state
 		s.BranchDepth++
 		s.RealBranchDepth++
 		return .BasicParent
 	
 	
-	function ExitBranch
+	function ExitBranch (|uint16| Old)
 		|| s = .state
 		s.BranchDepth--
 		s.RealBranchDepth--
 	
-	
-	function ExitBranch (|uint16| Old)
-		.ExitBranch
 		if old != .BasicParent
 			.NextBasicBlock
 		

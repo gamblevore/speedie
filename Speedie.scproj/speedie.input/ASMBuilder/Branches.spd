@@ -242,7 +242,6 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
 	range.Start = .curr
-//	range.FirstBlock = .BasicBlock
 	|| mode = asmreg.CondRequest.Negate(neg)
 
 	rz = .µ(cond, mode)
@@ -257,14 +256,6 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	range.after = .curr
 
 
-/*
-	|| Old = .BasicParent
-	.EnterBranch
-	...
-	.ExitBranch
-	if Old != .BasicParent
-		.NextBasicBlock
-*/
 
 // this was crazy complex before. We simplified it!
 helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
@@ -337,11 +328,6 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 
-
-function BoolTestAndJump (|message| exp, |asmreg| req, |opmode| opp, |&fatasm|)
-	|| mode = ASMReg.CondRequest.negate(opp is OR)
-	return .Exists(exp, mode, req).fat!
-
 	
 function BoolAndOrSmartValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, |ASMReg|)
 	opt norefcounts
@@ -402,8 +388,10 @@ function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, 
 	if first is Const
 		return .BoolConst1(b, dest, opp, first).BoolAnswerMaybeBugged	// x = 5 or Y() --> x = Y()
 	
+	|| XMode = ASMReg.CondRequest.negate(opp is OR)
+	|| JUMP = .Exists(A, xmode, first).fat!								// AND/OR
 	|| old = .EnterBranch
-	|| JUMP = .BoolTestAndJump(a, first, opp)							// AND/OR
+	
 
 	dest.reg = first
 	|| Second = .µBoolInto(B, dest, true)

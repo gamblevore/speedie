@@ -188,14 +188,15 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
+	|asmreg| PointerCall
 	
 	.ParentSanity
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
 			
-		if  fn isnt NoInline
-			|| DepthOK = .DepthOK(fn)
+		if  fn isnt NoInline // and fn is linkinline // could disable inlines?
+			|| DepthOK = .DepthOK(fn) // at least till speedie is stable.
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
 			
@@ -206,7 +207,8 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		
 	  else // function pointers
 		|| f = exp.first!
-		TableID = .µ(f).Reg
+		PointerCall = .µ(f)
+		TableID = PointerCall.reg
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 	
 	dest = .FunctionDestination(exp, dest, fn)
@@ -218,6 +220,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		|| i = 0
 		|| args = fn.args
 		for	p.fast in prms
+			// todo: The last call to µFuncPrms doesn't need µFuncPrms. Needs total ASM-dump compare.
 			regs[i] = .µFuncPrms(p!, args[i]!)
 			i++
 		.CloseVars(Closer)
@@ -230,7 +233,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		return fat.info // already set in asmcall
 
 	|| HighBit = .TempMe(datatypecode.uint64|asmreg|)
-	|| branch = exp.JTST(asmreg(tableid), 63)
+	|| branch = exp.JTST(PointerCall, 63)
 	branch.OperatorMul(highbit)
 	.ASMCall(exp, dest, fn, tableid, regs, false)
 	|| J = exp.jump
@@ -241,7 +244,6 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	
 	.GrabbedRegisters(exp, Start,  fn2)
 	return fn2.info
-
 
 
 function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&asmreg| Regs, |bool| Cpp, |&fatasm|)

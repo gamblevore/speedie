@@ -119,8 +119,12 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	OrigTemps = OrigTemps &~ .VTemps
 	
 	if OrigDecls and (exp or params)
+		if .vtemps & OrigDecls
+/			ASMDebug()
 		.VDecls |= OrigDecls
 	if OrigTemps and params
+		if .vdecls & OrigDecls
+/			ASMDebug()
 		.VTemps |= OrigTemps
 	
 	return return
@@ -269,6 +273,8 @@ function @assembler.ASMDebug (|int| Level=-1)
 	visible
 	opt norefcounts
 	.ASMDebug(scfunction.currfunc!, level)
+	target !debug
+		printline app.StackTrace
 	
 
 

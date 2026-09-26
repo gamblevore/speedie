@@ -4,7 +4,7 @@ struct FatASM
 	linkage
 		cpp_part FAT
 //		sort_properties true // no... we must have it this order.
-	
+							 // Specifcally for tightness, but also to allow inputs to overwrite _const 
 	|ASMParam[5]|		Prms
 	|uint16|			BasicBlock
 	|int16|				RefCount
@@ -364,16 +364,16 @@ struct FatASM
 			if self == RefCountTrap
 		.RefCount = value
 	
+	
 	function RegInput (|int| a, assigns:|asmreg|)
 		.prms[a] = value.Prm
 		|| i = value.FatIndex
 		|| sh = Assembler.sh
 		if !i // oof
-			if "ClassOfObjForC".trap
-				i = sh.regs.setters[value.reg]
+			i = sh.regs.setters[value.reg]
 			if !i
 				return
-/			0 // why?
+			// once all params come from nops... we can break here always.
 		
 		|| src = sh.funcstart_+i
 		if src < self

@@ -66,7 +66,7 @@ extend Assembler
 		require !.EntireInlineFailed
 		|| First = exp.first!
 		|| Last = exp.last!
-		target debug: || MathTrap = ++ASMTrapper, if MathTrap == 312699
+		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
 
 		|| Closer = .OpenVars
 				
@@ -459,7 +459,11 @@ extend Assembler
 		return exp.ASMDecl.Internal
 
 
-	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |bool|)
+	function trap (|int| N)
+		target debug
+			if asmtrapper == N
+	
+	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |asmreg|)
 //		x = y + 1
 //		x = x + 1
 //			-->
@@ -480,9 +484,9 @@ extend Assembler
 		|| add2 = XY1.prms[2] + add		
 		if add2.CanStoreAsAddK
 			if Changed
-				require .ReDest(xy1, xout)
+				xout = .ReDest(xy1, xout)		#require
 			xy1.p2 = add2
-			return true
+			return xout
 		
 		
 	function IntPlus     (fn_opasm)
@@ -510,8 +514,8 @@ extend Assembler
 				RR = -RR
 			rr *= lmul
 			if .CanAddK(r, RR)											// a - 1,  a + 1
-				if .InlineAddK(l, rr, dest)
-					return dest
+				|| Fast = .InlineAddK(l, rr, dest)
+					return fast
 				if 0: exp.QADK
 				return exp.ADDK(dest, L, RR).Vectorise(dest, asm.QADK)
 
