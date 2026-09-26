@@ -66,7 +66,7 @@ extend Assembler
 		require !.EntireInlineFailed
 		|| First = exp.first!
 		|| Last = exp.last!
-		target debug: || MathTrap = ++ASMTrapper, if MathTrap == -1
+		target debug: || MathTrap = ++ASMTrapper, if MathTrap == 312699
 
 		|| Closer = .OpenVars
 				
@@ -592,7 +592,7 @@ extend Assembler
 	
 	function Plus (fn_opasm)
 		rz = .Plussub(exp, dest, l, r)
-		rz = rz asnt asmreg.subtract
+		(rz isnt subtract)
 
 
 	function PlusSub (fn_opasm)
@@ -1042,11 +1042,13 @@ extend Assembler
 			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
 										// we can fuck around with it as much as we like >:3
 
+		/*
 		target debug
-			if IntoTrap
+			if BoolTrap
 				f.debugprint
 				DebugPrint()
 				debugger
+		*/
 		
 		return .redest(f, dest)
 	

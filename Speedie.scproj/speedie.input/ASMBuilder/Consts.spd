@@ -31,6 +31,8 @@ extend Assembler
 					|| info = f.info
 					if info.µType.SpecialReg == Special
 						(info is blocknop) // the value might have not been used yet:   x[1] = 1
+						(info isnt alreadynegated)
+						(info isnt negate)
 						return info
 	
 			

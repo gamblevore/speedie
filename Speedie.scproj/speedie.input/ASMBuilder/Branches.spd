@@ -165,7 +165,8 @@ function NopBranch (|fatasm| start)
 
 function Ternary		(fn_asm)
 	opt norefcounts
-	return .MainBrancher(exp, dest as asmreg.veryspecial)
+	(Dest is veryspecial)
+	return .MainBrancher(exp, dest)
 
 
 function TernaryOfLocals (|message| cond, |asmreg| dest, |message| A, |message| B, |asmreg|)
@@ -715,6 +716,9 @@ function @assembler.PrintRegs
 		while ++i <= 31
 			|| test = 1<<i
 			if X&Test
+				print "$i = "
 				|| msg = .sh.declarations[i]
-					"$i = $msg"
+					printline msg
+				  else
+					printline "?"
 

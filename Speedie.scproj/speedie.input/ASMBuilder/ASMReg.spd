@@ -24,7 +24,7 @@ datatype ASMReg (uint64)
 		DebugVars = [DebugVarOpen, DebugVarClose]
 		ParamNeedsCopy
 		NoScale
-		FromInline			// remove?
+		FromInline
 		ContainsAddr
 		ConstRequest		// Could we merge? Probably dont want const+cond+AddrRequest
 		CondRequest			// Perhaps the responses could also be merged into a number, all exclusive.
@@ -36,11 +36,12 @@ datatype ASMReg (uint64)
 		VerySpecial
 		Const
 		StatelessFunc
-//		NotNil				// probably a big addition. Will need tests...
+//		NotNil				// Probably a big addition. Will need tests...
 		Set
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
 		TempFlags		= OKAsTemp	||| Temp
+		InlineFlagsToKeep = TempFlags  |||  Set  |||  NewlyDeclared
 		FlagsToRemove	= Const		||| Discard
 		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
 		// don't go above 47

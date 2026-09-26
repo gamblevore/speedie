@@ -222,16 +222,16 @@ struct FatASM
 	
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
 		if !.IsWithinCurrInline(f)
-			// all the callers assume this works... but it fails here
-/			return nil // seems to never be called
+			return nil
 		
 		require !f.isfunc
 		
 		if f isa asm.phi // bruh. Would need to redest it's inputs, and their inputs inputs.
-			target debug
-				f.asmreg(1).debugprint
-				f.asmreg(2).debugprint
-/			return nil // do another day.
+						 // also... we would need to do ALL or none
+						 // AND... they all need to be within the currinline.
+						 // and all the things that used them need to be changed...
+						 // assuming we cahnged a decl. Not so bad if its a temp. Either way don't do it.
+			return nil // do another day.
 
 		|uint| o = f.OutputPrms
 			|| a = o.log2

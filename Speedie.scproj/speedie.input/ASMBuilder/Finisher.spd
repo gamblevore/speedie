@@ -1,7 +1,5 @@
 
 
-// MiniOptimisations, miniopts, optimize, finishmost 
-
 function Assembler.AddMissingReturn (|&fatasm|)
 	|| Last = .LastReal
 	|| S = .FuncStart

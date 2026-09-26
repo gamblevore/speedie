@@ -188,10 +188,10 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 	|| dest2 = dest
 	if dest isnt discard
 		if !dest.reg or (dest is temp and ExitAtAll)
-			dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
 			require .TempCheck(dest)
+			dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
 	
-	dest2 = dest2.simplify
+	dest2 = dest2.simplify // as (dest & asmreg.InlineFlagsToKeep) // put in later
 	dest2.µtype = fn.ASMReturn.ASMRegType
 	if !dest2.reg
 		(dest2 is discard)

@@ -96,13 +96,14 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		rz = exp.RD4U(dest, base, VarAdd, index, pinc)
 		byte_shift = (byte_shift<<1) + t.issigned
 		op = ASMType.ReadASM[byte_shift]
+		if "ExpandBits".trap
 	
 	
 	rz._op = op
 	if pinc				// || y = (x++)[]
 		rz.incr
 		rz.Dest(1, base, self) // base is being written to, but it is still an input
-	if rz is const // what
+	if rz is const		// what
 
 
 function MemOpt (|$asmreg| base, |$int| index, |int| bytes, |int|)
@@ -161,7 +162,7 @@ function Assembler.MemOffsetFix (|| base, |int| pow2, |$int| index, |uint| MaxBi
 	i = (index << pow2) + LostBytes
 	index = 0
 
-	base = base as asmreg.NoScale
+	(base is NoScale)
 	return .AddToReg(exp, nil, base, i, base)
 
 

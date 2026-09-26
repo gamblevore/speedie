@@ -79,6 +79,7 @@ class SCParamArray
 		return StdErr.ErrorCount > .errcount
 	
 	function IsSelfCon (|bool|)
+//		opt norefcounts
 		return (.isself or .issuper) and (scfunction.currfunc is constructor)
 	
 	function IgnoreSelfContain (|int|)

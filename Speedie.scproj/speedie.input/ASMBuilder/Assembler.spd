@@ -172,9 +172,9 @@ struct Assembler
 		.AddToReg(exp, dest, src, value, src)
 
 	
-	function DeclareBody (|Message| where,  |scdecl| Type,  |asmreg|)
-		return .DeclareVar(where, type) // as asmreg.Declaration	// this makes AddAK_K and others bigger?
-		// Generally this uses less registers tho! Needs marked as temp+decl sometimes!
+	function DeclareBody (|Message| where,  |scdecl| Type, |asmreg| extra=nil,   |asmreg|)
+		(extra is newlydeclared)
+		return .DeclareVar(where, type, Extra)
 
 							
 	function DeclareMe (|Message| where, |asmreg| V=nil, |asmreg|)
@@ -189,8 +189,9 @@ struct Assembler
 		.Vdecls = d
 		if freebit and !(d & .VTemps)
 			if Index < asmreg.DontWantTempsHere or .InlineDepth == 0
-				return v
-			#!inlining too many registers
+				return v // typical success case.
+		
+		#!inlined too many registers
 
 		if .InlineDepth > 0
 			.FailInline
@@ -199,14 +200,12 @@ struct Assembler
 		return v
 	
 
-	function DeclareVar (|Message| where,  |scdecl| Type,  |asmreg|)
+	function DeclareVar (|Message| where,  |scdecl| Type, |asmreg| extra=nil,    |asmreg|)
 		rz = Type.CalculateASMType
-//		|| ret = .IsOnlyVarThatWeReturn(type)
-//			return ret
-		
 		rz = .DeclareMe(where, rz)
 		Type.WholeType = rz
 		type.DepthOfLoop = .LoopDepth
+		(rz as= extra)
 		
 		target debug: Type.ASMSanity
 
@@ -269,9 +268,9 @@ struct Assembler
 	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |bool| Force, |asmreg|)
 		dest.µType = DataTypeCode.bool
-		IntoTrap++
+		BoolTrap++
 		|| x = (force)(.µinto(exp, dest), .µ(exp, dest))
-		IntoTrap--
+		BoolTrap--
 		if x.IsBool
 			return x
 		return .Exists(exp, dest, X)
@@ -300,7 +299,11 @@ struct Assembler
 			|| r = s.Return.reg
 				dest.reg = r
 				return dest
-		return .DeclareBody(exp, a) as dest
+				// its only newlydeclared if it really is newly declared.
+				// || x = .func1, x = .inlined(x) // x is not newly declared 
+		
+		return .DeclareBody(exp, a, dest)
+
 
 	
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
@@ -313,7 +316,6 @@ struct Assembler
 		|| OV = .OpenVars
 
 		dest = .µInlineImproveDest(exp, a, dest)		
-		(dest is NewlyDeclared)
 		|| Closer = .OpenVars
 
 		|| Curr = .curr
@@ -362,7 +364,7 @@ struct Assembler
 			.BreakRequest |= assembler.Breakable
 
 		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
-			Dest = Dest asnt ASMReg.NewlyDeclared
+			(Dest isnt NewlyDeclared) // why remove? need total ASM-dump test
 		  elseif Dest is temp										//	x = (y + 1) + (z + 1)
 			Dest = .TempMe(Dest)
 		  else
@@ -370,13 +372,14 @@ struct Assembler
 			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
 			// but these are functionally temps.
 			Dest = .DeclareMe(exp, Dest)
+			(dest is newlydeclared)
 			(dest isnt const)										// :3
 		
 		require .TempCheck(dest)
 
 		|| r = .µGetASM(Exp, Dest)
 		ov = ov.AddReg(R)
-		// this will close all vars, except the one we just got back!
+		// This will close all vars, except the one we just got back!
 		return .CloseVars(ov, nil, r)
 	
 		
@@ -435,8 +438,8 @@ struct Assembler
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM
-		dest = dest asnt asmreg.const		// a dest is a dest. so it should never be a const, right?
-											// I mean it can be, but WE have to decide that, not the caller.
+		(dest isnt const)				// a dest is a dest. so it should never be a const, right?
+										// I mean it can be, but WE have to decide that, not the caller.
 		target debug
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
@@ -669,4 +672,4 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 
 
 
-|| IntoTrap = 0
+|| BoolTrap = 0

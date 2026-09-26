@@ -339,13 +339,12 @@ function Decl (fn_asm) // DeclareSub declare
 	
 function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
 	opt norefcounts
-	if !dest or dest is temp // can't declare temps!
+	if !dest or dest is temp // can't declare temps! would mess up function calls
 		dest = .DeclareBody(exp, ty)
 	  else
 		dest.µType = ty.CalculateASMType
 		ty.WholeType = dest
 		
-	(dest is NewlyDeclared)
 	.RegDebugInfo |= 1<<dest.reg
 	if ty.IsBareStruct or ty.IsCarray
 		return AllocBearStruct(1, exp, dest, ty.SizeOfQuery)
@@ -602,7 +601,8 @@ function AddressOf (fn_asm)
 	if exp.declfunc					// function pointers need to be read normally...
 		return .µGetASM(exp, dest)
 
-	rz = .µGetASM(exp, dest  as asmreg.AddrNeed)
+	(Dest is AddrNeed)
+	rz = .µGetASM(exp, dest)
 	target debug: if (rz isnt ContainsAddr)
 	(rz isnt ContainsAddr)
 	(rz isnt AddrRequest)
@@ -719,7 +719,7 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		return src
 	
 
-	src = src as asmreg.noscale
+	(src is noscale)
 	dest.µType = src.µType									// right? it can't be different.
 	|| p = exp.parent!										// better positions
 	if src is ContainsAddr
@@ -792,7 +792,7 @@ function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmre
 		dest.µtype = DataTypeCode._voidptr
 	dest = dest.haveaddr
 	dest.µtype = obj.µtype // i guess?
-	obj = obj as asmreg.NoScale
+	(obj is NoScale)
 	return .AddToReg(exp, dest, obj, pos)
 
 
