@@ -51,7 +51,7 @@ void JB_Ring_NextSibSet( JB_List* self, JB_List* NewParent );
 bool JB_Ring_PrevSibSet( JB_List* self, JB_List* NewParent );
 bool JB_Ring_LastSet( JB_List* self, JB_List* NewParent );
 bool JB_Ring_FirstSet( JB_List* self, JB_List* New );
-JB_List* JB_Ring_MakeFirst( JB_List* self );
+void JB_Ring_Swap (JB_List* S, JB_List* O);
 
 bool JB_Ring_Sanity( JB_List* ring );
 

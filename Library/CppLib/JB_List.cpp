@@ -119,7 +119,7 @@ void JB_Ring_TotalSanity(JB_List* Root) {
 
 
 
-inline void RingOwnForDeref_( JB_List* Curr ) {
+inline void RingClearLocation_( JB_List* Curr ) {
     Curr->Next = 0;
     Curr->Parent = 0;
     Curr->Prev = 0;
@@ -226,6 +226,7 @@ JB_List* JB_Ring_PrevSib( JB_List* self ) {
 		
 	return 0;
 }
+
 
 JB_List* JB_Ring_First( JB_List* self ) {
 	if (self)
@@ -384,7 +385,7 @@ void JB_Ring_ParentSet( JB_List* self, JB_List* NewParent ) {
 		JB_Ring_LastSet( NewParent, self );
 	} else if (self and self->Parent) {
 		RingLeave_( self );
-		RingOwnForDeref_( self );
+		RingClearLocation_( self );
 		JB_Decr(self);
 	}
 }
@@ -445,6 +446,40 @@ bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 }
 
 
+void JB_Ring_Swap (JB_List* S, JB_List* O) {
+	if (O==S) return;							// haha
+
+	auto SR = S->Parent;
+	auto OR = O->Parent;
+
+/*
+	SO, STO, TOS, TOS, OS
+	OS, OST, OST, STO, SO
+	
+	OAS, OAST, OSAT, SATO, SAO
+	SAO, STAO, TAOS, TOAS, OAS
+*/
+	
+	if (SR and OR) {
+		auto T = JB_Ring_Constructor0(nil);		// only sensible way.
+		JB_Ring_NextSibSet(S, T);
+		JB_Ring_NextSibSet(O, S);
+		JB_Ring_NextSibSet(T, O);
+		JB_Ring_ParentSet(T, nil);
+		return;
+	}
+	
+	if (SR == OR) { // both nil
+		return;
+	}
+
+	if (!SR and OR)
+		std::swap(O, S);
+	JB_Ring_NextSibSet(S, O);
+	JB_Ring_ParentSet(S, nil);
+}
+
+
 JB_List* JB_Ring_Constructor0( JB_List* self ) {
 	JB_New2(JB_List);
     self->Position = 0;
@@ -496,13 +531,13 @@ void JB_Ring_Destructor( JB_List* self ) {
 	// less oofing around with stuff.
 	while (Curr) {
 		JB_List* Next = Curr->Next;
-		RingOwnForDeref_( Curr );
+		RingClearLocation_( Curr );
 		JB_Decr( Curr );
 		Curr = Next;
 	};
     if (self->Parent) {
 		RingLeave_( self );
-		RingOwnForDeref_( self );
+		RingClearLocation_( self );
 		JB_SafeDecr( self );
 	}
 	JB_SetRef(self->Obj, 0);
