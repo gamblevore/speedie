@@ -110,20 +110,27 @@ extend Assembler
 		rz = rz.ExpectSameType(dest)
 
 
-	function AlreadyABool (|asmreg| L, |asmreg| Zero, |asmreg|)
-		for i in 2
-			if Zero.IsZero
-				|| B = L.Fat
-				if b and .IsCurrBlock(b, asm.bflg)
-					if (b.prms[4] == 0  and  b.prms[3] == 63)
-						L.µType = DataTypeCode.bool
-						B.info = L
-						return L
-			swap (L) (Zero)
+	function AlreadyABool (|asmreg| L, |asmreg|)
+		|| B = L.Fat
+		require b and .IsCurrBlock(b, asm.bflg)
+		if (b.prms[4] == 0  and  b.prms[3] == 63)
+			L.µType = DataTypeCode.bool
+			B.info = L
+			return L
 
 		
-	function BankOpt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
-		|| x = (L|uint64|&2)==2
+	function TryBangOpt (|asmreg| X, |asmreg| KK, |asmreg|)
+		// do later
+//		if KK is temp
+//			|| K = KK.const
+//				|| f = X.fat
+//				if f isa asm.bang
+//					|| Shift = f.prms[2]
+//					if 1<<Shift == K
+//						.NopTempConst(KK)
+//				
+		return KK
+		
 		
 
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
@@ -134,11 +141,13 @@ extend Assembler
 			|| num = ((l.const==r.const) != negate)|int|
 			return .NumToReg(exp, res, num, DataTypeCode.bool)
 		
+
+		if  r is Const  and  l isnt Const
+			swap (l) (r)
+
 		if dest isnt CondRequest
-			|| Bank = .BankOpt(exp, dest, L, R)
-				return Bank
-			if negate
-				|| B = .AlreadyABool(l, R)
+			if negate and l.IsZero
+				|| B = .AlreadyABool(R)
 					return B
 			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
 			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
@@ -146,11 +155,10 @@ extend Assembler
 			if negate
 				fat._op = asm.NQUL
 			return fat * dest
-
-		if  r is Const  and  l isnt Const
-			swap (l) (r)
 		
-		negate = !negate // jmp/cond are used oppositely
+		l = .TryBangOpt(r, l)
+
+		negate = !negate // jmp/equl are used oppositely
 		|| RS = r.issmall|int|
 		|&fatasm| fat
 		if !l.IsZero
@@ -878,6 +886,12 @@ extend Assembler
 				|| B = .CanBAND_BFLG(R)
 					return .BFLG_Sub(exp, dest, L, B, B, false)
 			
+			if (opp + 4 == asm.bank) and (r is const)
+				|uint64| K = r.const
+				if K.IsPow2
+					.NopTempConst(r)
+					return exp.BANG(Dest, L, K.log2) * dest
+					
 			|| k = .Const(R, 14, true)
 				if 0:  exp.BORK,  exp.BXRK
 				|| fat = exp.BANK(Dest, L, K)

@@ -158,8 +158,7 @@ struct FatASM
 	
 	operator isa (|asm| m, |bool|)
 		nil checker
-		if self
-			return m == .op
+		return self and (m == .op)
 			
 	syntax is (|asmreg| flags, |bool|)
 		nil checker
