@@ -246,16 +246,21 @@ function message.CallChainError (|string| name)
 
 
 |file| DebugLogFile
+function SaveStdOut
+	opt norefcounts
+	|| f = debuglogfile
+	require !f
+	f = "/tmp/logs/SpeedieASM.txt".file
+	if f.open
+		f.UseAsStdOut
+		DebugLogFile = f
+
+
 function @assembler.ASMDebug (|scfunction| fn, |int| Level)
 	cpp_name adb2
 	opt norefcounts
 	target !debug
-		|| f = debuglogfile
-		if !f
-			f = "/tmp/logs/SpeedieASM.txt".file
-			if f.open
-				f.UseAsStdOut
-				DebugLogFile = f
+		SaveStdOut()
 	"---"
 	printline fn
 	|| Start = fn.µStart
@@ -311,11 +316,4 @@ function @assembler.PrintRegs
 					printline msg
 				  else
 					printline "?"
-
-
-//|&fatasm| FatSanity
-//function TestFatSanity
-//	|| f = FatSanity
-//	if f and f.op == asm.halt
-
 

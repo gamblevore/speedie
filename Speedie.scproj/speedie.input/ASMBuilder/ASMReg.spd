@@ -270,7 +270,13 @@ datatype ASMReg (uint64)
 		return self
 
 	
-	function Reg (assigns:|asmreg|, |asmreg|)
+	function SlimReg (assigns:|asmreg|, |asmreg|)
+		.reg = value.reg
+		self = .temp(value)
+		return self
+
+	
+	function FatReg (assigns:|asmreg|, |asmreg|)
 		// we could do all of this in two bit-operations...
 		// just clear, then copy
 		.reg = value.reg
@@ -306,10 +312,10 @@ datatype ASMReg (uint64)
 			return dest.µtype.zero
 		return dest
 	
-	function TryReg (assigns:|asmreg| dest, |asmreg|)
+	function TryDestReg (assigns:|asmreg| dest, |asmreg|)
 		if .reg or dest isnt temp
 			return self
-		.reg = dest
+		.slimreg = dest
 		return self
 	
 	target debug {

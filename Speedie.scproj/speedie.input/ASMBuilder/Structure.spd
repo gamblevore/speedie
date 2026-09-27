@@ -111,7 +111,7 @@ extend assembler
 */
 	
 	function EnterBranch (|uint16|)
-		if "IsSelfCon".trap
+		// if "IsSelfCon".trap
 		|| s = .state
 		s.BranchDepth++
 		s.RealBranchDepth++

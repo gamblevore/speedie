@@ -223,7 +223,7 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)
 	opt norefcounts
-	dest = .TempMe(dest)
+	dest = .TempMe(cond.parent, dest)
 	|| C = ASMReg()
 	ifn (Dest iz A or B)
 		C = dest
@@ -322,9 +322,11 @@ function UniqueLocation (|message| A, |asmreg| dest, |message| B, |asmreg|)
 	// a = a or b, can   directly set 'a' (But code isnt't smart enough?)
 	// a = b or a, can't directly set 'a'
 	// a = b or c, can   directly set 'a'
+	opt norefcounts
+	
 	if dest.reg and .Unchanged(A, dest, B)
 		return dest
-	rz = .TempMe()
+	rz = .TempMe(A.parent)
 	(rz is negate) = (Dest is negate)
 	rz.µtype = dest.µtype	
 
@@ -388,12 +390,12 @@ function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, 
 	if first is Const
 		return .BoolConst1(b, dest, opp, first).BoolAnswerMaybeBugged	// x = 5 or Y() --> x = Y()
 	
+	|| old = .EnterBranch
 	|| XMode = ASMReg.CondRequest.negate(opp is OR)
 	|| JUMP = .Exists(A, xmode, first).fat!								// AND/OR
-	|| old = .EnterBranch
 	
 
-	dest.reg = first
+	dest.slimreg = first
 	|| Second = .µBoolInto(B, dest, true)
 	if Second is Const
 		second = .BoolConst2(first, second, opp, jump).BoolAnswerMaybeBugged
@@ -445,7 +447,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	opt norefcounts
 	
 	|fatrange| AndTest
-	|| First = .Branch(A, andtest, dest is negate)
+	|| First = .Branch(A, andtest, dest is negate)	// could just use .exists and test the const value
 	if AndTest.never
 		return first
 
@@ -474,7 +476,9 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	opt norefcounts
 
 	|FatRange| OrTest
+	|| Old = .EnterBranch
 	|| First = .Branch(A, OrTest, dest isnt negate)
+	.ExitBranch(old)
 	(first is alreadynegated) = dest is negate			// fix :]
 	|| KF = OrTest.Constness.negate
 	if kf.knowntrue
@@ -486,7 +490,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	|fatrange| Br2
 	|| Phi = .PhiInit()
-	|| Old = .EnterBranch
+	Old = .EnterBranch
 	|| Second = .Branch(B, Br2, dest is negate)
 
 	// if this branch... creates no instructions (fully known)

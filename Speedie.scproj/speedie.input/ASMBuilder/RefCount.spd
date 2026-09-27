@@ -27,7 +27,7 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	
 	|| glob = DestMsg.ASMDecl
 	if  B is ContainsAddr
-		|| where = .TempMe
+		|| where = .TempMe(exp)
 		where.µtype = datatypecode._voidptr
 		B = .Read(where, SrcMsg, B, nil, SrcMsg.ASMDecl) * where	// (mem to reg)?
 	

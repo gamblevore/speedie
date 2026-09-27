@@ -153,7 +153,7 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 		return ret
 	
 	BeefIn = r.info
-	ret.reg = beefin			// keep exit flags or other stuff
+	ret.slimreg = beefin			// keep exit flags or other stuff
 	ret.µtype = beefin.µtype	// not copied in .reg...
 	.SoftNop(BFLG)
 	return ret
@@ -234,7 +234,7 @@ function TypeCast (fn_asm)
 			from.µtype = newtype
 			return from
 	
-	dest = .TempMe(dest)
+	dest = .TempMe(exp, dest)
 	
 	if (OV|||NV) > 1
 		if NewType.IsFloat == oldtype.isfloat
@@ -310,7 +310,7 @@ function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl|
 	dest.µType = Reff.µType
 	
 	if dest isnt set
-		dest = .TempMe(dest)
+		dest = .TempMe(exp, dest)
 		if dest is ContainsAddr // how?
 		// dest = reff --> dest = *reff
 		return .Read(dest, exp, Reff, nil, nil) * dest
@@ -493,7 +493,7 @@ function Dot (fn_asm)										// a.b
 	
 	if dest isnt set
 		if (!dest.reg) and (obj is temp)
-			dest.reg = obj					// Keeps the const. not what we want
+			dest.slimreg = obj					// Keeps the const. not what we want
 			(dest isnt Const)
 		
 											// We can't return an address if we are setting?
@@ -633,9 +633,9 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 	opt	NoRefCounts
 	|| TmpCloser = .OpenVars
 	if dest is Discard
-		dest = .TempMe(Dest)
+		dest = .TempMe(f, Dest)
 	if Dest iz Addr
-		dest = .TempMe
+		dest = .TempMe(f)
 
 	(addr is BlockNop)
 	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ
@@ -701,7 +701,6 @@ function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
 function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
-//	if dest is const							// should never happen	(look below)
 	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
 	|| D = exp.ASMDecl
 	|| Amount = IncrAmount(src, mode, D)
@@ -709,11 +708,10 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	if dest is discard
 		mode = IncrBefore
 	  elseif !dest.reg
-//		(dest isnt const)						// remove test!!		(look above)
 		if mode & IncrAfter
 			dest = .TempTyped(exp, dest)
 		  else
-			dest.reg = src
+			dest.slimreg = src
 	  elseif (dest iz src) and (mode & IncrAfter)
 		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	// x = x++ makes no sense
 		return src
@@ -826,7 +824,7 @@ function ExistingVar (|message| m, |asmreg|)
 
 function Str (fn_asm)
 	opt	norefcounts
-	dest = .TempMe(dest)
+	dest = .TempMe(exp, dest)
 	dest.µtype = DataTypeCode._voidptr
 	
 	|| real = exp.name|MessageID|
@@ -848,7 +846,7 @@ function Str (fn_asm)
 
 helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 	|| T = src.BasicVec.reg(0)
-	T = .TempMe(T)
+	T = .TempMe(exp, T)
 	|| Mode = (1<<2) + (1<<5) + (1<<8) + (1<<11)
 	return exp.VSWZ(T, src, Mode) * T
 

@@ -386,7 +386,7 @@ function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg
 			|| value = s.inputfat(0)
 				rz = .PerhapsPhi(exp, value.info, rz)
 			  else
-				rz.reg = s.asmreg(0)
+				rz.fatreg = s.asmreg(0)
 				rz.µType = .state.return.µType
 			
 			if value

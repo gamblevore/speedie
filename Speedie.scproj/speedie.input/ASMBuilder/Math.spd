@@ -140,7 +140,7 @@ extend Assembler
 			if negate
 				|| B = .AlreadyABool(l, R)
 					return B
-			dest = .TempTyped(TypeBool!.TypeNormal, dest)
+			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
 			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
 			|| fat = exp.EQUL(dest, L, R, Mode)
 			if negate
@@ -536,7 +536,7 @@ extend Assembler
 	function SmallToBig (|ASMReg| Src, |ASMReg| Cmp, |message| exp, |ASMReg|)
 		if src.issmall and cmp.IsBig
 			cmp.reg = 0
-			|| dest = .TempMe(cmp)
+			|| dest = .TempMe(exp, cmp)
 			return .BFLG_Sub(exp, dest, src, 32, 32, false)
 		return src
 		
@@ -601,12 +601,12 @@ extend Assembler
 
 	function PlusSub (fn_opasm)
 		if r.iszero								// allow a = a ± 0
-			dest.reg = l
+			dest.fatreg = l
 			return dest
 		
 		if l isnt Subtract						// 0 + a
 			if l.iszero
-				dest.reg = r
+				dest.fatreg = r
 				return dest
 		  else
 			if (r iz l)

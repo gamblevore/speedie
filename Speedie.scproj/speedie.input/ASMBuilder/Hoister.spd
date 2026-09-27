@@ -37,7 +37,7 @@ function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	if compiler is hungry
 		(d is asmreached)
-	dest = .temptyped(d, dest)
+	dest = .temptyped(exp, dest, d)
 	(Dest is GlobalMemory)
 	dest = dest.haveaddr	
 	dest.µtype = DataTypeCode._voidptr

@@ -45,10 +45,10 @@ struct Assembler
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
-	|byte|					StackSize
+	|byte|						StackSize
 	|InlineState[8]|			InlineState
 	|scfunction--|				Root_Fn
-	|(Message--)[32]|		Declarations
+	|(Message--)[32]|			Declarations
 
 	|uint16[32]|				DelayedNops
 	|?&FatASM|					InlineEnd
@@ -71,6 +71,7 @@ struct Assembler
 		|uint16|					StringsOutOfRange
 		|jbin?|						DebugDecls
 		|uint16[16K]|				BlockParents // this should be part of the FatASM. need to free a few bytes first.
+		|uint|						SanityCount
 
 	
 	function State (|&InlineState|)
@@ -82,12 +83,12 @@ struct Assembler
 	function FuncStart (|&fatasm|)
 		return .FuncStart_ + 1
 
-	function Fat (|uint16| Index, |&fatasm|)
-		if index
-			return .funcstart_ + index
+//	function Fat (|uint16| Index, |&fatasm|)
+//		if index
+//			return .funcstart_ + index
 		
-	function Fat (|asmreg| F, |&fatasm|)
-		return .fat(f.fatindex)
+//	function Fat (|asmreg| F, |&fatasm|)
+//		return .fat(f.fatindex)
 		
 	function FnLength (|int|)
 		return .curr_ - .funcstart
@@ -142,7 +143,7 @@ struct Assembler
 			T = DataTypeCode.int
 		if !dest.reg
 			dest.µtype = T
-		dest = .TempMe(dest)
+		dest = .TempMe(exp, dest)
 
 		|| Where = orig • dest
 		(where is Const)
@@ -164,7 +165,7 @@ struct Assembler
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
 			return exp.ADAK(dest, Src, Value) * Dest
-		rz = .Assign(exp,  .TempMe(dest),  Src)
+		rz = .Assign(exp,  .TempMe(exp, dest),  Src)
 		if !dest.reg
 			dest = src
 		.AddToReg(exp, dest, src, value, src)
@@ -225,19 +226,19 @@ struct Assembler
 		.vtemps_ = value
 
 
-	function TempTyped (|scdecl| Type, |asmreg| T,  |asmreg|)
+	function TempTyped (|message| exp,  |asmreg| T, |scdecl| Type, |asmreg|)
 		if type
 			t.µtype = type.mu.DataType
-		return .TempMe(t)
+		return .TempMe(exp, t)
 	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
 		t.µtype = where.asmdecl.mu.DataType
-		return .TempMe(t)
+		return .TempMe(where, t)
 
 
-	function TempMe (|asmreg| T=asmreg.Temp, |asmreg|)
+	function TempMe (|message| where, |asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
 		if t.reg
 			return t
@@ -248,6 +249,7 @@ struct Assembler
 		|| Free = (~r).Log2			// Find lowest free bit.
 		r |= 1<<Free
 		t.reg = Free
+		.Declarations[free] = where
 		.VTemps = r
 		(t isnt Const)				// why would it be?
 		(t is temp)
@@ -303,11 +305,10 @@ struct Assembler
 	function µInlineImproveDest (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)
 		|| s = .state
 		if s.CanReturnAnyReg and (A is ReturnedLocal)
-			|| r = s.Return.reg
-				dest.reg = r
+			|| r = s.Return
+			if r.reg and r isnt temp // do we need this? what if the param gets wiped?
+				dest.slimreg = r
 				return dest
-				// its only newlydeclared if it really is newly declared.
-				// || x = .func1, x = .inlined(x) // x is not newly declared 
 		
 		return .DeclareBody(exp, a, dest)
 
@@ -317,11 +318,14 @@ struct Assembler
 		// We just want to avoid passing a register twice, once as a reference
 		// and another as the actual reg... cos if we alter the refered ASM reg
 		// that will alter the actual reg.
-
+		
+		target debug
+			|| InlineParamTrap = ++asmtrapper
+			if InlineParamTrap == -1
 		if exp is BreakPoint
 			.Breakrequest |= BreakPoint
 
-		|| OV = .OpenVars // why am i opening this twice? And closing it twice?
+		|| OV = .OpenVars						// Why am i opening this twice? And closing it twice?
 		dest = .µInlineImproveDest(exp, a, dest)		
 		|| Closer = .OpenVars
 
@@ -374,7 +378,7 @@ struct Assembler
 		if Dest is NewlyDeclared									// || x = (y + 1) + (z + 1)
 			(Dest isnt NewlyDeclared) // why remove? need total ASM-dump test
 		  elseif Dest is temp										//	x = (y + 1) + (z + 1)
-			Dest = .TempMe(Dest)
+			Dest = .TempMe(exp, Dest)
 		  else
 			// when compiling:		x()[y()] = z()
 			// function y() will destroy temps in z() and x(), so we need (temp) declarations.
@@ -435,13 +439,29 @@ struct Assembler
 			m.debugprint
 			debugger
 
-	
+
+	function Sanity
+		return
+		|| s = .TotalStart
+		|| a = .curr
+		|| C = SanityCount++
+		while s < a
+			if (s.Op == nil) and (s.const!=123456789)
+				SaveStdOut()
+/				"Corrupted: $C"
+				printline app.StackTrace
+				app.Quit(-1)
+				exit
+			s++
+
+
 	function µGetASM (|message| exp, |AsmReg| Dest = asmreg(), |asmreg|)
 		opt norefcounts
 		cpp_part GetASM
 		(dest isnt const)				// a dest is a dest. so it should never be a const, right?
 										// I mean it can be, but WE have to decide that, not the caller.
 		target debug
+			.Sanity
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
@@ -453,6 +473,7 @@ struct Assembler
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
+			.Sanity
 			.StackSize--
 			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"

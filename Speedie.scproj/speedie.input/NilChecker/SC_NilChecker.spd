@@ -31,7 +31,7 @@ extend_module ArchonPurger {
 		(ASMType.kSwap):		Swap
 		(ASMType.kReturn):		Return
 		(ASMType.kTern):		Tern
-		(ASMType.kStatExpr): 	StatExpr
+		(ASMType.kStatExpr):	StatExpr
 		(ASMType.kIgnore):		Ignore
 		(ASMType.krejoin):		Rejoin
 		(ASMType.kFail):		Fail
@@ -153,7 +153,7 @@ function Rel (NilTrackerFn)									// x = y
 	|SCOperator| scop
 	|| op = ll.next
 		scop = op.obj|scoperator|
-	expect (scop) (msg) 
+	expect (scop) (msg)
 	|| rr = op.next!
 
 	if scop Is Compare
@@ -322,7 +322,7 @@ function DetectStillChecks (|message| first, |nilstate|)
 		return rz
 
 	|| F = first.TrueNess(rz)
-	|| SelfNil = .t.self is nilish 
+	|| SelfNil = .t.self is nilish
 	if f.Knownfalse
 		if !SelfNil
 			.t.FnAbleToNilCheck = false		// also require that false returns ALWAYS have self nil!
@@ -398,7 +398,7 @@ function If (NilTrackerFn)
 		ElseIfCond = arg2
 		arg2 = arg2.next
 
-	|| Orig = .T.BranchEnter(msg) #require
+	|| Orig = .T.BranchEnter(msg)						#require
 	
 	#!"First Branch"
 	.SyncJump(Cond, NilCheckMode.Ifpos)
@@ -408,7 +408,7 @@ function If (NilTrackerFn)
 	|| First = .T.BranchSwap(Orig)
 
 	#!"Second Branch"
-	.SyncJump(cond, NilCheckMode.ifneg) // we need the negative, for the merging.
+	.SyncJump(cond, NilCheckMode.ifneg)					// we need the negative, for the merging.
 	if ElseIfCond
 		.if(Else)
 	  elseif arg2.HasAny
@@ -446,11 +446,11 @@ function BooleanLogic (NilTrackerFn)
 	|| AA = msg.first!
 	|| BB = msg.last!
 	|| IsAnd = test is AND
-	(test is AND) = false 
+	(test is AND) = false
 
-	|| Orig = .T.BranchEnter(AA)	#require
+	|| Orig = .T.BranchEnter(AA)									#require
 	if IsAnd == (test is positive)
-		|| NC = .Jump(AA, test ||| nilcheckmode.ForBools)				// x = (!a or !a.y)
+		|| NC = .Jump(AA, test ||| nilcheckmode.ForBools)			// x = (!a or !a.y)
 		NC   |= .JumpWithinBool(BB, test)
 		.t.BranchExitBool(.value, test, orig)
 		return nilstate.real ||| (NC & nilstate.FnBecomesNilCh)
@@ -573,7 +573,7 @@ function ThingSub (|message| msg,  |nilcheckmode| test,  |scdecl| dcl,  |nilstat
 function StatExpr (NilTrackerFn)
 	opt norefcounts
 	return Argument(msg.first!, test)
- 
+
 
 function Argument (NilTrackerFn)
 	opt norefcounts
@@ -741,7 +741,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 	if recv.StatedReal and ((recv isnt local) or (recv is reference))
 		if SentState isnt nilish
 			return sentstate
-		if (SentState is realish) 
+		if (SentState is realish)
 			return .BecomeReal(sent, SentMsg, NilReason.using)
 		
 		if (recv is property) and (recvmsg.func == @dot)
@@ -864,7 +864,7 @@ function message.DenyPreviousUse (|message| msg)
 
 	for ch.flat in .parent
 		if ch == self
-			return 
+			return
 		if ch.obj == decl
 			error (ch, "Unsafe var passing. (Altered later in expression)")
 	

@@ -17,9 +17,9 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
 	if !dest.reg
-		dest.TryReg = Vara
-		dest.TryReg = Base
-		dest = .TempMe(dest)
+		dest.TryDestReg = Vara
+		dest.TryDestReg = Base
+		dest = .TempMe(exp, dest)
 	return .Plus(exp, dest, base, vara)
 
 

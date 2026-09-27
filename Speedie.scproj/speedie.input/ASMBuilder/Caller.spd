@@ -107,7 +107,7 @@ function fatasm.CurrGrabID (assigns:|byte|)
 
 function GrabAddr (|message| exp, |AsmReg| Dest, |scdecl| d, |asmreg| T, |asmreg|)
 	opt norefcounts
-	dest = .TempTyped(d, dest)
+	dest = .TempTyped(exp, dest, d)
 	
 	|| fat = exp.GRAB(dest, t)
 	fat.CurrGrabID = .CurrFuncGrab
@@ -232,7 +232,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		.GrabbedRegisters(exp, Start, fat)
 		return fat.info // already set in asmcall
 
-	|| HighBit = .TempMe(datatypecode.uint64|asmreg|)
+	|| HighBit = .TempMe(exp, datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(PointerCall, 63)
 	branch.OperatorMul(highbit)
 	.ASMCall(exp, dest, fn, tableid, regs, false)

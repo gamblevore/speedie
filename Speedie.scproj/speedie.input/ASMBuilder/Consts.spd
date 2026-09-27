@@ -43,7 +43,7 @@ extend Assembler
 			|| Found = .MegaNumFinder(v, special, dest.µtype)
 				return Found
 		
-		dest = .TempMe(dest)		
+		dest = .TempMe(exp, dest)		
 		if dest isnt blocknop
 			//	It seems we can nop this better.
 			//		* lastreal only checks if its the current block, rather than are we 'within' it.
