@@ -231,7 +231,7 @@
 "#pragma GCC optimize (\"O"
 "#pragma GCC visibility pop\n"
 "#pragma GCC visibility push(default)\n"
-"IsSelfCon"
+" (But it does exist on the module.)"
 "funcaddr"
 "--verify"
 "uint"
@@ -2395,4 +2395,3 @@
 "t"
 "GUI_ctrl_SizeSet"
 "Can only swap registers."
-" (But it does exist on the module.)"

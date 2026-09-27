@@ -2511,6 +2511,7 @@ extern MWrap* SC__Pac_HoistSpace;
 extern MWrap* SC__Pac_JSM;
 #define kSC__Pac_kContinue ((int)254)
 #define kSC__Pac_kExit ((int)255)
+extern uint SC__Pac_SanityCount;
 extern Assembler SC__Pac_Sh;
 extern u16 SC__Pac_StringsOutOfRange;
 extern Array* SC__Cpp_Cpp_Includes;
@@ -4171,6 +4172,8 @@ SCNode* SC_RootCollectTable_static(Message* Node, SCNode* Name_space, Message* E
 
 SCDecl* SC_SameTypeSub(Message* First, Message* Second, SCNode* Name_space);
 
+void SC_SaveStdOut();
+
 Message* SC_SettingAProperty(Message* Rel);
 
 bool SC_SettingMemory(Message* Rel);
@@ -4747,6 +4750,8 @@ uint SC_Reg_FatIndex(ASMReg Self);
 
 ASMReg SC_Reg_FatIndexSet(ASMReg Self, uint Value);
 
+ASMReg SC_Reg_FatRegSet(ASMReg Self, ASMReg Value);
+
 Float64 SC_Reg_float(ASMReg Self);
 
 ASMReg SC_Reg_HaveAddr(ASMReg Self);
@@ -4795,13 +4800,13 @@ ASMReg SC_Reg_ReallySimplify(ASMReg Self);
 
 int SC_Reg_Reg(ASMReg Self);
 
-ASMReg SC_Reg_RegSetWithInt(ASMReg Self, int Value);
-
-ASMReg SC_Reg_RegSetWithReg(ASMReg Self, ASMReg Value);
+ASMReg SC_Reg_RegSet(ASMReg Self, int Value);
 
 bool SC_Reg_Signed(ASMReg Self);
 
 ASMReg SC_Reg_Simplify(ASMReg Self);
+
+ASMReg SC_Reg_SlimRegSet(ASMReg Self, ASMReg Value);
 
 bool SC_Reg_SomePointer(ASMReg Self);
 
@@ -4811,7 +4816,7 @@ ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
 
 ASMReg SC_Reg_Temp(ASMReg Self, ASMReg Other);
 
-ASMReg SC_Reg_TryRegSet(ASMReg Self, ASMReg Dest);
+ASMReg SC_Reg_TryDestRegSet(ASMReg Self, ASMReg Dest);
 
 FatASM* SC_Reg_Within(ASMReg Self, ASM Op);
 
@@ -6610,9 +6615,9 @@ ASMReg SC_Pac_Subtract(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 
 bool SC_Pac_TempCheck(Assembler* Self, ASMReg V, bool AllowZero);
 
-ASMReg SC_Pac_TempMe(Assembler* Self, ASMReg T);
+ASMReg SC_Pac_TempMe(Assembler* Self, Message* Where, ASMReg T);
 
-ASMReg SC_Pac_TempTypedWithDeclReg(Assembler* Self, SCDecl* Type, ASMReg T);
+ASMReg SC_Pac_TempTypedWithMsgRegDecl(Assembler* Self, Message* Exp, ASMReg T, SCDecl* Type);
 
 ASMReg SC_Pac_TempTypedWithMsgReg(Assembler* Self, Message* Where, ASMReg T);
 
