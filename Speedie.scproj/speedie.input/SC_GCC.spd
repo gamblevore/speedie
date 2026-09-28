@@ -554,7 +554,7 @@ function file.TestBatch (|bool|)
 		if c.visible and c isa "spd"
 			if printed
 				print ", "
-			.SilentExecute([c, "--nocompile", "--perry"])
+			.Execute([c, "--nocompile", "--perry"], nil, nil, ProcessMode.StdOutSilence+processmode.StdErrCapture)
 			printed = true
 			print c.Name
 	printline

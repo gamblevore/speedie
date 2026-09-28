@@ -7,11 +7,11 @@ main
 	expect (inpath!=outpath)				("InPath = OutPath??")
 	|| b		= inpath.file.Readall(1GB, true)	#require
 	if b.isjbin
-		OutPath ?= inpath.Removeext("jbin").UniqueFile
+		OutPath ?= inpath.trimext.UniqueFile
 		expect (outpath) ("Can't make a unique file path at: " + inpath)
 	  else
 		Outpath ?= inpath + ".jbin"
-	|| writer = outpath.out				#require
+	|| writer = outpath.outputstream					#require
 	
 	if b.isjbin
 		b = b.Parsetime.render(writer)

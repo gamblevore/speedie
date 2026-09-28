@@ -1,5 +1,6 @@
 #!/usr/local/bin/spd
 
+// this file seems unused. Speedie is not compiling it?
 
 module Counts 
 	|int64|		Lines
@@ -20,13 +21,13 @@ module Counts
 	
 	function Init (|string| ss)
 		|| pt = app["p"]
-			PrintTree = true
+			.PrintTree = true
 			if pt != "true"
-				MaxNodeLength = pt.int
+				.MaxNodeLength = pt.int
 		ss = ss.trim 
-		ss ?= DefaultExt
+		ss ?= .DefaultExt
 		for s in (ss / '/') 
-			exts[s] = s
+			.exts[s] = s
 
 	function Count (|message| Msg)
 		Counts.parsed++
@@ -36,7 +37,7 @@ module Counts
 			|| len = s.name.Length
 			names += (len>0)
 			|| n = len min 64
-			Histogram[n]++
+			.Histogram[n]++
 			nodes++
 		.Names += names
 		.Nodes += Nodes
@@ -72,11 +73,11 @@ function file.cloc
 		if counts.maxnodelength
 			for s.flat in msg 
 				s.name = s.name.Preview(counts.MaxNodeLength)
-		msg.RenderAST(app.stdout.out)
+		msg.RenderAST(app.stdout.outputstream)
 		""
 	  elseif counts.ParseSpeed
-		|| fs = app.stdout.out!
-		fs.RenderSpeed("Parsed", data.length, durr)
+		|| fs = app.stdout.outputstream!
+		"Parsed".RenderSpeed(fs, data.length, durr)
 		fs <~ "\n"
 	(msg)
 		
@@ -105,7 +106,7 @@ main
 "
 		return 0
 	
-	counts.Init(app..files)
+	counts.Init(app["files"])
 	for path in app.args
 		|| dir = path.filethatexists
 			dir.CountAll(true)
@@ -116,14 +117,14 @@ function Counts.ReportHisto
 	require app.yes("h")
 	|| h_done = false
 	|| curr = 0
-	|| total = .names + Histogram[0]
+	|| total = .names + .Histogram[0]
 	for i in 65
-		if histogram[i]
+		if .histogram[i]
 			if !h_done
 				h_done = true
 				"histogram:"
-			curr += histogram[i]
-			|| pc = curr pc total
+			curr += .histogram[i]
+			|| pc = (curr div total).percent
 			"    $i: $pc"
 	if h_done
 		""
@@ -143,6 +144,6 @@ function Counts.report
 	if p > 1 or f > 1
 		"Total files: $f, total jeebox files: $p"
 	if compressionstats.All.Out
-		compressionstats.all.report(true, app.stdout.out)
+		compressionstats.all.report(app.stdout.outputstream)
 		""
 		
