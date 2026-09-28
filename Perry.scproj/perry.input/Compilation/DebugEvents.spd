@@ -549,8 +549,8 @@ function perryide.ClearOldASMErrors
 	|| s = .EditMe.FindTextLine(Start)
 	while s and (s.Position <= after)
 		err = s.LineError
-		if err and err.tag == 8888
-			s.LineError = nil
+//		if err and err.tag == 8888
+//			s.LineError = nil
 		s++
 		
 
@@ -567,10 +567,11 @@ function perryide.GotASMError (|message| Error_List)
 				v.AddFail "ASM unavailable for " + .path.name
 				v.addfail "File not in " + .projname
 				continue
-			
-		|| err = error.from(s)
-			s.Tag = 8888
-			.editme.addErrorToLine(err, false)
+
+// 		// spams!			
+//		|| err = error.from(s)
+//			s.Tag = 8888
+//			.editme.addErrorToLine(err, false)
 
 
 function perryide.GotASMSub (|message| asm)

@@ -360,7 +360,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		if msg.first == "asm"
 			.GotASMError(msg.second)
 		return false
-
+	
 	.DuringMsgFB = true
 	|| reason = ""
 	if msg ~= "result"
