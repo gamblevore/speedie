@@ -436,9 +436,6 @@ class list
 //			p--
 
 
-	function Swap (|list| other)
-		cpp_wrapper JB_Ring_Swap
-	
 	function Sort (|SorterComparer| fnc=&(...).Sorter)
 		opt NoRefCounts
 		for f in self
