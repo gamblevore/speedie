@@ -446,40 +446,6 @@ bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
 }
 
 
-void JB_Ring_Swap (JB_List* S, JB_List* O) {
-	if (O==S) return;							// haha
-
-	auto SR = S->Parent;
-	auto OR = O->Parent;
-
-/*
-	SO, STO, TOS, TOS, OS
-	OS, OST, OST, STO, SO
-	
-	OAS, OAST, OSAT, SATO, SAO
-	SAO, STAO, TAOS, TOAS, OAS
-*/
-	
-	if (SR and OR) {
-		auto T = JB_Ring_Constructor0(nil);		// only sensible way.
-		JB_Ring_NextSibSet(S, T);
-		JB_Ring_NextSibSet(O, S);
-		JB_Ring_NextSibSet(T, O);
-		JB_Ring_ParentSet(T, nil);
-		return;
-	}
-	
-	if (SR == OR) { // both nil
-		return;
-	}
-
-	if (!SR and OR)
-		std::swap(O, S);
-	JB_Ring_NextSibSet(S, O);
-	JB_Ring_ParentSet(S, nil);
-}
-
-
 JB_List* JB_Ring_Constructor0( JB_List* self ) {
 	JB_New2(JB_List);
     self->Position = 0;
