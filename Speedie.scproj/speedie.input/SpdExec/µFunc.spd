@@ -94,11 +94,9 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 //  And capture stdout, then uncapture? Simpler?
 	|faststring| fs
 	if !Compiler.InPerry
-		target debug
-			|file--| f = app.StdOut
-		  else
-			|file--| f = assembler.ASMDump
-		fs = f.OutputStream
+//		target debug
+//			|file--| f = app.StdOut // i think always dumping is better
+		fs = assembler.ASMDump.OutputStream
 		
 	|| i = 0
 	while (|scfunction--| fn = .PackFuncs[i++])
@@ -123,9 +121,8 @@ function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |
 		bmr.AppendHInt(glob.ExportPosition)
 		bmr.AppendHInt(Start)
 	
-	//
 	if dump
-		assembler.ASMDebug(dump, fn, -1)
+		assembler.ASMDebug(fn, dump)
 		dump.Flush
 	return true
 

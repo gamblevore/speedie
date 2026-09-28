@@ -285,9 +285,9 @@ struct FatASM
 	
 	Syntax Expect (|string?| Error=nil)
 		target debug
-			assembler.ASMDebug(0)
+			assembler.ASMDebug
 			print "---\n"
-			.DebugPrint(-1)
+			.DebugPrint
 			if !error
 				error = errorreceiver.internalerror
 		error (.msg, error)
