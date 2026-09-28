@@ -45,7 +45,6 @@ function SCDecl.DumpDeclOpen (|jbin!| dd, |int| Pos, |int| Reg, |bool| IsLocal=t
 	
 	|| s = .source
 	|| SrcMap = (s!=nil)(s.SrcMap, 0)
-//	|| SrcMap = (s.SrcMap, 0)(s) // I guess the original was cleaner.
 	dd.AppendHInt(SrcMap)
 	.MiniName(dd)
 	dd <~ '\0'
@@ -172,5 +171,20 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 	last.OutputPrms = 1,  last.refcount = 1,  last.prms[0] = Declared.reg
 	(Last is DebugVarOpen)	
 	return Declared
+
+
+
+target debug
+	function scdecl.ASMSanity 
+		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
+			|| size = .type.ClsSize
+			|| T = .TypeOnly
+			if T == DataTypeCode.Vec3 or DataTypeCode.ivec3
+				size = 12
+			if size != T.bytecount // sigh. what?
+				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
+				#!"We could change it if it is only 112."
+				debugger
+				t.DebugPrint
 
 

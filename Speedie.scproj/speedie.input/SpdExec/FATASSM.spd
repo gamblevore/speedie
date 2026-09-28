@@ -286,7 +286,7 @@ struct FatASM
 	Syntax Expect (|string?| Error=nil)
 		target debug
 			assembler.ASMDebug(0)
-			"----"
+			print "---\n"
 			.DebugPrint(-1)
 			if !error
 				error = errorreceiver.internalerror
@@ -706,16 +706,15 @@ struct FatASM
 		return .IsFinisher(.info)
 
 	
-	function DebugPrint (|int| Level=-1)
+	function DebugPrint
 		visible
 		nil self
 		if (self)
 			|| fs = FastString()
-			.RenderFat(fs, Level)
+			.RenderFat(fs, -1)
 			printline fs
 		  else
 			 "(nil)"
-		
 
 			
 	iterator FatInputs

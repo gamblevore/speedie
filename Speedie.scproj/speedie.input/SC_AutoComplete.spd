@@ -594,8 +594,8 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 			return .define_behaviour(fn, cmd.name)
 		return .Define_Something(my_file, f, thg, cmd.name)
 
-	expect (thg)                       ("nomsg")
-	expect (cmd starts "autocomplete") ("badcmd")
+	expect (thg)						("nomsg")
+	expect (cmd starts "autocomplete")	("badcmd")
 	|| stuff = cmd[@str, 3]
 	|| Auto = MainActAutoComplete(thg, stuff.name, cmd)
 		rz = @arg + "result"

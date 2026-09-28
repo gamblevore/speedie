@@ -84,7 +84,19 @@ function PackMaker.RunAFewTests
 	object.TotalSanity
 
 
-|ivec4| Butter 
+
+function SCFunction.µTest (|memory of asm|)
+	description "Generate some code (only for testing)."
+	rz = asm[.µfatlength|int|*3]!
+	|| p = rz.ptr
+	|| after = .ASMBake(P, P+rz.Size, nil)
+	rz.Size = after-p
+	rz.length = rz.Size		// ::::::]]]]]]]
+
+
+
+
+|ivec4| Butter
 function SCFunction.TestObesity (|!&ivec4|)
 	target debug
 		|| mu = .µFATLength
@@ -93,6 +105,7 @@ function SCFunction.TestObesity (|!&ivec4|)
 			testvm.Load(mu2.ptr, mu2.length)
 			return testvm.Run(0)
 	return butter
+
 
 }
 

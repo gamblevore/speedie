@@ -22,6 +22,7 @@ function message.ASMDecl (|SCDecl!|)
 		|| T = rz.wholetype
 		T.µtype = rz.CalculateASMType
 		rz.wholetype = T
+	
 	target debug: rz.ASMSanity
 
 
@@ -80,20 +81,6 @@ function asmreg.ExpectSameType (|Asmreg| Expected, |asmreg|)
 		if (dt.bytecount <= st.bytecount)
 			.µtype = dt								// correct sign/whatever
 	return self
-
-
-target debug
-	function scdecl.ASMSanity 
-		ifn  .IsCarray  or  .PointerCount  or  .IsObject  or  .IsBareStruct
-			|| size = .type.ClsSize
-			|| T = .TypeOnly
-			if T == DataTypeCode.Vec3 or DataTypeCode.ivec3
-				size = 12
-			if size != T.bytecount // sigh. what?
-				#!"Should we have set the dtype when the decl was created? or at least verified in the nil-checker?"
-				#!"We could change it if it is only 112."
-				debugger
-				t.DebugPrint
 
 
 function Assembler.OpenVars (|uint64|)
@@ -229,91 +216,4 @@ function asmreg.IncrFat (|asmreg|)
 	target debug
 		if .reg and self is Const  // sigh
 	return self
-
-
-function message.CallChainError (|string| name)
-	opt norefcounts
-	problem (self, name)
-	|| sh = assembler.sh
-	|| i = sh.inlinedepth|int|
-	while --i >= 0
-		|| st = sh.inlinestate[i]
-		|| fn = st.fn
-		|| src = fn.source
-			problem (src, "\tInlined from here.")
-
-
-
-
-|file| DebugLogFile
-function SaveStdOut
-	opt norefcounts
-	|| f = debuglogfile
-	require !f
-	f = "/tmp/logs/SpeedieASM.txt".file
-	if f.open
-		f.UseAsStdOut
-		DebugLogFile = f
-
-
-function @assembler.ASMDebug (|scfunction| fn, |int| Level)
-	cpp_name adb2
-	opt norefcounts
-	target !debug
-		SaveStdOut()
-	"---"
-	printline fn
-	|| Start = fn.µStart
-		|| Base = assembler.sh.TotalStart + Start
-		|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
-		for n in amount
-			base[n].debugprint(Level)
-		
-		.PrintRegs
-
-
-
-function @assembler.ASMDebug (|int| Level=-1)
-	cpp_name adb
-	visible
-	opt norefcounts
-	.ASMDebug(scfunction.currfunc!, level)
-	target !debug
-		printline app.StackTrace
-	
-
-
-function @assembler.PrintRegs
-	target debug
-		|| i = 0
-		|| D = .sh.vdecls_
-		|| T = .sh.vtemps
-		|| X = D|||T
-		|| Prev = false
-		print "Regs: "
-		while ++i <= 31
-			|| test = 1<<i
-			if X&Test
-				if Prev
-					print ",  "
-				Prev = true
-
-				ifn D&Test
-					print "t"
-				  elseif T&Test
-					print "x"
-				  else
-					print "r"
-				print i
-
-		printline "\n"
-		i = 0
-		while ++i <= 31
-			|| test = 1<<i
-			if X&Test
-				print "$i = "
-				|| msg = .sh.declarations[i]
-					printline msg
-				  else
-					printline "?"
 

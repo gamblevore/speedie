@@ -1,0 +1,101 @@
+
+
+
+function message.CallChainError (|string| name)
+	opt norefcounts
+	if self
+		problem (self, name)
+	|| sh = assembler.sh
+	|| i = sh.inlinedepth|int|
+	while --i >= 0
+		|| st = sh.inlinestate[i]
+		|| fn = st.fn
+		|| src = fn.source
+			problem (src, "\tInlined from here.")
+
+
+
+|file| DebugLogFile
+function @assembler.ASMDump (|file|)
+	opt norefcounts
+	|| f = DebugLogFile
+		return f
+	|| p = "/tmp/logs/SpeedieASM" + date.now.WithinDay.Minutes
+	target debug
+		p = p + ".dbg.txt"
+	  else
+		p = p + ".txt"
+	f = p.file
+	DebugLogFile = f
+	f.OpenEmpty
+	return f
+	
+	
+function @assembler.SaveStdOut
+	opt norefcounts
+	if !debuglogfile
+		.ASMDump.UseAsStdOut
+
+
+function @assembler.ASMDebug (|faststring| fs, |scfunction| fn, |int| Level)
+	cpp_name adb2
+	opt norefcounts
+	|| Start = fn.µStart$
+	fs <~ "---\n"
+	|| Base = assembler.sh.TotalStart + Start
+	|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
+
+	for n in amount
+		base[n].RenderFat(fs, Level)
+		fs <~ "\n"
+			
+	.PrintRegs(fs)
+
+
+
+function @assembler.ASMDebug (|int| Level=-1)
+	cpp_name adb
+	visible
+	|| fs = FastString()
+	.ASMDebug(fs, scfunction.currfunc!, level)
+	target !debug
+		app.StackTrace(fs)
+	printline fs
+	
+
+
+function @assembler.PrintRegs (|faststring| fs)
+	|| D = .sh.vdecls_
+	|| T = .sh.vtemps
+	|| X = D|||T									#require
+	|| Prev = false
+	fs <~ "Regs: "
+	|| i = 0
+	while ++i <= 31
+		|| test = 1<<i
+		if X&Test
+			if Prev
+				fs <~ ",  "
+			Prev = true
+
+			ifn D&Test
+				fs <~ "t"
+			  elseif T&Test
+				fs <~ "x"
+			  else
+				fs <~ "r"
+			fs <~ i
+
+	fs <~ "\n"
+	i = 0
+	while ++i <= 31
+		|| test = 1<<i
+		if X&Test
+			fs <~ i
+			fs <~ " = "
+			|| msg = .sh.declarations[i]
+				fs <~ msg
+			  else
+				fs <~ "?"
+
+
