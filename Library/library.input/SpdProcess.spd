@@ -20,7 +20,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 	|int|						DeathLimit
 	|bool|						AlreadyWarnedDied
 
-	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.stderrpassthru)
+	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.StdErrCapture)
 		mode |= ProcessMode.MsgPassing
 		super.constructor(path, mode, params, pico)
 		.deathlimit = 12
