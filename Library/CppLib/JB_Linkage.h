@@ -3,9 +3,13 @@
 #include <dlfcn.h>
 
 
-extern "C" {
-
 #define	VMClearHigh(VM)	((__typeof(VM))(((IntPtr)(VM)<<1)>>1))
+#if DEBUG
+	#define VMDEBUG DEBUG
+#endif
+
+
+extern "C" {
 
 JB_String* JB_Platform();
 bool JB_Platform__OSX();
@@ -113,8 +117,14 @@ struct CakeVM {
     byte*			AllocBase;
     PicoAction		Pico;
 	void* const*	OriginalJumpTable;
+	#if VMDEBUG
+		byte			PagePad[16*1024];
+	#endif
 	void*			JumpTable[514];
-    
+	#if VMDEBUG
+		byte			PagePad2[16*1024];
+	#endif
+	
     u16				VFlags;
 std::atomic<bool>	Lock;
 	u8				BreakState;

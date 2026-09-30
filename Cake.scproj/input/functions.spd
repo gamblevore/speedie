@@ -21,8 +21,17 @@ role SpdFunc (message)
 		.RangeLength = n
 		
 		if (n-1)|uint| < (16~bits)|uint|
+			|| CodeAddr = code.addr|&asm|
+			
+			target debug
+				|| i = 0
+				while i < n
+					|| Op = CodeAddr[i]
+					ifn Op>>24
+					i += op.Size
+
 			|| dest = cake.BeginCode + .Position
-			memory.Copy(dest, Code.addr, n<<2)
+			memory.Copy(dest, CodeAddr, n << 2)
 			if .func != @tmp
 				.func = @tmp
 				.name = "(unnamed)"

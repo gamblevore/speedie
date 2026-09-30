@@ -1,5 +1,6 @@
 
 
+
 // vm.box
 forms
 	U0:
@@ -356,12 +357,16 @@ forms
 
 #!						 (((((STOP)))))
 /**/ HALT (HALT)
+		DebugOnly(
+		puts("halt")
+		)
 		if (Op == VMHexEndCleanly)
 			vm.Registers[2].Int = 0
 		else if (Op == VMHexFinalReturn)
 			0
 		else
-			CakeCrashed(&vm, EILSEQ)
+			CakeCrashed(&vm, EILSEQ, Code)
+		#!sigill
 		return &vm.Registers[2].Ivec
 
 
@@ -448,7 +453,7 @@ POS 255
 
 
 
-#!						 (((((Consts)))))
+#!						(((((Consts)))))
 /**/ KNSR (RotateConst)
 		RotateConst(r, Op)
 
@@ -465,7 +470,7 @@ POS 5
 
 
 
-#!						 (((((Math)))))
+#!						(((((Math)))))
 
 /**/ ADDB (AddB) // add big
 		i1 = i1 + (AddB_Ki<<12)

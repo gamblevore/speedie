@@ -17,6 +17,7 @@ Design:
 #include <sys/mman.h>
 #include <setjmp.h>
 #include <utility>
+#include <unistd.h>
 
 
 
@@ -58,6 +59,7 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 
 
 int JB_ASM_Index (CakeVM* vm, ASM* Code) {
+	if (!vm) vm = JB_GlobalVM;
 	vm = VMClearHigh(vm);
 	Code = VMClearHigh(Code);
 	ASM* Start = VMCodePtr(vm);
@@ -69,7 +71,7 @@ int JB_ASM_Index (CakeVM* vm, ASM* Code) {
 
 
 VMOpt int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
-	auto Break = Code[CakeCodeMax]; 
+	auto Break = Code[1024*256]; 
 	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
 	r = VMClearHigh(r);
 	return (V->__VIEW__)(V, (CakeStack*)(r-1), 0, Break);
@@ -99,12 +101,23 @@ uint* JB_ASM_SetDebug (CakeVM* V, int Level) {
 	V->BreakState = Level;
 	auto J = V->JumpTable;
 	void* Break = J[512+(Level>2)];
+	
+	#if VMDEBUG
+		uint64 Protect = (uint64)((void*)VMClearHigh(J));
+		uint64 Page = sysconf(_SC_PAGESIZE);
+		Protect = Protect &~ (Page-1);
+		int Err = mprotect((void*)Protect, Page, PROT_READ|PROT_WRITE);
+	#endif
+	
 	if (Level <= 1)
 		memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));		
-	  else if (Level >= 2)
+	  else
 		for_(256)
 			J[i] = Break;
 
+	#if VMDEBUG
+		Err = mprotect((void*)Protect, Page, PROT_READ);
+	#endif
 	V->Lock = false;
 	
 	return Rz;
@@ -115,22 +128,22 @@ void JB_ASM_LinkPico (CakeVM* V, PicoComms* P, PicoActionFn Fn) {
 	V->Pico.Action = Fn;
 	PicoSetAction(P, &(V->Pico));
 }
-
-
-
+ 
  
 #define EROR HALT
-ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm
-static void * const GlobalJumpTable[] = {
-	#include "InstructionList.h"
-	&&TRYBREAK,
-	&&ALWAYSBREAK,
-};
-    if_rare (!Code) {
-		vm.OriginalJumpTable = &GlobalJumpTable[0];
-		memcpy(vm.JumpTable,     GlobalJumpTable, sizeof(void*)     * 256);
-		memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
-		return 0;
+ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __cakerun__, cake_run, vm_run, run_vm, vmstart, startvm
+	{
+		static void * const GlobalJumpTable[] = { // one less reg used
+			#include "InstructionList.h"
+			&&TRYBREAK,
+			&&ALWAYSBREAK,
+		};
+		if_rare (!Code) {
+			vm.OriginalJumpTable = &GlobalJumpTable[0];
+			memcpy(vm.JumpTable,     GlobalJumpTable, sizeof(void*)     * 256);
+			memcpy(vm.JumpTable+256, GlobalJumpTable, sizeof(GlobalJumpTable));
+			return 0;
+		}
 	}
   
     RegVar(JumpTable, r22) = &vm.JumpTable[0];
@@ -148,6 +161,11 @@ static void * const GlobalJumpTable[] = {
 
 	
 	TRYBREAK:; {
+		#if VMDEBUG
+			if (JB_ASM_Index(&vm, Code) < 0)
+				debugger; // RET is returning to the wrong place?
+			printf("Code: %i,  Op: %i (%u)\n", JB_ASM_Index(&vm, Code), Op>>24, Op);
+		#endif
 		auto BreakValue = ++(Code[CakeCodeMax-1]);
 		((CakeStack*)(r))[-1].Code = Code-1;		// save for crash-debug
 		if_usual (!(BreakValue & 0x40000000))
@@ -312,21 +330,22 @@ static CakeStack* GetMaxStack (CakeVM* V) {
 }
 
 
-static ivec4* CakeCrashed (CakeVM* V, int Signal) {
+static ivec4* CakeCrashed (CakeVM* V, int Error, ASM* Code) {
+	// EILSEQ (instead of SIGILL) can come here. 
 	if (SubCrash) {
 		printf("Crashed inside crash handler, at point: %i\n", SubCrash);
 		return 0;
 	}													SubCrash = 2;
-	errno = Signal;
-	
-	CakeCrashedSub(V, kStillInRange, GetMaxStack(V), Signal);
+	errno = Error;
+	int Where = JB_ASM_Index(V, Code);
+	CakeCrashedSub(V, kStillInRange, GetMaxStack(V), Error);
 	return 0;
 }
 
 
 void CakeCorrupt (int Sig) {
 	CrashCount++;
-	longjmp(CakeRestore, Sig);
+	longjmp(CakeRestore, Sig|128);
 }
 
 
@@ -336,8 +355,8 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
 	auto OldBus = signal(SIGBUS,  CakeCorrupt);
 
-	int Signal = setjmp(CakeRestore);
-	ivec4* Reg =  Signal  ?  CakeCrashed(V, Signal | 128)  :  JB_ASM_Run_(*V, Code);
+	int Error = setjmp(CakeRestore);
+	ivec4* Reg =  Error  ?  CakeCrashed(V, Error, 0)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	SubCrash = 0;

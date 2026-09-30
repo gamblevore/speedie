@@ -3,6 +3,13 @@
 	#define __builtin_unreachable()
 #endif
 
+#if DEBUG
+	#define DebugOnly(x) (x);
+#else
+	#define DebugOnly(x) ;
+#endif
+
+
 
 extern "C" {
 // Need to allow vectorcall on windows. To allow vectors to be passed
@@ -10,7 +17,7 @@ extern "C" {
 typedef void (*FFI_Fn)(void);
 extern "C" pid_t getpid(void);
 static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
-static ivec4* CakeCrashed (CakeVM* V, int Signal);
+static ivec4* CakeCrashed (CakeVM* V, int Signal, ASM* Code);
 
 
 #define TryTrap() if (CanTrap(&vm, Op, Code)) {Op = *Code++; goto BREAK;}
@@ -239,6 +246,10 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 		R0			= NewR0;							// NewZero
 		Stack		= (CakeStack*)(NewR0 - 1);
 		auto Code	= Stack->Code;
+		#if VMDEBUG
+		if (JB_ASM_Index(nil, Code+1) < 0)
+			debugger;	// seems we are jumping... just outside?
+		#endif			// off by 1 error??
 		Stack->Up = 0;
 	//	*R0			= {};								// unnecessary
 		return Code;

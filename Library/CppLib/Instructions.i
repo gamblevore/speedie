@@ -1,4 +1,5 @@
 ı HALT:;
+	DebugOnly(puts("halt"));
 	if (Op == VMHexEndCleanly)
 	vm.Registers[2].Int = 0
 ;
@@ -6,8 +7,10 @@
 	0
 ;
 	else
-	CakeCrashed(&vm, EILSEQ)
+	CakeCrashed(&vm, EILSEQ, Code)
 ;
+	// sigill
+
 	return &vm.Registers[2].Ivec;
 ı TAIL:;
 	Code = TailStack(vm, r, Code + 1, Op, *Code);
