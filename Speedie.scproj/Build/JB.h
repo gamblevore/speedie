@@ -2368,6 +2368,7 @@ extern Array* SC__NilReason_values;
 #define kJB__PIDM_OwnGroup ((ProcessMode)128)
 #define kJB__PIDM_PassThru ((ProcessMode)40)
 #define kJB__PIDM_Silence ((ProcessMode)20)
+#define kJB__PIDM_StdErrCapture ((ProcessMode)32)
 #define kJB__PIDM_StdErrPassThru ((ProcessMode)32)
 #define kJB__PIDM_StdErrSilence ((ProcessMode)16)
 #define kJB__PIDM_StdOutPassThru ((ProcessMode)8)
@@ -3307,6 +3308,8 @@ void SC_PackMaker__BakeClasses(FastString* J);
 
 void SC_PackMaker__BakeDebug(FastString* J);
 
+bool SC_PackMaker__BakeOneFunc(FastString* J, FastString* Bmr, FastString* Dump, SCFunction* Fn);
+
 void SC_PackMaker__BakePackToDisk();
 
 void SC_PackMaker__BakeStrings(FastString* J);
@@ -4172,8 +4175,6 @@ SCNode* SC_RootCollectTable_static(Message* Node, SCNode* Name_space, Message* E
 
 SCDecl* SC_SameTypeSub(Message* First, Message* Second, SCNode* Name_space);
 
-void SC_SaveStdOut();
-
 Message* SC_SettingAProperty(Message* Rel);
 
 bool SC_SettingMemory(Message* Rel);
@@ -4233,6 +4234,8 @@ SCObject* SC_TypeOfChar(Message* Exp, SCNode* Name_space, Message* Side);
 SCObject* SC_TypeOfDot(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfDotDotDot(Message* Exp, SCNode* Name_space, Message* Side);
+
+SCObject* SC_TypeOfERel(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCDecl* SC_TypeOfExpr(Message* Exp, SCNode* Name_space, Message* Side);
 
@@ -4301,6 +4304,9 @@ SCClass* SC_VecType(bool Isfloat, int Count);
 // zalgo
 int JB_zalgo__Init_();
 
+
+
+// Float16
 
 
 // _void
@@ -4381,9 +4387,6 @@ float JB_f_Unsin(float Self);
 
 float JB_f_UnTan(float Self, float Y);
 
-
-
-// hfloat
 
 
 // int
@@ -4499,6 +4502,8 @@ FatASM* SC_uint16_fat(uint /*u16*/ Self);
 uint64 SC_uint64_AddReg(uint64 Self, ASMReg V);
 
 int JB_uint64_HintLength(uint64 Self);
+
+bool JB_uint64_IsPow2(uint64 Self);
 
 uint64 JB_uint64_LowestBit(uint64 Self);
 
@@ -5023,9 +5028,13 @@ JB_Duration JB_Date_Ago(Date Self);
 
 int64 JB_Date_Days(Date Self);
 
+int64 JB_Date_Minutes(Date Self);
+
 JB_Duration JB_Date_OperatorMinus(Date Self, Date D);
 
 JB_String* JB_Date_RenderDurr(Date Self, FastString* Fs_in);
+
+JB_Duration JB_Date_WithinDay(Date Self);
 
 
 
@@ -5080,9 +5089,6 @@ bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F);
 
 
 // FileSizeInt
-
-
-// Float16
 
 
 // Float64
@@ -5664,6 +5670,8 @@ NilState SC_nil__Dummy(Message* Msg, NilCheckMode Test);
 
 NilRecord SC_nil__EndBlock();
 
+NilState SC_nil__EqualsRel(Message* Msg, NilCheckMode Test);
+
 NilState SC_nil__Exit(Message* Msg, NilCheckMode Test);
 
 void SC_nil__ExterminateZergBugs(SCFunction* F);
@@ -5842,6 +5850,8 @@ ASMReg SC_FAT_ASMReg(FatASM* Self, int A);
 
 void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint Break);
 
+void SC_FAT_BakeLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
+
 int SC_FAT_BaseOp(FatASM* Self);
 
 bool SC_FAT_CanCloseRegs(FatASM* Self, int R);
@@ -5864,7 +5874,7 @@ byte SC_FAT_CurrGrabID(FatASM* Self);
 
 void SC_FAT_CurrGrabIDSet(FatASM* Self, uint /*byte*/ Value);
 
-void SC_FAT_DebugPrint(FatASM* Self, int Level);
+void SC_FAT_DebugPrint(FatASM* Self);
 
 ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh);
 
@@ -5873,8 +5883,6 @@ ASM* SC_FAT_DoNotEncode(FatASM* Self, ASM* Curr, ASM* After);
 float SC_FAT_F32(FatASM* Self);
 
 Float64 SC_FAT_F64(FatASM* Self);
-
-void SC_FAT_FillLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 FatASM* SC_FAT_FindOlder(FatASM* Self);
 
@@ -6183,7 +6191,7 @@ FatASM* SC_Pac_AddMissingReturn(Assembler* Self);
 
 ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount, ASMReg Stronger);
 
-ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L, ASMReg Zero);
+ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L);
 
 ASMReg SC_Pac_AskForInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
 
@@ -6208,8 +6216,6 @@ int SC_Pac_ASMTableID(Assembler* Self, Message* Exp, SCFunction* Fn);
 ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, FatASM* Start);
 
 void SC_Pac_BackupFAT(Assembler* Self, FatASM* Curr);
-
-ASMReg SC_Pac_BankOpt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down);
 
@@ -6328,6 +6334,8 @@ u16 SC_Pac_EnterBranch(Assembler* Self);
 ASMReg SC_Pac_Equals(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_EqualsInt(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
+
+ASMReg SC_Pac_EqualsRel(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_ExistingVar(Assembler* Self, Message* M);
 
@@ -6517,8 +6525,6 @@ ASMReg SC_Pac_PerhapsPhi(Assembler* Self, Message* Exp, ASMReg New, ASMReg Old);
 
 void SC_Pac_PhiFix(Assembler* Self, FatASM* Start);
 
-void SC_Pac_PhiInit(Assembler* Self, BranchPHITracker* Rz);
-
 ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest, int Liftup);
 
 ASMReg SC_Pac_PhiMergeDeeper(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
@@ -6528,6 +6534,8 @@ ASMReg SC_Pac_PhiMergeNormal(Assembler* Self, Message* Exp, BranchPHITracker* T,
 void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both, uint Liftup);
 
 void SC_Pac_PhiMiddle(Assembler* Self, BranchPHITracker* T);
+
+void SC_Pac_PhiStart(Assembler* Self, BranchPHITracker* Rz);
 
 ASMReg SC_Pac_Plus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -6631,6 +6639,8 @@ ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* SrcPrms, Message* ASMPrms, AS
 
 void SC_Pac_Trash(Assembler* Self, uint Reg);
 
+ASMReg SC_Pac_TryBangOpt(Assembler* Self, ASMReg X, ASMReg KK);
+
 ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain);
 
 ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int AllowedGain, FatRange* LL);
@@ -6677,13 +6687,15 @@ ASMReg SC_Pac_xC2xB5Into(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5Trin(Assembler* Self, Message* Exp);
 
-void adb2(SCFunction* Fn, int Level);
+void adb2(SCFunction* Fn, FastString* Fs_in, int Level);
 
-void adb(int Level);
+void adb();
+
+JB_File* SC_Pac__ASMDump();
+
+void SC_Pac__DumpRegs(FastString* Fs);
 
 int SC_Pac__Init_();
-
-void SC_Pac__PrintRegs();
 
 
 
@@ -9756,6 +9768,8 @@ bool SC_Decl_OperatorMatches(SCDecl* Self, SCClass* O);
 
 void SC_Decl_Paramfix(SCDecl* Self);
 
+NilCheckMode SC_Decl_PerhapsSoft(SCDecl* Self);
+
 int SC_Decl_PointerIncrement(SCDecl* Self);
 
 bool SC_Decl_PointeryMatch(SCDecl* Self, SCDecl* O);
@@ -11113,8 +11127,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
 
-inline bool JB_FileDes_SyntaxCast(FileDes Self);
-
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self);
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
@@ -11216,10 +11228,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 
 inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
 	return Self != ((int)kJB__FailableInt_Fail);
-}
-
-inline bool JB_FileDes_SyntaxCast(FileDes Self) {
-	return Self >= 0;
 }
 
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self) {
