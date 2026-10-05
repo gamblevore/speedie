@@ -568,6 +568,8 @@ function perryide.GotASMError (|message| Error_List)
 				v.addfail "File not in " + .projname
 				continue
 
+// asm errors are good for me debugging Speedie, but not general-use even for me.
+// so how to turn it on/off? some pref switch?
 // 		// spams!			
 //		|| err = error.from(s)
 //			s.Tag = 8888
