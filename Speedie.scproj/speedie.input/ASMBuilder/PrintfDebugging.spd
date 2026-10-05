@@ -82,7 +82,7 @@ function @assembler.DumpRegs (|faststring| fs)
 		|| test = 1<<i
 		if X&Test
 			if Prev
-				fs <~ ",  "
+				fs <~ ", "
 			Prev = true
 
 			ifn D&Test

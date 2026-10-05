@@ -367,7 +367,7 @@ function LoadSuperClass
 	
 	|| OldMod = .modul.parent // in case it was already set, like in a task... which has a name_space
 	if !oldmod
-		.Modul.parent = compiler.program 
+		.Modul.parent = compiler.program
 	
 	|| p = .Source								#require
 	|| supc = p.Second
@@ -401,6 +401,12 @@ function LoadSuperClass
 		.Super = S
 		if Options.MakeExec or options.modecake or compiler.inperry
 			s.Children <~ self
+
+		|| PA = .ProcessAs
+			expect (PA == s.ProcessAs) (self, "ProcessAs mismatch")
+		  else
+			.ProcessAs = s.ProcessAs
+
 		if !.IsRole
 			(s is HasSubClass)
 		  elseif !oldmod
