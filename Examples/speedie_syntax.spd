@@ -8,7 +8,10 @@ class Person
 	|int| age
 	|string| name
 	setter Age (|int|)
-		expect (value > 0 and value < 300) "Age $value out of range on ${.name}"
+		ifn (value > 0 and value < 300)
+			|| str = "Age $value out of range on ${.name}"
+			printline str
+			
 		.age = value
 	
 	render
@@ -17,6 +20,8 @@ class Person
 
 
 main
+/	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
+	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
 
 
@@ -24,8 +29,25 @@ function PrintNum (|int64| b1)
 	"${B1.strsize} = $B1"
 
 
+
+function ByteCountTest (|DataTypeCode| A, |DataTypeCode| B)
+	opt noinline
+	|| AC = A.ByteCount
+	|| BC = B.ByteCount
+	printline AC
+	printline BC
+	
+
+
+function app.TestSyntax2 (|int| z=1, |int|)
+	opt noinline
+	|| B = (z!=0)(1, 2)
+	|| A = (z!=0)(mesayer, shesayer)
+	return z+1
+//	(fn)("hello")
+
+
 function app.TestSyntax
-	|| L2 = "(a,b,c,d)".parse
 	printnum(60GB)
 	printnum(7.9MB|int|)
 	printnum(9524600)
