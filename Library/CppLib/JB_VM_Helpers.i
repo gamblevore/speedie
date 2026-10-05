@@ -3,21 +3,37 @@
 	#define __builtin_unreachable()
 #endif
 
-#if DEBUG
+#if VMDEBUG
 	#define DebugOnly(x) (x);
 #else
 	#define DebugOnly(x) ;
 #endif
 
 
+void _StackSanity (CakeStack* Stack, ASM* CodePtr) {
+	#if VMDEBUG
+		// make sure we are not jumping outside of the code.
+		int A = 0; int B = 0;
+		if (Stack) JB_ASM_Index(nil, Stack->Code+1);
+
+		// VMHexFinalReturn is at Code[CakeCodeMax-1]
+		if (CodePtr != VMCodePtr(JB_GlobalVM)+CakeCodeMax-1)
+			B = JB_ASM_Index(nil, CodePtr);
+
+		if (A < 0 or B < 0)
+			debugger;
+	#endif
+}
+
+
 
 extern "C" {
 // Need to allow vectorcall on windows. To allow vectors to be passed
 // Using the SIMD registers.
-typedef void (*FFI_Fn)(void);
-extern "C" pid_t getpid(void);
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
-static ivec4* CakeCrashed (CakeVM* V, int Signal, ASM* Code);
+typedef void (*FFI_Fn)			();
+pid_t		  getpid			();
+static ivec4* CakeCrashedSub	(CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
+static ivec4* CakeCrashed		(CakeVM* V, int Signal, ASM* Code);
 
 
 #define TryTrap() if (CanTrap(&vm, Op, Code)) {Op = *Code++; goto BREAK;}
@@ -205,11 +221,13 @@ static __boiling ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* se
 		
 		OldStack->Up = Save;
 		NewStack->Depth = OldStack->Depth+1;
+		_StackSanity(OldStack, CodePtr);
 		OldStack->Code = CodePtr;
 	}
 	
 	NewStack->SFlags = 0x80000;
 	NewStack->Up = 0;
+	_StackSanity(NewStack, (ASM*)Destructor);
 	NewStack->Code = (ASM*)Destructor;
 	((CakeRegister*)NewStack)[2].Obj = self;
 	((CakeRegister*)NewStack)[1] = {};
@@ -246,10 +264,7 @@ VMOpt ASM* RestoreStack (CakeVM& vm, CakeRegister*& R0, ASM Op, ASM* DebugCode) 
 		R0			= NewR0;							// NewZero
 		Stack		= (CakeStack*)(NewR0 - 1);
 		auto Code	= Stack->Code;
-		#if VMDEBUG
-		if (JB_ASM_Index(nil, Code+1) < 0)
-			debugger;	// seems we are jumping... just outside?
-		#endif			// off by 1 error??
+		_StackSanity(Stack, Code);
 		Stack->Up = 0;
 	//	*R0			= {};								// unnecessary
 		return Code;
@@ -660,6 +675,7 @@ VMOpt ASM* TailStack (CakeVM& vm, CakeRegister* r, ASM* CodePtr, ASM Op, ASM Cod
 	}
 	#undef Zero
 
+	_StackSanity(stck, CodePtr);
 	stck->Code = CodePtr;
 	stck->Depth++; // noice
 	return CodePtr;
@@ -682,6 +698,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		
 		NewStack->Depth = OldStack->Depth+1;
 		OldStack->Up = Dest;
+		_StackSanity(OldStack, CodePtr);
 		OldStack->Code = CodePtr;
 	}
 	
@@ -695,6 +712,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 	CodePtr += Dest;
 	if (Code&16)
 		CodePtr = (ASM*)(r[Dest&31].Uint);
+	_StackSanity(nil, CodePtr);
 	NewStack->Code = CodePtr;
 
 	switch ( Code&15 ) {

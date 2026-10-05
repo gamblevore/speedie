@@ -28,7 +28,7 @@ uint			CrashCount;
 CakeVM*			JB_GlobalVM;
 
 
-#if !AS_LIBRARY		// #ifdef __VM__		// hmmm... seems to cause compile errors.
+#if !AS_LIBRARY
 #pragma GCC optimize ("Os")
 
 #define kOverFlowStack			-2
@@ -58,13 +58,20 @@ ivec4* JB_ASM_Registers (CakeVM* V, bool Clear) {
 }
 
 
-int JB_ASM_Index (CakeVM* vm, ASM* Code) {
+
+
+int64 JB_ASM_IndexSub (CakeVM* vm, ASM* Code) {
 	if (!vm) vm = JB_GlobalVM;
 	vm = VMClearHigh(vm);
 	Code = VMClearHigh(Code);
 	ASM* Start = VMCodePtr(vm);
-	int64 Diff = Code - Start;
-	if ((uint64)Diff < CakeCodeMax)
+	return Code - Start;
+}
+
+
+int JB_ASM_Index (CakeVM* vm, ASM* Code) {
+	int64 Diff = JB_ASM_IndexSub(vm, Code);
+	if_usual ((uint64)Diff < CakeCodeMax)
 		return (int)Diff;
 	return -1;
 }
@@ -162,9 +169,11 @@ ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __c
 	
 	TRYBREAK:; {
 		#if VMDEBUG
-			if (JB_ASM_Index(&vm, Code) < 0)
+			int64 Where = JB_ASM_IndexSub(&vm, Code-1);
+			printf("Code: %lli,  Op: %u (%u)\n", Where, Op>>24, Op);
+			if (JB_ASM_Index(&vm, Code-1) < 0) {
 				debugger; // RET is returning to the wrong place?
-			printf("Code: %i,  Op: %i (%u)\n", JB_ASM_Index(&vm, Code), Op>>24, Op);
+			}
 		#endif
 		auto BreakValue = ++(Code[CakeCodeMax-1]);
 		((CakeStack*)(r))[-1].Code = Code-1;		// save for crash-debug
