@@ -12,6 +12,7 @@ extend_module ArchonPurger {
 		@item:	Item
 		@brel:	brel
 		@arel:	arel
+		@erel:	EqualsRel
 		@rel:	Rel
 		@list:	List
 		@decl:	Declaration
@@ -147,7 +148,7 @@ function UseAsRealSub (|message| ch, |nilcheckmode| test, |nilreason| reason, |s
 	return nd
 
 
-function Rel (NilTrackerFn)									// x = y
+function Rel (NilTrackerFn)									// x + y
 	opt norefcounts
 	|| ll = msg.first!
 	|SCOperator| scop
@@ -705,17 +706,32 @@ function Swap (NilTrackerFn)
 	.swapity(RD,R,  LD,L,  LN)
 
 
+
 function SetRel (NilTrackerFn)
 	opt norefcounts
 	|| R = msg.last!
 	|| L = msg.first!
 	|| LD = L.FastDecl
-	test = (nilcheckmode.soft) * (ld isnt local  and  ld.nildeclared == nilstate.optional)
-	|| RN = .Jump(R, test)
+	|| RN = .Jump(R, ld.PerhapsSoft)
 	
-	.Jump(L, nilcheckmode.TryingToAssign)
+	.Jump(L, NilCheckMode.TryingToAssign)
 								
 	return .VariableSet(LD, L, R.FastDecl, R, RN)
+
+
+function EqualsRel (NilTrackerFn)
+	//	x += y		// Not possible on objects, but on pointers, yes
+	//				// does it change anything? if x is nil... thats no good.
+	//				// unless y is a uint64, but at that point we are just doing x = y|&type|
+	//				// So its still... nil?
+	opt norefcounts
+	|| RelResult = rel(msg, test)
+	// not sureeee! // I think this requires ASM changes. I don't have += on a asm basis?
+	
+	|| R = msg.last!
+	|| L = msg.first!
+	|| LD = L.FastDecl
+	return .VariableSet(LD, L, R.FastDecl, R, RelResult)
 
 
 function Fail (NilTrackerFn)

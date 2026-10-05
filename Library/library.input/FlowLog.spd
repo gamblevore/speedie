@@ -5,7 +5,8 @@
 	Smashing all bugs!
 */
 
-		
+
+
 module FlowLog
 	linkage: cpp_part Flow
 
@@ -25,10 +26,10 @@ module FlowLog
 
 	inline Disable
 		description "Each disable must be matched with an enable. Can nest disable calls, and it will stay disabled till the last enable."
-		._Enabled -= 1
+		._Enabled--
 
 	inline Enable
-		._Enabled += 1
+		._Enabled++
 
 
 	function Stop

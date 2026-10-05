@@ -10,6 +10,7 @@ prototype ExprResolver (|Message| Exp, |SCNode| name_space, |Message?| side=nil,
 dispatch ExprFuncs (ExprResolver)
 /* @decl is BAD!   dont add it*/
 	@Rel  : (TypeOfRel)
+	@erel : (TypeOfERel)
 	@BRel : (TypeOfBRel)
 	@ARel : (TypeOfARel)
 	@Adj  : (TypeOfAdj)
@@ -1491,6 +1492,10 @@ function message.AndOrExpansionTest (|int|)
 	return 2 + bs
 
 
+function TypeOfERel (ExprResolver)
+	return typeofrel(exp, name_space, side)
+
+
 function TypeOfRel (ExprResolver)
 	|message--| opch = exp.second!
 	|SCOperator--| Comp = SCOperator.Lookup( opch )
@@ -1505,7 +1510,7 @@ function TypeOfRel (ExprResolver)
 	|| ParentFunc = P.func
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl)
 
-	if (comp isnt Assigns)
+	if (comp isnt Assigns) and (exp != @erel)
 		if (ShouldBeSet)
 			if comp is ExactlyEquals
 				error (opch, "Did you mean '='?")
@@ -1789,7 +1794,7 @@ function Message.FixErl
 	
 	if (name == "?=") and (.niceparent != @arg)
 		.BecomeMacro(Macros.InitExpand, [ch, .last!]) // just use .run?
-	  else
+	  else // if name == "?="
 		using opp
 				
 		.Func = @rel
@@ -1803,6 +1808,10 @@ function Message.FixErl
 			new_if.msg(@arg) <~ self
 
 		  else								// a += 1 --> a = a + 1
+			// not sure this is the right thing. It makes for less clear ASM.
+			// also x.f() += 1... what should that do?
+			// but changing it... requires changing my ASM. I don't wanna do that now.
+			
 			if last == @rel
 				last = last.WrapWith(@bra)
 			|| rel = @rel.msg

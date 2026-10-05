@@ -18,7 +18,17 @@ function regfile.ActualPhi (|uint16| From, |uint|)
 			rz |= i
 
 
-function assembler.PhiInit (|BranchPhiTracker|)
+function assembler.PhiStart (|BranchPhiTracker|)
+	// we should make a virtual block to go into...
+	// for each branch, even! how?
+
+// something like this? // and then something similar in PhiMiddle and PhiMerge
+//	.NextBasicBlock
+//	.EnterBranch
+//	.NextBasicBlock
+
+// for now... just rely on the fact that our regfile has been cleared of the other branch
+
 	rz.Start = .regs
 	|| i = .curr.index
 	rz.StartIndex = i

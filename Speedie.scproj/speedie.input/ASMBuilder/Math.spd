@@ -48,6 +48,9 @@ extend asmreg
 	
 	
 extend Assembler
+	function EqualsRel (fn_asm)
+		// don't wanna do this right now.
+		
 	function DoMath (fn_asm)
 		opt norefcounts
 		|| op = exp.second!
@@ -57,8 +60,8 @@ extend Assembler
 		|| fn = scop.OpASM
 			return .DoMathSub(exp, dest, fn)
 		error (exp, errorreceiver.InternalError)
-
-
+	
+	
 	helper DoMathSub (|message| exp,  |ASMReg| Dest,  |fn_opasm!| fn, |ASMReg|)
 		opt norefcounts
 		|| ml = ASMReg()

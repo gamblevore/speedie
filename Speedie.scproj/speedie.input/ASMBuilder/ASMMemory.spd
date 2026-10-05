@@ -72,7 +72,7 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 			if K <= 20~bits
 				if Compiler is Hungry
 					decl! is ASMReached
-				.AskNop(bs)								// assume this works for now
+				.AskNop(bs)
 				return exp.GOBJ(dest, 0, 0, K>>3)
 	
 	|| op = ASMType.WriteASM[byte_shift]

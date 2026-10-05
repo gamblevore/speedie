@@ -1,5 +1,4 @@
 
-
 #! `probably faster to pass the nil tracker in "T"!`
 prototype NilTrackerFn (|message| msg, |NilCheckMode| Test=0,  |nilstate|)
 
@@ -16,7 +15,7 @@ datatype NilRecord (Uint64)
 			return .log2|int|>>1
 
 
-struct NilRecorder 
+struct NilRecorder
 	linkage:cpp_part NRC
 	|nilrecord| 	Value
 	syntax call (|uint64| item, assigns:|uint64| value)
@@ -31,7 +30,7 @@ struct NilRecorder
 datatype NilCheckMode (int)
 	linkage: cpp_part khalai
 	flags
-		|NilCheckMode| 
+		|NilCheckMode|
 		Nothing = 0
 		Negative
 		Positive
@@ -48,7 +47,6 @@ datatype NilCheckMode (int)
 		WhilePos = IfPos ||| while
 		WhileNeg = IfNeg ||| while
 		Active  = Positive ||| Negative
-//		Basic   = Active ||| Soft
 
 	syntax is (|NilCheckMode| other, |bool|)
 		return self & other
@@ -74,6 +72,10 @@ datatype NilCheckMode (int)
 		|| p = (self & positive) >> 1
 		p   |= (self & negative) << 1
 		return  p ||| (self &~ active)
+	
+	function scdecl.PerhapsSoft (|nilcheckMode|)
+		if (self isnt local  and  .nildeclared == nilstate.optional)
+			rz = nilcheckmode.soft
 
 
 datatype NilReason (byte)
@@ -81,14 +83,14 @@ datatype NilReason (byte)
 		|nilreason|
 		Accessing
 		Property
-		Reading 
+		Reading
 		Using
 		Passing
 	module
 		|| values = [
 			"Accessing"
 			"Accessing property on"
-			"Reading" 
+			"Reading"
 			"Using"
 			"Passing"
 		]

@@ -19,6 +19,7 @@ dispatch fn_asm_table (fn_asm)
 	@acc:					ASMType.Access
 	@brel:					ASMType.Brel		// ++, --, -, &
 	@arel:					ASMType.arel		// ++, --, 
+	@erel:					assembler.EqualsRel	// +=
 	@type:					ASMType.TypeCast
 	@tmp:					ASMType.unexpected
 

@@ -109,9 +109,8 @@ extend assembler
 				return true
 			B = PB
 */
-	
+			
 	function EnterBranch (|uint16|)
-		// if "IsSelfCon".trap
 		|| s = .state
 		s.BranchDepth++
 		s.RealBranchDepth++

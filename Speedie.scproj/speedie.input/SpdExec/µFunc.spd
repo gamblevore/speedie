@@ -55,7 +55,7 @@ extend SCFunction
 		if HasLabel
 			for fat.fat in self
 				|| r = fat.JumpPrm
-					fat.FillLabelRequest(where, rz, r-1)	
+					fat.BakeLabelRequest(where, rz, r-1)	
 	
 	
 
@@ -69,7 +69,7 @@ extend SCFunction
 
 
 
-function fatasm.FillLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
+function fatasm.BakeLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	(after)
 	|| SelfOut = start + .ASMIndex
 	target debug: debug_require  SelfOut >= start  and  SelfOut < after
@@ -122,7 +122,9 @@ function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |
 		bmr.AppendHInt(Start)
 	
 	if dump
-		assembler.ASMDebug(fn, dump)
+		assembler.ASMDebug(fn, dump, ~4)
+		// we don't have the block info at this point. its gone! unless we made a fatter fatasm
+		// which... might be a good idea. I mean... saving the old output could be nice?
 		dump.Flush
 	return true
 

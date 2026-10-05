@@ -169,9 +169,10 @@ ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __c
 	
 	TRYBREAK:; {
 		#if VMDEBUG
-			int64 Where = JB_ASM_IndexSub(&vm, Code-1);
-			printf("Code: %lli,  Op: %u (%u)\n", Where, Op>>24, Op);
+//			printf("Code: %lli,  Op: %u (%u)\n", Where, Op>>24, Op);
 			if (JB_ASM_Index(&vm, Code-1) < 0) {
+				int64 Where = JB_ASM_IndexSub(&vm, Code-1);
+				printf("Code: %lli,  Op: %u (%u)\n", Where, Op>>24, Op);
 				debugger; // RET is returning to the wrong place?
 			}
 		#endif

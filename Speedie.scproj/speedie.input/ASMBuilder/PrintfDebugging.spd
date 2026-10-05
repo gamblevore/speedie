@@ -37,7 +37,7 @@ function @assembler.SaveStdOut
 		.ASMDump.UseAsStdOut
 
 
-function @assembler.ASMDebug (|scfunction| fn, |faststring| fs_in)
+function @assembler.ASMDebug (|scfunction| fn, |faststring| fs_in, |int| Level)
 	cpp_name adb2
 	opt norefcounts
 	|| Start = fn.µStart$
@@ -51,7 +51,7 @@ function @assembler.ASMDebug (|scfunction| fn, |faststring| fs_in)
 	|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
 
 	for n in amount
-		base[n].RenderFat(fs, -1)
+		base[n].RenderFat(fs, Level)
 		fs <~ "\n"
 			
 	.DumpRegs(fs)
@@ -64,7 +64,7 @@ function @assembler.ASMDebug
 	cpp_name adb
 	visible
 	|| fs = FastString()
-	.ASMDebug(scfunction.currfunc!, fs)
+	.ASMDebug(scfunction.currfunc!, fs, -1)
 	target !debug
 		app.StackTrace(fs)
 	printline fs
@@ -104,5 +104,6 @@ function @assembler.DumpRegs (|faststring| fs)
 				fs <~ msg
 			  else
 				fs <~ "?"
+			fs <~ "\n"
 
 

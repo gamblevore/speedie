@@ -3,8 +3,8 @@
 struct FatASM
 	linkage
 		cpp_part FAT
-//		sort_properties true // no... we must have it this order.
-							 // Specifcally for tightness, but also to allow inputs to overwrite _const 
+//		sort_properties true	// no... we must have it this order.
+								// For Tightness + allow fnc() inputs to overwrite _const
 	|ASMParam[5]|		Prms
 	|uint16|			BasicBlock
 	|int16|				RefCount
@@ -129,7 +129,7 @@ struct FatASM
 		._const = value
 		
 	function F32 (|float|)
-		|&uint64| A = &._Const 
+		|&uint64| A = &._Const
 		rz = (A|&float|)[]
 		if !rz: rz = 0						// rationalise
 
@@ -232,44 +232,44 @@ struct FatASM
 						 // assuming we cahnged a decl. Not so bad if its a temp. Either way don't do it.
 			return nil // do another day.
 
-		|uint| o = f.OutputPrms
-			|| a = o.log2
-			target debug: if 1<<a != o
-			|| old = f.prms[a] & 31								// Need to remove the old output.
-				if .Register(old) == f
-					.SetRegister(old, nil, f.FindOlder)
-			
-			return f.Dest(a, dest, self)					// Then we set it to the new value
-		error (f, errorreceiver.InternalError)				// what?	
+		|uint| o = f.OutputPrms								#expect (f, errorreceiver.InternalError)
+
+		|| a = o.log2
+		target debug: if 1<<a != o
+		|| old = f.regonly(a)								// Need to remove the old output.
+			if .Register(old) == f
+				.SetRegister(old, nil, f.FindOlder)
+		
+		return f.Dest(a, dest, self)						// Then set it to the new value
+
 
 
 	function OutputMap (|uint|)
-		|| outprms = .OutputPrms|int|$
 		|| Found = 0
+		|| outprms = .OutputPrms
 		if outprms&1
-			Found |= 1<<.prms[0].reg
+			Found |= 1<<.RegOnly(0)
 		if outprms&2									// we never set more than 2, and only the first two.
-			Found |= 1<<.prms[1].reg
+			Found |= 1<<.RegOnly(1)
 		return Found
 
 
 
 	function FindOlder (|&fatasm|)
-		|| OM = .OutputMap 
+		// this would causing issues.
+		// it was finding values from other branches, causing them to be nopped later
+		// They were found, as if they should be replaced, when they shouldn't be.
+		
+		// But what branch ARE we in currently? We don't know...
+		// Until the next instruction is made.
+		// We can use the current branch... but I think that is risky.
+		
+		// Perhaps just disable, until we can sort out this branch issue?
+		
+		return nil	// just disable. The branch issue need to be looked at properly
+					// and in full.
+		|| OM = .OutputMap
 	
-		// if we look at trashing stuff... its not so simple.
-		// OK look at this, branches.
-		// So... What are we doing with the regfile, and branches?
-		// we want to save the regfile in a branch, then merge it
-		// so all changes are merged.
-		// but what about trashing. Shouldn't that be merged too?
-		// in that case, a linear scan is enough?
-		// I think so?
-		
-		// another issue is nopping.
-		// lets say a var is trashed, then we nop it. So... i guess
-		// we find nothing? cos of the trashing?
-		
 		|| s = Assembler.sh.FuncStart
 		while --self >= s
 			|| d = .OutputMap & OM
