@@ -122,7 +122,7 @@ function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |
 		bmr.AppendHInt(Start)
 	
 	if dump
-		assembler.ASMDebug(fn, dump, ~4)
+		assembler.ASMDebug(fn, dump, int.max&~4)
 		// we don't have the block info at this point. its gone! unless we made a fatter fatasm
 		// which... might be a good idea. I mean... saving the old output could be nice?
 		dump.Flush

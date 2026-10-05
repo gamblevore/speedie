@@ -121,18 +121,17 @@ extend Assembler
 			B.info = L
 			return L
 
-		
-	function TryBangOpt (|asmreg| X, |asmreg| KK, |asmreg|)
-		// do later
-//		if KK is temp
-//			|| K = KK.const
-//				|| f = X.fat
-//				if f isa asm.bang
-//					|| Shift = f.prms[2]
-//					if 1<<Shift == K
-//						.NopTempConst(KK)
-//				
-		return KK
+	
+	function TryBangOpt (|asmreg| X, |asmreg| KK, |bool|)
+		|| KF = KK.fat
+		require kf and kk is temp
+		|| K = KK.const
+			|| xf = X.fat
+			require xf isa asm.bang
+			|| Shift = xf.prms[2]
+			require 1<<Shift == K
+			.AskNop(kf)
+			return true
 		
 		
 
@@ -152,6 +151,10 @@ extend Assembler
 			if negate and l.IsZero
 				|| B = .AlreadyABool(R)
 					return B
+			if .TryBangOpt(r, l)
+				l = ASMReg()
+				negate = !negate
+	
 			dest = .TempTyped(exp, dest, TypeBool!.TypeNormal)
 			|| Mode = L.EqulClip ||| (R.EqulClip << 2)
 			|| fat = exp.EQUL(dest, L, R, Mode)
@@ -159,7 +162,9 @@ extend Assembler
 				fat._op = asm.NQUL
 			return fat * dest
 		
-		l = .TryBangOpt(r, l)
+		if .TryBangOpt(r, l)
+			l = ASMReg()
+			negate = !negate
 
 		negate = !negate // jmp/equl are used oppositely
 		|| RS = r.issmall|int|

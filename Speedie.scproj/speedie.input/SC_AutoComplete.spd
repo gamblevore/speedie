@@ -1256,9 +1256,8 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 		skinny--
 	
 	while Fat <= Skinny
-		if fat.WillRenderFat
-			|| hisss = fat.GuessSize
-			count += hisss > 0
+		|| hisss = fat.GuessSize
+			count += 1
 			size += hisss
 			
 			if RenderBlocks and (fat.BasicBlock != bb)

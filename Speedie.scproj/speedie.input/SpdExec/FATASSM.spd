@@ -318,6 +318,7 @@ struct FatASM
 		.prms[j-1] = D
 		if d
 			return d
+		// what if all the instructions inbetween are noops.
 		.JumpPrm = 0 // safer for jump calculations
 		return .SaferNoop
 
@@ -463,15 +464,6 @@ struct FatASM
 		fs <~ ")"
 	
 
-	function WillRenderFat (|bool|)
-		if (.GuessSize == 0)
-			if .msg.func == @sheb
-				return false
-			if self isa asm.mark or asm.phi
-				return false
-		return true
-	
-
 	target debug
 		function RendaOpenClose (|faststring| fs)
 			opt norefcounts
@@ -490,7 +482,7 @@ struct FatASM
 				fs <~ "\n"
 	
 	
-	function RenderFat (|FastString| fs, |int| Level, |bool|)
+	function RenderFat (|FastString| fs, |int| Level=int.max, |bool|)
 		opt norefcounts
 		if (self isa asm.phi) and !(level & 1)
 			return false
@@ -517,7 +509,7 @@ struct FatASM
 		|| f = op.sizes
 		
 		for i in f.count
-			|| bs = f[i].BitSize
+			|| bs = f[i].BitSize				// remove this bs/remain check??
 			if bs and (remain > 0)
 				fs <~ GotAny
 				GotAny = ", "
@@ -528,7 +520,10 @@ struct FatASM
 					  else
 						fs.Length-=2
 				  else
-					if f[i].isreg
+					|| j = .JumpPrm
+					if j and (i == j - 1)
+						v = .CountActualJump(v)
+					  elseif f[i].isreg
 						fs <~ ('r' + v|uint| >> 30)|byte|
 						v &= 31
 					fs <~ v
@@ -550,6 +545,16 @@ struct FatASM
 			.RendaMsg(fs, n)
 		return true
 	
+
+	function CountActualJump (|int| v, |int|)
+		real self
+		|| d = (v > 0).Dir
+		while v
+			self += d
+			v -= d
+			if .GuessSize
+				rz += d
+
 	
 	function Next (|&FatASM|)
 		real self
@@ -711,7 +716,7 @@ struct FatASM
 		nil self
 		if (self)
 			|| fs = FastString()
-			.RenderFat(fs, -1)
+			.RenderFat(fs)
 			printline fs
 		  else
 			 "(nil)"
