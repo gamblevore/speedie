@@ -310,7 +310,7 @@ function SCDecl.ASMReg (assigns:|asmreg|)
 	
 	(value isnt temp)		// i don't think a decl can be temp?
 	(value isnt okastemp)
-	value.µType = .mu.DataType
+	value.µType = .µtype
 	.WholeType = value
 
 

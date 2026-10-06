@@ -311,14 +311,14 @@ struct FatASM
 	
 	function JumpTo (|&fatasm| Value, |int64|)
 		cpp_Part JumpToSet
-		|| j = .JumpPrm									#expect (value, errorreceiver.internalerror)
+		|| j = .JumpPrm							#expect (value, errorreceiver.internalerror)
 		
 		|| D = (value - self) - 1
-		check (D != -1) (self, "Infinite loop")
+		check (D != -1)									(self, "Infinite loop")
+		
 		.prms[j-1] = D
-		if d
+		if d and .CountActualJump(d)
 			return d
-		// what if all the instructions inbetween are noops.
 		.JumpPrm = 0 // safer for jump calculations
 		return .SaferNoop
 
@@ -549,6 +549,8 @@ struct FatASM
 	function CountActualJump (|int| v, |int|)
 		real self
 		|| d = (v > 0).Dir
+		if v < 0
+			self++
 		while v
 			self += d
 			v -= d
@@ -795,7 +797,6 @@ datatype FatNopMode	(byte)
 		KeepInputs
 		Rewind
 		NopTemp
-		NoBackStep
 	
 	Syntax Is (|fatnopmode| f, |bool|)
 		return self&f

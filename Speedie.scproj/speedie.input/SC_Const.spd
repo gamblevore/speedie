@@ -368,7 +368,7 @@ function scdecl.NumericCountWithBools (|int|)
 		return 1
 	if .iscarray
 		return .internal!.NumericCountWithBools
-	if .mu.DataType & datatypecode.bool
+	if .µtype & datatypecode.bool
 		return 1
 	return .Type.TypeInfo.VecCount
 		

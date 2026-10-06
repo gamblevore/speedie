@@ -113,22 +113,46 @@ struct Assembler
 			L--
 		return L
 
+	
+	function FattenParam (|scfunction| fn, |int| i, |SCDecl!| A)
+		opt norefcounts
+		|| src = a.Source
+		if !src
+			src = fn.Source!
 
+		|| fake = src.noop
+		|| reg	= a.WholeType
+		reg.reg = i
+		fake.Dest(0, reg, self)
+	
+
+	function FatZero (|scfunction| fn)
+		opt norefcounts
+		|| src = fn.Source!
+		|| fake = src.knst
+		fake.constfill(nil,0)
+		fake._op = asm.noop
+
+	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-		for a in fn.Args
+		.FatZero(fn)
+		for (a in fn.Args) (i)
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
+			.FattenParam(fn, i+1, a)
 	
 	
 	function IntPowerOfTwo (|asmreg| r, |int| Sub=0, |FailableInt|)
 		// -1 --> -1,  0 --> 0,  1 --> 1,  2 --> 2,  4 --> 3,  8 --> 4
 		// this is used for multiplication mostly. like x*-1, or x*0, or x*1
+		// but also for pow2 stuff
 		|| v = r.const
 
 		if v == -1
 			.NopTempConst(r)
 			return v
+		
 		v -= Sub
 		if !v or v.IsPow2
 			.NopTempConst(r)
@@ -228,13 +252,13 @@ struct Assembler
 
 	function TempTyped (|message| exp,  |asmreg| T, |scdecl| Type, |asmreg|)
 		if type
-			t.µtype = type.mu.DataType
+			t.µtype = type.µtype
 		return .TempMe(exp, t)
 	
 	
 	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
-		t.µtype = where.asmdecl.mu.DataType
+		t.µtype = where.asmdecl.µtype
 		return .TempMe(where, t)
 
 
@@ -475,9 +499,12 @@ struct Assembler
 		target debug
 			.Sanity
 			.StackSize--
+
+//			if ss.reg and !ss.fatindex // huh?
 			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
 				"!Const has no fat!"
 				.µdebug(exp, dest)
+
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
 			if dest isnt negate and ss is alreadynegated
@@ -556,7 +583,7 @@ struct Assembler
 		return self == asm.KNSR or asm.KNST or asm.KNST2 or asm.KNST3
 	
 	
-	function InitAndStartFunc (|scfunction| fn)			// init
+	function InitAndStartFunc (|scfunction| fn)			// initfunc
 		opt norefcounts
 		
 		target debug
@@ -588,6 +615,7 @@ struct Assembler
 		.Guard
 		fn.µstart = .Index
 		.VDecls = 1								// set after .FuncStart
+		
 		.AddFuncParams(fn)
 
 

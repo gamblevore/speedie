@@ -53,7 +53,7 @@ class SCDecl (SCObject) {
 		return (.MemoryLayer.obj as SCImport)!
 	
 	function TypeOnly (|datatypecode|)
-		return .mu.DataType & datatypecode.possiblebits
+		return .µtype & datatypecode.possiblebits
 	
 	setter WholeType (|asmreg|)
 		target debug
@@ -61,11 +61,14 @@ class SCDecl (SCObject) {
 			if value is temp and value isnt okastemp // huh?
 		.mu.DataType = value|datatypecode|
 	
+	function µType (|datatypecode|)
+		return .mu.DataType
+	
 	function WholeType (|asmreg|)
-		return .mu.DataType|asmreg|
+		return .µtype|asmreg|
 	
 	function Reg (|int|)
-		return .mu.DataType|asmreg|.reg
+		return .µtype|asmreg|.reg
 	
 	syntax append (|SCDeclInfo| d)
 		.mu.info |= d
@@ -112,7 +115,7 @@ class SCDecl (SCObject) {
 	// T.IsInt and t.veccount <= 1
 	function SpecialReg (|bool|)
 		if self and self isnt reference
-			return .mu.DataType.SpecialReg
+			return .µtype.SpecialReg
 	
 	
 	function CopyDeclsStructFixer (|message| src, |declmode| mode, |message| Type, |SCDecl|)

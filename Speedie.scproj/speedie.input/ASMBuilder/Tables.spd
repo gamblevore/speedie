@@ -204,7 +204,7 @@ function TypeCast (fn_asm)
 	if newdecl.IsBareStruct
 		return asmreg() as asmreg.discard
 	
-	dest.µtype = newdecl.mu.DataType
+	dest.µtype = newdecl.µtype
 	|| From = .µGetASM(F, dest)
 	if From.µtype == dest.µtype
 		return From // already done!
@@ -454,7 +454,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	
 	if d.CanCopyNormally
 		if dest isnt AddrRequest
-			dest.µType = exp.ASMDecl.mu.DataType
+			dest.µType = exp.ASMDecl.µtype
 			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)		// readorwrite can convert vara to a const
 	  elseif dest is set
 		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!)
@@ -532,7 +532,7 @@ function Thg (fn_asm)
 function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is Const)
 	if dest isnt ConstRequest
-		dest.µtype = d.mu.DataType
+		dest.µtype = d.µType
 		return .NumToReg(exp, dest, d.ExportPosition, dest.µtype)
 	return dest
 
@@ -583,14 +583,14 @@ function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, 
 	
 	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
 		|| addr = .GlobAddr(d, exp, dest)$ 
-		addr.µtype = d.mu.DataType
+		addr.µtype = d.µtype
 		return addr.HaveAddr
 	
 	|asmreg| addr
 	if dest isnt set // read
 		addr = dest
 	addr = .GlobAddr(d, exp, addr)$ 
-	dest.µtype = d.mu.DataType
+	dest.µtype = d.µtype
 	(dest isnt ContainsAddr)
 
 	return .ReadOrWrite(dest, Exp, addr, ASMReg(), d)
@@ -819,7 +819,7 @@ function ExistingVar (|message| m, |asmreg|)
 		require d is local and d isnt Reference
 		return .LocalThg(d)
 
-	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.mu.DataType)
+	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.µtype)
 
 
 
