@@ -369,11 +369,10 @@ struct FatASM
 		.prms[a] = value.Prm
 		|| i = value.FatIndex
 		|| sh = Assembler.sh
-		if !i // oof
+		if !i
+			if value.reg // not good
 			i = sh.regs.setters[value.reg]
 			if !i
-				return
-			// once all params come from nops... we can break here always.
 		
 		|| src = sh.funcstart_+i
 		if src < self
@@ -633,8 +632,10 @@ struct FatASM
 			msg = msg.parent
 		  else
 			while msg == @num or @thg or @opp or @bra or @char
-				loop !(msg in @prm)
-				msg = msg.parent
+				|| p = msg.parent
+				if !p or (p in @prm)
+					exit
+				msg = p
 		if (msg == @tmp)
 			.TmpRender(fs, msg)
 		  else

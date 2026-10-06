@@ -366,15 +366,16 @@ function AskForInline (|Message| prms, |ASMReg| dest, |SCFunction| fn, |ASMReg|)
 
 
 function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
-	if old.FatIndex
+	if old.reg
+		ifn new iz old // how? 
 		return exp.phi(new, new, old) * new
 	return new
 	
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
+	rz.fatindex = 1
 	target debug: || InlineTrap = ++ASMTrapper,  if InlineTrap == -1
 	|| dest = .state.return
-
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
@@ -384,10 +385,12 @@ function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg
 		  elseif op == asm.ret
 			sv.ReturnedCount++
 			|| value = s.inputfat(0)
-				rz = .PerhapsPhi(exp, value.info, rz)
+				if dest.reg
+					rz = .PerhapsPhi(exp, value.info, rz)
 			  else
-				rz.fatreg = s.asmreg(0)
-				rz.µType = .state.return.µType
+				debugger // should always exist
+				// rz.fatreg = s.asmreg(0)
+				// rz.µType = .state.return.µType
 			
 			if value
 				value.safedecr		// Will get incremented later.

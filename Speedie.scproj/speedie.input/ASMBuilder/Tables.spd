@@ -177,6 +177,8 @@ function Return (fn_asm)
 		return InlinedReturn(self, exp, L)
 
 	dest = ASMReg.ExitFunction
+	target debug: || returntrap = ++asmtrapper, if returntrap == -1
+	
 	|| f = exp.first
 		dest = .µGetASM(f, dest)
 	
@@ -294,8 +296,7 @@ function SetRel (fn_asm)						// function relset (
 	dest = f.ASMAllowsTemp
 	|| Src = .µGetPrms(exp.last!, dest)
 	(Src is Set)
-	.µ(F, Src)
-	return asmreg.discard
+	return .µ(F, Src) as asmreg.discard
 
 
 
@@ -416,8 +417,9 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	if !Mask
 		.RegDebugInfo = 0		// Leave all debug info open, but still dealloc structs
 		// exp = nil			// Can't set exp = nil, or we block dealloc.
-		
-	rz = .CloseVars(v, exp, rz & Mask)
+	
+	rz = (rz & mask).fatindex(rz.fatindex)  // not so pretty. mask kinda made sense before. but now?
+	rz = .CloseVars(v, exp, rz)				// when all things need indexes?
 
 	if rz is ExitFunction		// this is being triggered by inlined returns
 		.regs = Restore			// but they don't ACTUALLY exit. Did I alter how inline returns work?

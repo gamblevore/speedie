@@ -284,6 +284,7 @@ extend assembler
 			
 			
 	function Trash (|uint| Reg)
+		require reg < 31
 		|uint| A = .regs.altered &~ ((1<<(Reg+1))-1)
 		while A
 			|| r = a.log2
@@ -318,10 +319,15 @@ extend assembler
 			A |= 1 << Changed
 			P |= 1 << Changed
 			N = Alterer - .FuncStart_							// Set value
-
+		
+		
 		|| oldi = .regs.Setters[changed]
+		if changed == 0
+			require !oldi
 		.regs.Altered = A // works really well with PHI nodes!
 		.regs.Phi = P
+		if !changed and !n // shouldn't happen
+		
 		.regs.Setters[changed] = n
 		.KnownValues(changed) = Alterer is Const
 		

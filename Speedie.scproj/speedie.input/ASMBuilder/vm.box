@@ -358,7 +358,7 @@ forms
 #!						 (((((STOP)))))
 /**/ HALT (HALT)
 		DebugOnly(
-		puts("halt")
+			puts("\t\t(((halt)))")
 		)
 		if (Op == VMHexEndCleanly)
 			vm.Registers[2].Int = 0

@@ -76,15 +76,17 @@ function MainBrancher (fn_asm)
 	|| BreakReq = .BreakRequest
 	|| old = .EnterBranch
 	
-	if dest == nil
-		rz = .WhileSub(exp)
-	  elseif dest isnt VerySpecial
-		rz = .IfSub(exp, nil)
-	  else
+	if dest is VerySpecial
 		rz = .TernarySub(Exp, dest)
+	  else
+		if dest == nil
+			rz = .WhileSub(exp)
+		  else
+			rz = .IfSub(exp, nil)
+		if .curr > StartOfBranch
+			rz.FatIndex = StartOfBranch.index
 
 	.ExitBranch(old)
-
 	.PhiFix(StartOfBranch) // they were created at a point that should have been here...	
 
 	.BreakRequest = nil
@@ -145,12 +147,14 @@ function Exit			(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to exit
 	j._Const = kexit
+	rz = J*rz
 
 
 function Continue		(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to continue
 	J._Const = kcontinue
+	rz = J*rz
 
 
 function NopBranch (|fatasm| start)
@@ -209,7 +213,6 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	|| mA = .µInto(A, dest)
 
 	.PhiMiddle(Phi)
-//	if "TestSyntax".trap
 	|| Exit = exp.jump
 	Branch.jumpto(.curr, 0)
 	|| mB = .µInto(B, dest)	

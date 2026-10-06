@@ -1,5 +1,5 @@
 ı HALT:;
-	DebugOnly(puts("halt"));
+	DebugOnly(puts("\t\t(((halt)))"));
 	if (Op == VMHexEndCleanly)
 	vm.Registers[2].Int = 0
 ;

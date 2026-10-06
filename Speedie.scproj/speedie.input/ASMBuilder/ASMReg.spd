@@ -121,6 +121,7 @@ datatype ASMReg (uint64)
 	function Zero (|asmreg|)
 		// keep the fatasm... like for .write() which returns reg0.
 		.reg = 0
+		.FatIndex = 1
 		is const
 		isnt TempFlags
 		return self

@@ -126,17 +126,24 @@ struct Assembler
 		fake.Dest(0, reg, self)
 	
 
-	function FatZero (|scfunction| fn)
+	function FattenZero (|scfunction| fn)
 		opt norefcounts
-		|| src = fn.Source!
+		|| src = fn.source!
+		|| ty = typenil
+			src = ty.source!
+		
 		|| fake = src.knst
 		fake.constfill(nil,0)
 		fake._op = asm.noop
-
+		.SetRegister(0, fake.info, fake)
+//		target debug
+//			if "".trap
+//				RefCountTrap = fake
+	
 	
 	function AddFuncParams (|SCFunction| fn)
 		opt NoRefCounts
-		.FatZero(fn)
+		.FattenZero(fn)
 		for (a in fn.Args) (i)
 			.DeclReset(a)
 			.DeclareVar(a.source, a)
@@ -489,6 +496,7 @@ struct Assembler
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper
+			|| CurrFat = .curr
 			if µtrap == -1 or stacksize > 30 // ugh
 		  else
 			opt inline
@@ -500,11 +508,6 @@ struct Assembler
 			.Sanity
 			.StackSize--
 
-//			if ss.reg and !ss.fatindex // huh?
-			if (ss is Const) and (ss.reg and !ss.fatindex) // huh?
-				"!Const has no fat!"
-				.µdebug(exp, dest)
-
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
 			if dest isnt negate and ss is alreadynegated
@@ -514,8 +517,15 @@ struct Assembler
 
 			if .EntireInlineFailed
 				return ss // doesnt matter
-			if !ss  or  (dest is set)  or  (ss is set or discard)
+
+			if !ss.fatindex 
+				if ss.reg or ((currfat-1).countactualJump(.curr-currfat) > 0)
+					"!output has no fat!"
+					.µdebug(exp, dest)
+
+			if !(ss.fatindex(0))  or  (dest is set)  or  (ss is set or discard)
 				return ss // no need test.
+			
 			if !ss.reg and (ss isnt condanswer)
 				if !(ss & asmreg.exit) and (ss isnt Const)
 					"!Zero Reg!"
@@ -539,7 +549,7 @@ struct Assembler
 		.FinishAdd(@bin, S)
 
 		
-	function FillDebugInfo 
+	function FillDebugInfo
 		opt norefcounts
 		if Options.TargetDebug
 			SourceMap.Positions = FastString()

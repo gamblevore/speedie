@@ -43,7 +43,7 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 
 		p.BasicBlock = .BasicBlock
 		target debug
-			if p.id == -1
+			if (p.id == -1) and "".trap
 			
 		return p
 

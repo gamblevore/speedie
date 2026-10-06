@@ -101,7 +101,7 @@ Message is also:
 	libinternal _Trap
 		inlined
 		target __PROJECT_SPEEDIE__
-			0 // if "App_abc_Constructor".trap
+			0 // if "".trap
 
 ///////////////////////////////////////////////////////////////////////////////
 	
