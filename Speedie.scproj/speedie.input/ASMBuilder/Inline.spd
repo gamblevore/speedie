@@ -303,7 +303,10 @@ function SCDecl.ASMReg (assigns:|asmreg|)
 	isnt const
 	.ExportPosition = 0		// this is for a local. locals store their consts in fats...
 	if value is Const
-		value.incrfat
+		if value.reg
+			value.incrfat // better to JUST incr... but we just added the fatindex check
+						  // and the old NopParams was NOT decrementing reg0... so either I change that it does
+						  // decr reg0, or don't incr here. Better to removeboth but do that later.
 		value.ConstCheck
 		if self isnt Altered
 			is const

@@ -53,7 +53,7 @@ extend Assembler
 
 		// we can consider 0 to be optional? for example... add + shift?
 		// do it later!
-		return (op.pcount == pos) #expect (list, "Too few params")
+		return (op.pcount == pos)					#expect (list, "Too few params")
 
 	
 	function fatasm.AddLabelRequest (|message| P, |int| Pos)
@@ -61,9 +61,15 @@ extend Assembler
 		|| x = .info
 		x.reg = pos
 		.info = x
-		|| j = .form.RegForJump // remove JumpPrm and use forms count
-			if j != pos + 1 // what?
+		|| j = .form.RegForJump				// remove JumpPrm and use forms count
+			if j != pos + 1					// what?
 		.JumpPrm = j
+		._Const = nil
+		|| name = p.name
+		|| n = name.Length
+		expect (n <= 7)						(p, "Value out of range")
+		Memory.Copy(&._const, name.addr, n)
+		
 		
 
 
@@ -81,8 +87,14 @@ extend Assembler
 		if !i
 			return true
 		i--
-		|| name = jumper.msg.first[i]
-			|| dest_index = textassembler.Labels.valuelower(name.name)		#expect (name, "arg")
+		
+		|| name_addr = (&Jumper._const)|Cstring|
+		|| name_len = name_addr.Length
+			|virtualjbstring| Virtual
+			Virtual.addr = name_addr
+			Virtual.length = name_len
+			|| fake = (&Virtual)|string|
+			|| dest_index = textassembler.Labels.valuelower(fake)		#expect ("Missing " + fake)
 			jumper.prms[i] = dest_index[] - jumper.index
 			return true
 				

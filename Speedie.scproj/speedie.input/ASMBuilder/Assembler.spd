@@ -82,13 +82,6 @@ struct Assembler
 
 	function FuncStart (|&fatasm|)
 		return .FuncStart_ + 1
-
-//	function Fat (|uint16| Index, |&fatasm|)
-//		if index
-//			return .funcstart_ + index
-		
-//	function Fat (|asmreg| F, |&fatasm|)
-//		return .fat(f.fatindex)
 		
 	function FnLength (|int|)
 		return .curr_ - .funcstart
@@ -118,7 +111,10 @@ struct Assembler
 		opt norefcounts
 		|| src = a.Source
 		if !src
-			src = fn.Source!
+			if i == 1 and a == "self"
+				src = compiler.ASMSelf
+			  else
+				src = fn.Source!
 
 		|| fake = src.noop
 		|| reg	= a.WholeType
@@ -652,7 +648,8 @@ struct Assembler
 //		|| Faked = arg.FrenchSpyReturn // cant use it here... unless we make a new return message.
 // why not... just add a new message? the thing is, I HAD that. and it crashes the compiler. No idea why.
 // in transform()
-		.CloseVars(1, arg)
+		
+		.ClearAllStructs(arg)
 		ASMType.ReturnOpt(self, nil)
 		|| FatRat = arg.ret
 		fatrat.RefCount = 1

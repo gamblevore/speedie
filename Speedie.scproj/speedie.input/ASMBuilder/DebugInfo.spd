@@ -82,7 +82,8 @@ function FATASM.OutputDebugVars (|int| Next)
 	  else
 		ifn self isa asm.mark
 			index = Next
-		|| ty = .msg.NilDecl
+		|| ty = .const|scdecl|
+		ifn ty isa scdecl // oof
 		|| reg = .Output.reg
 		if ty and reg
 			ty.DumpDeclOpen(dd, index, reg)
@@ -134,41 +135,21 @@ function Assembler.MarkVarClosed (|int| RegBits)
 	.RegDebugInfo &= ~RegBits
 	|| Mark = .last
 	if !mark.CanCloseRegs(RegBits)
-		mark = mark.Msg.MARK()
+		mark = mark.source.MARK()
 		mark.refcount = 1
 		
 	(mark is DebugVarClose)
 	mark._Const |= RegBits
 
 
-
-function fatasm.CanMarkOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |bool|)
-	opt norefcounts
-	require (self isnt DebugVarOpen) or (self isa asm.mark)
-	require self isnt DebugVarClose			// for cleanlyness
-	if (.Output iz Declared)
-		|| msg = .msg
-		if (msg.NilDecl == ty)
-			return true
-		if msg.func != @func
-			.msg = exp
-			return true
-
-
-
 function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |!&FatASM| Start, |ASMReg|)
 	|| Last = .Last
 	if Start > Last	and start > .funcstart		// It could have nopped a .gtab if its an inlined param 
 		start -= .IsCurrBlock(start-1)|int|		// and it gets replaced into a .gobj
-	
-	while Start <= Last
-		if Last.CanMarkOpen(exp, Declared, ty)
-			(Last is DebugVarOpen)
-			return declared
-		Last--
 
 	last = exp.mark()
 	last.OutputPrms = 1,  last.refcount = 1,  last.prms[0] = Declared.reg
+	last.const = ty|uint64|
 	(Last is DebugVarOpen)	
 	return Declared
 

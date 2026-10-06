@@ -234,7 +234,8 @@ class SCImport
 			return -1										// Set later in sort()
 
 		
-		function PleaseDoConfsDifferently (|message| s, |int| t)
+		function LateConfAdd (|message| s, |int| t)
+			#!"I need to do confs differently than this!"
 			s.FixFileNumber(t)
 		
 		
@@ -257,7 +258,7 @@ class SCImport
 			for (f in .allfiles) (i)
 				f.filenum = i
 				|| s = f.liveast
-					.PleaseDoConfsDifferently(s, i<<5)
+					.LateConfAdd(s, i<<5)
 			
 									
 				

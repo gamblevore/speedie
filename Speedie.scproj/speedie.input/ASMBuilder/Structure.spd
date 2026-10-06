@@ -321,12 +321,14 @@ extend assembler
 			N = Alterer - .FuncStart_							// Set value
 		
 		
+//		if "SemiConst2".trap and changed == 8
 		|| oldi = .regs.Setters[changed]
 		if changed == 0
 			require !oldi
 		.regs.Altered = A // works really well with PHI nodes!
 		.regs.Phi = P
-		if !changed and !n // shouldn't happen
+		
+		if !changed and !n and oldi								// shouldn't happen
 		
 		.regs.Setters[changed] = n
 		.KnownValues(changed) = Alterer is Const

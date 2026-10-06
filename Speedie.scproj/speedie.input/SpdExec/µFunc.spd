@@ -35,7 +35,7 @@ extend SCFunction
 			rz = fat.µBakeInto(rz, after)
 
 			if Positions
-				|| pos = fat.msg.SrcMap
+				|| pos = fat.SrcMap
 				if pos >> 21 == 0						// init code... has no file
 					pos = 0
 					|| prev = fat-1

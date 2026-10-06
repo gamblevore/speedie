@@ -70,7 +70,7 @@ function Assembler.RefCountIncr (|message| exp, |ASMReg| Obj,  |&FatASM|)
 			Last.p2 = 1										// incring a gobj. Lets do it internally!
 			return Last
 	|| fat = exp.rfun(asmreg(), asmreg(), 0, Obj)
-	Fat.OutputPrms = 0
+	if Fat.OutputPrms// = 0
 	return fat
 
 

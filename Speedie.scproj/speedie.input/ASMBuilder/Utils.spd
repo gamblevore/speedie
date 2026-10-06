@@ -26,7 +26,7 @@ function message.ASMDecl (|SCDecl!|)
 	target debug: rz.ASMSanity
 
 
-function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
+function Assembler.RequestOp (|asm| op, |message?| exp, |sourcelocation| map=nil,  |&fatasm|)
 	|| p = .Curr
 	if p < .End
 		.curr_ = p + 1
@@ -34,7 +34,9 @@ function Assembler.RequestOp (|asm| op, |message| exp, |&fatasm|)
 		|| Info = p.index|uint64|<<48
 		p.info = Info|asmreg|
 		p._op = op
-		p.msg = exp
+		p.SrcMap = map
+		if exp
+			p.msg = exp
 		
 		if (op != asm.noop and asm.mark and asm.phi)
 			p.BreakInfo = .BreakRequest

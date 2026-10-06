@@ -1,5 +1,39 @@
 
 
+
+datatype SourceLocation (uint64)
+	syntax expect (|string?| error=nil)
+		|| fs = FastString()
+		.Render(fs, 128)
+		error (error, fs)
+		
+		
+	function Position (|int|)
+		return self & 21~bits
+	
+	function File (|scfile|)
+		return SCImport.AllFiles[self>>21]
+	
+	function MARK (|&FATASM|)
+		return Assembler.sh.RequestOp(asm.mark, nil, self)
+		
+	function Render (|faststring| fs, |int| Max)
+		opt norefcounts
+		|| f = .File
+		if !f
+			fs <~ ("?", 3)
+			return
+		|| start = .Position
+		|| after = start
+		|| str = f.FData
+		for max
+			after++
+			|| c = str[after]
+			if !c or c.IsTextLine
+				exit
+		fs.AppendRange(str, Start, after)
+
+
 module SourceMap
 	|faststring|		Positions
 	|int|				LastLength
@@ -52,8 +86,6 @@ module SourceMap
 
 	////	////	////	////	////	////	////	////	////	////	////	////	////	////
 
-
-datatype SourceLocation (uint64)
 
 function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
 	|| i = .ASMIndex + sourcemap.ASMTotal

@@ -9,7 +9,8 @@ struct FatASM
 	|uint16|			BasicBlock
 	|int16|				RefCount
 	|ASMReg|			Info
-	|Message--|			Msg
+	|uint|				SrcMap
+	|uint16[2]|			OldOutputs
 	|uint16|			ASMIndex
 	|byte|				BreakInfo
 	|byte|				OutputPrms		// Not just dependant on µform. For example RD1U can increment or not.
@@ -17,18 +18,32 @@ struct FatASM
 	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
 	|uint64|			_Const
+
+//	|uint64|			A // sigh
+//	|uint64|			B
+//	|uint64|			C
+//	|uint64|			D
 	
 	
+	function Source (|sourcelocation|)
+		return .SrcMap
+	
+	function Msg (|message|)
+		disabled
+	
+	setter Msg (|message|)
+		.SrcMap = Value.SrcMap
+
 	function Op (|byte|)
 		return ._op
 	
 	setter SetOp (|byte| value)
 		opt norefcounts
-		|| m = .Msg
+		|| m = .SrcMap
 		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
 		|| b = .BasicBlock
 		self[0] = nil
-		.Msg = m
+		.srcmap = m
 		.Const = k
 		._op = value
 		.BasicBlock = b
@@ -290,7 +305,7 @@ struct FatASM
 			.DebugPrint
 			if !error
 				error = errorreceiver.internalerror
-		error (.msg, error)
+		error (.source, error)
 
 	
 	function Jump (|int|)
@@ -421,25 +436,15 @@ struct FatASM
 		return R >> 12
 	
 	
+	setter TotalFuncInputs (|int|)
+		.Inputs[8] = value
+	function TotalFuncInputs (|int|)
+		return .Inputs[8]
+	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
-		|| exp = .msg
-		if exp != @func
-		|| fn = exp.last!.Obj|scfunction|
-		ifn fn isa scfunction
-			fn = nil
-			|| obj = exp.first!.obj
-			if obj isa scfunction
-				fn = obj
-			  elseif obj isa scdecl
-				fn = obj.type.funcproto
-			  else
-				debugger
-			if !fn
-				fs <~ "(unknown)"
-				return
 		|| regs = .FuncPrms
-		|int64| n  = fn.Args.Length
+		|int64| n  = .totalfuncinputs
 		fs <~ "("
 		
 		if n > 10
@@ -558,11 +563,9 @@ struct FatASM
 
 	
 	function Next (|&FatASM|)
-		real self
 		return .move(1)
 	
 	function Prev (|&FatASM|)
-		real self
 		return .move(-1)
 	
 	
@@ -572,10 +575,6 @@ struct FatASM
 			self = self + dir
 			if .GuessSize
 				return self
-	
-	
-	function IsChanger (|bool|)
-		return !.IsStateless
 	
 	
 	function IsStateless (|bool|)
@@ -617,42 +616,10 @@ struct FatASM
 
 	function RendaMsg (|faststring| fs, |int| sofar)
 		opt norefcounts
-		|| msg = .msg
-		if msg == @sheb
-			msg.render(fs)
-			return
-		fs <~ (' ', 47-sofar)
-		require msg != @arg
-
+		|| map = .source
 		fs <~ "/*"						// reuse /* string lol.
 		fs <~ " "
-
-		|| Start = fs.length
-		if msg == @prm
-			msg = msg.parent
-		  else
-			while msg == @num or @thg or @opp or @bra or @char
-				|| p = msg.parent
-				if !p or (p in @prm)
-					exit
-				msg = p
-		if (msg == @tmp)
-			.TmpRender(fs, msg)
-		  else
-			msg.render(fs)
-		
-		|| After = fs.length
-		|| OrigAfter = After
-		if after - Start > 40
-			after = start + 40
-			fs.length = After
-
-		After = fs|string|.find('\n', Start, After)
-		if After > Start
-			fs.length = after
-		if OrigAfter < OrigAfter
-			fs <~ "..."
-		
+		map.Render(fs,40)		
 		fs <~ " "						// reuse "*/" string
 		fs <~ "*/"
 	
@@ -751,7 +718,7 @@ struct FatASM
 			require (asm.jmke xor 1) == asm.jmkn
 			require (asm.jbor xor 1) == asm.jban
 			|| S = –sizeof FatASM
-			require S == 128 or 64
+			require S == 128 or 64 or 96
 			require (asm.rfrd > asm.RFUN and asm.rfwr and asm.rfst)
 			require (asm.rfun < asm.RFST and asm.RFWR)
 			return true

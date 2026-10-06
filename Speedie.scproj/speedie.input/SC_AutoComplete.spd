@@ -1194,14 +1194,6 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 
 
 
-function Message.NextPath (|message| Before, |message?| path, |message|)
-	opt norefcounts
-	|string| sp = .file
-	if path.firstname != sp
-		path = .FileMark
-		Before.prev = path
-	return path
-
 
 function message.FileMark (|message|)
 	opt norefcounts
@@ -1230,21 +1222,12 @@ function ASM (|message| arg,  |SCFunction| fn, |bool|)
 	if Assembler.sh.FatterCompile(fn)
 		|| fs = FastString()
 		rz = .FeedBackViewASMSub(arg, fn, fs)
-
-
-function message.AsmIndent (|message| top, |int|)
-	opt norefcounts
-	while self and self != top
-		rz += (self == @arg)
-		self = .parent
-
+	
 
 function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
 	|| bb = 0
-	|message| path
-	|| lp = 0
-	|| top = fn.SourceArg
+	|file| curr_file
 	|| Count = 0
 	|| Size = 0
 	
@@ -1263,16 +1246,18 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 			if RenderBlocks and (fat.BasicBlock != bb)
 				bb = fat.BasicBlock
 				out <~ bb
-			fs <~ (' ', fat.msg.asmindent(top)*2)
+			fs <~ (' ', 2)
 			fat.RenderFat(fs, 0)
 			|| tmp = out.msg(@tmp, fs)
-			|| msg = fat.msg
-			|| p =  (msg!=nil)(msg.Position, 0)//(msg?) // could be nil due to the length set wrongly...
-			if p <= 0
-				p = lp
-			tmp <~ p
-			lp = p
-			path = msg.NextPath(tmp, path)
+			
+			|| map = fat.source
+			tmp <~ map.position
+			|| mapfile = map.file
+			if mapfile != curr_file and nil
+				curr_file = mapfile
+				|| file = @tmp + "file"
+				file <~ mapfile
+				tmp.prev = file
 		fat++
 	
 	|| title = out.first
@@ -1281,6 +1266,7 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 	
 	.CppView(out, fn)
 	return true
+
 
 
 function scfunction.RenderSheBless (|string|)

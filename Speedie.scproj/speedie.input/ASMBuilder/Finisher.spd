@@ -54,12 +54,11 @@ function assembler.FinishJump (|fatasm| Jump, |bool|)
 			d++								// Need to check for where the func ends
 		  elseif d isa asm.jump
 			d = d.JumpTo!
-			expect (++n < 30) (jump.msg)
+			expect (++n < 30) (jump.source)
 		  else
 			exit
 
-	|message--| Nothing
-	if d.msg == Nothing
+	if !d.SrcMap
 		expect (d == .curr)					// Yikes. well we can still fix this.
 		.MissingReturn
 		
