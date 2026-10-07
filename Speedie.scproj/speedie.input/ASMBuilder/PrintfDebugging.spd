@@ -72,6 +72,7 @@ function @assembler.ASMDebug
 
 
 function @assembler.DumpRegs (|faststring| fs)
+	require compiler isnt TextAssembling
 	|| D = .sh.vdecls_
 	|| T = .sh.vtemps
 	|| X = D|||T									#require
@@ -94,6 +95,8 @@ function @assembler.DumpRegs (|faststring| fs)
 			fs <~ i
 
 	fs <~ "\n"
+	
+	
 	i = 0
 	while ++i <= 31
 		|| test = 1<<i

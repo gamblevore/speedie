@@ -83,10 +83,9 @@ function FATASM.OutputDebugVars (|int| Next)
 		ifn self isa asm.mark
 			index = Next
 		|| ty = .const|scdecl|
-		ifn ty isa scdecl // oof
-		|| reg = .Output.reg
-		if ty and reg
-			ty.DumpDeclOpen(dd, index, reg)
+			ifn ty isa scdecl // oof
+			|| reg = .OutputRegMap
+				ty.DumpDeclOpen(dd, index, reg.log2)
 
 
 
@@ -147,9 +146,10 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 	if Start > Last	and start > .funcstart		// It could have nopped a .gtab if its an inlined param 
 		start -= .IsCurrBlock(start-1)|int|		// and it gets replaced into a .gobj
 
-	last = exp.mark()
-	last.OutputPrms = 1,  last.refcount = 1,  last.prms[0] = Declared.reg
-	last.const = ty|uint64|
+	last = exp.mark(),   last.refcount = 1
+//	last.OutputPrms = 1
+	last.prms[0] = Declared.reg
+	last.Const = ty|uint64|
 	(Last is DebugVarOpen)	
 	return Declared
 

@@ -154,8 +154,14 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 		return ret
 	
 	BeefIn = r.info
+
+	// why not just... return beefin? theres no shifts, right?
+	// its just for wierd flags right?
+	
 	ret.slimreg = beefin			// keep exit flags or other stuff
-	ret.µtype = beefin.µtype	// not copied in .reg...
+	ret.µtype = beefin.µtype		// not copied in .slimreg...
+	ret.fatindex = beefin.fatindex
+	
 	.SoftNop(BFLG)
 	return ret
 	
@@ -296,6 +302,7 @@ function SetRel (fn_asm)						// function relset (
 	dest = f.ASMAllowsTemp
 	|| Src = .µGetPrms(exp.last!, dest)
 	(Src is Set)
+	// if I change this to incr the op, then IncrPost and IncrPre should too.
 	return .µ(F, Src) as asmreg.discard
 
 
@@ -641,7 +648,7 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 		dest = .TempMe(f)
 
 	(addr is BlockNop)
-	|| value = .Read(Dest, F, addr, nil, glob) * Dest						// READ
+	|| value = .Read(Dest, F, addr, nil, glob) 							* Dest						// READ
 	(value is noscale)
 	if mode & incrafter
 		dest = value
@@ -671,8 +678,8 @@ function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 	|| fat = exp.CNTD(dest, Addr, offset, amount, bc)
 	fat.incr							// memory alteration!
 	(dest is set)
-	if !dest.reg
-		fat.OutputPrms &= ~1			// clear output
+//	if !dest.reg
+//		fat.OutputPrms &= ~1			// clear output
 	
 	if mode & IncrAfter
 		if 0: exp.CNTC
@@ -937,7 +944,6 @@ function FatASM.FloatIntConvConst (|datatypecode| src, |datatypecode| dest, |int
 			return v|uint64||float|.asint		// u to f32
 		return v|uint64||Float64|.asint			// u to f64
 
-	// src.isfloat
 	if src.ByteCount == 4
 		|| f32 = f|&float|[]
 		if dest.IsSigned
@@ -975,24 +981,4 @@ function message.DeclFunc (|scfunction|)
 	|| D = .obj
 	if D isa SCDecl
 		return d.Func
-
-
-/*
-	while a and b
-		c()
-	
-	-->
-	
-	jump+1:
-	c()
-	
-	if !(a and b)
-		jump-1:
-		
- // !(a and b) --> !a or !b --> !a or !0 --> !a or 1 --> always_true(!a)
-
-*/
-
-
-
 

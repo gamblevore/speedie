@@ -22,7 +22,7 @@ extend Assembler
 
 	function MegaNumFinder (|int64| V, |bool| Special, |DataTypeCode| Type, |ASMReg|)
 		if v == 0
-			return asmreg.zero.µtype(type)
+			return asmreg().µtype(type)
 		// shouldn't the BranchID shift with the basicblock Or not? IDK?
 		|| cc = .curr
 		for f.Known in self

@@ -13,7 +13,8 @@ target Debug
 
 
 	function string.trap (|message| msg=nil, |bool|)
-		if scfunction.currfunc == self
+		opt norefcounts
+		if !self or scfunction.currfunc == self
 			if msg
 				printline msg
 			return true

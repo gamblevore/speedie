@@ -147,14 +147,14 @@ function Exit			(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to exit
 	j._Const = kexit
-	rz = J*rz
+	return J.info
 
 
 function Continue		(fn_asm)
 	opt norefcounts
 	|| J = exp.jump											// request jump to continue
 	J._Const = kcontinue
-	rz = J*rz
+	return J.info
 
 
 function NopBranch (|fatasm| start)

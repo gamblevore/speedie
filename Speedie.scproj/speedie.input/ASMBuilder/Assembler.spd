@@ -131,7 +131,7 @@ struct Assembler
 		|| fake = src.knst
 		fake.constfill(nil,0)
 		fake._op = asm.noop
-		.SetRegister(0, fake.info, fake)
+		.SetRegister(0, fake.info, fake, 0)
 //		target debug
 //			if "".trap
 //				RefCountTrap = fake
@@ -191,7 +191,10 @@ struct Assembler
 
 	function IncrPost (|message| exp,  |AsmReg| Dest,  |AsmReg| Src,  |int64| Value,  |asmreg|)
 		if  Src.isint  and  value.CanStoreAsAddK  and  !dest.IsVec
-			return exp.ADAK(dest, Src, Value) * Dest
+			|| fat = exp.ADAK(dest, Src, Value)
+			// setrel doesn't incr the things (Why not?)
+			// so I guess this shouldn't also.
+			return fat * Dest
 		rz = .Assign(exp,  .TempMe(exp, dest),  Src)
 		if !dest.reg
 			dest = src
@@ -304,13 +307,13 @@ struct Assembler
 	
 	function µBoolInto (|message| exp, |AsmReg| Dest, |bool| Force, |asmreg|)
 		dest.µType = DataTypeCode.bool
-		BoolTrap++
-		|| x = (force)(.µinto(exp, dest), .µ(exp, dest))
-		BoolTrap--
-		if x.IsBool
-			return x
-		return .Exists(exp, dest, X)
-	
+		|| start = .curr
+		|| value = .µ(exp, dest)
+		if (value iz dest) and value.isbool
+			return value
+		if value.isbool
+			return .Assign(exp, dest, value, start)
+		return .Exists(exp, dest, value)	
 	
 	function message.ASMAllowsTemp (|asmreg|)
 		opt norefcounts
@@ -451,18 +454,23 @@ struct Assembler
 			|| intotrap = asmtrapper
 			if intotrap == -1
 		|| v = .µGetASM(Exp, dest)
+		.CloseVars(Closer, nil, v)
 		ifn v iz dest
 			v = .Assign(exp, dest, v, start)
-		return .CloseVars(Closer, nil, v)
+		return v
 		
 	
 	target debug
 		function µDebug (|message| exp, |asmreg| dest)
-			|| fn = fn_asm_table[exp.ASMType]!
+			|| µMaker = fn_asm_table[exp.ASMType]!
+			|| FuncIndex = packmaker.PackFuncIndex
 			dest.DebugPrint
+			"---\n"
 			ASMDebug()
+			"---\n"
+			printline exp
 			debugger
-			|| m = (fn)(self, exp, dest)
+			|| m = (µMaker)(self, exp, dest)
 			m.debugprint
 			debugger
 
@@ -727,5 +735,3 @@ function Assembler.FatterCompile (|SCFunction| fn, |bool|)
 	return true
 
 
-
-|| BoolTrap = 0

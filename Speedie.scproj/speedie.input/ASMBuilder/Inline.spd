@@ -83,6 +83,7 @@ struct InlineInfo
 
 	function NopParams (|int| n, |asmreg| Ret, |assembler| sh)
 		opt norefcounts
+		
 		while  --n >= 0
 			|| r = .Items[n]
 			|| v = r.reg
@@ -249,6 +250,8 @@ function @ASMType.InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest
 	if .state.TailInlineable
 		(extras is ExitFunction)
 
+	target debug
+		|| in_ret_trap = ++asmtrapper, if in_ret_trap == 52325
 	(dest as= extras)
 	|| f = exp.first
 		if !dest.reg
@@ -377,13 +380,12 @@ function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	rz.fatindex = 1
-	target debug: || InlineTrap = ++ASMTrapper,  if InlineTrap == -1
+	target debug: || FinishTrap = ++ASMTrapper,  if FinishTrap == -1
 	|| dest = .state.return
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
-			error (s)
-/			sv.ReturnedCount++			// Should never get this instruction! not inlined anyway.
+			error (s)			// Should never get this instruction! not inlined anyway.
 
 		  elseif op == asm.ret
 			sv.ReturnedCount++

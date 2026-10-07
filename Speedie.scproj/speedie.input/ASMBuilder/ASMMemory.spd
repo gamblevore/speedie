@@ -37,6 +37,23 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 	return exp.WCPY(Src, dest, Amount & 14~bits) * src		// VM treats 0 as the biggest num
 
 
+function GObjOpt (|ASMReg| Dest, |message| Exp, |asmreg| Base, |int| Index, |scdecl?| Decl, |&fatasm|)
+	|| bs = base.fat
+	if (bs isa asm.gtab) and  .iswithin(bs)
+		if bs.prms[1]		// This is lib, and is always in range.
+			|| GlobID = bs.prms[2]
+			|| gobj = exp.GOBJ(dest, 1, 0, GlobID)
+			return .AskNopTemp(bs, gobj)
+		
+		
+		|| K = bs.Const + ((index-1) << 3)
+		if K <= 20~bits
+			if Compiler is Hungry
+				decl! is ASMReached
+			|| gobj = exp.GOBJ(dest, 0, 0, K>>3)
+			return .AskNoptemp(bs, gobj)
+
+
 function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| VarAdd, |scdecl?| Decl, |int| Index, |&fatasm|)
 	(dest isnt AddrRequest)
 	target debug
@@ -57,23 +74,15 @@ function ReadOrWriteSub (|ASMReg| Dest, |message| Exp, |asmreg| Base, |asmreg| V
 		base = .MemOffsetFix(Base, byte_shift, index, 7, Decl, exp)
 	
 	|| pinc = .MemOpt(base, index, byte_shift)
-	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg)
-		|| bs = base.fat
-		if (bs isa asm.gtab) and  .iswithin(bs)
-			if bs.prms[1]		// This is lib, and is always in range.
-				|| GlobID = bs.prms[2]
-				|| gobj = exp.GOBJ(dest, 1, 0, GlobID)
-				if bs is temp
-					.AskNop(bs, gobj)
-				return gobj
-			
-			
-			|| K = bs.Const + ((index-1) << 3)
-			if K <= 20~bits
-				if Compiler is Hungry
-					decl! is ASMReached
-				.AskNop(bs)
-				return exp.GOBJ(dest, 0, 0, K>>3)
+	if (!pinc) and (dest isnt set) and (Byte_Shift == 3) and (!varadd.reg) and (base is temp)
+		// this might be done better as a post-optimisation. SIGH.
+		// For now... we have to be very conservative. Or we add extra instructions.
+		// this case is the issue:    inlinedfunc(mod.var) --> v = x[], v++, x[] = v
+		// so the test  (base is temp)  solves that, but loses potential opts
+		
+		|| bs = .GObjOpt(dest, exp, base, index, decl)
+			return bs
+	
 	
 	|| op = ASMType.WriteASM[byte_shift]
 	if dest is set
@@ -184,10 +193,10 @@ function ReadOrWrite (|| dest,  |message| exp,  || base,  || VarAdd,  |scdecl| T
 		dest = .TempTyped(exp, dest)
 	(dest isnt Const)
 	|| fat = .ReadOrWriteSub(dest, exp, base, VarAdd, ty, index)
-	if dest is set
+	if !fat.OutputMap
 		dest = dest.zero
-	return fat*dest
-
+	return fat / dest
+	
 
 function Dummy (|message| exp)
 	if exp: exp.RD1U, exp.RD1S, exp.RD2U, exp.RD2S, exp.RD4S, exp.RD8U, exp.RD16, exp.WR1U, exp.WR2U, exp.WR4U, exp.WR8U, exp.WR16, exp.KNSR, exp.KNST2, exp.KNST3

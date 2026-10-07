@@ -17,11 +17,11 @@ linkage:cpp_part Ext
 ////////////////////////////////////////////////////////////////////////////////
 
 
-function TmpBase (|string| V, |bool| Lib=false,  |string|)
+function TmpBase (|string| SpdChild, |bool| Lib=false,  |string|)
 	opt norefcounts
 	if !Lib and options.SelfReplacement
-		return "/tmp/SpeedieSelf/" + V
-	return "/tmp/Speedie/" + V
+		return "/tmp/SpeedieSelf/" + SpdChild
+	return "/tmp/Speedie/" + SpdChild
 
 
 function TmpOut (|string| V, |string|)

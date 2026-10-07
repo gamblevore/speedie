@@ -81,6 +81,10 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 		v = ret.reg
 		v ?= .state.parentvars|uint|.log2 + 1
 		dest = dest.Temp(ret)
+
+		// this could trash a valid reg!!!
+		// x = inl(y) --> return y + func() // func trashes! 
+
 	  else
 		|| vd = .VDecls
 		v = vd.log2					// we can't use .declareme, .log2 is used to protect the vars. 
@@ -124,7 +128,7 @@ function GrabbedRegisters (|message| AllPrms, |&fatasm| Start, |!&fatasm| Fn)
 	while C >= Start
 		if c isa asm.GRAB
 			if c.CurrGrabID == .CurrFuncGrab
-				.SetRegister(c.regonly(1), nil, fn)
+				.SetRegister(c.regonly(1), nil, fn, 0)
 		c--
 		
 }
@@ -211,7 +215,7 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		TableID = PointerCall.reg
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 	
-	dest = .FunctionDestination(exp, dest, fn)
+	dest = .FunctionDestination(exp, dest &~ asmreg.ExitAtAll, fn)
 	|| Start = .curr
 	|asmreg[8]| Regs
 
@@ -232,9 +236,9 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		.GrabbedRegisters(exp, Start, fat)
 		return fat.info // already set in asmcall
 
-	|| HighBit = .TempMe(exp, datatypecode.uint64|asmreg|)
+//	|| HighBit = .TempMe(exp, datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(PointerCall, 63)
-	branch.OperatorMul(highbit)
+//	branch.OperatorMul(highbit)							// this returns nothing? so no need to add.
 	.ASMCall(exp, dest, fn, tableid, regs, false)
 	|| J = exp.jump
 	
@@ -277,7 +281,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 		fat.incr					// NOICE!
 	
 	if fn is Killer
-		dest = asmreg.exit
+		(dest is exit)
 		fat.incr
 	dest = (fat * dest)
 	return fat

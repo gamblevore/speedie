@@ -27,10 +27,10 @@ datatype SourceLocation (uint64)
 		|| after = start
 		|| str = f.FData
 		for max
-			after++
 			|| c = str[after]
 			if !c or c.IsTextLine
 				exit
+			after++
 		fs.AppendRange(str, Start, after)
 
 

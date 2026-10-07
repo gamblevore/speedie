@@ -10,20 +10,17 @@ struct FatASM
 	|int16|				RefCount
 	|ASMReg|			Info
 	|uint|				SrcMap
-	|uint16[2]|			OldOutputs
+	|uint16[2]|			PrevOutput
 	|uint16|			ASMIndex
 	|byte|				BreakInfo
-	|byte|				OutputPrms		// Not just dependant on µform. For example RD1U can increment or not.
+	|byte|				UnusedOutput	// Not just dependant on µform. For example RD1U can increment or not.
 	|byte|				_Op
 	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
+	// we could do this better.
+	// put it after prms[] with spacer gaps, align the fatindexes
 	|uint64|			_Const
 
-//	|uint64|			A // sigh
-//	|uint64|			B
-//	|uint64|			C
-//	|uint64|			D
-	
 	
 	function Source (|sourcelocation|)
 		return .SrcMap
@@ -32,6 +29,11 @@ struct FatASM
 		disabled
 	
 	setter Msg (|message|)
+		opt norefcounts
+		if (value == @arg) and !(self isa asm.halt)
+		if value == @prm
+			|| p = value.parent
+				value = p
 		.SrcMap = Value.SrcMap
 
 	function Op (|byte|)
@@ -62,6 +64,11 @@ struct FatASM
 	function IsFunc (|bool|)
 		|| b = .BaseOp
 		return b == asm.fncx or asm.fnc
+	
+	function IsReffer (|bool|)
+		|| b = .op
+		// keep in sync with vm.box if more are added!
+		return b >= asm.RFUN and b <= asm.RFRD
 	
 	
 	constants
@@ -124,15 +131,23 @@ struct FatASM
 		return dest
 	
 	
-	operator mul (|asmreg| flags, |asmreg|)
-		cpp_part AsReg
-		
+	operator divide (|asmreg| flags, |asmreg|)
 		(flags isnt FlagsToRemove)
 		if (flags is Exit) and !.IsFinisher(flags)
 			(flags isnt exit)				// right?
 		flags = flags.FatIndex(.index)
 		.info = flags
 		return flags
+
+
+	operator mul (|asmreg| flags, |asmreg|)
+		cpp_part AsReg
+		
+		target debug
+			|| m = .OutputRegMap
+				|| v = flags.reg
+				ifn (m & 1<<v)
+		return .OperatorDivide(flags)
 
 	
 	function Const (|int64|)
@@ -228,76 +243,54 @@ struct FatASM
 		if !changed
 			return info
 		
-		.OutputPrms |= 1 << a
+		.UnusedOutput |= 1 << a
 		if info
 			(info is AllowNopDest)
-		return sh.SetRegister(changed, info, self)
+		return sh.SetRegister(changed, info, self, a)
 	
+
+	function assembler.RewindOutput (|fatasm| f, |int| a)
+		|| i = f.PrevOutput[a]$
+		|| reg = f.regonly(a)
+		if !reg												// how?
+		if .Register(reg) == f
+			f.PrevOutput[a] = 0
+			|| prev = i.fat
+			if i == 1 // special-case. reset to 0
+				prev = nil
+			.SetRegister(reg, nil, prev, -1)
+
 	
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
+		// only applies to regs with only 1 output. (in theory, but good to check anyhow)
 		if !.IsWithinCurrInline(f)
 			return nil
 		
-		require !f.isfunc
-		
-		if f isa asm.phi // bruh. Would need to redest it's inputs, and their inputs inputs.
-						 // also... we would need to do ALL or none
-						 // AND... they all need to be within the currinline.
-						 // and all the things that used them need to be changed...
-						 // assuming we cahnged a decl. Not so bad if its a temp. Either way don't do it.
-			return nil // do another day.
+		require !f.isfunc and !(f isa asm.phi)
 
-		|uint| o = f.OutputPrms								#expect (f, errorreceiver.InternalError)
-
-		|| a = o.log2
-		target debug: if 1<<a != o
-		|| old = f.regonly(a)								// Need to remove the old output.
-			if .Register(old) == f
-				.SetRegister(old, nil, f.FindOlder)
-		
+		|uint| a = f.OutputMap - 1
+		expect (a <= 1)										(f, errorreceiver.InternalError)
+		.rewindoutput(f, a)
 		return f.Dest(a, dest, self)						// Then set it to the new value
 
 
-
 	function OutputMap (|uint|)
-		|| Found = 0
-		|| outprms = .OutputPrms
-		if outprms&1
-			Found |= 1<<.RegOnly(0)
-		if outprms&2									// we never set more than 2, and only the first two.
-			Found |= 1<<.RegOnly(1)
-		return Found
-
-
-
-	function FindOlder (|&fatasm|)
-		// this would causing issues.
-		// it was finding values from other branches, causing them to be nopped later
-		// They were found, as if they should be replaced, when they shouldn't be.
+		if .PrevOutput[0]
+			rz |= 1
+		if .PrevOutput[1]
+			rz |= 2
 		
-		// But what branch ARE we in currently? We don't know...
-		// Until the next instruction is made.
-		// We can use the current branch... but I think that is risky.
 		
-		// Perhaps just disable, until we can sort out this branch issue?
-		
-		return nil	// just disable. The branch issue need to be looked at properly
-					// and in full.
-		|| OM = .OutputMap
-	
-		|| s = Assembler.sh.FuncStart
-		while --self >= s
-			|| d = .OutputMap & OM
-				return self
-			if .CanTrashRegisters and d < om.LowestBit
-				return nil // can't go past ops that wipe stuff!
-	
-	
-	function Output (|asmparam|)
-		|uint| o = .OutputPrms
-			return .prms[o.log2]
+	function OutputRegMap (|uint|)
+		|| Map = .OutputMap
+		|uint| Found = 0
+		if Map&1
+			found |= 1<<.RegOnly(0)
+		if Map&2
+			found |= 1<<.RegOnly(1)
+		return found
 
-	
+		
 	Syntax Expect (|string?| Error=nil)
 		target debug
 			assembler.ASMDebug
@@ -381,20 +374,19 @@ struct FatASM
 	
 	
 	function RegInput (|int| a, assigns:|asmreg|)
-		.prms[a] = value.Prm
 		|| i = value.FatIndex
-		|| sh = Assembler.sh
 		if !i
-			if value.reg // not good
-			i = sh.regs.setters[value.reg]
-			if !i
+			if value.reg				// not good
+			i = 1						// sh.regs.setters[0]
+			Value.FatIndex = i
+		.prms[a] = value.Prm
 		
-		|| src = sh.funcstart_+i
-		if src < self
-			.Inputs[a] = i
-			src.incr
-		  else
-			debugger // what?
+
+		|| src = Assembler.sh.funcstart_ + i
+		if src >= self					// how?
+
+		.Inputs[a] = i
+		src.incr
 	
 	
 ////////////////////////////////////////////////////////////
@@ -406,10 +398,9 @@ struct FatASM
 			return p.ASMReg
 	
 	
-	function CheckHasOutput 
+	function CheckHasOutput
 		target debug {
-		opt norefcounts
-		for (b.bits in .OutputPrms|int|) (i)
+		for (b.bits in .OutputMap|int|) (i)
 			if !.regonly(i)
 				error (self, "Missing ASM output")
 		}
@@ -482,7 +473,7 @@ struct FatASM
 				fs <~ "\n"
 			  elseif self is DebugVarOpen
 				fs <~ "\t\tOpen: "
-				fs <~ .output.reg
+				fs <~ .OutputRegMap.log2
 				fs <~ "\n"
 	
 	
@@ -507,6 +498,7 @@ struct FatASM
 				fs <~ "/"
 				fs <~ assembler.sh.parentblock(self)
 				fs <~ ")"
+		
 		fs <~ (' ', 5-op.name.length)
 		|| GotAny = ""
 		|| Remain = 24
@@ -535,9 +527,9 @@ struct FatASM
 			if .op == asm.knst
 				exit
 		
-		if (self  isa  asm.knst or asm.knsr or asm.gtab or asm.knst2 or asm.knst3)
+		|| asm_op = .op
+		if (asm_op  ==  asm.knst or asm.knsr or asm.gtab or asm.knst2 or asm.knst3)
 			.RendaKnst(fs, fs.StreamLength-m)
-			fs <~ ' '
 		
 		|| n = fs.StreamLength - m
 		if n <= 2
@@ -545,9 +537,12 @@ struct FatASM
 			fs <~ "..."
 			n += 2
 
-		if Level&8
-			.RendaMsg(fs, n)
+		if Level & 8
+			fs <~ (' ', 42-n)
+			.RendaMsg(fs)
+		
 		return true
+
 	
 
 	function CountActualJump (|int| v, |int|)
@@ -614,7 +609,7 @@ struct FatASM
 			fs.Length = start + 30
 
 
-	function RendaMsg (|faststring| fs, |int| sofar)
+	function RendaMsg (|faststring| fs)
 		opt norefcounts
 		|| map = .source
 		fs <~ "/*"						// reuse /* string lol.
@@ -627,7 +622,7 @@ struct FatASM
 	
 	function RendaKnst (|faststring| fs, |int| SoFar)
 		|| ty = .info.µType
-		fs <~ (' ', 26-sofar)
+		fs <~ (' ', 24-sofar)
 		fs <~ "/# "
 		if ty.IsInt
 			fs <~ .const|int64|
@@ -701,15 +696,6 @@ struct FatASM
 		while (i < n)
 			yield inputs[i++].fat
 
-			
-	iterator RegOutputs
-		// maybe going up to 128bytes, and simply doing it as a map... is better?
-		|| outprms = .OutputPrms|int|
-		while outprms
-			|| i = outprms.lowestbit
-			outprms &=~ i
-			yield .prms[i.log2]
-
 
 	module
 		function VerifyNumbers (|bool|)
@@ -726,12 +712,16 @@ struct FatASM
 
 
 datatype ASMParam (uint)
-	// this would have been better if I had planned this all out ahead of time
-	// so we could do like... lowest 5 bits are the reg, next is tmp, then fatbits,
-	// for 21-bits after that we have 11 more bits that we could either use or keep empty...
-	// depending on if they confuse the code or not, but at least we have something that
-	// makes sense, easy to convert from one to the other!
-	// at this point... its too late, really.
+	// storing 24-bits is kinda possible, but not so good for functions, right?
+	// the others don't need it.
+
+
+	// fatindex(16),   ---(5),   temp(1),   ---(5),   Reg(5)
+
+	// Not sure temp is needed here??
+	// I should try to remove it. later.
+	// Could be nice to store if the prm is a input/output
+	
 	
 	function ASMReg (|asmreg|)
 		|asmreg| R = ((self>>31)<<10)|asmreg|
@@ -753,6 +743,8 @@ function asmreg.Prm	(|asmparam|)
 	|| r = .reg
 	|| t = (self is Temp)<<31
 	return r ||| t ||| i
+
+
 
 
 target debug

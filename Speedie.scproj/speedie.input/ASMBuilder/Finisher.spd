@@ -100,13 +100,13 @@ function assembler.TryTail (|fatasm| FNC)
 	|| ReturnType = .Root_Fn.ReturnType
 	require !returntype or fnc.RegOnly == rr				// returning same var, or nothing at all.
 
-	// If this overwrites params... then we need to copy params
+	// If tail's inputs overwrite some params... then we need to copy params
 	// We could adapt the TAIL encoder! That should do it.
 
 	Fnc.prms[0] = Fnc.prms[1]
 	Fnc.prms[1] = Fnc.prms[2]
 	Fnc.prms[2] = 0
-	Fnc.OutputPrms = 0
+//	Fnc.OutputPrms = 0
 	Fnc._op = asm.tail
 	fnc.incr
 	(Fnc is exit)

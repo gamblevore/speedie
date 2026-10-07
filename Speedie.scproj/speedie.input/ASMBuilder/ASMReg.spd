@@ -43,7 +43,6 @@ datatype ASMReg (uint64)
 		TempFlags		= OKAsTemp	||| Temp
 		InlineFlagsToKeep = TempFlags  |||  Set  |||  NewlyDeclared
 		FlagsToRemove	= Const		||| Discard
-		Zero			= Const		||| Param		||| 56	// 56 == datatypecode.uint64
 		// don't go above 47
 
 	
@@ -244,9 +243,10 @@ datatype ASMReg (uint64)
 		return self & R
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
+		self = self asnt r
 		if (value)
-			return self as r
-		return self asnt r
+			self = self as r
+		return self
 		
 	function datatypecode.zero (|asmreg|)
 		|| K = asmreg.Const
@@ -358,12 +358,8 @@ datatype ASMReg (uint64)
 			
 	module
 		function New (|asmreg|)
-			return Zero
-		
-		function New (|int| reg, |asmreg|)
-			rz.reg = reg
-		
-		function New (|int| reg, |uint16| Index, |asmreg|)
-			rz.reg = reg
-			rz.fatindex = index
-		
+			(rz is const)
+			(rz is param)
+			(rz as= datatypecode.uint64|asmreg|)
+			rz.FatIndex = 1			
+

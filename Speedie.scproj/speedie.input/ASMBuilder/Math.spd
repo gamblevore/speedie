@@ -859,7 +859,7 @@ extend Assembler
 			// D = ~L & R
 			if .IsWithin(f)
 				|| bnot = exp.bnot(dest, f.asmreg(1), R, 0)
-				.AskNop(f, bnot)
+				bnot = .AskNopTemp(f, bnot)
 				return bnot.Vectorise(dest, asm.qnot)
 
 
@@ -868,7 +868,10 @@ extend Assembler
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitAnd)
 		if (l iz r)
 			return l
-		|| k = .BitAndOpt(exp, dest, l, r) ?? .BitAndOpt(exp, dest, r, l)
+		|| k = .BitAndOpt(exp, dest, l, r)
+		if !k
+			k = .BitAndOpt(exp, dest, r, l)
+		if k
 			return k
 		if (l is Const)
 			swap (l) (r)
@@ -1065,14 +1068,7 @@ extend Assembler
 			|| Find = 1<<src.reg
 			require !(vdecls & find)	// the decl is out of range! IE... it won't be missed.
 										// we can fuck around with it as much as we like >:3
-		/*
-		target debug
-			if BoolTrap
-				f.debugprint
-				DebugPrint()
-				debugger
-		*/
-		
+
 		return .redest(f, dest)
 	
 	
@@ -1084,7 +1080,9 @@ extend Assembler
 			if !src.reg
 				(src is const)
 			(Dest is const) = (src is const)
-			
+
+		dest.µtype = src.µtype // its not really changed... boolinto does nothing if it finds a bool but its not a bool.
+		
 		target debug: if (dest.IsVec != src.IsVec) and src.reg
 		|| improve = .ImproveAssign(dest, src, start)
 			return improve
@@ -1096,25 +1094,18 @@ extend Assembler
 			|| K = src.const
 			return .LoadNumber(exp, K, src.µtype.SpecialReg, dest)		// Consts are the most optimisable thing we have
 
+		(dest isnt Const)
 		if src.IsFloat
 			return exp.FADD(dest, src, asmreg(), asmreg(), src.FourBytes|int|) * dest
 		// BFLG is VERY optimisable :] (but consts are even more)
 		
-		|| sh = src.BitCount - dest.BitCount
-		if sh >= 0
-			// leave as is
-		  elseif src.signed
-			sh = 64 - src.bitcount
-		  else
-			sh = 0 // no point otherwise. just make the asm simpler.
-				
-		(dest isnt Const)
+		// asmtodo: doing the wrong thing here. we want to test a var... instead of equl we get bflg here.
+		|| sh = 64 - src.BitCount		// did i just fix it?
 
-		|| Sign = src.signed|int|
-		|| Merge = .MergeBFLG(exp, dest, src, sh, sh, Sign)
+		|| Merge = .MergeBFLG(exp, dest, src, sh, sh, src.signed|int|)
 			return Merge
 		
-		return exp.BFLG(dest, src, sh, sh, sign) * Dest
+		return exp.BFLG(dest, src, sh, sh, src.signed|int|) * Dest
 	
 	
 function int64.Fits (|int| amount, |bool| signed=true, |bool|)

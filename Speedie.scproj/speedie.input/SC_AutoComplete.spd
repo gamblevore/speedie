@@ -802,11 +802,13 @@ function Object.AsDecl (|scdecl|)
 	opt norefcounts
 	if self isa SCClass
 		return .typenormal
-	  elseif self isa SCModule
+	
+	if self isa SCModule
 		|| c = .cls
 			return c.typenormal
-	  else
-		return .BaseAsDecl
+		return nil
+
+	return .BaseAsDecl
 
 
 function Object.BaseAsDecl (|scdecl|)
@@ -834,7 +836,7 @@ function AutoSub3 (|SCObject| value, |string| key, |[autoitem]| found, |string| 
 						.total++
 						sub_name = value.baseicon + " " + sub_name
 						found <~ autoitem(key, orig, value, sub_name, exact, value.auto_type)
-			 
+		
 		value = value.nextdisplay(exact)
 
 			
@@ -922,7 +924,7 @@ function TmpAutoComplete (|message!| f, |string| name, |string| type, |message|)
 						arg.msg(@tmp, cf.name) <~ (@str, cf.name)
 	
 	.AutoCompleteSub(f, name, arg)
-	  
+	
 
 
 function JumpImport (|message| cmd, |message|)
@@ -1081,6 +1083,7 @@ function Message.AutoMsgFuncFn (|SCFunction|)
 	if self == @name
 		|| cls = compiler[self]
 			return cls.ConstructorFunc // what if there are multiple?
+	
 	|| tmp = self
 	if tmp != @tmp
 		tmp = .parent
@@ -1192,14 +1195,6 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 		rz = nil
 		.ASMFail(fn, rz)
 
-
-
-
-function message.FileMark (|message|)
-	opt norefcounts
-	|| path = .File
-		rz = .msg(@tmp, "file")
-		rz <~ path
 	
 	
 //function Nothing (|message| out,  |SCFunction| fn)

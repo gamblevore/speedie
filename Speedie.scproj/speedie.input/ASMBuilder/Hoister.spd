@@ -68,7 +68,6 @@ function PackGlobAddr (|SCDecl?| D, |message| exp, |AsmReg| Dest, |int64| Export
 	if Missing >= 4096
 		fat.const = -1									// Not directly accessable anymore.
 		fat = exp.ADDB(dest, missing >> 12)
-//		fat.const = Direct + ((missing >> 12) << 12)	// Not needed.
 		rz = fat * dest
 
 }

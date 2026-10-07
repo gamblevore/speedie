@@ -86,6 +86,12 @@ function assembler.PhiMergeNormal  (|message| Exp, |BranchPhiTracker| T, |asmreg
 	return .PhiMerge(exp, t, dest, 0)
 
 
+				
+function @asmreg.NewPhi (|int| reg, |uint16| Index, |asmreg|)
+	rz.reg = reg
+	rz.fatindex = index
+		
+
 function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint| Both, |uint| Liftup)
 	for (Bit.bits in both) (reg)
 		|| I1 = A.Setters[reg]
@@ -97,7 +103,7 @@ function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint
 			if !f1.phiAlready(I2) and !f2.phiAlready(i1)
 				|| r = f1.info
 				(r isnt const)
-				|| phi = exp.phi(r, asmreg(reg, f1.index), asmreg(reg, f2.index))
+				|| phi = exp.phi(r, asmreg.newphi(reg, f1.index), asmreg.newphi(reg, f2.index))
 				phi.prms[3] = Liftup
 
 

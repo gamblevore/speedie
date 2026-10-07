@@ -10,6 +10,10 @@ struct RegFile
 
 
 extend assembler
+	function pp (|int| x, |int| y)
+		x = y++
+		x = ++y
+		
 	function BackupFAT (|&fatasm| Curr)
 		|| Start = .FuncStart
 		|| Amount = Curr - Start
@@ -224,6 +228,7 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
+		if "Sibling".trap
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -258,10 +263,9 @@ extend assembler
 					NopMode = FatNopMode.KeepInputs
 				.Decr(f, NopMode, depth)
 
-		for v.RegOutputs in fat
-			v &= 31
-			if .Register(v) == fat
-				.SetRegister(v, nil, fat.FindOlder)
+
+		.RewindOutput(fat, 0)
+		.RewindOutput(fat, 1)
 		
 		fat.setop = asm.noop
 		if HasBreak
@@ -289,14 +293,12 @@ extend assembler
 		while A
 			|| r = a.log2
 			a &= ~(1<<r)
-			.SetRegister(R, nil, nil)
+			.ClearRegister(R)
 	
 	
 	function CanNop (|fatasm| F, |int| Changed, |bool|)
-		// what about... using .IsCurrBranch
-		
 		require (f.RefCount <= 0) and .IsCurrBranch(f)
-		|| m = f.OutputMap
+		|| m = f.OutputRegMap // 1
 
 		m &= ~(1<<changed)
 		if !m
@@ -311,35 +313,49 @@ extend assembler
 		return true
 	
 	
-	function SetRegister (|int| Changed, |asmreg| NopDest, |?&FATASM| Alterer, |asmreg|)
-		|| A = .regs.Altered &~ (1<<Changed)
-		|| P = .regs.Phi &~ (1<<Changed)
+	function ClearRegister (|int| Changed,  |asmreg|)
+		opt inline
+		return .SetRegister(changed, nil, nil, nil)
+	
+	
+	function SetRegister (|int| Reg, |asmreg| NopDest, |?&FATASM| Alterer, |int| Field,  |asmreg|)
+		|| oldi = .regs.Setters[Reg]
+		if (Reg == 0) and oldi
+			debugger
+			return NopDest
+
+		|| A = .regs.Altered &~ (1<<Reg)
+		|| P = .regs.Phi &~ (1<<Reg)
 		|| N = 0
+
 		if Alterer
-			A |= 1 << Changed
-			P |= 1 << Changed
+			A |= 1 << Reg
+			P |= 1 << Reg
 			N = Alterer - .FuncStart_							// Set value
-		
-		
-//		if "SemiConst2".trap and changed == 8
-		|| oldi = .regs.Setters[changed]
-		if changed == 0
-			require !oldi
-		.regs.Altered = A // works really well with PHI nodes!
+			if Field >= 0
+				|| bigger = oldi|uint| max 1
+				Alterer.PrevOutput[field] = bigger
+//		  else
+//			target debug
+//				|| Allocated = .vdecls ||| .vtemps
+//				if Allocated & (1<<Reg) // nope!
+			
+			
+		.regs.Altered = A										// works really well with PHI nodes!
 		.regs.Phi = P
 		
-		if !changed and !n and oldi								// shouldn't happen
+		if !Reg and !n and oldi									// shouldn't happen
 		
-		.regs.Setters[changed] = n
-		.KnownValues(changed) = Alterer is Const
+		.regs.Setters[Reg] = n
+		.KnownValues(Reg) = Alterer is Const			
 		
 		target debug
-			if .Register(changed) != alterer					// huh?
+			if .Register(reg) != alterer						// huh?
 				
-		if oldi and (NopDest is AllowNopDest)
+		if (oldi > 1) and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
-			if .CanNop(old, changed)
+			if .CanNop(old, Reg)
 				if alterer and old is DebugVarOpen
 					(alterer is DebugVarOpen)					// like: || a = 1, a = 2
 
@@ -369,11 +385,12 @@ extend assembler
 		.nop_sub(f, mode, depth)
 	
 	
-	function AskNop (|fatasm| ToNop, |&fatasm| Replace)
-		if ToNop.RefCount <= 0
+	function AskNopTemp (|fatasm| ToNop, |&fatasm| Replace, |&fatasm|)
+		if tonop is temp  and  ToNop.RefCount <= 0
 			|| br = ToNop.BreakInfo
 			.nop(ToNop)
 			replace.BreakInfo = br
+		return Replace
 
 	
 	function AskNop (|fatasm| ToNop)

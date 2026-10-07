@@ -643,6 +643,7 @@ POS 5
 /**/ RFRD  (RefSet3)								// RefCount reg <-- mem
 		Code = SetRefMemToReg(vm, r, Op, Code)
 	
+// if more are added, fatasm.IsReffer must be updated
 /**/ RFRT  (RefReturn)								// its ONLY used for returns...
 		Code = DeRefRegs(vm, r, Op, Code)
 		if (!Code)
