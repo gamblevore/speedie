@@ -143,7 +143,7 @@ extend PerryIDE
 
 
 		with .FileList
-			.IsMainListView = true
+			.IsMainEditor = true
 			.tooltip		= "Displays files in project"
 			.folfile		= ".perry"
 			.takesfocus		= takesfocusflag.CanFocus
@@ -224,7 +224,7 @@ extend PerryIDE
 
 		with .ErrorList
 			.Columns = ListViewRow("", listviewstate.aligncenter)
-			.IsMainListView = true
+			.IsMainEditor = true
 			.tooltip = "Displays Compile Errors. Press \1f< or \1f> to step in list."
 			.GNormal.Solid = LeftBG
 			.onpaste = ErrorListPaste
@@ -235,7 +235,7 @@ extend PerryIDE
 			
 		
 		with .CommsLogList
-			.IsMainListView = true
+			.IsMainEditor = true
 			.GNormal.Solid = LeftBG
 			.oncopy = listview.PerryCopyComms|guicopyevent|
 		
@@ -306,7 +306,7 @@ extend PerryIDE
 			is   UnSearchable
 			isnt DrawsFocus
 			.Columns = ListViewRow("", listviewstate.aligncenter)
-			.IsMainListView	= true
+			.IsMainEditor	= true
 			.RowHeight		= .rowheight + 3
 			.Hierarchical	= true
 			.tooltip		= self.SearchArea.Tooltip			
@@ -373,7 +373,7 @@ extend PerryIDE
 			.OnExpandRow	= &Perry.collectexpansion
 			.Hierarchical	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
-			.IsMainListView	= true
+			.IsMainEditor	= true
 			.MultiSelection	= true
 			.OnEditCell = PerryStackEditCell
 			.AlwaysSendChangeEvent = true

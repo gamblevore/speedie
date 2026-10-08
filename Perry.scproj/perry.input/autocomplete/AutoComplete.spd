@@ -181,6 +181,7 @@ function PerryIDE.ShowAutoComplete (|bool|)
 		a.ShowCmm(self, .AutoPoint.x, .AutoPoint.y - .lastbottom)
 		(a is typethrough)
 		return true
+	
 	a.ListSource.obj = nil
 	a.closemenu
 

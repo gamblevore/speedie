@@ -30,6 +30,7 @@ class GUIControl (list)
 	|byte|						Padding
 	|byte|						ExpandOnMouseOver
 	|bool|						ClickOutsideCloses
+	|bool|						IsMainEditor
 	|CopyPasteFlags|			CopyPaste
 
 

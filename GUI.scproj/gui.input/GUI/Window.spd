@@ -260,8 +260,8 @@ class Window (GUIControl)
 			if !s.isviewable
 				s = s.flatafter
 				continue
-			if (s isa listview) and !(s isa menu)
-				if s.IsMainListView
+			if s.IsMainEditor
+				if (s isa listview) and !(s isa menu)
 					rz = s
 				
 			s = s.flatnext

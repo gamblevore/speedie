@@ -86,21 +86,31 @@ class Menu (ListView)
 		rz *= font.width
 	
 	
+	libinternal guicontrol.OversizedCmm (|int| H, |bool|)
+		opt norefcounts
+		require .ismaineditor or self isa window
+		|| w = .window
+			return H*3 > w.height<<1								// 2/3rds
+		
+		
 	function ShowCmm (|GUIControl| Owner, |int| X, |int| Y)
 		opt norefcounts
 		|| mw = .CmmWidth(owner)
 		|| W = (x)~right for mw
-		if (x < 0) and (.MouseXY.x > .Horz.sum/2)
+		|| dh = .DesiredHeight
+
+		if  ((x < 0) and (.MouseXY.x > .Horz.sum/2))  or  owner.oversizedcmm(dh)
 			w = the~right back mw
 		|| CP = ControlPoint.low
 		if y
 			cp = (Y)~up
-		|| H = CP back .DesiredHeight
+
+		|| H = CP back dh
 		.size = w by h
 		.ShowMenu
 	
 	
-	function ShowMenu 
+	function ShowMenu
 		|| win = .window					#require
 		win.inline.clear
 		win.openedmenu = self
@@ -108,7 +118,8 @@ class Menu (ListView)
 		._Scrollstart = nil
 		.touch
 //		.SlideOpen(0.125s)
-		.SelectFirst(ListViewSelectMode.InitialSelection)
+		if !.FirstSelected
+			.SelectFirst(ListViewSelectMode.InitialSelection)
 	
 	
 	function IsCmm (|bool|)

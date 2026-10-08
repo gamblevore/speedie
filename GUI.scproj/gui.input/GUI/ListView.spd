@@ -5,8 +5,6 @@ class ListView (GUIControl) {
 	|int|							RowHeight
 	|bool|							MultiLineDraw
 
-	|bool|							IsMainListView
-
 	|int|							ScrollShift
 	|bool|							RightClickSelects
 	|bool|							AlwaysSendChangeEvent
