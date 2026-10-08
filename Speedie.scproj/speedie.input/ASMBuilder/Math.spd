@@ -1,6 +1,6 @@
 
 
-prototype fn_OpASM			(|&Assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+prototype fn_OpASM			(|assembler| self, |message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
 prototype fn_ASMConstifier	(|asmreg| L, |asmreg| R, |int64|)
 
 
@@ -396,7 +396,7 @@ extend Assembler
 
 
 	// from 1 to -1
-	function Quick1Or1Sub (|&Assembler| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
+	function Quick1Or1Sub (|assembler| self, |asmreg| dest, |asmreg| L, |int| ptoi, |message| exp, |asmreg|)
 		if ptoi == -1										//   x * -1  -->  0-x
 			return .Subtract(exp, dest, ASMReg(), l)
 		if ptoi == 1										//   x * 1   -->  x

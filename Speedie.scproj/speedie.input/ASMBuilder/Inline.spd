@@ -71,7 +71,7 @@ struct InlineInfo
 	|uint|			Normal
 	|uint|			CantNop
 	
-	function DoImmediates (|?message| p, |[scdecl]| args, |&assembler| sh)
+	function DoImmediates (|?message| p, |[scdecl]| args, |assembler| sh)
 		opt norefcounts
 		for (a in args) (i)
 			.Items[i] = .PreInlineOneParam(p!, a, sh, i)
@@ -243,10 +243,9 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 
 
-function @ASMType.InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest, |AsmReg|) // inlinereturn
+function @ASMType.InlinedReturn (|assembler| self, |message| exp, |asmreg| dest, |AsmReg|) // inlinereturn
 	opt norefcounts
-	// What about getting the address of registers?
-	|| Extras = asmreg.ExitAtAll
+	|| Extras = asmreg.ExitAtAll	
 	if .state.TailInlineable
 		(extras is ExitFunction)
 
@@ -261,10 +260,11 @@ function @ASMType.InlinedReturn (|&Assembler| self, |message| exp, |asmreg| dest
 		  else
 			dest = .µinto(f, dest)
 	
-	(dest as= extras) // it can get lost... sadly.
+	(dest as= extras)							// it can get lost... sadly.	
 	if .state.TailInlineable
 		.ClearAllStructs(exp)
 		dest = ReturnOpt(self, dest)
+		(dest is AlreadyReturned)
 	
 	|| fat = exp.RET(Dest)
 	fat.µRefCount = 1
@@ -377,6 +377,26 @@ function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
 		return exp.phi(new, new, old) * new
 	return new
 	
+
+function InlineReturnToJump (|message| exp, |Fatasm| S, |asmreg| r, |asmreg| dest, |ASMReg|)
+	if !.state.TailInlineable
+		|| value = s.inputfat(0)
+			value.safedecr					// Will get incremented later.
+			if dest.reg
+				r = .PerhapsPhi(exp, value.info, r)
+		  else
+			debugger						// Should always exist
+		
+		|| Old = s.info
+		(old is DebugVars)					// Or else we lose our MARK close.
+		s.info = old
+		s.setOp = asm.jump
+		s.JumpPrm = 1
+		s.JumpFix(.curr)
+	  else
+		(r is AlreadyReturned)
+	return r
+
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	rz.fatindex = 1
@@ -385,35 +405,19 @@ function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg
 	for s in R
 		|| op = s.op
 		if op == asm.RFRT
-			error (s)			// Should never get this instruction! not inlined anyway.
-
+			error (s)							// Should never get this instruction! not inlined anyway.
+		
 		  elseif op == asm.ret
 			sv.ReturnedCount++
-			|| value = s.inputfat(0)
-				if dest.reg
-					rz = .PerhapsPhi(exp, value.info, rz)
-			  else
-				debugger // should always exist
-				// rz.fatreg = s.asmreg(0)
-				// rz.µType = .state.return.µType
-			
-			if value
-				value.safedecr		// Will get incremented later.
-			
-			|| Old = s.info & asmreg.DebugVars // or else we lose our MARK close.
-			s.setOp = asm.jump
-			s.JumpPrm = 1
-			s.info = old
-			s.JumpFix(.curr)
-
+			rz = .InlineReturnToJump(exp, s, rz, dest)
 		if s.GuessSize
-			(s is FromInline)			// Whyy???? this blocks consts, but why?
+			(s is FromInline)					// Whyy???? this blocks consts, but why?
 	
 	rz &= ~ASMReg.Exit
 	(rz as= dest&asmreg.exit)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg
-		(rz is const)					// Make compiler happy
+		(rz is const)							// Make compiler happy
 
 
 }

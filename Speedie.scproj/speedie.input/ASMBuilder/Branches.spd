@@ -161,7 +161,7 @@ function NopBranch (|fatasm| start)
 	|| l = .last
 	require l >= start
 	|| bb = l.basicblock
-	.Nop(l)
+	.Nop_sub(l, fatnopmode.rewind)
 	--l
 	if l.basicblock == bb  and  l >= start  and  l is Const
 		.nop(l)

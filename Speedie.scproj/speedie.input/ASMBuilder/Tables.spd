@@ -135,7 +135,7 @@ function Sheb (fn_asm)
 
 
 
-function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
+function ReturnOpt (|Assembler| self, |asmreg| Ret, |asmreg|)
 	opt norefcounts
 	|| rr = ret.reg
 	if !rr or !.state.TailInlineable
@@ -167,7 +167,7 @@ function ReturnOpt (|&Assembler| self, |asmreg| Ret, |asmreg|)
 	
 
 
-function ExpandBits2 (|&assembler| self, |message| exp, |asmreg| dest, |scdecl| ty,  |asmreg|)
+function ExpandBits2 (|assembler| self, |message| exp, |asmreg| dest, |scdecl| ty,  |asmreg|)
 	if !dest.IsBitCorrect
 		|| Needed = ty.ASMRegType
 		|| BC = dest.BitCount
@@ -183,11 +183,14 @@ function Return (fn_asm)
 		return InlinedReturn(self, exp, L)
 
 	dest = ASMReg.ExitFunction
-	target debug: || returntrap = ++asmtrapper, if returntrap == -1
+	target debug: || ReturnTrap = ++ASMTrapper, if ReturnTrap == -1
 	
 	|| f = exp.first
 		dest = .µGetASM(f, dest)
 	
+	if dest is AlreadyReturned
+		return dest
+		
 	.ClearAllStructs(exp)
 
 	dest = ReturnOpt(self, dest)
@@ -263,7 +266,7 @@ function TypeCast (fn_asm)
 
 
 
-function ConstConvert  (|&Assembler| self, |message| exp, |ASMReg| dest, |ASMReg| from, |Datatypecode| Old, |Datatypecode| New, |ASMReg|)
+function ConstConvert  (|assembler| self, |message| exp, |ASMReg| dest, |ASMReg| from, |Datatypecode| Old, |Datatypecode| New, |ASMReg|)
 	// this converts in place...	// we don't want that.
 	
 	|| srf = from.NeedFAT
@@ -300,14 +303,19 @@ function SetRel (fn_asm)						// function relset (
 	// Probably x.y = z,  or x[y] = z
 
 	dest = f.ASMAllowsTemp
-	|| Src = .µGetPrms(exp.last!, dest)
+	exp = exp.last!
+	target debug
+		|| SetRelTrap = ++asmtrapper
+		if SetRelTrap == -1
+
+	|| Src = .µGetPrms(exp, dest)
 	(Src is Set)
 	// if I change this to incr the op, then IncrPost and IncrPre should too.
 	return .µ(F, Src) as asmreg.discard
 
 
 
-function ThgReference (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+function ThgReference (|assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	|| Reff = d.WholeType
 	|| dr = dest.reg
 	if dest is AddrRequest // (|$int|) v {v++}
@@ -346,7 +354,7 @@ function Decl (fn_asm) // DeclareSub declare
 	return .MarkVarOpen(exp, Declared, ty, Start)
 
 	
-function DeclSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
+function DeclSub (|assembler| self, |message| exp, |AsmReg| Dest, |scdecl| Ty, |message| Rel, |AsmReg|)
 	opt norefcounts
 	if !dest or dest is temp // can't declare temps! would mess up function calls
 		dest = .DeclareBody(exp, ty)
@@ -399,7 +407,7 @@ function StatExpr (fn_asm)
 	rz = .CloseVars(v, exp, rz)
 
 
-function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
+function ArgumentSub (|assembler| self=assembler.sh, |message| exp, |asmreg| Mask=asmreg.exit,  |AsmReg|)
 	// merge into argument?
 	opt NoRefCounts
 	|| ch = exp.first
@@ -409,7 +417,6 @@ function ArgumentSub (|&Assembler| self=assembler.sh, |message| exp, |asmreg| Ma
 	|regfile| Restore = .Regs	// adapt nilchecker to check if arg COULD return? If not... dont save.
 
 	while !.EntireInlineFailed
-
 		.BreakRequest |= assembler.Breakable
 		if (ch is BreakPoint)
 			.Breakrequest |= assembler.BreakPoint
@@ -472,7 +479,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	
 
 
-function DotConst (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
+function DotConst (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
 	|| fn = prop.Func
 		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
@@ -538,7 +545,7 @@ function Thg (fn_asm)
 	return thg										// Its still ok.   nil/false
 
 
-function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
+function ConstFromThgName (|assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
 	(dest is Const)
 	if dest isnt ConstRequest
 		dest.µtype = d.µType
@@ -547,7 +554,7 @@ function ConstFromThgName (|&Assembler| self, |message| exp, |AsmReg| Dest, |scd
 
 
 
-function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
+function ThgSub (|assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	|| d = exp.ASMDecl
 	if d is local
@@ -587,17 +594,21 @@ function ThgSub (|&Assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 
 
 
-function DoGlobal (|&Assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
+function DoGlobal (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |ASMReg|)
 	opt	NoRefCounts
 	
 	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
-		|| addr = .GlobAddr(d, exp, dest)$ 
-		addr.µtype = d.µtype
-		return addr.HaveAddr
+		|| addr = .GlobAddr(d, exp, dest) 
+		if addr and dest isnt set
+			addr.µtype = d.µtype
+			addr = addr.HaveAddr
+		return addr
 	
 	|asmreg| addr
 	if dest isnt set // read
 		addr = dest
+	  else
+		debugger
 	addr = .GlobAddr(d, exp, addr)$ 
 	dest.µtype = d.µtype
 	(dest isnt ContainsAddr)
@@ -639,7 +650,7 @@ function BoolNot (fn_asm)							// !a
 //		return src
 
 
-function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
+function IncrSlowOnAddr (|assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
 	opt	NoRefCounts
 	|| TmpCloser = .OpenVars
 	if dest is Discard
@@ -663,7 +674,7 @@ function IncrSlowOnAddr (|&Assembler| self, |message| f, |ASMReg| Dest, |int| Mo
 
 
 
-function IncrOnAddr (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
+function IncrOnAddr (|assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg| Addr, |int64| Amount, |scdecl| Glob, |asmreg|)
 
 	if !dest.reg
 		(dest is const)					// in case its not been cleared.
@@ -701,14 +712,14 @@ function IncrAmount (|asmreg| upon, |int| IsPlus, |scdecl| D,  |int64|)
 
 
 
-function NotTemp (|&Assembler| self, |asmreg| Src, |message| p)
+function NotTemp (|assembler| self, |asmreg| Src, |message| p)
 	|| r = .state.return.reg
 	if r and r == src.reg
 		return
 	check (src isnt temp) (p, "Can't increment temporary value.")
 
 	
-function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
+function Incrementa (|assembler| self, |message| exp, |AsmReg| Dest, |int| Mode, |AsmReg|)
 	opt	NoRefCounts
 	
 	|| Src = .µGetASM(exp, ASMReg.AddrRequest)
@@ -726,7 +737,6 @@ function Incrementa (|&Assembler| self, |message| exp, |AsmReg| Dest, |int| Mode
 		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	// x = x++ makes no sense
 		return src
 	
-
 	(src is noscale)
 	dest.µType = src.µType									// right? it can't be different.
 	|| p = exp.parent!										// better positions
@@ -751,7 +761,7 @@ function ARel (fn_asm)
 	|| N = exp.name[]
 	|| F = exp.first!
 	if N == '?' or '!'
-		exp.ASMDecl // can correct global export positions, for later code
+		exp.ASMDecl							// Can correct global export positions, for later code
 		return .µGetASM(F, dest)
 	|| M = (N == '+')|int|
 	if dest isnt discard

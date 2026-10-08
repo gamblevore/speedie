@@ -581,10 +581,10 @@ function AddK2 (|int| x, |int|)
 
 function AndOrConstTest (|int|) /// active ///
 	visible
-	|| f1 = 4 or  0
+	|| f1 = 7 and 8
 	|| f2 = 0 and 5
 	|| f3 = 0 and 0 // these first 3 should be optimised of the add!
-	|| T4 = 7 and 8
+	|| T4 = 4 or  0
 	|| T5 = 6 and 0
 	|| T6 = 0 or  3
 	|| f7 = 0 or  0

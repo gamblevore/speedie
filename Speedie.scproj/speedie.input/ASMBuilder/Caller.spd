@@ -258,6 +258,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	
 	|| fat = exp.FNC(dest, TableID, P, PExt)
 	|| NArgs = fn.args.Length
+	fat.TotalFuncInputs = nargs
 	|| inputs = &fat.Inputs[0]
 
 	fat.numinput(4) = nargs

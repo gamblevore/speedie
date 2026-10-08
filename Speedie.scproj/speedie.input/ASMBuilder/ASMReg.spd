@@ -1,6 +1,6 @@
 
 
-prototype fn_asm	(|&Assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
+prototype fn_asm	(|assembler| self=Assembler.sh, |message!| exp, |AsmReg| Dest=asmreg(), |AsmReg|)
 
 
 
@@ -38,10 +38,12 @@ datatype ASMReg (uint64)
 		StatelessFunc
 //		NotNil				// Probably a big addition. Will need tests...
 		Set
+		AlreadyReturned
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
 		TempFlags		= OKAsTemp	||| Temp
 		InlineFlagsToKeep = TempFlags  |||  Set  |||  NewlyDeclared
+		FatParam		= Param ||| veryspecial
 		FlagsToRemove	= Const		||| Discard
 		// don't go above 47
 

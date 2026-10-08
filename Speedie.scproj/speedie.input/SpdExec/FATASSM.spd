@@ -226,7 +226,7 @@ struct FatASM
 		return findex >= st.FuncStart
 	
 	
-	function FatASM.Dest (|uint| a, |asmreg| info, |&assembler| sh, |asmreg|)
+	function FatASM.Dest (|uint| a, |asmreg| info, |assembler| sh, |asmreg|)
 		|| Changed = info.prm
 		.prms[a] = changed
 		changed &= 31
@@ -262,15 +262,14 @@ struct FatASM
 
 	
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
-		// only applies to regs with only 1 output. (in theory, but good to check anyhow)
-		if !.IsWithinCurrInline(f)
-			return nil
+		// Only applies to regs with only 1 output. (in theory, but good to check anyhow)
 		
-		require !f.isfunc and !(f isa asm.phi)
+		require .IsWithinCurrInline(f)
+		require !(f.isfunc or (f isa asm.phi))
 
 		|uint| a = f.OutputMap - 1
 		expect (a <= 1)										(f, errorreceiver.InternalError)
-		.rewindoutput(f, a)
+		.RewindOutput(f, a)
 		return f.Dest(a, dest, self)						// Then set it to the new value
 
 
@@ -376,14 +375,17 @@ struct FatASM
 	function RegInput (|int| a, assigns:|asmreg|)
 		|| i = value.FatIndex
 		if !i
-			if value.reg				// not good
+			if value.reg				// Not good
 			i = 1						// sh.regs.setters[0]
 			Value.FatIndex = i
+
 		.prms[a] = value.Prm
-		
 
 		|| src = Assembler.sh.funcstart_ + i
-		if src >= self					// how?
+		
+		target debug
+			if src >= self						// How?
+			if (src isa asm.noop) and (src isnt param)	// no way 
 
 		.Inputs[a] = i
 		src.incr
@@ -438,8 +440,8 @@ struct FatASM
 		|int64| n  = .totalfuncinputs
 		fs <~ "("
 		
-		if n > 10
-			n = 10 // sigh
+		if n > 8
+			n = 8 // sigh
 
 		|| IsC = (self isa asm.fncx or asm.fncx3)
 

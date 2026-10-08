@@ -111,15 +111,16 @@ struct Assembler
 		opt norefcounts
 		|| src = a.Source
 		if !src
-			if i == 1 and a == "self"
+			if i == 1 and a is Self
 				src = compiler.ASMSelf
 			  else
 				src = fn.Source!
 
-		|| fake = src.noop
-		|| reg	= a.WholeType
-		reg.reg = i
+		|| Fake = src.noop
+
+		|| Reg	= a.WholeType.reg(i) as ASMReg.FatParam		
 		fake.Dest(0, reg, self)
+		if fake isnt param // huh?
 	
 
 	function FattenZero (|scfunction| fn)
@@ -129,12 +130,10 @@ struct Assembler
 			src = ty.source!
 		
 		|| fake = src.knst
-		fake.constfill(nil,0)
 		fake._op = asm.noop
-		.SetRegister(0, fake.info, fake, 0)
-//		target debug
-//			if "".trap
-//				RefCountTrap = fake
+		|| dest = fake.constfill(asmreg.fatparam, 0)
+		.SetRegister(0, dest, fake, 0)
+		if fake isnt param // huh?
 	
 	
 	function AddFuncParams (|SCFunction| fn)
@@ -259,13 +258,17 @@ struct Assembler
 	function TempTyped (|message| exp,  |asmreg| T, |scdecl| Type, |asmreg|)
 		if type
 			t.µtype = type.µtype
+		// else 
+		//	t.µtype = exp.asmdecl.µtype
+			
 		return .TempMe(exp, t)
 	
+	// can I merge these two? The like ^^^^ this perhaps?
 	
-	function TempTyped (|Message| where, |asmreg| T=asmreg.Temp, |asmreg|)
+	function TempTyped (|Message| exp, |asmreg| T=asmreg.Temp, |asmreg|)
 		opt norefcounts
-		t.µtype = where.asmdecl.µtype
-		return .TempMe(where, t)
+		t.µtype = exp.asmdecl.µtype
+		return .TempMe(exp, t)
 
 
 	function TempMe (|message| where, |asmreg| T=asmreg.Temp, |asmreg|)
@@ -309,11 +312,12 @@ struct Assembler
 		dest.µType = DataTypeCode.bool
 		|| start = .curr
 		|| value = .µ(exp, dest)
-		if (value iz dest) and value.isbool
+		if  value.isbool  and  ((value iz dest) or !Force)
 			return value
-		if value.isbool
-			return .Assign(exp, dest, value, start)
-		return .Exists(exp, dest, value)	
+		if !value.isbool
+			return .Exists(exp, dest, value)	
+		return .Assign(exp, dest, value, start)
+	
 	
 	function message.ASMAllowsTemp (|asmreg|)
 		opt norefcounts
@@ -341,7 +345,6 @@ struct Assembler
 				return dest
 		
 		return .DeclareBody(exp, a, dest)
-
 
 	
 	function µInlineOneParam (|message| exp,  |scdecl| A,  |asmreg| Dest,  |asmreg|)

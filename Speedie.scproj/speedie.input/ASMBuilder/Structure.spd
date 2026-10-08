@@ -228,7 +228,7 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-		if "Sibling".trap
+		if "AndOrConstTest".trap
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -236,7 +236,12 @@ extend assembler
 					fat.DebugPrint()
 					debugger
 				return
-
+		
+		if fat isa asm.noop // already nopped. perhaps reg0
+			target debug
+				if fat.index!=1 and nopmode isnt rewind // hmmmm?
+			return
+		
 		if !.IsWithinCurrInline(fat)
 			|| C = .DelayedNopCount++
 			if C < –count .DelayedNops
@@ -244,7 +249,7 @@ extend assembler
 			return
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
-		if (nopmode is rewind)
+		if (nopmode is rewind)		// asmtodo: what about ((or .iscurrblock))
 		// the problem is jumps, if something jumped to a point, and then we nop the jump-dest
 		// it goes wrong. It happens during returnopt. But could it happen elsewhere? who knows
 		// might as well play safe.
@@ -344,13 +349,9 @@ extend assembler
 		.regs.Altered = A										// works really well with PHI nodes!
 		.regs.Phi = P
 		
-		if !Reg and !n and oldi									// shouldn't happen
-		
-		.regs.Setters[Reg] = n
-		.KnownValues(Reg) = Alterer is Const			
 		
 		target debug
-			if .Register(reg) != alterer						// huh?
+			if !Reg and !n and oldi								// shouldn't happen
 				
 		if (oldi > 1) and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
@@ -360,6 +361,12 @@ extend assembler
 					(alterer is DebugVarOpen)					// like: || a = 1, a = 2
 
 				.nop_sub(old, fatnopmode.hard)
+
+		.regs.Setters[Reg] = n
+		.KnownValues(Reg) = Alterer is Const			
+
+		target debug
+			if .Register(reg) != alterer						// huh?
 		
 		(NopDest isnt AllowNopDest)
 		return NopDest

@@ -1,7 +1,7 @@
 
 
 extend Assembler
-	function MakeConstFromTwo (|&Assembler| self,  |message| exp,  || dest,  || L,  || R,  |fn_ASMConstifier| fn,  ||)
+	function MakeConstFromTwo (|assembler| self,  |message| exp,  || dest,  || L,  || R,  |fn_ASMConstifier| fn,  ||)
 		// how to vectorise this? sigh...
 		|| K = (fn)(l, r)
 		.Nop2TempConsts(r, l)
