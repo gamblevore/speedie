@@ -9,11 +9,7 @@ struct RegFile
 
 
 
-extend assembler
-	function pp (|int| x, |int| y)
-		x = y++
-		x = ++y
-		
+extend assembler		
 	function BackupFAT (|&fatasm| Curr)
 		|| Start = .FuncStart
 		|| Amount = Curr - Start

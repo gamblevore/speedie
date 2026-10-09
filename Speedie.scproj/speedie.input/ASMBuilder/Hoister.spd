@@ -33,15 +33,7 @@ function SCDecl.ASMIsPack (|bool|)
 	// what if its an embedded function
 
 
-function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| src, |asmreg|)
-	if src isnt set
-		return .GlobAddrSub(d, exp, src)
-
-	|| CopyTo = .GlobAddrSub(d, exp, nil)
-	return .CopyMemory(0, Exp, CopyTo, src, nil, D)
-
-
-function GlobAddrSub (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
+function GlobAddr (|SCDecl| D, |message| exp, |AsmReg| Dest, |asmreg|)
 	opt norefcounts
 	if compiler is hungry
 		(d is asmreached)

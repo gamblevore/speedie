@@ -497,11 +497,16 @@ function Dot (fn_asm)										// a.b
 	if prop is global
 		return DoGlobal(self, dest, exp, prop)
 	
-	|| OV = .OpenVars						// Is this safe? Not sure! delete if it causes problems.
+//	|| OV = .OpenVars						// Is this safe? Not sure! delete if it causes problems.
 	|| Obj = .µGetASM(exp.first!)
 	|| TyA = prop.ASMRegType
 	dest.µtype = tya
-	.CloseVars(ov)							// In terms of anything simple... I can't see problems.
+//	.CloseVars(ov)
+											// index (int) gets turned into a const, overwrites obj!
+											// I just want the FINAL memory-op to be doing the close.
+											// I could redest it?
+											// it should be ok :] simple is better!
+
 	
 	|| Index = prop.ExportPosition
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
@@ -598,8 +603,11 @@ function DoGlobal (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |
 	opt	NoRefCounts
 	
 	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
+		if dest is set
+			|| CopyTo = .GlobAddr(d, exp, nil)
+			return .CopyMemory(0, Exp, CopyTo, dest, nil, D)
+		
 		|| addr = .GlobAddr(d, exp, dest) 
-		if addr and dest isnt set
 			addr.µtype = d.µtype
 			addr = addr.HaveAddr
 		return addr
@@ -607,8 +615,6 @@ function DoGlobal (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |
 	|asmreg| addr
 	if dest isnt set // read
 		addr = dest
-	  else
-		debugger
 	addr = .GlobAddr(d, exp, addr)$ 
 	dest.µtype = d.µtype
 	(dest isnt ContainsAddr)
