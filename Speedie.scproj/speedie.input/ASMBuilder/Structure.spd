@@ -212,7 +212,7 @@ extend assembler
 	
 	
 	function SoftNop (|FATASM| ToNop, |fatnopmode| mode = 0)
-		// means we still want to use the inputs of tonop, later, even if they get derecremented down to 0
+		// Means we still want to use the inputs of tonop, later, even if they get derecremented down to 0
 		mode |= fatnopmode.KeepInputs
 		return .nop_sub(ToNop, mode, 0)
 	
@@ -228,7 +228,6 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-		if "AndOrConstTest".trap
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -250,7 +249,7 @@ extend assembler
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
 		if (nopmode is rewind)		// asmtodo: what about ((or .iscurrblock))
-		// the problem is jumps, if something jumped to a point, and then we nop the jump-dest
+		// The problem is jumps, if something jumped to a point, and then we nop the jump-dest
 		// it goes wrong. It happens during returnopt. But could it happen elsewhere? who knows
 		// might as well play safe.
 			|| C = .Last
@@ -328,31 +327,10 @@ extend assembler
 		if (Reg == 0) and oldi
 			debugger
 			return NopDest
-
+				
 		|| A = .regs.Altered &~ (1<<Reg)
 		|| P = .regs.Phi &~ (1<<Reg)
-		|| N = 0
 
-		if Alterer
-			A |= 1 << Reg
-			P |= 1 << Reg
-			N = Alterer - .FuncStart_							// Set value
-			if Field >= 0
-				|| bigger = oldi|uint| max 1
-				Alterer.PrevOutput[field] = bigger
-//		  else
-//			target debug
-//				|| Allocated = .vdecls ||| .vtemps
-//				if Allocated & (1<<Reg) // nope!
-			
-			
-		.regs.Altered = A										// works really well with PHI nodes!
-		.regs.Phi = P
-		
-		
-		target debug
-			if !Reg and !n and oldi								// shouldn't happen
-				
 		if (oldi > 1) and (NopDest is AllowNopDest)
 			target debug: if !alterer							// can't happen,  .Dest sets this.
 			|| old = .FuncStart_ + oldi
@@ -361,6 +339,31 @@ extend assembler
 					(alterer is DebugVarOpen)					// like: || a = 1, a = 2
 
 				.nop_sub(old, fatnopmode.hard)
+
+		
+		|| N = 0
+		target debug
+			if A != .regs.Altered &~ (1<<Reg)
+			if P != .regs.Phi &~ (1<<Reg)
+
+		if Alterer
+			A |= 1 << Reg
+			P |= 1 << Reg
+			N = Alterer - .FuncStart_							// Set value
+			if Field >= 0
+				|| post_nop_oldi = .regs.Setters[Reg]|uint| max 1
+				Alterer.PrevOutput[field] = post_nop_oldi
+//		  else
+//			target debug
+//				|| Allocated = .vdecls ||| .vtemps
+//				if Allocated & (1<<Reg) // nope!
+			
+		target debug
+			if !Reg and !n and oldi								// shouldn't happen
+			
+		.regs.Altered = A										// works really well with PHI nodes!
+		.regs.Phi = P
+		
 
 		.regs.Setters[Reg] = n
 		.KnownValues(Reg) = Alterer is Const			
