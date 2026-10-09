@@ -1,20 +1,23 @@
  
 // confirm, ask, confirmit, beep, alert
 module beep
-	|date| OK = 1
 	syntax expect (|string?| s=nil)
 		inlined
 		app.beep(s)
+	visible false
+	|date| _OK
 
 
 extend_module app
-	function BeepSub
+	libinternal BeepSub
 		cpp_wrapper JB_App__Beep
 	
 	function Beep (|string?| q=nil)
-		if beep.OK.fired
+		if beep._OK < date.now
+			if app.prefs["dev"]
+				file.Logs["beep_log"].WriteAll(app.stacktrace) // why is this beeping?
 			.BeepSub
-			beep.OK = date.now + (1s/12) // really must be date.now, NOT framestart!
+			beep._OK = date.now + (1s/12) // really must be date.now, NOT framestart!
 		if q
 			.alert(q)
 	
@@ -45,10 +48,11 @@ function string.Ask_Named (|string| Answers,  |int|)
 
 
 function string.Ask (|string| response="",  |string| Title="",  |stringthatwasreadsafely|)
+	|| err = string.error
 	|| Answers = ["OK", "Cancel"]
 	if confirmationdialog.ask(self, title, Answers, response) == 1
-		return ConfirmationDialog._asker!.response.text
-	return String.Error
+		err = ConfirmationDialog._asker!.response.text
+	return err
 
 
 libinternal window.TryCloseDialog (|bool|)
@@ -105,10 +109,10 @@ class ConfirmationDialog (Window)
 		cpp_part cwin
 	|textview|			Question
 	|textview|			Response
-	|Button|		Yes
-	|Button|		No
-	|Button|		Cancel
-	|[Button]|		Buttons
+	|Button|			Yes
+	|Button|			No
+	|Button|			Cancel
+	|[Button]|			Buttons
 	|date|				DelayUntil // for accidental presses.
 
 	constructor
@@ -119,7 +123,7 @@ class ConfirmationDialog (Window)
 		.Cancel			= Button(self, OnConfirmAnswer)
 		.response		= textview(self, nil)
 		.Question		= textview(self, nil)
-		.gnormal		 = ¥.systemstyle 
+		.gnormal		= ¥.systemstyle
 		.EntireScreen	= (300, 150)
 		.AddButton(.yes, "Yes")
 		.AddButton(.No,	 "No" )

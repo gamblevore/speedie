@@ -1077,7 +1077,7 @@ module GUI
 			SDL_RaiseWindow(.ScreenWindow!) // work around crappy SDL/MacOSX event issues?
 			.ForeGroundTime = gui.FrameStart
 
-		beep.OK = 1		
+		beep._OK = 0		
 		.FlashSelector = false
 		if !.DialogIsOpen
 			for w in window.all
@@ -1326,7 +1326,7 @@ module GUI
 			// later... I mean... send an event of same type that is already sent
 			// so hopefully only 1 gets through?
 			return 0
-		beep.OK = 1
+		beep._OK = 0
 
 		keys.AddKey(key)
 
@@ -1354,7 +1354,7 @@ module GUI
 	
 	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,   |int|)
 		|| xy = b.xy
-		beep.OK = 1
+		beep._OK = 0
 		if notifications.Clickedat(xy)
 			return GUIActivity.activity
 			
