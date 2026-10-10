@@ -30,6 +30,7 @@ JB__API_NilHappened_
 JB__Tk__StopBars
 JB__Flow__Enabled
 JB__Flow_FlowWhile
+JB__Flow_LastCodePoint
 GUI__App_EventCount
 GUI__App_Scale
 GUI__ScrollInfo_InDrag_
@@ -48,7 +49,7 @@ GUI__App_FrameStart
 GUI__App_NewSize
 GUI__App_OpenedTime
 GUI__App_TryResizeLater
-GUI__beep_OK
+GUI__beep__OK
 GUI__font_Char
 GUI__MB_DownAt
 GUI__GridSection_Dummy
@@ -77,7 +78,7 @@ JB__App__StdOut
 JB__App_Usage
 GUI__Clip__Clip2
 GUI__Clip__InternalCopy
-JB__Flow_CompareAgainst
+JB__Flow_FlowIn
 JB__Flow_FlowOut
 GUI__App_DrawDrag
 GUI__App_LastSearch
@@ -135,5 +136,3 @@ GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
 JB__Constants__FuncArray
-JB__Flow_FlowIn
-JB__Flow_LastCodePoint

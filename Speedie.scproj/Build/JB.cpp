@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2400];
+extern JB_StringC* JB_LUB[2399];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -3505,7 +3505,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026100818));
+	JB_FS_AppendInt32(_fsf0, (2026101017));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10332,7 +10332,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026100818));
+	JB_FS_AppendInt32(_fsf0, (2026101017));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -16903,7 +16903,9 @@ ASMReg SC_ASMType__ArgumentSub(Assembler* Self, Message* Exp, ASMReg Mask) {
 	Rz = SC_Reg_FatIndexSet((SC_Reg_OperatorBitand(Rz, Mask)), SC_Reg_FatIndex(Rz));
 	Rz = SC_Pac_CloseVars(Self, V, Exp, Rz, false);
 	if (SC_Reg_SyntaxIs(Rz, kSC__Reg_ExitFunction)) {
-		Self->Regs = Restore;
+		if (Self->InlineDepth == 0) {
+			Self->Regs = Restore;
+		}
 	}
 	return Rz;
 }
@@ -17117,8 +17119,12 @@ ASMReg SC_ASMType__DeclSub(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* T
 
 ASMReg SC_ASMType__DoGlobal(Assembler* Self, ASMReg Dest, Message* Exp, SCDecl* D) {
 	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) or (SC_Decl_IsBareStruct(D) or SC_Decl_IsCArray(D))) {
+		if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
+			ASMReg CopyTo = SC_Pac_GlobAddr(Self, D, Exp, nil);
+			return SC_Pac_CopyMemory(Self, 0, Exp, CopyTo, Dest, nil, D);
+		}
 		ASMReg Addr = SC_Pac_GlobAddr(Self, D, Exp, Dest);
-		if (Addr and (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Set))) {
+		if (Addr) {
 			Addr = SC_Reg_xC2xB5TypeSetWithTC(Addr, SC_Decl_xC2xB5Type(D));
 			Addr = SC_Reg_HaveAddr(Addr);
 		}
@@ -17127,8 +17133,6 @@ ASMReg SC_ASMType__DoGlobal(Assembler* Self, ASMReg Dest, Message* Exp, SCDecl* 
 	ASMReg Addr = ((ASMReg)0);
 	if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
 		Addr = Dest;
-	}
-	 else {
 	}
 	Addr = SC_Pac_GlobAddr(Self, D, Exp, Addr);
 	if (!Addr) {
@@ -17147,11 +17151,9 @@ ASMReg SC_ASMType__Dot(Assembler* Self, Message* Exp, ASMReg Dest) {
 	if (SC_Decl_SyntaxIs(Prop, kSC__SCDeclInfo_Global)) {
 		return SC_ASMType__DoGlobal(Self, Dest, Exp, Prop);
 	}
-	uint64 OV = SC_Pac_OpenVars(Self);
 	ASMReg Obj = SC_Pac_GetASM(Self, ((Message*)JB_Ring_First(Exp)), SC_Reg__New());
 	uint TyA = SC_Decl_ASMRegType(Prop);
 	Dest = SC_Reg_xC2xB5TypeSetWithTC(Dest, TyA);
-	SC_Pac_CloseVars(Self, OV, nil, nil, false);
 	int64 Index = SC_Decl_ExportPosition(Prop);
 	if ((Index >= 1048576) or (SC_Decl_TypeSuffers(Prop) and (SC_Reg_ByteCount(Dest) != 8))) {
 		SC_Decl_TypeInfo(Prop);
@@ -17513,12 +17515,12 @@ ASMReg SC_ASMType__Thg(Assembler* Self, Message* Exp, ASMReg Dest) {
 }
 
 ASMReg SC_ASMType__ThgReference(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* D) {
-	ASMReg Reff = SC_Decl_WholeType(D);
+	ASMReg Reff = SC_Pac_WholeType(Self, D);
 	int Dr = SC_Reg_Reg(Dest);
 	if (SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) {
 		return SC_Reg_HaveAddr(Reff);
 	}
-	if (Dr == SC_Reg_Reg(SC_Decl_WholeType(D))) {
+	if (Dr == SC_Reg_Reg(Reff)) {
 		return Dest;
 	}
 	Dest = SC_Reg_xC2xB5TypeSetWithTC(Dest, SC_Reg_xC2xB5Type(Reff));
@@ -20987,7 +20989,6 @@ ASMReg SC_FAT_Dest(FatASM* Self, uint A, ASMReg Info, Assembler* Sh) {
 	if (!Changed) {
 		return Info;
 	}
-	Self->UnusedOutput = (Self->UnusedOutput | (1 << A));
 	if (Info) {
 		Info = SC_Reg_SyntaxIsSet(Info, kSC__Reg_AllowNopDest, true);
 	}
@@ -21355,6 +21356,16 @@ ASMReg SC_FAT_AsReg(FatASM* Self, ASMReg Flags) {
 	return SC_FAT_OperatorDivide(Self, Flags);
 }
 
+ASMParam SC_FAT_Output(FatASM* Self) {
+	if (Self->PrevOutput[0]) {
+		return Self->Prms[0];
+	}
+	if (Self->PrevOutput[1]) {
+		return Self->Prms[1];
+	}
+	return 0;
+}
+
 void SC_FAT_OutputDebugVars(FatASM* Self, int Next) {
 	FastString* Dd = SC__Pac_DebugDecls;
 	uint Index = Self->ASMIndex;
@@ -21480,21 +21491,6 @@ void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs) {
 		}
 	};
 	JB_FS_AppendByte(Fs, ')');
-}
-
-ASMReg SC_FAT_RefCountFinish(FatASM* Self) {
-	if (Self) {
-		if (SC_FAT_IsReffer(Self)) {
-			int Saved = SC_FAT_RegOnly(Self, 2);
-			if (Saved) {
-				SC_Pac_Trash((&SC__Pac_Sh), Saved);
-			}
-			SC_FAT_Incr(Self);
-			return SC_Reg_OperatorAs(Self->Info, SC_Reg__New());
-		}
-		return Self->Info;
-	}
-	return ((ASMReg)0);
 }
 
 void SC_FAT_RegInputSet(FatASM* Self, int A, ASMReg Value) {
@@ -23229,7 +23225,6 @@ bool SC_Pac_CloseOneVar(Assembler* Self, Message* Exp, uint Missing) {
 	int Result = Curr & (~V_bits);
 	Self->Regs.KnownMap = (Self->Regs.KnownMap & (~V_bits));
 	Self->Regs.Phi = (Self->Regs.Phi & (~V_bits));
-	Self->Regs.Altered = (Self->Regs.Altered & (~V_bits));
 	if (IsReal) {
 		(SC_Pac_vdeclsSet(Self, Result));
 		if (Self->RegDebugInfo & V_bits) {
@@ -23891,7 +23886,7 @@ void SC_Pac_FattenParam(Assembler* Self, SCFunction* Fn, int I, SCDecl* A) {
 		}
 	}
 	FatASM* Fake = SC_Msg_NOOP(Src);
-	ASMReg Reg = SC_Reg_OperatorAs(SC_Reg_RegSet(SC_Decl_WholeType(A), I), kSC__Reg_FatParam);
+	ASMReg Reg = SC_Reg_OperatorAs(SC_Reg_RegSet(((ASMReg)SC_Decl_xC2xB5Type(A)), I), kSC__Reg_FatParam);
 	SC_FAT_Dest(Fake, 0, Reg, Self);
 	if (!SC_FAT_SyntaxIs(Fake, kSC__Reg_Param)) {
 	}
@@ -24185,15 +24180,7 @@ ASMReg SC_Pac_FunctionDestination(Assembler* Self, Message* Exp, ASMReg Dest, SC
 	return SC_Reg_Simplify(Ty);
 }
 
-ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Src) {
-	if (!SC_Reg_SyntaxIs(Src, kSC__Reg_Set)) {
-		return SC_Pac_GlobAddrSub(Self, D, Exp, Src);
-	}
-	ASMReg CopyTo = SC_Pac_GlobAddrSub(Self, D, Exp, nil);
-	return SC_Pac_CopyMemory(Self, 0, Exp, CopyTo, Src, nil, D);
-}
-
-ASMReg SC_Pac_GlobAddrSub(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest) {
+ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest) {
 	if (SC_Comp__SyntaxIs(kSC__CompilerStage_Hungry)) {
 		(SC_Decl_SyntaxIsSet(D, kSC__SCDeclInfo_ASMReached, true));
 	}
@@ -24778,16 +24765,11 @@ ASMReg SC_Pac_LoadNumber(Assembler* Self, Message* Exp, int64 V, bool Special, A
 }
 
 ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D) {
-	ASMReg T = SC_Decl_WholeType(D);
-	if (SC_Reg_SyntaxIs(T, kSC__Reg_Temp)) {
-	}
+	ASMReg T = SC_Pac_WholeType(Self, D);
 	T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Param, SC_Decl_SyntaxIs(D, kSC__SCDeclInfo_Param)));
-	FatASM* F = SC_Pac_Register(Self, SC_Reg_Reg(T));
-	if (F) {
-		T = SC_Reg_FatIndexSet(T, SC_FAT_Index(F));
-		if (SC_Pac_CanConstLocalThg(Self, D, F)) {
-			T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (SC_FAT_SyntaxIs(F, kSC__Reg_Const))));
-		}
+	FatASM* F = SC_Reg_FAT(T);
+	if (F and SC_Pac_CanConstLocalThg(Self, D, F)) {
+		T = (SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (SC_FAT_SyntaxIs(F, kSC__Reg_Const))));
 	}
 	int Rr = SC_Reg_Reg(T);
 	if (Rr) {
@@ -25248,8 +25230,6 @@ void SC_Pac_Nop2TempConsts(Assembler* Self, ASMReg A, ASMReg B) {
 }
 
 void SC_Pac_nop_sub(Assembler* Self, FatASM* Fat, uint /*FatNopMode*/ NopMode, int Depth) {
-	if (SC_Str_trap(JB_LUB[2399], nil)) {
-	}
 	if (!SC_FatNopMode_SyntaxIs(NopMode, kSC__FatNopMode_Rewind)) {
 		if (!SC_FAT_IsStateless(Fat)) {
 			return;
@@ -25850,7 +25830,26 @@ FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj) {
 			}
 		}
 	}
-	return SC_Msg_RFUN(Exp, Obj, Obj, SC_Pac_RefSaveWithReg(Self, Obj), SC_Reg__New());
+	return SC_Msg_RFUN(Exp, Obj, Obj, SC_Pac_RefSaveWith0(Self), SC_Reg__New());
+}
+
+ASMReg SC_Pac_RefCountFinish(Assembler* Self, FatASM* Fat) {
+	if (Fat) {
+		if (SC_FAT_IsReffer(Fat)) {
+			int Saved = SC_FAT_RegOnly(Fat, 2);
+			if (Saved) {
+				int Output = SC_ASMParam_Reg(SC_FAT_Output(Fat));
+				if (Output == (Saved + 1)) {
+					Saved = Output;
+				}
+				SC_Pac_Trash((&SC__Pac_Sh), Saved);
+			}
+			SC_FAT_Incr(Fat);
+			return SC_Reg_OperatorAs(Fat->Info, SC_Reg__New());
+		}
+		return Fat->Info;
+	}
+	return ((ASMReg)0);
 }
 
 FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj) {
@@ -25886,9 +25885,9 @@ FatASM* SC_Pac_RefCountSet(Assembler* Self, Message* Exp, Message* Prms) {
 		if (SC_Reg_SyntaxIs(B, kSC__Reg_ContainsAddr)) {
 			int Offset = 0;
 			B = SC_Pac_InlineOffsetOpt(Self, B, 3, Offset, 13, SC_Msg_ASMDecl(SrcMsg), SrcMsg);
-			return SC_Msg_RFRD(Exp, A, B, SC_Pac_RefSaveWith0(Self), Offset);
+			return SC_Msg_RFRD(Exp, A, B, SC_Pac_RefSaveWithReg(Self, A), Offset);
 		}
-		return SC_Msg_RFST(Exp, A, B, SC_Pac_RefSaveWith0(Self));
+		return SC_Msg_RFST(Exp, A, B, SC_Pac_RefSaveWithReg(Self, A));
 	}
 	SCDecl* Glob = SC_Msg_ASMDecl(DestMsg);
 	if (SC_Reg_SyntaxIs(B, kSC__Reg_ContainsAddr)) {
@@ -25903,13 +25902,13 @@ FatASM* SC_Pac_RefCountSet(Assembler* Self, Message* Exp, Message* Prms) {
 
 ASMReg SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFunction* Fn) {
 	if (Fn == SC__Comp_RefClear) {
-		return SC_FAT_RefCountFinish(SC_Pac_RefCountClear(Self, Exp, Prms));
+		return SC_Pac_RefCountFinish(Self, SC_Pac_RefCountClear(Self, Exp, Prms));
 	}
 	if (Fn == SC__Comp_RefSetRef) {
-		return SC_FAT_RefCountFinish(SC_Pac_RefCountSet(Self, Exp, Prms));
+		return SC_Pac_RefCountFinish(Self, SC_Pac_RefCountSet(Self, Exp, Prms));
 	}
 	if (Fn == SC__Comp_RefIncr2) {
-		return SC_FAT_RefCountFinish(SC_Pac_RefCountIncrMemory(Self, Exp, Prms));
+		return SC_Pac_RefCountFinish(Self, SC_Pac_RefCountIncrMemory(Self, Exp, Prms));
 	}
 	ASMReg Obj = SC_Pac_xC2xB5(Self, ((Message*)JB_Ring_First(Prms)), SC_Reg__New());
 	if (SC_Pac_RegIsConst(Self, Obj, 0)) {
@@ -25919,23 +25918,23 @@ ASMReg SC_Pac_RefCountSub(Assembler* Self, Message* Exp, Message* Prms, SCFuncti
 		// Disallow: if obj.X(),   when obj.X() is a disowner;
 		// Then we will never freeifdead within if-branch or other tests.;
 		// needs understanding of disowners!;
-		FatASM* Fat = SC_Msg_RFUN(Exp, Obj, SC_Reg__New(), SC_Pac_RefSaveWithReg(Self, Obj), SC_Reg__New());
-		SC_FAT_RefCountFinish(Fat);
+		FatASM* Fat = SC_Msg_RFUN(Exp, Obj, SC_Reg__New(), SC_Pac_RefSaveWith0(Self), SC_Reg__New());
+		SC_Pac_RefCountFinish(Self, Fat);
 		return SC_FAT_AsReg(Fat, Obj);
 	}
 	if (Fn == SC__Comp_RefIncr) {
-		return SC_FAT_RefCountFinish(SC_Pac_RefCountIncr(Self, Exp, Obj));
+		return SC_Pac_RefCountFinish(Self, SC_Pac_RefCountIncr(Self, Exp, Obj));
 	}
 	if (Fn == SC__Comp_RefEarlyDecr) {
-		return SC_FAT_RefCountFinish(SC_Msg_RFST(Exp, Obj, SC_Reg__New(), SC_Pac_RefSaveWith0(Self)));
+		return SC_Pac_RefCountFinish(Self, SC_Msg_RFST(Exp, Obj, SC_Reg__New(), SC_Pac_RefSaveWith0(Self)));
 	}
 	if (Fn == SC__Comp_RefDecr) {
 		FatASM* Fat = SC_Pac_RefCountDecr(Self, Exp, Obj);
 		SC_Pac_CloseOneVar(Self, nil, 1 << SC_Reg_Reg(Obj));
-		return SC_FAT_RefCountFinish(Fat);
+		return SC_Pac_RefCountFinish(Self, Fat);
 	}
 	if (Fn == SC__Comp_RefSafeDecr) {
-		return SC_FAT_RefCountFinish(SC_Msg_RFUN(Exp, SC_Reg__New(), Obj, nil, nil));
+		return SC_Pac_RefCountFinish(Self, SC_Msg_RFUN(Exp, SC_Reg__New(), Obj, nil, nil));
 	}
 	return SC_Reg__New();
 }
@@ -26045,6 +26044,10 @@ void SC_Pac_RootGen(Assembler* Self, SCFunction* Fn) {
 	SC_ASMType__ArgumentSub(Self, SC_Func_SourceArg(Fn), nil);
 }
 
+void SC_Pac_Sanity(Assembler* Self, FatASM* Broken) {
+	return;
+}
+
 ASMReg SC_Pac_SelfDivide(Assembler* Self, ASMReg Dest, Message* Exp) {
 	if (SC_Reg_IsInt(Dest)) {
 		return SC_Pac_NumToReg(Self, Exp, Dest, 1, kJB__TC_Int);
@@ -26097,20 +26100,7 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Reg, ASMReg NopDest, FatASM* Alte
 	if ((Reg == 0) and Oldi) {
 		return NopDest;
 	}
-	int A = Self->Regs.Altered & (~(1 << Reg));
 	int P = Self->Regs.Phi & (~(1 << Reg));
-	int N = 0;
-	if (Alterer) {
-		A = (A | (1 << Reg));
-		P = (P | (1 << Reg));
-		N = (Alterer - Self->FuncStart_);
-		if (Field >= 0) {
-			uint Bigger = JB_uint_OperatorMax(((uint)Oldi), 1);
-			Alterer->PrevOutput[Field] = Bigger;
-		}
-	}
-	Self->Regs.Altered = A;
-	Self->Regs.Phi = P;
 	if ((Oldi > 1) and (SC_Reg_SyntaxIs(NopDest, kSC__Reg_AllowNopDest))) {
 		FatASM* Old = Self->FuncStart_ + Oldi;
 		if (SC_Pac_CanNop(Self, Old, Reg)) {
@@ -26120,6 +26110,16 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Reg, ASMReg NopDest, FatASM* Alte
 			SC_Pac_nop_sub(Self, Old, kSC__FatNopMode_Hard, 0);
 		}
 	}
+	int N = 0;
+	if (Alterer) {
+		P = (P | (1 << Reg));
+		N = (Alterer - Self->FuncStart_);
+		if (Field >= 0) {
+			uint Post_nop_oldi = JB_uint_OperatorMax(((uint)Self->Regs.Setters[Reg]), 1);
+			Alterer->PrevOutput[Field] = Post_nop_oldi;
+		}
+	}
+	Self->Regs.Phi = P;
 	Self->Regs.Setters[Reg] = N;
 	(SC_Pac_KnownValuesSet(Self, Reg, SC_FAT_SyntaxIs(Alterer, kSC__Reg_Const)));
 	NopDest = SC_Reg_SyntaxIsSet(NopDest, kSC__Reg_AllowNopDest, (!true));
@@ -26374,14 +26374,10 @@ ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* SrcPrms, Message* ASMPrms, AS
 }
 
 void SC_Pac_Trash(Assembler* Self, uint Reg) {
-	if (Reg >= 31) {
-		return;
-	}
-	uint A = Self->Regs.Altered & (~((1 << (Reg + 1)) - 1));
-	while (A) {
-		int R = JB_uint_Log2(A);
-		A = (A & (~(1 << R)));
-		SC_Pac_ClearRegister(Self, R);
+	while ((++Reg) <= 31) {
+		if (Self->Regs.Setters[Reg]) {
+			SC_Pac_ClearRegister(Self, Reg);
+		}
 	};
 }
 
@@ -26456,6 +26452,7 @@ ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int A
 	LL->After = SC_Pac_Curr(Self);
 	if (!Self->EntireInlineFailed) {
 		Rz = SC_Pac_InlineFinish(Self, Prms, LL, (&Svregs));
+		SC_Pac_Sanity(Self, nil);
 	}
 	int Grown = SC_Pac_CurrGain(Self, RealStart);
 	if ((Grown > AllowedGain) or Self->EntireInlineFailed) {
@@ -26694,6 +26691,12 @@ ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
 		Self->ExpectOneMore = true;
 	}
 	return Returns;
+}
+
+ASMReg SC_Pac_WholeType(Assembler* Self, SCDecl* Decl) {
+	ASMReg T = ((ASMReg)SC_Decl_xC2xB5Type(Decl));
+	T = SC_Reg_FatIndexSet(T, Self->Regs.Setters[SC_Reg_Reg(T)]);
+	return T;
 }
 
 ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest) {
@@ -36173,7 +36176,7 @@ SCDecl* SC_Msg_ASMDecl(Message* Self) {
 		}
 	}
 	if (SC_Decl_TypeOnly(Rz) == 0) {
-		ASMReg T = SC_Decl_WholeType(Rz);
+		ASMReg T = SC_Pac_WholeType((&SC__Pac_Sh), Rz);
 		T = SC_Reg_xC2xB5TypeSetWithReg(T, SC_Decl_CalculateASMType(Rz));
 		(SC_Decl_WholeTypeSet(Rz, T));
 	}
@@ -48154,10 +48157,6 @@ bool SC_Decl_TypeSuffers(SCDecl* Self) {
 
 void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value) {
 	Self->mu.DataType = ((DataTypeCode)Value);
-}
-
-ASMReg SC_Decl_WholeType(SCDecl* Self) {
-	return ((ASMReg)SC_Decl_xC2xB5Type(Self));
 }
 
 int SC_Decl_Wierdness(SCDecl* Self) {
@@ -61514,4 +61513,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 2151729368674093843 -2333435807701775120
+// -1177412655638830628 -6336789732165576057

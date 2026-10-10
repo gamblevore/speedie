@@ -681,7 +681,7 @@ struct FatASM {
 	u16 PrevOutput[2];
 	u16 ASMIndex;
 	byte BreakInfo;
-	byte UnusedOutput;
+	byte Unused;
 	byte _Op;
 	byte JumpPrm;
 	u16 Inputs[5];
@@ -768,7 +768,6 @@ struct RandomXOR {
 struct RegFile {
 	u16 Setters[32];
 	uint KnownMap;
-	uint Altered;
 	uint Phi;
 };
 
@@ -5967,6 +5966,8 @@ bool SC_FAT_OperatorIsa(FatASM* Self, ASM M);
 
 ASMReg SC_FAT_AsReg(FatASM* Self, ASMReg Flags);
 
+ASMParam SC_FAT_Output(FatASM* Self);
+
 void SC_FAT_OutputDebugVars(FatASM* Self, int Next);
 
 uint SC_FAT_OutputMap(FatASM* Self);
@@ -5994,8 +5995,6 @@ bool SC_FAT_PhiAlready(FatASM* Self, int Index);
 FatASM* SC_FAT_Prev(FatASM* Self);
 
 void SC_FAT_PrmCollectCounterPart(FatASM* Self, FastString* Fs);
-
-ASMReg SC_FAT_RefCountFinish(FatASM* Self);
 
 void SC_FAT_RegInputSet(FatASM* Self, int A, ASMReg Value);
 
@@ -6394,9 +6393,7 @@ FatASM* SC_Pac_FuncStart(Assembler* Self);
 
 ASMReg SC_Pac_FunctionDestination(Assembler* Self, Message* Exp, ASMReg Dest, SCFunction* Fn);
 
-ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Src);
-
-ASMReg SC_Pac_GlobAddrSub(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest);
+ASMReg SC_Pac_GlobAddr(Assembler* Self, SCDecl* D, Message* Exp, ASMReg Dest);
 
 FatASM* SC_Pac_GObjOpt(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg Base, int Index, SCDecl* Decl);
 
@@ -6600,6 +6597,8 @@ FatASM* SC_Pac_RefCountClear(Assembler* Self, Message* Exp, Message* Prms);
 
 FatASM* SC_Pac_RefCountDecr(Assembler* Self, Message* Exp, ASMReg Obj);
 
+ASMReg SC_Pac_RefCountFinish(Assembler* Self, FatASM* Fat);
+
 FatASM* SC_Pac_RefCountIncr(Assembler* Self, Message* Exp, ASMReg Obj);
 
 FatASM* SC_Pac_RefCountIncrMemory(Assembler* Self, Message* Exp, Message* Prms);
@@ -6627,6 +6626,8 @@ void SC_Pac_RewindOutput(Assembler* Self, FatASM* F, int A);
 void SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 
 void SC_Pac_RootGen(Assembler* Self, SCFunction* Fn);
+
+void SC_Pac_Sanity(Assembler* Self, FatASM* Broken);
 
 ASMReg SC_Pac_SelfDivide(Assembler* Self, ASMReg Dest, Message* Exp);
 
@@ -6701,6 +6702,8 @@ void SC_Pac_vtempsSet(Assembler* Self, uint Value);
 ASMReg SC_Pac_While(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp);
+
+ASMReg SC_Pac_WholeType(Assembler* Self, SCDecl* Decl);
 
 ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -9876,8 +9879,6 @@ void SC_Decl_TypeReach(SCDecl* Self, SCNode* From, Message* Src);
 bool SC_Decl_TypeSuffers(SCDecl* Self);
 
 void SC_Decl_WholeTypeSet(SCDecl* Self, ASMReg Value);
-
-ASMReg SC_Decl_WholeType(SCDecl* Self);
 
 int SC_Decl_Wierdness(SCDecl* Self);
 
