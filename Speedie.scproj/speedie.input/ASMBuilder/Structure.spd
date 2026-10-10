@@ -4,7 +4,6 @@
 struct RegFile
 	|uint16[32]|				Setters
 	|uint|						KnownMap
-	|uint|						Altered
 	|uint|						Phi
 
 
@@ -287,12 +286,9 @@ extend assembler
 			
 			
 	function Trash (|uint| Reg)
-		require reg < 31
-		|uint| A = .regs.altered &~ ((1<<(Reg+1))-1)
-		while A
-			|| r = a.log2
-			a &= ~(1<<r)
-			.ClearRegister(R)
+		while  ++reg <= 31
+			if .regs.setters[reg]
+				.ClearRegister(Reg)
 	
 	
 	function CanNop (|fatasm| F, |int| Changed, |bool|)
@@ -323,7 +319,6 @@ extend assembler
 			debugger
 			return NopDest
 				
-		|| A = .regs.Altered &~ (1<<Reg)
 		|| P = .regs.Phi &~ (1<<Reg)
 
 		if (oldi > 1) and (NopDest is AllowNopDest)
@@ -338,11 +333,9 @@ extend assembler
 		
 		|| N = 0
 		target debug
-			if A != .regs.Altered &~ (1<<Reg)
 			if P != .regs.Phi &~ (1<<Reg)
 
 		if Alterer
-			A |= 1 << Reg
 			P |= 1 << Reg
 			N = Alterer - .FuncStart_							// Set value
 			if Field >= 0
@@ -355,9 +348,10 @@ extend assembler
 			
 		target debug
 			if !Reg and !n and oldi								// shouldn't happen
+			if "".trap and reg == -1
 			
-		.regs.Altered = A										// works really well with PHI nodes!
 		.regs.Phi = P
+		
 		
 
 		.regs.Setters[Reg] = n

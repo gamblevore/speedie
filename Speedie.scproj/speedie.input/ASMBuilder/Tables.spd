@@ -316,12 +316,12 @@ function SetRel (fn_asm)						// function relset (
 
 
 function ThgReference (|assembler| self, |message| exp, |AsmReg| Dest, |scdecl| d, |asmreg|)
-	|| Reff = d.WholeType
+	|| Reff = .WholeType(d)
 	|| dr = dest.reg
 	if dest is AddrRequest // (|$int|) v {v++}
 		return reff.haveaddr	
 	
-	if dr == d.WholeType.reg
+	if dr == reff.reg
 		return dest
 
 	dest.µType = Reff.µType
@@ -907,7 +907,7 @@ function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
 
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
-	|| T = d.WholeType
+	|| T = .WholeType(d)
 	
 	(t is param) = d is param
 	|| f = t.fat

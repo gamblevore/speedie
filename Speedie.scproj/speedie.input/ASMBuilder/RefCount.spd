@@ -22,14 +22,14 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 		if B is ContainsAddr
 			|| offset = 0
 			B = .InlineOffsetOpt(B, 3, offset, 13, SrcMsg.ASMDecl, SrcMsg)
-			return exp.RFRD(A, B, .RefSave, offset)					// mem to reg
-		return exp.RFST(A, B, .RefSave)								// reg to reg
+			return exp.RFRD(A, B, .RefSave(A), offset)				// mem to reg
+		return exp.RFST(A, B, .RefSave(a))							// reg to reg
 	
 	|| glob = DestMsg.ASMDecl
 	if  B is ContainsAddr
 		|| where = .TempMe(exp)
 		where.µtype = datatypecode._voidptr
-		B = .Read(where, SrcMsg, B, nil, SrcMsg.ASMDecl) * where	// (mem to reg)?
+		B = .Read(where, SrcMsg, B, nil, SrcMsg.ASMDecl) * where	// mem to mem
 	
 	|| offset = 0
 	A = .InlineOffsetOpt(A, 3, offset, 13, glob, SrcMsg)
@@ -87,7 +87,7 @@ function Assembler.RefCountDecr (|message| exp, |ASMReg| Obj, |&FatASM|)
 					return nil
 				return ret
 	
-	return exp.RFUN(Obj, Obj, .RefSave(Obj), asmreg())
+	return exp.RFUN(Obj, Obj, .RefSave, asmreg())
 
 
 
@@ -95,13 +95,13 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 	opt	NoRefCounts
 
 	if fn == compiler.RefClear
-		return .RefCountClear(exp, prms).RefCountFinish
+		return .RefCountFinish(.RefCountClear(exp, prms))
 
 	if fn == Compiler.RefSetRef
-		return .RefCountSet(exp, prms).RefCountFinish
+		return .RefCountFinish(.RefCountSet(exp, prms))
 
 	if fn == Compiler.RefIncr2
-		return .RefCountIncrMemory(exp, prms).RefCountFinish
+		return .RefCountFinish(.RefCountIncrMemory(exp, prms))
 
 	|| Obj = .µ(prms.first!)
 	require !.RegIsConst(Obj, 0)
@@ -112,37 +112,39 @@ function Assembler.RefCountSub (|message| exp, |message| prms, |scfunction| fn, 
 		#! Disallow: if obj.X(),   when obj.X() is a disowner
 		#! Then we will never freeifdead within if-branch or other tests.
 		#! needs understanding of disowners!
-		|| fat = exp.rfun(Obj, asmreg(), .RefSave(Obj), asmreg())
-		fat.RefCountFinish
+		|| fat = exp.rfun(Obj, asmreg(), .RefSave, asmreg())
+		.RefCountFinish(fat)
 		return fat*Obj
 
 	if fn == Compiler.RefIncr
-		return .RefCountIncr(exp, Obj).RefCountFinish
+		return .RefCountFinish(.RefCountIncr(exp, Obj))
 
 	if fn == Compiler.RefEarlyDecr
-		Return exp.RFST(Obj, asmreg(), .RefSave).RefCountFinish		// reg to 0
+		Return .RefCountFinish(exp.RFST(Obj, asmreg(), .RefSave))		// reg to 0
 
 	if fn == Compiler.RefDecr
 		|| fat = .RefCountDecr(exp, obj)
 		.CloseOneVar(nil, 1<<Obj.reg)
-		return fat.RefCountFinish
+		return .RefCountFinish(fat)
 
 	if fn == Compiler.RefSafeDecr
-		return exp.rfun(ASMReg(), Obj).RefCountFinish
+		return .RefCountFinish(exp.rfun(ASMReg(), Obj))
 
 	debugger 
 	return asmreg()
 
 
-function fatasm.RefCountFinish (|asmreg|)
-	if self
-		if .isreffer
-			|| saved = .RegOnly(2)
+function assembler.RefCountFinish (|&fatasm| fat, |asmreg|)
+	if fat
+		if fat.isreffer
+			|| saved = fat.RegOnly(2)
+				|| output = fat.output.reg
+				if output == saved + 1
+					saved = output
 				assembler.sh.Trash(saved)
-			.incr
-			return .info as asmreg()
-		return .info
-	
+			fat.incr
+			return fat.info as asmreg()
+		return fat.info
 
 
 // dead-code stripping means this is better in ASM, than at c-level phase.

@@ -64,9 +64,9 @@ class SCDecl (SCObject) {
 	function µType (|datatypecode|)
 		return .mu.DataType
 	
-	function WholeType (|asmreg|)
-		|| T = .µtype|asmreg|
-		t.FatIndex = Assembler.sh.regs.Setters[t.reg] // probably true?
+	function assembler.WholeType (|scdecl| decl, |asmreg|)
+		|| T = decl.µtype|asmreg|
+		t.FatIndex = .regs.Setters[t.reg] // probably true?
 		target debug
 			if t is temp						// how can a declared variable be a temp?
 			if !t.FatIndex // oof?

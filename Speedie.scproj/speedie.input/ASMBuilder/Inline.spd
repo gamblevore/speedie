@@ -216,15 +216,11 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 		if InlineTrap == -1
 		.sanity
 	asmtype.ArgumentSub(self, fn.SourceArg!)
-	.sanity
-	
 	info.NopParams(fn.args.length, .state.return, self)
-	.sanity
 	svregs.Restore(fn.args)
 	
 	ll.after = .curr
 	if !.EntireInlineFailed
-		.sanity
 		rz = .InlineFinish(prms, ll, svregs)
 		.sanity
 	

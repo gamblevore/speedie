@@ -479,6 +479,8 @@ struct Assembler
 
 
 	function Sanity (|&fatasm| Broken=nil)
+		target !debug
+			return
 		if (Broken)
 			ASMDebug()
 			Broken.DebugPrint()
@@ -487,15 +489,16 @@ struct Assembler
 		|| r = &(.regs.setters[0])
 		for i in 32
 			|| sanity = r[i]
-			if sanity > 0
-				|| f = sanity.fat
+			|| f = sanity.fat
+				
+			if (sanity > 0)
 				if (f isa asm.noop)
 					if (f isnt param)
 						printline errorreceiver.internalerror
 						ASMDebug()
 						f.DebugPrint
 						debugger
-		return
+
 
 		|| s = .TotalStart
 		|| a = .curr

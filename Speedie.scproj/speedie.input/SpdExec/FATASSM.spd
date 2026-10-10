@@ -13,7 +13,7 @@ struct FatASM
 	|uint16[2]|			PrevOutput
 	|uint16|			ASMIndex
 	|byte|				BreakInfo
-	|byte|				UnusedOutput	// Not just dependant on µform. For example RD1U can increment or not.
+	|byte|				Unused
 	|byte|				_Op
 	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
@@ -243,7 +243,7 @@ struct FatASM
 		if !changed
 			return info
 		
-		.UnusedOutput |= 1 << a
+//		.UnusedOutput |= 1 << a
 		if info
 			(info is AllowNopDest)
 		return sh.SetRegister(changed, info, self, a)
@@ -279,7 +279,14 @@ struct FatASM
 		if .PrevOutput[1]
 			rz |= 2
 		
-		
+	
+	function Output (|asmparam|)
+		if .PrevOutput[0]
+			return .prms[0]
+		if .PrevOutput[1]
+			return .prms[1]
+	
+	
 	function OutputRegMap (|uint|)
 		|| Map = .OutputMap
 		|uint| Found = 0
