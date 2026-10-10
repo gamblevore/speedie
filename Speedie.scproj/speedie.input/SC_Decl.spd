@@ -65,7 +65,12 @@ class SCDecl (SCObject) {
 		return .mu.DataType
 	
 	function WholeType (|asmreg|)
-		return .µtype|asmreg|
+		|| T = .µtype|asmreg|
+		t.FatIndex = Assembler.sh.regs.Setters[t.reg] // probably true?
+		target debug
+			if t is temp						// how can a declared variable be a temp?
+			if !t.FatIndex // oof?
+		return T
 	
 	function Reg (|int|)
 		return .µtype|asmreg|.reg

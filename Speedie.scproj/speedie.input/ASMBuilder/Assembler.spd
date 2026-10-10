@@ -118,7 +118,7 @@ struct Assembler
 
 		|| Fake = src.noop
 
-		|| Reg	= a.WholeType.reg(i) as ASMReg.FatParam		
+		|| Reg	= a.µtype|asmreg|.reg(i) as ASMReg.FatParam		
 		fake.Dest(0, reg, self)
 		if fake isnt param // huh?
 	
@@ -478,8 +478,25 @@ struct Assembler
 			debugger
 
 
-	function Sanity
+	function Sanity (|&fatasm| Broken=nil)
+		if (Broken)
+			ASMDebug()
+			Broken.DebugPrint()
+			debugger
+			
+		|| r = &(.regs.setters[0])
+		for i in 32
+			|| sanity = r[i]
+			if sanity > 0
+				|| f = sanity.fat
+				if (f isa asm.noop)
+					if (f isnt param)
+						printline errorreceiver.internalerror
+						ASMDebug()
+						f.DebugPrint
+						debugger
 		return
+
 		|| s = .TotalStart
 		|| a = .curr
 		|| C = SanityCount++

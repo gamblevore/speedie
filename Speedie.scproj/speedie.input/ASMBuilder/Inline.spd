@@ -214,14 +214,19 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	target debug
 		|| InlineTrap = ++asmtrapper
 		if InlineTrap == -1
+		.sanity
 	asmtype.ArgumentSub(self, fn.SourceArg!)
+	.sanity
 	
 	info.NopParams(fn.args.length, .state.return, self)
+	.sanity
 	svregs.Restore(fn.args)
 	
 	ll.after = .curr
 	if !.EntireInlineFailed
+		.sanity
 		rz = .InlineFinish(prms, ll, svregs)
+		.sanity
 	
 	|| Grown = .CurrGain(RealStart)
 	if (Grown > AllowedGain) or .EntireInlineFailed
@@ -250,7 +255,7 @@ function @ASMType.InlinedReturn (|assembler| self, |message| exp, |asmreg| dest,
 		(extras is ExitFunction)
 
 	target debug
-		|| in_ret_trap = ++asmtrapper, if in_ret_trap == 52325
+		|| in_ret_trap = ++asmtrapper, if in_ret_trap == -1
 	(dest as= extras)
 	|| f = exp.first
 		if !dest.reg

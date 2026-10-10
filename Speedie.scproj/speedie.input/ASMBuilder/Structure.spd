@@ -227,14 +227,13 @@ extend assembler
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
-					ASMDebug()
-					fat.DebugPrint()
-					debugger
+					.sanity(fat)
 				return
 		
-		if fat isa asm.noop // already nopped. perhaps reg0
+		if fat isa asm.noop
 			target debug
-				if fat.index!=1 and nopmode isnt rewind // hmmmm?
+				if fat isnt param and nopmode isnt rewind // hmmmm?
+					.sanity(fat)
 			return
 		
 		if !.IsWithinCurrInline(fat)

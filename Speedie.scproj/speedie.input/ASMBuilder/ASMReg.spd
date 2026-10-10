@@ -120,7 +120,6 @@ datatype ASMReg (uint64)
 		
 
 	function Zero (|asmreg|)
-		// keep the fatasm... like for .write() which returns reg0.
 		.reg = 0
 		.FatIndex = 1
 		is const
@@ -128,7 +127,7 @@ datatype ASMReg (uint64)
 		return self
 		
 	function IsZero (|bool|)
-		if .reg == 0 // what if "const" needs fixing?
+		if .reg == 0
 			return true
 		return  (self is Const) and (.const == 0)
 	

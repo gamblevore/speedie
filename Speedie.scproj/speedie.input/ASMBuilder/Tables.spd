@@ -435,9 +435,9 @@ function ArgumentSub (|assembler| self=assembler.sh, |message| exp, |asmreg| Mas
 	rz = (rz & mask).fatindex(rz.fatindex)  // not so pretty. mask kinda made sense before. but now?
 	rz = .CloseVars(v, exp, rz)				// when all things need indexes?
 
-	if rz is ExitFunction		// this is being triggered by inlined returns
-		.regs = Restore			// but they don't ACTUALLY exit. Did I alter how inline returns work?
-								// i didn't get this problem before?
+	if (rz is ExitFunction)		// this is being triggered by inlined returns
+		if .inlinedepth == 0
+			.regs = Restore
 
 
 function Argument (fn_asm) // argument 
@@ -908,14 +908,11 @@ function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
 function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
 	|| T = d.WholeType
-	if t is temp						// how can a declared variable be a temp?
 	
 	(t is param) = d is param
-	|| f = .Register(t.reg)				// consts must have fats! both in and out. unless r0.
-		t.FatIndex = f.index			// why did I not do it always?
-		if .CanConstLocalThg(d, f)
-			(T is Const) = (f is Const)	
-	
+	|| f = t.fat
+	if f and .CanConstLocalThg(d, f)
+		(T is Const) = (f is Const)	
 	
 	|| rr = T.reg
 		|| Ret = .State.Return
