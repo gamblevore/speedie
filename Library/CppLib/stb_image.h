@@ -3814,7 +3814,7 @@ static stbi_uc *load_jpeg_image(stbi__jpeg *z, int *out_x, int *out_y, int *comp
    z->s->img_n = 0; // make stbi__cleanup_jpeg safe
 
    // validate req_comp
-   if (req_comp < 0 || req_comp > 4) return stbi__errpuc("bad req_comp", "Internal error");
+   if (req_comp < 0 || req_comp > 4) return stbi__errpuc("bad req_comp", "Internal Error");
 
    // load a jpeg image from whichever source, but leave in YCbCr format
    if (!stbi__decode_jpeg_image(z)) { stbi__cleanup_jpeg(z); return NULL; }
@@ -5199,7 +5199,7 @@ static int stbi__parse_png_file(stbi__png *z, int scan, int req_comp)
 static void *stbi__do_png(stbi__png *p, int *x, int *y, int *n, int req_comp, stbi__result_info *ri)
 {
    void *result=NULL;
-   if (req_comp < 0 || req_comp > 4) return stbi__errpuc("bad req_comp", "Internal error");
+   if (req_comp < 0 || req_comp > 4) return stbi__errpuc("bad req_comp", "Internal Error");
    if (stbi__parse_png_file(p, STBI__SCAN_load, req_comp)) {
       if (p->depth <= 8)
          ri->bits_per_channel = 8;
