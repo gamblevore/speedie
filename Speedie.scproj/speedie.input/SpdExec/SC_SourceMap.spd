@@ -3,6 +3,7 @@
 
 datatype SourceLocation (uint64)
 	syntax expect (|string?| error=nil)
+		opt norefcounts
 		|| fs = FastString()
 		.Render(fs, 128)
 		error (error, fs)

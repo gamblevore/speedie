@@ -607,6 +607,7 @@ extend Assembler
 		
 		
 		fatmul.reginput(3) = add
+		dest.reg = fatmul.regonly(0)
 		return fatmul * dest
 	
 	

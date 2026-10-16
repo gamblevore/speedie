@@ -320,7 +320,9 @@ struct FatASM
 		// should nop_sub use this?
 		|| o = asm.noop
 		if self is debugvarclose or debugvaropen
-			o = asm.mark
+			// i'm not sure this ever happens anymore?
+/			o = asm.mark
+			#!Remove this??
 		._op = o
 	
 	function JumpTo (|&fatasm| Value, |int64|)
@@ -409,6 +411,7 @@ struct FatASM
 	
 	function CheckHasOutput
 		target debug {
+		require !(self isa asm.noop)
 		for (b.bits in .OutputMap|int|) (i)
 			if !.regonly(i)
 				error (self, "Missing ASM output")

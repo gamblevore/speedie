@@ -100,14 +100,14 @@ function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 		
 	|| i = 0
 	while (|scfunction--| fn = .PackFuncs[i++])
-		if !.BakeOneFunc(j, bmr, fs, fn)
+		if !.TryBakeOneFunc(j, bmr, fs, fn)
 			i = -1
 			exit
 	return i >= 0
 
 
 
-function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |scfunction| fn,  |bool|)
+function packmaker.TryBakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |scfunction| fn,  |bool|)
 	opt norefcounts
 	if !.PackSaved.AddOrShrink(j, fn)
 		return true
@@ -115,7 +115,7 @@ function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |
 	SCFunction.CurrFunc = fn
 	|| Start = SourceMap.ASMTotal
 
-	require j.BakeFunc(fn)
+	require j.BakeOneFunc(fn)
 	|| glob = fn.HasProto
 	if glob and !glob.type.IsInterface
 		bmr.AppendHInt(glob.ExportPosition)
@@ -124,7 +124,6 @@ function packmaker.BakeOneFunc (|jbin| j, |faststring| bmr, |faststring| dump, |
 	if dump
 		assembler.ASMDebug(fn, dump, int.max&~4)
 		// we don't have the block info at this point. its gone! unless we made a fatter fatasm
-		// which... might be a good idea. I mean... saving the old output could be nice?
 		dump.Flush
 	return true
 
@@ -141,7 +140,7 @@ function JBin.BakeASMSub (|SCFunction| fn, |int| T, |bool|)
 	return sourcemap.check(fn, T*4)
 
 
-function JBin.BakeFunc (|SCFunction| fn, |bool|)
+function JBin.BakeOneFunc (|SCFunction| fn, |bool|)
 	opt norefcounts
 	|| t = fn.µASMLength
 	Compiler.stTotalASMOps += t
@@ -149,6 +148,7 @@ function JBin.BakeFunc (|SCFunction| fn, |bool|)
 	if !Options.StripNames // never true if dd
 		.BakeFuncName(fn)
 
+	if fn == "InitAppCode_"
 	|| dd = assembler.DebugDecls
 		for a in fn.args
 			a.DumpDeclOpen(dd, 0, a.reg)

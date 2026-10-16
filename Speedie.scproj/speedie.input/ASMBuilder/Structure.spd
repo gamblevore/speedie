@@ -236,9 +236,14 @@ extend assembler
 			return
 		
 		if !.IsWithinCurrInline(fat)
-			|| C = .DelayedNopCount++
+			|| C = .DelayedNopCount
+			|| fatty = fat.index
+			for i in c
+				if .delayednops[i] == fatty
+					return
+			.DelayedNopCount = C + 1
 			if C < –count .DelayedNops
-				.DelayedNops[C] = fat.Index
+				.DelayedNops[C] = fatty
 			return
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
