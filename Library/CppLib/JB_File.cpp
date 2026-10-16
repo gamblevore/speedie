@@ -881,6 +881,35 @@ void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
 }
 
 
+// Something like this could be nice?
+static bool PathIsClean (JB_String* P) {
+	// Doesn't handle    /../
+	int N = JB_Str_Length(P);
+	if (N<=0 or N >= PATH_MAX) return false;
+	
+	byte* PS = P->Addr;
+	if (PS[N-1] == '\n')
+		return false;
+	
+	int B = PS[0];
+    if (B != '/')
+		return false;
+	
+	int A = -1;
+	for (int i = 1; i < N; i++) {
+		int C = PS[i];
+		if (C == '/' and C == B) // oof
+			return false;
+		if (C == '/' and B == '.' and A == '/')
+			return false;
+		A = B;
+		B = C;
+	}
+	
+	return true;
+}
+
+
 JB_StringC* JB_File_PathFix (JB_String* P) {
 // creates c-strings.
 // might be nicer to instead... have a "path is clean" function
@@ -1172,6 +1201,10 @@ bool JB_Str_IsOK(JB_String* Self) {
 }
 
 bool JB_File_Exists ( JB_String* self ) {
+	// should use JB_File_PathFix() for... consistancy? or else a path ending with "\n"
+	// fails even though it WOULD work if turned into a file!
+	// it uses a faststring, and here we just use a buff. which is even faster.
+	
 	uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (!tmp)
@@ -1179,6 +1212,10 @@ bool JB_File_Exists ( JB_String* self ) {
 	int err = access(tmp, 0);
 	if (!err)
 		return true;
+
+// could use PathIsClean...
+//	auto Path2 = JB_File_PathFix(self); // now what?
+//	err = access((const char*)(Path2->Addr), 0);
 	
 	if (errno != ENOENT) {
 		ErrorHandle_(err, self, nil, "testing the existance of");
