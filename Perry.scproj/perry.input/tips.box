@@ -30,7 +30,7 @@
 
 "\1F0-\1F9 (holding option key) flips between various open projects"
 
-"Press your project button, to flip between a todo-list and your current file."
+"Click the current tab, to flip between a todo-list and your current file."
 
 "\1FD opens the quick file-finder! Just type a file name!"
 
@@ -41,4 +41,5 @@
 "Use perry from the terminal! Just type: perry <path to file> (needs link to perry in /usr/local/bin)"
 
 "\1FK can clear your build-log, or other logs in the log-area."
-
+//
+//
