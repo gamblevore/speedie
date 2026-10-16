@@ -48,7 +48,7 @@ struct Assembler
 	|byte|						StackSize
 	|InlineState[8]|			InlineState
 	|scfunction--|				Root_Fn
-	|(Message--)[32]|			Declarations
+	|SourceLocation[32]|		Declarations
 
 	|uint16[32]|				DelayedNops
 	|?&FatASM|					InlineEnd
@@ -76,6 +76,9 @@ struct Assembler
 	
 	function State (|&InlineState|)
 		return .inlinestate[.inlinedepth]
+	
+	function Fat (|uint| i, |&fatasm|)
+		return .FuncStart_ + i
 	
 	function Curr (|&fatasm|)
 		return .curr_
@@ -211,7 +214,7 @@ struct Assembler
 		d |= FreeBit
 		|| Index = freeBit.log2
 		v.reg = index
-		.Declarations[index] = where
+		.Declarations[index] = (where!=nil)(where.srcmap, nil)
 
 		.Vdecls = d
 		if freebit and !(d & .VTemps)
@@ -282,7 +285,7 @@ struct Assembler
 		|| Free = (~r).Log2			// Find lowest free bit.
 		r |= 1<<Free
 		t.reg = Free
-		.Declarations[free] = where
+		.Declarations[free] = (where!=nil)(where.srcmap, nil)
 		.VTemps = r
 		(t isnt Const)				// why would it be?
 		(t is temp)

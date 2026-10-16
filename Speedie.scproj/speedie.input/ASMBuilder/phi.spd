@@ -51,9 +51,18 @@ function assembler.PhiMiddle (|BranchPhiTracker| T)
 
 
 function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest, |int| Liftup, |asmreg|)
+	|| A = .vdecls ||| .vtemps
 	|| XS = T.Start.phi
 	|| XM = T.Middle.ActualPhi(T.StartIndex)
 	|| XC = .regs.ActualPhi(T.MiddleIndex)
+	
+//	if (XS&~A)
+//	if (XM&~A)
+//	if (XC&~A)
+	XS &= A // kinda makes sense?
+	XM &= A // not sure
+	XC &= A // i might be too strict or too loose. Or just messing this up!
+	
 	|uint| Avoid = 1<<dest.reg
 	.regs.phi = XC|||XM|||XS
 

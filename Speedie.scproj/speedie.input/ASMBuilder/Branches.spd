@@ -451,6 +451,8 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 	opt norefcounts
 	
 	|fatrange| AndTest
+	target debug
+		|| BranchTrap = ++asmtrapper, if BranchTrap == -1
 	|| First = .Branch(A, andtest, dest is negate)	// could just use .exists and test the const value
 	if AndTest.never
 		return first

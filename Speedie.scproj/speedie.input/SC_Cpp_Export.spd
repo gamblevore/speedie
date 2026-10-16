@@ -1395,6 +1395,20 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function SCClass.SimplerDataTypes (|faststring| fs, |scdecl| d)
+		// we seem to be creating a temp at 30
+		// from two paths, which makes a phi
+		// the phi is made BEFORE: if t.isfloat ...
+		// NOW... it gets replaced inside the arg.
+		// if it were replaced, normally... that means it is... replaced.
+		// but we just nopped it.
+		// because it wasn't used.
+		// I guess that is the issue here. It is not used. the phi, that is
+		// the intermediates are.
+		// lets say the value WAS used... it wouldn't be nopped!
+		// So I think, the problem is leftover temps, leading to a phi
+		// should I solve it?
+		// won't that cause MORE issues? how is it being left over?
+		
 		if .IsDataTypeOnly
 			|| t = .TypeInfo
 			if (t.VecCount <= 1) and (t is numeric) and (t.bytecount < 4)

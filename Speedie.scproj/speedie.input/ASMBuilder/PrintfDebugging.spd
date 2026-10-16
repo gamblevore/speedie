@@ -77,7 +77,7 @@ function @assembler.DumpRegs (|faststring| fs)
 	|| T = .sh.vtemps
 	|| X = D|||T									#require
 	|| Prev = false
-	fs <~ "Regs: "
+	fs <~ "\nRegs: "
 	|| i = 0
 	while ++i <= 31
 		|| test = 1<<i
@@ -94,7 +94,7 @@ function @assembler.DumpRegs (|faststring| fs)
 				fs <~ "r"
 			fs <~ i
 
-	fs <~ "\n"
+	fs <~ ('\n',2)
 	
 	
 	i = 0
@@ -104,7 +104,7 @@ function @assembler.DumpRegs (|faststring| fs)
 			fs <~ i
 			fs <~ " = "
 			|| msg = .sh.declarations[i]
-				fs <~ msg
+				msg.Render(fs, 40)
 			  else
 				fs <~ "?"
 			fs <~ "\n"

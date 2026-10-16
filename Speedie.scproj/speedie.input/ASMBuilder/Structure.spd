@@ -234,6 +234,9 @@ extend assembler
 				if fat isnt param and nopmode isnt rewind // hmmmm?
 					.sanity(fat)
 			return
+
+		target debug
+			.sanity()
 		
 		if !.IsWithinCurrInline(fat)
 			|| C = .DelayedNopCount
@@ -273,12 +276,14 @@ extend assembler
 		fat.setop = asm.noop
 		if HasBreak
 			fat.BreakInfo = breakpoint ||| Breakable
-							
+		target debug
+			.sanity()
+
 		
 	function Register (|int| i, |?&FATASM|)
 // If a var is altered in a loop, and we're in a loop, its not a known value.
 		|| r = .Regs.Setters[i]
-			return .funcstart_ + r
+			return .fat(r)
 
 	
 	function KnownValues (|int| changed, assigns:|bool|)
@@ -327,11 +332,11 @@ extend assembler
 		|| P = .regs.Phi &~ (1<<Reg)
 
 		if (oldi > 1) and (NopDest is AllowNopDest)
-			target debug: if !alterer							// can't happen,  .Dest sets this.
-			|| old = .FuncStart_ + oldi
+			target debug: if !alterer							// Can't happen,  .Dest sets this.
+			|| old = .fat(oldi)
 			if .CanNop(old, Reg)
 				if alterer and old is DebugVarOpen
-					(alterer is DebugVarOpen)					// like: || a = 1, a = 2
+					(alterer is DebugVarOpen)					// Like: || a = 1, a = 2
 
 				.nop_sub(old, fatnopmode.hard)
 
@@ -340,23 +345,19 @@ extend assembler
 		target debug
 			if P != .regs.Phi &~ (1<<Reg)
 
+		if "Halt_Encoder".trap
 		if Alterer
 			P |= 1 << Reg
 			N = Alterer - .FuncStart_							// Set value
 			if Field >= 0
 				|| post_nop_oldi = .regs.Setters[Reg]|uint| max 1
 				Alterer.PrevOutput[field] = post_nop_oldi
-//		  else
-//			target debug
-//				|| Allocated = .vdecls ||| .vtemps
-//				if Allocated & (1<<Reg) // nope!
 			
 		target debug
 			if !Reg and !n and oldi								// shouldn't happen
 			if "".trap and reg == -1
 			
 		.regs.Phi = P
-		
 		
 
 		.regs.Setters[Reg] = n

@@ -436,9 +436,10 @@ function ArgumentSub (|assembler| self=assembler.sh, |message| exp, |asmreg| Mas
 	rz = (rz & mask).fatindex(rz.fatindex)  // not so pretty. mask kinda made sense before. but now?
 	rz = .CloseVars(v, exp, rz)				// when all things need indexes?
 
-	if (rz is ExitFunction)		// this is being triggered by inlined returns
-		if .inlinedepth == 0
-			.regs = Restore
+	if (rz is ExitFunction)	and !.inlinedepth	// this is being triggered by inlined returns
+		.sanity
+		.regs = Restore
+		.sanity
 
 
 function Argument (fn_asm) // argument 

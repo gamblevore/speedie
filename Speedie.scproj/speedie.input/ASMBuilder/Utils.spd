@@ -45,7 +45,7 @@ function Assembler.RequestOp (|asm| op, |message?| exp, |sourcelocation| map=nil
 
 		p.BasicBlock = .BasicBlock
 		target debug
-			if (p.id == -1) and "".trap
+			if (p.id == -1) and "".trap // 32895
 			
 		return p
 
@@ -108,12 +108,15 @@ function Assembler.CloseVars (|uint64| Orig,  |message| exp = nil,  |asmreg| Ret
 	OrigTemps = OrigTemps &~ .VTemps
 	
 	if OrigDecls and (exp or params)
-		if .vtemps & OrigDecls
-/			ASMDebug()
+		target debug
+			if .vtemps & OrigDecls
+/				ASMDebug()
 		.VDecls |= OrigDecls
+
 	if OrigTemps and params
-		if .vdecls & OrigDecls
-/			ASMDebug()
+		target debug
+			if .vdecls & OrigDecls
+/				ASMDebug()
 		.VTemps |= OrigTemps
 	
 	return return
