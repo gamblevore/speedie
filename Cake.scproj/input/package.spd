@@ -52,7 +52,7 @@ module CakeRun
 		if debugger.WantDebug
 			args <~ "-d"
 		|| Answer = cake.speedie.ExecuteStr(args)
-		if !Answer.FileExists
-			Answer = nil
+			Answer = Answer.FileThatExists
 		return Answer
 	
+
