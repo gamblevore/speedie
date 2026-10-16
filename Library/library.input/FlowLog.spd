@@ -150,7 +150,7 @@ module FlowLog
 		flow off
 		(name)
 		target flow
-			target cake
+			target cake_interpreter
 				.StartTest(name)
 			  else
 				.StartGen(name)

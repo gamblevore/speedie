@@ -678,11 +678,11 @@ function ImportFile (|SCFile| file)
 		
 	
 	todo `visibility needs to make a bit more sense than this...
-	 we should remove the "Visible" statement from within class scope... only allowed in the linkage.
+	 we should remove the "visible" statement from within class scope... only allowed in the linkage.
 	 within modules... it should only apply to global vars`
 	
 	file.Use
-	compiler.project = file.proj 
+	compiler.project = file.proj
 	|| v = file.proj.IsLibraryImp and Options.MakeExec
 	compiler.program.CollectFromNode( ast, v )
 	file.Stop

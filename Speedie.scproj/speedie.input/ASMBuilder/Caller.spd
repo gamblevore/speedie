@@ -80,7 +80,7 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 	if ret and (dest is ExitAtAll) // inlined return
 		v = ret.reg
 		v ?= .state.parentvars|uint|.log2 + 1
-		dest = dest.Temp(ret)
+		dest = dest.Tempness(ret)
 
 		// this could trash a valid reg!!!
 		// x = inl(y) --> return y + func() // func trashes! 

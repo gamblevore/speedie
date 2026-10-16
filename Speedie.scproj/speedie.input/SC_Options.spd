@@ -112,7 +112,6 @@ module Feedback
 			.Help
 			return false
 
-
 		|| AskSelf = ""
 		for (S in Args)
 			if s.argname != "self"

@@ -274,7 +274,7 @@ datatype ASMReg (uint64)
 	
 	function SlimReg (assigns:|asmreg|, |asmreg|)
 		.reg = value.reg
-		self = .temp(value)
+		self = .Tempness(value)
 		return self
 
 	
@@ -282,7 +282,7 @@ datatype ASMReg (uint64)
 		// we could do all of this in two bit-operations...
 		// just clear, then copy
 		.reg = value.reg
-		self = .temp(value)
+		self = .Tempness(value)
 		.fatindex = value.fatindex
 		return self
 
@@ -291,7 +291,7 @@ datatype ASMReg (uint64)
 		return (b)(self, nil)
 		
 		
-	function Temp (|asmreg| Other, |asmreg|)
+	function Tempness (|asmreg| Other, |asmreg|)
 		self &=~ TempFlags
 		(self as= other&tempflags)
 		return self

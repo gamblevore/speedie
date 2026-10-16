@@ -99,6 +99,7 @@ function Debugger (fn_asm)
 		fat = exp.TRAP(num)
 	
 	fat.incr
+	return fat * asmreg.discard
 
 
 function Swap (fn_asm)
@@ -917,7 +918,7 @@ function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
-			t = t.temp(ret)
+			t = t.Tempness(ret)
 	  else
 		(T is const)
 		

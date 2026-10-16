@@ -380,28 +380,28 @@ function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
 	
 
 function InlineReturnToJump (|message| exp, |Fatasm| S, |asmreg| r, |asmreg| dest, |ASMReg|)
-	if !.state.TailInlineable
-		|| value = s.inputfat(0)
-			value.safedecr					// Will get incremented later.
-			if dest.reg
-				r = .PerhapsPhi(exp, value.info, r)
-		  else
-			debugger						// Should always exist
+	|| value = s.inputfat(0)				#expect
+	|| value_info = value.info
+	if .state.TailInlineable
+		(value_info is AlreadyReturned)
+		return value_info
 		
-		|| Old = s.info
-		(old is DebugVars)					// Or else we lose our MARK close.
-		s.info = old
-		s.setOp = asm.jump
-		s.JumpPrm = 1
-		s.JumpFix(.curr)
-	  else
-		(r is AlreadyReturned)
+	if dest.reg
+		r = .PerhapsPhi(exp, value_info, r)
+
+	value.safedecr						// Will get incremented later.
+	|| Old = s.info
+	(old is DebugVars)					// Or else we lose our MARK close.
+	s.info = old
+	s.setOp = asm.jump
+	s.JumpPrm = 1
+	s.JumpFix(.curr)
 	return r
 
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	rz.fatindex = 1
-	target debug: || FinishTrap = ++ASMTrapper,  if FinishTrap == -1
+	target debug: || FinishTrap = ++ASMTrapper,  if FinishTrap == 150485
 	|| dest = .state.return
 	for s in R
 		|| op = s.op

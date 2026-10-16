@@ -29,6 +29,7 @@ module Linkage
 						fs <~ ' '
 					fs <~ str
 
+
 	function message.ConfTake (|message| dest, |string| name)
 		opt norefcounts
 		|| F = self[name]
@@ -39,7 +40,8 @@ module Linkage
 	function CompilerCollect (|message| s)
 		opt norefcounts
 		Linkage.LinkCollect(s, Compiler.Program, nil)
-		if linkage["interpreter"]
+		if linkage["cake_interpreter"]
+			SC_Targets["cake_interpreter"] = true
 			Options.MakeExec = true
 			if Options.ModeCake
 				options.mode = Options.cpp

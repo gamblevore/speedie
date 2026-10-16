@@ -49,8 +49,8 @@ module Compiler {
 linkage
 	cpp_part Comp
 
-|SCNode|					VisibleFuncs = SCNode("Visible")
-|SCNode|					Interpreter = SCNode("Interpreter")
+|SCNode|					VisibleFuncs = SCNode("visible")
+|SCNode|					Interpreter = SCNode("cake_interpreter")
 |File|						BaseProjectPath  // projectfolder, projfol
 |file|						Library
 |string|					OriginalInputPath
@@ -792,7 +792,7 @@ function @scmodule.Sorter (SorterComparer of scmodule)
 	return .name < b.name
 
 
-function SCFunction.DetectIfReached 
+function SCFunction.DetectIfReached
 	opt norefcounts
 	|| Base = Compiler.VisibleFuncs!
 	
@@ -858,7 +858,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.r
 function AddMain (|int| mark, |bool|)
 	opt norefcounts
 
-	|| f = compiler.MainFunc 
+	|| f = compiler.MainFunc
 		f.blindcasts = errorseverity.error
 		|| c = Compiler.AppInitCode
 		C.FixFileNumber(f.source!.tag)
