@@ -590,7 +590,8 @@ function message.LoadXVars (|?&xvar| Registers, |[xvar]| out)
 			OK = (reg-1)|uint| < 31
 		
 		
-		if input.Position >= ReadEnd					// Close
+		if input.Position >= ReadEnd
+			#!Close Register
 			expect (OK)									(self, "CloseOutRange: "	+ reg)
 			expect (Registers)							(self, "BadRegClose: "		+ reg)
 			|| r = Registers[reg]			#expect		(self, "BadRegClose: "		+ reg)
