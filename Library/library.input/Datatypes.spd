@@ -585,8 +585,9 @@ datatype float
 		cpp_Part FloatMix
 		trin (20, MIX)
 		description "0.0 means fully A,  1.0 means fully B,  0.5 means half-way between A and B." 
-		return A + (self * (B - A))
-
+//		return A + (self * (B - A))
+		return (A - (self*A)) + (self*B)
+	
 	function SmoothStep (|float| low=0, |float| high=1, |float|)
 		trin (21, SMS)
 		|| t = ((self - low) / (high - low)).clamp
