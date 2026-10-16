@@ -59,10 +59,9 @@ Learn more about Speedie at: http://github.com/gamblevore/speedie/
 "
 		
 		check (r1[] != '-') ("Unexpected switch: " + r1)
-		if r1.FileExists
+		if r1.FileThatExists
 			app.CallPath = r1.Addr|cstring|
 		  else
-			r1.FileThatExists
 			r1 = nil
 		return r1
 
