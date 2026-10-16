@@ -1,8 +1,6 @@
 #!/usr/local/bin/spd
 
-// this file seems unused. Speedie is not compiling it?
-
-module Counts 
+module Counts
 	|int64|		Lines
 	|int64|		Names
 	|int64|		Nodes
@@ -17,21 +15,21 @@ module Counts
 	||			PrintTree = false
 	||			PrintedTree = false
 	||			ParseSpeed = app.yes("s")
-	|string| 	DefaultExt = "spd/box/jbin/jb"
+	|string|	DefaultExt = "spd/box/jbin/jb"
 	
 	function Init (|string| ss)
 		|| pt = app["p"]
 			.PrintTree = true
 			if pt != "true"
 				.MaxNodeLength = pt.int
-		ss = ss.trim 
+		ss = ss.trim
 		ss ?= .DefaultExt
-		for s in (ss / '/') 
+		for s in (ss / '/')
 			.exts[s] = s
 
 	function Count (|message| Msg)
 		Counts.parsed++
-		|| names = 	0 
+		|| names = 0
 		|| nodes = 0
 		for s.flat in msg
 			|| len = s.name.Length
@@ -68,10 +66,10 @@ function file.cloc
 	|| Durr = start.ago
 	Counts.Lines += data.loc
 	require msg
-	counts.Count(msg) 
+	counts.Count(msg)
 	if counts.PrintTree
 		if counts.maxnodelength
-			for s.flat in msg 
+			for s.flat in msg
 				s.name = s.name.Preview(counts.MaxNodeLength)
 		msg.RenderAST(app.stdout.outputstream)
 		""
@@ -97,12 +95,12 @@ function file.CountAll (|bool| force=false)
 main  
 	if !app.args
 		"Usage: cloc path
---files=cpp/c/h               Only report these files (defaults to ${counts.DefaultExt})
---quiet=true/false            Makes less output
--k                            Keeps errors
--s                            Report parse speed
--p                            Print parse Tree
--h                            Histogram
+--files=cpp/c/h					Only report these files (defaults to ${counts.DefaultExt})
+--quiet=true/false				Makes less output
+-k								Keeps errors
+-s								Report parse speed
+-p								Print parse Tree
+-h								Histogram
 "
 		return 0
 	
