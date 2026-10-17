@@ -102,6 +102,8 @@ function @assembler.DumpRegs (|faststring| fs)
 		|| test = 1<<i
 		if X&Test
 			fs <~ i
+			if i < 10
+				fs <~ " "
 			fs <~ " = "
 			|| msg = .sh.declarations[i]
 				msg.Render(fs, 40)

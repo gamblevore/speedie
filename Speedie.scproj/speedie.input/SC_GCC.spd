@@ -566,12 +566,13 @@ function file.TestCake (|bool|)
 
 
 function file.TestBatch (|bool|)
+	|| mode = ProcessMode.StdOutSilence+processmode.StdErrCapture
 	|| Sep = ""
 	print "Tested: "
 	|| args = [self, "--nocompile", "--perry"]
 	for c in "Batch".Batchspds
 		args[0] = c
-		.Execute(args, nil, nil, ProcessMode.StdOutSilence+processmode.StdErrCapture)
+		.Execute(args, nil, nil, mode)
 		print Sep
 		Sep = ", "
 		print c.Name

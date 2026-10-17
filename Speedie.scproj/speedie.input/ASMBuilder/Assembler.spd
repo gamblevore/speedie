@@ -120,7 +120,12 @@ struct Assembler
 				src = fn.Source!
 
 		|| Fake = src.noop
-
+		target debug
+			fake.refcount = 1
+		  else
+			fake.refcount = 1000
+		  
+			
 		|| Reg	= a.µtype|asmreg|.reg(i) as ASMReg.FatParam		
 		fake.Dest(0, reg, self)
 		if fake isnt param // huh?
@@ -134,6 +139,10 @@ struct Assembler
 		
 		|| fake = src.knst
 		fake._op = asm.noop
+		target debug
+			fake.refcount = 1
+		  else
+			fake.refcount = 1000
 		|| dest = fake.constfill(asmreg.fatparam, 0)
 		.SetRegister(0, dest, fake, 0)
 		if fake isnt param // huh?
@@ -438,13 +447,15 @@ struct Assembler
 		return .CloseVars(Closer, nil, v)
 
 
-	function µFuncPrms (|message| exp, |scdecl!| A, |asmreg|)
+	function µFuncPrms (|message| exp, |scdecl!| A, |int| Add,  |asmreg|)
 		|asmreg| Mode = nil //exp.AllowsTemp
 		(Mode is AddrNeed) = (a is Reference)
 
 		|| r = .µGetPrms(exp, Mode)
 		if (a is reference  and  r isnt containsaddr)
 			error (exp, errorreceiver.InternalError)
+		|| fat = r.fat
+			fat.µRefCount = fat.RefCount + Add
 		return r
 
 

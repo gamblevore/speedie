@@ -92,9 +92,7 @@ function Debugger (fn_asm)
 		|| ch = exp.first
 			num = ch.int + 1
 			if num <= 1								// debugat 0 --> non-removeable noop. To track BreakCount
-				|| r1 = 56|asmreg|
-				r1.reg = 1
-				fat = exp.ADDB(r1, 0)
+				fat = exp.ADDB(nil, 0)
 	if !fat
 		fat = exp.TRAP(num)
 	

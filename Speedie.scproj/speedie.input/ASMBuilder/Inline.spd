@@ -295,12 +295,12 @@ function InlineParams (|message| prms, |InlineInfo| Info, |scfunction| fn)
 		if !(V asnt ASMReg.ParamNeedsCopy) // its nil or ParamNeedsCopy
 			info.items[i] = .µInlineOneParam(p, a, V)
 		
-		a.AsmReg = info.Items[i] // A stores the output of P
+		a.InlineASMReg = info.Items[i] // A stores the output of P
 		p = p.next!
 
 
 
-function SCDecl.ASMReg (assigns:|asmreg|)
+function SCDecl.InlineASMReg (assigns:|asmreg|)
 	target debug
 		if !value.reg and self is alteredorref
 	

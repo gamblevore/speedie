@@ -223,6 +223,8 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
+		target debug
+			if fat.id == 66816
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -234,9 +236,6 @@ extend assembler
 				if fat isnt param and nopmode isnt rewind // hmmmm?
 					.sanity(fat)
 			return
-
-		target debug
-			.sanity()
 		
 		if !.IsWithinCurrInline(fat)
 			|| C = .DelayedNopCount
@@ -270,14 +269,15 @@ extend assembler
 				.Decr(f, NopMode, depth)
 
 
+		debugat 19773
 		.RewindOutput(fat, 0)
+		target debug: .sanity
 		.RewindOutput(fat, 1)
+		target debug: .sanity
 		
 		fat.setop = asm.noop
 		if HasBreak
 			fat.BreakInfo = breakpoint ||| Breakable
-		target debug
-			.sanity()
 
 		
 	function Register (|int| i, |?&FATASM|)
@@ -345,7 +345,6 @@ extend assembler
 		target debug
 			if P != .regs.Phi &~ (1<<Reg)
 
-		if "Halt_Encoder".trap
 		if Alterer
 			P |= 1 << Reg
 			N = Alterer - .FuncStart_							// Set value

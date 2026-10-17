@@ -187,6 +187,9 @@ function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 		rz = 0xFFFF	
 
 
+function scfunction.SingleASMCall (|bool|)
+	return !.ProtoType or (.ASMAndCpp != 3)
+
 
 function @ASMType.ASMFunction (fn_asm)				// dofunction
 	opt norefcounts
@@ -223,15 +226,16 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 		|| Closer = .OpenVars
 		|| i = 0
 		|| args = fn.args
+		|| RefAdd = 2 - fn.SingleASMCall
 		for	p.fast in prms
 			// todo: The last call to µFuncPrms doesn't need µFuncPrms. Needs total ASM-dump compare.
-			regs[i] = .µFuncPrms(p!, args[i]!)
+			regs[i] = .µFuncPrms(p, args[i]!, RefAdd)
 			i++
 		.CloseVars(Closer)
 	}
 
 	|| C = fn.HasCVersion
-	if !fn.ProtoType or (fn.ASMAndCpp != 3)
+	if fn.SingleASMCall
 		|| fat = .ASMCall(exp, dest, fn, tableid, regs, C)
 		.GrabbedRegisters(exp, Start, fat)
 		return fat.info // already set in asmcall
@@ -250,42 +254,42 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	return fn2.info
 
 
+function int.FuncFill (|&asmreg| regs, |&uint16| func_inputs)
+	for i in self
+		|| r = regs[i]
+			|| fati = r.FatIndex
+			|| input = fati.fat
+				func_inputs++[] = fati
+
+
 function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int| TableID, |&asmreg| Regs, |bool| Cpp, |&fatasm|)
 	opt norefcounts
 	|| P = .EncodeParams(exp.last!, fn, Cpp, regs)
 	|| PExt = P >> 32
 	(dest is statelessfunc) = (fn|scobject| is Stateless)
 	
-	|| fat = exp.FNC(dest, TableID, P, PExt)
+	|| func = exp.FNC(dest, TableID, P, PExt)
 	|| NArgs = fn.args.Length
-	fat.TotalFuncInputs = nargs
-	|| inputs = &fat.Inputs[0]
-
-	fat.numinput(4) = nargs
-	for i in nargs
-		|| r = regs[i]
-			|| fati = r.FatIndex
-			|| input = fati.fat
-				inputs++[] = fati
-				input.incr
+	func.TotalFuncInputs = nargs
+	nargs.funcfill(regs, &func.Inputs[0])
 	
 	if Cpp
-		fat._op = asm.FNCX
+		func._op = asm.FNCX
 		if PExt > 0
-			fat._op = asm.fncx3
+			func._op = asm.fncx3
 	  elseif PExt > 0
-		fat._op = asm.fnc3
+		func._op = asm.fnc3
 	
 	.Trash(dest.reg)
 
 	if fn|scobject| isnt stateless
-		fat.incr					// NOICE!
+		func.incr					// NOICE!
 	
 	if fn is Killer
 		(dest is exit)
-		fat.incr
-	dest = (fat * dest)
-	return fat
+		func.incr
+	dest = (func * dest)
+	return func
 
 
 function assembler.ASMReach (|SCFunction| fn)

@@ -40,7 +40,13 @@ struct FatASM
 		return ._op
 	
 	setter SetOp (|byte| value)
-		opt norefcounts
+//		.info = nil
+//		.jumpprm = nil
+//		for i in –count .inputs
+//			.Inputs[i] = nil
+//		if .IsFunc
+//			._Const = nil // extended inputs
+//		._op = value
 		|| m = .SrcMap
 		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
 		|| b = .BasicBlock
@@ -249,33 +255,32 @@ struct FatASM
 		return sh.SetRegister(changed, info, self, a)
 	
 
-	function assembler.FindRegOutput (|&fatasm| fat, |int| reg, |int| a, |&fatasm|)
+	function assembler.FindOutput (|&fatasm| fat, |int| reg, |int| a, |&fatasm|)
 		if fat.PrevOutput[a]
 			|| p = fat.prms[a]
 			if reg == p.reg
-/				|| i = p.fatindex
+				|| i = p.fatindex
 					return .fat(i)
 
 	
-	function assembler.MultiNop (|fatasm| fat, |int| reg, |&fatasm|)
-		|| f = .findregoutput(fat, reg, 0)
+	function assembler.FindOutput (|fatasm| fat, |int| reg, |&fatasm|)
+		|| f = .FindOutput(fat, reg, 0)
 			return f
-		return .findregoutput(fat, reg, 1)
+		return .FindOutput(fat, reg, 1)
 		
 
-	function assembler.RewindOutput (|fatasm| f, |int| a)
-		|| i = f.PrevOutput[a]$
-		|| reg = f.regonly(a)
-		if !reg												// how?
-		if .Register(reg) == f
-			f.PrevOutput[a] = 0
-			|&fatasm| prev
-			if i > 1
-				prev = .fat(i)
-				while prev isa asm.noop
-					prev = .MultiNop(prev, reg)
-				
-			.SetRegister(reg, nil, prev, -1)
+	function assembler.RewindOutput (|fatasm| fat, |int| a)
+		|| i = fat.PrevOutput[a]$
+		|| reg = fat.regonly(a)
+
+		require .Register(reg) == fat
+		|&fatasm| prev
+		if i > 1
+			prev = .fat(i)
+			while (prev isa asm.noop) and (prev isnt param)
+				prev = .FindOutput(prev, reg) #loop
+			
+		.SetRegister(reg, nil, prev, -1)
 
 	
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)
@@ -397,6 +402,7 @@ struct FatASM
 	function µRefCount (assigns:|int|)
 		target debug
 			if self == RefCountTrap
+			if value <= 0 and self == assembler.sh.FuncStart
 		.RefCount = value
 	
 	
@@ -404,7 +410,7 @@ struct FatASM
 		|| i = value.FatIndex
 		if !i
 			if value.reg				// Not good
-			i = 1						// sh.regs.setters[0]
+			i = 1
 			Value.FatIndex = i
 
 		.prms[a] = value.Prm
@@ -459,9 +465,11 @@ struct FatASM
 	
 	
 	setter TotalFuncInputs (|int|)
-		.Inputs[8] = value
+		.prms[4] = value
 	function TotalFuncInputs (|int|)
-		return .Inputs[8]
+		|| n = .prms[4]
+		target debug: if n > 8
+		return n
 	
 	function PrmCollectCounterPart (|FastString| fs)
 		opt norefcounts
@@ -723,7 +731,8 @@ struct FatASM
 		|| i = 0
 		|| n = –count .Inputs
 		if self.isfunc
-			n = .prms[4] min 8
+			n = .totalfuncinputs
+			if n > 8 // what?
 		while (i < n)
 			yield inputs[i++].fat
 
