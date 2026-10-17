@@ -2,6 +2,6 @@
 
 main
 	if 1
-		"1234"
+		print "Success"
 	for i in 5
-		printline "abc" + (i + 1)
+		check ("abc" + (i + 1) == "abc" + (i + 1).render) ("failed string test")

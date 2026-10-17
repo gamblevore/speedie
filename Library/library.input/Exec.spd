@@ -94,12 +94,13 @@ extend string
 		cpp_wrapper JB_Str_Execute
 		stateful
 
-	function SilentExecute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
+	inline SilentExecute (|[string]?| Args = nil,  |faststring?| Out = nil, |faststring?| Errs = nil, |date| timeout=0,  |ExitCode|)
 		return .execute(args, out, errs, ProcessMode.Silence, timeout)
 
-	function ExecuteStr (|[string]| Args=nil, |string|)
+	function ExecuteStr (|[string]| Args=nil, |faststring?| Errs = nil, |ProcessMode| Mode=ProcessMode.StdOutPassThru, |date| timeout=0, |stringthatwasreadsafely|)
+		rz = string.error
 		|| fs = faststring()
-		if .execute(args, fs).Successful
+		if .execute(args, fs, errs, mode, timeout).Successful
 			rz = fs
 
 //	function System (|int|)
