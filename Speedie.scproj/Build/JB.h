@@ -805,7 +805,7 @@ struct Assembler {
 	byte StackSize;
 	InlineState InlineState[8];
 	SCFunction* Root_Fn;
-	Message* Declarations[32];
+	SourceLocation Declarations[32];
 	u16 DelayedNops[32];
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
@@ -2966,8 +2966,6 @@ bool SC_FB__AppOptions_crash(JB_String* Name, JB_String* Value, FastString* Purp
 
 bool SC_FB__AppOptions_d(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppOptions_debug(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 bool SC_FB__AppOptions_directtest(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_dosign(JB_String* Name, JB_String* Value, FastString* Purpose);
@@ -3308,8 +3306,6 @@ void SC_PackMaker__BakeClasses(FastString* J);
 
 void SC_PackMaker__BakeDebug(FastString* J);
 
-bool SC_PackMaker__BakeOneFunc(FastString* J, FastString* Bmr, FastString* Dump, SCFunction* Fn);
-
 void SC_PackMaker__BakePackToDisk();
 
 void SC_PackMaker__BakeStrings(FastString* J);
@@ -3341,6 +3337,8 @@ void SC_PackMaker__OrderLibGlobs();
 void SC_PackMaker__PackClasses(FastString* J, int LibOrPack);
 
 void SC_PackMaker__PackIDFuncs(Array* List);
+
+bool SC_PackMaker__TryBakeOneFunc(FastString* J, FastString* Bmr, FastString* Dump, SCFunction* Fn);
 
 bool SC_PackMaker__UseMain(JB_String* Name, int Id);
 
@@ -4821,7 +4819,7 @@ bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
 
 ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
 
-ASMReg SC_Reg_Temp(ASMReg Self, ASMReg Other);
+ASMReg SC_Reg_Tempness(ASMReg Self, ASMReg Other);
 
 ASMReg SC_Reg_TryDestRegSet(ASMReg Self, ASMReg Dest);
 
@@ -5910,8 +5908,6 @@ int SC_FAT_GuessSize(FatASM* Self);
 
 ASM* SC_FAT_Halt_Encoder(FatASM* Self, ASM* Curr, ASM* After);
 
-uint SC_FAT_ID(FatASM* Self);
-
 void SC_FAT_Incr(FatASM* Self);
 
 uint SC_FAT_Index(FatASM* Self);
@@ -6363,6 +6359,8 @@ void SC_Pac_ExitBranch(Assembler* Self, uint /*u16*/ Old);
 
 void SC_Pac_FailInline(Assembler* Self);
 
+FatASM* SC_Pac_Fat(Assembler* Self, uint I);
+
 void SC_Pac_FattenParam(Assembler* Self, SCFunction* Fn, int I, SCDecl* A);
 
 void SC_Pac_FattenZero(Assembler* Self, SCFunction* Fn);
@@ -6374,6 +6372,8 @@ void SC_Pac_FillDebugInfo(Assembler* Self);
 void SC_Pac_FillOneTrinParam(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* S, int I, int MaxParam);
 
 Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
+
+FatASM* SC_Pac_FindRegOutput(Assembler* Self, FatASM* Fat, int Reg, int A);
 
 void SC_Pac_FinishASM(Assembler* Self);
 
@@ -6508,6 +6508,8 @@ ASMReg SC_Pac_More(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg 
 ASMReg SC_Pac_MoreEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 FatASM* SC_Pac_MUL_(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, ASMReg Add, Message* Exp);
+
+FatASM* SC_Pac_MultiNop(Assembler* Self, FatASM* Fat, int Reg);
 
 ASMReg SC_Pac_Multiply(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -7755,6 +7757,8 @@ JB_String* SC_Str_ArgsMatchError(JB_String* Self, bool TypeCast);
 
 JB_String* JB_Str_ArgValue(JB_String* Self);
 
+Array* SC_Str_BatchSpds(JB_String* Self);
+
 JB_String* JB_Str_Before(JB_String* Self, JB_String* S);
 
 JB_String* JB_Str_BeforeLastByte(JB_String* Self, uint /*byte*/ B, int Fudge);
@@ -7786,6 +7790,8 @@ JB_String* JB_Str_Escape(JB_String* Self);
 JB_String* JB_Str_EscapeChr(JB_String* Self);
 
 bool JB_Str_EscapeTest(JB_String* Self);
+
+JB_String* JB_Str_ExecuteStr(JB_String* Self, Array* Args, FastString* Errs, uint /*ProcessMode*/ Mode, Date Timeout);
 
 JB_String* JB_Str_Ext(JB_String* Self);
 
@@ -8127,9 +8133,9 @@ void JB_bin_AddRow(FastString* Self, Syntax Type, JB_String* Row, JB_String* Val
 
 bool SC_bin_BakeASMSub(FastString* Self, SCFunction* Fn, int T);
 
-bool SC_bin_BakeFunc(FastString* Self, SCFunction* Fn);
-
 void SC_bin_BakeFuncName(FastString* Self, SCFunction* Fn);
+
+bool SC_bin_BakeOneFunc(FastString* Self, SCFunction* Fn);
 
 void SC_bin_Cakeify(FastString* Self, SCFunction* Fn);
 
@@ -10222,6 +10228,8 @@ void JB_File_Fail(JB_File* Self, JB_String* Error);
 void JB_File_SyntaxProblem(JB_File* Self, JB_String* Error);
 
 bool SC_File_TestBatch(JB_File* Self);
+
+bool SC_File_TestCake(JB_File* Self);
 
 bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
 
