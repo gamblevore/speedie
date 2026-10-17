@@ -40,21 +40,20 @@ struct FatASM
 		return ._op
 	
 	setter SetOp (|byte| value)
-//		.info = nil
-//		.jumpprm = nil
-//		for i in –count .inputs
-//			.Inputs[i] = nil
-//		if .IsFunc
-//			._Const = nil // extended inputs
-//		._op = value
-		|| m = .SrcMap
-		|| k = ._Const		// leave msg/srcmap/_const. Other things may need them still.
-		|| b = .BasicBlock
-		self[0] = nil
-		.srcmap = m
-		.Const = k
-		._op = value
-		.BasicBlock = b
+// leave msg/srcmap/_const/PrevOutput. Other things may need them still.
+		for i in –count .prms
+			.Prms[i] = nil
+		.RefCount = nil
+		.Info = nil
+//		for i in –count .PrevOutput
+//			.PrevOutput[i] = nil
+		.ASMIndex = nil
+		.BreakInfo = nil
+		.Unused = nil
+		._Op = value
+		.JumpPrm = nil
+		for i in –count .Inputs
+			.Inputs[i] = nil
 	
 	setter _op (|byte|)
 		._op = value
