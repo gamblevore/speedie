@@ -41,8 +41,8 @@ JB_String* JB_Str__Freeable(uint8* p, int n) {
 }
 
 
-void JB_TooLargeAlloc(int64 N, const char* S) {
-	JB_ReportMemoryError("Jeebox: Oversized alloc requested: ", N, S); 
+bool JB_TooLargeAlloc (int64 N, const char* S) {
+	return JB_ReportMemoryError("Jeebox: Oversized alloc requested: ", N, S); 
 }
 
 

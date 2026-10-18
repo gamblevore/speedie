@@ -74,15 +74,13 @@ static bool GrowToLength_ (Array* self, int N, bool Extra) {
 		return true;
 	}
 	
-	if (N <= kArrayLengthMax) {
-		if (ReAlloc_(self, N+((N*Extra)>>1))) {
-			self->Length = N;
-			return true;
-		}
-    } else {
-        JB_TooLargeAlloc(N, "array allocation");
-    }
-    return false;
+	if_rare (N > kArrayLengthMax)
+        return JB_TooLargeAlloc(N, "array allocation");
+	if_rare (!ReAlloc_(self, N+((N*Extra)>>1)))
+		return false;
+
+	self->Length = N;
+	return true;
 }
 
 
@@ -326,7 +324,7 @@ JB_Object* JB_Array_Last( Array* self, int Pos ) {
     if (self) {
 		int N = self->Length;
 		Pos = N - (Pos+1);
-		if (Pos < N)
+		if ((uint)Pos < (uint)N)
 			return self->_Ptr[ Pos ];
     }
     return 0;

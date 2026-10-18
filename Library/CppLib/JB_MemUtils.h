@@ -58,10 +58,10 @@ struct JB_Object;
 extern int OutOfMemoryHappenedAlready;
 bool JB_OutOfMemoryOccurred();
 u64 JB_TotalMemoryCount();
-void JB_TooLargeAlloc(int64 N, const char* S);
+bool JB_TooLargeAlloc(int64 N, const char* S);
 void JB_OutOfMainMemory(int64 N);
 void JB_OutOfUserMemory(int64 N);
-void JB_ReportMemoryError(const char* A, int64 N, const char* B);
+bool JB_ReportMemoryError(const char* A, int64 N, const char* B);
 uint8* JB_AllocateString (const void* Arr, int N);
 void JB_FreeString(const void* Arr);
 

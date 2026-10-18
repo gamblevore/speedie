@@ -151,11 +151,11 @@ void JB_OutOfUserMemory(int64 N) {
 		JB_ReportMemoryError("Jeebox: Failed to allocate ", N, nil); 
 } 
 
-void JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
+bool JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
     static uint8 ReportCount = 0;
-    require0 (ReportCount < 10);
+    require (ReportCount < 10);
 	FastString* FS = JB_FS__FastNew(0);
-	require0 (FS);
+	require (FS);
 	ReportCount++;
 	JB_FS_AppendCString(FS, A);
 	if (N) {
@@ -167,6 +167,7 @@ void JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
 		JB_FS_AppendCString(FS, operation);
 	}
 	JB_Str_Fail(JB_FS_GetResult(FS));
+	return false;
 }
 
 }

@@ -54,8 +54,7 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
     }
 
     if (Length > kStrLengthMax) {
-        JB_TooLargeAlloc(Length, "strings");
-        return 0;
+        return JB_TooLargeAlloc(Length, "strings");
     }
     
     auto Result = JB_AllocateString( self->Addr, Length+1 );

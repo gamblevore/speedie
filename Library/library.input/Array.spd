@@ -88,6 +88,7 @@ class Array
 		cpp_wrapper JB_Array_Remove
 
 	function FastRemove (|int| Pos)
+		description "Unordered remove of an item. Moves the last item into it's place. A bit like playing Jenga."
 		opt norefcounts
 		|| p = .pop
 			self[pos] = P
