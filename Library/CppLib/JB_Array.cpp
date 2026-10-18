@@ -36,7 +36,7 @@
 
 extern "C" {
 void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
-	int N = JB_Array_Size(self);
+	int N = JB_Array_Length(self);
 	require0 (N >= 2);
 
 	#if __VM__
@@ -181,7 +181,7 @@ void JB_Array_Shrink (Array* self) {
 	}
 }
 
-void JB_Array_SizeSet( Array* self, int NewLength ) {
+void JB_Array_LengthSet( Array* self, int NewLength ) {
     int Length = self->Length;	
     if (NewLength >= Length)
 		return;
@@ -196,7 +196,7 @@ JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 		JB_FS_AppendCString(fs, "nil");
 	} else {
 		JB_FS_AppendByte(fs, '[');
-		int n = JB_Array_Size(self);
+		int n = JB_Array_Length(self);
 		for_(n) {
 			JB_Object* obj = JB_Array_Value(self, i);
 			if (i)
@@ -240,7 +240,7 @@ void JB_Array_Destructor( Array* self ) {
 }
 
 
-int JB_Array_Size( Array* self ) {
+int JB_Array_Length( Array* self ) {
     if (self)
         return (int)(self->Length);
     return 0;
@@ -271,7 +271,7 @@ Array* JB_Array_Copy(Array* self) {
 
 
 void JB_Array_Swap (Array* self, uint i, uint j) {
-	uint n = JB_Array_Size(self);
+	uint n = JB_Array_Length(self);
 	if (i < n and j < n) {
 		std::swap(self->_Ptr[i], self->_Ptr[j]);
 	}
@@ -290,7 +290,7 @@ Array* JB_Array_Constructor0 ( Array* self ) {
 
 int JB_Array_Wipe (Array* self) {
     if (self)
-		JB_Array_SizeSet(self, 0);
+		JB_Array_LengthSet(self, 0);
     return 0;
 }
 
@@ -340,7 +340,7 @@ void JB_FillInts(int* Start, int N, int Value) {
 
 #ifndef AS_LIBRARY
 void JB_Array_Shuffle( Array* self ) {
-	int n = JB_Array_Size(self);
+	int n = JB_Array_Length(self);
 	JB_Object** Array = self->_Ptr;
 	uint64 Hash = ~1234567;
 	self->Marker = 0;

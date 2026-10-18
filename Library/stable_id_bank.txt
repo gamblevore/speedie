@@ -700,7 +700,6 @@ JB_App__ArgValue
 JB_App__Args
 JB_App__ArgsArray
 JB_App__BackTrace
-JB_App__Beep
 JB_App__CWDSet
 JB_App__CallPath
 JB_App__Conf
@@ -748,6 +747,8 @@ JB_Array_Find
 JB_Array_GlobExpand
 JB_Array_Insert
 JB_Array_Last
+JB_Array_Length
+JB_Array_LengthSet
 JB_Array_Next
 JB_Array_Now
 JB_Array_OperatorPlus
@@ -758,8 +759,6 @@ JB_Array_Reverse
 JB_Array_SetAt
 JB_Array_Shrink
 JB_Array_Shuffle
-JB_Array_Size
-JB_Array_SizeSet
 JB_Array_Sort
 JB_Array_Swap
 JB_Array_Value
@@ -1456,7 +1455,6 @@ JB_Str_Reveal
 JB_Str_Reverse
 JB_Str_Rotate
 JB_Str_SetExt
-JB_Str_SilentExecute
 JB_Str_Sort
 JB_Str_SpacesToTabs
 JB_Str_Split

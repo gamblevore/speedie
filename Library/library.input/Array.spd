@@ -76,7 +76,7 @@ class Array
 	
 	function Length (|int|)
 		nil checker
-		cpp_wrapper JB_Array_Size
+		cpp_wrapper JB_Array_Length
 	
 	function Reverse
 		cpp_wrapper JB_Array_Reverse
@@ -107,7 +107,7 @@ class Array
 		cpp_wrapper  JB_Array_Shrink
 	
 	function Length (assigns:|int|)
-		cpp_wrapper JB_Array_SizeSet
+		cpp_wrapper JB_Array_LengthSet
 
 	function Size (assigns:|int|)
 		cpp_part wtfwtfwf

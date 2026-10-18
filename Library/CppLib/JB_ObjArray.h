@@ -27,13 +27,13 @@ void JB_Array_Reverse( Array* self );
 JB_String* JB_Array_Render(Array* self, FastString* fs);
 void JB_Array_Shuffle( Array* self );
 void JB_Array_Shrink (Array* self);
-void JB_Array_SizeSet( Array* self, int NewSize );
+void JB_Array_LengthSet( Array* self, int NewSize );
 bool JB_Array_Append( Array* self, JB_Object* Value );
 bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value );
 bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count );
 int JB_Array_Find (Array* Self, JB_Object* F);
 void JB_Array_Destructor( Array* self );
-int JB_Array_Size( Array* self );
+int JB_Array_Length( Array* self );
 Array* JB_Array_Copy(Array* self);
 void JB_Array_Swap(Array* self, uint i, uint j);
 

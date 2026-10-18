@@ -145,7 +145,7 @@ void JB_Flow__Report (u8* Addr, int Length);
 
 
 const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
-	int N = JB_Array_Size(R);
+	int N = JB_Array_Length(R);
 	int Strs = JB_Str_Length(self) + 1;
 
 	for_(N) {
