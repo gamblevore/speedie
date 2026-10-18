@@ -680,8 +680,8 @@ struct FatASM {
 	uint SrcMap;
 	u16 PrevOutput[2];
 	u16 ASMIndex;
-	byte BreakInfo;
 	byte Unused;
+	byte BreakInfo;
 	byte _Op;
 	byte JumpPrm;
 	u16 Inputs[5];
@@ -4392,6 +4392,8 @@ float JB_f_UnTan(float Self, float Y);
 // int
 int JB_int_AlignUp(int Self, int To);
 
+void SC_int_FuncFill(int Self, ASMReg* Regs, u16* Func_inputs);
+
 bool SC_int_IsNormalMatch(int Self);
 
 bool JB_int_IsPow2(int Self);
@@ -4488,8 +4490,6 @@ uint JB_uint_LowestBit(uint Self);
 bool JB_uint_OperatorIsa(uint Self, uint N);
 
 uint JB_uint_OperatorMax(uint Self, uint Other);
-
-uint JB_uint_OperatorMin(uint Self, uint Other);
 
 
 
@@ -6373,7 +6373,9 @@ void SC_Pac_FillOneTrinParam(Assembler* Self, ASMReg* Collection, FatASM* Fat, M
 
 Ind SC_Pac_FillTheFat(Assembler* Self, ASMReg* Collection, FatASM* Fat, Message* Prms, int N);
 
-FatASM* SC_Pac_FindRegOutput(Assembler* Self, FatASM* Fat, int Reg, int A);
+FatASM* SC_Pac_FindOutputWithFATIntInt(Assembler* Self, FatASM* Fat, int Reg, int A);
+
+FatASM* SC_Pac_FindOutputWithFATInt(Assembler* Self, FatASM* Fat, int Reg);
 
 void SC_Pac_FinishASM(Assembler* Self);
 
@@ -6509,8 +6511,6 @@ ASMReg SC_Pac_MoreEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 
 FatASM* SC_Pac_MUL_(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, ASMReg Add, Message* Exp);
 
-FatASM* SC_Pac_MultiNop(Assembler* Self, FatASM* Fat, int Reg);
-
 ASMReg SC_Pac_Multiply(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_MustInlineFailed(Assembler* Self, Message* Exp, bool DepthOK, SCFunction* Fn);
@@ -6623,7 +6623,7 @@ void SC_Pac_RevertFAT(Assembler* Self, bool Check, int TrapCount);
 
 void SC_Pac_Rewind(Assembler* Self, FatASM* Start, FatASM* After);
 
-void SC_Pac_RewindOutput(Assembler* Self, FatASM* F, int A);
+void SC_Pac_RewindOutput(Assembler* Self, FatASM* Fat, int A);
 
 void SC_Pac_Rework(Assembler* Self, SCFunction* Fn);
 
@@ -6711,7 +6711,7 @@ ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest, bool Force);
 
-ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A);
+ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A, int Add);
 
 ASMReg SC_Pac_xC2xB5GetPrms(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -9514,8 +9514,6 @@ SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 
 bool SC_Decl_ASMIsPack(SCDecl* Self);
 
-void SC_Decl_ASMRegSet(SCDecl* Self, ASMReg Value);
-
 DataTypeCode SC_Decl_ASMRegType(SCDecl* Self);
 
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc, bool WasHex);
@@ -9659,6 +9657,8 @@ SCFunction* SC_Decl_HasStructDestructor(SCDecl* Self);
 SCDecl* SC_Decl_HighestArrayContainMatch(SCDecl* Self, SCDecl* Other);
 
 SCDecl* SC_Decl_HighestMatch(SCDecl* Self, SCDecl* Other);
+
+void SC_Decl_InlineASMRegSet(SCDecl* Self, ASMReg Value);
 
 bool SC_Decl_IntsOnly(SCDecl* Self, Message* Exp);
 
@@ -10888,6 +10888,8 @@ void SC_Func_SetBlindCasts(SCFunction* Self, SCNode* Name_space);
 
 bool SC_Func_ShouldBake(SCFunction* Self);
 
+bool SC_Func_SingleASMCall(SCFunction* Self);
+
 Message* SC_Func_SourceArg(SCFunction* Self);
 
 void SC_Func_StatelessAccumulate(SCFunction* Self);
@@ -11338,7 +11340,7 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
-	return JB_Array_Size(Self) > 0;
+	return JB_Array_Length(Self) > 0;
 }
 
 inline JB_String* JB_CP_AsString(Codepoint Self) {
