@@ -12,8 +12,8 @@ struct FatASM
 	|uint|				SrcMap
 	|uint16[2]|			PrevOutput
 	|uint16|			ASMIndex
-	|byte|				BreakInfo
 	|byte|				Unused
+	|byte|				BreakInfo
 	|byte|				_Op
 	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
@@ -40,16 +40,12 @@ struct FatASM
 		return ._op
 	
 	setter SetOp (|byte| value)
-// leave msg/srcmap/_const/PrevOutput. Other things may need them still.
-		for i in –count .prms
-			.Prms[i] = nil
+// leave msg/srcmap/_const/PrevOutput/prms. Other things may need them still.
+// need prms[x].reg, for rewindoutput.
+
 		.RefCount = nil
 		.Info = nil
-//		for i in –count .PrevOutput
-//			.PrevOutput[i] = nil
-		.ASMIndex = nil
 		.BreakInfo = nil
-		.Unused = nil
 		._Op = value
 		.JumpPrm = nil
 		for i in –count .Inputs
@@ -255,11 +251,10 @@ struct FatASM
 	
 
 	function assembler.FindOutput (|&fatasm| fat, |int| reg, |int| a, |&fatasm|)
-		if fat.PrevOutput[a]
+		|| O = fat.PrevOutput[a]
 			|| p = fat.prms[a]
 			if reg == p.reg
-				|| i = p.fatindex
-					return .fat(i)
+				return .fat(o)
 
 	
 	function assembler.FindOutput (|fatasm| fat, |int| reg, |&fatasm|)

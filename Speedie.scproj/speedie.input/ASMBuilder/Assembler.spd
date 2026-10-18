@@ -533,7 +533,7 @@ struct Assembler
 		(dest isnt const)				// a dest is a dest. so it should never be a const, right?
 										// I mean it can be, but WE have to decide that, not the caller.
 		target debug
-			.Sanity
+//			.Sanity
 			.TempCheck(dest)
 			|| StackSize = ++.StackSize
 			|| µTrap = ++ASMTrapper

@@ -223,8 +223,6 @@ extend assembler
 		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
-		target debug
-			if fat.id == 66816
 		if NopMode isnt Rewind
 			if !fat.IsStateless						// Can't nop something that does something.
 				target debug						// but also, it shouldn't even happen
@@ -232,9 +230,6 @@ extend assembler
 				return
 		
 		if fat isa asm.noop
-			target debug
-				if fat isnt param and nopmode isnt rewind // hmmmm?
-					.sanity(fat)
 			return
 		
 		if !.IsWithinCurrInline(fat)
@@ -269,9 +264,8 @@ extend assembler
 				.Decr(f, NopMode, depth)
 
 
-		debugat 19773
+//		debugat 19708
 		.RewindOutput(fat, 0)
-		target debug: .sanity
 		.RewindOutput(fat, 1)
 		target debug: .sanity
 		

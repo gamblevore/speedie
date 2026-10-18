@@ -51,6 +51,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	.CloseInline(st)
 
 	if !.InlineDepth
+		target debug: .sanity
 		if r
 			for i in (32 min .DelayedNopCount)
 				|| f = .DelayedNops[i].fat!
