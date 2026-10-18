@@ -221,6 +221,13 @@ extend assembler
 			.BreakRequest = 0
 			return true
 		
+
+	function CanDelay (|fatasm| fat, |uint16|)
+		|| fatty = .Index(Fat)
+		for i in .DelayedNopCount
+			require .delayednops[i] != fatty
+		return fatty
+		
 		
 	function nop_sub (|FATASM| Fat, |FatNopMode| NopMode, |int| Depth=0)
 		if NopMode isnt Rewind
@@ -230,15 +237,14 @@ extend assembler
 				return
 		
 		if fat isa asm.noop
+			target debug
+				if fat isnt param and nopmode isnt rewind // hmmmm?
+					.sanity(fat)
 			return
 		
 		if !.IsWithinCurrInline(fat)
-			|| C = .DelayedNopCount
-			|| fatty = fat.index
-			for i in c
-				if .delayednops[i] == fatty
-					return
-			.DelayedNopCount = C + 1
+			|| fatty = .CanDelay(fat)$
+			|| C = .DelayedNopCount++
 			if C < –count .DelayedNops
 				.DelayedNops[C] = fatty
 			return
@@ -269,6 +275,7 @@ extend assembler
 		.RewindOutput(fat, 1)
 		target debug: .sanity
 		
+		.SaferNop(fat)
 		fat.setop = asm.noop
 		if HasBreak
 			fat.BreakInfo = breakpoint ||| Breakable
@@ -307,7 +314,7 @@ extend assembler
 		// I can't get this case to occur, but it could in theory.
 		// I guess this is just me being "extra safe".
 /		|| i = m.Log2
-		if .regs.Setters[i] == F.index
+		if .regs.Setters[i] == .index(F)
 			return false
 		return true
 	

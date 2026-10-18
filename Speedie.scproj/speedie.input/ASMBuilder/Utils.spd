@@ -31,7 +31,7 @@ function Assembler.RequestOp (|asm| op, |message?| exp, |sourcelocation| map=nil
 	if p < .End
 		.curr_ = p + 1
 		p[0] = nil
-		|| Info = p.index|uint64|<<48
+		|| Info = .index(p)|uint64|<<48
 		p.info = Info|asmreg|
 		p._op = op
 		p.SrcMap = map

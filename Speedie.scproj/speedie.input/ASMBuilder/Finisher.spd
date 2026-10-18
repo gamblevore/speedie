@@ -74,7 +74,7 @@ function assembler.FinishJump (|fatasm| Jump, |bool|)
 			return jump.JumpNegate(self, mid)
 	
 	if n > 0
-		jump.JumpTo(D)
+		jump.JumpTo(D, self)
 		return true
 
 

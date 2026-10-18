@@ -104,7 +104,7 @@ struct FatASM
 		return instruction.typelist[0]!.Sizes
 
 
-	function Vectorise (|asmreg| Dest, |asm| VOpp,  |asmreg|)
+	function Vectorise (|asmreg| Dest, |asm| VOpp, |asmreg|)
 		dest.FatIndex = .index
 		
 		.info = dest
@@ -331,30 +331,32 @@ struct FatASM
 	function JumpTo (|&fatasm|)
 		|| j = .JumpPrm
 			return self + 1 + .prms[j-1]|int|
-	
-	function SaferNoop (|int64|)
-		// should nop_sub use this?
-		|| o = asm.noop
-		if self is debugvarclose or debugvaropen
-			// i'm not sure this ever happens anymore?
-/			o = asm.mark
-			#!Remove this??
-		._op = o
+
+
+	function assembler.SaferNop (|&fatasm| fat, |int64|)
 		target debug
-			assembler.sh.sanity
+			|| ok = .CanDelay(fat)
+			if !ok
+		fat._op = asm.noop
+		target debug
+			.sanity
 	
-	function JumpTo (|&fatasm| Value, |int64|)
+	
+	function JumpTo (|&fatasm| Value, |assembler| sh,  |int64|)
+		// want to swap params... do later! // assembler.jumpto(value, fat)
+		// forces other things to have to change, thats the problem. spirals out and im tired rn.
+		
 		cpp_Part JumpToSet
-		|| j = .JumpPrm							#expect (value, errorreceiver.internalerror)
+		|| j = .JumpPrm								#expect (value, errorreceiver.internalerror)
 		
 		|| D = (value - self) - 1
-		check (D != -1)									(self, "Infinite loop")
+		check (D != -1)								(self, "Infinite loop")
 		
 		.prms[j-1] = D
 		if d and .CountActualJump(d)
 			return d
 		.JumpPrm = 0 // safer for jump calculations
-		return .SaferNoop
+		return sh.SaferNop(self)
 
 ////////////////////////////////////////////////////////////
 	function p0 (|ASMParam|): return .prms[0]

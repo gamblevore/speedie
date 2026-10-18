@@ -80,6 +80,9 @@ struct Assembler
 	function Fat (|uint| i, |&fatasm|)
 		return .FuncStart_ + i
 	
+	function Index (|&fatasm| f, |int|)
+		return f - .FuncStart_
+	
 	function Curr (|&fatasm|)
 		return .curr_
 
@@ -89,7 +92,7 @@ struct Assembler
 	function FnLength (|int|)
 		return .curr_ - .funcstart
 
-	function Index (|int|)
+	function TotalIndex (|int|)
 		return .curr_ - .TotalStart
 	
 	function FuncIndex (|int|)
@@ -124,7 +127,6 @@ struct Assembler
 			fake.refcount = 1
 		  else
 			fake.refcount = 1000
-		  
 			
 		|| Reg	= a.µtype|asmreg|.reg(i) as ASMReg.FatParam		
 		fake.Dest(0, reg, self)
@@ -137,8 +139,7 @@ struct Assembler
 		|| ty = typenil
 			src = ty.source!
 		
-		|| fake = src.knst
-		fake._op = asm.noop
+		|| fake = src.noop // why not just do src.noop?
 		target debug
 			fake.refcount = 1
 		  else
@@ -664,7 +665,7 @@ struct Assembler
 		.InlineDepthLimit = 3
 		.BasicBlock = 1							// good to start these at 1.
 		.Guard
-		fn.µstart = .Index
+		fn.µstart = .totalIndex
 		.VDecls = 1								// set after .FuncStart
 		
 		.AddFuncParams(fn)

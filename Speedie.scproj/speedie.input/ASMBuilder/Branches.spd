@@ -50,7 +50,7 @@ function IfSub (fn_asm) // function If (fn_asm)
 	b.JumpTo(.curr, fatrange.kEmptyRemove)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	if afterfirst
-		AfterFirst.JumpTo(.curr)
+		AfterFirst.JumpTo(.curr, self)
 	.PhiMergeDeeper(exp, Phi)
 
 
@@ -63,9 +63,9 @@ function LoopFill (|fatasm| C, |fatasm| S, |fatasm| A)
 		if (op == asm.jump) and k >= kContinue
 			C._Const = 0
 			if k == kContinue				// continue
-				C.JumpTo(S)
+				C.JumpTo(S, self)
 			  else							// exit
-				C.JumpTo(A)
+				C.JumpTo(A, self)
 		C++
 
 
@@ -84,7 +84,7 @@ function MainBrancher (fn_asm)
 		  else
 			rz = .IfSub(exp, nil)
 		if .curr > StartOfBranch
-			rz.FatIndex = StartOfBranch.index
+			rz.FatIndex = .index(StartOfBranch)
 
 	.ExitBranch(old)
 	.PhiFix(StartOfBranch) // they were created at a point that should have been here...	
@@ -124,14 +124,14 @@ function WhileSub (|message| exp,   |asmreg|)
 	.PhiMiddle(phi)
 	if Known.knowntrue
 		.Nop(InitialJump)	
-		exp.JUMP.JumpTo(initialjump+1)
+		exp.JUMP.JumpTo(initialjump+1, self)
 		loop_test.after++
 	  else
-		InitialJump.JumpTo(loop_test.start)
+		InitialJump.JumpTo(loop_test.start, self)
 		loop_test.JumpTo(InitialJump+1, 0)
 		if loop_Test.length == 1									// loop opt!
 			InitialJump.CopyJump(loop_test.Start)
-			InitialJump.JumpTo(loop_test.After)
+			InitialJump.JumpTo(loop_test.After, self)
 			InitialJump.JumpNegate
 		returns = nil
 
@@ -217,7 +217,7 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	Branch.jumpto(.curr, 0)
 	|| mB = .µInto(B, dest)	
 	
-	Exit.jumpto(.curr)
+	Exit.jumpto(.curr, self)
 	
 	|| FatPhi = exp.phi(dest, ma, mb)
 	FatPhi.prms[3] = 1 // liftup in phifix
@@ -407,7 +407,7 @@ function BoolAndOrValue (|message| A, |message| B, |ASMReg| Dest, |opmode| Opp, 
 		target debug
 			if !first.IsBool or !Second.IsBool
 		
-		JUMP.JumpTo(.curr)
+		JUMP.JumpTo(.curr, self)
 		second = second.BoolAnswerMaybeBugged
 	.ExitBranch(old)
 	return second
@@ -491,7 +491,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		|| fake = A.noop
 		fake.const = 1
 		(first is CondAnswer)
-		first.fatindex = fake.index
+		first.fatindex = .index(fake)
 		return first.BoolAnswerOK						// only way around this. Cos we got asmreg(0)
 
 	|fatrange| Br2
@@ -640,7 +640,7 @@ Struct FatRange
 
 function fatasm.JumpFix (|&fatasm| curr)
 	isnt CondAnswer
-	.JumpTo(curr)									// shouldn't (s isnt CondAnswer) go inside .jumpto?
+	.JumpTo(curr, assembler.sh)									// shouldn't (s isnt CondAnswer) go inside .jumpto?
 	
 
 function FatRange.JumpTo (|&FatAsm| curr, |int| Allowed=FatRange.kNeverEmpty)

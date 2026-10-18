@@ -42,7 +42,7 @@ extend Assembler
 			return .TextConst(list, m)
 		
 		|| A = .Requestop(op.opcode, m)
-		m.RangeLength = a.Index // each message now knows its fat thingy.
+		m.RangeLength = .Index(a) // each message now knows its fat thingy.
 		|| pos = 0
 		for p in list
 			if p != @name
@@ -104,7 +104,7 @@ extend Assembler
 	function AddLabel (|message| ch)
 		opt norefcounts
 		|| d = textassembler.labels init dictionary()
-		d.valuelower(ch.name) = .curr.index
+		d.valuelower(ch.name) = .index(.curr)
 
 
 	function TextFuncSub (|message| m)

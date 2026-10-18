@@ -30,7 +30,7 @@ function assembler.PhiStart (|BranchPhiTracker|)
 // for now... just rely on the fact that our regfile has been cleared of the other branch
 
 	rz.Start = .regs
-	|| i = .curr.index
+	|| i = .index(.curr)
 	rz.StartIndex = i
 	rz.MiddleIndex = i
 
@@ -46,7 +46,7 @@ function assembler.PhiFix (|&fatasm| Start)
 
 function assembler.PhiMiddle (|BranchPhiTracker| T)
 	t.Middle = .regs
-	T.MiddleIndex = .curr.index
+	T.MiddleIndex = .index(.curr)
 	.regs = T.Start
 
 
@@ -112,7 +112,7 @@ function assembler.PhiMergeSub (|message| Exp, |&RegFile| A, |&RegFile| B, |uint
 			if !f1.phiAlready(I2) and !f2.phiAlready(i1)
 				|| r = f1.info
 				(r isnt const)
-				|| phi = exp.phi(r, asmreg.newphi(reg, f1.index), asmreg.newphi(reg, f2.index))
+				|| phi = exp.phi(r, asmreg.newphi(reg, .index(f1)), asmreg.newphi(reg, .index(f2)))
 				phi.prms[3] = Liftup
 
 
