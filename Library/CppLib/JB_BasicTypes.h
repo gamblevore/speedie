@@ -93,16 +93,16 @@ typedef int64					Date;
 #define __PLATFORM_SPD__ 1
 
 #if defined(__APPLE__) && defined(__MACH__)
-	#pragma message("Plat: OSX")
+//	#pragma message("Plat: OSX")
 	#define __PLATFORM_CURR__ __PLATFORM_OSX__
 #elif __unix__
-	#pragma message("Plat: Linux")
+//	#pragma message("Plat: Linux")
 	#define __PLATFORM_CURR__ __PLATFORM_LINUX__
 	#ifndef __linux__ 
 		#define __linux__
 	#endif
 #elif __WIN32__ || _WIN64
-	#pragma message("Plat: Windows")
+//	#pragma message("Plat: Windows")
 	#define __PLATFORM_CURR__ __PLATFORM_WIN__
 	#define __WIN32__
 #endif
