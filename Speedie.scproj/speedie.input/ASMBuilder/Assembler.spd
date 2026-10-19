@@ -311,9 +311,9 @@ struct Assembler
 			for i in 32
 				|| ii = 1<<i
 				if r & ii
-					print "t"
+					print string.byte('t')
 				if D & ii
-					print "r"
+					print string.byte('r')
 				if (D|||r)&ii
 					printline i
 			error (.Root_Fn.sourcearg, "Decl and temp clash.")	// entirely full

@@ -8,7 +8,7 @@ module Options
 	||		output_path				= ""
 	||		SingleFileInput			= ""
 	||		Variant					= ""
-	||		Arch					= ""		// TargetArchitecture
+//	||		Arch					= ""		// TargetArchitecture
 	||		SingleCppOutput			= true
 	||		NilTestAllocNeverFails	= true
 	||		Beep					= false
@@ -242,12 +242,12 @@ module Feedback
 		
 		+'x' (AppTransCompile)
 		
-		+'arch'
-			|| str = "intel/arm" // don't we just want a bitfield?
-			explain(Purpose, "Set to "+str)
-			for v in str / '/'
-				if v~=value
-					options.arch = v
+//		+'arch'
+//			|| str = "intel/arm" // don't we just want a bitfield?
+//			explain(Purpose, "Set to "+str)
+//			for v in str / '/'
+//				if v~=value
+//					options.arch = v
 				
 		+'gcc'
 			explain(Purpose, "Replace gcc with something else")$

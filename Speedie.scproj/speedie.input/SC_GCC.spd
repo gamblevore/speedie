@@ -244,12 +244,12 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math -fno-math-errno -fwrapv")
 	
-	if options.arch ~= "intel"
-		rz.appendwords( "-arch x86_64" )
+	if Platform.CPU_Intel
+//		rz.appendwords( "-arch x86_64" ) // its march on linux anyway
 		if options.optimise >= 3 // sigh
 			rz.AppendWords( "-march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2" )
-	  elseif platform.CPU_ARM
-		rz.appendwords( "-arch arm64" )
+//	  elseif platform.CPU_ARM
+//		rz.appendwords( "-arch arm64" ) // its march on linux anyway
 
 	if platform.OSX
 		rz.appendwords( "-mmacosx-version-min=11.0" )
@@ -271,7 +271,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 		if Options.SelfReplacement or opt >= 1
 			rz.AppendWords( " -Os " )
 		if (opt >= 1)
-			if options.arch ~= "intel"
+			if Platform.CPU_Intel
 				rz.AppendWords( "-mtune=native" )
 			if (opt >= 2)
 				rz.AppendWords( " -flto " )
@@ -586,8 +586,8 @@ function File.TestSpeedie (|string| v, |bool|)
 	|| cmd_args = ["--self",  "--nocolor",  Variant]
 	//if v == "3"
 	//	cmd_args <~ "--final" // i guess we dont do this anymore
-	if Options.arch
-		cmd_args <~ "--arch="+options.arch
+//	if Options.arch
+//		cmd_args <~ "--arch="+options.arch // its march on linux anyway
 	if options.PrintCompileString
 		cmd_args <~ "--noisy"
 		printline .path
