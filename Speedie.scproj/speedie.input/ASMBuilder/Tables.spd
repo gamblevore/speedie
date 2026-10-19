@@ -283,7 +283,7 @@ function ConstConvert  (|assembler| self, |message| exp, |ASMReg| dest, |ASMReg|
 			K = (oof|int64| >> sh)			//
 
 	if srf._const == K // haha.
-		return srf.info
+		return srf.info.µtype(new)
 	
 	.NopTempConst(from)
 	return .NumToReg(exp, dest, K, new)
