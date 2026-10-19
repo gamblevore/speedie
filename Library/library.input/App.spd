@@ -298,7 +298,7 @@ function Say (|string| s, |bool| print=true,  |ExitCode|)
 	if print
 		printline s
 	target lin
-		return "/usr/bin/say-spd".execute([s])
+		return "/usr/bin/spd-say".execute([s])
 	  else
 		return "/usr/bin/say".execute([s])
 
