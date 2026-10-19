@@ -297,8 +297,12 @@ function Say (|string| s, |bool| print=true,  |ExitCode|)
 	// what if we don't want to wait. pass -1 for the timeout?
 	if print
 		printline s
-	return "/usr/bin/say".execute([s])
-	
+	target lin
+		return "/usr/bin/say-spd".execute([s])
+	  else
+		return "/usr/bin/say".execute([s])
+
+
 function AppleScript (|string| str, |ExitCode|)
 	return "/usr/bin/osascript".execute(["-e",str], nil)
 
