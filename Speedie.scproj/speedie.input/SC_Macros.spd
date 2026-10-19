@@ -183,6 +183,10 @@ function message.Tran_TargetSub
 		arg = upon[@arg, 1]							#require
 		
 		|| secondpart = arg.next
+		if !secondpart and upon!=self
+			secondpart = upon.next // oof.
+		
+		if secondpart
 			require secondpart.Expect(@tmp)
 		
 		if value.TargetTest
