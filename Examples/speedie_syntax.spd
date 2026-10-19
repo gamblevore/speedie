@@ -20,6 +20,7 @@ class Person
 
 
 main
+	printline file.prefs
 /	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
