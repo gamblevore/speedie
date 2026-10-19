@@ -148,7 +148,6 @@ function JBin.BakeOneFunc (|SCFunction| fn, |bool|)
 	if !Options.StripNames // never true if dd
 		.BakeFuncName(fn)
 
-	if fn == "InitAppCode_"
 	|| dd = assembler.DebugDecls
 		for a in fn.args
 			a.DumpDeclOpen(dd, 0, a.reg)
