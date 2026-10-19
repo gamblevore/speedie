@@ -3470,7 +3470,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026101917));
+	JB_FS_AppendInt32(_fsf0, (2026101920));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10291,7 +10291,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026101917));
+	JB_FS_AppendInt32(_fsf0, (2026101920));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -17004,7 +17004,7 @@ ASMReg SC_ASMType__ConstConvert(Assembler* Self, Message* Exp, ASMReg Dest, ASMR
 		}
 	}
 	if (Srf->_Const == K) {
-		return Srf->Info;
+		return SC_Reg_xC2xB5TypeSetWithTC(Srf->Info, New);
 	}
 	SC_Pac_NopTempConstWithReg(Self, From);
 	return SC_Pac_NumToReg(Self, Exp, Dest, K, New);
@@ -35551,8 +35551,6 @@ bool SC_bin_BakeOneFunc(FastString* Self, SCFunction* Fn) {
 	if (!SC__Options_StripNames) {
 		SC_bin_BakeFuncName(Self, Fn);
 	}
-	if (SC_SCObject_syntaxequals(Fn, JB_LUB[1537])) {
-	}
 	FastString* Dd = SC__Pac_DebugDecls;
 	if (Dd) {
 		{
@@ -44177,6 +44175,9 @@ void SC_Msg_Tran_TargetSub(Message* Self) {
 			return;
 		}
 		Message* Secondpart = ((Message*)JB_Ring_NextSib(Arg));
+		if ((!Secondpart) and (Upon != Self)) {
+			Secondpart = ((Message*)JB_Ring_NextSib(Upon));
+		}
 		if (Secondpart) {
 			if (!JB_Msg_Expect(Secondpart, kJB_SyxTmp, nil)) {
 				return;
