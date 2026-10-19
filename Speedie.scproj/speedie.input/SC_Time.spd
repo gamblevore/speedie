@@ -16,12 +16,14 @@ function compiler.PrintCompileTime (|date| durr)
 	fs.appendfloat(avg, 1)
 	fs <~ ")"
 	fs.Normal  "Globals"
-	fs <~ "lib "
+	if Options.ModeCake
+		fs <~ "lib "
 	
 	packmaker.LibGlobSize.strsize(fs)
-	|| G = packmaker.PackGlobs
-		fs <~ ", app "
-		packmaker.PackGlobSize.StrSize(fs)
+	if Options.ModeCake
+		|| G = packmaker.PackGlobs
+			fs <~ ", app "
+			packmaker.PackGlobSize.StrSize(fs)
 	
 	|| vm_ops = VM_Builder.InstructionCount
 		fs.normal  "vm_ops",    fs <~ vm_ops
