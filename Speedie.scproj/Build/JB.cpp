@@ -2230,15 +2230,19 @@ void SC_Comp__PrintCompileTime(Date Durr) {
 	JB_FS_AppendFloat(Fs, Avg, 1, false);
 	JB_FS_AppendByte(Fs, ')');
 	SC_FS_Normal(Fs, JB_LUB[89]);
-	JB_FS_AppendString(Fs, JB_LUB[1673]);
-	JB_FreeIfDead(JB_int_RenderSize(SC__PackMaker_LibGlobSize, Fs));
-	Array* G = SC__PackMaker_PackGlobs;
-	JB_Incr(G);
-	if (JB_Array_SyntaxCast(G)) {
-		JB_FS_AppendString(Fs, JB_LUB[86]);
-		JB_FreeIfDead(JB_int_RenderSize(SC__PackMaker_PackGlobSize, Fs));
+	if (SC_Options__ModeCake()) {
+		JB_FS_AppendString(Fs, JB_LUB[1673]);
 	}
-	JB_Decr(G);
+	JB_FreeIfDead(JB_int_RenderSize(SC__PackMaker_LibGlobSize, Fs));
+	if (SC_Options__ModeCake()) {
+		Array* G = SC__PackMaker_PackGlobs;
+		JB_Incr(G);
+		if (JB_Array_SyntaxCast(G)) {
+			JB_FS_AppendString(Fs, JB_LUB[86]);
+			JB_FreeIfDead(JB_int_RenderSize(SC__PackMaker_PackGlobSize, Fs));
+		}
+		JB_Decr(G);
+	}
 	int Vm_ops = SC__VM_Builder_InstructionCount;
 	if (Vm_ops) {
 		SC_FS_Normal(Fs, JB_LUB[730]);
