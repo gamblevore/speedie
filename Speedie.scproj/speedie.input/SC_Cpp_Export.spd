@@ -1201,7 +1201,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			t <~ "("
 			|| ti = d.Type.TypeInfo
 			|| ty = ti.ByteCount
-			if ty < 4
+			if (ty < 4) and (ti isnt bool)
 				// byte consts don't work so well on linux... So this is a work around
 				// just stick to int/uint
 				if !ti.IsSigned
