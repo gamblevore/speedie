@@ -13,7 +13,7 @@ main {
 	app.Gen("osx", platform.OSX)
 	"Making Linux script"
 	app.Gen("linux", platform.lin)
-	"App Finished"
+	"Make Finished"
 }
 
 
@@ -38,21 +38,25 @@ if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
 fi
 `
 
-function UnMod (|string| Dir, |string|)
+// can't quote the path as one path ends with * to capture all files.
+function UnMod (|string| Dir, |string| indent="",  |string|)
 	return "chmod 775 $dir
-chown \$U $dir"
+$indent${}chown \$U $dir"
 
 	
 function compile_example (|string| name, |string|)
 	return "echo \"Compiling ${name}.cpp\"
-\$CXX -o Build/$name  $ExecFlags  ${name}.cpp
+$gcc -o Build/$name  $ExecFlags  ${name}.cpp
 ${unmod(`Build/`+name)}
 "
 
 function mkdir (|string| dir, |string|)
-	rz = "echo \"Creating dir $dir\"
-mkdir -p \"$dir\"
-${unmod(dir)}
+	rz = "
+if [ ! -f $dir ]; then
+    echo \"Creating dir $dir\"
+    mkdir -p \"$dir\"
+    ${unmod(dir, `    `)}
+fi
 "
 
 function link (|string| src, |string| dest, |string|)
@@ -74,6 +78,7 @@ ${unmod(dest)}
 |string|	SpdTerm
 |string|	CakeTerm
 |string|	LibPath
+|string|	gcc
 
 
 module Vars
@@ -85,6 +90,7 @@ module Vars
 		LinkLibFlags = ""
 		ext = "so"
 		PerryPreReqs = ""
+		gcc = "g++"
 		if plat ~= "osx"
 			shared = "dynamiclib"
 			ext = "dylib"
@@ -114,13 +120,11 @@ sudo apt install gedit
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 set -e
-# Override clang++ by exporting CXX.
-CXX=\"\${CXX:-clang++}\"
 cd ${CppLib}
 
 $GetUserName
 echo \"Compiling Speedie to $SpdTerm\"
-\$CXX -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+$gcc -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
 mv ${SpdTerm}tmp $SpdTerm
 ${unmod(SpdTerm)}
 
@@ -156,7 +160,7 @@ set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
 $SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
 echo \"Compiling $LibPath for user '\$U'\"
-\$CXX -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+$gcc -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 ${unmod(LibPath)}
 
 
@@ -238,8 +242,7 @@ function file.NeedExecute (|bool|)
 	// replaces all of cmake. Meaning I don't need to remember or understand it!
 	
 // TODO:
-	// Make this NOT alter the creator of /usr/local/include or /usr/local/bin
-	// at least if they already exist!
+	// * Allow run from any file path
 
 
 

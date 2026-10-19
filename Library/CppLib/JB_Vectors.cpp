@@ -84,7 +84,7 @@ __H__ vec4 JB_vec4_Log (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_log)
 		return __builtin_elementwise_log(x);
 	#else
-		return vf1(logf, x);
+		return vf1(log, x);
 	#endif
 }
 
@@ -108,7 +108,7 @@ __H__ vec4 JB_vec4_Unsin (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_asin)
 		return __builtin_elementwise_asin(x) * iTau;
 	#else
-		return vf1(asinf, x) * iTau;
+		return vf1(asin, x) * iTau;
 	#endif
 }
 
@@ -116,7 +116,7 @@ __H__ vec4 JB_vec4_Uncos (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_acos)
 		return __builtin_elementwise_acos(x) * iTau;
 	#else
-		return vf1(acosf, x) * iTau;
+		return vf1(acos, x) * iTau;
 	#endif
 }
 
@@ -124,7 +124,7 @@ __H__ vec4 JB_vec4_UnTan (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_atan2)
 		return __builtin_elementwise_atan2(x, y) * iTau;
 	#else
-		return vf2(atan2f, x, y) * iTau;
+		return vf2(atan2, x, y) * iTau;
 	#endif
 }
 
@@ -132,7 +132,7 @@ __H__ vec4 JB_vec4_Sin (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_sin)
 		return __builtin_elementwise_sin(x) * Tau;
 	#else
-		return vf1(sinf, x) * Tau;
+		return vf1(sin, x) * Tau;
 	#endif
 }
 
@@ -140,7 +140,7 @@ __H__ vec4 JB_vec4_Cos (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_cos)
 		return __builtin_elementwise_cos(x) * Tau;
 	#else
-		return vf1(cosf, x) * Tau;
+		return vf1(cos, x) * Tau;
 	#endif
 }
 
@@ -148,7 +148,7 @@ __H__ vec4 JB_vec4_Tan (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_tan)
 		return __builtin_elementwise_tan(x) * Tau;
 	#else
-		return vf1(tanf, x) * Tau;
+		return vf1(tan, x) * Tau;
 	#endif
 }
 
@@ -156,7 +156,7 @@ __H__ vec4 JB_vec4_Pow (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_pow)
 		return __builtin_elementwise_pow(x, y);
 	#else
-		return vf2(powf, x, y);
+		return vf2(pow, x, y);
 	#endif
 }
 
@@ -164,7 +164,7 @@ __H__ vec4 JB_vec4_Mod (vec4 x, vec4 y) {
 	#if __has_builtin(__builtin_elementwise_fmod)
 		return __builtin_elementwise_fmod(x, y);
 	#else
-		return vf2(fmodf, x, y);
+		return vf2(fmod, x, y);
 	#endif
 }
 
