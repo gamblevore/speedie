@@ -17,7 +17,6 @@ main {
 }
 
 
-|| Speedie = "/usr/local/speedie"
 || ExecFlags = ""
 
 
@@ -73,7 +72,8 @@ ${unmod(dest)}
 |string|	PerryPreReqs
 |string|	LibName
 |string|	LibFlags
-|file|		CppLib
+|string|	SpdLocal = file.speediedir
+|file|		CppLibLocal = (SpdLocal+"/Library/CppLib").file
 |string|	SpdSrc
 |string|	SpdTerm
 |string|	CakeTerm
@@ -83,7 +83,7 @@ ${unmod(dest)}
 
 module Vars
 	function InitVars (|string| plat)
-		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I \$Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 		// what about -D __VM__=1 ???
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
 		shared = "shared"
@@ -109,18 +109,24 @@ sudo apt install gedit
 		LibName  = "libjeebox.$ext" 
 		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
 		ExecFlags= "$CFlags -g -ljeebox"
-		CppLib   = "$Speedie/Library/CppLib".file
-		SpdSrc   = "$Speedie/Speedie.scproj/Build"
-		SpdTerm  = "$Speedie/Terminal/Speedie"
-		CakeTerm = "$Speedie/Terminal/Cake"
+		SpdSrc   = "\$Speedie/Speedie.scproj/Build"
+		SpdTerm  = "\$Speedie/Terminal/Speedie"
+		CakeTerm = "\$Speedie/Terminal/Cake"
 		LibPath  = "/usr/local/lib/$LibName"
 
 
 	function CreateScriptOut (|string| list, |string|)
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
+Speedie=\$(dirname \"$(realpath $0)\")
+Speedie=\$(dirname \"\$(realpath \$Speedie)\")
+echo \"Building to \$Speedie\"
+if [ \"\$Speedie\" = \"\" ] ; then
+	echo \"failed to find speedie path\"
+	exit 1
+fi
 set -e
-cd ${CppLib}
+cd \"\$Speedie/Library/CppLib\"
 
 $GetUserName
 echo \"Compiling Speedie to $SpdTerm\"
@@ -129,7 +135,7 @@ mv ${SpdTerm}tmp $SpdTerm
 ${unmod(SpdTerm)}
 
 
-cd $Speedie/jeebox.scproj/Examples
+cd \$Speedie/jeebox.scproj/Examples
 echo \"Creating directories\"
 ${mkdir(`Build`)}
 ${mkdir(`/usr/local/include/`)}
@@ -146,7 +152,7 @@ ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
 
 echo \"Making 🎂 Cake 🎂\"
-$SpdTerm $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
+$SpdTerm \$Speedie/Cake.scproj --output_path=\$Speedie/Terminal/Cake
 
 echo \"Symlinking 🎂\"
 ${link(CakeTerm, `/usr/local/bin/cake`)}
@@ -157,16 +163,16 @@ echo \"Compiling JeeboxLib\"
 
 
 set +e									# better to continue if libjeebox can't be compiled
-cd $Speedie/Library/CppLib				# allow source to be found!
-$SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
-${unmod(Speedie+`/jeebox.scproj/Cpp/*`)}
-${unmod(Speedie+`/jeebox.scproj/Build/*`)}
+cd \$Speedie/Library/CppLib				# allow source to be found!
+$SpdTerm \$Speedie/jeebox.scproj -x		# regenerate libjeebox source
+${unmod(`../../jeebox.scproj/Cpp/*`)}
+${unmod(`../../jeebox.scproj/Build/*`)}
 echo \"Compiling $LibPath for user '\$U'\"
-$gcc -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+$gcc -o $LibPath  $LibFlags  $list   \$Speedie/jeebox.scproj/Cpp/JB.cpp   \$Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 ${unmod(LibPath)}
 
 
-cd $Speedie/jeebox.scproj/Examples
+cd \$Speedie/jeebox.scproj/Examples
 ${compile_example(`jb`)}
 ${compile_example(`xml`)}
 ${compile_example(`test`)}
@@ -178,7 +184,7 @@ set -e
 
 echo \"Speedie Compiling Perry (Optional Extra)\"
 $PerryPreReqs
-$SpdTerm $Speedie/Perry.scproj
+$SpdTerm \$Speedie/Perry.scproj
 "
 
 
@@ -187,7 +193,7 @@ function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
 vars.initvars(plat)
 || tocompile = FastString()
 || Count = 2							//JB.cpp and JB_Globals.cpp
-for ch in CppLib!
+for ch in CppLibLocal!
 	if ch isa "cpp" or "S"
 		tocompile <~ ch
 		tocompile <~ ' '
@@ -199,10 +205,9 @@ for ch in CppLib!
 <(`    (((generating cpp files)))    `)>
 ////////////////////////////
 
-expect !(Speedie contains ' ') ("The path: '$speedie' contains spaces and can't be compiled.")
-.cwd = Speedie.child("jeebox.scproj").resolve
-|| ScriptOut = "$Speedie/Terminal/make$plat.sh".file
-|| PrepareCpp = "$Speedie/Terminal/PrepareSpeedie.sh".file
+.cwd = SpdLocal.child("jeebox.scproj").resolve
+|| ScriptOut = "$SpdLocal/Terminal/make$plat.sh".file
+|| PrepareCpp = "$SpdLocal/Terminal/PrepareSpeedie.sh".file
 
 
 PrepareCpp.writeall `#!/bin/bash
@@ -242,10 +247,6 @@ function file.NeedExecute (|bool|)
 
 	// This basically makes YOU replace cmake with your small program. This 205 lines of code
 	// replaces all of cmake. Meaning I don't need to remember or understand it!
-	
-// TODO:
-	// * Allow run from any file path
-
 
 
 
