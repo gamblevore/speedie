@@ -159,6 +159,8 @@ echo \"Compiling JeeboxLib\"
 set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
 $SpdTerm $Speedie/jeebox.scproj -x		# regenerate libjeebox source
+${unmod(Speedie+`/jeebox.scproj/Cpp/*`)}
+${unmod(Speedie+`/jeebox.scproj/Build/*`)}
 echo \"Compiling $LibPath for user '\$U'\"
 $gcc -o $LibPath  $LibFlags  $list   $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 ${unmod(LibPath)}
