@@ -1498,7 +1498,6 @@ extern Message* SC__Macros_TernQMark;
 extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
-extern JB_String* SC__Options_Arch;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 #define kSC__Options_cake ((int)2)
@@ -2941,8 +2940,6 @@ void SC_FastStringOpts__TryStringAppend(Message* S);
 
 // FB
 bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* Purpose);
-
-bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_b(JB_String* Name, JB_String* Value, FastString* Purpose);
 

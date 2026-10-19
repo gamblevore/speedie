@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2401];
+extern JB_StringC* JB_LUB[2394];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2983,37 +2983,6 @@ bool SC_FB__AppOptions_alive(JB_String* Name, JB_String* Value, FastString* Purp
 	return true;
 }
 
-bool SC_FB__AppOptions_arch(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	JB_String* Str = JB_LUB[1637];
-	JB_Incr(Str);
-	JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[1111], Str);
-	JB_Incr(_tmPf3);
-	SC_FB__Explain(Purpose, _tmPf3);
-	{
-		Array* _LoopSrcf2 = JB_Str_OperatorDivide(Str, '/');
-		JB_Incr(_LoopSrcf2);
-		int _if0 = 0;
-		while (true) {
-			JB_String* V = ((JB_String*)JB_Array_Value(_LoopSrcf2, _if0));
-			JB_Incr(V);
-			if (V == nil) {
-				JB_EarlyDecr(V);
-				break;
-			}
-			if (JB_Str_Equals(V, Value, true)) {
-				JB_SetRef(SC__Options_Arch, V);
-			}
-			JB_Decr(V);
-			(++_if0);
-		};
-		JB_Decr(_LoopSrcf2);
-		JB_Decr(_tmPf3);
-	}
-	;
-	JB_EarlyDecr(Str);
-	return false;
-}
-
 bool SC_FB__AppOptions_b(JB_String* Name, JB_String* Value, FastString* Purpose) {
 	if (!SC_FB__Explain(Purpose, JB_LUB[531])) {
 		return nil;
@@ -3603,7 +3572,6 @@ int SC_FB__Init_() {
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1368], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_keepallerrors)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1536], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_env)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1681], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppTransCompile))))));
-		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1388], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_arch)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1594], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_gcc)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[421], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_perry)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[2293], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_hideaway)))));
@@ -5990,7 +5958,6 @@ int SC_Options__Init_() {
 		JB_SetRef(SC__Options_output_path, JB_LUB[0]);
 		JB_SetRef(SC__Options_SingleFileInput, JB_LUB[0]);
 		JB_SetRef(SC__Options_Variant, JB_LUB[0]);
-		JB_SetRef(SC__Options_Arch, JB_LUB[0]);
 		SC__Options_SingleCppOutput = true;
 		SC__Options_NilTestAllocNeverFails = true;
 		SC__Options_InlineLib = true;
@@ -10129,14 +10096,10 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 		SC_Array_AppendWords(Rz, JB_LUB[143]);
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[336]);
-	if (JB_Str_Equals(SC__Options_Arch, JB_LUB[1636], true)) {
-		SC_Array_AppendWords(Rz, JB_LUB[1455]);
+	if (JB_Platform__CPU_Intel()) {
 		if (SC__Options_Optimise >= 3) {
 			SC_Array_AppendWords(Rz, JB_LUB[325]);
 		}
-	}
-	 else if (JB_Platform__CPU_ARM()) {
-		SC_Array_AppendWords(Rz, JB_LUB[1561]);
 	}
 	if (JB_Platform__OSX()) {
 		SC_Array_AppendWords(Rz, JB_LUB[1585]);
@@ -10162,7 +10125,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 			SC_Array_AppendWords(Rz, JB_LUB[139]);
 		}
 		if (Opt >= 1) {
-			if (JB_Str_Equals(SC__Options_Arch, JB_LUB[1636], true)) {
+			if (JB_Platform__CPU_Intel()) {
 				SC_Array_AppendWords(Rz, JB_LUB[340]);
 			}
 			if (Opt >= 2) {
@@ -26288,10 +26251,10 @@ ASMReg SC_Pac_TempMe(Assembler* Self, Message* Where, ASMReg T) {
 			while (I < 32) {
 				int Ii = 1 << I;
 				if (R & Ii) {
-					JB_Print(JB_LUB[2395]);
+					JB_Print(JB_Str__Byte('t'));
 				}
 				if (D & Ii) {
-					JB_Print(JB_LUB[1311]);
+					JB_Print(JB_Str__Byte('r'));
 				}
 				if ((D | R) & Ii) {
 					JB_Str_PrintLine(JB_int_RenderFS(I, nil));
@@ -26889,7 +26852,7 @@ JB_File* SC_Pac__ASMDump() {
 	if (F) {
 		return F;
 	}
-	JB_String* P = JB_Str_OperatorPlusWithInt64(JB_LUB[2396], JB_Date_Minutes(JB_Date_WithinDay(JB_Date__Now())));
+	JB_String* P = JB_Str_OperatorPlusWithInt64(JB_LUB[309], JB_Date_Minutes(JB_Date_WithinDay(JB_Date__Now())));
 	P = JB_Str_OperatorPlus(P, JB_LUB[377]);
 	F = JB_Str_AsFile(P);
 	JB_SetRef(SC_DebugLogFile, F);
@@ -31156,7 +31119,7 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[443], 67);
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[460], 68);
 	SC_Instruction__Add(JB_LUB[689], JB_LUB[2393], 69);
-	SC_Instruction__Add(JB_LUB[244], JB_LUB[2394], 70);
+	SC_Instruction__Add(JB_LUB[244], JB_LUB[1111], 70);
 	SC_Instruction__Add(JB_LUB[785], JB_LUB[697], 71);
 	SC_Instruction__Add(JB_LUB[775], JB_LUB[798], 72);
 	SC_Instruction__Add(JB_LUB[776], JB_LUB[803], 73);
@@ -51385,7 +51348,7 @@ bool SC_File_TestBatch(JB_File* Self) {
 
 bool SC_File_TestCake(JB_File* Self) {
 	uint Mode = kJB__PIDM_StdOutSilence + kJB__PIDM_StdErrCapture;
-	Array* List = SC_Str_BatchSpds(JB_LUB[2398]);
+	Array* List = SC_Str_BatchSpds(JB_LUB[1388]);
 	JB_Incr(List);
 	{
 		int _if0 = 0;
@@ -51399,12 +51362,12 @@ bool SC_File_TestCake(JB_File* Self) {
 			Array* Args = (JB_Array_Constructor0(nil));
 			JB_Incr(Args);
 			JB_Array_SyntaxAppend(Args, C);
-			JB_Array_SyntaxAppend(Args, JB_LUB[2399]);
+			JB_Array_SyntaxAppend(Args, JB_LUB[1455]);
 			JB_String* Str = JB_Str_ExecuteStr(Self, Args, nil, Mode, 0);
 			JB_Incr(Str);
 			JB_Decr(Args);
 			if ((!JB_Str_Equals(Str, JB_LUB[1299], false))) {
-				JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[2400], C);
+				JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[1561], C);
 				JB_Incr(_tmPf2);
 				JB_Str_Fail(_tmPf2);
 				JB_Decr(_tmPf2);
@@ -51415,7 +51378,7 @@ bool SC_File_TestCake(JB_File* Self) {
 		};
 	}
 	;
-	JB_String* _tmPf3 = JB_Str_OperatorPlusWithInt64(JB_LUB[2397], JB_Array_Length(List));
+	JB_String* _tmPf3 = JB_Str_OperatorPlusWithInt64(JB_LUB[1637], JB_Array_Length(List));
 	JB_Incr(_tmPf3);
 	JB_Decr(List);
 	JB_PrintLine(_tmPf3);
@@ -51449,53 +51412,47 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	JB_Array_SyntaxAppend(Cmd_args, JB_LUB[313]);
 	JB_Array_SyntaxAppend(Cmd_args, Variant);
 	JB_Decr(Variant);
-	if (JB_Str_Exists(SC__Options_Arch)) {
-		JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[309], SC__Options_Arch);
-		JB_Incr(_tmPf3);
-		JB_Array_SyntaxAppend(Cmd_args, _tmPf3);
-		JB_Decr(_tmPf3);
-	}
 	if (SC__Options_PrintCompileString) {
 		JB_Array_SyntaxAppend(Cmd_args, JB_LUB[315]);
-		JB_String* _tmPf4 = JB_File_Path(Self);
+		JB_String* _tmPf3 = JB_File_Path(Self);
+		JB_Incr(_tmPf3);
+		JB_PrintLine(_tmPf3);
+		JB_Decr(_tmPf3);
+		JB_String* _tmPf4 = JB_Array_Render(Cmd_args, nil);
 		JB_Incr(_tmPf4);
-		JB_PrintLine(_tmPf4);
+		JB_Str_PrintLine(_tmPf4);
 		JB_Decr(_tmPf4);
-		JB_String* _tmPf5 = JB_Array_Render(Cmd_args, nil);
-		JB_Incr(_tmPf5);
-		JB_Str_PrintLine(_tmPf5);
-		JB_Decr(_tmPf5);
 	}
 	FastString* Errs = JB_FS_Constructor(nil);
 	JB_Incr(Errs);
-	JB_String* _tmPf6 = JB_File_Path(Self);
-	JB_Incr(_tmPf6);
-	JB_Str_Execute(_tmPf6, Cmd_args, nil, Errs, 0, 0);
+	JB_String* _tmPf5 = JB_File_Path(Self);
+	JB_Incr(_tmPf5);
+	JB_Str_Execute(_tmPf5, Cmd_args, nil, Errs, 0, 0);
 	JB_Decr(Cmd_args);
-	JB_Decr(_tmPf6);
+	JB_Decr(_tmPf5);
 	if (Errs->Length) {
 		JB_PrintFS(Errs);
 	}
 	JB_Decr(Errs);
-	JB_String* _tmPf7 = JB_Str_OperatorPlus(JB_LUB[1220], V);
-	JB_Incr(_tmPf7);
-	JB_File* TestProd = SC_Comp__SpeedieDir(_tmPf7);
+	JB_String* _tmPf6 = JB_Str_OperatorPlus(JB_LUB[1220], V);
+	JB_Incr(_tmPf6);
+	JB_File* TestProd = SC_Comp__SpeedieDir(_tmPf6);
 	JB_Incr(TestProd);
-	JB_Decr(_tmPf7);
+	JB_Decr(_tmPf6);
 	JB_File_MustExist(TestProd, JB_LUB[668]);
 	JB_Decr(TestProd);
-	JB_String* _tmPf9 = SC_Ext__TmpOut(V);
-	JB_Incr(_tmPf9);
-	JB_String* _tmPf8 = JB_Str_ReadAll(_tmPf9, 16777216, true);
+	JB_String* _tmPf8 = SC_Ext__TmpOut(V);
 	JB_Incr(_tmPf8);
-	JB_Decr(_tmPf9);
-	JB_Print(_tmPf8);
+	JB_String* _tmPf7 = JB_Str_ReadAll(_tmPf8, 16777216, true);
+	JB_Incr(_tmPf7);
 	JB_Decr(_tmPf8);
-	JB_String* _tmPf10 = SC_Ext__TmpErr(V);
-	JB_Incr(_tmPf10);
-	JB_String* Test_err = JB_Str_ReadAll(_tmPf10, 16777216, true);
+	JB_Print(_tmPf7);
+	JB_Decr(_tmPf7);
+	JB_String* _tmPf9 = SC_Ext__TmpErr(V);
+	JB_Incr(_tmPf9);
+	JB_String* Test_err = JB_Str_ReadAll(_tmPf9, 16777216, true);
 	JB_Incr(Test_err);
-	JB_Decr(_tmPf10);
+	JB_Decr(_tmPf9);
 	if (Test_err->Length) {
 		if (true) {
 			JB_Str_Fail(Test_err);
@@ -61620,4 +61577,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -808609608106921326 -8988250143676862048
+// 8621623383295781105 -4024598282356260420
