@@ -33720,7 +33720,7 @@ SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err) {
 	if (JB_Str_Equals(Self, JB_LUB[425], true)) {
 		return ((SortComparison)JB_Platform__Win());
 	}
-	if (JB_Str_Equals(Self, JB_LUB[426], true)) {
+	if ((JB_Str_Equals(Self, JB_LUB[426], true)) or (JB_Str_Equals(Self, JB_LUB[416], true))) {
 		return ((SortComparison)JB_Platform__Lin());
 	}
 	if (JB_Str_Equals(Self, JB_LUB[405], true)) {
