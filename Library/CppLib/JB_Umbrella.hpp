@@ -11,7 +11,7 @@
 #include "JB_VectorTypes.h"
 #include "JB_LibTypes.h"
 #include <math.h>
-#include <cmath> // somehow both are needed for OSX ARM vs OSX Intel. Sigh.
+#include <cmath> // somehow both are needed for OSX ARM, but not on OSX Intel.
 #include "StringFunctions.h"
 #include "StringFunctionsLib.h"
 

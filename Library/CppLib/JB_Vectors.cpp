@@ -22,7 +22,7 @@ extern "C" {
 #define one		vec4{1.0f,1.0f,1.0f,1.0f}
 #define zero	vec4{}
 
-#define vf1(name, x)					\
+#define vf1(name, x)				\
   (vec4) {  						\
 	std::name(x[0]),				\
 	std::name(x[1]),				\
@@ -52,7 +52,7 @@ __H__ vec4 JB_vec4_Abs (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_abs)
 		return __builtin_elementwise_abs(x);
 	#else
-		return vf1(fabsf, x);
+		return vf1(fabs, x);
 	#endif
 }
 
@@ -60,7 +60,7 @@ __H__ vec4 JB_vec4_Floor (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_floor)
 		return __builtin_elementwise_floor(x);
 	#else
-		return vf1(floorf, x);
+		return vf1(floor, x);
 	#endif
 }
 
@@ -68,7 +68,7 @@ __H__ vec4 JB_vec4_Sqrt (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_sqrt)
 		return __builtin_elementwise_sqrt(x);
 	#else
-		return vf1(sqrtf, x);
+		return vf1(sqrt, x);
 	#endif
 }
 
@@ -76,7 +76,7 @@ __H__ vec4 JB_vec4_Exp (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_exp)
 		return __builtin_elementwise_exp(x);
 	#else
-		return vf1(expf, x);
+		return vf1(exp, x);
 	#endif
 }
 
@@ -92,7 +92,7 @@ __H__ vec4 JB_vec4_Exp2 (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_exp2)
 		return __builtin_elementwise_exp2(x);
 	#else
-		return vf1(exp2f, x);
+		return vf1(exp2, x);
 	#endif
 }
 
@@ -100,7 +100,7 @@ __H__ vec4 JB_vec4_Log2 (vec4 x) {
 	#if __has_builtin(__builtin_elementwise_log2)
 		return __builtin_elementwise_log2(x);
 	#else
-		return vf1(log2f, x);
+		return vf1(log2, x);
 	#endif
 }
 
