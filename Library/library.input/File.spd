@@ -497,13 +497,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 
 		function Prefs (|string?| name=nil, |file|)
 			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
-			target false
-				0
-			  elseif lin
+			target lin
 				|string--| P = "~/.config"
 			  elseif win
 				|string--| P = "~\AppData\Roaming"
-			  elseif osx
+			  else
 				|string--| P = "~/Library/Preferences"
 			if name
 				return P.child(Name).file
