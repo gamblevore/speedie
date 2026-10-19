@@ -3,11 +3,15 @@
 // press command-R to run this app.
 
 main (|int| amount)	
+	require "/usr/bin/say".file.MustExist("speak")
+	
 	if amount > 10
 		app.say "$amount ??"
-		return app.say("thats too many bananas")
+		app.say("thats too many bananas")
+		return 0
 	if amount <= 0
-		return app.say("you don't like bananas?")
+		app.say("you don't like bananas?")
+		return 0
 	
 	for count in 0 to Amount
 		app.say count of "banana"
