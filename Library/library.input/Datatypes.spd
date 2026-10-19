@@ -13,9 +13,9 @@ datatype int
 
 	constants
 		|int|
+		Min = ~0x7FFFffff
 		Max = 0x7FFFffff
-		Min = 0x80000000
-
+	
 	function AsFloat (|float|)
 		cpp_wrapper
 
@@ -707,8 +707,8 @@ datatype int64
 	default 0
 
 	constants
-		max = 0x7FFFffffFFFFffff_
-		min = max+1
+		Min = 1<<63
+		Max = (1<<63)-1
 
 	render
 		opt norefcounts

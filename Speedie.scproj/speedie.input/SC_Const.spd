@@ -19,12 +19,12 @@ function SCNode.CalculateConstRel (|message!| value, |$datatypecode| Ty, |uint64
 	|| L = .CalculateConstSub(A, Ty)
 	require ty!=DataTypeCode.Failed
 	
-	|| B = A.next!
-	|| C = b.next!
 	if value == @brel
 		expect (ty == datatypecode.int) (value, "Not an integer")
 		return ~L
 		
+	|| B = A.next!
+	|| C = b.next!
 	|| op = scoperator.lookup(B)
 	|| R = .CalculateConstSub(C, Ty)
 	expect (op is MathLike) (B)

@@ -1194,12 +1194,21 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 	function WriteConst (|SCDecl| D, |FastStringCpp| T)
 		opt norefcounts
-		T <~ "#define "
+		T <~ "#define "				// #define kJB__
 		D.exportName.safe(T)
 		t <~ " ("
 		if d.IsInt
 			t <~ "("
-			.WriteType(D,T)
+			|| ti = d.Type.TypeInfo
+			|| ty = ti.ByteCount
+			if ty < 4
+				// byte consts don't work so well on linux... So this is a work around
+				// just stick to int/uint
+				if !ti.IsSigned
+					t <~ 'u'
+				t <~ "int"
+			  else
+				.WriteType(D, T)
 			t <~ ")"
 		if d.ExportPosition and d.IsInt
 			t <~ d.ExportPosition|int64|

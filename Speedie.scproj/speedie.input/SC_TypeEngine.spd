@@ -1393,41 +1393,29 @@ function error.FromSamePlace (|message| s, |bool|)
 				return true
 
 
-function int64.ValueTrap (|int64| L, |int64| H, |int64|)
-	if self < L
-		return L
-	if self > H
-		return H
-	return 0
-
-
 function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |int64|)
 	|| T = .type.typeinfo
-	require t.IsInt
+	|| S = t.ByteCount<<3
+	require t.isint and (S <= 32)
 
-	|| S = t.ByteCount
-	|| sign = t.issigned
-	if S == 4
-		if sign and !WasHex
-			return value.ValueTrap(int.min, int.max)
-		return value.ValueTrap(-1, 0xFFFFffff)
-			
-	if S == 2
-		if sign and !WasHex
-			return value.ValueTrap(int16.min, int16.max)
-		return value.ValueTrap(-1, 0xFFFF)
-
-	if S == 1
-		if sign and !WasHex
-			return value.ValueTrap(int8.min, int8.max)
-		return value.ValueTrap(-1, 0xFF)
+	|| sign = !WasHex and t.issigned
+	|int64| Low = 0
+	|int64| High = ((1|uint64|) << S)-1
+	if Sign
+		high >>= Sign
+		Low = ~High
+		
+	if Value < Low
+		return Low
+	if Value > High
+		return High
 
 
 function scdecl.ConstInRange (|message| RN, |scdecl| rt, |bool| WasHex)
 	opt norefcounts
 	|int64| N
 	if RN == @num	
-		if rn.isint 
+		if rn.isint
 			n = rn.int
 	
 	  elseif (rt is NumberConst) and rt.IsNormalNumber and rt.isinteger
