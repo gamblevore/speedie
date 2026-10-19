@@ -768,7 +768,7 @@ POS 5
 /**/ VSET (VecSet)
 		iv1[u3+VecSet_Indu] = i2
 /**/ VBLD (VecBuild)
-		v1 = VBuild(r, Op)
+		iv1 = VBuild(r, Op)
 /**/ VSWZ (VecSwizzle)
 		v1 = VSwiz(r, Op)
 /**/ VMOV (U4)

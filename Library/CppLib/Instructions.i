@@ -296,7 +296,7 @@
 ı VSET:;
 	iv1[u3 + VecSet_Indu] = i2;
 ı VBLD:;
-	v1 = VBuild(r, Op);
+	iv1 = VBuild(r, Op);
 ı VSWZ:;
 	v1 = VSwiz(r, Op);
 ı VMOV:;

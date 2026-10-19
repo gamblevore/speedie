@@ -161,14 +161,14 @@ VMOpt u64 bitstats(u64 R2, u64 Mode) {
 
 
 VMOpt ivec4 VBuild (CakeRegister* r, ASM Op) {
-	return ivec4{ii2, ii3, ii4, ii5};
+	return (ivec4){ii2, ii3, ii4, ii5};
 }
 
 
 VMOpt vec4 VBuild2 (CakeRegister* r, ASM Op) {
 	auto F = f2;
 	uint Bits = Alloc_Amountu; 
-	return vec4{
+	return (vec4){
 		F * ((Bits>>0)&1),
 		F * ((Bits>>1)&1),
 		F * ((Bits>>2)&1),
@@ -796,7 +796,7 @@ VMOpt __jb_restrict void BridgeEntry (CakeVM& vm, ASM* CodePtr, CakeRegister* r,
 
 
 VMOpt ivec4 QMax (ivec4 A, ivec4 B) {
-	return {
+	return (ivec4){
 		std::max(A[0], B[0]),
 		std::max(A[1], B[1]),
 		std::max(A[2], B[2]),
@@ -805,7 +805,7 @@ VMOpt ivec4 QMax (ivec4 A, ivec4 B) {
 }
 
 VMOpt ivec4 QMin (ivec4 A, ivec4 B) {
-	return {
+	return (ivec4){
 		std::min(A[0], B[0]),
 		std::min(A[1], B[1]),
 		std::min(A[2], B[2]),
