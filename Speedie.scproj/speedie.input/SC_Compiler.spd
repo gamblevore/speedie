@@ -55,7 +55,6 @@ linkage
 |file|						Library
 |string|					OriginalInputPath
 |File|						_BuildFolder
-|String?|					_Projects = nil
 |String?|					_SpeedieProj = nil
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
@@ -154,7 +153,7 @@ function BuildFolder (|file|)
 	|| b = ._BuildFolder!
 	if !B.Exists
 		B.MakeDir
-	return B!
+	return B
 
 
 function CompileAll
@@ -387,15 +386,12 @@ function PrepareAST
 		rz.PrepareAll
 
 
-function ImportAll 
+function ImportAll
 	(compiler is Importing)
 	.Timer( "Read" )
 	require .Stage( "Finding Files" )
 	
 	if options.SelfReplacement
-//		if !options.variant						// somehow causes other issues. The OS cant see the files (but only sometimes!)
-//			TransCompiler.Clean(true)			// avoid caching issues
-
 		require VM_Builder.MakeTheVM
 
 	.ImportLibs
@@ -412,8 +408,10 @@ function ImportAll
 
 	.Stage( "Initialising Compiler" )
 
-	|| mark = .InitBasicStuff
-	require .AddMain(mark) and .InitedOK		
+	{
+		|| mark = .InitBasicStuff // hide local var
+		require .AddMain(mark) and .InitedOK		
+	}
 	
 	parser.using.Flags = MessageFlags.Inserted // noice
 	scimport.noproj
@@ -446,16 +444,10 @@ function ImportAll
 	for c in .ClassList
 		c.DataTypePostLoad
 	
-	require .Stage( "Savers and behaviours" )
-//	for c in .ClassList
-//		c.LoadSaver
-//
-//	.DoSavers(0)
+	require .Stage( "Behaviours" )
 
 	for c in .ClassList
 		c.ProcessBehaviours
-	
-	// ProcessBehaviours generates classes
 	
 	require stderr.ok
 	for c in .ClassList
@@ -485,15 +477,10 @@ function ImportAll
 	(Message).Restore
 	scimport.noproj
 
-
-	// we need decls for this.
-	// can we move decls earlier?
 	if .API_Place
 		|| Proj = .API_Place[@thg]
 			for m in .api_list
 				sc_api.DelayedClassAPI(m, proj.name)
-
-//	.DoSavers(1)
 
 	require .Stage( "Creating Class Exportnames" )
 	for c in .ClassList: c.LoadExportName
@@ -515,9 +502,6 @@ function ImportAll
 
 	require StdErr.OK
 	
-//	.DoSavers(2)
-
-	
 	require .Stage( "Parsing Function Params" )
 	for f in .FuncList
 		f.FuncParamsLoad
@@ -528,9 +512,10 @@ function ImportAll
 	scfunction.currfunc = nil
 
 
-	|| fn = .XFunc("JB_App__Quit")
-		(fn is killer)
-	
+	{ // hide local var
+		|| fn = .XFunc("JB_App__Quit")
+			(fn is killer)
+	}
 
 	require .Stage( "A Bit More Stuff On Classes" )
 	for c in .ClassList
@@ -579,7 +564,7 @@ function ImportAll
 	.Stage( "Building Function Link Map" )
 	LinkMap.CollectAll
 	scfunction.currfunc = nil
-	
+
 		
 function LoadSuperClasses
 	opt norefcounts
@@ -617,15 +602,14 @@ function InitCompiler
 	SCGlobals.UniqueNum = 100
 	////////////////////////////////////////////////
 	
-	if options.SingleFileInput
-		if app.parent
-			._BuildFolder = compiler.originalinputpath.ScriptContainer.file
-		  else
-			._BuildFolder = .BaseProjectPath
-	  else
+	if !options.SingleFileInput
 		._BuildFolder = .BaseProjectPath![ "Build" + Compiler.VariantSuffix ]
+	  elseif app.parent
+		._BuildFolder = compiler.originalinputpath.ScriptContainer.file
+	  else
+		._BuildFolder = .BaseProjectPath
 
-	|| t = TransCompiler.ProjTmpPath.file!  /// Tmp/Speedie/Proj
+	|| t = TransCompiler.ProjTmpPath.file!		/// Tmp/Speedie/Proj
 	.TempFolder = t
 	t.MakeEntirePath
 	.GeneratedCppsFolder.makeEntirePath
@@ -855,7 +839,7 @@ function AddGlobalConst (|string| name, |SCClass| c, |nilstate| dcl = NilState.r
 	Return d
 
 
-function AddMain (|int| mark, |bool|)
+function AddMain (|int| Mark, |bool|)
 	opt norefcounts
 
 	|| f = compiler.MainFunc
@@ -995,8 +979,7 @@ function FindProject (|string| Path, |File|)
 	|| p = .BaseProjectPath!.parent
 	|| B = .FindProjectSub(p, path)
 		return B
-	|| A = .FindProjectSub(file.Speediedir, path)
-		return A
+	return .FindProjectSub(file.Speediedir, path)
 
 	
 function FindProjectSub (|string| base, |string| Path, |File|)
