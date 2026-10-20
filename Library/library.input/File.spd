@@ -422,10 +422,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		libinternal FindSpeedie	(|string|)			
 			|| f = app.exepath
 			f = f.Resolve
+			f = f.parent
 			while f
-				f = f.parent
 				if f.FileChild("Speedie.scproj").Exists
 					return f
+				f = f.parent
 			return "/usr/local/speedie/"
 
 

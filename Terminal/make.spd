@@ -3,12 +3,24 @@
 // INSTALL:
 // sudo /usr/local/speedie/Terminal/make.spd
 
+|string|	SpdLocal = file.speediedir
+|file|		CppLibLocal = (SpdLocal+"/Library/CppLib").file
 
 main {
 	|| R = app.args
 	ifn R.Last isa "git"
 		expect (!R.length) ("This script takes no arguments.")
 	
+	if !SpdLocal or !SpdLocal.FileExists
+		printerror "Can't find Speedie installation: "
+		|| f = app.exepath
+		printerror f
+		printerror " :  "
+		f = f.Resolve
+		printerror f
+		return 1
+	
+	printline "Installation: " + SpdLocal
 	"Making OSX script"
 	app.Gen("osx", platform.OSX)
 	"Making Linux script"
@@ -72,8 +84,6 @@ ${unmod(dest)}
 |string|	PerryPreReqs
 |string|	LibName
 |string|	LibFlags
-|string|	SpdLocal = file.speediedir
-|file|		CppLibLocal = (SpdLocal+"/Library/CppLib").file
 |string|	SpdSrc
 |string|	SpdTerm
 |string|	CakeTerm
