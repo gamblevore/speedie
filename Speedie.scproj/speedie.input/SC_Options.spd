@@ -328,7 +328,7 @@ module Feedback
 				options.Mode = options.cpp
 
 		+'b'
-			Explain(Purpose, "Silent bake")$
+			Explain(Purpose, "Same as --bake but silent.")$
 			Options.Silent = true
 			options.Mode = options.cake
 		
