@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2392];
+extern JB_StringC* JB_LUB[2390];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1810,6 +1810,11 @@ void SC_Comp__ImportProj() {
 			return;
 		}
 	}
+	if ((!SC__Options_SelfReplacement) and SC_Linkage__SyntaxAccess(JB_LUB[2388])) {
+		if (true) {
+			JB_File_Fail(F, JB_LUB[2389]);
+		}
+	}
 }
 
 int SC_Comp__Init_() {
@@ -3397,13 +3402,6 @@ bool SC_FB__AppTransCompile(JB_String* Name, JB_String* Value, FastString* Purpo
 	return false;
 }
 
-bool SC_FB__AppVersionNumber(JB_String* Name, JB_String* Value, FastString* Purpose) {
-	if (!SC_FB__Explain(Purpose, JB_LUB[1041])) {
-		return nil;
-	}
-	return SC_FB__CompilerInfo();
-}
-
 void SC_FB__CheckSelfModifying() {
 	if (((JB_String*)JB_Str_Exists(SC__Options_SingleFileInput))) {
 		return;
@@ -3435,19 +3433,6 @@ void SC_FB__CheckSelfModifying() {
 	JB_Decr(_tmPf0);
 }
 
-bool SC_FB__CompilerInfo() {
-	FastString* _fsf0 = JB_FS_Constructor(nil);
-	JB_Incr(_fsf0);
-	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026102011));
-	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
-	JB_Incr(_tmPf1);
-	JB_Decr(_fsf0);
-	JB_PrintLine(_tmPf1);
-	JB_EarlyDecr(_tmPf1);
-	return true;
-}
-
 bool SC_FB__Explain(FastString* Purpose, JB_String* Name) {
 	if (!Purpose) {
 		return true;
@@ -3467,6 +3452,7 @@ void SC_FB__Help() {
 	JB_FS_AppendString(Fs, _tmPf7);
 	JB_Decr(_tmPf7);
 	JB_FS_AppendString(Fs, JB_LUB[150]);
+	JB_FS_AppendInt32(Fs, (2026102013));
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[816]);
 	JB_String* _tmPf8 = JB_File__SpeedieDir(nil);
@@ -3576,8 +3562,6 @@ int SC_FB__Init_() {
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1524], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_dosign)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1607], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_mem)))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1452], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_clean)))));
-		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1415], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber))))));
-		(JB_Dict_ValueSet(_tmPf0, JB_LUB[194], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_FB__AppVersionNumber))))));
 		(JB_Dict_ValueSet(_tmPf0, JB_LUB[1603], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_FB__AppOptions_help)))));
 		JB_SetRef(SC__FB_AppOptions, _tmPf0);
 	}
@@ -3589,7 +3573,6 @@ bool SC_FB__ParseArgs() {
 	SC_FB__StopStripping();
 	Array* Args = JB_App__Args();
 	if (!JB_Array_SyntaxCast(Args)) {
-		SC_FB__CompilerInfo();
 		SC_FB__Help();
 		return false;
 	}
@@ -4860,7 +4843,7 @@ void SC_AC__IdentifyBetter(Message* Node, JB_String* Name) {
 int SC_AC__Init_() {
 	{
 		SC__AC_Max_Total = 400;
-		JB_SetRef(SC__AC_func_tmp_src, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[2390])), 1073741824), false));
+		JB_SetRef(SC__AC_func_tmp_src, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[1415])), 1073741824), false));
 		JB_SetRef(SC__AC_all_tmp_src, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[715])), 1073741824), false));
 		JB_SetRef(SC__AC_TestCrash, JB_Str_OperatorPlus(JB_LUB[1345], JB_LUB[125]));
 	}
@@ -10244,7 +10227,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026102011));
+	JB_FS_AppendInt32(_fsf0, (2026102013));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -12940,7 +12923,7 @@ int JB_InitCode_() {
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Bin__)), JB_LUB[1420], JB_LUB[2386], 18);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Str__)), JB_LUB[1876], JB_LUB[2185], 19);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Unit__)), JB_LUB[2387], JB_LUB[0], 20);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_ARel__)), JB_LUB[2388], JB_LUB[2389], 21);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_ARel__)), JB_LUB[194], JB_LUB[1041], 21);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Name__)), JB_LUB[305], JB_LUB[0], 22);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Dot__)), JB_LUB[1930], JB_LUB[503], 23);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_SDot__)), JB_LUB[1911], JB_LUB[1735], 24);
@@ -26823,7 +26806,7 @@ void SC_Pac__DumpRegs(FastString* Fs) {
 		return;
 	}
 	bool Prev = false;
-	JB_FS_AppendString(Fs, JB_LUB[2391]);
+	JB_FS_AppendString(Fs, JB_LUB[166]);
 	int I = 0;
 	while ((++I) <= 31) {
 		int Test = 1 << I;
@@ -33671,7 +33654,7 @@ SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err) {
 	if (JB_Str_Equals(Self, JB_LUB[425], true)) {
 		return ((SortComparison)JB_Platform__Win());
 	}
-	if ((JB_Str_Equals(Self, JB_LUB[426], true)) or (JB_Str_Equals(Self, JB_LUB[416], true))) {
+	if (JB_Str_Equals(Self, JB_LUB[416], true)) {
 		return ((SortComparison)JB_Platform__Lin());
 	}
 	if (JB_Str_Equals(Self, JB_LUB[405], true)) {
@@ -33699,8 +33682,8 @@ JB_String* SC_Str_InBuiltTargetWrong(JB_String* Self) {
 	if ((JB_Str_Equals(Self, JB_LUB[410], true)) or (JB_Str_Equals(Self, JB_LUB[414], true))) {
 		return JB_LUB[1258];
 	}
-	if ((JB_Str_Equals(Self, JB_LUB[416], true))) {
-		return JB_LUB[426];
+	if ((JB_Str_Equals(Self, JB_LUB[426], true))) {
+		return JB_LUB[416];
 	}
 	if ((JB_Str_Equals(Self, JB_LUB[417], true))) {
 		return JB_LUB[425];
@@ -51296,6 +51279,7 @@ bool SC_File_TestCake(JB_File* Self) {
 	uint Mode = kJB__PIDM_StdOutSilence + kJB__PIDM_StdErrCapture;
 	Array* List = SC_Str_BatchSpds(JB_LUB[1388]);
 	JB_Incr(List);
+	int OK = 0;
 	{
 		int _if0 = 0;
 		while (true) {
@@ -51312,11 +51296,16 @@ bool SC_File_TestCake(JB_File* Self) {
 			JB_String* Str = JB_Str_ExecuteStr(Self, Args, nil, Mode, 0);
 			JB_Incr(Str);
 			JB_Decr(Args);
-			if ((!JB_Str_Equals(Str, JB_LUB[1299], false))) {
-				JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[1561], C);
-				JB_Incr(_tmPf2);
-				JB_Str_Fail(_tmPf2);
-				JB_Decr(_tmPf2);
+			if (JB_Str_Equals(Str, JB_LUB[1299], false)) {
+				(++OK);
+			}
+			 else {
+				if (true) {
+					JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[1561], C);
+					JB_Incr(_tmPf2);
+					JB_Str_Fail(_tmPf2);
+					JB_Decr(_tmPf2);
+				}
 			}
 			JB_Decr(C);
 			JB_Decr(Str);
@@ -51324,9 +51313,9 @@ bool SC_File_TestCake(JB_File* Self) {
 		};
 	}
 	;
-	JB_String* _tmPf3 = JB_Str_OperatorPlusWithInt64(JB_LUB[1637], JB_Array_Length(List));
-	JB_Incr(_tmPf3);
 	JB_Decr(List);
+	JB_String* _tmPf3 = JB_Str_OperatorPlusWithInt64(JB_LUB[1637], OK);
+	JB_Incr(_tmPf3);
 	JB_PrintLine(_tmPf3);
 	JB_EarlyDecr(_tmPf3);
 	return JB_Rec_OK(JB_StdErr);
@@ -51421,14 +51410,18 @@ JB_String* JB_File__Applications() {
 	return JB_LUB[310];
 }
 
-JB_String* JB_File__FindSpeedie() {
-	JB_String* _tmPf0 = JB_App__Path();
-	JB_Incr(_tmPf0);
-	JB_String* F = JB_Str_ResolvePath(_tmPf0, false);
+JB_String* JB_File__FindSpeedie(JB_String* Start) {
+	JB_String* F = JB_Str_ResolvePath(Start, false);
 	JB_Incr(F);
-	JB_Decr(_tmPf0);
-	while (JB_Str_Exists((F))) {
-		JB_SetRef(F, JB_Str_Parent(F));
+	while (true) {
+		JB_String* _tmPf0 = JB_Str_Parent(F);
+		JB_Incr(_tmPf0);
+		if (!JB_Str_Exists(_tmPf0)) {
+			JB_EarlyDecr(_tmPf0);
+			break;
+		}
+		JB_SetRef(F, _tmPf0);
+		JB_Decr(_tmPf0);
 		JB_File* _tmPf1 = JB_Str_ChildFile(F, JB_LUB[1125]);
 		JB_Incr(_tmPf1);
 		if (JB_File_FileExistance(_tmPf1)) {
@@ -51458,7 +51451,7 @@ JB_String* JB_File__SpeedieDir(JB_String* Child) {
 	JB_String* Spd = ({
 		JB_String* _X = JB__File__Speedie;
 		if (_X == nil) {
-			_X = JB_File__FindSpeedie();
+			_X = JB_File__FindSpeedie(JB_App__Path());
 			JB_SetRef(JB__File__Speedie, _X);
 		}
 		 _X;
@@ -61520,4 +61513,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3869946011404654293 -7015075750031872814
+// 8065082961275450281 -2513982725488684683

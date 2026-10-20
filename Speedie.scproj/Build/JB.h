@@ -3022,11 +3022,7 @@ bool SC_FB__AppOptions_warn(JB_String* Name, JB_String* Value, FastString* Purpo
 
 bool SC_FB__AppTransCompile(JB_String* Name, JB_String* Value, FastString* Purpose);
 
-bool SC_FB__AppVersionNumber(JB_String* Name, JB_String* Value, FastString* Purpose);
-
 void SC_FB__CheckSelfModifying();
-
-bool SC_FB__CompilerInfo();
 
 bool SC_FB__Explain(FastString* Purpose, JB_String* Name);
 
@@ -10233,7 +10229,7 @@ ExitCode JB_File_Touch(JB_File* Self);
 
 JB_String* JB_File__Applications();
 
-JB_String* JB_File__FindSpeedie();
+JB_String* JB_File__FindSpeedie(JB_String* Start);
 
 JB_File* JB_File__Logs();
 
