@@ -2634,12 +2634,12 @@ struct JB_Globals {
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
 	JB_File* App__StdOut;
-	JB_String* File__Speedie;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
+	JB_String* File__Speedie;
 	FP_fnIDGenerator Tk_Splitter;
 	FP_SorterComparer File__Sorter;
 	FP_SorterComparer Tree__Sorter;
@@ -2803,8 +2803,6 @@ JB_File* SC_Comp__FindProject(JB_String* Path);
 JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path);
 
 JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path);
-
-JB_String* SC_Comp__FindSpeediePath();
 
 JB_File* SC_Comp__GeneratedCppsFolder();
 
@@ -10235,7 +10233,7 @@ ExitCode JB_File_Touch(JB_File* Self);
 
 JB_String* JB_File__Applications();
 
-int JB_File__Init_();
+JB_String* JB_File__FindSpeedie();
 
 JB_File* JB_File__Logs();
 
@@ -11548,12 +11546,12 @@ struct JB_Globals {
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
 	JB_Object* App__StdOut;
-	JB_Object* File__Speedie;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* App__Path;
 	JB_Object* Tk__ErrorNames;
 	JB_Object* ErrorSeverity__ErrorNames;
+	JB_Object* File__Speedie;
 };
 extern JB_Globals JB__;
 

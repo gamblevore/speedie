@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2393];
+extern JB_StringC* JB_LUB[2392];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1162,24 +1162,6 @@ JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path) {
 	}
 	JB_EarlyDecr(Spd);
 	return JB_Str_OperatorPlus(Path, JB_LUB[374]);
-}
-
-JB_String* SC_Comp__FindSpeediePath() {
-	JB_String* F = JB_App__Path();
-	JB_Incr(F);
-	while (JB_Str_Exists((F))) {
-		JB_SetRef(F, JB_Str_Parent(F));
-		JB_File* _tmPf0 = JB_Str_ChildFile(F, JB_LUB[1125]);
-		JB_Incr(_tmPf0);
-		if (JB_File_FileExistance(_tmPf0)) {
-			JB_EarlyDecr(_tmPf0);
-			JB_SafeDecr(F);
-			return F;
-		}
-		JB_Decr(_tmPf0);
-	};
-	JB_EarlyDecr(F);
-	return JB_LUB[0];
 }
 
 JB_File* SC_Comp__GeneratedCppsFolder() {
@@ -2473,7 +2455,7 @@ void SC_Comp__SetupEnv() {
 		JB_StdErr->PrintNewErrors = 0;
 		JB__TerminalColor_RainbowTerm = false;
 	}
-	JB_SetRef(JB__File__Speedie, SC_Comp__FindSpeediePath());
+	JB_FreeIfDead(JB_File__SpeedieDir(nil));
 }
 
 SCClass* SC_Comp__SoftClass(JB_String* Name) {
@@ -12845,8 +12827,6 @@ int JB_Init_() {
 	JB_App__Init_();
 	//// Jeebox;
 	JB_Constants__Init_();
-	//// File;
-	JB_File__Init_();
 	//// Macro;
 	JB_Macro__Init_();
 	JB_InitCode_();
@@ -26778,7 +26758,7 @@ void adb2(SCFunction* Fn, FastString* Fs_in, int Level) {
 		return;
 	}
 	FastString* Fs = JB_FS__FastNew(Fs_in);
-	JB_FS_AppendString(Fs, JB_LUB[2392]);
+	JB_FS_AppendString(Fs, JB_LUB[1884]);
 	JB_FreeIfDead(SC_Func_Render(Fn, Fs));
 	JB_FS_AppendByte(Fs, '\n');
 	FatASM* Base = SC__Pac_Sh.TotalStart + Start;
@@ -33310,7 +33290,13 @@ JB_String* JB_Str_BeforeLastByte(JB_String* Self, uint /*byte*/ B, int Fudge) {
 
 JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname) {
 	if (!JB_Str_Exists(Self)) {
+		if (Cname == nil) {
+			return JB_LUB[0];
+		}
 		return Cname;
+	}
+	if (!JB_Str_Exists(Cname)) {
+		return Self;
 	}
 	int C = ((int)(JB_Str_Last(Self, 0) == '/'));
 	C = (C + (JB_Str_First(Cname) == '/'));
@@ -33318,21 +33304,15 @@ JB_String* JB_Str_Child(JB_String* Self, JB_String* Cname) {
 		return JB_Str_OperatorPlus(Self, Cname);
 	}
 	if (C == 0) {
-		JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[1702], Cname);
-		JB_Incr(_tmPf0);
-		JB_String* _tmPf3 = JB_Str_OperatorPlus(Self, _tmPf0);
-		JB_Incr(_tmPf3);
-		JB_EarlyDecr(_tmPf0);
-		JB_SafeDecr(_tmPf3);
-		return _tmPf3;
+		return JB_Str_Append4(Self, JB_LUB[1702], Cname, nil);
 	}
-	JB_String* _tmPf1 = JB_Str_Range(Cname, 1, kJB__int_Max, false);
+	JB_String* _tmPf0 = JB_Str_Range(Cname, 1, kJB__int_Max, false);
+	JB_Incr(_tmPf0);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(Self, _tmPf0);
 	JB_Incr(_tmPf1);
-	JB_String* _tmPf2 = JB_Str_OperatorPlus(Self, _tmPf1);
-	JB_Incr(_tmPf2);
-	JB_EarlyDecr(_tmPf1);
-	JB_SafeDecr(_tmPf2);
-	return _tmPf2;
+	JB_EarlyDecr(_tmPf0);
+	JB_SafeDecr(_tmPf1);
+	return _tmPf1;
 }
 
 Array* JB_Str_Components(JB_String* Self) {
@@ -51441,12 +51421,25 @@ JB_String* JB_File__Applications() {
 	return JB_LUB[310];
 }
 
-int JB_File__Init_() {
-	{
-		JB_SetRef(JB__File__Speedie, JB_LUB[0]);
-	}
-	;
-	return 0;
+JB_String* JB_File__FindSpeedie() {
+	JB_String* _tmPf0 = JB_App__Path();
+	JB_Incr(_tmPf0);
+	JB_String* F = JB_Str_ResolvePath(_tmPf0, false);
+	JB_Incr(F);
+	JB_Decr(_tmPf0);
+	while (JB_Str_Exists((F))) {
+		JB_SetRef(F, JB_Str_Parent(F));
+		JB_File* _tmPf1 = JB_Str_ChildFile(F, JB_LUB[1125]);
+		JB_Incr(_tmPf1);
+		if (JB_File_FileExistance(_tmPf1)) {
+			JB_EarlyDecr(_tmPf1);
+			JB_SafeDecr(F);
+			return F;
+		}
+		JB_Decr(_tmPf1);
+	};
+	JB_EarlyDecr(F);
+	return JB_LUB[1885];
 }
 
 JB_File* JB_File__Logs() {
@@ -51462,28 +51455,15 @@ JB_File* JB_File__Prefs(JB_String* Name) {
 }
 
 JB_String* JB_File__SpeedieDir(JB_String* Child) {
-	if (!JB_Str_Exists(JB__File__Speedie)) {
-		JB_String* _tmPf0 = JB_App__Path();
-		JB_Incr(_tmPf0);
-		JB_String* Paths = JB_Str_Parent(_tmPf0);
-		JB_Incr(Paths);
-		JB_Decr(_tmPf0);
-		JB_String* Srch = JB_LUB[1884];
-		JB_Incr(Srch);
-		Ind Found = JB_Str_InStr(Paths, Srch, 0, kJB__int_Max, true);
-		if (JB_Ind_SyntaxCast(Found)) {
-			JB_SetRef(JB__File__Speedie, JB_Str_Range(Paths, 0, Found + Srch->Length, false));
+	JB_String* Spd = ({
+		JB_String* _X = JB__File__Speedie;
+		if (_X == nil) {
+			_X = JB_File__FindSpeedie();
+			JB_SetRef(JB__File__Speedie, _X);
 		}
-		 else {
-			JB_SetRef(JB__File__Speedie, JB_LUB[1885]);
-		}
-		JB_Decr(Paths);
-		JB_Decr(Srch);
-	}
-	if (JB_Str_Exists(Child)) {
-		return JB_Str_Child(JB__File__Speedie, Child);
-	}
-	return JB__File__Speedie;
+		 _X;
+	});
+	return JB_Str_Child(Spd, Child);
 }
 
 
@@ -61540,4 +61520,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 2726716425587759974 7266427177675583929
+// 3869946011404654293 -7015075750031872814
