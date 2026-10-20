@@ -28,7 +28,7 @@
 
 Speedie has been written as a passion project with a large amount of hacker mentality. And we are proud of this. Just love it or leave it.
 
-**Note:** _Currently, Speedie has issues compiling outside of OSX._ I **can** fix these. Speedie has worked recently on Windows and Linux. Before release we will fix these bugs.
+**Note:** _Currently, Speedie has issues compiling outside of OSX._ It is compiling on Debian Linux, however there is some dependancy work to solve, especially around SDL2. SDL2 is not needed for the compiler but Perry and other graphical apps will not compile, unless SDL2 is already setup.
 
 If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
@@ -44,6 +44,10 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Safety in Speedie](Documentation/Safety.md) _(What Speedie does for you)_
 * [Speedie Is Fast](Documentation/Speed.md) _(Why use a lang if its not fast?)_
 * [Cake VM 🍰](Documentation/Cake.md) _(Not finished but will be tasty!)_
+
+
+# Code of Conduct #
+*  [Code of conduct](Documentation/Cond.md) _(Our required expectations for behaviour.)_
 
 
 # Power Features #
