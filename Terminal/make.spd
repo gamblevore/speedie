@@ -12,7 +12,7 @@ main {
 	"Making OSX script"
 	app.Gen("osx", platform.OSX)
 	"Making Linux script"
-	app.Gen("linux", platform.lin)
+	app.Gen("linux", platform.linux)
 	"Make Finished"
 }
 
