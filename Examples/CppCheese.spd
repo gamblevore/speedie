@@ -1,5 +1,4 @@
-
-https://pboyd.io/posts/one-c++-footgun     // original article
+#!/usr/local/bin/spd
 
 class CheeseShop // An example to show how bad c++ is compared to speedie.
 	|messagetable| inventory
@@ -14,7 +13,6 @@ class CheeseShop // An example to show how bad c++ is compared to speedie.
 			return "Sir?"
 		return (.inventory[cheeseName]!=nil)("Yes", "No")
 
-//	return JB_Ternary(( JB_FreeIfDead( Get(.inventory, cheeseName) )|bool|), <(`Yes`)>, <(`No`)>)
 
 main
 	|| shop = CheeseShop(ConfigData.parse #require)
@@ -23,7 +21,8 @@ main
 	"Wenslydale?    ${shop[`wenslydale`]}"
 	"Cheddar?       ${shop[`cheddar`]}"
 	"Barris?        ${shop[`barris`]}"
-	
+
+
 /*
    The original C++ uses 'toml::parse' that raises an exception... causing issues.
 Speedie has no exceptions, but a far better error-handling system.
@@ -32,8 +31,8 @@ Speedie has no exceptions, but a far better error-handling system.
 */
 
 
-|| ConfigData = `
-cheeses
+|| ConfigData = ` // this config file represents a jeebox version of a file that would have been
+cheeses			  // read from the C++ version of the code.
 	"Red Leicester"
 	"Flamange"
 	"Chester"
