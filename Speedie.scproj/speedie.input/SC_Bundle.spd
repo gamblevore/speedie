@@ -30,13 +30,13 @@ function compiler.AppBuildOneLib (|file| inner, |string| name)
 	|| ldest = inner.parent.sibling("Frameworks/" + name)
 	if ldest.exists
 		ldest.Delete
-	|| prefered = file.speediedir.child("/Library")
+	|| prefered = file.speediedir("/Library")
 	if !.TryCopyLib(ldest, name, prefered)
 		.TryCopyLib(ldest, name, "/usr/local/lib")
 
 
 function Compiler.TryCopyLib (|file| ldest, |string| name, |string| Base, |bool|)
-	|| lib = base.Child(name).File
+	|| lib = base.filechild(name)
 	if lib.Exists
 		lib.HardLinkTo(ldest)
 		rz = true

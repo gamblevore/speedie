@@ -291,7 +291,7 @@ Relative paths take the current working directory.`
 			return self
 		return file.new(self)
 		
-	function FileCh (|string| ch, |File|)
+	function FileChild (|string| ch, |File|)
 		cpp_Part ChildFile
 		return self.Child(ch).file
 	

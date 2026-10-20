@@ -33,7 +33,7 @@ function TmpErr (|string| V, |string|)
 
 
 function BackupPath (|string|)
-	return Compiler.Projects.child("Terminal/Backup")
+	return file.Speediedir("Terminal/Backup")
 
 
 function ProductBaseName (|string|)
@@ -72,15 +72,14 @@ function compiler.ProductPath (|string|)
 	
 	|| prod = transcompiler.ProductNameFull
 	if Options.SelfReplacement
-		|string--| proj = Compiler.Projects
-		return proj.child("Terminal/" + prod)
+		return file.Speediedir("Terminal/" + prod)
 	
-	|file--| build = Compiler.BuildFolder 
+	|file--| build = Compiler.BuildFolder
 	return build.child( prod )
 
 
 function CppLib (|File|)
-	return Compiler.Projects.filech("Library/CppLib")
+	return file.Speediedir.filechild("Library/CppLib")
 
 
 function LibSuff (|string|)
@@ -525,7 +524,7 @@ function InstallCompiler
 
 	// so that the (product `bla`) prints properly =)
 	|| OldProd = compiler.ProductPath 
-	options.output_path = Compiler.Projects.child("Terminal/Speedie")
+	options.output_path = file.Speediedir("Terminal/Speedie")
 	OldProd.File.MoveTo( options.output_path )
 
 	FlowLog.disable

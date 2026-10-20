@@ -427,7 +427,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	module
 		|string| _Speedie
 				
-		function SpeedieDir (|string|)
+		function SpeedieDir (|string?| Child=nil, |string|)
 			if !._speedie
 				|| paths = app.exepath.parent
 				|| srch = "/speedie/"
@@ -435,6 +435,8 @@ Creates an error, if the file is bigger than the 'Limit' param."
 					._speedie = paths[0, found + srch.length]
 				  else
 					._speedie = "/usr/local/speedie/"
+			if child
+				return ._Speedie.Child(child)
 			return ._speedie
 		
 		function Sorter (SorterComparer of file)
@@ -504,7 +506,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			  else
 				|string--| P = "~/Library/Preferences"
 			if name
-				return P.child(Name).file
+				return P.filechild(Name)
 			return P.file
 		
 		module Existing

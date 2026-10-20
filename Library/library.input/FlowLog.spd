@@ -120,7 +120,7 @@ module FlowLog
 				
 	
 	libinternal FlowPath (|string| name, |file|)
-		return ("/tmp/logs/SpeedieFlow/" + name).file
+		return "/tmp/logs/SpeedieFlow/".filechild(name)
 		
 		
 	function StartGen (|string| name)

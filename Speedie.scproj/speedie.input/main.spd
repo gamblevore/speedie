@@ -67,6 +67,9 @@ function compiler.SetupEnv
 	if app.parent
 		stderr.PrintNewErrors = 0
 		TerminalColor.RainbowTerm = false
+	file._Speedie = app.exepath.Parent.Parent
+	if !file._Speedie.file.IsDir // oof
+		file._Speedie = "" // hope we find it another way.
 
 
 

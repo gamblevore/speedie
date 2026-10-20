@@ -72,7 +72,7 @@ module Feedback
 		require !Options.SelfReplacement
 		
 		|| p = compiler.BaseProjectPath$
-		|| spd = compiler.Projects.FileCh("Speedie.scproj")
+		|| spd = file.Speediedir("Speedie.scproj")
 		if p ~= spd
 			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true

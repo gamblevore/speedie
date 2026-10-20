@@ -42,7 +42,7 @@
 
 
 function Compiler.SpeedieDir (|string| s, |file|)
-	return file.Speediedir.Child(s).file
+	return file.Speediedir.filechild(s)
 	
 
 module Compiler {
@@ -207,12 +207,8 @@ function CompileAll
 	.Successfulness |= StdErr.ok << 1
 
 
-function Projects (|String|)
-	return ._projects init file.Speediedir
-
-
 function SpeedieProj (|String|)
-	return ._SpeedieProj init .projects["Speedie.scproj"]
+	return ._SpeedieProj init file.Speediedir("Speedie.scproj")
 
 
 function TestDate
@@ -345,13 +341,13 @@ function InitBasicFuncs (|bool|)
 
 function Jeebox (|file|)
 	opt norefcounts
-	return .jeeboxproj_ init .Projects.FileCh("jeebox.scproj")
+	return .jeeboxproj_ init file.Speediedir.filechild("jeebox.scproj")
 
 
 function ImportLibs
 	opt norefcounts
 	SCImport.STDLibTime = true
-	.Library = .projects.filech("Library")
+	.Library = file.Speediedir.filechild("Library")
 	|| Lib = SCImport.Importpath( "Library",  .Library!,	1,  true )
 	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
 	.VisibleFuncs.project = Lib // visible-only funcs must be considered lib
@@ -604,7 +600,7 @@ function PostInitCodeCall
 
 function InitCompiler
 	(compiler is Initialising)
-	require (.Projects.fileCh("Library").mustexist) and stderr.ok
+	require (file.Speediedir.filechild("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
 
@@ -995,7 +991,7 @@ function FindProject (|string| Path, |File|)
 	|| p = .BaseProjectPath!.parent
 	|| B = .FindProjectSub(p, path)
 		return B
-	|| A = .FindProjectSub(.projects, path)
+	|| A = .FindProjectSub(file.Speediedir, path)
 		return A
 
 	
@@ -1011,7 +1007,7 @@ function FindProjectSub (|string| base, |string| Path, |File|)
 	if SlashPos
 		First = First + Path[SlashPos...]
 
-	rz = base.FileCh(First)
+	rz = base.filechild(First)
 	if !rz.Exists
 		rz = nil
 }
