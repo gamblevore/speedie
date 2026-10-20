@@ -2860,8 +2860,6 @@ JB_File* SC_Comp__ProductFile();
 
 JB_String* SC_Comp__ProductPath();
 
-JB_String* SC_Comp__Projects();
-
 bool SC_Comp__Reached(JB_String* S);
 
 int SC_Comp__ReachedClassCount();
@@ -10243,7 +10241,7 @@ JB_File* JB_File__Logs();
 
 JB_File* JB_File__Prefs(JB_String* Name);
 
-JB_String* JB_File__SpeedieDir();
+JB_String* JB_File__SpeedieDir(JB_String* Child);
 
 
 
