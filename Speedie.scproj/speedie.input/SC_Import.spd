@@ -99,7 +99,7 @@ class SCImport
 				Linkage.CompilerCollect(s)
 			  elseif s ~= "conf"
 				using s
-				compiler.SetConf(self, s)
+				compiler.SetConf(s)
 			  elseif s ~= "targets"
 				.IndexTargets(s)
 	
@@ -115,7 +115,7 @@ class SCImport
 		tar.remove
 		
 	
-	function compiler.SetConf (|scimport| Proj, |message| conf)
+	function compiler.SetConf (|message| conf)
 		opt norefcounts
 		|| arg = conf[@arg]
 			compiler.ConfMsg = arg
@@ -125,9 +125,9 @@ class SCImport
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
 			.IsLibraryImp = true
-			.WarnUnusedFuncs = false 
+			.WarnUnusedFuncs = false
 		if link["apps_folder"].yes and options.modecpp
-			Options.output_path = file.Applications[compiler.Productpath.name]
+			feedback.SetOutputPath( file.Applications[compiler.Productpath.name], 1 )
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])
 		|| arg = link[@arg]

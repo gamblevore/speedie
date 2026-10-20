@@ -136,7 +136,7 @@ function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target tr
 	if self ~= "win"
 		return Platform.win
 	if self ~= "lin" or "linux" // deprecate "lin" prefer "linux"
-		return Platform.lin
+		return Platform.linux
 	if self ~= "vm"
 		return Linkage.vm
 	if self ~= "exec"

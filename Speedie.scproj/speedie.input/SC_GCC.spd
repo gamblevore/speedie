@@ -238,18 +238,15 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.AppendWords( "-finput-charset=UTF-8 -fextended-identifiers" )
 	rz.AppendWords( "-fno-strict-aliasing  -fvisibility=hidden  -fvisibility-inlines-hidden" )
 	rz.AppendWords( Linkage.CombineFlags(Platform.name) )
-	if platform.lin
+	if platform.linux
 		rz.appendwords( " -lrt" )
 	
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math -fno-math-errno -fwrapv")
 	
 	if Platform.CPU_Intel
-//		rz.appendwords( "-arch x86_64" ) // its march on linux anyway
 		if options.optimise >= 3 // sigh
 			rz.AppendWords( "-march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2" )
-//	  elseif platform.CPU_ARM
-//		rz.appendwords( "-arch arm64" ) // its march on linux anyway
 
 	if platform.OSX
 		rz.appendwords( "-mmacosx-version-min=11.0" )
@@ -261,19 +258,19 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	
 	|| opt = options.optimise
 	|| aslib = options.projectislibrary
-		rz.appendwords( "-dynamiclib -fPIC")
+		rz.appendwords("-dynamiclib -fPIC")
 		opt = 3
 	if options.selfreplacement or aslib
-		rz.appendwords( "-g")
+		rz.appendwords("-g")
 	if (opt < 0)
-		rz.AppendWords( " -O0  " )
+		rz.AppendWords(" -O0 ")
 	  else
-		if Options.SelfReplacement or opt >= 1
-			rz.AppendWords( " -Os " )
 		if (opt >= 1)
+			rz.AppendWords( " -Os " )
 			if Platform.CPU_Intel
 				rz.AppendWords( "-mtune=native" )
-			if (opt >= 2)
+			if (opt >= 2) or (options.selfreplacement and platform.Linux)
+				// linux compiles seem bloated somehow. 1.3MB on Mac and 5.3MB on Linux?
 				rz.AppendWords( " -flto " )
 
 	if options.ProjectIsMiniLib
@@ -284,7 +281,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	|| cbf = Compiler.BuildFolder
 	|| cgcf = compiler.generatedcppsfolder
 		
-	rz.AppendWords( "   -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I $cbf -I $cgcf  " )
+	rz.AppendWords( " -D TARGET_UNIX=1 -D __SPEEDIE__=1  -I $cppl  -I $cbf -I $cgcf " )
 	if linkage.vm
 		rz.AppendWords( "-D __VM__" )
 		

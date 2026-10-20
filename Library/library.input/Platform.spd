@@ -35,7 +35,7 @@ module Platform
 	function OSX (|bool|)
 		cpp_wrapper JB_Platform__OSX
 
-	function Lin (|bool|)
+	function Linux (|bool|)
 		cpp_wrapper JB_Platform__Lin
 
 	function Win (|bool|)

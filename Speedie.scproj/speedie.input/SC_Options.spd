@@ -6,9 +6,9 @@ module Options
 	||		BannedClasses			= nil|dictionary|
 	||		exe_path				= ""		// if not exist, use output_path
 	||		output_path				= ""
+	||		output_path_strength	= 0
 	||		SingleFileInput			= ""
 	||		Variant					= ""
-//	||		Arch					= ""		// TargetArchitecture
 	||		SingleCppOutput			= true
 	||		NilTestAllocNeverFails	= true
 	||		Beep					= false
@@ -28,7 +28,6 @@ module Options
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
 	||		ProjectIsMiniLib		= false
-//	||		Noisy					= false
 	||		PrintCompileString		= false
 	||		PrintStages				= false
 	||		Warnings				= false
@@ -130,11 +129,16 @@ module Feedback
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 
 	
-	function SetOutputPath (|string| path)
+	function SetOutputPath (|string| path, |int| strength)
+		if Options.output_path_strength > strength // already set, and at a stronger level.
+			// --output_path in stdargs, will override output_path in .conf files
+			return
+			
 		|| value = path.PathFixSpd
 		if options.output_path != value
 			check (!options.output_path) ("output_path already specified: " + options.output_path)
-			options.output_path = value 
+			options.output_path = value
+			Options.output_path_strength = strength
 			options.ForceRecompile = true // it's what we expect
 		
 
@@ -389,7 +393,7 @@ module Feedback
 
 		+'output_path'
 			explain(purpose, "Specifies the build product path")$
-			.setoutputpath value
+			.setoutputpath(value, 3)
 		
 		+'force'
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
