@@ -15,7 +15,7 @@ main {
 		printerror "Can't find Speedie installation: "
 		|| f = app.exepath
 		printerror f
-		printerror " :  "
+		printerror "  -->  "
 		f = f.Resolve
 		printerror f
 		return 1

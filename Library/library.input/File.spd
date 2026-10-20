@@ -419,20 +419,21 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	module
 		|string?| _Speedie = nil
 
-		libinternal FindSpeedie	(|string|)			
-			|| f = app.exepath
-			f = f.Resolve
-			f = f.parent
-			while f
+
+		libinternal FindSpeedie	(|string| start, |string|)
+			target !__SPEEDIE__
+				libinternal
+			|| f = start.resolve
+			while
+				f = f.parent		#loop
 				if f.FileChild("Speedie.scproj").Exists
 					return f
-				f = f.parent
 			return "/usr/local/speedie/"
 
 
 		function SpeedieDir (|string?| Child=nil, |string|)
 			opt norefcounts
-			|| spd = ._speedie init .FindSpeedie
+			|| spd = ._speedie init .FindSpeedie(app.exepath)
 			return spd.child(Child)
 		
 		
@@ -452,7 +453,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				return "~/.Trash/"
 			target win
 				return `C:\$Recycle.Bin`
-			target lin
+			target linux
 				return "~/.local/share/Trash"
 		
 		function SystemDrive (|string|)
@@ -468,7 +469,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				return "/Applications/"
 			target win
 				return `C:\$Recycle.Bin`
-			target lin
+			target linux
 				return "~/.local/share/Trash"
 
 		function HomePath (|string|)
@@ -496,7 +497,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 
 		function Prefs (|string?| name=nil, |file|)
 			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."
-			target lin
+			target linux
 				|string--| P = "~/.config"
 			  elseif win
 				|string--| P = "~\AppData\Roaming"

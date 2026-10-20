@@ -41,7 +41,7 @@ struct DynamicLibrary
 		target osx
 			return path.addext("dylib")
 		
-		target lin
+		target linux
 			return path.addext("so")
 		
 		target win

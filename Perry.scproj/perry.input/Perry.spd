@@ -123,7 +123,7 @@ module Perry
 
 	
 	function Startup
-		target lin: GUI.removeborder // doesnt seem to work in Windows WSL?
+		target linux: GUI.removeborder // doesnt seem to work in Windows WSL?
 		GUI.AppDocumentOpen = &PerryIDE.PerryOpenDoc
 		stderr.LogFile = "PerryErrors.txt"
 		|| old = app.prefs["currproj"]

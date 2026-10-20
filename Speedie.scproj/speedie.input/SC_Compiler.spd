@@ -372,6 +372,10 @@ function ImportProj
 	if F.path ~!= .jeebox
 		require scimport.ImportPathSub("", F, proj, F.path.lowercase)
 
+	if !Options.SelfReplacement and Linkage["speedie_compiler"]
+		// oh dear... this is not supported.
+		error (F, "Speedie don't work like that! Using one speedie on another??")
+			
 
 function ConfBool (|string| name, |bool| Default=true, |bool|)
 	return .ConfMsg[name].Yes(Default)

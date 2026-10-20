@@ -98,14 +98,14 @@ function message.TargetTest (|bool|) // target true, target false,
 
 
 function message.TargetThg (|bool|)
-	return .name.targetthg(self)
+	return .name.TargetThg(self)
 
 
 function string.InBuiltTargetWrong (|string?|)
 	if (self ~= "mac" or "macos")
 		return "OSX"
-	if (self ~= "linux")
-		return "lin"
+	if (self ~= "lin")
+		return "linux"				// 'target lin'   just... looks lame
 	if (self ~= "windows")
 		return "win"
 	if (self ~= "import")
@@ -135,7 +135,7 @@ function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target tr
 		return Platform.osx
 	if self ~= "win"
 		return Platform.win
-	if self ~= "lin" or "linux" // deprecate "lin" prefer "linux"
+	if self ~= "linux"
 		return Platform.linux
 	if self ~= "vm"
 		return Linkage.vm
