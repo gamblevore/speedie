@@ -1517,6 +1517,7 @@ extern bool SC__Options_NilTestAllocNeverFails;
 extern byte SC__Options_OperationCount;
 extern int8 SC__Options_Optimise;
 extern JB_String* SC__Options_output_path;
+extern int SC__Options_output_path_strength;
 extern byte SC__Options_PerryOutput;
 extern bool SC__Options_PrintCompileString;
 extern bool SC__Options_PrintLibraries;
@@ -2869,7 +2870,7 @@ JB_String* SC_Comp__RenderErrors(JB_ErrorReceiver* Stderr, uint /*ErrorSeverity*
 
 bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build);
 
-void SC_Comp__SetConf(SCImport* Proj, Message* Conf);
+void SC_Comp__SetConf(Message* Conf);
 
 void SC_Comp__SetupEnv();
 
@@ -3039,7 +3040,7 @@ bool SC_FB__ParseArgs();
 
 void SC_FB__ParseOption(JB_String* Arg);
 
-void SC_FB__SetOutputPath(JB_String* Path);
+void SC_FB__SetOutputPath(JB_String* Path, int Strength);
 
 void SC_FB__StopStripping();
 
