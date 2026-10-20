@@ -107,7 +107,6 @@ module Feedback
 
 		|[string]--| Args = app._rawargs
 		if !Args
-			.CompilerInfo
 			.Help
 			return false
 
@@ -210,12 +209,6 @@ module Feedback
 		explain(purpose, "Places the .cpp and header files locally")$
 		Options.ExternalCompile = true
 		Options.Color = false // makes sense... we want to do this using xcode
-
-
-	function AppVersionNumber (ShellOption)
-		Explain(Purpose, "Print version number.")$
-		return CompilerInfo()
-
 
 	dispatch AppOptions (ShellOption)
 		+'nocompile' // remove this later
@@ -434,13 +427,9 @@ module Feedback
 				"Cleaned"
 			return true // does something, counts towards operationCount
 		
-		+'version' (AppVersionNumber)
-		
-		+'v'	   (AppVersionNumber)
-		
 		+'help'
 			Explain(Purpose, "This.")$
-			Help()
+			.Help
 			return true
 
 
@@ -453,26 +442,21 @@ module Feedback
 			return 1
 		return .int
 
-
-	function CompilerInfo (|bool|)
-		"spd $__time_id__"
-		return true
-
-
-	function Help 
+	function Help
 		|| fs		 = faststring.new
 		|| fs_tester = faststring.new
 		fs <~ "Usage: "
 		fs <~ app.filename
-		fs <~ " /path/to/project\n"
-		fs <~ "Installation: ${file.Speediedir}"
+		fs <~ " /path/to/project\n\ntimestamp: "
+		fs <~ __time_id__
+		fs <~ "\nInstallation: ${file.Speediedir}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"
 		fs <~ "  @Syx: ${@max|int|}"
-		for (v in .AppOptions) (k) 
+		for (v in .AppOptions) (k)
 			(v[])("", "", fs_tester)
 			|| val = v.Value|shelloption|
-			if (val and fs_tester.length) 
+			if (val and fs_tester.length)
 				fs_tester.length = 0
 				fs <~ "\n--"
 				fs <~ k

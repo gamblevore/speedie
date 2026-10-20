@@ -549,11 +549,15 @@ function string.BatchSpds (|[file]|)
 function file.TestCake (|bool|)
 	|| mode = ProcessMode.StdOutSilence+processmode.StdErrCapture
 	|| list = "CakeTest".BatchSpds
+	|| OK = 0
 	for c in list
 		|| args = [c, "--bake"]
 		|| str = .ExecuteStr(args, nil, mode)
-		check (str == "Success") ("Cake failed: " + c)
-	printline "Cakes OK: " + list.Length
+		if str == "Success"
+			OK++
+		  else
+			error ("Cake failed: " + c)
+	printline "Cakes OK: " + OK
 	return stderr.ok
 
 
