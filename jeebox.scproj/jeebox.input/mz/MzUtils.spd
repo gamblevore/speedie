@@ -1,12 +1,12 @@
 
 
-Module MZLab 
+Module MZLab
 	constants
-		None      = 0			// none
-		Fast	  = 10			// old mz?
-		Strong    = 20			// 
-		Strongest = 30			// 
-		Default   = strong		// its fast enough!
+		None		= 0				// none
+		Fast		= 10			// old mz?
+		Strong		= 20			// 
+		Strongest	= 30			// 
+		Default		= strong		// its fast enough!
 	
 	
 	function FreeNow

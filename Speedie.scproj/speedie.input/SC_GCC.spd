@@ -79,7 +79,7 @@ function compiler.ProductPath (|string|)
 
 
 function CppLib (|File|)
-	return file.Speediedir.filechild("Library/CppLib")
+	return compiler.Speediedir("Library/CppLib")
 
 
 function LibSuff (|string|)

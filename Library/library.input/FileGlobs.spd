@@ -72,7 +72,7 @@ function array.GlobExpand (|[string]| self, |[file]|)
 
 	|| base = "/".file
 	for L in self
-		|| fixed = L.RegularPath
+		|| fixed = L.PathFix
 		if Fixed contains "**"
 			error "Can't glob '**' in: " + Fixed
 		  else

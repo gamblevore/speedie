@@ -41,8 +41,8 @@
 |SCDecl|	FalseBool
 
 
-function Compiler.SpeedieDir (|string| s, |file|)
-	return file.Speediedir.filechild(s)
+function Compiler.SpeedieDir (|string?| s=nil, |file|)
+	return file.Speediedir(s).file
 	
 
 module Compiler {
@@ -341,13 +341,13 @@ function InitBasicFuncs (|bool|)
 
 function Jeebox (|file|)
 	opt norefcounts
-	return .jeeboxproj_ init file.Speediedir.filechild("jeebox.scproj")
+	return .jeeboxproj_ init .Speediedir("jeebox.scproj")
 
 
 function ImportLibs
 	opt norefcounts
 	SCImport.STDLibTime = true
-	.Library = file.Speediedir.filechild("Library")
+	.Library = .Speediedir("Library")
 	|| Lib = SCImport.Importpath( "Library",  .Library!,	1,  true )
 	SCImport.Importpath( "jeebox",   .Jeebox,	1,  true )
 	.VisibleFuncs.project = Lib // visible-only funcs must be considered lib
@@ -600,7 +600,7 @@ function PostInitCodeCall
 
 function InitCompiler
 	(compiler is Initialising)
-	require (file.Speediedir.filechild("Library").mustexist) and stderr.ok
+	require (.Speediedir("Library").mustexist) and stderr.ok
 	scoperator.Init
 	Cpp_Export.Init
 

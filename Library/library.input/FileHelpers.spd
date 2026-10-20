@@ -158,14 +158,14 @@ extend String
 		if self != "/"
 			return .TrimSlashes.BeforeLastByte('/', 1)
 
-	function RegularPath (|string|)
-		return .AbsolutePath.TrimSlashes
-	
-	function AbsolutePath (|StringZeroTerminated|)
+	function PathFix (|StringZeroTerminated|)
 		cpp_wrapper JB_File_PathFix
 		stateful
-		description `Replaces "~/" with the username.
-Relative paths take the current working directory.`
+		description `"~/" is replaced with the home directory.
+Relative paths become full paths (using the cwd)
+Removes trailing slashes, and multiple slashes.
+Removes pointless /./
+Trims newlines from start/end`
 
 	function MakeDir (|ErrorInt|)
 		cpp_wrapper JB_Str_MakeDir
@@ -245,7 +245,7 @@ Relative paths take the current working directory.`
 
 	iterator FullPaths
 		// returns each fullpath section, starting from the beginning each time.
-		|| P = .regularpath
+		|| P = .PathFix
 		|| i = p.find2('/', 1)
 
 		while i > 0
@@ -297,12 +297,12 @@ Relative paths take the current working directory.`
 	
 	target !minilib {
 	function OpenInEditor (|ExitCode|)
-		|| p = .AbsolutePath
+		|| p = .PathFix
 			return "/usr/bin/open".SilentExecute([p], NIL, nil)
 	
 	function Reveal (|bool|)
 		if self and platform.osx
-			|| p = .AbsolutePath
+			|| p = .PathFix
 			require p.fileExists
 			|| R = ["-R", p]
 			if .last == '/'

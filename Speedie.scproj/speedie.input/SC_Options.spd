@@ -148,15 +148,15 @@ module Feedback
 
 	function string.PathFixSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speediedir+self[5...]).AbsolutePath
-		return .AbsolutePath
+			return (file.Speediedir+self[5...]).PathFix
+		return .PathFix
 
 
 	function TryUseProject (|String| path, |bool| IsScript=false, |string|)
 		ifn (path contains '/' or '.' or '~')
 			Path = compiler.FindProjNoSuffix(Path)
 		
-		|| path2 = path.PathFixSpd.RegularPath
+		|| path2 = path.PathFixSpd
 		if path2 and path2!=path
 			path = path2
 		|| F = Path.File
@@ -465,7 +465,7 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n"
-		fs <~ "Installation: ${compiler.SpeedieProj.parent}"
+		fs <~ "Installation: ${file.Speediedir}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"
 		fs <~ "  @Syx: ${@max|int|}"

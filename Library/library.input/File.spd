@@ -316,7 +316,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 //		return .isdir and self isa ext
 		
 	function DirectoryContains (|string| path, |bool|)
-		return path.AbsolutePath starts .PathDir
+		return path.PathFix starts .PathDir
 	
 	operator IsNewerThan (|File| F, |bool|)
 		cpp_Part NewerThanFile
@@ -478,7 +478,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			cpp_wrapper JB_File__Home
 
 		function Trash (|string|name="", |file|)
-			rz = .TrashPath.AbsolutePath.file
+			rz = .TrashPath.PathFix.file
 			if name
 				rz = rz.uniquechild(name)
 

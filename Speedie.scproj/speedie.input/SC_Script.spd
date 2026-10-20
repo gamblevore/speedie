@@ -68,7 +68,7 @@ function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |str
 
 
 function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
-	|| full = .AbsolutePath ?? self
+	|| full = .PathFix ?? self
 	|| dest = full.Scriptcontainer(container)
 	dest.MakeEntirePath
 	rz = dest[full.SpdScriptName]

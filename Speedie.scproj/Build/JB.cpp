@@ -1164,6 +1164,24 @@ JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path) {
 	return JB_Str_OperatorPlus(Path, JB_LUB[374]);
 }
 
+JB_String* SC_Comp__FindSpeediePath() {
+	JB_String* F = JB_App__Path();
+	JB_Incr(F);
+	while (JB_Str_Exists((F))) {
+		JB_SetRef(F, JB_Str_Parent(F));
+		JB_File* _tmPf0 = JB_Str_ChildFile(F, JB_LUB[1125]);
+		JB_Incr(_tmPf0);
+		if (JB_File_FileExistance(_tmPf0)) {
+			JB_EarlyDecr(_tmPf0);
+			JB_SafeDecr(F);
+			return F;
+		}
+		JB_Decr(_tmPf0);
+	};
+	JB_EarlyDecr(F);
+	return JB_LUB[0];
+}
+
 JB_File* SC_Comp__GeneratedCppsFolder() {
 	if (!SC__Options_ExternalCompile) {
 		return SC__Comp_TempFolder;
@@ -1786,7 +1804,7 @@ void SC_Comp__ImportAll() {
 
 void SC_Comp__ImportLibs() {
 	SC__Imp_STDLibTime = true;
-	JB_SetRef(SC__Comp_Library, JB_Str_ChildFile(JB_File__SpeedieDir(nil), JB_LUB[887]));
+	JB_SetRef(SC__Comp_Library, SC_Comp__SpeedieDir(JB_LUB[887]));
 	SCImport* Lib = SC_Imp__ImportPath(JB_LUB[887], SC__Comp_Library, 1, true);
 	JB_FreeIfDead(SC_Imp__ImportPath(JB_LUB[1523], SC_Comp__Jeebox(), 1, true));
 	SC__Comp_VisibleFuncs->Project = Lib;
@@ -1908,11 +1926,8 @@ int SC_Comp__InitBasicStuff() {
 void SC_Comp__InitCompiler() {
 	(SC_Comp__SyntaxIsSet(kSC__CompilerStage_Initialising, true));
 	if (!((({
-		JB_String* _tmPf2 = JB_File__SpeedieDir(nil);
-		JB_Incr(_tmPf2);
-		JB_File* _tmPf1 = JB_Str_ChildFile(_tmPf2, JB_LUB[887]);
+		JB_File* _tmPf1 = SC_Comp__SpeedieDir(JB_LUB[887]);
 		JB_Incr(_tmPf1);
-		JB_Decr(_tmPf2);
 		bool _tmPf0 = JB_File_MustExist(_tmPf1, JB_LUB[0]);
 		JB_EarlyDecr(_tmPf1);
 		 _tmPf0;
@@ -1925,44 +1940,44 @@ void SC_Comp__InitCompiler() {
 		JB_SetRef(SC__Comp_Files, JB_Dict_Constructor(nil));
 	}
 	JB_FS_AppendByte(SC__Comp_TimerOutput, '\n');
-	Message* _tmPf3 = JB_Syx_Msg(kJB_SyxStr, nil);
-	JB_Incr(_tmPf3);
-	SC_Crkt__CollectString(_tmPf3);
-	JB_Decr(_tmPf3);
+	Message* _tmPf2 = JB_Syx_Msg(kJB_SyxStr, nil);
+	JB_Incr(_tmPf2);
+	SC_Crkt__CollectString(_tmPf2);
+	JB_Decr(_tmPf2);
 	SC__Comp_CurrStage = 1;
 	SC__SC_UniqueNum = 100;
 	if (JB_Str_Exists(SC__Options_SingleFileInput)) {
 		if (JB_FreeIfDead(JB_App__Parent(false))) {
-			JB_String* _tmPf4 = SC_Str_ScriptContainer(SC__Comp_OriginalInputPath, JB_LUB[418]);
-			JB_Incr(_tmPf4);
-			JB_SetRef(SC__Comp__BuildFolder, JB_Str_AsFile(_tmPf4));
-			JB_Decr(_tmPf4);
+			JB_String* _tmPf3 = SC_Str_ScriptContainer(SC__Comp_OriginalInputPath, JB_LUB[418]);
+			JB_Incr(_tmPf3);
+			JB_SetRef(SC__Comp__BuildFolder, JB_Str_AsFile(_tmPf3));
+			JB_Decr(_tmPf3);
 		}
 		 else {
 			JB_SetRef(SC__Comp__BuildFolder, SC__Comp_BaseProjectPath);
 		}
 	}
 	 else {
-		JB_String* _tmPf6 = SC_Comp__VariantSuffix();
-		JB_Incr(_tmPf6);
-		JB_String* _tmPf5 = JB_Str_OperatorPlus(JB_LUB[562], _tmPf6);
+		JB_String* _tmPf5 = SC_Comp__VariantSuffix();
 		JB_Incr(_tmPf5);
-		JB_Decr(_tmPf6);
-		JB_SetRef(SC__Comp__BuildFolder, JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, _tmPf5));
+		JB_String* _tmPf4 = JB_Str_OperatorPlus(JB_LUB[562], _tmPf5);
+		JB_Incr(_tmPf4);
 		JB_Decr(_tmPf5);
+		JB_SetRef(SC__Comp__BuildFolder, JB_File_SyntaxAccess(SC__Comp_BaseProjectPath, _tmPf4));
+		JB_Decr(_tmPf4);
 	}
-	JB_String* _tmPf7 = SC_Ext__ProjTmpPath();
-	JB_Incr(_tmPf7);
-	JB_File* T = JB_Str_AsFile(_tmPf7);
+	JB_String* _tmPf6 = SC_Ext__ProjTmpPath();
+	JB_Incr(_tmPf6);
+	JB_File* T = JB_Str_AsFile(_tmPf6);
 	JB_Incr(T);
-	JB_Decr(_tmPf7);
+	JB_Decr(_tmPf6);
 	JB_SetRef(SC__Comp_TempFolder, T);
 	JB_Str_MakeEntirePath(T, true);
 	JB_Decr(T);
-	JB_File* _tmPf8 = SC_Comp__GeneratedCppsFolder();
-	JB_Incr(_tmPf8);
-	JB_Str_MakeEntirePath(_tmPf8, true);
-	JB_Decr(_tmPf8);
+	JB_File* _tmPf7 = SC_Comp__GeneratedCppsFolder();
+	JB_Incr(_tmPf7);
+	JB_Str_MakeEntirePath(_tmPf7, true);
+	JB_Decr(_tmPf7);
 	SC_Comp__CreateRoot();
 	SC_Comp__CreateDisambiguation();
 	JB_Array_SyntaxAppend(SC__Imp_AllFiles, SC__Comp_InternalFile);
@@ -2082,7 +2097,7 @@ JB_File* SC_Comp__Jeebox() {
 	return ({
 		JB_File* _X = SC__Comp_JeeboxProj_;
 		if (_X == nil) {
-			_X = JB_Str_ChildFile(JB_File__SpeedieDir(nil), JB_LUB[247]);
+			_X = SC_Comp__SpeedieDir(JB_LUB[247]);
 			JB_SetRef(SC__Comp_JeeboxProj_, _X);
 		}
 		 _X;
@@ -2458,10 +2473,7 @@ void SC_Comp__SetupEnv() {
 		JB_StdErr->PrintNewErrors = 0;
 		JB__TerminalColor_RainbowTerm = false;
 	}
-	JB_SetRef(JB__File__Speedie, JB_Str_Parent(JB_Str_Parent(JB_App__Path())));
-	if (!JB_File_IsDir(JB_Str_AsFile(JB__File__Speedie))) {
-		JB_SetRef(JB__File__Speedie, JB_LUB[0]);
-	}
+	JB_SetRef(JB__File__Speedie, SC_Comp__FindSpeediePath());
 }
 
 SCClass* SC_Comp__SoftClass(JB_String* Name) {
@@ -2515,9 +2527,9 @@ bool SC_Comp__SortModulesAndClasses() {
 }
 
 JB_File* SC_Comp__SpeedieDir(JB_String* S) {
-	JB_String* _tmPf0 = JB_File__SpeedieDir(nil);
+	JB_String* _tmPf0 = JB_File__SpeedieDir(S);
 	JB_Incr(_tmPf0);
-	JB_File* _tmPf1 = JB_Str_ChildFile(_tmPf0, S);
+	JB_File* _tmPf1 = JB_Str_AsFile(_tmPf0);
 	JB_Incr(_tmPf1);
 	JB_EarlyDecr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -3445,7 +3457,7 @@ bool SC_FB__CompilerInfo() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[166]);
-	JB_FS_AppendInt32(_fsf0, (2026102010));
+	JB_FS_AppendInt32(_fsf0, (2026102011));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -3475,25 +3487,22 @@ void SC_FB__Help() {
 	JB_FS_AppendString(Fs, JB_LUB[150]);
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[816]);
-	JB_String* _tmPf9 = SC_Comp__SpeedieProj();
-	JB_Incr(_tmPf9);
-	JB_String* _tmPf8 = JB_Str_Parent(_tmPf9);
+	JB_String* _tmPf8 = JB_File__SpeedieDir(nil);
 	JB_Incr(_tmPf8);
-	JB_Decr(_tmPf9);
 	JB_FS_AppendString(Fs, _tmPf8);
 	JB_Decr(_tmPf8);
 	//;
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[116]);
-	JB_String* _tmPf10 = JB_Platform();
+	JB_String* _tmPf9 = JB_Platform();
+	JB_Incr(_tmPf9);
+	JB_FS_AppendString(Fs, _tmPf9);
+	JB_Decr(_tmPf9);
+	JB_FS_AppendByte(Fs, '+');
+	JB_String* _tmPf10 = JB_Platform__CPU_Name();
 	JB_Incr(_tmPf10);
 	JB_FS_AppendString(Fs, _tmPf10);
 	JB_Decr(_tmPf10);
-	JB_FS_AppendByte(Fs, '+');
-	JB_String* _tmPf11 = JB_Platform__CPU_Name();
-	JB_Incr(_tmPf11);
-	JB_FS_AppendString(Fs, _tmPf11);
-	JB_Decr(_tmPf11);
 	//;
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[117]);
@@ -3534,11 +3543,11 @@ void SC_FB__Help() {
 	}
 	;
 	JB_Decr(Fs_tester);
-	JB_String* _tmPf12 = JB_FS_GetResult(Fs);
-	JB_Incr(_tmPf12);
+	JB_String* _tmPf11 = JB_FS_GetResult(Fs);
+	JB_Incr(_tmPf11);
 	JB_Decr(Fs);
-	JB_PrintLine(_tmPf12);
-	JB_Decr(_tmPf12);
+	JB_PrintLine(_tmPf11);
+	JB_Decr(_tmPf11);
 }
 
 int SC_FB__Init_() {
@@ -3718,11 +3727,8 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript) {
 	if (!(JB_Str_ContainsByte(Path, '/') or (JB_Str_ContainsByte(Path, '.') or JB_Str_ContainsByte(Path, '~')))) {
 		JB_SetRef(Path, SC_Comp__FindProjNoSuffix(Path));
 	}
-	JB_String* _tmPf0 = SC_Str_PathFixSpd(Path);
-	JB_Incr(_tmPf0);
-	JB_String* Path2 = JB_Str_RegularPath(_tmPf0);
+	JB_String* Path2 = SC_Str_PathFixSpd(Path);
 	JB_Incr(Path2);
-	JB_Decr(_tmPf0);
 	if (JB_Str_Exists(Path2) and (!JB_Str_Equals(Path2, Path, false))) {
 		JB_SetRef(Path, Path2);
 	}
@@ -3734,11 +3740,11 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript) {
 	JB_SetRef(SC__Comp_ProjectName, JB_Str_TrimExtAndPath(F, true));
 	bool Exists = JB_File_FileExistance(F);
 	bool IsSpd = ({
-		JB_String* _tmPf2 = JB_Str_Name(F);
-		JB_Incr(_tmPf2);
-		bool _tmPf1 = SC_Str_IsSpeedieSrc(_tmPf2);
-		JB_EarlyDecr(_tmPf2);
-		 _tmPf1;
+		JB_String* _tmPf1 = JB_Str_Name(F);
+		JB_Incr(_tmPf1);
+		bool _tmPf0 = SC_Str_IsSpeedieSrc(_tmPf1);
+		JB_EarlyDecr(_tmPf1);
+		 _tmPf0;
 	}) or IsScript;
 	if ((Exists and (!JB_File_IsDir(F))) or ((!Exists) and IsSpd)) {
 		JB_SetRef(SC__Options_SingleFileInput, JB_File_Path(F));
@@ -3751,10 +3757,10 @@ JB_String* SC_FB__TryUseProject(JB_String* Path, bool IsScript) {
 		JB_SetRef(SC__Comp_BaseProjectPath, F);
 	}
 	SC_FB__CheckSelfModifying();
-	JB_String* _tmPf3 = JB_Str_Moat(SC__Comp_ProjectName, JB_LUB[1313]);
-	JB_Incr(_tmPf3);
-	(SC_SC_Targets__SyntaxAccessSet(_tmPf3, true));
-	JB_Decr(_tmPf3);
+	JB_String* _tmPf2 = JB_Str_Moat(SC__Comp_ProjectName, JB_LUB[1313]);
+	JB_Incr(_tmPf2);
+	(SC_SC_Targets__SyntaxAccessSet(_tmPf2, true));
+	JB_Decr(_tmPf2);
 	if (!JB_Str_Exists(SC__Options_SingleFileInput)) {
 		JB_File_MustExist(F, JB_LUB[0]);
 	}
@@ -9989,13 +9995,7 @@ Array* SC_Ext__CollectCppsInto(JB_File* Fol, JB_File* Objects) {
 }
 
 JB_File* SC_Ext__CppLib() {
-	JB_String* _tmPf0 = JB_File__SpeedieDir(nil);
-	JB_Incr(_tmPf0);
-	JB_File* _tmPf1 = JB_Str_ChildFile(_tmPf0, JB_LUB[889]);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
+	return SC_Comp__SpeedieDir(JB_LUB[889]);
 }
 
 Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_String* Type) {
@@ -10262,7 +10262,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026102010));
+	JB_FS_AppendInt32(_fsf0, (2026102011));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -34000,7 +34000,7 @@ ErrorInt JB_Str_MakeEntirePath(JB_String* Self, bool Last) {
 	JB_String* P = ((JB_String*)JB_Ternary((Last), Self, JB_Str_Parent(Self)));
 	JB_Incr(P);
 	{
-		JB_String* _Pf0 = JB_Str_RegularPath(P);
+		JB_StringC* _Pf0 = JB_File_PathFix(P);
 		JB_Incr(_Pf0);
 		Ind _if1 = JB_Str_Find2(_Pf0, '/', 1, kJB__int_Max);
 		while (_if1 > 0) {
@@ -34480,16 +34480,6 @@ JB_String* JB_Str_ReadAll(JB_String* Self, int Lim, bool AllowMissing) {
 	JB_File* _tmPf0 = JB_Str_AsFile(Self);
 	JB_Incr(_tmPf0);
 	JB_String* _tmPf1 = JB_File_ReadAll(_tmPf0, Lim, AllowMissing);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
-}
-
-JB_String* JB_Str_RegularPath(JB_String* Self) {
-	JB_StringC* _tmPf0 = JB_File_PathFix(Self);
-	JB_Incr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_TrimSlashes(_tmPf0);
 	JB_Incr(_tmPf1);
 	JB_EarlyDecr(_tmPf0);
 	JB_SafeDecr(_tmPf1);
@@ -61550,4 +61540,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -5162080917531499369 7266427177675583929
+// 2726716425587759974 7266427177675583929

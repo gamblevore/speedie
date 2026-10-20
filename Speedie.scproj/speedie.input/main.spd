@@ -67,10 +67,15 @@ function compiler.SetupEnv
 	if app.parent
 		stderr.PrintNewErrors = 0
 		TerminalColor.RainbowTerm = false
-	file._Speedie = app.exepath.Parent.Parent
-	if !file._Speedie.file.IsDir // oof
-		file._Speedie = "" // hope we find it another way.
+	file._Speedie = .findspeediepath
+	
 
+function compiler.FindSpeediePath (|string|)
+	|| f = app.exepath
+	while f
+		f = f.parent
+		if f.FileChild("Speedie.scproj").Exists
+			return f
 
 
 api Speedie_Main (spdprocess.MicroProcess)

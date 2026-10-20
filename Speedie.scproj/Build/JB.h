@@ -2804,6 +2804,8 @@ JB_File* SC_Comp__FindProjectSub(JB_String* Base, JB_String* Path);
 
 JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path);
 
+JB_String* SC_Comp__FindSpeediePath();
+
 JB_File* SC_Comp__GeneratedCppsFolder();
 
 SCDecl* SC_Comp__GetTypeVoid();
@@ -7930,8 +7932,6 @@ JB_String* JB_Str_Pluralize(JB_String* Self, bool Plural, FastString* Fs_in);
 JB_String* JB_Str_Preview(JB_String* Self, int N);
 
 JB_String* JB_Str_ReadAll(JB_String* Self, int Lim, bool AllowMissing);
-
-JB_String* JB_Str_RegularPath(JB_String* Self);
 
 JB_String* JB_Str_RenderSpeed(JB_String* Self, JB_Object* Fs_in, int64 BytesIn, JB_Duration Duration, int64 BytesOut);
 
