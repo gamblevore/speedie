@@ -52,7 +52,8 @@ module GUI
 	
 	visible true
 	
-	cpp_func SDL_Init				(|uint| c)
+	cpp_func SDL_GetError			(|cstring|)
+	cpp_func SDL_Init				(|uint| c, |int|)
 	cpp_func SDL_Quit				()
 
 	cpp_func SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
@@ -87,7 +88,8 @@ module GUI
 	cpp_func SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
 	cpp_func SDL_StartTextInput		()
 	cpp_func SDL_StopTextInput		()
-	cpp_func SDL_ShowSimpleMessageBox		(|int| Flags, |cstring| title, |cstring| msg, |?&SDL_Window| window)
+	function Alert (|int| Flags=0, |cstring| title, |cstring| msg=gui.sdl_geterror(), |?&SDL_Window| window=nil)
+		cpp_wrapper SDL_ShowSimpleMessageBox
 	cpp_func JB_SDL_RemoveWindowBorder (|&nil| window)
 	cpp_func JB_SDL_SetModified		(|&nil| window, |bool| b)
 	target osx
@@ -120,11 +122,6 @@ module GUI
 		|| s = .ScreenWindow
 			s.SDL_GetWindowWMInfo(data)
 			return data.window|&nil|
-
-	function Alert (|string| msg, |string| title="")
-		cpp_part MsgBox
-		visible
-		SDL_ShowSimpleMessageBox(0, Title.ZeroTerm, msg.ZeroTerm, nil)
 
 	
 	libinternal SelChanged
@@ -301,10 +298,13 @@ module GUI
 		WINDOW_FULLSCREENISH = 	0x1001
 
 
+	libinternal AlertError
+		gui.sdl_geterror().copy
 	libinternal InitSDL (|&nil|)
 		expect (font.small) "SmallFont not loaded."
 		// joystick works around a sdl2-bug
-		SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
+		|| Err = SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
+			return nil
 
 		|| DS = .CurrDisplaySize
 		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
@@ -427,7 +427,7 @@ module GUI
 		AppMenu.GetAppMenu
 		|| n = .InitSDL
 		if !n
-			gui.Alert("Unable to load SDL2", StdErr.LastError.name)
+			.alert("Unable to load SDL2")
 			return false
 	
 		.SDL_FullScreen(n, 1)
@@ -897,7 +897,7 @@ module GUI
 
 	libinternal CheckQuarantine
 		if platform.osx and app.isQuarantined
-			GUI.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning" )
+			.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning")
 
 
 	libinternal ReScale (|float| NewScale, |bool|)
