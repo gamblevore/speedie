@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2390];
+extern JB_StringC* JB_LUB[2393];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -457,6 +457,9 @@ void SC_Comp__AppendCompilerTime(JB_String* S, int Durr) {
 }
 
 void SC_Comp__AppleBuildApp(JB_File* Product, JB_File* Project) {
+	if (!JB_Platform__OSX()) {
+		return;
+	}
 	JB_String* Dest = JB_File_LinkToGet(Product);
 	JB_Incr(Dest);
 	if ((((JB_String*)JB_Str_Exists(Dest)))) {
@@ -516,6 +519,9 @@ JB_File* SC_Comp__BuildFolder() {
 }
 
 void SC_Comp__Bundle() {
+	if (!JB_Platform__OSX()) {
+		return;
+	}
 	if (!((!SC_Comp__IsTest()) and (!SC__Options_ExternalCompile))) {
 		return;
 	}
@@ -3452,7 +3458,7 @@ void SC_FB__Help() {
 	JB_FS_AppendString(Fs, _tmPf7);
 	JB_Decr(_tmPf7);
 	JB_FS_AppendString(Fs, JB_LUB[150]);
-	JB_FS_AppendInt32(Fs, (2026102114));
+	JB_FS_AppendInt32(Fs, (2026102115));
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[816]);
 	JB_String* _tmPf8 = JB_File__SpeedieDir(nil);
@@ -10038,8 +10044,13 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 		SC_Array_AppendWords(Rz, JB_LUB[143]);
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[336]);
+	int Opt = SC__Options_Optimise;
+	bool Aslib = SC__Options_ProjectIsLibrary;
+	if (Aslib) {
+		Opt = 3;
+	}
 	if (JB_Platform__CPU_Intel()) {
-		if (SC__Options_Optimise >= 3) {
+		if (Opt >= 3) {
 			SC_Array_AppendWords(Rz, JB_LUB[325]);
 		}
 	}
@@ -10050,11 +10061,14 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 		SC_Array_AppendWords(Rz, JB_LUB[342]);
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[335]);
-	int Opt = SC__Options_Optimise;
-	bool Aslib = SC__Options_ProjectIsLibrary;
 	if (Aslib) {
-		SC_Array_AppendWords(Rz, JB_LUB[333]);
-		Opt = 3;
+		if (JB_Platform__OSX()) {
+			SC_Array_AppendWords(Rz, JB_LUB[2391]);
+		}
+		 else {
+			SC_Array_AppendWords(Rz, JB_LUB[333]);
+		}
+		SC_Array_AppendWords(Rz, JB_LUB[2390]);
 	}
 	if (SC__Options_SelfReplacement or Aslib) {
 		SC_Array_AppendWords(Rz, JB_LUB[339]);
@@ -10129,7 +10143,7 @@ bool SC_Ext__ExecuteGCC(Array* Commands) {
 }
 
 void SC_Ext__ExportAndInstall(Date Elapsed) {
-	bool ActualCompile = SC_Ext__ShouldTransComp();
+	bool ActualCompile = SC_Ext__ShouldCppComp();
 	if (ActualCompile) {
 		if (SC_Options__ModeCpp()) {
 			({
@@ -10227,7 +10241,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026102114));
+	JB_FS_AppendInt32(_fsf0, (2026102115));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -10602,7 +10616,7 @@ void SC_Ext__SayTest(JB_String* N) {
 	JB_PrintLine(JB_LUB[110]);
 }
 
-bool SC_Ext__ShouldTransComp() {
+bool SC_Ext__ShouldCppComp() {
 	if (SC__Options_Scripting) {
 		return true;
 	}
@@ -31371,6 +31385,25 @@ byte* JB_Mem__Zalloc(int Count) {
 
 
 
+JB_String* SC_Imp_AppFolderProd(SCImport* Self) {
+	JB_String* _tmPf0 = SC_Comp__ProductPath();
+	JB_Incr(_tmPf0);
+	JB_String* Name = JB_Str_Name(_tmPf0);
+	JB_Incr(Name);
+	JB_Decr(_tmPf0);
+	JB_String* Base = JB_LUB[2392];
+	JB_Incr(Base);
+	if (JB_Platform__OSX()) {
+		JB_SetRef(Base, JB_LUB[310]);
+	}
+	JB_String* _tmPf1 = JB_Str_Child(Base, Name);
+	JB_Incr(_tmPf1);
+	JB_Decr(Name);
+	JB_EarlyDecr(Base);
+	JB_SafeDecr(_tmPf1);
+	return _tmPf1;
+}
+
 bool SC_Imp_CanBan(SCImport* Self, SCFile* Scf) {
 	bool Rz = false;
 	if (!SC__Imp_STDLibTime) {
@@ -31562,32 +31595,25 @@ void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 		Self->IsLibraryImp = true;
 		Self->WarnUnusedFuncs = false;
 	}
-	if (({
-		Message* _tmPf2 = JB_Msg_SyntaxAccess(Link, JB_LUB[1402]);
-		JB_Incr(_tmPf2);
-		bool _tmPf1 = JB_Msg_Yes(_tmPf2, false);
-		JB_EarlyDecr(_tmPf2);
-		 _tmPf1;
-	}) and SC_Options__ModeCpp()) {
-		JB_String* _tmPf4 = JB_File__Applications();
-		JB_Incr(_tmPf4);
-		JB_String* _tmPf6 = SC_Comp__ProductPath();
-		JB_Incr(_tmPf6);
-		JB_String* _tmPf5 = JB_Str_Name(_tmPf6);
-		JB_Incr(_tmPf5);
-		JB_Decr(_tmPf6);
-		JB_String* _tmPf3 = JB_Str_SyntaxAccess(_tmPf4, _tmPf5);
-		JB_Incr(_tmPf3);
-		JB_Decr(_tmPf4);
-		JB_Decr(_tmPf5);
-		SC_FB__SetOutputPath(_tmPf3, 1);
-		JB_Decr(_tmPf3);
+	if (JB_Platform__OSX()) {
+		if (({
+			Message* _tmPf2 = JB_Msg_SyntaxAccess(Link, JB_LUB[1402]);
+			JB_Incr(_tmPf2);
+			bool _tmPf1 = JB_Msg_Yes(_tmPf2, false);
+			JB_EarlyDecr(_tmPf2);
+			 _tmPf1;
+		}) and SC_Options__ModeCpp()) {
+			JB_String* _tmPf3 = SC_Imp_AppFolderProd(Self);
+			JB_Incr(_tmPf3);
+			SC_FB__SetOutputPath(_tmPf3, 1);
+			JB_Decr(_tmPf3);
+		}
 	}
 	if (SC_Imp_CanBan(Self, Scf)) {
-		Message* _tmPf7 = JB_Msg_SyntaxAccess(Link, JB_LUB[1413]);
-		JB_Incr(_tmPf7);
-		SC_Imp_LoadBanned(Self, _tmPf7);
-		JB_Decr(_tmPf7);
+		Message* _tmPf4 = JB_Msg_SyntaxAccess(Link, JB_LUB[1413]);
+		JB_Incr(_tmPf4);
+		SC_Imp_LoadBanned(Self, _tmPf4);
+		JB_Decr(_tmPf4);
 	}
 	Message* Arg = JB_Msg_NeedSyx(Link, kJB_SyxArg);
 	JB_Incr(Arg);
@@ -51406,10 +51432,6 @@ ExitCode JB_File_Touch(JB_File* Self) {
 	return _tmPf1;
 }
 
-JB_String* JB_File__Applications() {
-	return JB_LUB[310];
-}
-
 JB_String* JB_File__FindSpeedie(JB_String* Start) {
 	JB_String* F = JB_Str_ResolvePath(Start, false);
 	JB_Incr(F);
@@ -61513,4 +61535,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -244447497979098737 8071962793008303241
+// 5683874613668573783 -691156344962572064

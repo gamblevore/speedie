@@ -3872,7 +3872,7 @@ void SC_Ext__RunCppCompile();
 
 void SC_Ext__SayTest(JB_String* N);
 
-bool SC_Ext__ShouldTransComp();
+bool SC_Ext__ShouldCppComp();
 
 bool SC_Ext__TestNewCompiler();
 
@@ -7515,6 +7515,8 @@ byte* JB_Mem__Zalloc(int Count);
 
 
 // JB_SCImport
+JB_String* SC_Imp_AppFolderProd(SCImport* Self);
+
 bool SC_Imp_CanBan(SCImport* Self, SCFile* Scf);
 
 SCImport* SC_Imp_Constructor(SCImport* Self, JB_File* F, bool Builtin);
@@ -10225,8 +10227,6 @@ bool SC_File_TestCake(JB_File* Self);
 bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
 
 ExitCode JB_File_Touch(JB_File* Self);
-
-JB_String* JB_File__Applications();
 
 JB_String* JB_File__FindSpeedie(JB_String* Start);
 
