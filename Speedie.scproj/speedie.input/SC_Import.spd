@@ -126,7 +126,7 @@ class SCImport
 		|| name = compiler.Productpath.name
 		|| base = "/usr/local/bin"
 		if platform.OSX // can't rely on file.applications, because of how code is copied from MacOS compile.
-			base = "/Applications" + name
+			base = "/Applications"
 		return base.Child(name)
 		
 		
