@@ -60,8 +60,6 @@ function compiler.ProductFile (|File|)
 
 
 function Compiler.CakeExt (|string|)
-//	if options.targetdebug and options.CompileDebugSeparately
-//		return ".dbg.cake"
 	return ".cake"
 
 

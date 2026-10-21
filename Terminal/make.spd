@@ -193,55 +193,54 @@ set -e
 
 
 echo \"Speedie Compiling Perry (Optional Extra)\"
-$PerryPreReqs
 $SpdTerm \$Speedie/Perry.scproj
 "
 
 
 
-function app.Gen (|string| plat, |bool| IsCurrentPlatform) {
-vars.initvars(plat)
-|| tocompile = FastString()
-|| Count = 2							//JB.cpp and JB_Globals.cpp
-for ch in CppLibLocal!
-	if ch isa "cpp" or "S"
-		tocompile <~ ch
-		tocompile <~ ' '
-		Count++
-|| list = tocompile.render
-
-
-////////////////////////////
-<(`    (((generating cpp files)))    `)>
-////////////////////////////
-
-.cwd = SpdLocal.child("jeebox.scproj").resolve
-|| ScriptOut = "$SpdLocal/Terminal/make$plat.sh".file
-|| PrepareCpp = "$SpdLocal/Terminal/PrepareSpeedie.sh".file
-
-
-PrepareCpp.writeall `#!/bin/bash
+function app.Gen (|string| plat, |bool| IsCurrentPlatform)
+	vars.initvars(plat)
+	|| tocompile = FastString()
+	|| Count = 2							//JB.cpp and JB_Globals.cpp
+	for ch in CppLibLocal!
+		if ch isa "cpp" or "S"
+			tocompile <~ ch
+			tocompile <~ ' '
+			Count++
+	|| list = tocompile.render
+	
+	
+	////////////////////////////
+	<(`    (((generating cpp files)))    `)>
+	////////////////////////////
+	
+	.cwd = SpdLocal.child("jeebox.scproj").resolve
+	|| ScriptOut = "$SpdLocal/Terminal/make$plat.sh".file
+	|| PrepareCpp = "$SpdLocal/Terminal/PrepareSpeedie.sh".file
+	
+	
+	PrepareCpp.writeall `#!/bin/bash
 echo "Prebuild .cpp files"
 /usr/local/bin/speedie   .    --x --nocompile
 /usr/local/bin/speedie --self --x --nocompile
 `
-if IsCurrentPlatform
-	printline "cwd: " + app.cwd
-	require PrepareCpp.NeedExecute								/* <----- ACTUAL CALL POINT -----> */
+	if IsCurrentPlatform
+		printline "cwd: " + app.cwd
+		require PrepareCpp.NeedExecute								/* <----- ACTUAL CALL POINT -----> */
+	
+	
+	////////////////////////////
+	<(`    (((generating script)))    `)>
+	////////////////////////////
+	
+	printline "Creating $scriptout"
+	scriptout.writeall vars.CreateScriptOut(list)
+	
+	"Script generated at: $scriptout"
+	if IsCurrentPlatform
+		"Running Script: $scriptout ($Count+ .cpp files)\n\n"
+		scriptout.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
 
-
-////////////////////////////
-<(`    (((generating script)))    `)>
-////////////////////////////
-
-printline "Creating $scriptout"
-scriptout.writeall vars.CreateScriptOut(list)
-
-"Script generated at: $scriptout"
-if IsCurrentPlatform
-	"Running Script: $scriptout ($Count+ .cpp files)\n\n"
-	scriptout.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
-}
 
 
 function file.NeedExecute (|bool|)

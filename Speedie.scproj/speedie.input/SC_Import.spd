@@ -126,8 +126,15 @@ class SCImport
 		if link["type"] ~= "library"
 			.IsLibraryImp = true
 			.WarnUnusedFuncs = false
-		if link["apps_folder"].yes and options.modecpp
-			feedback.SetOutputPath( file.Applications[compiler.Productpath.name], 1 )
+
+		target osx
+			if link["apps_folder"].yes and options.modecpp
+				feedback.SetOutputPath( file.Applications[compiler.Productpath.name], 1 )
+			// where should perry be installed on linux? /usr/bin? hmmmm
+			// on macos, perry is a symlink to the exe in /Applications/
+			// but if its already in /usr/bin or /usr/local/bin, then what? we cant do the link
+			// just do nothing, for now
+			
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])
 		|| arg = link[@arg]
