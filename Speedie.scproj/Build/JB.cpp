@@ -764,7 +764,7 @@ void SC_Comp__CompileAll() {
 
 void SC_Comp__CompileTime() {
 	if ((!JB_Str_Exists(SC__Options_output_path)) and SC__Options_HideawayScripts) {
-		JB_SetRef(SC__Options_output_path, SC_Str_ScriptLocation(SC__Comp_OriginalInputPath, JB_LUB[418]));
+		SC_FB__SetOutputPath(SC_Str_ScriptLocation(SC__Comp_OriginalInputPath, JB_LUB[418]), 2);
 	}
 	if (!SC__Options_Scripting) {
 		if (SC__Options_SelfReplacement) {

@@ -78,6 +78,7 @@ function compiler.TimeTest (|date| elapsed, |bool|)
 
 
 function compiler.CompileTime
+	opt norefcounts
 	if !options.output_path and options.HideawayScripts
 		feedback.SetOutputPath(.originalinputpath.ScriptLocation, 2)
 	
