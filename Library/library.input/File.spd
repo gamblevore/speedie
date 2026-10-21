@@ -467,9 +467,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			inlined
 			target OSX
 				return "/Applications"
-			target win
-				return "/usr/local/bin"
-			target linux
+			  else
 				return "/usr/local/bin"
 
 		function HomePath (|string|)
