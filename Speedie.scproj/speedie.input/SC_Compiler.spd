@@ -847,7 +847,8 @@ function AddMain (|int| Mark, |bool|)
 		|| c = Compiler.AppInitCode
 		C.FixFileNumber(f.source!.tag)
 	  else
-		"Compiling as library!"
+		if !Options.Silent
+			"Compiling as library!"
 		Options.ProjectisLibrary = true
 		.program.CollectStr( "main:\n" )
 	
