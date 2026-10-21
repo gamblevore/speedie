@@ -1443,7 +1443,7 @@ JB_Str_Protocol
 JB_Str_Range
 JB_Str_RangeVec
 JB_Str_ReadAll
-JB_Str_RemoveProp
+JB_Str_RemoveCharset
 JB_Str_RenderSpeed
 JB_Str_ReplaceAll
 JB_Str_ReplacePathComponent
@@ -1904,7 +1904,6 @@ SDL_CreateWindow
 SDL_DestroyRenderer
 SDL_DestroyTexture
 SDL_DestroyWindow
-SDL_EventState
 SDL_GL_GetDrawableSize
 SDL_GetClipboardText
 SDL_GetCurrentDisplayMode
@@ -1916,20 +1915,17 @@ SDL_GetMouseState
 SDL_GetNumTouchFingers
 SDL_GetRendererOutputSize
 SDL_GetScancodeFromKey
-SDL_GetWindowFlags
 SDL_GetWindowPosition
 SDL_GetWindowSize
 SDL_GetWindowTitle
 SDL_GetWindowWMInfo
 SDL_Init
 SDL_LockTexture
-SDL_MaximizeWindow
 SDL_PollEvent
 SDL_Quit
 SDL_RaiseWindow
 SDL_RenderCopy
 SDL_RenderPresent
-SDL_RestoreWindow
 SDL_SetClipboardText
 SDL_SetRelativeMouseMode
 SDL_SetWindowFullscreen
@@ -1940,7 +1936,6 @@ SDL_SetWindowSize
 SDL_SetWindowTitle
 SDL_ShowCursor
 SDL_ShowSimpleMessageBox
-SDL_ShowWindow
 SDL_StartTextInput
 SDL_StopTextInput
 SDL_UnlockTexture

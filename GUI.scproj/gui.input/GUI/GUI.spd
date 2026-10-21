@@ -56,15 +56,13 @@ module GUI
 	cpp_func SDL_Init				(|uint| c, |int|)
 	cpp_func SDL_Quit				()
 
-	cpp_func SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|) 
-	cpp_func SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title) 
-	cpp_func SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|) 
-	cpp_func SDL_RaiseWindow			(|&SDL_Window| win) 
-	cpp_func SDL_GetWindowFlags		(|&SDL_Window| win, |uint64|)
-///
+	cpp_func SDL_CreateWindow		(|cstring| title, |int| x, |int| y, |int| w, |int| h, |uint| flags, |?&SDL_Window|)
+	cpp_func SDL_SetWindowTitle		(|&SDL_Window| win, |cstring| title)
+	cpp_func SDL_GetWindowTitle		(|&SDL_Window| win, |cstring|)
+	cpp_func SDL_RaiseWindow		(|&SDL_Window| win)
 
-	cpp_func SDL_CaptureMouse		(|bool| state, |int|) 
-	cpp_func SDL_GetMouseState		(|$int| x, |$int| y, |mousebutton|) 
+	cpp_func SDL_CaptureMouse		(|bool| state, |int|)
+	cpp_func SDL_GetMouseState		(|$int| x, |$int| y, |mousebutton|)
 	cpp_func SDL_SetRelativeMouseMode (|bool| Relative)
 	cpp_func SDL_WarpMouseInWindow   (|&sdl_window| window, |int| x, |int| y)
 
@@ -75,13 +73,10 @@ module GUI
 	cpp_func SDL_GL_GetDrawableSize	(|&SDL_Window| window, |&int| w, |&int| h)
 	cpp_func SDL_RenderCopy			(|&SDL_Renderer| renderer,  |&SDL_Texture| texture,  |?&SDL_Rect| srcrect, |&SDL_Rect| dstrect)
 	cpp_func SDL_RenderPresent		(|&SDL_Renderer| renderer)
-	cpp_func SDL_EventState			(|int| event, |int| enable, |byte|)
 	cpp_func SDL_SetWindowPosition	(|&SDL_Window| w,  |int| x, |int| y)
 	cpp_func SDL_GetDisplayBounds	(|int| displayIndex, |&SDL_Rect| rect, |int|)
 	cpp_func SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
 	cpp_func SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
-	cpp_func SDL_MaximizeWindow		(|&SDL_Window| window)
-	cpp_func SDL_RestoreWindow		(|&SDL_Window| window)
 	cpp_func SDL_GetWindowPosition	(|&SDL_Window| window,  |&int| x, |&int| y)
 	cpp_func SDL_GetWindowSize		(|&SDL_Window| window,  |&int| x, |&int| y)
 	cpp_func SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
@@ -567,7 +562,6 @@ module GUI
 	
 	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
 		require path
-		// shouldn't 
 		|| d = .AppDocumentOpen
 			|| f = path.Resolve(Allowmissing)
 				// if its not existing, the called-func can create it, or not.
@@ -1438,7 +1432,7 @@ module GUI
 		
 		|| info = ""
 		ifn r isa textview  and  r is editable
-			info = r.Description
+			info = r.Tooltip
 		|| delay = 0.0s
 		if GUI.FastToolTipDate.fired
 			delay = 1.25s
@@ -1449,10 +1443,6 @@ module GUI
 		t.when = now + delay
 		t.name = info
 
-
-inline guicontrol.Description (|string|)
-	return .tooltip // :)
-	
 
 datatype GUIActivity (byte)
 	flags
