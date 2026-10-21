@@ -1344,7 +1344,6 @@ extern JB_String* SC__AutoComplete_function_cls_only;
 extern JB_String* SC__AutoComplete_function_names;
 extern Dictionary* SC__AutoComplete_SpdFunctions;
 extern JB_File* SC__Comp__BuildFolder;
-extern JB_String* SC__Comp__Projects;
 extern JB_String* SC__Comp__SpeedieProj;
 extern Array* SC__Comp_ActualSyxes;
 extern Dictionary* SC__Comp_AdjDicts;
