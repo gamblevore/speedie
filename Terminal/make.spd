@@ -81,7 +81,6 @@ ${unmod(dest)}
 |string|	shared
 |string|	LinkLibFlags
 |string|	ext
-|string|	PerryPreReqs
 |string|	LibName
 |string|	LibFlags
 |string|	SpdSrc
@@ -99,7 +98,6 @@ module Vars
 		shared = "shared"
 		LinkLibFlags = ""
 		ext = "so"
-		PerryPreReqs = ""
 		gcc = "g++"
 		if plat ~= "osx"
 			shared = "dynamiclib"
@@ -108,13 +106,6 @@ module Vars
 		if plat ~= "linux"
 			CFlags += " -rdynamic"
 			LinkLibFlags += "-lrt -pthread"
-			PerryPreReqs = `
-echo "Getting GUI files that Perry needs"
-sudo apt install libsdl2-dev
-sudo apt install gedit
-`
-		  else
-			PerryPreReqs = `echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."`
 		
 		LibName  = "libjeebox.$ext" 
 		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
@@ -161,12 +152,6 @@ echo \"Symlinking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
 
-echo \"Making 🎂 Cake 🎂\"
-$SpdTerm \$Speedie/Cake.scproj --output_path=\$Speedie/Terminal/Cake
-
-echo \"Symlinking 🎂\"
-${link(CakeTerm, `/usr/local/bin/cake`)}
-${link(CakeTerm, `/usr/local/bin/🎂`)}
 
 echo \"\"
 echo \"Compiling JeeboxLib\"
@@ -192,8 +177,24 @@ ${compile_example(`users`)}
 set -e
 
 
-echo \"Speedie Compiling Perry (Optional Extra)\"
+echo \"Compiling Cake and Perry\"
+if [ ! -f \"/usr/local/include/SDL2/SDL.h\" ]; then
+	echo \"Please install SDL2 to get Perry and Cake to compile. Speedie expects SDL2 headers at /usr/local/include/SDL2/SDL.h\"
+	echo \"https://wiki.libsdl.org/SDL2/Installation contains the guidelines.\"
+
+else
+
+echo \"Making 🎂 Cake 🎂\"
+$SpdTerm \$Speedie/Cake.scproj --output_path=\$Speedie/Terminal/Cake
+
+echo \"Symlinking 🎂\"
+${link(CakeTerm, `/usr/local/bin/cake`)}
+${link(CakeTerm, `/usr/local/bin/🎂`)}
+
+
 $SpdTerm \$Speedie/Perry.scproj
+
+fi
 "
 
 

@@ -72,20 +72,6 @@ chmod 775 /usr/local/bin/speedie
 chown $U /usr/local/bin/speedie
 
 
-echo "Making 🎂 Cake 🎂"
-$Speedie/Terminal/Speedie $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
-
-echo "Symlinking 🎂"
-
-ln -sf $Speedie/Terminal/Cake /usr/local/bin/cake
-chmod 775 /usr/local/bin/cake
-chown $U /usr/local/bin/cake
-
-
-ln -sf $Speedie/Terminal/Cake /usr/local/bin/🎂
-chmod 775 /usr/local/bin/🎂
-chown $U /usr/local/bin/🎂
-
 
 echo ""
 echo "Compiling JeeboxLib"
@@ -130,6 +116,29 @@ chown $U Build/users
 set -e
 
 
-echo "Speedie Compiling Perry (Optional Extra)"
-echo "Please make sure that you have libSDL2 installed. We won't check for libSDL2, just assume it exists."
+echo "Compiling Cake and Perry"
+if [ ! -f "/usr/local/include/SDL2/SDL.h" ]; then
+	echo "Please install SDL2 to get Perry and Cake to compile. Speedie expects SDL2 headers at /usr/local/include/SDL2/SDL.h"
+	echo "https://wiki.libsdl.org/SDL2/Installation contains the guidelines."
+
+else
+
+echo "Making 🎂 Cake 🎂"
+$Speedie/Terminal/Speedie $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
+
+echo "Symlinking 🎂"
+
+ln -sf $Speedie/Terminal/Cake /usr/local/bin/cake
+chmod 775 /usr/local/bin/cake
+chown $U /usr/local/bin/cake
+
+
+ln -sf $Speedie/Terminal/Cake /usr/local/bin/🎂
+chmod 775 /usr/local/bin/🎂
+chown $U /usr/local/bin/🎂
+
+
+
 $Speedie/Terminal/Speedie $Speedie/Perry.scproj
+
+fi
