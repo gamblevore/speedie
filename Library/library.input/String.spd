@@ -138,7 +138,7 @@ class String
 			fs <~ s
 
 	render Remove (|CharSet| remove, |int| to=-1)
-		cpp_part RemoveProp
+		cpp_part RemoveCharset
 		for c in self
 			if !remove[c]
 				fs <~ c

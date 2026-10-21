@@ -1490,7 +1490,7 @@ extern Message* SC__Macros_MainArgArray;
 extern Message* SC__Macros_MainArgBasic;
 extern Message* SC__Macros_MainArgBasicReq;
 extern Message* SC__Macros_MainArgDefault;
-extern Message* SC__Macros_MainArgNoNE;
+extern Message* SC__Macros_MainArgNone;
 extern Message* SC__Macros_MultiDecr;
 extern Message* SC__Macros_MultiEarlyDecr;
 extern Message* SC__Macros_TernQMark;
@@ -8035,6 +8035,8 @@ void JB_Tree_AppendBefore(JB_List* Self, JB_List* Item, JB_List* Before);
 
 void JB_Tree_Clear(JB_List* Self);
 
+int JB_Tree_Count(JB_List* Self);
+
 JB_List* JB_Tree_FlatLast(JB_List* Self);
 
 bool JB_Tree_HasOneChild(JB_List* Self);
@@ -8876,6 +8878,8 @@ Message* JB_Msg_MacroPrm(Message* Self, Message* Orig, Message* Root, Array* Prm
 Message* JB_Msg_MacroSame(Message* Self, Message* Orig, Message* Prm);
 
 Message* SC_Msg_MainArgDotFix(Message* Self);
+
+bool SC_Msg_MainArgHasArray(Message* Self);
 
 bool SC_Msg_MainArgsCanBeZero(Message* Self);
 

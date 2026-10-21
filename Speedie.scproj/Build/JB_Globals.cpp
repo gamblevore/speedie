@@ -132,7 +132,7 @@ Message* SC__Macros_MainArgArray;
 Message* SC__Macros_MainArgBasic;
 Message* SC__Macros_MainArgBasicReq;
 Message* SC__Macros_MainArgDefault;
-Message* SC__Macros_MainArgNoNE;
+Message* SC__Macros_MainArgNone;
 Message* SC__Macros_MultiDecr;
 Message* SC__Macros_MultiEarlyDecr;
 Message* SC__Macros_TernQMark;
