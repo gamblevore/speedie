@@ -450,7 +450,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		function TrashPath (|string|)
 			inlined
 			target OSX
-				return "~/.Trash/"
+				return "~/.Trash"
 			target win
 				return `C:\$Recycle.Bin`
 			target linux
@@ -466,11 +466,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		function Applications (|string|)
 			inlined
 			target OSX
-				return "/Applications/"
+				return "/Applications"
 			target win
-				return `C:\$Recycle.Bin`
+				return "/usr/local/bin"
 			target linux
-				return "~/.local/share/Trash"
+				return "/usr/local/bin"
 
 		function HomePath (|string|)
 			cpp_wrapper JB_File__Home
