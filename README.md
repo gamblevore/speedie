@@ -46,9 +46,6 @@ If you'd like to support the ongoing development of Speedie, consider [sponsorin
 * [Cake VM 🍰](Documentation/Cake.md) _(Not finished but will be tasty!)_
 
 
-# Code of Conduct #
-*  [Code of conduct](Documentation/Cond.md) _(Our required expectations for behaviour.)_
-
 
 # Power Features #
 * Has an awesome nil-checker and type-safety system! Write safe code while having an easy time of doing it!
@@ -74,6 +71,10 @@ Proper Release:
 * GPU acceleration via OpenCL
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state.
+
+
+# Contributing Patches #
+*  [Code of Conduct For Patches and Requests](Documentation/Cond.md)
 
 
 # Downsides #
