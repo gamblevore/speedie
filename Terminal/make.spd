@@ -96,18 +96,15 @@ module Vars
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
 		SpdGccFlags = ""
 		gcc = "g++"
-		|| shared = ""
 		if plat ~= "osx"
 			CFlags += " -lc++"
-			shared = "-dynamiclib"
 			ext = "dylib"
 		  else
-			shared = " -rdynamic -shared"
 			ext = "so"
 			SpdGccFlags += "-lrt -pthread"
 		
-		LibName  = "libjeebox.$ext" 
-		LibFlags = "$CFlags $shared -fPIC -D AS_LIBRARY=1 "
+		LibName  = "libjeebox.$ext"
+		LibFlags = "$CFlags -rdynamic -shared -fPIC -D AS_LIBRARY=1 "
 		ExecFlags= "$CFlags -g -ljeebox"
 		SpdSrc   = "\$Speedie/Speedie.scproj/Build"
 		SpdTerm  = "\$Speedie/Terminal/Speedie"
