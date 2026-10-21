@@ -446,7 +446,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		function NewPipe (|filedes| Pipe, |file|)
 			cpp_wrapper JB_File__NewPipe
 		
-// can rename these from path into files :)
+
 		function TrashPath (|string|)
 			inlined
 			target OSX
