@@ -122,7 +122,7 @@ class SyntaxObj
 		.ExportAddr = Message.Dummy!
 	
 	
-	render 
+	render
 		if !fs_in
 			return .LongName.lowercase
 		fs_in.appendlower(.LongName)
