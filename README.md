@@ -70,6 +70,7 @@ Beta Release:
 
 Proper Release:
 
+* Needs to run smoothly on (Mac + Window + Linux) * (x86 + ARM). So thats 6 combinations.
 * GPU acceleration via OpenCL
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state.
