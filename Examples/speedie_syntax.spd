@@ -11,6 +11,7 @@ class Person
 		ifn (value > 0 and value < 300)
 			|| str = "Age $value out of range on ${.name}"
 			printline str
+			return
 			
 		.age = value
 	
