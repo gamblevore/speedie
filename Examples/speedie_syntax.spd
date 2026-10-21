@@ -41,12 +41,12 @@ function ByteCountTest (|DataTypeCode| A, |DataTypeCode| B)
 	
 
 
-function app.TestSyntax2 (|int| z=1, |int|)
-	opt noinline
-	|| B = (z!=0)(1, 2)
-	|| A = (z!=0)(mesayer, shesayer)
-	return z+1
-//	(fn)("hello")
+//function app.TestSyntax2 (|int| z=1, |int|)
+//	opt noinline
+//	|| B = (z!=0)(1, 2)
+//	|| A = (z!=0)(mesayer, shesayer)
+//	return z+1
+////	(fn)("hello")
 
 
 function app.TestSyntax
@@ -116,6 +116,8 @@ class RPGHero // for a tile-based board game
 	|int|		GroundSpeed
 
 	constructor (|string| name)
+		.OnGround = true
+		.IsDucking = false
 		.name = name
 	render
 
@@ -133,7 +135,8 @@ dispatch DoAction (|rpghero|self, |string| Reason)
 		.IsDucking = false
 
 	duck
-		"$.Name ducked because $Reason"
-		.IsDucking = true
+		if !.isducking
+			"$.Name ducked because $Reason"
+			.IsDucking = true
 
 

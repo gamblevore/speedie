@@ -15,7 +15,7 @@ main (|int| amount)
 	
 	for count in 0 to Amount
 		app.say count of "banana"
-	app.say "bye"
+	app.say "yummy!"
 
 
 
