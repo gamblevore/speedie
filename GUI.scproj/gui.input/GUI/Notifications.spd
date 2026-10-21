@@ -123,11 +123,10 @@ module Notifications
 		|| p = data.parse.Rand
 			Notifications <~ (prefix + p.name)
 
-	cpp_func SDL_GetError (|cstring|)
 		
 	function NotifySDLError
 		opt norefcounts
-		self <~ (sdl_geterror().copy, errorseverity.error)		
+		self <~ (gui.sdl_geterror().copy, errorseverity.error)		
 
 
 function error.Useable (|date| ago=8s, |error|)
