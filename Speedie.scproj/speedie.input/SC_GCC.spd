@@ -258,12 +258,11 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	rz.appendwords( "-fdata-sections -ffunction-sections")
 	
 	if aslib
-//		if Platform.OSX
-//			rz.appendwords("-dynamiclib")
-//		  else
 		rz.appendwords("-rdynamic -shared -fPIC")
+
 	if options.selfreplacement or aslib
 		rz.appendwords("-g")
+
 	if (opt < 0)
 		rz.AppendWords(" -O0 ")
 	  else

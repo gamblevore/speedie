@@ -79,7 +79,7 @@ function compiler.TimeTest (|date| elapsed, |bool|)
 
 function compiler.CompileTime
 	if !options.output_path and options.HideawayScripts
-		options.output_path = .originalinputpath.ScriptLocation
+		feedback.SetOutputPath(.originalinputpath.ScriptLocation, 2)
 	
 	if !options.scripting
 		if options.SelfReplacement	// avoid failing needlessly

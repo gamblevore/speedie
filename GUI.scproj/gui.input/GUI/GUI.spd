@@ -304,16 +304,23 @@ module GUI
 		expect (font.small) "SmallFont not loaded."
 		// joystick works around a sdl2-bug
 		|| Err = SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
+			printerror "SDL_Init failed"
 			return nil
 
 		|| DS = .CurrDisplaySize
 		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
-			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI) #expect "Can't init window"
+			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI)
+		if !W
+			printerror "SDL_CreateWindow failed"
+			return nil
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
 		.vsync = true
-		.renderer = SDL_CreateRenderer(w, -1, 0)  #expect  "Can't init renderer"
+		.renderer = SDL_CreateRenderer(w, -1, 0)
+		if !.renderer
+			printerror "SDL_CreateRenderer failed"
+			return nil
 		return .NativeWindow
 
 
