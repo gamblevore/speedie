@@ -138,6 +138,13 @@ function message.MainArgDotFix (|message|)
 		self = .first!
 
 
+function message.MainArgHasArray (|bool|)
+	opt norefcounts
+	for ch.fast in self
+		if ch.first == @arr
+			return true
+
+
 function message.MainOneArg (|message| arg, |int| i, |int| found, |int|)
 	opt norefcounts
 	
@@ -206,14 +213,15 @@ function message.InsertMainArgs (|message| prms)
 	|| FirstArg = macro.new(src.parsejbin, false)	
 	using prms
 	.AppendMacro(FirstArg, [Usage.msg])
+	
+	if !prms.MainArgHasArray
+		macros.mainargNone.clean
+		.AppendMacro(macros.mainargNone, [prms.count.msg])
+	
 	|| i = 0
 	|| Found = 0
 	for ch in prms
 		Found |= ch.MainOneArg(self, i++, Found)
-
-	ifn found&1
-		macros.mainargNone.clean
-		.AppendMacro(macros.mainargNone, [i.msg])
 
 	self <~ "require stderr.ok"~parse
 

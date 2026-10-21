@@ -48,7 +48,7 @@ while __ArgCurr < __ArgCount
 	_0 <~ _1.MainArg(++__ArgCurr, "_0")
 `.macro
 
-|| MainArgNoNE = `
+|| MainArgNone = `
 	check (__ArgCount <= _0) ("Unexpected argument: " + app.args[_0]!)
 `.macro
 }
