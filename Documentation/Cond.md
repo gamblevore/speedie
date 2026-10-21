@@ -3,7 +3,7 @@
 
 ### About the Code of Conduct
 
-The purpose of the code of conduct, is to create an environment, where positive contributions can grow. This does mean, that certain behaviours are not allowed.
+The purpose of the code of conduct, is to create an environment, where positive contributions can grow. This document explains what we expect.
 
 ## Our Pledge
 
@@ -26,7 +26,7 @@ Speedie has bugs, like all software. Please report any bugs found via [GitHub's 
 
 ## Usage
 
-Just using speedie at all, for something important, is already beneficial to the language. So the easiest way to contribute, is just use Speedie.
+Just using Speedie at all, for something important, is already beneficial to the language. So the easiest way to contribute, is just use Speedie.
 
 
 ## Patch Contributions
