@@ -297,31 +297,36 @@ module GUI
 		WINDOW_FULLSCREEN = 	0x1
 		WINDOW_FULLSCREENISH = 	0x1001
 
+	
+	libinternal AlertError (|stringzeroterminated| s, |&nil|)
+		printerror s
+		printerror "\n"
+		.alert(s, .sdl_Geterror)
 
-	libinternal AlertError
-		gui.sdl_geterror().copy
+	
 	libinternal InitSDL (|&nil|)
-		expect (font.small) "SmallFont not loaded."
+		if !(font.small)
+			return .alerterror("SmallFont not loaded.")
+
 		// joystick works around a sdl2-bug
 		|| Err = SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
-			printerror "SDL_Init failed"
-			return nil
+			return .alerterror("SDL_Init failed")
 
 		|| DS = .CurrDisplaySize
 		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
 			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI)
 		if !W
-			printerror "SDL_CreateWindow failed"
-			return nil
+			return .alerterror("SDL_CreateWindow failed")
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
 		.vsync = true
 		.renderer = SDL_CreateRenderer(w, -1, 0)
 		if !.renderer
-			printerror "SDL_CreateRenderer failed"
-			return nil
-		return .NativeWindow
+			return .alerterror("SDL_CreateRenderer failed")
+		|| Native = .NativeWindow
+			return Native
+		return .AlertError("SDL_GetWindowWMInfo failed")
 
 
 	function vsync (assigns:|bool|)
@@ -434,7 +439,6 @@ module GUI
 		AppMenu.GetAppMenu
 		|| n = .InitSDL
 		if !n
-			.alert("Unable to load SDL2")
 			return false
 	
 		.SDL_FullScreen(n, 1)
