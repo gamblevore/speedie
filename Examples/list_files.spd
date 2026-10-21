@@ -1,11 +1,16 @@
+#!/usr/local/bin/spd
 
+main
+	for f in app.CWD.file.List
+		printline f
 
+/*
+// speedie version
 main
 	|| dir = "directory".FileThatExists
 		for f in dir
 			printline f
 
-/*
 // java version
 import java.io.File;
 
