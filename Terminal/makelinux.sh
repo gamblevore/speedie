@@ -60,6 +60,7 @@ cp    *.h /usr/local/include/
 chmod 775 /usr/local/include/jeebox*
 chown $U /usr/local/include/jeebox*
 
+set +e									# better to continue
 echo "Symlinking Speedie"
 
 ln -sf $Speedie/Terminal/Speedie /usr/local/bin/spd
@@ -77,7 +78,6 @@ echo ""
 echo "Compiling JeeboxLib"
 
 
-set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
 $Speedie/Terminal/Speedie $Speedie/jeebox.scproj -x		# regenerate libjeebox source
 chmod 775 ../../jeebox.scproj/Cpp/*

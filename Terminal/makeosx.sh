@@ -60,6 +60,7 @@ cp    *.h /usr/local/include/
 chmod 775 /usr/local/include/jeebox*
 chown $U /usr/local/include/jeebox*
 
+set +e									# better to continue
 echo "Symlinking Speedie"
 
 ln -sf $Speedie/Terminal/Speedie /usr/local/bin/spd
@@ -74,17 +75,19 @@ chown $U /usr/local/bin/speedie
 
 
 echo ""
-echo "Compiling JeeboxLib"
-
-
-set +e									# better to continue if libjeebox can't be compiled
 cd $Speedie/Library/CppLib				# allow source to be found!
+
+echo "Preparing libJeebox"
 $Speedie/Terminal/Speedie $Speedie/jeebox.scproj -x		# regenerate libjeebox source
+
+echo "Relaxing permissions"
+
 chmod 775 ../../jeebox.scproj/Cpp/*
 chown $U ../../jeebox.scproj/Cpp/*
 chmod 775 ../../jeebox.scproj/Build/*
 chown $U ../../jeebox.scproj/Build/*
 echo "Compiling /usr/local/lib/libjeebox.dylib for user '$U'"
+
 g++ -o /usr/local/lib/libjeebox.dylib  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -lc++ -dynamiclib -fPIC -D AS_LIBRARY=1   JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp    $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 chmod 775 /usr/local/lib/libjeebox.dylib
 chown $U /usr/local/lib/libjeebox.dylib
@@ -139,6 +142,7 @@ chown $U /usr/local/bin/🎂
 
 
 
+echo "Making Perry"
 $Speedie/Terminal/Speedie $Speedie/Perry.scproj
 
 fi
