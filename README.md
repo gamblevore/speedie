@@ -110,13 +110,33 @@ I have a lot of long-term goals... Overall, I want to make programming a whole l
 On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to **not** drain our health.
 
 
+# Dependancies #
+
+Speedie makes use of SDL2 as it's only dependancy. It is only needed for graphical apps, but this includes Cake (the VM) and Perry (The IDE). If you have SDL2 installed already, you can skip this step. (Check `/usr/local/include/SDL2/SDL.h` exists).
+
+To install SDL2, run these commands, from any directory.
+
+    git clone https://github.com/libsdl-org/SDL.git -b SDL2
+    cd SDL
+    mkdir build
+    cd build
+    ../configure
+    make
+    sudo make install
+
+This should copy the headers to `/usr/local/include/SDL2/SDL.h` and build the libs needed. You can delete your cloned folder after that, as the copies no longer need it.
+
+
 # Installation #
 
-1. Run "`git clone https://github.com/gamblevore/speedie.git`" then move the folder to `/usr/local/speedie/` if it wasn't cloned there already.
-2. `cd /usr/local/speedie`
-3. Execute `sudo Terminal/makelinux.sh` ... OR `sudo Terminal/makeosx.sh`
+1. Run "`git clone https://github.com/gamblevore/speedie.git`"
+2. Run build script
+    1. Linux: `sudo Terminal/makelinux.sh`
+    2. MacOS: `sudo Terminal/makeosx.sh`
 
-My IDE Perry, will need libsdl2-dev to compile. LibSDL2 has [install instructions](https://wiki.libsdl.org/SDL2/Installation).
+_Tip: The script will setup some symlinks to Speedie, and Cake. This is so you can run commands like `spd source.spd`. To make this easier, its best to settle on a dedicated directory for Speedie._
+
+_My recommendation is to move your cloned Speedie folder, to `/usr/local/speedie/` then run the build script._
 
 
 
