@@ -204,9 +204,10 @@ class Window (GUIControl)
 
 	syntax is (|guicontrolflags| F, assigns:|bool|)
 		require self
-		|| n = GUI.nativewindow
-			if (f == guicontrolflags.Modified) and ((self is modified) != value)
-				GUI.JB_SDL_SetModified(n, value)
+		target osx
+			|| n = GUI.OSXWindow
+				if (f == guicontrolflags.Modified) and ((self is modified) != value)
+					GUI.JB_SDL_SetModified(n, value)
 		super.syntaxis(f) = value
 
 
@@ -585,8 +586,11 @@ struct SDL_Window
 struct SDL_SysWMinfo
 	|int|		A
 	|int|		B
-	|&nil|		window //actually a "datatype ObjCID:"
-	|byte[56]|	Buffer
+	target osx
+		|&nil|		window //actually a "datatype ObjCID:"
+		|byte[56]|	Buffer
+	  else
+		|byte[64]|	Buffer
 
 
 

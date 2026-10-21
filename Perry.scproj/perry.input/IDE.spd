@@ -839,9 +839,10 @@ So anything not 0 means "its OK"`
 		
 		|| Loaded = E.LoadDocument(doc, true)					#require
 
-//		e.DebugLevel = .DebugLevel(.Debugmode)
-		if .debugmode is debug
-			.ReloadBreaks
+		|| dm = .DebugMode
+		if (dm is debug) and !.ReloadBreaks // apparantly its not debug after all? how did that happen
+			(dm isnt debug)
+			.DebugMode = dm
 
 		|| m = .FunctionMenu.SubControl as menu
 			m.StopFilter

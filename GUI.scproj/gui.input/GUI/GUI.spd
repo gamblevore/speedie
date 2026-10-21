@@ -81,30 +81,47 @@ module GUI
 	cpp_func SDL_SetWindowMaximumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
 	cpp_func SDL_SetWindowMinimumSize (|&SDL_Window| window, |int| max_w, |int| max_h)
 	cpp_func SDL_MaximizeWindow		(|&SDL_Window| window)
-	cpp_func SDL_SetWindowFullscreen	(|&SDL_Window| window, |int| Mode=0x1001, |int|)
 	cpp_func SDL_RestoreWindow		(|&SDL_Window| window)
-	cpp_func SDL_GetWindowPosition	(|&SDL_Window| w,  |&int| x, |&int| y)
-	cpp_func SDL_GetWindowSize		(|&SDL_Window| w,  |&int| x, |&int| y)
+	cpp_func SDL_GetWindowPosition	(|&SDL_Window| window,  |&int| x, |&int| y)
+	cpp_func SDL_GetWindowSize		(|&SDL_Window| window,  |&int| x, |&int| y)
 	cpp_func SDL_SetWindowSize		(|&SDL_Window| window, |int| w, |int| h, |int|)
 	cpp_func SDL_StartTextInput		()
 	cpp_func SDL_StopTextInput		()
 	function Alert (|int| Flags=0, |cstring| title, |cstring| msg=gui.sdl_geterror(), |?&SDL_Window| window=nil)
 		cpp_wrapper SDL_ShowSimpleMessageBox
-	cpp_func JB_SDL_RemoveWindowBorder (|&nil| window)
-	cpp_func JB_SDL_SetModified		(|&nil| window, |bool| b)
+
+	target osx
+		cpp_func JB_SDL_SetModified		(|&nil| window, |bool| b)
+
 	target osx
 		cpp_func JB_SDL_FullScreenToggle	(|&nil| w)
-	cpp_func JB_SDL_FullScreen	(|&nil| w, |bool| On)
-	cpp_func SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
 
-	libinternal SDL_FullScreen (|&nil| w, |int| Mode=1)
+	cpp_func SDL_GetCurrentDisplayMode (|int| displayIndex, |&SDL_DisplayMode| mode, |errorint|)
+	cpp_func SDL_SetWindowFullscreen (|&SDL_Window| window, |int| Mode=WINDOW_FULLSCREENDESKTOP, |int|)
+	cpp_func SDL_ShowWindow (|&SDL_Window| window)
+
+
+	function FullScreen (|bool| Force = false, assigns:|int| Mode)
+		description "1 = fullscreen, 0 = not-full, -1 = toggle"
 		target osx
-			|| full = .isfullscreen
-			if (mode == 0) or (!full and mode>0) or (full and mode<0)
-				.JB_SDL_FullScreenToggle(w)
-		  else
-			.JB_SDL_FullScreen(W, Mode>0)
-		
+			|| n = .OSXWindow
+				|| full = .isfullscreen|int|
+				if (full != mode)
+					.JB_SDL_FullScreenToggle(n)
+
+		|| w = .ScreenWindow
+			|| Full = .IsFullScreen|int|
+			if mode < 0 // toggle
+				mode = (!Full)|int|
+			
+			if (Full == mode) and !force
+				return
+			
+			if mode
+				mode = WINDOW_FULLSCREENDESKTOP
+			SDL_SetWindowFullscreen(w|&SDL_Window|, mode)
+	
+	
 	function DocumentOpened  (|bool|Clear=true, |String|)
 		cpp_wrapper JB_App__DocumentOpened
 		
@@ -117,11 +134,13 @@ module GUI
 		cpp_Part GetScreen
 		return (.Screenraw.vec4 / .scale).iVec4
 
-	libinternal NativeWindow (|&nil|)
-		|SDL_SysWMinfo| data
-		|| s = .ScreenWindow
-			s.SDL_GetWindowWMInfo(data)
-			return data.window|&nil|
+
+	target osx
+		libinternal OSXWindow (|&nil|)
+			|SDL_SysWMinfo| data
+			|| s = .ScreenWindow
+				s.SDL_GetWindowWMInfo(data)
+				return data.window|&nil|
 
 	
 	libinternal SelChanged
@@ -184,22 +203,21 @@ module GUI
 		return sdl_cursor.Show()
 
 
-	libinternal Screenraw (assigns:|ivec4| result, |bool|)
-		require .ScreenWindow
+	libinternal ScreenRaw (assigns:|ivec4| result, |bool|)
+		|| w = .ScreenWindow$
 		if (result.x <= 0) and (result.y <= 0)
-			|| n = .NativeWindow
-				.SDL_FullScreen(n)
+			.FullScreen = 1
 			return true
 		|| Old = .SizeRaw
 		|| aligned = .scale * (1.0+.IsHighDPI)
 		|| wh = result.size-1
 		if aligned > 1.0
 			 wh = wh align aligned|int|
-		.SDL_SetWindowSize(.screenwindow!, wh.x, wh.y)
+		.SDL_SetWindowSize(w, wh.x, wh.y)
 		if .Sizeraw != wh
 			.TryResizeLater = wh
 		if result.xy
-			.SDL_SetWindowPosition(.ScreenWindow!, result.x, result.y)
+			.SDL_SetWindowPosition(w, result.x, result.y)
 
 		if old != .Sizeraw
 			.NewSize = .Sizeraw
@@ -292,56 +310,60 @@ module GUI
 		INIT_SENSOR =			0x00008000
 		WINDOWPOS_CENTERED =	0x2FFF0000
 		TEXTUREACCESS_STREAMING = 1
+		WINDOW_BORDERLESS =		0x00000010
 		WINDOW_RESIZABLE =		0x20
+		WINDOW_HIDDEN =			0x08
 		WINDOW_ALLOW_HIGHDPI =	0x00002000
 		WINDOW_FULLSCREEN = 	0x1
-		WINDOW_FULLSCREENISH = 	0x1001
+		WINDOW_FULLSCREENDESKTOP = 	0x1001
 
 	
-	libinternal AlertError (|stringzeroterminated| s, |&nil|)
+	syntax Expect (|stringzeroterminated| s)
 		printerror s
 		printerror "\n"
-		.alert(s, .sdl_Geterror)
+		.alert(0, s, .sdl_Geterror, nil)
 
-	
-	libinternal InitSDL (|&nil|)
-		if !(font.small)
-			return .alerterror("SmallFont not loaded.")
+		
+	libinternal CreateNativeWindow (|bool|)
+		expect (font.small) (gui, "SmallFont not loaded.")
 
 		// joystick works around a sdl2-bug
 		|| Err = SDL_Init(INIT_AUDIO ||| INIT_VIDEO ||| INIT_EVENTS ||| INIT_HAPTIC ||| INIT_JOYSTICK)
-			return .alerterror("SDL_Init failed")
+		expect !Err (gui, "SDL_Init failed")
 
 		|| DS = .CurrDisplaySize
+		|| WinFlags = WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI
+		target !osx
+			WinFlags |= WINDOW_FULLSCREENDESKTOP
+			
 		|| W = SDL_CreateWindow(.NiceAppName.ZeroTerm, WINDOWPOS_CENTERED, WINDOWPOS_CENTERED,
-			DS.x, DS.y, WINDOW_RESIZABLE ||| WINDOW_ALLOW_HIGHDPI)
-		if !W
-			return .alerterror("SDL_CreateWindow failed")
+			DS.x, DS.y, WinFlags)
+
+		expect W (gui, "SDL_CreateWindow failed")
+		
 		.screenwindow = w
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
+		.hint("SDL_VIDEO_ALLOW_SCREENSAVER") = true
 		.vsync = true
-		.renderer = SDL_CreateRenderer(w, -1, 0)
-		if !.renderer
-			return .alerterror("SDL_CreateRenderer failed")
-		|| Native = .NativeWindow
-			return Native
-		return .AlertError("SDL_GetWindowWMInfo failed")
+		.renderer = SDL_CreateRenderer(w, -1, 0)		#expect (gui, "SDL_CreateRenderer failed")
+		
+		target osx
+			|| n = .OSXWindow							#expect (gui, "SDL_GetWindowWMInfo failed")
+			.JB_SDL_FullScreenToggle(n)
+		return true
+		
 
-
-	function vsync (assigns:|bool|)
-		// Lowers frame-rate. We'll need a better option to resyncing.
-		// if we draw into our own buffer anyhow.
+	function Hint (|stringzeroterminated| Hint, assigns:|bool|)
 		|byte[2]| cvalue
 		cvalue[0] = '0' + value
-		.SetHint("SDL_RENDER_VSYNC", (&cvalue[0])|cstring|)
+		.SetHint(hint, (&cvalue[0])|cstring|)
 	
 	
-	function RemoveBorder
-		|| n = .NativeWindow
-			JB_SDL_RemoveWindowBorder(n)
-
-
+	function vsync (assigns:|bool|)
+		.hint("SDL_RENDER_VSYNC") = value
+	
+	
 	function SavePrefs
 		if app._prefs
 			app.prefs["screen"] = GUI.Screenraw.Msg
@@ -371,12 +393,7 @@ module GUI
 		|| b = BigPx[0]
 		if s and b
 			return s > b
-	
-	
-	function IsFullScreen (assigns:|bool|)
-		|| n = GUI.NativeWindow
-			.SDL_FullScreen(n, (value<<1)-1)
-		
+			
 		
 	function IsFullScreen (|bool|)
 		return .CurrDisplaySize.y <= .Screenraw.size.y
@@ -437,11 +454,8 @@ module GUI
 		.CurrMouseXY = ivec2(-1)
 
 		AppMenu.GetAppMenu
-		|| n = .InitSDL
-		if !n
-			return false
-	
-		.SDL_FullScreen(n, 1)
+		require .CreateNativeWindow
+		
 		scaling *= 2.0 - (0.5*.IsHighDPI)
 		.Scaling = scaling
 		.sdl_stoptextinput
@@ -453,6 +467,7 @@ module GUI
 		.InitDelegates
 		.ShowCursor(false)
 		.StartedProperly = true
+
 		return true
 		
 	
@@ -1042,8 +1057,7 @@ module GUI
 			if (key is minus)
 				return .Rescale(.scale-0.5)
 			if (key is f) and keys.option
-				|| n = .nativewindow
-					.SDL_FullScreen(n)
+				.FullScreen = -1
 				return true
 			if (key is l) and keys.shift
 				JB_Mem_ClassLeakCounter()

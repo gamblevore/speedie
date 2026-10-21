@@ -406,11 +406,12 @@ function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
 
 
 
-function perryide.ReloadBreaks
+function perryide.ReloadBreaks (|bool|)
 	if .EditorIsCode
 		|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
 		j.addstr .path
-		.SendJbin(j)
+		return .SendJbin(j)
+	return true
 
 
 

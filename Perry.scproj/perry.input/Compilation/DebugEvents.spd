@@ -438,7 +438,7 @@ function GUIControl.SendRunMsg (|string| s, |int| state, |bool|)
 
 
 function GUIControl.SendJbin (|jbin!| j, |bool|)
-	.SendMsg(j.getresult, false)
+	return .SendMsg(j.getresult, false)
 
 
 function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
@@ -449,14 +449,12 @@ function GUIControl.SendMsg (|string| s, |bool| PressingAButton, |bool|)
 		if (r <~ s)
 			if PressingAButton
 				i.AppInfo.SetFocus
+			rz = true
 		  else
 			Notifications <~ "Debugger connection failed"
 	  else
 		if PressingAButton
 			Notifications <~ "Program already finished"
-		  else
-			beep
-	return true
 	
 
 function Perryide.ASMVis (|bool|)
