@@ -78,8 +78,7 @@ ${unmod(dest)}
 
 
 |string|	CFlags
-|string|	shared
-|string|	LinkLibFlags
+|string|	SpdGccFlags
 |string|	ext
 |string|	LibName
 |string|	LibFlags
@@ -95,20 +94,20 @@ module Vars
 		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I \$Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 		// what about -D __VM__=1 ???
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
-		shared = "shared"
-		LinkLibFlags = ""
-		ext = "so"
+		SpdGccFlags = ""
 		gcc = "g++"
+		|| shared = ""
 		if plat ~= "osx"
-			shared = "dynamiclib"
-			ext = "dylib"
 			CFlags += " -lc++"
-		if plat ~= "linux"
-			CFlags += " -rdynamic"
-			LinkLibFlags += "-lrt -pthread"
+			shared = "-dynamiclib"
+			ext = "dylib"
+		  else
+			shared = " -rdynamic -shared"
+			ext = "so"
+			SpdGccFlags += "-lrt -pthread"
 		
 		LibName  = "libjeebox.$ext" 
-		LibFlags = "$CFlags -$shared -fPIC -D AS_LIBRARY=1 "
+		LibFlags = "$CFlags $shared -fPIC -D AS_LIBRARY=1 "
 		ExecFlags= "$CFlags -g -ljeebox"
 		SpdSrc   = "\$Speedie/Speedie.scproj/Build"
 		SpdTerm  = "\$Speedie/Terminal/Speedie"
@@ -131,7 +130,7 @@ cd \"\$Speedie/Library/CppLib\"
 
 $GetUserName
 echo \"Compiling Speedie to $SpdTerm\"
-$gcc -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $LinkLibFlags
+$gcc -o ${SpdTerm}tmp  $CFlags  $list  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp $SpdGccFlags
 mv ${SpdTerm}tmp $SpdTerm
 ${unmod(SpdTerm)}
 

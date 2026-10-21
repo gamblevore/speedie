@@ -27,7 +27,7 @@ if [ "$U" = "" ]  ||  [ "$U" = "root" ] ; then
 fi
 
 echo "Compiling Speedie to $Speedie/Terminal/Speedie"
-g++ -o $Speedie/Terminal/Speedietmp  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic  JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp   -I $Speedie/Speedie.scproj/Build  $Speedie/Speedie.scproj/Build/JB.cpp  $Speedie/Speedie.scproj/Build/JB_Globals.cpp -lrt -pthread
+g++ -o $Speedie/Terminal/Speedietmp  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1  JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp   -I $Speedie/Speedie.scproj/Build  $Speedie/Speedie.scproj/Build/JB.cpp  $Speedie/Speedie.scproj/Build/JB_Globals.cpp -lrt -pthread
 mv $Speedie/Terminal/Speedietmp $Speedie/Terminal/Speedie
 chmod 775 $Speedie/Terminal/Speedie
 chown $U $Speedie/Terminal/Speedie
@@ -88,29 +88,29 @@ chmod 775 ../../jeebox.scproj/Build/*
 chown $U ../../jeebox.scproj/Build/*
 echo "Compiling /usr/local/lib/libjeebox.so for user '$U'"
 
-g++ -o /usr/local/lib/libjeebox.so  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -shared -fPIC -D AS_LIBRARY=1   JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp    $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
+g++ -o /usr/local/lib/libjeebox.so  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1  -rdynamic -shared -fPIC -D AS_LIBRARY=1   JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp    $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
 chmod 775 /usr/local/lib/libjeebox.so
 chown $U /usr/local/lib/libjeebox.so
 
 
 cd $Speedie/jeebox.scproj/Examples
 echo "Compiling jb.cpp"
-g++ -o Build/jb  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -g -ljeebox  jb.cpp
+g++ -o Build/jb  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  jb.cpp
 chmod 775 Build/jb
 chown $U Build/jb
 
 echo "Compiling xml.cpp"
-g++ -o Build/xml  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -g -ljeebox  xml.cpp
+g++ -o Build/xml  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  xml.cpp
 chmod 775 Build/xml
 chown $U Build/xml
 
 echo "Compiling test.cpp"
-g++ -o Build/test  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -g -ljeebox  test.cpp
+g++ -o Build/test  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  test.cpp
 chmod 775 Build/test
 chown $U Build/test
 
 echo "Compiling users.cpp"
-g++ -o Build/users  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -g -ljeebox  users.cpp
+g++ -o Build/users  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  users.cpp
 chmod 775 Build/users
 chown $U Build/users
 

@@ -122,14 +122,24 @@ class SCImport
 			conf.CommentOut
 
 	
+	function AppFolderProd (|string|)
+		|| name = compiler.Productpath.name
+		|| base = "/usr/local/bin"
+		if platform.OSX // can't rely on file.applications, because of how code is copied from MacOS compile.
+			base = "/Applications" + name
+		return base.Child(name)
+		
+		
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
 			.IsLibraryImp = true
 			.WarnUnusedFuncs = false
 
-		target osx
-			if link["apps_folder"].yes and options.modecpp
-				feedback.SetOutputPath( file.Applications[compiler.Productpath.name], 1 )
+		if Platform.osx // the C++ Compiled code is copied from OSX.
+						// so target osx is true at build time.
+			target osx
+				if link["apps_folder"].yes and options.modecpp
+					feedback.SetOutputPath( .AppFolderProd, 1 )
 			// where should perry be installed on linux? /usr/bin? hmmmm
 			// on macos, perry is a symlink to the exe in /Applications/
 			// but if its already in /usr/bin or /usr/local/bin, then what? we cant do the link

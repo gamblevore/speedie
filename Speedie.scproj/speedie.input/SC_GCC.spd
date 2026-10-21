@@ -241,8 +241,12 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	// Gaming64Bit
 	rz.AppendWords("-ffast-math -fno-math-errno -fwrapv")
 	
+	|| opt = options.optimise
+	|| aslib = options.projectislibrary
+		opt = 3
+	
 	if Platform.CPU_Intel
-		if options.optimise >= 3 // sigh
+		if opt >= 3 // sigh
 			rz.AppendWords( "-march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2" )
 
 	if platform.OSX
@@ -253,10 +257,12 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	// stripping
 	rz.appendwords( "-fdata-sections -ffunction-sections")
 	
-	|| opt = options.optimise
-	|| aslib = options.projectislibrary
-		rz.appendwords("-dynamiclib -fPIC")
-		opt = 3
+	if aslib
+		if Platform.OSX
+			rz.appendwords("-rdynamic -shared")
+		  else
+			rz.appendwords("-dynamiclib")
+		rz.appendwords("-fPIC")
 	if options.selfreplacement or aslib
 		rz.appendwords("-g")
 	if (opt < 0)
@@ -339,7 +345,7 @@ function IsCompilerAndNeedsInstall (|bool|)
 
 
 function ExportAndInstall (|date| Elapsed)
-	|| ActualCompile = .ShouldTransComp 
+	|| ActualCompile = .ShouldCppComp
 		if Options.ModeCpp
 			.RunCppCompile~quietly
 			|| CanInstall = compiler.TimeTest(elapsed)
@@ -392,7 +398,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 	tof.delete
 
 
-function ShouldTransComp (|bool|)
+function ShouldCppComp (|bool|)
 	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
 	require Options.Compile and options.ModeCpp

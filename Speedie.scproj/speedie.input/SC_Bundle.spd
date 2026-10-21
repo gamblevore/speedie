@@ -4,6 +4,7 @@
 
 
 function compiler.Bundle 
+	require Platform.osx
 	target osx
 		require !Compiler.IsTest and !Options.ExternalCompile
 		require SC_Targets["gui"] // what about exec? or other that want to be cmd-line?
@@ -50,6 +51,7 @@ function compiler.AppBuildLibs (|file| inner)
 
 
 function compiler.AppleBuildApp (|file| product, |file| project)
+	require Platform.osx
 	target OSX
 		|| dest = product.linksto			
 		expect (!dest) (dest, "This should not be a link")
