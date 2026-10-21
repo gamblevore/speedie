@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2393];
+extern JB_StringC* JB_LUB[2391];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -10062,12 +10062,6 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[335]);
 	if (Aslib) {
-		if (JB_Platform__OSX()) {
-			SC_Array_AppendWords(Rz, JB_LUB[2391]);
-		}
-		 else {
-			SC_Array_AppendWords(Rz, JB_LUB[333]);
-		}
 		SC_Array_AppendWords(Rz, JB_LUB[2390]);
 	}
 	if (SC__Options_SelfReplacement or Aslib) {
@@ -31391,7 +31385,7 @@ JB_String* SC_Imp_AppFolderProd(SCImport* Self) {
 	JB_String* Name = JB_Str_Name(_tmPf0);
 	JB_Incr(Name);
 	JB_Decr(_tmPf0);
-	JB_String* Base = JB_LUB[2392];
+	JB_String* Base = JB_LUB[333];
 	JB_Incr(Base);
 	if (JB_Platform__OSX()) {
 		JB_SetRef(Base, JB_LUB[310]);
@@ -61535,4 +61529,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 5683874613668573783 -691156344962572064
+// 5683874613668573783 1543829225269149870
