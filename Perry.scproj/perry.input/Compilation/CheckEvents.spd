@@ -171,6 +171,8 @@ extend PerryIDE
 		// simplify this?
 		|| Bad = .CheckCrashed(c,  "compiler")
 		|| Errors = c.readstderr
+		.compilr = nil
+		if Errors
 			|| p = errors.parse
 				.ShowCompileErrors(p, true)
 			// Notifications will pick up the err otherwise!
@@ -178,7 +180,6 @@ extend PerryIDE
 			if !killed
 				.ShowCompileOK("compile")
 			.CompiledOK(killed)
-		.compilr = nil
 		.RenableAfterCompile
 
 
