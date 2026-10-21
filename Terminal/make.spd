@@ -21,15 +21,22 @@ main {
 		return 1
 	
 	printline "Installation: " + SpdLocal
-	"Making OSX script"
-	app.Gen("osx", platform.OSX)
-	"Making Linux script"
-	app.Gen("linux", platform.linux)
-	"Make Finished"
+	print "Generating cpp files: "
+	require "/usr/local/bin/speedie".Execute(["--self", "--x", "--nocompile", "--quiet"]).Successful
+
+	|| tocompile = FastString()
+	|| Count = 2							//JB.cpp and JB_Globals.cpp
+	for ch in CppLibLocal!
+		if ch isa "cpp" or "S"
+			tocompile <~ ch
+			tocompile <~ ' '
+			Count++
+	|| list = tocompile.render
+
+	app.Gen("osx", platform.OSX, Count, List)
+	app.Gen("linux", platform.linux, Count, List)
+	"All done!"
 }
-
-
-|| ExecFlags = ""
 
 
 || GetUserName = `
@@ -57,14 +64,14 @@ $indent${}chown \$U $dir"
 	
 function compile_example (|string| name, |string|)
 	return "echo \"Compiling ${name}.cpp\"
-$gcc -o Build/$name  $ExecFlags  ${name}.cpp
+$gcc -o Build/$name  $CFlags -g -ljeebox  ${name}.cpp
 ${unmod(`Build/`+name)}
 "
 
 function mkdir (|string| dir, |string|)
 	rz = "
 if [ ! -f $dir ]; then
-    echo \"Creating dir $dir\"
+    echo \"Creating: $dir/\"
     mkdir -p \"$dir\"
     ${unmod(dir, `    `)}
 fi
@@ -79,45 +86,28 @@ ${unmod(dest)}
 
 |string|	CFlags
 |string|	SpdGccFlags
-|string|	ext
-|string|	LibName
-|string|	LibFlags
-|string|	SpdSrc
-|string|	SpdTerm
-|string|	CakeTerm
-|string|	LibPath
-|string|	gcc
+|string|	SpdSrc = "\$Speedie/Speedie.scproj/Build"
+|string|	SpdTerm = "\$Speedie/Terminal/Speedie"
+|string|	CakeTerm = "\$Speedie/Terminal/Cake"
+|string|	gcc = "g++"
 
 
 module Vars
-	function InitVars (|string| plat)
-		CFlags   = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I \$Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
+	function InitVars (|string| Plat)
+		CFlags = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I \$Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1"
 		// what about -D __VM__=1 ???
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
 		SpdGccFlags = ""
-		gcc = "g++"
 		if plat ~= "osx"
 			CFlags += " -lc++"
-			ext = "dylib"
 		  else
-			ext = "so"
 			SpdGccFlags += "-lrt -pthread"
-		
-		LibName  = "libjeebox.$ext"
-		LibFlags = "$CFlags -rdynamic -shared -fPIC -D AS_LIBRARY=1 "
-		ExecFlags= "$CFlags -g -ljeebox"
-		SpdSrc   = "\$Speedie/Speedie.scproj/Build"
-		SpdTerm  = "\$Speedie/Terminal/Speedie"
-		CakeTerm = "\$Speedie/Terminal/Cake"
-		LibPath  = "/usr/local/lib/$LibName"
-
 
 	function CreateScriptOut (|string| list, |string|)
 		return "#!/bin/bash
 echo \"Starting Speedie Build\"
 Speedie=\$(dirname \"$(realpath $0)\")
 Speedie=\$(dirname \"\$(realpath \$Speedie)\")
-echo \"Building to \$Speedie\"
 if [ \"\$Speedie\" = \"\" ] ; then
 	echo \"failed to find speedie path\"
 	exit 1
@@ -133,11 +123,10 @@ ${unmod(SpdTerm)}
 
 
 cd \$Speedie/jeebox.scproj/Examples
-echo \"Creating directories\"
 ${mkdir(`Build`)}
-${mkdir(`/usr/local/include/`)}
+${mkdir(`/usr/local/include`)}
 
-echo \"Cleaning old files\"
+echo \"Cleaning Build temp files\"
 rm -rf Build/* 2>/dev/null || true
 
 echo \"Installing headers\"
@@ -153,17 +142,13 @@ ${link(SpdTerm, `/usr/local/bin/speedie`)}
 echo \"\"
 cd \$Speedie/Library/CppLib				# allow source to be found!
 
-echo \"Preparing libJeebox\"
-$SpdTerm \$Speedie/jeebox.scproj -x		# regenerate libjeebox source
+echo \"Compiling libJeebox for user '\$U'\"
+$SpdTerm \$Speedie/jeebox.scproj --quiet		# regenerate libjeebox source
 
 echo \"Relaxing permissions\"
 
 ${unmod(`../../jeebox.scproj/Cpp/*`)}
 ${unmod(`../../jeebox.scproj/Build/*`)}
-echo \"Compiling $LibPath for user '\$U'\"
-
-$gcc -o $LibPath  $LibFlags  $list   \$Speedie/jeebox.scproj/Cpp/JB.cpp   \$Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
-${unmod(LibPath)}
 
 
 cd \$Speedie/jeebox.scproj/Examples
@@ -176,71 +161,39 @@ ${compile_example(`users`)}
 set -e
 
 
-echo \"Compiling Cake and Perry\"
 if [ ! -f \"/usr/local/include/SDL2/SDL.h\" ]; then
 	echo \"Please install SDL2 to get Perry and Cake to compile. Speedie expects SDL2 headers at /usr/local/include/SDL2/SDL.h\"
 	echo \"https://wiki.libsdl.org/SDL2/Installation contains the guidelines.\"
 
 else
 
-echo \"Making 🎂 Cake 🎂\"
-$SpdTerm \$Speedie/Cake.scproj --output_path=\$Speedie/Terminal/Cake
+echo -n \"Making 🎂 Cake 🎂: \"
+$SpdTerm \$Speedie/Cake.scproj --output_path=\$Speedie/Terminal/Cake --quiet
 
 echo \"Symlinking 🎂\"
 ${link(CakeTerm, `/usr/local/bin/cake`)}
 ${link(CakeTerm, `/usr/local/bin/🎂`)}
 
 
-echo \"Making Perry\"
-$SpdTerm \$Speedie/Perry.scproj
+echo -n \"Making Perry: \"
+$SpdTerm \$Speedie/Perry.scproj --quiet
 
 fi
 "
 
 
 
-function app.Gen (|string| plat, |bool| IsCurrentPlatform)
+function app.Gen (|string| Plat, |bool| IsCurrentPlatform, |int| Count, |string| List)
+	"Making Script: make$plat.sh"
 	vars.initvars(plat)
-	|| tocompile = FastString()
-	|| Count = 2							//JB.cpp and JB_Globals.cpp
-	for ch in CppLibLocal!
-		if ch isa "cpp" or "S"
-			tocompile <~ ch
-			tocompile <~ ' '
-			Count++
-	|| list = tocompile.render
-	
-	
-	////////////////////////////
-	<(`    (((generating cpp files)))    `)>
 	////////////////////////////
 	
-	.cwd = SpdLocal.child("jeebox.scproj").resolve
-	|| ScriptOut = "$SpdLocal/Terminal/make$plat.sh".file
-	|| PrepareCpp = "$SpdLocal/Terminal/PrepareSpeedie.sh".file
-	
-	
-	PrepareCpp.writeall `#!/bin/bash
-echo "Prebuild .cpp files"
-/usr/local/bin/speedie   .    --x --nocompile
-/usr/local/bin/speedie --self --x --nocompile
-`
-	if IsCurrentPlatform
-		printline "cwd: " + app.cwd
-		require PrepareCpp.NeedExecute								/* <----- ACTUAL CALL POINT -----> */
-	
-	
-	////////////////////////////
-	<(`    (((generating script)))    `)>
-	////////////////////////////
-	
-	printline "Creating $scriptout"
+	|| ScriptOut = "$SpdLocal/Terminal/make$plat.sh".file	
 	scriptout.writeall vars.CreateScriptOut(list)
-	
-	"Script generated at: $scriptout"
+
 	if IsCurrentPlatform
-		"Running Script: $scriptout ($Count+ .cpp files)\n\n"
-		scriptout.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
+		"Running Script: $scriptout\n"
+		ScriptOut.NeedExecute										/* <----- ACTUAL CALL POINT -----> */
 
 
 

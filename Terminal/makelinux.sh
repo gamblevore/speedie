@@ -2,7 +2,6 @@
 echo "Starting Speedie Build"
 Speedie=$(dirname "$(realpath $0)")
 Speedie=$(dirname "$(realpath $Speedie)")
-echo "Building to $Speedie"
 if [ "$Speedie" = "" ] ; then
 	echo "failed to find speedie path"
 	exit 1
@@ -34,25 +33,24 @@ chown $U $Speedie/Terminal/Speedie
 
 
 cd $Speedie/jeebox.scproj/Examples
-echo "Creating directories"
 
 if [ ! -f Build ]; then
-    echo "Creating dir Build"
+    echo "Creating: Build/"
     mkdir -p "Build"
     chmod 775 Build
     chown $U Build
 fi
 
 
-if [ ! -f /usr/local/include/ ]; then
-    echo "Creating dir /usr/local/include/"
-    mkdir -p "/usr/local/include/"
-    chmod 775 /usr/local/include/
-    chown $U /usr/local/include/
+if [ ! -f /usr/local/include ]; then
+    echo "Creating: /usr/local/include/"
+    mkdir -p "/usr/local/include"
+    chmod 775 /usr/local/include
+    chown $U /usr/local/include
 fi
 
 
-echo "Cleaning old files"
+echo "Cleaning Build temp files"
 rm -rf Build/* 2>/dev/null || true
 
 echo "Installing headers"
@@ -77,8 +75,8 @@ chown $U /usr/local/bin/speedie
 echo ""
 cd $Speedie/Library/CppLib				# allow source to be found!
 
-echo "Preparing libJeebox"
-$Speedie/Terminal/Speedie $Speedie/jeebox.scproj -x		# regenerate libjeebox source
+echo "Compiling libJeebox for user '$U'"
+$Speedie/Terminal/Speedie $Speedie/jeebox.scproj --quiet		# regenerate libjeebox source
 
 echo "Relaxing permissions"
 
@@ -86,11 +84,6 @@ chmod 775 ../../jeebox.scproj/Cpp/*
 chown $U ../../jeebox.scproj/Cpp/*
 chmod 775 ../../jeebox.scproj/Build/*
 chown $U ../../jeebox.scproj/Build/*
-echo "Compiling /usr/local/lib/libjeebox.so for user '$U'"
-
-g++ -o /usr/local/lib/libjeebox.so  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -rdynamic -shared -fPIC -D AS_LIBRARY=1   JB_File.cpp JB_Pico.cpp JB_MSR.cpp JB_LibraryFile.cpp JB_List.cpp JB_Temporal.cpp JB_FastString.cpp JB_Dictionary.cpp JB_Child.cpp JB_Compress.cpp JB_String.cpp JB_Utils.cpp JB_Main.cpp JB_Pipe.cpp JB_Run.cpp JB_Vectors.cpp JB_PNG.cpp JB_Dylib.cpp JB_Date.cpp JB_Errors.cpp JB_DirReaderUnix.cpp JB_Math.cpp FF_ARM64.S FF_Intel.S JB_DirReaderWin32.cpp JB_Array.cpp JB_BasicIO.cpp JB_VM.cpp JB_Alloc.cpp JB_Tokeniser.cpp    $Speedie/jeebox.scproj/Cpp/JB.cpp   $Speedie/jeebox.scproj/Cpp/JB_Globals.cpp
-chmod 775 /usr/local/lib/libjeebox.so
-chown $U /usr/local/lib/libjeebox.so
 
 
 cd $Speedie/jeebox.scproj/Examples
@@ -119,15 +112,14 @@ chown $U Build/users
 set -e
 
 
-echo "Compiling Cake and Perry"
 if [ ! -f "/usr/local/include/SDL2/SDL.h" ]; then
 	echo "Please install SDL2 to get Perry and Cake to compile. Speedie expects SDL2 headers at /usr/local/include/SDL2/SDL.h"
 	echo "https://wiki.libsdl.org/SDL2/Installation contains the guidelines."
 
 else
 
-echo "Making 🎂 Cake 🎂"
-$Speedie/Terminal/Speedie $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake
+echo -n "Making 🎂 Cake 🎂: "
+$Speedie/Terminal/Speedie $Speedie/Cake.scproj --output_path=$Speedie/Terminal/Cake --quiet
 
 echo "Symlinking 🎂"
 
@@ -142,7 +134,7 @@ chown $U /usr/local/bin/🎂
 
 
 
-echo "Making Perry"
-$Speedie/Terminal/Speedie $Speedie/Perry.scproj
+echo -n "Making Perry: "
+$Speedie/Terminal/Speedie $Speedie/Perry.scproj --quiet
 
 fi
