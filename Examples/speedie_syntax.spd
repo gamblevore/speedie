@@ -4,6 +4,15 @@
 // doesnt really actually do anything useful otherwise.
 
 targets: flow
+
+main
+	printline file.prefs
+/	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
+	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
+	app.TestSyntax
+
+
+
 class Person
 	|int| age
 	|string| name
@@ -18,13 +27,6 @@ class Person
 	render
 		fs <~ "$.name's age is $.age"
 
-
-
-main
-	printline file.prefs
-/	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
-	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
-	app.TestSyntax
 
 
 function PrintNum (|int64| b1)
