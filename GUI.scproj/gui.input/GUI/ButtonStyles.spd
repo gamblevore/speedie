@@ -102,7 +102,57 @@ function image.CurlieQueDrawer (ImageDrawStyleEvent)
 			W++
 
 
-function ivec4.DistToCorner (|ivec2| xy, |ivec2|)
+
+libinternal ivec4.FollowEdge (|int64| Progress, |ivec2|)
+	|| x = .x
+	|| y = .y
+	|| w = .Width
+	|| h = .Height
+	|| C = w*2 + h*2
+	if Progress < 0
+		progress += ((progress / -C)+1)*C
+	|int| P = Progress mod c
+	if P <= h
+		return (0+x, p+y)
+	p -= h
+	if p <= w
+		return (p+x, h+y)
+	p -= w
+	if p <= h
+		return (w+x, (h+y)-p)
+	p -= h
+	return ((w+x)-p, 0+y)
+
+
+function image.ActiveEdges (ImageDrawStyleEvent)
+	opt norefcounts
+	
+	|| P = gui.framestart / 600
+	|| Edge = ((Rect.Width*2 + rect.Height*2) - 4)|float|
+	|| iLineCount = 1.0/math.phi
+	|| sub = 0.75 / (edge*iLineCount)
+	|| A = 0.0
+	|| Reset = 0.0
+	|| H = 0.0
+	
+	for Edge
+		if reset <= 0
+			reset = iLineCount*edge
+			A = iLineCount*0.75
+		
+		|| Curr = rect.FollowEdge(P)
+		|| Col = Colors.rainbow(H, 0.625, 1.0, A*2).PreMul
+		self[Curr].overlay(col)
+		A -= sub
+		reset--
+		p--
+		H += 0.005
+	
+	if !gui.IsBackground
+		gui.Touch
+	
+
+libinternal ivec4.DistToCorner (|ivec2| xy, |ivec2|)
 	return (xy - .x1y1)  min  (.x2y2 - xy)
 
 

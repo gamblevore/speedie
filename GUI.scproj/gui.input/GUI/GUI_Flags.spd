@@ -69,6 +69,7 @@ datatype GuiControlFlags (uint)
 		BlockSized
 		HasBeenSized
 		DrawsFocus // showborder, showsborder, hasborder, drawborder
+		ActivelySpinning
 
 
 struct TimeFader

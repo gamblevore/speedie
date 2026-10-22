@@ -89,6 +89,9 @@ class GUIControl (list)
 		using g
 			g.Strengthen(.declutterer.strength)
 			Where.DrawRectStyled(.lastrect, g)
+		if self is ActivelySpinning
+			(image.ActiveEdges)(where, .lastrect, g)
+			
 	virtual PostLoad
 		0
 	virtual Copy

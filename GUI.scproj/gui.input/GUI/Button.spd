@@ -344,15 +344,19 @@ class Button (GUIControl)
 		where.ControlClip += grow
 		|| w = .ItemWidth
 		if !w
-			return .DrawOneButton(where, r, grow, nil)
+			.DrawOneButton(where, r, grow, nil)
+		  else
+			|| rx1 = r.x
+			R.x2 = rx1 + W
+			for tab in .ButtonSource
+				if tab isnt hidden
+					.DrawOneButton(where, R, grow, tab)
+					R = R right W + .itemgap
+				loop r.x < where.width
 		
-		|| rx1 = r.x
-		R.x2 = rx1 + W
-		for tab in .ButtonSource
-			if tab isnt hidden
-				.DrawOneButton(where, R, grow, tab)
-				R = R right W + .itemgap
-			loop r.x < where.width
+		if self is ActivelySpinning
+			(image.ActiveEdges)(where, .lastrect, .gnormal)
+		
 
 
 	function TrimWidth

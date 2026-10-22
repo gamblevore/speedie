@@ -1,6 +1,6 @@
 
 
-prototype ImageDrawStyleEvent (|Image| self,  |ivec4| Rect, |drawstyle| G, |MoveCode| Edges)
+prototype ImageDrawStyleEvent (|Image| self, |ivec4| Rect, |drawstyle| G, |MoveCode| Edges=nil)
 
 class DrawStyle
 	description "DrawStyle is used for colorising GUIControls, and text. It also allows for some (limited) styling options, such as rounding buttons.
