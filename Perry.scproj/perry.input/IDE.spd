@@ -5,7 +5,7 @@ class PerryIDE (Window)
 	linkage: cpp_part IDE
 
 	|SpdProcess?|				Feedback
-	|SpdProcess?|				ASMProcess
+	|SpdProcess?|				ASMHelper
 	|UnixProcess?|				Compilr
 	|UnixProcess?|				RunningProd
 	|message?|					LastCakeError
@@ -54,6 +54,7 @@ class PerryIDE (Window)
 	|SplitView|					ProductSep
 	|SplitView|					FileSep
 	|listviewrow|				LogComms
+	|listviewrow|				LogASM
 	|listviewrow|				LogActions
 	|listviewrow|				LogCake
 	|menu|						AutoComplete
@@ -485,7 +486,7 @@ class PerryIDE (Window)
 		|| fs = faststring()
 		fs <~ "Crashed: ${exit.name}  {${p.render}}\n"
 		fs <~ p.ReadStdErr.FindStacktrace
-		.Notify(fs, @emb + what)
+		.Notify(fs, @emb + what, p)
 		if p == .Compilr
 			return .CancelCompile
 		return true
@@ -533,8 +534,8 @@ class PerryIDE (Window)
 				.setfocus(.editme)				// shouldn't need this... why doesn't .focus setter get called?
 		.UpdateDebuggedApp(false)
 
-		if .CheckCrashed(.ASMProcess, "ASM View")
-			.ASMProcess = nil
+		if .CheckCrashed(.ASMHelper, "ASM View")
+			.ASMHelper = nil
 		if .CheckCrashed(.feedback, "feedback")
 			.Feedback = nil
 		if .CheckCrashed(.compilr,  "compiler")
@@ -542,7 +543,7 @@ class PerryIDE (Window)
 
 		|| f = .Feedback
 			.SpeedieMsgReceive(f)
-		|| asm = .ASMProcess
+		|| asm = .ASMHelper
 			.SpeedieMsgReceive(asm)
 		.UpdateSearchText
 		.UpdateStatusErrors

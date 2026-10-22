@@ -9,6 +9,7 @@ extend PerryIDE
 		.Project			= project
 		.CanAskingAboutMissing = true
 		.LogComms			= Message()
+		.LogASM				= Message()
 		.LogActions			= Message()
 		.LogCake			= Message()
 		.RecentFiles		= message()
@@ -637,6 +638,7 @@ extend PerryIDE
 		
 		g.OnKeyDown = LogAreaKeys
 		.AddBaseLog("-- feedback comms --", .logcomms)
+		.AddBaseLog("-- asm comms --", .logasm)
 		.AddBaseLog("-- perry actions --", .logactions)
 		.AddBaseLog("-- cake actions --", .logcake)
 	
@@ -677,8 +679,17 @@ extend PerryIDE
 		.LogOneThing(msg, type, .LogCake)
 		
 	
-	function LogOneComm (|object| msg, |string| type="")
-		.LogOneThing(msg, type, .LogComms)
+	function LogOneComm (|object| msg, |string| type="", |unixprocess| C)
+		|message--| where = .LogActions
+		if c
+			if c == .Feedback
+				where = .logcomms
+			  elseif c == .ASMHelper
+				where = .LogASM
+			  elseif c == .Compilr
+				/0 // wierd?
+				
+		.LogOneThing(msg, type, where)
 
 
 	function LogOneAction (|object| msg, |string| type="")

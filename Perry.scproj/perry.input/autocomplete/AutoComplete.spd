@@ -343,7 +343,7 @@ function PerryIDE.PopupHide
 function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	debug_require c
 	if (c == .compilr) and !c.CommsOpen
-		isnt active
+/		isnt active		// the compiler doesn't send messages? its just a unixprocess?
 
 	|| msg = C.Get					#require
 	|message| date
@@ -354,7 +354,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 	if msg ~= "error"
 		if msg.last == "define"
 			beep
-		.LogOneComm(msg, "\1b")
+		.LogOneComm(msg, "\1b", c)
 		if date.int == .sectionkeytime
 			.sectionkeytime = 0
 			.editme.insertautocomplete
@@ -370,7 +370,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
 			msg.name = "" // returns
 	
-	.LogOneComm(msg, "\1b ")
+	.LogOneComm(msg, "\1b ", c)
 	|| f = msg.first
 		if msg ~= "autocomplete"
 			.AutoCompleteFB(f, AutoCompleteMode.default, reason)

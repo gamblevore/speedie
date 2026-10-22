@@ -65,8 +65,8 @@ function PerryIDE.SendFeedback (|message| msg, |spdprocess|)
 	require .IsFront // save memory on startup :]
 	
 	if msg ~= "asm"
-		|| fb = .FeedbackInit(.ASMProcess)
-			.ASMProcess = fb
+		|| fb = .FeedbackInit(.ASMHelper)
+			.ASMHelper = fb
 			return fb
 	
 	  else
@@ -81,7 +81,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
 	|| d = gui.framestart
 	|| record = .DateWrap(msg, d)
 	fb <~ record
-	.LogOneComm(msg, "\1C")
+	.LogOneComm(msg, "\1C", fb)
 	.SpeedieMsgReceive(fb)
 	return d
 
@@ -119,8 +119,8 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 		if !noisy
 			mode = ProcessMode.silence
 		
-		.LogOneComm(p, "feedback")
 		|| spd = SpdProcess.spawn(spd_on_disk, p, mode, f.name)
+			.LogOneComm(p, "feedback", spd)
 			spd.pico.name = .project.name
 			return spd
 

@@ -12,7 +12,7 @@ extend PerryIDE
 			.ModifiedForCompile = false
 			if .ProjectIsCode and !.UsingSpdLib
 				.Feedback = nil
-				.ASMProcess = nil
+				.ASMHelper = nil
 
 		|| unused = @tmp + "check"
 		unused <~ p * .EditorIsCode
@@ -215,11 +215,11 @@ extend PerryIDE
 						.run_compile_wrap(f)
 
 
-	function Notify (|string| What, |message| response=nil)
+	function Notify (|string| What, |message| response=nil, |unixprocess| proc=nil)
 		|| c = what
 		if response
 			c = what + ("\n" + response.render) // hmmm... seems awkward
-		.LogOneComm(@emb + c, "\1b")
+		.LogOneComm(@emb + c, "\1b", proc)
 		notifications <~ (what, response)
 	
 	
