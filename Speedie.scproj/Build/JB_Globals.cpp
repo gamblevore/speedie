@@ -24,6 +24,7 @@ Message* SC__Comp_AppInitGlobals;
 Message* SC__Comp_AppInitTest;
 Message* SC__Comp_ASMSelf;
 JB_File* SC__Comp_BaseProjectPath;
+JB_File* SC__Comp_BundleProductFile_;
 Array* SC__Comp_ClassList;
 Message* SC__Comp_ConfMsg;
 Message* SC__Comp_ConstantsList;

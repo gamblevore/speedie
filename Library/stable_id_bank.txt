@@ -166,6 +166,7 @@ GUI_ImageBlurrer_Constructor
 GUI_ImageBlurrer_Create
 GUI_ImageReader_Destructor
 GUI_ImageTiler_Constructor
+GUI_Img_ActiveEdges
 GUI_Img_AtXY
 GUI_Img_Clear
 GUI_Img_Clip
@@ -667,7 +668,6 @@ GUI_inl_Edit
 GUI_inl_SyntaxIs
 GUI_inl_SyntaxIsSet
 GUI_ivec2_SDLXY
-GUI_ivec4_DistToCorner
 GUI_ivec4_Msg
 GUI_ivec4_TextCorner
 GUI_vec4_BoxVsPlane

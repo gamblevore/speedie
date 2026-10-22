@@ -1355,6 +1355,7 @@ extern Message* SC__Comp_AppInitGlobals;
 extern Message* SC__Comp_AppInitTest;
 extern Message* SC__Comp_ASMSelf;
 extern JB_File* SC__Comp_BaseProjectPath;
+extern JB_File* SC__Comp_BundleProductFile_;
 extern Array* SC__Comp_ClassList;
 extern Message* SC__Comp_ConfMsg;
 extern Message* SC__Comp_ConstantsList;
@@ -1497,6 +1498,7 @@ extern Message* SC__Macros_TernQMark;
 extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
+#define kJB__Math_Phi (1.61803398875f)
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 #define kSC__Options_cake ((int)2)
@@ -2739,13 +2741,15 @@ void SC_Comp__AppBuildOneLib(JB_File* Inner, JB_String* Name);
 
 void SC_Comp__AppendCompilerTime(JB_String* S, int Durr);
 
-void SC_Comp__AppleBuildApp(JB_File* Product, JB_File* Project);
+JB_File* SC_Comp__AppleBuildApp(JB_File* OrigProduct, JB_File* Project);
 
 bool SC_Comp__Banned(JB_String* Name);
 
 JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__Bundle();
+
+JB_File* SC_Comp__BundleProductFile();
 
 JB_String* SC_Comp__CakeExt();
 
@@ -3033,7 +3037,7 @@ bool SC_FB__ParseArgs();
 
 void SC_FB__ParseOption(JB_String* Arg);
 
-void SC_FB__SetOutputPath(JB_String* Path, int Strength);
+bool SC_FB__SetOutputPath(JB_String* Path, int Strength);
 
 void SC_FB__StopStripping();
 
@@ -7515,8 +7519,6 @@ byte* JB_Mem__Zalloc(int Count);
 
 
 // JB_SCImport
-JB_String* SC_Imp_AppFolderProd(SCImport* Self);
-
 bool SC_Imp_CanBan(SCImport* Self, SCFile* Scf);
 
 SCImport* SC_Imp_Constructor(SCImport* Self, JB_File* F, bool Builtin);
@@ -7546,6 +7548,8 @@ void SC_Imp_ReloadImports(SCImport* Self, SCFile* Index);
 JB_String* SC_Imp_Render(SCImport* Self, FastString* Fs_in);
 
 void SC_Imp_Use(SCImport* Self);
+
+void SC_Imp_UseApps_FolderProd(SCImport* Self);
 
 int SC_Imp__CurrFileNum();
 
