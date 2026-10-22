@@ -19,6 +19,8 @@ function PerryIDE.ACTUAL_COMPILE
 	if (.debugmode is debug)
 		args <~ "--targetdebug"
 		args <~ "--hideaway" // store the scripts in a hidden temp folder
+	  else
+		args <~ "--force"
 	args <~ .project
 
 	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)

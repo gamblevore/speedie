@@ -396,7 +396,7 @@ function LinkOK (|file| p, |file|) // or just not a link
 
 
 function ShouldCppComp (|bool|)
-	if options.Scripting
+/	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
 	require Options.Compile and options.ModeCpp
 
