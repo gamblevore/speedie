@@ -1,0 +1,51 @@
+#!/usr/local/bin/spd
+
+/*
+git clone https://github.com/libsdl-org/SDL.git -b SDL2
+cd SDL
+mkdir build
+cd build
+../configure
+make
+sudo make install
+*/
+
+main
+	|| P = app.cwd
+	|| SDL = P.filechild("SDL")
+	if "/usr/local/include/SDL2/SDL.h".FileExists
+		"SDL2 is already installed. Continue? Y/n"
+		while
+			|| y = app.Input
+			if !y.isok
+				return 0
+			if (y ~= "" or "y")
+				exit
+			if y ~= "n"
+				return 0
+			"Not a Y/n answer."
+
+	if "SDL".fileExists
+		app.cwd(SDL)$
+		ExecuteLine("git pull")$
+	  else
+		ExecuteLine("git clone https://github.com/libsdl-org/SDL.git -b SDL2")$
+
+	app.cwd(SDL)$
+	"${app.cwd}"
+	"build".file.MakeDir$
+
+	ExecuteLine(P["SDL/configure"])$
+	ExecuteLine("make")$
+	ExecuteLine("sudo make install")$
+
+
+function ExecuteLine (|string| self, |ErrorInt|)
+	|| Args = self / ' '
+	printline "# $self"
+	|| Cmd = Args[]
+		Args.Remove(0)
+		rz = Cmd.Execute(Args, processmode.PassThru)
+		if rz!=0
+			printline "$Cmd: Error: $rz"
+
