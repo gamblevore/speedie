@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2391];
+extern JB_StringC* JB_LUB[2383];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -408,42 +408,6 @@ Dictionary* SC_Comp__Adj(Message* F) {
 	return ((Dictionary*)JB_Dict_Value0(D, JB_LUB[1595]));
 }
 
-void SC_Comp__AppBuildLibs(JB_File* Inner) {
-	{
-		Message* _LoopSrcf2 = SC__Linkage_OSXFrameworks;
-		Message* Lib = ((Message*)JB_Ring_First(_LoopSrcf2));
-		while (Lib) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Lib));
-			if (JB_Msg_Expect(Lib, kJB_SyxStr, nil)) {
-				SC_Comp__AppBuildOneLib(Inner, Lib->Name);
-			}
-			Lib = _Nf1;
-		};
-		;
-	};
-}
-
-void SC_Comp__AppBuildOneLib(JB_File* Inner, JB_String* Name) {
-	JB_File* _tmPf0 = JB_File_Parent(Inner);
-	JB_Incr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[781], Name);
-	JB_Incr(_tmPf1);
-	JB_File* Ldest = JB_File_Sibling(_tmPf0, _tmPf1);
-	JB_Incr(Ldest);
-	JB_Decr(_tmPf0);
-	JB_Decr(_tmPf1);
-	if (JB_File_FileExistance(Ldest)) {
-		JB_File_Delete(Ldest);
-	}
-	JB_String* Prefered = JB_File__SpeedieDir(JB_LUB[402]);
-	JB_Incr(Prefered);
-	if (!SC_Comp__TryCopyLib(Ldest, Name, Prefered)) {
-		SC_Comp__TryCopyLib(Ldest, Name, JB_LUB[428]);
-	}
-	JB_Decr(Ldest);
-	JB_Decr(Prefered);
-}
-
 void SC_Comp__AppendCompilerTime(JB_String* S, int Durr) {
 	FastString* Fs = SC__Comp_TimerOutput;
 	JB_FS_AppendString(Fs, S);
@@ -456,60 +420,6 @@ void SC_Comp__AppendCompilerTime(JB_String* S, int Durr) {
 		JB_FS_AppendString(Fs, kJB__TerminalColor_Normal);
 	}
 	JB_FS_AppendByte2(Fs, '\n');
-}
-
-JB_File* SC_Comp__AppleBuildApp(JB_File* OrigProduct, JB_File* Project) {
-	if (!JB_Platform__OSX()) {
-		return nil;
-	}
-	if (Project) {
-		JB_String* Dest = JB_File_LinkToGet(OrigProduct);
-		JB_Incr(Dest);
-		if (JB_Str_Exists(Dest)) {
-			if (true) {
-				JB_Object_FailStr(Dest, JB_LUB[462]);
-			}
-		}
-		JB_Decr(Dest);
-	}
-	SC_Comp__Stage(JB_LUB[1569]);
-	JB_String* Name = SC_Comp__IdealName();
-	JB_Incr(Name);
-	JB_String* Prefered_name = JB_Str_OperatorPlus(Name, JB_LUB[1044]);
-	JB_Incr(Prefered_name);
-	JB_File* Final_app = JB_File_Sibling(OrigProduct, Prefered_name);
-	JB_Incr(Final_app);
-	JB_String* _tmPf0 = JB_Str_OperatorPlus(JB_LUB[419], Name);
-	JB_Incr(_tmPf0);
-	JB_Decr(Name);
-	JB_File* Inner = JB_File_SyntaxAccess(Final_app, _tmPf0);
-	JB_Incr(Inner);
-	JB_Decr(_tmPf0);
-	if (Project) {
-		JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[1375], Prefered_name);
-		JB_Incr(_tmPf1);
-		JB_File* Copy_from = JB_File_Child(Project, _tmPf1);
-		JB_Incr(Copy_from);
-		JB_Decr(_tmPf1);
-		if (JB_File_FileExistance(Copy_from)) {
-			JB_File_CopyAll(Copy_from, Final_app, false);
-		}
-		JB_Decr(Copy_from);
-		JB_File* _tmPf2 = SC_Comp__ProductFile();
-		JB_Incr(_tmPf2);
-		if (JB_ErrorInt_SyntaxCast(JB_File_MoveTo(_tmPf2, Inner))) {
-			JB_SetRef(SC__Options_exe_path, Inner);
-			SC_Comp__AppBuildLibs(Inner);
-			SC_Comp__CodeSign(Final_app);
-			JB_SetRef(SC__Options_output_path, Final_app);
-			JB_File_Touch(Final_app);
-		}
-		JB_Decr(_tmPf2);
-	}
-	JB_Decr(Prefered_name);
-	JB_Decr(Final_app);
-	JB_SafeDecr(Inner);
-	return Inner;
 }
 
 bool SC_Comp__Banned(JB_String* Name) {
@@ -541,18 +451,7 @@ void SC_Comp__Bundle() {
 	if (SC_Linkage__SyntaxAccess(JB_LUB[1831])) {
 		return;
 	}
-	JB_File* Pd = SC_Comp__BundleProductFile();
-	JB_Incr(Pd);
-	JB_FreeIfDead(SC_Comp__AppleBuildApp(Pd, SC__Comp_BaseProjectPath));
-	JB_Decr(Pd);
-}
-
-JB_File* SC_Comp__BundleProductFile() {
-	JB_File* B = SC__Comp_BundleProductFile_;
-	if (B) {
-		return B;
-	}
-	return SC_Comp__ProductFile();
+	SC_Comp__CodeSign();
 }
 
 JB_String* SC_Comp__CakeExt() {
@@ -613,25 +512,32 @@ void SC_Comp__ClearEnvs() {
 	JB_Decr(Allowed);
 }
 
-void SC_Comp__CodeSign(JB_File* Gui_exe) {
-	Message* _tmPf0 = JB_App__Prefs();
+void SC_Comp__CodeSign() {
+	SC_Comp__Stage(JB_LUB[1375]);
+	JB_String* _tmPf0 = SC_Comp__ProductPath();
 	JB_Incr(_tmPf0);
-	Message* Sign = JB_Msg_SyntaxAccess(_tmPf0, kJB_codesign_native);
+	JB_File* Prod = JB_Str_AsFile(_tmPf0);
+	JB_Incr(Prod);
+	JB_Decr(_tmPf0);
+	Message* _tmPf1 = JB_App__Prefs();
+	JB_Incr(_tmPf1);
+	Message* Sign = JB_Msg_SyntaxAccess(_tmPf1, kJB_codesign_native);
 	JB_Incr(Sign);
 	if (Sign) {
-		JB_String* _tmPf1 = JB_config_AsString(Sign);
-		JB_Incr(_tmPf1);
-		SC_File_CodeSign(Gui_exe, _tmPf1);
-		JB_Decr(_tmPf1);
-	}
-	 else {
-		JB_String* _tmPf2 = JB_Str_OperatorPlus(JB_LUB[963], Gui_exe);
+		JB_String* _tmPf2 = JB_config_AsString(Sign);
 		JB_Incr(_tmPf2);
-		JB_Rec__NewWarning(nil, _tmPf2, nil);
+		SC_File_CodeSign(Prod, _tmPf2);
 		JB_Decr(_tmPf2);
 	}
+	 else {
+		JB_String* _tmPf3 = JB_Str_OperatorPlus(JB_LUB[963], Prod);
+		JB_Incr(_tmPf3);
+		JB_Rec__NewWarning(nil, _tmPf3, nil);
+		JB_Decr(_tmPf3);
+	}
+	JB_Decr(Prod);
 	JB_Decr(Sign);
-	JB_Decr(_tmPf0);
+	JB_Decr(_tmPf1);
 }
 
 void SC_Comp__CollectConstants() {
@@ -1198,29 +1104,6 @@ SCDecl* SC_Comp__GetTypeVoid() {
 	JB_SetRef(SC_TypeVoid, Rz);
 	JB_SetRef(SC_TypeVoidPtr, SC_Decl_GetAddress(Rz, kSC__DeclMode_Always));
 	return Rz;
-}
-
-JB_String* SC_Comp__IdealName() {
-	if (JB_Str_Exists(SC__Options_output_path)) {
-		return JB_Str_TrimExtAndPath(SC__Options_output_path, true);
-	}
-	Message* S = JB_Msg_SyntaxAccess(SC__Comp_ConfMsg, JB_LUB[305]);
-	JB_Incr(S);
-	if (S) {
-		JB_String* _tmPf2 = S->Name;
-		JB_Incr(_tmPf2);
-		JB_EarlyDecr(S);
-		JB_SafeDecr(_tmPf2);
-		return _tmPf2;
-	}
-	JB_String* _tmPf0 = SC_Ext__ProductBaseName();
-	JB_Incr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_TrimExtAndPath(_tmPf0, true);
-	JB_Incr(_tmPf1);
-	JB_EarlyDecr(_tmPf0);
-	JB_EarlyDecr(S);
-	JB_SafeDecr(_tmPf1);
-	return _tmPf1;
 }
 
 void SC_Comp__ImportAll() {
@@ -1822,9 +1705,9 @@ void SC_Comp__ImportProj() {
 			return;
 		}
 	}
-	if ((!SC__Options_SelfReplacement) and SC_Linkage__SyntaxAccess(JB_LUB[2388])) {
+	if ((!SC__Options_SelfReplacement) and SC_Linkage__SyntaxAccess(JB_LUB[1569])) {
 		if (true) {
-			JB_File_Fail(F, JB_LUB[2389]);
+			JB_File_Fail(F, JB_LUB[1402]);
 		}
 	}
 }
@@ -2637,18 +2520,6 @@ bool SC_Comp__TimeTest(Date Elapsed) {
 	}
 	JB_Flow__Enable();
 	return CanInstall;
-}
-
-bool SC_Comp__TryCopyLib(JB_File* Ldest, JB_String* Name, JB_String* Base) {
-	bool Rz = false;
-	JB_File* Lib = JB_Str_ChildFile(Base, Name);
-	JB_Incr(Lib);
-	if (JB_File_FileExistance(Lib)) {
-		JB_File_HardLinkTo(Lib, Ldest);
-		Rz = true;
-	}
-	JB_EarlyDecr(Lib);
-	return Rz;
 }
 
 bool SC_Comp__TryVariousStartModes() {
@@ -10056,7 +9927,7 @@ Array* SC_Ext__CreateCompileString(Array* FileList, JB_String* Product, JB_Strin
 	}
 	SC_Array_AppendWords(Rz, JB_LUB[335]);
 	if (Aslib) {
-		SC_Array_AppendWords(Rz, JB_LUB[2390]);
+		SC_Array_AppendWords(Rz, JB_LUB[333]);
 	}
 	if (SC__Options_SelfReplacement or Aslib) {
 		SC_Array_AppendWords(Rz, JB_LUB[339]);
@@ -12913,11 +12784,11 @@ int JB_InitCode_() {
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_SThg__)), JB_LUB[2377], JB_LUB[2378], 13);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Num__)), JB_LUB[2379], JB_LUB[2380], 14);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_SStr__)), JB_LUB[2381], JB_LUB[2382], 15);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Back__)), JB_LUB[2383], JB_LUB[2384], 16);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Char__)), JB_LUB[1767], JB_LUB[2385], 17);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Bin__)), JB_LUB[1420], JB_LUB[2386], 18);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Back__)), JB_LUB[428], JB_LUB[781], 16);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Char__)), JB_LUB[1767], JB_LUB[419], 17);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Bin__)), JB_LUB[1420], JB_LUB[462], 18);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Str__)), JB_LUB[1876], JB_LUB[2185], 19);
-	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Unit__)), JB_LUB[2387], JB_LUB[0], 20);
+	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Unit__)), JB_LUB[1044], JB_LUB[0], 20);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_ARel__)), JB_LUB[194], JB_LUB[1041], 21);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Name__)), JB_LUB[305], JB_LUB[0], 22);
 	JB_Syx__StdNew(((FP_fpMsgRender)(JB_Msg_Dot__)), JB_LUB[1930], JB_LUB[503], 23);
@@ -31551,22 +31422,11 @@ void SC_Imp_IndexLinkage(SCImport* Self, Message* Link, SCFile* Scf) {
 		Self->IsLibraryImp = true;
 		Self->WarnUnusedFuncs = false;
 	}
-	if (JB_Platform__OSX()) {
-		if (({
-			Message* _tmPf2 = JB_Msg_SyntaxAccess(Link, JB_LUB[1402]);
-			JB_Incr(_tmPf2);
-			bool _tmPf1 = JB_Msg_Yes(_tmPf2, false);
-			JB_EarlyDecr(_tmPf2);
-			 _tmPf1;
-		}) and SC_Options__ModeCpp()) {
-			SC_Imp_UseApps_FolderProd(Self);
-		}
-	}
 	if (SC_Imp_CanBan(Self, Scf)) {
-		Message* _tmPf3 = JB_Msg_SyntaxAccess(Link, JB_LUB[1413]);
-		JB_Incr(_tmPf3);
-		SC_Imp_LoadBanned(Self, _tmPf3);
-		JB_Decr(_tmPf3);
+		Message* _tmPf1 = JB_Msg_SyntaxAccess(Link, JB_LUB[1413]);
+		JB_Incr(_tmPf1);
+		SC_Imp_LoadBanned(Self, _tmPf1);
+		JB_Decr(_tmPf1);
 	}
 	Message* Arg = JB_Msg_NeedSyx(Link, kJB_SyxArg);
 	JB_Incr(Arg);
@@ -31722,23 +31582,6 @@ void SC_Imp_Use(SCImport* Self) {
 		JB_Layer_Use(Self->DeclLayer);
 		SC__Imp_Curr = Self;
 	}
-}
-
-void SC_Imp_UseApps_FolderProd(SCImport* Self) {
-	JB_String* Base = JB_LUB[333];
-	JB_Incr(Base);
-	if (JB_Platform__OSX()) {
-		JB_SetRef(Base, JB_LUB[310]);
-	}
-	JB_SetRef(Base, JB_Str_Child(Base, SC__Comp_ProjectName));
-	if (SC_FB__SetOutputPath(Base, 1) and JB_Platform__OSX()) {
-		JB_File* Prod = SC_Comp__ProductFile();
-		JB_Incr(Prod);
-		JB_SetRef(SC__Comp_BundleProductFile_, Prod);
-		JB_SetRef(SC__Options_output_path, SC_Comp__AppleBuildApp(Prod, nil));
-		JB_Decr(Prod);
-	}
-	JB_Decr(Base);
 }
 
 int SC_Imp__CurrFileNum() {
@@ -34593,10 +34436,6 @@ JB_String* JB_Str_Shorten(JB_String* Self, int N) {
 
 JB_String* JB_Str_Sibling(JB_String* Self, JB_String* Name) {
 	return JB_Str_ReplacePathComponent(Self, -1, Name);
-}
-
-ExitCode JB_Str_SilentExecute(JB_String* Self, Array* Args, FastString* Out, FastString* Errs, Date Timeout) {
-	return JB_Str_Execute(Self, Args, Out, Errs, kJB__PIDM_Silence, Timeout);
 }
 
 JB_String* SC_Str_SpdScriptName(JB_String* Self) {
@@ -51403,15 +51242,6 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	return JB_Rec_OK(JB_StdErr);
 }
 
-ExitCode JB_File_Touch(JB_File* Self) {
-	Array* _tmPf0 = (JB_Array_Constructor0(nil));
-	JB_Incr(_tmPf0);
-	JB_Array_SyntaxAppend(_tmPf0, Self);
-	ExitCode _tmPf1 = JB_Str_SilentExecute(JB_LUB[1754], _tmPf0, nil, nil, 0);
-	JB_EarlyDecr(_tmPf0);
-	return _tmPf1;
-}
-
 JB_String* JB_File__FindSpeedie(JB_String* Start) {
 	JB_String* F = JB_Str_ResolvePath(Start, false);
 	JB_Incr(F);
@@ -61515,4 +61345,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4773908706774751821 6905354664782377500
+// -6365354561340508163 -3948791512080162050

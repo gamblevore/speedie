@@ -1355,7 +1355,6 @@ extern Message* SC__Comp_AppInitGlobals;
 extern Message* SC__Comp_AppInitTest;
 extern Message* SC__Comp_ASMSelf;
 extern JB_File* SC__Comp_BaseProjectPath;
-extern JB_File* SC__Comp_BundleProductFile_;
 extern Array* SC__Comp_ClassList;
 extern Message* SC__Comp_ConfMsg;
 extern Message* SC__Comp_ConstantsList;
@@ -2735,21 +2734,13 @@ JB_String* SC_Comp__AddSCProj(JB_String* Path);
 
 Dictionary* SC_Comp__Adj(Message* F);
 
-void SC_Comp__AppBuildLibs(JB_File* Inner);
-
-void SC_Comp__AppBuildOneLib(JB_File* Inner, JB_String* Name);
-
 void SC_Comp__AppendCompilerTime(JB_String* S, int Durr);
-
-JB_File* SC_Comp__AppleBuildApp(JB_File* OrigProduct, JB_File* Project);
 
 bool SC_Comp__Banned(JB_String* Name);
 
 JB_File* SC_Comp__BuildFolder();
 
 void SC_Comp__Bundle();
-
-JB_File* SC_Comp__BundleProductFile();
 
 JB_String* SC_Comp__CakeExt();
 
@@ -2759,7 +2750,7 @@ void SC_Comp__CheckIsGoodLibrary();
 
 void SC_Comp__ClearEnvs();
 
-void SC_Comp__CodeSign(JB_File* Gui_exe);
+void SC_Comp__CodeSign();
 
 void SC_Comp__CollectConstants();
 
@@ -2810,8 +2801,6 @@ JB_String* SC_Comp__FindProjNoSuffix(JB_String* Path);
 JB_File* SC_Comp__GeneratedCppsFolder();
 
 SCDecl* SC_Comp__GetTypeVoid();
-
-JB_String* SC_Comp__IdealName();
 
 void SC_Comp__ImportAll();
 
@@ -2900,8 +2889,6 @@ void SC_Comp__Timer(JB_String* Name);
 void SC_Comp__TimerSub(JB_String* S, int Durr);
 
 bool SC_Comp__TimeTest(Date Elapsed);
-
-bool SC_Comp__TryCopyLib(JB_File* Ldest, JB_String* Name, JB_String* Base);
 
 bool SC_Comp__TryVariousStartModes();
 
@@ -7549,8 +7536,6 @@ JB_String* SC_Imp_Render(SCImport* Self, FastString* Fs_in);
 
 void SC_Imp_Use(SCImport* Self);
 
-void SC_Imp_UseApps_FolderProd(SCImport* Self);
-
 int SC_Imp__CurrFileNum();
 
 SCNode* SC_Imp__DoImport(Message* Node, SCNode* Name_space, Message* ErrPlace);
@@ -7945,8 +7930,6 @@ JB_String* SC_Str_ScriptLocation(JB_String* Self, JB_String* Container);
 JB_String* JB_Str_Shorten(JB_String* Self, int N);
 
 JB_String* JB_Str_Sibling(JB_String* Self, JB_String* Name);
-
-ExitCode JB_Str_SilentExecute(JB_String* Self, Array* Args, FastString* Out, FastString* Errs, Date Timeout);
 
 JB_String* SC_Str_SpdScriptName(JB_String* Self);
 
@@ -10233,8 +10216,6 @@ bool SC_File_TestBatch(JB_File* Self);
 bool SC_File_TestCake(JB_File* Self);
 
 bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
-
-ExitCode JB_File_Touch(JB_File* Self);
 
 JB_String* JB_File__FindSpeedie(JB_String* Start);
 
