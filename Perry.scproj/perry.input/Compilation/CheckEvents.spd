@@ -122,7 +122,7 @@ extend PerryIDE
 	function CheckMsg (|string| operation, |message|)
 		opt norefcounts
 		|| cmd = @tmp + operation
-		cmd <~ .Project.path
+		cmd <~ .Project
 		return cmd
 	
 	

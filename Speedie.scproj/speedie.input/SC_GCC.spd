@@ -164,7 +164,7 @@ function CollectCppsInto ( |File| Fol,  |File| Objects, |[File]| )
 	|[string]| Cpps
 	for name in Fol.list
 		if .CanCompile(name)
-			Cpps <~ Fol.path.child( name )
+			Cpps <~ Fol.child( name )
 
 	return .FilterCppsIfAlreadyDone(Cpps, Objects)
 	
@@ -445,8 +445,8 @@ function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, t
 	|| Test3 = (S+"3").file
 
 	|| Cpp1 = Cpp_Export.CppProduct
-	|| Cpp2 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest2").File
-	|| Cpp3 = Cpp1.Path.ReplacePathComponent(-2, "BuildTest3").File
+	|| Cpp2 = Cpp1.ReplacePathComponent(-2, "BuildTest2").File
+	|| Cpp3 = Cpp1.ReplacePathComponent(-2, "BuildTest3").File
 
 	.Cleanup <~ Test2
 	.Cleanup <~ Test3
@@ -491,7 +491,7 @@ function ReplaceOld (|file| input, |File| Backs)
 
 function MakeDailyProductPath (|File| B, |string|)
 	|| D = (Date.Now.days mod 7)+1
-	return B.Path.child( D.Render + "_Speedie" )
+	return B.child( D.Render + "_Speedie" )
 
 
 function BackupCompiler (|bool|)
@@ -517,7 +517,7 @@ function BackupCompiler (|bool|)
 
 function InstallOne (|file| test)
 	test.parent.MakeDir
-	|| f0 = test.Path.ReplacePathComponent(-2, "Build").file
+	|| f0 = test.ReplacePathComponent(-2, "Build").file
 	if !Test.CompareFile( f0)
 		Test.Copyto(f0)
 

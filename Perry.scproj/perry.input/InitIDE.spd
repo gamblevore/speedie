@@ -859,7 +859,7 @@ extend PerryIDE
 	
 	
 	function StartFileList
-		perry.AddProj(.project.path, self)
+		perry.AddProj(.project, self)
 		|| r = .root
 			.id = r.FilePath
 		.nottodo = nil

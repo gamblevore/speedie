@@ -369,9 +369,8 @@ function ImportProj
 	SCImport.STDLibTime = false
 	|| proj = compiler.Project!
 	|| F = proj.Where!
-	|| fp = f.path
-	if fp ~!= .jeebox
-		require scimport.ImportPathSub("", F, proj, fp.lowercase)
+	if F|string| ~!= .jeebox
+		require scimport.ImportPathSub("", F, proj, F.lowercase)
 
 	if !Options.SelfReplacement and Linkage["speedie_compiler"]
 		// oh dear... this is not supported.

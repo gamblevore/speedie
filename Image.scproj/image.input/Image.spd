@@ -373,7 +373,7 @@ class Image (memory)
 
 		function file.LoadQOI (|image|)
 			|| s = .readall
-				return s.loadqoi(self) #expect (.path, "Failed to read image.")
+				return s.loadqoi(self) #expect (self, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
 			|| l = .ByteLength

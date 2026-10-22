@@ -5,19 +5,20 @@ class FileRow (ListViewRow)
 // then fileviewer can handle it...
 	linkage
 		cpp_part FR
-	|string|						FilePath
-	|Document?|						_Document
-	|date|							DateOfFileAtRead
-	|string|						DirFile
-	|int|							LastSize
-	|int|							LastScroll
-	|int|							LastFileCount
-	|byte|							FindID
-	|bool|							HasError
-	|bool|							InMainProj
-	|bool|							AsDir
-	|bool|							DoesntExist
-	|ind|							_NameClash
+	
+	|string|				FilePath	// why not make .FilePath an actual file? we often want to do file stuff on it?
+	|Document?|				_Document	// files don't consume any resources unless opened... only tiny object memory.
+	|date|					DateOfFileAtRead
+	|string|				DirFile
+	|int|					LastSize
+	|int|					LastScroll
+	|int|					LastFileCount
+	|byte|					FindID
+	|bool|					HasError
+	|bool|					InMainProj
+	|bool|					AsDir
+	|bool|					DoesntExist
+	|ind|					_NameClash
 	contains FileRow
 	
 	
@@ -178,7 +179,7 @@ class FileRow (ListViewRow)
 	libinternal FillFilesSub (|file| fol, |dictionary?| excl, |string| folfile, |$int| Count)
 		.DateOfFileAtRead = fol.modified
 		for f.files in fol // merge these two
-			|| name = f.path.name
+			|| name = f.name
 			|| ext = name.ext
 			if (name[0] != '.')  and  (!excl[ext])
 				if !.AddFileSub(f, excl, folfile, count)
