@@ -84,6 +84,9 @@ class Object
 		debugger
 
 		
+	function SyntaxExpect (|message| msg )
+		disabled "Did you mean to reverse the parameter order?"
+	
 	autogen SyntaxExpect ( |string| Error )
 		visible
 		cpp_part FailStr
