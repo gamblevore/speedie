@@ -110,9 +110,6 @@ datatype ImagePixel (uint)
 				v = 255
 			parts[i] = v
 	
-//	function Lum (|float|)
-//		return .color.lum
-	
 	function HasColor (|bool|)
 		inlined
 		return (self << 8) != 0
@@ -121,11 +118,6 @@ datatype ImagePixel (uint)
 		cpp_part CastVec4
 		inlined
 		return .color
-
-//	syntax cast (|PremultipliedColor|)
-//		cpp_part CastPremul
-//		inlined
-//		return .PreMul
 
 	function AddAlpha (|&imagepixel| self, |float| v)
 		v += .Alpha

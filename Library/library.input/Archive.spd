@@ -87,9 +87,8 @@ role FileArchive (message)
 	syntax append (|file| f)
 		cpp_part AppendFile
 		opt norefcounts
-		|| p = f.path
-		|| where = p.TrimStart(.base)
-		if where != p
+		|| where = f.TrimStart(.base)
+		if where != f
 			|| l = .last
 				|| item = l.msg(@tmp, where)
 				item["data"] = f.readall

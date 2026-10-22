@@ -42,6 +42,11 @@ class File (StringShared)
 		cpp_wrapper JB_File_Mode
 	
 	function Path (|string|)
+		// gets the internal path that this file contains
+		// while it is true that files ARE paths... you might want to release
+		// the file object, and only keep the path. Apart from that, this function has no real use.
+		// I could rename it to internal-path or something.
+		// and make .path just return self haha.
 		nil checker
 		cpp_wrapper JB_File_Path
 
@@ -179,6 +184,7 @@ class File (StringShared)
 
 
 	function Child (|string| name, |File!|)
+//		real self put back later
 		check (name) (Self, "No name specified for sub-file of directory: " + self)
 		return File( self|string|.child(name) )
 	
@@ -221,6 +227,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	
 	inline Exists (|bool|)
 		cpp_part FileExistance
+		nil checker
 		return self|string|.fileexists
 	
 	syntax access (|string| name, |File!|)
