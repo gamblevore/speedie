@@ -1,12 +1,10 @@
 
 
-
-function compiler.BundleProductFile (|File|)
-	opt norefcounts
-	|| B = compiler.BundleProductFile_
-		return B
-	return .ProductFile
-
+// i used to do work to create a bundle on OSX.
+// now I realised... this is futile. It makes a mess out of the compiler
+// the complexity was spiralling. Files and stuff moved all over. I hated it
+// this is not the place for creating such a complex product. Thats for an
+// installer script or post-production script!
 
 function compiler.Bundle
 	require Platform.osx
@@ -14,82 +12,24 @@ function compiler.Bundle
 		require !Compiler.IsTest and !Options.ExternalCompile
 		require SC_Targets["gui"]				// what about exec? or other that want to be cmd-line?
 		require !linkage["nobundle"]
-		|| Pd = .BundleProductFile
-		.AppleBuildApp(pd, .BaseProjectPath!)
+		.CodeSign
 
-	
+
+function compiler.CodeSign
+	.Stage("Code signing")
+	|| prod = .productpath.file
+	|| sign = app.prefs[codesign_native]
+		prod.codesign(sign)
+	  else
+		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + prod )
+	// lets not scare users. it might a well be commented out at this point but I'd rather leave it.
+	// could be useful info!
+
+
 function compiler.WrongConf (CollectFunc)
 	expect (!.ConfMsg) (node, "Conf already exists!")
 	error (node, "Conf must be in the app.conf file")
 
 
-function compiler.IdealName (|string|)
-	if options.output_path
-		return options.output_path.TrimExtAndPath
-	|| s = .confmsg["name"]
-		return s.name
-	return TransCompiler.ProductBaseName.TrimExtAndPath
-
-
-function compiler.AppBuildOneLib (|file| inner, |string| name)
-	|| ldest = inner.parent.sibling("Frameworks/" + name)
-	if ldest.exists
-		ldest.Delete
-	|| Prefered = file.speediedir("/Library")
-	if !.TryCopyLib(ldest, name, prefered)
-		.TryCopyLib(ldest, name, "/usr/local/lib")
-
-
-function Compiler.TryCopyLib (|file| ldest, |string| name, |string| Base, |bool|)
-	|| lib = base.filechild(name)
-	if lib.Exists
-		lib.HardLinkTo(ldest)
-		rz = true
-
-
-function compiler.AppBuildLibs (|file| inner)
-	opt norefcounts
-	for lib in linkage.OSXFrameworks
-		if lib.expect(@str)				// ok so... hard-link it?
-			.AppBuildOneLib(inner, lib.name)
-
-
-
-function compiler.AppleBuildApp (|file| OrigProduct, |file?| Project=nil, |file|)
-	target !OSX
-		return nil
-	require Platform.osx // for reusing MacOS generated Cpps on linux builds.
-	
-	if project
-		|| dest = OrigProduct.linksto	
-			error (dest, "This should not be a link")
-	
-	Compiler.stage("Create MacOSX Package")
-	|| name	= .idealname
-	|| prefered_name=name + ".app"
-	|| final_app = OrigProduct.sibling(prefered_name)
-	|| inner = final_app["Contents/MacOS/"+name]!
-	if project
-		|| copy_from = project.child("OSX/"+prefered_name)
-		if copy_from.exists
-			copy_from.copyall(Final_app)
-		if .ProductFile.moveto( inner )
-			options.exe_path = inner
-			.AppBuildLibs(inner)
-			.CodeSign(final_app)
-			options.output_path = final_app // reporting only. Perhaps we should have a reported-path
-			final_app.touch
-	return inner
-
-
-
 constants
 	codesign_native = "codesign_osx"
-
-function compiler.CodeSign (|file| gui_exe)
-	|| sign = app.prefs[codesign_native]
-		gui_exe.codesign(sign)
-	  else
-		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe )
-	// lets not scare users. it might a well be commented out at this point but I'd rather leave it.
-	// could be useful info!

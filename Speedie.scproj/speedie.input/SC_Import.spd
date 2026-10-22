@@ -121,39 +121,11 @@ class SCImport
 			compiler.ConfMsg = arg
 			conf.CommentOut
 
-	
-	function UseApps_FolderProd
-		|| base = "/usr/local/bin"
-		if platform.OSX				// Can't rely on file.applications, because of how code is copied from MacOS compile.
-			base = "/Applications"
-
-		base = base.Child(compiler.projectname)
-		if feedback.SetOutputPath( base, 1 ) and platform.osx
-			|| prod = Compiler.ProductFile // setoutputpath actually calls pathfix.
-			compiler.BundleProductFile_ = prod
-			options.output_path = compiler.AppleBuildApp(prod)!
-			// compiler.Bundle should be put in sync with this.
-			// it can fire without this... meaning we don't realise the build is actually already good.
-			// obviously, its not using the apps_Folder, but still... .AppleBuildApp(prod)! should be called later
-			// that or SIMPLIFY the entire process.
-			// I think... actually simplifying is better
-			// the complexity is just spiraling.
-			// leave it where it is... don't install from here.
-			// we are doing it the wrong way.
-			// remove BundleProductFile_ too.
-	
-	
+		
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
 			.IsLibraryImp = true
 			.WarnUnusedFuncs = false
-
-		if Platform.osx // The C++ Compiled code is copied from OSX.
-						// so target osx is true at build time, even on linux!
-						// so we need multiple tests.
-			target osx
-				if link["apps_folder"].yes and options.modecpp
-					.UseApps_FolderProd
 			
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])

@@ -59,7 +59,6 @@ linkage
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
-|file|						BundleProductFile_
 |scimport|					Project
 |scfunction|				MainFunc
 |message|					ConfMsg
