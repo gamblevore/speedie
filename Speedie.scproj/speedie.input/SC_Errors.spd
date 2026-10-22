@@ -109,7 +109,7 @@ function Error.Improve					// sc_improve
 		if SC != .node.file
 			.node = node // wrong file!!
 		if sc.exists
-			.path = sc.path
+			.path = sc
 
 
 function FindBytePosSub (|Message?| Node, |Message?|)

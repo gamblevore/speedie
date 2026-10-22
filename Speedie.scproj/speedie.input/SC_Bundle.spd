@@ -1,17 +1,21 @@
 
 
-// must create an error if not found... unless the name is "default"
+
+function compiler.BundleProductFile (|File|)
+	opt norefcounts
+	|| B = compiler.BundleProductFile_
+		return B
+	return .ProductFile
 
 
-function compiler.Bundle 
+function compiler.Bundle
 	require Platform.osx
 	target osx
 		require !Compiler.IsTest and !Options.ExternalCompile
-		require SC_Targets["gui"] // what about exec? or other that want to be cmd-line?
+		require SC_Targets["gui"]				// what about exec? or other that want to be cmd-line?
 		require !linkage["nobundle"]
-		|| Pd = .productfile
-		|| Pj = .BaseProjectPath
-			.AppleBuildApp(pd, pj)
+		|| Pd = .BundleProductFile
+		.AppleBuildApp(pd, .BaseProjectPath!)
 
 	
 function compiler.WrongConf (CollectFunc)
@@ -31,7 +35,7 @@ function compiler.AppBuildOneLib (|file| inner, |string| name)
 	|| ldest = inner.parent.sibling("Frameworks/" + name)
 	if ldest.exists
 		ldest.Delete
-	|| prefered = file.speediedir("/Library")
+	|| Prefered = file.speediedir("/Library")
 	if !.TryCopyLib(ldest, name, prefered)
 		.TryCopyLib(ldest, name, "/usr/local/lib")
 
@@ -45,31 +49,37 @@ function Compiler.TryCopyLib (|file| ldest, |string| name, |string| Base, |bool|
 
 function compiler.AppBuildLibs (|file| inner)
 	opt norefcounts
-	for lib in linkage.osxframeworks 
+	for lib in linkage.OSXFrameworks
 		if lib.expect(@str)				// ok so... hard-link it?
 			.AppBuildOneLib(inner, lib.name)
 
 
-function compiler.AppleBuildApp (|file| product, |file| project)
-	require Platform.osx
-	target OSX
-		|| dest = product.linksto			
-		expect (!dest) (dest, "This should not be a link")
-		
-		Compiler.stage("Create MacOSX Package")
-		|| name			= .idealname
-		|| prefered_name=name + ".app"
-		|| final_app	= product.sibling(prefered_name)
-		|| copy_from	= project.child("OSX/"+prefered_name)
-		|| inner		= final_app["Contents/MacOS/"+name]!
+
+function compiler.AppleBuildApp (|file| OrigProduct, |file?| Project=nil, |file|)
+	target !OSX
+		return nil
+	require Platform.osx // for reusing MacOS generated Cpps on linux builds.
+	
+	if project
+		|| dest = OrigProduct.linksto	
+			error (dest, "This should not be a link")
+	
+	Compiler.stage("Create MacOSX Package")
+	|| name	= .idealname
+	|| prefered_name=name + ".app"
+	|| final_app = OrigProduct.sibling(prefered_name)
+	|| inner = final_app["Contents/MacOS/"+name]!
+	if project
+		|| copy_from = project.child("OSX/"+prefered_name)
 		if copy_from.exists
 			copy_from.copyall(Final_app)
-		if product.moveto( inner )
+		if .ProductFile.moveto( inner )
 			options.exe_path = inner
 			.AppBuildLibs(inner)
 			.CodeSign(final_app)
 			options.output_path = final_app // reporting only. Perhaps we should have a reported-path
 			final_app.touch
+	return inner
 
 
 
@@ -80,6 +90,6 @@ function compiler.CodeSign (|file| gui_exe)
 	|| sign = app.prefs[codesign_native]
 		gui_exe.codesign(sign)
 	  else
-		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe.path )
+		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + gui_exe )
 	// lets not scare users. it might a well be commented out at this point but I'd rather leave it.
 	// could be useful info!

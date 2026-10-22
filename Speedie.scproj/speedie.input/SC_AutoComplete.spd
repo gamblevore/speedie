@@ -932,7 +932,7 @@ function JumpImport (|message| cmd, |message|)
 		cmd.clear
 		|| proj = Compiler.FindProject(f.name)
 		require proj.exists
-		cmd <~ (@sstr, proj.path)
+		cmd <~ (@sstr, proj)
 		cmd <~ 0
 		return cmd
 

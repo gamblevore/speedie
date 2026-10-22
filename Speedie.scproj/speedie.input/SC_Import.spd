@@ -81,7 +81,7 @@ class SCImport
 			return true
 		if options.ProjectIsMiniLib
 			|| p = compiler.BaseProjectPath
-				rz = p.DirectoryContains(scf.path)
+				rz = p.DirectoryContains(scf)
 		// we also need something else to be the same.
 		// scf needs to be inside the thing...
 	
@@ -122,28 +122,29 @@ class SCImport
 			conf.CommentOut
 
 	
-	function AppFolderProd (|string|)
-		|| name = compiler.Productpath.name
+	function UseApps_FolderProd
 		|| base = "/usr/local/bin"
-		if platform.OSX // can't rely on file.applications, because of how code is copied from MacOS compile.
+		if platform.OSX				// Can't rely on file.applications, because of how code is copied from MacOS compile.
 			base = "/Applications"
-		return base.Child(name)
-		
+
+		base = base.Child(compiler.projectname)
+		if feedback.SetOutputPath( base, 1 ) and platform.osx
+			|| prod = Compiler.ProductFile // setoutputpath actually calls pathfix.
+			compiler.BundleProductFile_ = prod
+			options.output_path = compiler.AppleBuildApp(prod)!
+
 		
 	function  IndexLinkage (|message| link, |scfile| scf)
 		if link["type"] ~= "library"
 			.IsLibraryImp = true
 			.WarnUnusedFuncs = false
 
-		if Platform.osx // the C++ Compiled code is copied from OSX.
-						// so target osx is true at build time.
+		if Platform.osx // The C++ Compiled code is copied from OSX.
+						// so target osx is true at build time, even on linux!
+						// so we need multiple tests.
 			target osx
 				if link["apps_folder"].yes and options.modecpp
-					feedback.SetOutputPath( .AppFolderProd, 1 )
-			// where should perry be installed on linux? /usr/bin? hmmmm
-			// on macos, perry is a symlink to the exe in /Applications/
-			// but if its already in /usr/bin or /usr/local/bin, then what? we cant do the link
-			// just do nothing, for now
+					.UseApps_FolderProd
 			
 		if .canBan(scf)
 			.LoadBanned(link["bannedclasses"])
@@ -155,12 +156,9 @@ class SCImport
 		|| blind = arg["blindcast"]
 			.BlindCast = blind.blind
 		  elseif Options.SelfReplacement
-			.BlindCast = 0
-
-	
+			.BlindCast = 0	
 	// * Needs better types: "contains (a,b,c)". (|0| a, |1| b, |2| c).
 	// scdecl would use linked-list to other decls... fileviewer has GUIcontrols+filerows
-
 		link.remove
 		
 
@@ -219,7 +217,7 @@ class SCImport
 				shaders![ cName ] = c
 
 			  elseif (ext.isclike)
-				Cpp_Export.Cpp_Input <~ c.path
+				Cpp_Export.Cpp_Input <~ c
 			  else
 				.Resources.valuelower(cname) = c
 				
@@ -320,7 +318,7 @@ class SCImport
 		function ImportPath (|string| path, |file!| f, |int| ImportDepth, |bool| Builtin, |scimport?|)
 			require f.MustExist and path.IsOKForImport
 	
-			|| fpl = f.Path.lowercase
+			|| fpl = f.lowercase
 			|| old = Compiler.ImportedNames[fpl]
 				return old
 			

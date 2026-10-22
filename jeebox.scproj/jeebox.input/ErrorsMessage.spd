@@ -33,8 +33,6 @@ extend_module ErrorReceiver
 function Message.OriginalFilePath (|string|)
 	Opt NoRefCounts
 	|| O = .memorylayer.obj
-	if !__IS_LIBRARY__ and (O isa File)
-		return O.path
 	if O isa String
 		return O
 

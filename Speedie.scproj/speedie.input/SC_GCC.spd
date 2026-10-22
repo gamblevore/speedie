@@ -55,20 +55,19 @@ function ProductSuffix (|String|)
 	
 
 function compiler.ProductFile (|File|)
+	opt norefcounts
 	return .ProductPath.file
-
 
 
 function Compiler.CakeExt (|string|)
 	return ".cake"
 
 
-
 function compiler.ProductPath (|string|)
 	if options.output_path
 		return options.output_path
 	
-	|| prod = transcompiler.ProductNameFull
+	|| prod = TransCompiler.ProductNameFull
 	if Options.SelfReplacement
 		return file.Speediedir("Terminal/" + prod)
 	
@@ -405,7 +404,9 @@ function ShouldCppComp (|bool|)
 		return true
 
 	|| p = .linkOK(compiler.ProductFile)
-	if   !p   or   p.modified < scimport.recent
+	if   !p
+		return true
+	if  p.modified < scimport.recent
 		return true
 	if !options.silent
 		"Already up to date"
@@ -582,7 +583,7 @@ function file.TestBatch (|bool|)
 
 function File.TestSpeedie (|string| v, |bool|)
 	require (.MustExist)
-	expect !(.path contains " ") ("Path contains a space: " + .path)
+	expect !(self contains " ") ("Path contains a space: " + self)
 
 	|| variant = "--variant=" + v
 	|| cmd_args = ["--self",  "--nocolor",  Variant]
@@ -592,12 +593,12 @@ function File.TestSpeedie (|string| v, |bool|)
 //		cmd_args <~ "--arch="+options.arch // its march on linux anyway
 	if options.PrintCompileString
 		cmd_args <~ "--noisy"
-		printline .path
+		printline self
 		printline cmd_args
 	
 	/////	/////	/////	/////
 	|| errs = FastString()
-	.path.execute(cmd_args, nil, errs, 0) // <------ CALL SPEEDIE
+	.execute(cmd_args, nil, errs, 0) // <------ CALL SPEEDIE
 	if errs.Length
 		printline errs
 	/////	/////	/////	/////

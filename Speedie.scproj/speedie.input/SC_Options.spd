@@ -23,7 +23,7 @@ module Options
 	||		GenFlowLogCode			= false
 	||		KeepAllErrors			= false
 	||		Scripting				= false
-	||		ForceRecompile			= false
+	||		ForceRecompile			= true
 	||		Silent					= false
 	||		IsDirectTest			= false
 	||		ProjectIsLibrary		= false
@@ -76,7 +76,6 @@ module Feedback
 		if p ~= spd
 			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
-			options.ForceRecompile = true
 			SC_Targets["self"] = true
 		  elseif p ~= compiler.jeebox
 			Options.ProjectIsMiniLib = true
@@ -128,17 +127,17 @@ module Feedback
 		return StdErr.OK and Compiler.BaseProjectPath.Exists
 
 	
-	function SetOutputPath (|string| path, |int| strength)
+	function SetOutputPath (|string| path, |int| strength, |bool|)
 		if Options.output_path_strength > strength // already set, and at a stronger level.
 			// --output_path in stdargs, will override output_path in .conf files
-			return
+			return false
 			
 		|| value = path.PathFixSpd
 		if options.output_path != value
 			check (!options.output_path) ("output_path already specified: " + options.output_path)
 			options.output_path = value
 			Options.output_path_strength = strength
-			options.ForceRecompile = true // it's what we expect
+			rz = true
 		
 
 	function string.IsSpeedieSrc (|bool|)
@@ -167,7 +166,7 @@ module Feedback
 		|| Exists	= f.exists
 		|| IsSpd	= f.name.IsSpeedieSrc or IsScript
 		if (exists and !F.isdir) or (!exists and IsSpd)
-			options.SingleFileInput = f.path
+			options.SingleFileInput = f
 			require f.mustexist
 			F = f.parent
 			Compiler.BaseProjectPath = f
@@ -252,9 +251,9 @@ module Feedback
 				
 		+'perry'
 			Explain(Purpose)$
-			options.perryoutput = 1
+			options.ForceRecompile = false
 			|| RealPerry = value~="bin"
-			options.perryoutput += RealPerry // argvalue not needed? just value, right?
+			options.perryoutput = 1 + RealPerry // argvalue not needed? just value, right?
 			compiler.insecurewords = file.Prefs("klinkerhoppen.banned").readall.dict
 
 		+'hideaway'
@@ -390,7 +389,7 @@ module Feedback
 		
 		+'force'
 			explain(purpose, "Forces recompilation even if the output is newer than the input files.")$
-			options.ForceRecompile = true
+			options.ForceRecompile = value.optionbool
 
 		+'variant'
 			Explain(Purpose)$

@@ -59,6 +59,7 @@ linkage
 |File|						TempFolder
 |SCFile|					InternalFile = SCFile.new(nil, SCImport(nil, true))
 |string|					ProjectName
+|file|						BundleProductFile_
 |scimport|					Project
 |scfunction|				MainFunc
 |message|					ConfMsg
@@ -368,8 +369,9 @@ function ImportProj
 	SCImport.STDLibTime = false
 	|| proj = compiler.Project!
 	|| F = proj.Where!
-	if F.path ~!= .jeebox
-		require scimport.ImportPathSub("", F, proj, F.path.lowercase)
+	|| fp = f.path
+	if fp ~!= .jeebox
+		require scimport.ImportPathSub("", F, proj, fp.lowercase)
 
 	if !Options.SelfReplacement and Linkage["speedie_compiler"]
 		// oh dear... this is not supported.
