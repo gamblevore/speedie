@@ -4,7 +4,7 @@
 */
 
 
-class File (StringShared)
+class File (stringshared)
 	linkage
 		cpp_class JB_File
 		wrapper
@@ -67,7 +67,7 @@ class File (StringShared)
 		cpp_wrapper JB_File_HardLinkTo
 
 	function IsOpen (|bool|)
-		disabled "use .opened"
+		disabled "Use .opened"
 	
 	function Opened (|bool|) // isopen
 		inlined
@@ -76,14 +76,15 @@ class File (StringShared)
 	function Name (assigns:|string|Name, |errorint|)
 		return .MoveTo( super.Parent[Name] )
 	
+	syntax cast (|Cstring|)
+		cpp_part CastZero // files ARE zeroterminated always
+		inlined
+		return .addr|cstring|
+
 	syntax cast (|bool|)
-		opt norefcounts // what? why is this necessary?
+		description "Necessary because while files are strings, we don't want to compare against an empty string."
 		inlined
 		return self|bool|
-
-//	syntax cast (|faststring|)
-//		cpp_part CastToStream
-//		return .out
 
 	syntax equals (|string?| s, |bool| aware=false, |bool|)
 		inlined

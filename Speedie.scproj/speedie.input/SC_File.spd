@@ -21,7 +21,7 @@ class SCFile (file)
 		flow off // dates shouldn't matter ///
 		FlowLog.disable
 		
-		|string--| x = (f != nil)(f.path, string.error) 	// just feel like doing this.
+		|string--| x = (f != nil)(f, string.error) 	// just feel like doing this.
 		super.constructor(x)
 		.Proj = p
 		.Types = nil

@@ -3326,7 +3326,7 @@ void SC_FB__Help() {
 	JB_FS_AppendString(Fs, _tmPf7);
 	JB_Decr(_tmPf7);
 	JB_FS_AppendString(Fs, JB_LUB[150]);
-	JB_FS_AppendInt32(Fs, (2026102221));
+	JB_FS_AppendInt32(Fs, (2026102223));
 	//;
 	JB_FS_AppendString(Fs, JB_LUB[816]);
 	JB_String* _tmPf8 = JB_File__SpeedieDir(nil);
@@ -10100,7 +10100,7 @@ void SC_Ext__InstallCompiler() {
 	FastString* _fsf0 = JB_FS_Constructor(nil);
 	JB_Incr(_fsf0);
 	JB_FS_AppendString(_fsf0, JB_LUB[817]);
-	JB_FS_AppendInt32(_fsf0, (2026102221));
+	JB_FS_AppendInt32(_fsf0, (2026102223));
 	JB_String* _tmPf1 = JB_FS_GetResult(_fsf0);
 	JB_Incr(_tmPf1);
 	JB_Decr(_fsf0);
@@ -54628,7 +54628,7 @@ SCFile* SC_File_Constructor(SCFile* Self, JB_File* F, SCImport* P) {
 	}
 	//;
 	JB_Flow__Disable();
-	JB_String* X = ((JB_String*)JB_Ternary((F != nil), JB_File_Path(F), JB_Str__Error()));
+	JB_String* X = ((JB_String*)JB_Ternary((F != nil), F, JB_Str__Error()));
 	JB_File_Constructor(Self, X);
 	Self->Unfinished = false;
 	Self->OrigAST = nil;
