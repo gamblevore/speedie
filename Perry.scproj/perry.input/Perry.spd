@@ -103,7 +103,7 @@ module Perry
 
 
 	function BuildAppMenu
-		appmenu.addsep
+		appmenu <~ ("", nil)
 		appmenu <~ ("Edit Preferences",	ClickedEditPrefs)
 
 

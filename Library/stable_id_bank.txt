@@ -1,7 +1,5 @@
 // beta-file. Unstable.
 GUI_AM_Constructor
-GUI_AM_Destructor
-GUI_AM_KeyDown
 GUI_AM_ShowAsDialog
 GUI_AM__SyntaxAppend
 GUI_App__Alert
@@ -622,6 +620,7 @@ GUI_ctrl_Size2
 GUI_ctrl_SizeFractionSet
 GUI_ctrl_SizeSet
 GUI_ctrl_SlideOpen_Constructor
+GUI_ctrl_SyntaxAccess
 GUI_ctrl_SyntaxEquals
 GUI_ctrl_SyntaxIs
 GUI_ctrl_SyntaxIsSet

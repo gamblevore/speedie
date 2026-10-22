@@ -277,6 +277,8 @@ class Window (GUIControl)
 
 	libinternal KeyDownWin (|keys| key, |bool|)
 		opt norefcounts
+		if super.KeyDown(key)
+			return true
 		
 		|| F = .realfocus
 			|| menu = .openedmenu

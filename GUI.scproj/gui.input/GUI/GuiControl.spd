@@ -397,7 +397,12 @@ class GUIControl (list)
 	libinternal GetCopy (|object?| item=nil, |string|)
 		return (.oncopy$)(self, item)
 	
-	
+	syntax access (|string| Name, |guicontrol|)
+		opt norefcounts
+		for ch.fast in self
+			if Ch == Name
+				return ch
+		
 	syntax equals (|string| s, |bool|)
 		if self
 			return .id.syntaxequals(s, true) // why would we want to tell "EditMe" apart from "editme"?
