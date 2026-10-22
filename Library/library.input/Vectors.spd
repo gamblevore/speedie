@@ -66,6 +66,9 @@ datatype ivec4
 	
 	inline Width (|int|)
 		return .x2 - .x1			// not quite true but SubliminalApp uses it this way :(
+
+	inline Height (|int|)
+		return .y2 - .y1
 	
 	function Width (assigns:|int|, |ivec4|)
 		.x2 = .x1 + Value
@@ -110,9 +113,6 @@ datatype ivec4
 	
 	inline V (|ivec2|)
 		return .y1y2
-		
-	inline Height (|int|)
-		return .y2 - .y1
 		
 	function Area (|int|)
 		return .width * .height
