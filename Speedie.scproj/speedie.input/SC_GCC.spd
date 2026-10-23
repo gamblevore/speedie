@@ -178,10 +178,11 @@ function Clean (|bool| Silent = options.silent, |bool|)
 @spd/Speedie.scproj/BuildTest
 @spd/Speedie.scproj/BuildTest2
 @spd/Speedie.scproj/BuildTest3
-".ReplaceAll("@spd", file.Speediedir)
+".trim.ReplaceAll("@spd", file.Speediedir)
 
 	for l.lines in paths
-		if l and l.file.deleteall
+		|| lf = l.file
+		if lf.exists and lf.deleteall
 			if !Silent
 				printline l
 
