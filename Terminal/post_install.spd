@@ -34,9 +34,8 @@ function app.LetsGo
 		.link("/usr/local/bin/🎂", cake)
 	if perry
 		.link("/usr/local/bin/perry", perry)
-	
 
-	.mkdir("/usr/local/include/")$			// does not always exist! can you beleive it.
+	.mkdir("/usr/local/include/")$					// Does not always exist! can you beleive it.
 	|| libJeebox = .compile("jeebox")$
 	"Install libJeebox"
 	.cp(libJeebox, "/usr/local/lib/"+libJeebox.name)$

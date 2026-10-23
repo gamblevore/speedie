@@ -77,8 +77,6 @@ $Speedie/Terminal/Speedie $Speedie/jeebox.scproj --quiet		# regenerate libjeebox
 
 echo "Relaxing permissions"
 cd $Speedie/jeebox.scproj/Examples
-chmod 775 ../*/*
-chown $U ../*/*
 echo "Compiling jb.cpp"
 g++ -o Build/jb  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  jb.cpp
 chmod 775 Build/jb
