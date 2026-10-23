@@ -699,12 +699,12 @@ JB_App__ArgValue
 JB_App__Args
 JB_App__ArgsArray
 JB_App__BackTrace
+JB_App__BaseUser
 JB_App__CWDSet
 JB_App__CallPath
 JB_App__Conf
 JB_App__Crash
 JB_App__CrashOnInterupt
-JB_App__Created
 JB_App__DocumentOpened
 JB_App__Env
 JB_App__ErrorNumber
@@ -733,7 +733,6 @@ JB_App__StdIn
 JB_App__StdOut
 JB_App__Sudo
 JB_App__Switches
-JB_App__TimeID
 JB_App__TurnInto
 JB_Array_AppendCount
 JB_Array_AppendMany
@@ -1362,7 +1361,6 @@ JB_Str_ContainsString
 JB_Str_Copy
 JB_Str_CopyFromCString
 JB_Str_CopyFromPtr
-JB_Str_CopyTo
 JB_Str_Count
 JB_Str_Decompress
 JB_Str_Dict
