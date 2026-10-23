@@ -5,6 +5,7 @@
 || User = app.BaseUser
 |string| CreationType
 |[string]| FilesMade
+|[string]| FailedLinks
 |bool| PrintMake
 
 main
@@ -14,10 +15,16 @@ main
 		""
 		app <~ "Success!"
 		
-	"\nFiles Created:"
+	.TwoLinesPrint(FilesMade, 60, "Files Created")
+	if FailedLinks
+		.TwoLinesPrint(FailedLinks, 30, "SymLinks Failed. Please manually recreate.")
+
+
+function app.TwoLinesPrint (|[string]| Lines, |int| Pad, |string| Title)
+	app <~ Title
 	|| i = 0
-	while (|| f = FilesMade[i++])
-		"    $f${` ` * (60-f.length)}(${FilesMade[i++]})"
+	while (|| f = Lines[i++])
+		"    $f${` ` * (pad-f.length)}(${Lines[i++]})"	
 
 
 function app.LetsGo
@@ -31,14 +38,15 @@ function app.LetsGo
 	|| perry = .compile("Perry", "IDE")
 		
 	self <~ ("Symlinking", "symlink")
-	.link("/usr/local/bin/spd", SpdTerm)
-	.link("/usr/local/bin/speedie", SpdTerm)
-	if cake
-		.link("/usr/local/bin/cake", cake)
-		.link("/usr/local/bin/🎂", cake)
-	if perry
-		.link("/usr/local/bin/perry", perry)
 
+	|| where = "/usr/local/bin"
+	.link("$where/spd", SpdTerm)
+	.link("$where/speedie", SpdTerm)
+	if cake
+		.link("$where/cake", cake)
+		.link("$where/🎂", cake)
+	if perry
+		.link("$where/perry", perry)
 
 				// Jeebox //
 	PrintMake = true
@@ -115,13 +123,14 @@ function app.cp (|string| From, |string| To, |bool|)
 		return .madefile(to)
 
 	
-function app.link (|string| From, |string| To, |errorint|)
+function app.link (|string| From, |string| To,  |errorint|)
 	|| Made = from.file
 	if made.LinksTo == to
 		return 0
 	|| Status = made.LinkTo(to)
 		return .madefile(made)
-	"failed: $from --> $to"
+	FailedLinks <~ from
+	FailedLinks <~ To
 	return Status
 
 
