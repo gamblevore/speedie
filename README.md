@@ -113,13 +113,15 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 # Installation #
 
     git clone https://github.com/gamblevore/speedie.git
-    sudo speedie/make.sh
+    speedie/make.sh
 
 Thats all!
 
 This little build script, knows how to build Speedie, collect dependancies (SDL2), and works on both MacOS and Linux. Its a very smart little build-script, mostly written in Speedie.
 
-Yuo don't need to clone, just run `sudo speedie/make.sh` if you have the `speedie` folder.
+You don't need to clone, just run `speedie/make.sh` if you have the `speedie` folder.
+
+Some systems may need `sudo speedie/make.sh` to install symlinks into `/usr/local/bin`.
 
 _Tip: The recommended place for your Speedie folder at `/usr/local/speedie/` . It doesn't have to be there, but installed command-line symlinks will break if the destination can't be found, if the speedie folder was moved after install. So you might as well settle on a fixed location. Or you will have to fix symlinks yourself._
 
