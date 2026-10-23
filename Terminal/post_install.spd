@@ -203,7 +203,11 @@ function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
 		args.Remove(0)
 		rz = name.Execute(Args, out, processmode.PassThru)
 		if rz!=0
-			printline "$name: $args Error: $rz"
+			printline "$name ${args * ' '}\n\nError: $rz"
+
+
+function array.operatormul (|[string]| self, |byte| c, |string|)
+	return .join(string.byte(c))
 
 
 function app.Ask (|string| Prefix, |string| Q,   |bool|)
