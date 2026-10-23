@@ -9,10 +9,11 @@
 |bool| PrintMake
 
 main
+	if app.args
+		printline app.args
 	.MadeFile(SpdTerm, "Compiler")
 	.LetsGo
 	if StdErr.ok
-		""
 		app <~ "Success!"
 		
 	.TwoLinesPrint(FilesMade, 60, "Files Created")
@@ -209,10 +210,9 @@ function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
 
 function app.Ask (|string| Prefix, |string| Q,   |bool|)
 	print prefix
-	|| f = app[0]
-	if f ~= "y" or "n"
+	if app["y"] or app["n"]
 		""
-		return f ~= "y"
+		return app["y"]
 
 	"  $Q Y/n"
 	while
