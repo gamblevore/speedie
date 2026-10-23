@@ -229,6 +229,27 @@ function StdOut (|file!|)
 	return ._StdOut init file.NewPipe(filedes.stdout)
 
 
+libinternal dictionary._BaseUser (|dictionary of string| self, |string| s, |string?|)
+	opt norefcounts
+	|| u = self[s]
+	if u and u ~!= "root"
+		return u
+	return nil
+
+
+function BaseUser (|string|)
+	opt norefcounts
+	|| e = .env
+	|| u = e._BaseUser("SUDO_USER")
+	if u==nil
+		u = e._BaseUser("USER")
+		if u == nil
+			u = e._BaseUser("LOGNAME")
+			if u == nil
+				u = file.HomePath.Name
+	return u
+	
+	
 function CWD (|string|)
 	cpp_wrapper JB_File__CWD
 

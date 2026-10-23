@@ -160,7 +160,7 @@ extend String
 		description "Gets the file path's parent'"
 		// this won't handle a bad path like "////" sigh.
 		if self != "/"
-			return .TrimSlashes.BeforeLastByte('/', 1)
+			return .BeforeLastByte('/')
 
 	function PathFix (|StringZeroTerminated|)
 		cpp_wrapper JB_File_PathFix

@@ -56,12 +56,12 @@ class File (stringshared)
 	function LinksTo (|string|)
 		cpp_wrapper JB_File_LinkToGet
 
-	libinternal String.SymLink (assigns:|string|, |errorint|)
+	libinternal String.SymLinkFrom (assigns:|string|, |errorint|)
 		cpp_wrapper JB_Str_SymLink
 
 	function LinkTo (assigns:|string|, |errorint|)
 		// reverses the order to something I can understand more easily.
-		return Value.SymLink(self)
+		return Value.SymLinkFrom(self)
 
 	function HardLinkTo (assigns:|string|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo
@@ -436,13 +436,15 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				f = f.parent		#loop
 				if f.FileChild("Speedie.scproj").Exists
 					return f
-			return "/usr/local/speedie/"
+			return "/usr/local/speedie"
 
 
 		function SpeedieDir (|string?| Child=nil, |string|)
 			opt norefcounts
 			|| spd = ._speedie init .FindSpeedie(app.exepath)
-			return spd.child(Child)
+			if child!=nil
+				spd = spd.child(Child)
+			return spd
 		
 		
 		function Sorter (SorterComparer of file)

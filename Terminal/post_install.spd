@@ -1,51 +1,196 @@
 #!/usr/local/bin/spd
 
-/*
-git clone https://github.com/libsdl-org/SDL.git -b SDL2
-cd SDL
-mkdir build
-cd build
-../configure
-make
-sudo make install
-*/
+|| Spd = file.SpeedieDir
+|| SpdTerm = spd.child("Terminal/Speedie")
+|| User = app.BaseUser
+|[string]| FilesMade
 
 main
-	|| P = app.cwd
-	|| SDL = P.filechild("SDL")
-	if "/usr/local/include/SDL2/SDL.h".FileExists
-		"SDL2 is already installed. Continue? Y/n"
-		while
-			|| y = app.Input
-			if !y.isok
-				return 0
-			if (y ~= "" or "y")
-				exit
-			if y ~= "n"
-				return 0
-			"Not a Y/n answer."
+	.LetsGo
+	if StdErr.ok
+		"\nSuccess!"
+		
+	"Files Created:"
+	for f in FilesMade
+		"    $f"
 
+
+function app.LetsGo
+	"Speedie Installation... lets go!"
+	.relax(spdterm)
+
+	"Checking for SDL2"
+	.buildSDL2(.cwd.File)
+
+	.cwd = spd
+	|| cake = .compile("Cake")
+	|| perry = .compile("Perry")
+		
+	"Symlinking"
+	.link("/usr/local/bin/spd", SpdTerm)
+	.link("/usr/local/bin/speedie", SpdTerm)
+	if cake
+		.link("/usr/local/bin/cake", cake)
+		.link("/usr/local/bin/🎂", cake)
+	if perry
+		.link("/usr/local/bin/perry", perry)
+	
+
+	.mkdir("/usr/local/include/")$			// does not always exist! can you beleive it.
+	|| libJeebox = .compile("jeebox")$
+	"Install libJeebox"
+	.cp(libJeebox, "/usr/local/lib/"+libJeebox.name)$
+
+	"Copying libJeebox Examples"
+	for ch.files in "$spd/jeebox.scproj/Examples".file
+		if ch isa "h"
+			.cp(ch, "/usr/local/include/"+ch.name)
+	
+	return
+	.cwd = "$spd/jeebox.scproj/Examples"
+	.compile_example("jb")
+	.compile_example("xml")
+	.compile_example("test")
+	.compile_example("users")
+
+
+function app.relax (|string| Path, |errorint|)
+	// sudo keeps forcing speedie/gcc to create files owned by root
+	// which is useless and makes it impossible to actually USE the files.
+	|| Status = .run("chmod", "775", Path)
+		status = .run("chown", User, Path)
+
+	if status!=0	
+		"relax failed: $Path"
+	return Status
+
+
+function app.mkdir (|string| Path, |errorint|)
+	|| f = path.File
+	if f.Exists
+		expect (f.IsDir) ("Unexpected file at directory: $path")
+		return 0
+	"Creating $f/"
+	|| Status = f.MakeDir
+		FilesMade <~ f + "/"
+		return .relax(f)
+	return Status
+
+
+function app.compile_example (|string| name, |errorint|)
+	"Compiling ${name}.cpp"
+	
+	|| Built = ("Build/" + name).file
+	|| cflags = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -w -Os -D TARGET_UNIX=1 -g -ljeebox"
+	|[string]| args
+	args.splitappend("gcc -o")
+	args <~ Built
+	args.splitappend(cflags)
+	args <~ "${name}.cpp"
+	|| Status = .Run(args)
+		FilesMade <~ Built
+		return .relax(Built)
+	return Status
+	
+
+function array.SplitAppend (|[string]| self, |string| name)
+	for item in (name / ' ')
+		self <~ item
+
+
+function app.cp (|string| From, |string| To, |bool|)
+	if From.file.CopyTo(To.file)
+		FilesMade <~ to
+		return .relax(To)
+
+	
+function app.link (|string| From, |string| To, |errorint|)
+	|| Made = from.file
+	if made.LinksTo == to
+		return 0
+	|| Status = made.LinkTo(to)
+		FilesMade <~ made
+		return .relax(made)
+	"failed: $from --> $to"
+	return Status
+
+
+function app.BuildSDL2 (|string| P)
+	|| Header = "/usr/local/include/SDL2/SDL.h"
+	if header.FileExists
+		if !FileDes.stdout.isterminal
+			"SDL2 already installed"
+			return
+		require  !app.ask("SDL2 is already detected at $header.", "Skip SDL2 Update?")
+
+	if p starts Spd
+		if !app.ask("Working directory is currently in $spd.", "Use /tmp/spd_install instead?")
+			app.quit
+		P = "/tmp/spd_install".file
+		P.MakeDir
+		.cwd(P)
+		
+	|| SDL = P.child("SDL")
 	if "SDL".fileExists
-		app.cwd(SDL)$
-		ExecuteLine("git pull")$
+		.cwd(SDL)$
+		.run("git", "pull")$
 	  else
-		ExecuteLine("git clone https://github.com/libsdl-org/SDL.git -b SDL2")$
+		.run("git clone https://github.com/libsdl-org/SDL.git -b SDL2" / ' ')$
 
-	app.cwd(SDL)$
-	"${app.cwd}"
+	.cwd(SDL)$
+	printline .cwd
 	"build".file.MakeDir$
 
-	ExecuteLine(P["SDL/configure"])$
-	ExecuteLine("make")$
-	ExecuteLine("sudo make install")$
+	.run(SDL["configure"])$
+	.run("make")$
+	.run("sudo", "make", "install")$
 
 
-function ExecuteLine (|string| self, |ErrorInt|)
-	|| Args = self / ' '
-	printline "# $self"
-	|| Cmd = Args[]
-		Args.Remove(0)
-		rz = Cmd.Execute(Args, processmode.PassThru)
+function app.Compile (|string| str, |stringthatwasreadsafely|)
+	|| out = FastString()
+	print "Making $str: "
+	|| Status = .run(SpdTerm, "$spd/$str.scproj",  "--quiet", out)
+		|| answer = out.GetResult
+		|| f = answer.file
+		if f.Exists
+			printline f
+			.relax(f)
+			FilesMade <~ f
+			return f
+		error "$answer does not exist!"
+	return string.error
+
+
+function app.Run (|string| name, |string?| arg1=nil, |string?| arg2=nil,   |faststring| out=nil,   |ErrorInt|)
+	|| args = [arg1, arg2]
+	rz = name.Execute(Args, out, processmode.PassThru)
+	if rz!=0
+		printline "$name: $args Error: $rz"
+
+
+function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
+	|| name = args[0]
+		args.Remove(0)
+		rz = name.Execute(Args, out, processmode.PassThru)
 		if rz!=0
-			printline "$Cmd: Error: $rz"
+			printline "$name: $args Error: $rz"
+
+
+function app.Ask (|string| Prefix, |string| Q,   |bool|)
+	print prefix
+	|| f = app[0]
+	if f ~= "y" or "n"
+		""
+		return f ~= "y"
+
+	"$Q Y/n"
+	while
+		|| y = app.Input
+		if !y.isok
+			return false
+		if (y ~= "" or "y")
+			return true
+		if y ~= "n"
+			return false
+		"Not a Y/n answer. Type y or n"
 

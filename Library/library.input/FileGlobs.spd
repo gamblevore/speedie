@@ -63,7 +63,7 @@ function string.OperatorGlobbed_By (|[string]| globs, |bool|)
 
 
 function string.GlobExpand (|[file]|)
-	description "Returns a list of files, that match the glob passed. Can send one glob per line."
+	description "Returns a list of files, that match the glob passed. Can accept multiple lines of globs."
 	return .split.GlobExpand
 
 
