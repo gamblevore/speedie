@@ -58,7 +58,7 @@ cp    *.h /usr/local/include/
 chmod 775 /usr/local/include/jeebox*
 chown $U /usr/local/include/jeebox*
 
-set +e									# better to continue
+set +e											# better to continue
 echo "Symlinking Speedie"
 
 ln -sf $Speedie/Terminal/Speedie /usr/local/bin/spd
@@ -72,21 +72,13 @@ chown $U /usr/local/bin/speedie
 
 
 
-echo ""
-cd $Speedie/Library/CppLib				# allow source to be found!
-
 echo "Compiling libJeebox for user '$U'"
 $Speedie/Terminal/Speedie $Speedie/jeebox.scproj --quiet		# regenerate libjeebox source
 
 echo "Relaxing permissions"
-
-chmod 775 ../../jeebox.scproj/Cpp/*
-chown $U ../../jeebox.scproj/Cpp/*
-chmod 775 ../../jeebox.scproj/Build/*
-chown $U ../../jeebox.scproj/Build/*
-
-
 cd $Speedie/jeebox.scproj/Examples
+chmod 775 ../*/*
+chown $U ../*/*
 echo "Compiling jb.cpp"
 g++ -o Build/jb  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1 -g -ljeebox  jb.cpp
 chmod 775 Build/jb
