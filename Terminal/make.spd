@@ -142,7 +142,6 @@ $SpdTerm \$Speedie/jeebox.scproj --quiet		# regenerate libjeebox source
 
 echo \"Relaxing permissions\"
 cd \$Speedie/jeebox.scproj/Examples
-${unmod(`../*/*`)}
 ${compile_example(`jb`)}
 ${compile_example(`xml`)}
 ${compile_example(`test`)}

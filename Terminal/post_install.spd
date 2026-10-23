@@ -127,7 +127,7 @@ function app.BuildSDL2 (|string| P)
 		if !app.ask("Working directory is currently in $spd.", "Use /tmp/spd_install instead?")
 			app.quit
 		P = "/tmp/spd_install".file
-		P.MakeDir
+		.mkdir(P)
 		.cwd(P)
 		
 	|| SDL = P.child("SDL")
