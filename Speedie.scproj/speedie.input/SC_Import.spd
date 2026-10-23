@@ -228,10 +228,11 @@ class SCImport
 		function VersionFile (|file|)
 			return compiler.SpeedieProj.filechild("vers.txt")
 		
-		function VersionBump		
+		function VersionBump
 			|| n = .VersionNumber
+				"Bumping version"
 				|| v = .VersionFile
-				v.WriteAll(n.render)
+				v.WriteAll((n+50).render)
 			
 		function VersionNumber (|int|)
 			opt norefcounts
