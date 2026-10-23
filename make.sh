@@ -20,4 +20,4 @@ g++  -o  $Speedie/Terminal/Speedietmp  -std=gnu++20 -L/usr/local/lib/ -I /usr/lo
 mv $Speedie/Terminal/Speedietmp $Speedie/Terminal/Speedie
 
 echo "Running post_install.spd $1"
-$Speedie/Terminal/Speedie $Speedie/Terminal/post_install.spd
+$Speedie/Terminal/Speedie $Speedie/Terminal/post_install.spd $1

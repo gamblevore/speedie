@@ -9,8 +9,6 @@
 |bool| PrintMake
 
 main
-	if app.args
-		printline app.args
 	.MadeFile(SpdTerm, "Compiler")
 	.LetsGo
 	if StdErr.ok
