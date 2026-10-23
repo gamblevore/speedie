@@ -523,7 +523,7 @@ function InstallOne (|file| test)
 
 
 function InstallCompiler
-	"Installing Speedie: $__time_id__"
+	"Installing Speedie: $__speedie__"
 
 	// so that the (product `bla`) prints properly =)
 	|| OldProd = compiler.ProductPath 
@@ -535,9 +535,6 @@ function InstallCompiler
 	.InstallOne Cpp_Export.HProduct
 	.InstallOne Cpp_Export.HProduct.Sibling("JB_Globals.cpp")
 	FlowLog.enable
-	
-//	if options.Makelib
-//		.MakeLib
 }
 
 
