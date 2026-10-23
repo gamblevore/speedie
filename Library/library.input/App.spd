@@ -312,7 +312,9 @@ function Say (|string| s, |bool| print=true,  |ExitCode|)
 	// what if we don't want to wait. pass -1 for the timeout?
 	if print
 		printline s
-	return "/usr/bin/say".execute([s])
+	if "/usr/bin/say".FileExists
+		return "/usr/bin/say".execute([s])
+	return ExitCode.ENOENT
 
 
 function AppleScript (|string| str, |ExitCode|)

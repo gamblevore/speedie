@@ -18,6 +18,9 @@ main
 	if FailedLinks
 		.TwoLinesPrint(FailedLinks, 30, "SymLinks Failed. Please manually recreate.")
 
+	if StdErr.ok
+		app.say("Success!")
+
 
 function app.TwoLinesPrint (|[string]| Lines, |int| Pad, |string| Title)
 	app <~ Title
