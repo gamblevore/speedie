@@ -1500,6 +1500,7 @@ extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_Phi (1.61803398875f)
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
+extern bool SC__Options_BumpVersion;
 #define kSC__Options_cake ((int)2)
 extern bool SC__Options_Compile;
 #define kSC__Options_cpp ((int)1)
@@ -1532,7 +1533,6 @@ extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_StripNames;
 extern bool SC__Options_TargetDebug;
-extern bool SC__Options_TrapFromPerry;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
 #define kSC__PackMaker_kAny ((int)3)
@@ -2937,6 +2937,8 @@ bool SC_FB__AppOptions_bake(JB_String* Name, JB_String* Value, FastString* Purpo
 bool SC_FB__AppOptions_beep(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_breakonerr(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_bump(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_cake(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -4419,6 +4421,8 @@ int SC_int64_BitsNeeded(int64 Self);
 bool SC_int64_CanStoreAsAddK(int64 Self);
 
 bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
+
+JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in);
 
 bool JB_int64_IsPow2(int64 Self);
 
@@ -7558,6 +7562,10 @@ void SC_Imp__Neaten();
 
 void SC_Imp__NoProj();
 
+JB_File* SC_Imp__VersionFile();
+
+int SC_Imp__VersionNumber();
+
 
 
 // JB_SCNodeRenamer
@@ -7968,8 +7976,6 @@ JB_String* JB_Str_TrimExtAndPath(JB_String* Self, bool RemovePath);
 JB_String* JB_Str_TrimFirst(JB_String* Self, uint /*byte*/ B);
 
 int JB_Str_TrimLastSub(JB_String* Self, uint /*byte*/ B);
-
-JB_String* JB_Str_TrimSlashes(JB_String* Self);
 
 bool SC_Str_UnderScoreAtAnyEnd(JB_String* Self);
 
