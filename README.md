@@ -121,9 +121,11 @@ This little build script, knows how to build Speedie, collect dependancies (SDL2
 
 You don't need to clone, just run `speedie/make.sh` if you have the `speedie` folder.
 
-Some systems may need `sudo speedie/make.sh` to install symlinks into `/usr/local/bin`.
+# SymLinks #
 
-_Tip: The recommended place for your Speedie folder at `/usr/local/speedie/` . It doesn't have to be there, but installed command-line symlinks will break if the destination can't be found, if the speedie folder was moved after install. So you might as well settle on a fixed location. Or you will have to fix symlinks yourself._
+Some systems may need `sudo speedie/make.sh` to install symlinks into `/usr/local/bin`
+
+The recommended place for your Speedie folder at `/usr/local/speedie/` . It doesn't have to be there, but installed command-line symlinks will break if the destination can't be found, if the speedie folder was moved after install. So you might as well settle on a fixed location. Or you will have to fix symlinks yourself.
 
 
 
