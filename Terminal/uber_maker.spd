@@ -39,7 +39,7 @@ cd \"\$Speedie/Library/CppLib\"
 g++  -o  ${SpdTerm}tmp  $CFlags  \$NativeFlags  *.cpp *.S  -I $SpdSrc  $SpdSrc/JB.cpp  $SpdSrc/JB_Globals.cpp
 mv ${SpdTerm}tmp $SpdTerm
 
-echo \"Running post_install.spd\"
+echo \"Running post_install.spd $1\"
 $SpdTerm \$Speedie/Terminal/post_install.spd
 "
 	"Testing: $scriptout"
