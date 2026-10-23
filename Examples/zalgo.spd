@@ -1,6 +1,8 @@
 #!/usr/local/bin/spd
 
 main (|[string]| inputs)
+	if !Inputs
+			zalgoline "Enter some text to make it go weiird"
 	|float| wierdness = app["w"].float|float|  ??  8.0
 	for i in inputs
 		for l.lines in i
