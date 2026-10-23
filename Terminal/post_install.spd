@@ -24,7 +24,6 @@ function app.LetsGo
 	"\nSpeedie Installation (v0x${__speedie__|int64|.hex})... lets go!"
 	.relax(spdterm)
 
-	self <~ "Checking for SDL2"
 	.buildSDL2(.cwd.File)
 
 	.cwd = spd
@@ -127,6 +126,7 @@ function app.link (|string| From, |string| To, |errorint|)
 
 
 function app.BuildSDL2 (|string| P)
+	self <~ "Checking for SDL2"
 	|| Header = "/usr/local/include/SDL2/SDL.h"
 	if header.FileExists
 		if !FileDes.stdout.isterminal
@@ -134,6 +134,7 @@ function app.BuildSDL2 (|string| P)
 			return
 		require  !app.ask("SDL2 is already detected at $header.", "Skip SDL2 Update?")
 
+	self <~ "Building SDL2"
 	if p starts Spd
 		if !app.ask("Working directory is currently in $spd.", "Use /tmp/spd_install instead?")
 			app.quit
@@ -155,6 +156,9 @@ function app.BuildSDL2 (|string| P)
 	.run(SDL["configure"])$
 	.run("make")$
 	.run("sudo", "make", "install")$
+	
+	self <~ "Returning To Installing Speedie! (SDL2 is done)"
+	
 
 
 function app.MadeFile (|string| f, |string| Kind=CreationType, |errorint|)
