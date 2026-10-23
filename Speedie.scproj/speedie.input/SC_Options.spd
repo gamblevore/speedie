@@ -33,7 +33,7 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		StripNames				= false
-	||		TrapFromPerry			= true
+	||		BumpVersion				= false
 
 	|int8|	Optimise				= 1
 	|bool|	SelfReplacement			= 0
@@ -54,7 +54,7 @@ module Options
 		return .mode == cpp
 	
 	function ShouldBuildTrap (|bool|)
-		return .TargetDebug or (.TrapFromPerry and Compiler.InPerry)
+		return .TargetDebug or Compiler.InPerry
 		// its nice to see traps in perry...
 		// i mean... isnt it nice to see debug code?
 		// but I don't wanna see all. I guess its a comprimise. Perhaps I should go all the way...
@@ -72,7 +72,7 @@ module Feedback
 		require !Options.SelfReplacement
 		
 		|| p = compiler.BaseProjectPath$
-		|| spd = file.Speediedir("Speedie.scproj")
+		|| spd = compiler.SpeedieProj
 		if p ~= spd
 			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
@@ -146,7 +146,7 @@ module Feedback
 
 	function string.PathFixSpd (|string|)
 		if self[0, "@spd/"]
-			return (file.Speediedir+self[5...]).PathFix
+			return (file.Speediedir(self[5...])).PathFix
 		return .PathFix
 
 
@@ -221,7 +221,8 @@ module Feedback
 		+'path'
 			Explain(Purpose)$
 			printline app.exepath
-			
+		
+		
 		+'beep'
 			Explain(Purpose, "Beeps after compile is complete")$
 			options.beep = value.optionbool
@@ -334,6 +335,10 @@ module Feedback
 		+'strip'
 			Explain(Purpose)$
 			Options.StripNames = value.optionbool
+		
+		+'bump'
+			Explain(Purpose)$
+			Options.BumpVersion = value.optionbool
 			
 		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$

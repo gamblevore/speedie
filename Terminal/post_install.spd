@@ -16,7 +16,7 @@ main
 
 
 function app.LetsGo
-	"Speedie Installation... lets go!"
+	"Speedie Installation (${__time_id__})... lets go!"
 	.relax(spdterm)
 
 	"Checking for SDL2"
@@ -35,18 +35,19 @@ function app.LetsGo
 	if perry
 		.link("/usr/local/bin/perry", perry)
 
-	.mkdir("/usr/local/include/")$					// Does not always exist! can you beleive it.
 	|| libJeebox = .compile("jeebox")$
 	"Install libJeebox"
+	.mkdir("/usr/local/include/")$					// Does not always exist! can you beleive it.
 	.cp(libJeebox, "/usr/local/lib/"+libJeebox.name)$
 
 	"Copying libJeebox Examples"
-	for ch.files in "$spd/jeebox.scproj/Examples".file
+	.cwd = "$spd/jeebox.scproj/Examples"
+	|| examples = "$spd/jeebox.scproj/Examples".file
+	for ch.files in examples
 		if ch isa "h"
 			.cp(ch, "/usr/local/include/"+ch.name)
 	
 	return
-	.cwd = "$spd/jeebox.scproj/Examples"
 	.compile_example("jb")
 	.compile_example("xml")
 	.compile_example("test")
@@ -145,7 +146,7 @@ function app.BuildSDL2 (|string| P)
 	.run("sudo", "make", "install")$
 
 
-function app.Compile (|string| str, |stringthatwasreadsafely|)
+function app.Compile (|string| str, |string|)
 	|| out = FastString()
 	print "Making $str: "
 	|| Status = .run(SpdTerm, "$spd/$str.scproj",  "--quiet", out)
@@ -157,7 +158,6 @@ function app.Compile (|string| str, |stringthatwasreadsafely|)
 			FilesMade <~ f
 			return f
 		error "$answer does not exist!"
-	return string.error
 
 
 function app.Run (|string| name, |string?| arg1=nil, |string?| arg2=nil,   |faststring| out=nil,   |ErrorInt|)

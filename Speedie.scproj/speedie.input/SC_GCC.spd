@@ -397,18 +397,21 @@ function LinkOK (|file| p, |file|) // or just not a link
 
 
 function ShouldCppComp (|bool|)
-/	if options.Scripting
+	if options.Scripting
 		return true // if were here... its cos the scripting code wants it
 	require Options.Compile and options.ModeCpp
 
+	|| p = .linkOK(compiler.ProductFile)
+	if !p
+		return true
+	if  p.modified < scimport.recent
+		if Options.SelfReplacement and Options.BumpVersion
+			SCImport.VersionBump
+			
+		return true
 	if options.ForceRecompile
 		return true
 
-	|| p = .linkOK(compiler.ProductFile)
-	if   !p
-		return true
-	if  p.modified < scimport.recent
-		return true
 	if !options.silent
 		"Already up to date"
 

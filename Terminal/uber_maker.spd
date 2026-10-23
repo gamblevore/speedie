@@ -15,7 +15,7 @@ main
 	expect (spd.FileExists)							"Can't find Speedie installation at: $spd}"
 
 	print "Generating cpp: "
-	require "/usr/local/bin/speedie".Execute(["--self", "--x", "--nocompile", "--quiet"]).Successful
+	require "/usr/local/bin/speedie".Execute(["--self", "--x", "--nocompile", "--quiet", "--bump"]).Successful
 
 	|| ScriptOut = "$spd/make.sh".file
 	scriptout.writeall "#!/bin/bash

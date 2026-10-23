@@ -22,7 +22,7 @@ main {
 	
 	printline "Installation: " + SpdLocal
 	print "Generating cpp files: "
-	require "/usr/local/bin/speedie".Execute(["--self", "--x", "--nocompile", "--quiet"]).Successful
+	require "/usr/local/bin/speedie".Execute(["--self", "--x", "--nocompile", "--quiet", "--bump"]).Successful
 
 	|| tocompile = FastString()
 	|| Count = 2							//JB.cpp and JB_Globals.cpp
