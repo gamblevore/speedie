@@ -98,9 +98,7 @@ module Vars
 		// what about -D __VM__=1 ???
 		// cflags += " -flto" // seems to cause crashes. no idea why. Some kinda clang bug I guess.
 		SpdGccFlags = ""
-		if plat ~= "osx"
-			CFlags += " -lc++"
-		  else
+		if plat ~!= "osx"
 			SpdGccFlags += "-lrt -pthread"
 
 	function CreateScriptOut (|string| list, |string|)
@@ -133,25 +131,18 @@ echo \"Installing headers\"
 cp    *.h /usr/local/include/
 ${unmod(`/usr/local/include/jeebox*`)}
 
-set +e									# better to continue
+set +e											# better to continue
 echo \"Symlinking Speedie\"
 ${link(SpdTerm, `/usr/local/bin/spd`)}
 ${link(SpdTerm, `/usr/local/bin/speedie`)}
 
 
-echo \"\"
-cd \$Speedie/Library/CppLib				# allow source to be found!
-
 echo \"Compiling libJeebox for user '\$U'\"
 $SpdTerm \$Speedie/jeebox.scproj --quiet		# regenerate libjeebox source
 
 echo \"Relaxing permissions\"
-
-${unmod(`../../jeebox.scproj/Cpp/*`)}
-${unmod(`../../jeebox.scproj/Build/*`)}
-
-
 cd \$Speedie/jeebox.scproj/Examples
+${unmod(`../*/*`)}
 ${compile_example(`jb`)}
 ${compile_example(`xml`)}
 ${compile_example(`test`)}
