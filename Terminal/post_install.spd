@@ -16,7 +16,10 @@ main
 		
 	.TwoLinesPrint(FilesMade, 60, "Files Created")
 	if FailedLinks
-		.TwoLinesPrint(FailedLinks, 30, "SymLinks Failed. Please manually recreate.")
+		app <~ "SymLinks Failed. Please manually recreate."
+		|| i = 0
+		while (|| f = FailedLinks[i++])
+			"ln -s $f ${FailedLinks[i++]}"	
 
 	if StdErr.ok
 		app.say("Success!")
