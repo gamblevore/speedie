@@ -1,7 +1,7 @@
 #!/usr/local/bin/spd
 
 || Spd = file.SpeedieDir
-|| SpdTerm = spd.child("Terminal/Speedie")
+|| SpdTerm = spd["Terminal/Speedie"]
 || User = app.BaseUser
 |string| CreationType
 |[string]| FilesMade
@@ -97,7 +97,9 @@ function app.mkdir (|string| Path, |errorint|)
 
 function app.compile_example (|string| name, |errorint|)
 	"Compiling ${name}.cpp"	
-	|| Built = "Build/".filechild(name)
+	|| BuildFol = "Build/".file
+	.mkdir(BuildFol)
+	|| Built = BuildFol[name]
 	|| cflags = "-std=gnu++20 -lstdc++ -L/usr/local/lib/ -I /usr/local/include -I $spd/Library/CppLib -w -Os -D TARGET_UNIX=1 -g -ljeebox"
 	|[string]| args
 
@@ -150,7 +152,7 @@ function app.BuildSDL2 (|string| P)
 		.mkdir(P)$
 		.cwd(P)$
 		
-	|| SDL = P.child("SDL")
+	|| SDL = P["SDL"]
 	if "SDL".fileExists
 		.cwd(SDL)$
 		.run("git", "pull")$
@@ -203,7 +205,7 @@ function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
 		args.Remove(0)
 		rz = name.Execute(Args, out, processmode.PassThru)
 		if rz!=0
-			"Error: $rz\n\n{cwd: ${app.cwd}}\n$name ${args * ' '}"
+			"Error: $rz\n\ncwd: ${app.cwd}\n$name ${args * ' '}"
 
 
 function array.operatormul (|[string]| self, |byte| c, |string|)
