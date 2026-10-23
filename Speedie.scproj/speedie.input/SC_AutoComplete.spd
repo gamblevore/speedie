@@ -1242,7 +1242,7 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 				bb = fat.BasicBlock
 				out <~ bb
 			fs <~ (' ', 2)
-			fat.RenderFat(fs, 0)
+			fat.RenderFat(fs, 8)
 			|| tmp = out.msg(@tmp, fs)
 			
 			|| map = fat.source
