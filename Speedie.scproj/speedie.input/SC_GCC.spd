@@ -401,13 +401,11 @@ function ShouldCppComp (|bool|)
 		return true // if were here... its cos the scripting code wants it
 	require Options.Compile and options.ModeCpp
 
-	|| p = .linkOK(compiler.ProductFile)
-	if  !p or (p.modified < scimport.recent)
-		if Options.SelfReplacement and Options.BumpVersion
-			SCImport.VersionBump
+	if options.ForceRecompile
 		return true
 
-	if options.ForceRecompile
+	|| p = .linkOK(compiler.ProductFile)
+	if  !p or (p.modified < scimport.recent)
 		return true
 
 	if !options.silent

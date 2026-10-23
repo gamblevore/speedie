@@ -656,6 +656,11 @@ extern "C" {
 	for i in cpp_Export.Cpp_Includes
 		fs <~ ' '
 		fs <~ i
+
+
+//		if Options.SelfReplacement and Options.BumpVersion
+//			SCImport.VersionBump
+
 	
 	Cpp_Export.SmartWrite(FS, Cpp_Export.CppProduct)
 
