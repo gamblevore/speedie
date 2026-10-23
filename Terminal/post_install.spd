@@ -19,7 +19,7 @@ main
 		app <~ "SymLinks Failed. Please manually recreate."
 		|| i = 0
 		while (|| f = FailedLinks[i++])
-			"sudo ln -s $f ${FailedLinks[i++]}"	
+			"sudo ln -s ${FailedLinks[i++]} $f"	
 
 	if StdErr.ok
 		app.say "Success!"
