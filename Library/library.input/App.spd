@@ -53,12 +53,6 @@ inline No (|string| name, |bool|)
 	inlined
 	return !.yes(name)
 
-function Created (|date|)
-	return __now__|date|
-	
-function TimeID (|uint64|)
-	return __time_id__
-
 function AllowInteruptCrash (assigns:|bool|)
 	cpp_wrapper JB_App__CrashOnInterupt
 
