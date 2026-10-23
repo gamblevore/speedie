@@ -402,13 +402,11 @@ function ShouldCppComp (|bool|)
 	require Options.Compile and options.ModeCpp
 
 	|| p = .linkOK(compiler.ProductFile)
-	if !p
-		return true
-	if  p.modified < scimport.recent
+	if  !p or (p.modified < scimport.recent)
 		if Options.SelfReplacement and Options.BumpVersion
 			SCImport.VersionBump
-			
 		return true
+
 	if options.ForceRecompile
 		return true
 
