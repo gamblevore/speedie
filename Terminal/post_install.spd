@@ -97,7 +97,7 @@ function app.mkdir (|string| Path, |errorint|)
 
 function app.compile_example (|string| name, |errorint|)
 	"Compiling ${name}.cpp"	
-	|| Built = ("Build/" + name).file
+	|| Built = "Build/".filechild(name)
 	|| cflags = "-std=gnu++20 -lstdc++ -L/usr/local/lib/ -I /usr/local/include -I $spd/Library/CppLib -w -Os -D TARGET_UNIX=1 -g -ljeebox"
 	|[string]| args
 
@@ -195,7 +195,7 @@ function app.Run (|string| name, |string?| arg1=nil, |string?| arg2=nil,   |fast
 	|| args = [arg1, arg2]
 	rz = name.Execute(Args, out, processmode.PassThru)
 	if rz!=0
-		printline "$name: $args Error: $rz"
+		"$name: $args Error: $rz"
 
 
 function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
@@ -203,7 +203,7 @@ function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
 		args.Remove(0)
 		rz = name.Execute(Args, out, processmode.PassThru)
 		if rz!=0
-			printline "$name ${args * ' '}\n\nError: $rz"
+			"Error: $rz\n\n{cwd: ${app.cwd}}\n$name ${args * ' '}"
 
 
 function array.operatormul (|[string]| self, |byte| c, |string|)
