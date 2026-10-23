@@ -11,7 +11,6 @@
 
 main
 	|| R = app.args
-	expect (!R.length or R.Last isa "git")			("This script takes no arguments.")
 	expect (spd.FileExists)							"Can't find Speedie installation at: $spd}"
 
 	print "Generating cpp: "

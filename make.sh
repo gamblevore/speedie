@@ -19,5 +19,5 @@ cd "$Speedie/Library/CppLib"
 g++  -o  $Speedie/Terminal/Speedietmp  -std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -I $Speedie/Library/CppLib -w -Wno-return-type-c-linkage -Os -ffast-math -D TARGET_UNIX=1 -D __SPEEDIE__=1  $NativeFlags  *.cpp *.S  -I $Speedie/Speedie.scproj/Build  $Speedie/Speedie.scproj/Build/JB.cpp  $Speedie/Speedie.scproj/Build/JB_Globals.cpp
 mv $Speedie/Terminal/Speedietmp $Speedie/Terminal/Speedie
 
-echo "Running post_install.spd"
+echo "Running post_install.spd $1"
 $Speedie/Terminal/Speedie $Speedie/Terminal/post_install.spd
