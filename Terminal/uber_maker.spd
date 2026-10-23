@@ -2,6 +2,7 @@
 
 /*
 	Creates a bash file. This bash file builds speedie, then uses Speedie to complete the install.
+	I just realised... we don't even NEED this script? Well... I'll fix that later.
 */
 
 |string|	spd = file.SpeedieDir
