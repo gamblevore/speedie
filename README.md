@@ -110,33 +110,18 @@ I have a lot of long-term goals... Overall, I want to make programming a whole l
 On a personal level, outside of Speedie, I'd love to work on anything helping to restore nature or make technology less harmful. Such as helping retune wifi or EM-emissions of tech to **not** drain our health.
 
 
-# Dependancies #
-
-Speedie makes use of SDL2 as it's only dependancy. It is only needed for graphical apps, but this includes Cake (the VM) and Perry (The IDE). If you have SDL2 installed already, you can skip this step. (Check `/usr/local/include/SDL2/SDL.h` exists).
-
-To install SDL2, run these commands, from any directory.
-
-    git clone https://github.com/libsdl-org/SDL.git -b SDL2
-    cd SDL
-    mkdir build
-    cd build
-    ../configure
-    make
-    sudo make install
-
-This should copy the headers to `/usr/local/include/SDL2/SDL.h` and build the libs needed. You can delete your cloned folder after that, as the copies no longer need it.
-
-
 # Installation #
 
-1. Run "`git clone https://github.com/gamblevore/speedie.git`"
-2. Run build script
-    1. Linux: `sudo Terminal/makelinux.sh`
-    2. MacOS: `sudo Terminal/makeosx.sh`
+    git clone https://github.com/gamblevore/speedie.git
+    sudo speedie/make.sh
 
-_Tip: The script will setup some symlinks to Speedie, and Cake. This is so you can run commands like `spd source.spd`. To make this easier, its best to settle on a dedicated directory for Speedie._
+Thats all!
 
-_My recommendation is to move your cloned Speedie folder, to `/usr/local/speedie/` then run the build script._
+This little build script, knows how to build Speedie, collect dependancies (SDL2), and works on both MacOS and Linux. Its a very smart little build-script, mostly written in Speedie.
+
+Yuo don't need to clone, just run `sudo speedie/make.sh` if you have the `speedie` folder.
+
+_Tip: The recommended place for your Speedie folder at `/usr/local/speedie/` . It doesn't have to be there, but installed command-line symlinks will break if the destination can't be found, if the speedie folder was moved after install. So you might as well settle on a fixed location. Or you will have to fix symlinks yourself._
 
 
 
