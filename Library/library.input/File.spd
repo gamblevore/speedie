@@ -429,7 +429,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 
 
 		libinternal FindSpeedie	(|string| start, |string|)
-			target !__SPEEDIE__
+			target !__speedie__
 				libinternal
 			|| f = start.resolve
 			while

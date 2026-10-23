@@ -523,7 +523,7 @@ function InstallOne (|file| test)
 
 
 function InstallCompiler
-	"Installing Speedie: $__speedie__"
+	"Installing Speedie: ${__speedie__|int64|.hex}"
 
 	// so that the (product `bla`) prints properly =)
 	|| OldProd = compiler.ProductPath 

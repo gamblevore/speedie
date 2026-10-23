@@ -451,8 +451,8 @@ module Feedback
 		|| fs_tester = faststring.new
 		fs <~ "Usage: "
 		fs <~ app.filename
-		fs <~ " /path/to/project\n\n v: "
-		fs <~ __speedie__
+		fs <~ " /path/to/project\n\n v0x"
+		fs.appendhex(__speedie__)
 		fs <~ "\nInstallation: ${file.Speediedir}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"
