@@ -3,30 +3,35 @@
 || Spd = file.SpeedieDir
 || SpdTerm = spd.child("Terminal/Speedie")
 || User = app.BaseUser
+|string| CreationType
 |[string]| FilesMade
+|bool| PrintMake
 
 main
+	.MadeFile(SpdTerm, "Compiler")
 	.LetsGo
 	if StdErr.ok
-		"\nSuccess!"
+		""
+		app <~ "Success!"
 		
-	"Files Created:"
-	for f in FilesMade
-		"    $f"
+	"\nFiles Created:"
+	|| i = 0
+	while (|| f = FilesMade[i++])
+		"    $f${` ` * (60-f.length)}(${FilesMade[i++]})"
 
 
 function app.LetsGo
-	"Speedie Installation (${__time_id__})... lets go!"
+	"\nSpeedie Installation (v0x${__speedie__|int64|.hex})... lets go!"
 	.relax(spdterm)
 
-	"Checking for SDL2"
+	self <~ "Checking for SDL2"
 	.buildSDL2(.cwd.File)
 
 	.cwd = spd
-	|| cake = .compile("Cake")
-	|| perry = .compile("Perry")
+	|| cake = .compile("Cake", "VM")
+	|| perry = .compile("Perry", "IDE")
 		
-	"Symlinking"
+	self <~ ("Symlinking", "symlink")
 	.link("/usr/local/bin/spd", SpdTerm)
 	.link("/usr/local/bin/speedie", SpdTerm)
 	if cake
@@ -35,24 +40,33 @@ function app.LetsGo
 	if perry
 		.link("/usr/local/bin/perry", perry)
 
-	|| libJeebox = .compile("jeebox")$
-	"Install libJeebox"
+
+				// Jeebox //
+	PrintMake = true
+	|| libJeebox = .compile("jeebox", "")$
 	.mkdir("/usr/local/include/")$					// Does not always exist! can you beleive it.
+	self <~ ("Install libJeebox", "Jeebox: Universal Data Format")
 	.cp(libJeebox, "/usr/local/lib/"+libJeebox.name)$
 
-	"Copying libJeebox Examples"
+	self <~ ("Copying libJeebox Headers", "jeebox header")
 	.cwd = "$spd/jeebox.scproj/Examples"
 	|| examples = "$spd/jeebox.scproj/Examples".file
 	for ch.files in examples
 		if ch isa "h"
 			.cp(ch, "/usr/local/include/"+ch.name)
+	PrintMake = false
 	
-	return
+	self <~ ("Compile libJeebox .cpp examples", "c++ jeebox example")
 	.compile_example("jb")
 	.compile_example("xml")
 	.compile_example("test")
 	.compile_example("users")
 
+
+function app.SyntaxAppend (|string| name, |string| type="")
+	"\n         -- $name -- "
+	CreationType = type
+	
 
 function app.relax (|string| Path, |errorint|)
 	// sudo keeps forcing speedie/gcc to create files owned by root
@@ -70,38 +84,36 @@ function app.mkdir (|string| Path, |errorint|)
 	if f.Exists
 		expect (f.IsDir) ("Unexpected file at directory: $path")
 		return 0
-	"Creating $f/"
 	|| Status = f.MakeDir
-		FilesMade <~ f + "/"
-		return .relax(f)
+		return app.MadeFile(f + "/")
 	return Status
 
 
 function app.compile_example (|string| name, |errorint|)
-	"Compiling ${name}.cpp"
-	
+	"Compiling ${name}.cpp"	
 	|| Built = ("Build/" + name).file
-	|| cflags = "-std=gnu++20 -L/usr/local/lib/ -I /usr/local/include -w -Os -D TARGET_UNIX=1 -g -ljeebox"
+	|| cflags = "-std=gnu++20 -lstdc++ -L/usr/local/lib/ -I /usr/local/include -I $spd/Library/CppLib -w -Os -D TARGET_UNIX=1 -g -ljeebox"
 	|[string]| args
-	args.splitappend("gcc -o")
+
+	args.SplitAppend("gcc -o")
 	args <~ Built
-	args.splitappend(cflags)
+	args.SplitAppend(cflags)
 	args <~ "${name}.cpp"
+
 	|| Status = .Run(args)
-		FilesMade <~ Built
-		return .relax(Built)
+		status = .madefile(Built)
 	return Status
 	
 
 function array.SplitAppend (|[string]| self, |string| name)
 	for item in (name / ' ')
-		self <~ item
+		if item
+			self <~ item
 
 
 function app.cp (|string| From, |string| To, |bool|)
 	if From.file.CopyTo(To.file)
-		FilesMade <~ to
-		return .relax(To)
+		return .madefile(to)
 
 	
 function app.link (|string| From, |string| To, |errorint|)
@@ -109,8 +121,7 @@ function app.link (|string| From, |string| To, |errorint|)
 	if made.LinksTo == to
 		return 0
 	|| Status = made.LinkTo(to)
-		FilesMade <~ made
-		return .relax(made)
+		return .madefile(made)
 	"failed: $from --> $to"
 	return Status
 
@@ -139,14 +150,23 @@ function app.BuildSDL2 (|string| P)
 
 	.cwd(SDL)$
 	printline .cwd
-	"build".file.MakeDir$
+	.mkdir("build")$
 
 	.run(SDL["configure"])$
 	.run("make")$
 	.run("sudo", "make", "install")$
 
 
-function app.Compile (|string| str, |string|)
+function app.MadeFile (|string| f, |string| Kind=CreationType, |errorint|)
+	if kind
+		if PrintMake
+			printline f
+		FilesMade <~ f
+		FilesMade <~ kind
+	return .relax(f)
+
+	
+function app.Compile (|string| str, |string| MakeKind,  |string|)
 	|| out = FastString()
 	print "Making $str: "
 	|| Status = .run(SpdTerm, "$spd/$str.scproj",  "--quiet", out)
@@ -154,8 +174,7 @@ function app.Compile (|string| str, |string|)
 		|| f = answer.file
 		if f.Exists
 			printline f
-			.relax(f)
-			FilesMade <~ f
+			.MadeFile(f, MakeKind)
 			return f
 		error "$answer does not exist!"
 
