@@ -1,6 +1,5 @@
 #!/usr/local/bin/cake
 
-|| Fails = FastString()
 || Speedie = "/usr/local/bin/spd"
 
 
@@ -8,9 +7,10 @@ main (|[string]| Paths)
 	|| files = Paths.GlobExpand
 	if app["d"] // debug
 		"$Paths\n$Files\n"
-	
+
+	|| fails = FastString()
 	for f in files
-		app.TryCompileOne(f)
+		app.TryCompileOne(f, fails)
 	if fails.Length	
 		printline fails
 		app.say("Failed")
@@ -18,10 +18,10 @@ main (|[string]| Paths)
 		app.say("// All OK")
 
 
-function app.TryCompileOne (|file| f)
+function app.TryCompileOne (|file| f, |faststring| dest)
 	|| args = [f,  "--nocompile",  "--target=ForBatchTest"]
 	if Speedie.Execute(args, ProcessMode.StdOutSilence).Successful
 		printline f.TrimStart(app.cwd)
 	  else
-		fails <~ "Fail: $f\n"
+		dest <~ "Fail: $f\n"
 
