@@ -475,10 +475,6 @@ extend Assembler
 		return exp.ASMDecl.Internal
 
 
-	function trap (|int| N)
-		target debug
-			if asmtrapper == N
-	
 	function InlineAddK (|asmreg| XIn, |int64| Add, |asmreg| XOut, |asmreg|)
 //		x = y + 1
 //		x = x + 1
