@@ -228,10 +228,5 @@ datatype ParsedInt (int64)
 	false   ParsedInt.fail
 	syntax cast (|bool|)
 		inlined
-		if self != 0
-			"888"
-			return true
-		"01345976"
-		return false
-//		return self != fail|int|
+		return self != fail|int|
 

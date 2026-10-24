@@ -79,8 +79,6 @@ typedef byte ErrorSeverity;
 
 typedef int ExitCode;
 
-typedef int FailableInt;
-
 typedef byte FatNopMode;
 
 typedef int FileDes;
@@ -118,6 +116,8 @@ typedef byte NilState;
 typedef int OpMode;
 
 typedef int PID_Int;
+
+typedef int64 ParsedInt;
 
 typedef vec4 Plane3D;
 
@@ -2215,9 +2215,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ExitCode_EINPROGRESS ((int)36)
 #define kJB__ExitCode_ENOENT ((int)2)
 #define kJB__ExitCode_SIGKILL ((int)9)
-#define kJB__FailableInt_Fail ((int)2147483648)
-#define kJB__FailableInt_Max ((int)2147483647)
-#define kJB__FailableInt_Min ((int)2147483649)
 #define kSC__FatNopMode_Hard ((int)0)
 #define kSC__FatNopMode_KeepInputs ((int)1)
 #define kSC__FatNopMode_NopTemp ((int)4)
@@ -2363,6 +2360,9 @@ extern Array* SC__NilReason_values;
 #define kSC__OpMode_ShiftOnly ((OpMode)32)
 #define kSC__OpMode_Subtraction ((OpMode)80)
 #define kSC__OpMode_SyntaxIs ((OpMode)65536)
+#define kJB__ParsedInt_Fail ((int64)-9223372036854775808)
+#define kJB__ParsedInt_Max ((int64)9223372036854775807)
+#define kJB__ParsedInt_Min ((int64)-9223372036854775807)
 #define kJB__PIDM_CaptureAll ((uint)0)
 #define kJB__PIDM_MsgPassing ((uint)1)
 #define kJB__PIDM_OwnGroup ((uint)128)
@@ -5070,9 +5070,6 @@ bool JB_ExitCode_Successful(ExitCode Self);
 
 
 
-// FailableInt
-
-
 // FatNopMode
 bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F);
 
@@ -5172,6 +5169,9 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 
 
 // PID_Int
+
+
+// ParsedInt
 
 
 // Plane3D
@@ -6431,7 +6431,7 @@ ASMReg SC_Pac_IntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 
 ASMReg SC_Pac_IntPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-FailableInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub);
+ParsedInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub);
 
 bool SC_Pac_IsASMConst(Assembler* Self, Message* Exp);
 
@@ -7816,8 +7816,6 @@ int JB_Str_FindTrailingSlashes(JB_String* Self);
 SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err);
 
 JB_String* SC_Str_InBuiltTargetWrong(JB_String* Self);
-
-int64 JB_Str_Int(JB_String* Self);
 
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self);
 
@@ -11157,8 +11155,6 @@ inline bool JB_ErrorInt_SyntaxCast(ErrorInt Self);
 
 inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self);
 
-inline bool JB_FailableInt_SyntaxCast(FailableInt Self);
-
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self);
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
@@ -11166,6 +11162,8 @@ inline bool JB_Ind_SyntaxCast(Ind Self);
 inline Syntax JB_Msg_Func(Message* Self);
 
 inline JB_String* JB_Msg_Name(Message* Self);
+
+inline bool JB_ParsedInt_SyntaxCast(ParsedInt Self);
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self);
 
@@ -11260,10 +11258,6 @@ inline bool JB_ErrorMarker_SyntaxCast(ErrorMarker Self) {
 	return JB_StdErr->ErrorCount == Self;
 }
 
-inline bool JB_FailableInt_SyntaxCast(FailableInt Self) {
-	return Self != ((int)kJB__FailableInt_Fail);
-}
-
 inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self) {
 	return Self >= 0;
 }
@@ -11284,6 +11278,10 @@ inline JB_String* JB_Msg_Name(Message* Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
+}
+
+inline bool JB_ParsedInt_SyntaxCast(ParsedInt Self) {
+	return Self != ((int)kJB__ParsedInt_Fail);
 }
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self) {

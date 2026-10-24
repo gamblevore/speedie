@@ -3136,7 +3136,7 @@ bool SC_FB__AppOptions_optimise(JB_String* Name, JB_String* Value, FastString* P
 	if (!SC_FB__Explain(Purpose, JB_LUB[1017])) {
 		return nil;
 	}
-	SC__Options_Optimise = JB_Str_TextIntegerSection(Value, 0, nil);
+	SC__Options_Optimise = JB_Str_TextIntegerSection(Value, 0, nil, 0);
 	return false;
 }
 
@@ -3258,7 +3258,7 @@ bool SC_FB__AppOptions_variant(JB_String* Name, JB_String* Value, FastString* Pu
 	if (!SC_FB__Explain(Purpose, JB_LUB[0])) {
 		return nil;
 	}
-	JB_SetRef(SC__Options_Variant, JB_int_RenderFS(((int)JB_Str_TextIntegerSection(Value, 0, nil)), nil));
+	JB_SetRef(SC__Options_Variant, JB_int_RenderFS(((int)JB_Str_TextIntegerSection(Value, 0, nil, 0)), nil));
 	SC__Options_PerryOutput = 1;
 	(SC_Options__ColorSet(false));
 	if (SC__Options_Optimise < 0) {
@@ -7028,7 +7028,7 @@ int JB_Tk__FindError(int Num) {
 			JB_Decr(_Valuef3);
 			JB_String* Key = JB_Nav_Name(_navf0);
 			JB_Incr(Key);
-			int I = ((int)JB_Str_TextIntegerSection(Key, 0, nil));
+			int I = ((int)JB_Str_TextIntegerSection(Key, 0, nil, 0));
 			JB_Decr(Key);
 			if ((Num & I) == I) {
 				JB_EarlyDecr(_navf0);
@@ -9162,7 +9162,7 @@ Message* SC_SCVersion__File() {
 }
 
 int SC_SCVersion__Num() {
-	return JB_Str_Int(SC_SCVersion__Str());
+	return JB_Str_TextIntegerSection(SC_SCVersion__Str(), 0, nil, 0);
 }
 
 JB_String* SC_SCVersion__Str() {
@@ -17965,7 +17965,6 @@ bool JB_ExitCode_Successful(ExitCode Self) {
 }
 
 
-
 bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F) {
 	return ((bool)(Self & F));
 }
@@ -18111,6 +18110,7 @@ bool SC_NilState_SyntaxIs(uint /*NilState*/ Self, uint /*NilState*/ Type) {
 bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X) {
 	return (Self & X) == X;
 }
+
 
 
 
@@ -24403,7 +24403,7 @@ ASMReg SC_Pac_IntPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMR
 	return SC_FAT_AsReg(SC_Pac_MUL_(Self, Dest, R, V, L, Exp), Dest);
 }
 
-FailableInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub) {
+ParsedInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub) {
 	int64 V = SC_Reg_Const(R);
 	if (V == -1) {
 		SC_Pac_NopTempConstWithReg(Self, R);
@@ -24417,7 +24417,7 @@ FailableInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub) {
 		}
 		return JB_int64_Log2(V) + 1;
 	}
-	return kJB__FailableInt_Fail;
+	return kJB__ParsedInt_Fail;
 }
 
 bool SC_Pac_IsASMConst(Assembler* Self, Message* Exp) {
@@ -25456,8 +25456,8 @@ ASMReg SC_Pac_QuickIntDiv(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, 
 	if (!SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
 		return nil;
 	}
-	FailableInt PToi = SC_Pac_IntPowerOfTwo(Self, R, 0);
-	if (!JB_FailableInt_SyntaxCast(PToi)) {
+	ParsedInt PToi = SC_Pac_IntPowerOfTwo(Self, R, 0);
+	if (!JB_ParsedInt_SyntaxCast(PToi)) {
 		return nil;
 	}
 	if (PToi <= 1) {
@@ -25476,8 +25476,8 @@ ASMReg SC_Pac_QuickIntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, 
 	if (!SC_Reg_SyntaxIs(R, kSC__Reg_Const)) {
 		return nil;
 	}
-	FailableInt Pow2 = SC_Pac_IntPowerOfTwo(Self, R, 0);
-	if (JB_FailableInt_SyntaxCast(Pow2)) {
+	ParsedInt Pow2 = SC_Pac_IntPowerOfTwo(Self, R, 0);
+	if (JB_ParsedInt_SyntaxCast(Pow2)) {
 		if (Pow2 <= 1) {
 			return SC_Pac_Quick1Or1Sub(Self, Dest, L, Pow2, Exp);
 		}
@@ -25486,8 +25486,8 @@ ASMReg SC_Pac_QuickIntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, 
 		}
 		return SC_Pac_BFLG_Sub(Self, Exp, Dest, L, Pow2 - 1, 0, false);
 	}
-	FailableInt Five = SC_Pac_IntPowerOfTwo(Self, R, 1);
-	if (JB_FailableInt_SyntaxCast(Five)) {
+	ParsedInt Five = SC_Pac_IntPowerOfTwo(Self, R, 1);
+	if (JB_ParsedInt_SyntaxCast(Five)) {
 		if (0) {
 			SC_Msg_QADD(Exp, nil, nil, nil, nil);
 			SC_Msg_QSUB(Exp, nil, nil, nil, nil);
@@ -33573,10 +33573,6 @@ JB_String* SC_Str_InBuiltTargetWrong(JB_String* Self) {
 	return nil;
 }
 
-int64 JB_Str_Int(JB_String* Self) {
-	return JB_Str_TextIntegerSection(Self, nil, nil);
-}
-
 JB_String* SC_Str_InterfaceToBehaviour(JB_String* Self) {
 	JB_String* _tmPf0 = JB_Str_Range(Self, 2, Self->Length - 2, false);
 	JB_Incr(_tmPf0);
@@ -34054,7 +34050,7 @@ int SC_Str_OptionInt(JB_String* Self) {
 	if (SC_Str_OptionBool(Self)) {
 		return 1;
 	}
-	return JB_Str_Int(Self);
+	return JB_Str_TextIntegerSection(Self, 0, nil, 0);
 }
 
 Ind JB_Str_OutByteWithByteIntInt(JB_String* Self, uint /*byte*/ Find, int Start, int After) {
@@ -35088,7 +35084,7 @@ void SC_xC2xB5Form_Destructor(xC2xB5Form* Self) {
 
 void SC_xC2xB5Form_LoadParam(xC2xB5Form* Self, JB_String* Pl, Message* Place) {
 	if (JB_Str_IsIntFrom(Pl, 0)) {
-		int64 I = JB_Str_Int(Pl);
+		int64 I = JB_Str_TextIntegerSection(Pl, 0, nil, 0);
 		if (!((I > 0) and (I <= 24))) {
 			JB_Msg_Fail(Place, JB_LUB[2087]);
 		}
@@ -40037,10 +40033,10 @@ int64 JB_Msg_Int(Message* Self, int StrStart) {
 				JB_Msg_Fail(Self, nil);
 				return 0;
 			}
-			return JB_Str_TextIntegerSection(Self->Name, StrStart, Self);
+			return JB_Str_TextIntegerSection(Self->Name, StrStart, Self, 0);
 		}
 		if (JB_Msg_SyntaxEquals(Self, JB_LUB[1681], false)) {
-			return JB_Str_HexIntegerSection(F->Name, StrStart, F);
+			return JB_Str_HexIntegerSection(F->Name, StrStart, F, 0);
 		}
 		Float64 Value = JB_Str_TextDouble(F->Name, nil, false);
 		int64 Mul = JB_Str_SuffixSize(F->Name);
@@ -40930,7 +40926,7 @@ Message* JB_Msg_MacroPrm(Message* Self, Message* Orig, Message* Root, Array* Prm
 		}
 	}
 	if (((C == '_') and (JB_Str_CompareInt(N, 1) >= 1)) and JB_Str_IsIntFrom(N, 1)) {
-		Message* Oop = ((Message*)JB_Array_Value(Prms, ((int)JB_Str_Int(N))));
+		Message* Oop = ((Message*)JB_Array_Value(Prms, ((int)JB_Str_TextIntegerSection(N, 0, nil, 0))));
 		if (!Oop) {
 			JB_Msg_Fail(Root, JB_LUB[2059]);
 			return nil;
@@ -61357,4 +61353,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 177521262503430985 7952873920498268895
+// 8623815259182387451 7952873920498268895
