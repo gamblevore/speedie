@@ -2386,5 +2386,7 @@
 "LOGNAME"
 "bump"
 "__speedie__"
-"vers.txt"
+"vers.conf"
 "Bumping version"
+"version"
+"hash"

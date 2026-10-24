@@ -1,9 +1,11 @@
 
 module SCVersion	
 	function File (|config|)
+		opt norefcounts
 		return compiler.SpeedieProj.filechild("vers.conf").Config
 	
 	function Bump (|int64| Hash)
+		opt norefcounts
 		|| v = .file	
 		Hash &= (~0)>>1
 		|| s = hash.render
@@ -14,6 +16,7 @@ module SCVersion
 			v.save
 		
 	function Str (|string|)
+		opt norefcounts
 		return .File["version"]
 	
 	function Num (|int|)

@@ -1500,7 +1500,6 @@ extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_Phi (1.61803398875f)
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
-extern bool SC__Options_BumpVersion;
 #define kSC__Options_cake ((int)2)
 extern bool SC__Options_Compile;
 #define kSC__Options_cpp ((int)1)
@@ -1527,7 +1526,7 @@ extern bool SC__Options_PrintStages;
 extern bool SC__Options_ProjectIsLibrary;
 extern bool SC__Options_ProjectIsMiniLib;
 extern bool SC__Options_Scripting;
-extern bool SC__Options_SelfReplacement;
+extern byte SC__Options_SelfReplacement;
 extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
@@ -2527,6 +2526,7 @@ extern Array* SC__Cpp_H_PostInput;
 #define kSC__Cpp_kNeedsNoBrackets ((int)2)
 #define kSC__Cpp_kNeedsOuterBrackets ((int)0)
 extern uint64 SC__Cpp_LubHash;
+extern uint64 SC__Cpp_SourceHash;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
@@ -3026,6 +3026,8 @@ int SC_FB__Init_();
 bool SC_FB__ParseArgs();
 
 void SC_FB__ParseOption(JB_String* Arg);
+
+bool SC_FB__Self(JB_String* Value);
 
 bool SC_FB__SetOutputPath(JB_String* Path, int Strength);
 
@@ -3719,6 +3721,17 @@ void SC_SCTasks__NewTaskActual(Message* Node, SCNode* Name_space);
 
 // SCThe
 SCNode* SC_SCThe__NewInsertion(Message* Node, SCNode* Name_space, Message* ErrPlace);
+
+
+
+// SCVersion
+void SC_SCVersion__Bump(int64 Hash);
+
+Message* SC_SCVersion__File();
+
+int SC_SCVersion__Num();
+
+JB_String* SC_SCVersion__Str();
 
 
 
@@ -4422,8 +4435,6 @@ int SC_int64_BitsNeeded(int64 Self);
 bool SC_int64_CanStoreAsAddK(int64 Self);
 
 bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
-
-JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in);
 
 bool JB_int64_IsPow2(int64 Self);
 
@@ -7563,10 +7574,6 @@ void SC_Imp__Neaten();
 
 void SC_Imp__NoProj();
 
-JB_File* SC_Imp__VersionFile();
-
-int SC_Imp__VersionNumber();
-
 
 
 // JB_SCNodeRenamer
@@ -9210,6 +9217,8 @@ Message* JB_Msg_NeedSyxInt(Message* Self, Syntax S, int N);
 Message* JB_Msg_NeedSyxName(Message* Self, Syntax S, JB_String* Name);
 
 void JB_Msg_SetStr(Message* Self, JB_String* Key, JB_String* Value);
+
+void JB_Msg_SetInt(Message* Self, JB_String* Key, int64 Value);
 
 void JB_Msg_SetMsg(Message* Self, JB_String* Key, Message* Value);
 
