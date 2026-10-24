@@ -4,10 +4,9 @@ Error handling is quite important. Its a skill to get right in any language.
 
 In Speedie, we use the `#require`/`#expect`/`#error`/`#check` statements to handle errors and control-flow in one go.
 
-Any errors you create, are stored in the global  "`StdErr`" object. Errors can be generated from any function and won't silently affect control-flow. (There are no exceptions in Speedie).
+Any errors you create, are stored in the global  "`StdErr`" object. Errors can be generated from any function and unlike exceptions, don't affect control-flow.
 
-Let's make a simple example:
-
+heres a more full example:
 
     || BannedWords = ["poop", "smelly"]
     
@@ -33,9 +32,14 @@ Let's make a simple example:
             "${stderr.errorCount} users have bad names"
         
 
-Hopefully the comments explain this function well.
-
 The statements `require` / `expect` / `check` / `error` are used for control-flow and error-handling. They remove the messy control-flow, so you can see your code clearly.
+
+Lets make a list of the statements:
+
++ `require X` - If X is `false`, the function will return `false`. No error.
++ `expect X`  - If X is `false`, this will create an error, then the function will return `false`.
++ `check X`   - If X is `false`, this will create an error. But the code will continue to flow.
++ `error`     - This will create an error. Same as `check false`
 
 The same error checking, can be written in two ways:
 
@@ -48,13 +52,6 @@ Both `A` and `B` are tested in the same way. But the first looks better to me. I
     || S = "abc".parse
     require S.name == "abc"             // can't be shortened into #require
 
-Lets make a list of the statements:
-
-+ `expect X`  - If X is `false`, this will create an error, then the function will return `false`.
-+ `require X` - If X is `false`, the function will return `false`. No error.
-+ `check X`   - If X is `false`, this will create an error. But the code will continue to flow.
-+ `error`     - This will create an error. Same as `check false`
-
 `expect`, `check` and `error` usually are used by passing an "Error identifier", as well as the object to test. For example:
 
     function Rename (|string| NewName)
@@ -64,27 +61,33 @@ Lets make a list of the statements:
             newname = newname[0, 50]    // trim name, but continue
         // Actually do the rename.
         
-The identifier could simply be a string, like above, but that might not tell you enough. Normally, the best way to make errors, is... with jeebox! Like this:
+The identifier could simply be a string, like above, but that might not tell you enough. Normally, the best way to make errors, is using the `message` class, accessed via `.parse`. Like this:
 
     main (|file| f) // your first dog checker app! 🐶
-        || s = f.parse  #require
-        for ch.flat in s
-            expect (ch.name!="dog") (ch, "No dogs 'aloud' in the pool.")
+        || Root = f.parse  #require
+        for animal in root
+            expect (animal!="dog") (ch, "No dogs 'aloud' in the pool.")
 
 
 Here, `expect` will correctly report an error, report the error position in the file, as well as the file-path, and your nice error message 😍, all bundled up into one little `error` object containing all that info. Its quite powerful if done properly.
 
-This means that anytime you are processing structured data, saved in files or typed by a user, it just makes sense to store that data in jeebox, as it will make error-reporting feel natural.
 
-If you run that code above, on a jeebox file containing a "dog" node, you should see this:
+If you run that code above, on a jeebox file containing this:
+
+    bird (thought="I just want to enjoy my life")
+    dog (hope="I hope i can swim!")
+    frog (feeling="Smells great out here")
+    
+you should see this:
 
     error occurred (-1)
-    /path/to/file.xml:5:1: error: No dogs 'aloud' in the pool.
-    <dog hope="I hope i can swim!"/>
+    /path/to/file.box:5:1: error: No dogs 'aloud' in the pool.
+    dog (hope="I hope i can swim!")
     ^
     1 issue found
 
-Jeebox can parse XML files, and JSON files too. Mostly aimed at importing and converting to jeebox. Either way, in this case I used an XML file containing a `<dog hope="I hope i can swim!"/>` node.
+This means that anytime you are processing structured data, saved in files or typed by a user, it just makes sense to store that data in jeebox, as it will make error-reporting feel natural. ([Jeebox](Jeebox.md) is a Universal Data Format included in Speedie, and can parse [XML/JSON too](Jeebox.md#walkthrough-of-creating-a-book-searcher)).
+
 
 ---
 
@@ -310,25 +313,25 @@ Things just are more convenient in speedie.
 
 C's error handling... what to say about it. It makes sense from a performance perspective. But from a coder's perspective its no fun. Awkward, easy to miss errors... messy.
 
-    const char* Fol = "/tmp/a/b/c/";
-    int err = mkdir(Fol, 0755);
+    const char* Folder = "/tmp/a/b/c/";
+    int err = mkdir(Folder, 0755);
     if (err) {
         if (err == -1 and errno == EEXIST) {
             ; // it's OK, just ignore
         } else {
-            printf("An error %s occurred while trying to make a directory at %s\n", strerror(errno), Fol);
+            printf("An error %s occurred while trying to make a directory at %s\n", strerror(errno), Folder);
             return -1;
         }
     }
-    UseFolder(Fol);
+    UseFolder(Folder);
 
 This code seems labourious, error-prone and time-wastery. What if you don't know about `EEXIST` or fail to log `strerror(errno)` and `Fol`. Thats 2 strings to log, and 2 checks to remember. Also the control flow is messy.
 
 In Speedie:
 
-    || Fol = "/tmp/a/b/c/".file
-    require fol.makedir
-    usefolder(fol)
+    || Folder = "/tmp/a/b/c/".file
+    require folder.makedir
+    usefolder(folder)
 
 Again! Super simple! Once the program exits, you get the list of errors printed. With nicely informative error message:
 
@@ -401,7 +404,7 @@ To help convince you... I'll show you the output given by Speedie's inbuilt ASM-
 This isn't "quite C" (missing semi-colons), its just close enough that you can understand it. However "proper C" (With semi-colons, etc) is actually output by Speedie, if you choose to compile to C.
      
 
-### Rust's Result Types
+### TypeScript's Result Types
 
     import { Result, ok, err } from 'neverthrow';
     import DB from 'my-synchronous-database';
