@@ -153,10 +153,6 @@ static bool HasFD (JB_File* f) {
     return (f->Descriptor >= 0);
 }
 
-inline uint8* JB_FastFileThing (JB_File* S) {
-	return S->Addr;
-}
-
 int64 ErrorHandle_ (int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
     if (MaybeErr >= 0) {
         return MaybeErr;
@@ -279,11 +275,11 @@ bool RetryMakePath (JB_String* s) {
 }
 
 
-int StrOpen_ (JB_File* Path, int Flags, bool AllowMissing) {
+int StrOpen_ (JB_String* Path, int Flags, bool AllowMissing, u8* Buff=nil) {
 	if (!JB_Str_Length(Path)) {
 		errno = ENOENT;
 	} else {
-		char* CPath = (char*)JB_FastFileThing( Path );
+		char* CPath = (char*)JB_FastFileString( Path, Buff );
 		
 		Flags |= O_Win32Sucks |  O_CLOEXEC; // mostly we dont want this... just for shm
 		int FD = open( CPath,  Flags,  kDefaultMode );
@@ -323,7 +319,7 @@ bool Stat_ ( JB_String* self, struct _stat* st, bool normal=true ) {
     uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (!tmp)
-		return 0;
+		return false;
 	return Stat2_(self, st, normal, tmp);
 }
 
@@ -337,14 +333,17 @@ JB_StringC* PathTooLong (JB_String* P) {
 
 
 
-uint8* JB_FastFileString (JB_String* Path, uint8* Tmp) { // just use posix funcs? fuck windows 16-bit chars.
+uint8* JB_FastFileString (JB_String* Path, uint8* Tmp=nil) { // just use posix funcs? fuck windows 16-bit chars.
     u32 N = JB_Str_Length( Path );
     if ( ! N )
         return (uint8*)"";
 
+	if (!Tmp) // For the JB_File* only functions.
+		return Path->Addr;
+
     if (N >= PATH_MAX) {
 		PathTooLong(Path);
-        return 0;
+        return nil;
 	}
 
 	uint8* Src = Path->Addr;
@@ -378,7 +377,7 @@ uint8* JB_FastFileString (JB_String* Path, uint8* Tmp) { // just use posix funcs
 	
 	if ((Write-Tmp)+N >= PATH_MAX) { // failed
 		PathTooLong(Path);
-		return 0;
+		return nil;
 	}
 
     Write[ N ] = 0;
@@ -442,7 +441,7 @@ int JB_File__CheckLeaks (int From, int To, bool Print) {
 int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 	if (!f)
 		return -1;
-	if (HasFD(f)  and  (OpenFlags & O_RDWR)  and  !(f->OpenMode & O_RDWR)) {
+	if (HasFD(f)  and  ((OpenFlags & (~f->OpenMode)) & O_RDWR)) {
 		JB_File_Close(f); // sigh
 	}
 	int FD = f->Descriptor;
@@ -474,29 +473,31 @@ int JB_Write_ (int fd, uint8* buffer, int N) {
 }
 
 
-int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, int AsFile, const char* Path) {	
-    do { // read() forces me to deal with 9 cases. :[
+int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, const char* Path) {
+
+// <=-1 : -errno
+// 0 	: Early EOF. (This is OK if you read an oversized amount to be safe).
+// 1	: Successful read, got all
+
+	int FailCount = 0;
+    do { // read() forces me to deal with 7 cases. :[
 		int nread = (int)read(fd, Out, Request);
 		if (nread > 0) {
             Total += nread; Out += nread; Request -= nread;
-			if (AsFile <= 0)									// 1) Let pipe get partial data. More responsive.
-				return 1;										//    (pipes delay stuff?)
-			if (Request <= 0)									// 2) We got the full requested amount.
+			if (Request <= 0)									// 1) We got the full requested amount.
 				return 1;										
-	        continue;											// 3) keep reading!
+	        continue;											// 2) keep reading!
 		}
-		if (nread == 0) return 0;								// 4) Pipe is closed, or file EOF.
+		if (nread == 0) return 0;								// 3) Pipe is closed, or file EOF.
 		int Error = errno;
-		if (Error == EINTR)										// 5) Retry ;_;
+		if (Error == EINTR)										// 4) Retry ;_;
 			continue;
 		if (Error == EWOULDBLOCK  or  Error == EAGAIN) {
-			if (AsFile <= 0)
-				return 1;										// 6) Tell pipe to retry later
-			if (++AsFile < 1024)
-				continue;										// 7) Files need a full read.
-			 													// 8) File failed too many times, give up.
+			if (++FailCount < 1024)
+				continue;										// 5) Files need a full read.
+			 													// 6) File failed too many times, give up.
 		}
-		return -JB_ErrorHandleFileC(Path, Error, "reading");	// 9) return error
+		return -JB_ErrorHandleFileC(Path, Error, "reading");	// 7) return error
     } while (true);
 }
 
@@ -578,7 +579,7 @@ int JB_FS_AppendFile (FastString* self, JB_File* F, uint64 L, bool LeaveOpen) {
 		uint Req = (uint)std::min(L, (uint64)(64*1024));
 		uint8* Buffer = JB_FS_WriteAlloc_(self, Req);
 		int64 N = 0;
-		Error = ReadIfItWasDoneProperly(fd, Buffer, Req, N, true, (const char*)F->Addr);
+		Error = ReadIfItWasDoneProperly(fd, Buffer, Req, N, (const char*)F->Addr);
 		JB_FS_AdjustLength_(self, 64 * 1024, (int)N);
 		if ((int64)L>0)
 			L -= N;
@@ -754,7 +755,7 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 		Result = JB_Str_New( Length );
 		if (Result) {
 			int64 Total = 0;
-			int Error = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, true, (const char*)(self->Addr) );
+			int Error = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, (const char*)(self->Addr) );
 			if (Error < 0) {
 				JB_FreeIfDead(Result);
 				Result = JB_Str__Error();
@@ -771,9 +772,13 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 }
 
 
-int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
-    N = JB_Write_( self->Descriptor, Data, N );
+static int64 WriteRawSub_ ( JB_String* self, uint8* Data, int N, int FD ) {
+    N = JB_Write_( FD, Data, N );
     return ErrorHandle_(N, self, nil, "write to");
+}
+
+int64 JB_File_WriteRaw_ ( JB_File* self, uint8* Data, int N ) {
+	return WriteRawSub_(self, Data, N, self->Descriptor);
 }
 
 
@@ -1001,7 +1006,7 @@ JB_String* JB_File_Render (JB_File* self, FastString* fs_in) {
 void JB_File_ListStart (JB_File* File, JB_DirReader* Reader) {
     Reader->File = JB_Incr(File);
     Reader->Item = 0;									// in case already set?
-    auto P = (const char*)JB_FastFileThing(File); 
+    auto P = (const char*)JB_FastFileString(File, nil); 
     Reader->Dir = opendir( P );
 }
 
@@ -1047,17 +1052,20 @@ void JB_File_Close ( JB_File* self ) {
 	JB_File_CloseSub(self);
 }
 
-int JB_File_Mode ( JB_File* self ) {
+int JB_File_Mode ( JB_String* self ) {
 	struct _stat st;
     require (Stat_(self, &st));
 	return st.st_mode&(7+(7<<3)+(7<<6));
 }
 
-int JB_File_ModeSet ( JB_File* self, int Mode ) {
-    require (self);
-	auto C = (const char*)JB_FastFileThing(self);
+static int FileModeSet ( JB_String* self, int Mode, u8* Buff ) {
+	auto C = (const char*)JB_FastFileString(self, Buff);
 	int Err = chmod(C, Mode);
 	return (int)ErrorHandle_(Err, self, nil, "setting permissions");
+}
+
+int JB_File_ModeSet ( JB_File* self, int Mode ) {
+	return FileModeSet(self, Mode, 0);
 }
 
 
@@ -1090,7 +1098,7 @@ int JB_Str_SymLink ( JB_String* TheSource, JB_String* ToCreate ) {
 
 
 bool JB_File_HardLinkTo ( JB_File* self, JB_String* Link ) {
-	auto C	= ((const char*)JB_FastFileThing(self));
+	auto C	= ((const char*)JB_FastFileString(self));
 	uint8 PCreate[PATH_MAX];
 	auto LinkPath = (const char*)JB_FastFileString(Link, PCreate);
     int Err	= link(C, LinkPath);
@@ -1103,10 +1111,11 @@ bool JB_File_HardLinkTo ( JB_File* self, JB_String* Link ) {
 
 JB_String* JB_File_LinkToGet ( JB_File* self ) {
 	// symlink
-	auto C = (const char*)JB_FastFileThing(self);
-	char Found[PATH_MAX];
-	int bytes = (int)readlink((const char *)C, Found, sizeof(Found));
-	return JB_Str_CopyFromPtr((uint8*)Found, bytes);
+	char _Found[PATH_MAX];
+	u8* Found = (u8*)(&_Found[0]);
+	auto C = (const char*)JB_FastFileString(self, Found);
+	int bytes = (int)readlink((const char *)C, _Found, sizeof(_Found));
+	return JB_Str_CopyFromPtr(Found, bytes);
 }
 
 
@@ -1280,21 +1289,20 @@ int JB_File_MoveTo (JB_File* Self, JB_String* New) {
 
 
 // copy file properly!! keeps attrs!! :)
-int CopyStats_ (JB_File* self, JB_File* To) {
+int CopyStats_ (JB_File* self, JB_String* To, u8* Buff) {
 	struct stat st;
 	if (Stat_(self, &st))
-		return JB_File_ModeSet(To, st.st_mode);
+		return  FileModeSet(To, st.st_mode, Buff);
 	return 0;
 }
 
 
-int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
-	if (!self or !To)
-		return -1;
+int JB_File_Copy (JB_File* self, JB_String* To, bool AttrOnly) {
+	u8 Buff[PATH_MAX];
 	if (AttrOnly)
-		return CopyStats_(self, To);
-	bool WasOpen = self->Descriptor > STDPICO_FILENO;
-	int Output = JB_File_OpenEmpty(To);
+		return CopyStats_(self, To, Buff);
+
+	int Output = StrOpen_(To, O_WRONLY|O_CREAT|O_TRUNC, true, Buff);
 	if (Output < 0)
 		return -1;
 
@@ -1305,17 +1313,15 @@ int JB_File_Copy (JB_File* self, JB_File* To, bool AttrOnly) {
 		u8 Block[ChunkSize];
 		while (Status > 0) {
 			int64 Total = 0;
-			Status = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, true, (const char*)self->Addr);
-			if (JB_File_WriteRaw_(To, Block, (int)Total) <= 0)
+			Status = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, (const char*)self->Addr);
+			if (WriteRawSub_(To, Block, (int)Total, Output) <= 0)
 				break;
 		}
 	}
 
-	JB_File_Close(To);
-	if (!WasOpen)
-		JB_File_Close(self);
-	CopyStats_(self, To);
-	if (Status == 1) Status = 0;
+	close(Output);
+	CopyStats_(self, To, Buff);
+	if (Status > 0) Status = 0;
 	return Status;
 }
 

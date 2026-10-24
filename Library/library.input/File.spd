@@ -357,12 +357,12 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	function Copy (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		disabled "Use .CopyTo"
 	
-	function CopyTo (|File| Dest, |bool| AttrOnly=false, |ErrorInt|)
+	function CopyTo (|String| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		cpp_wrapper JB_File_Copy
 	
 	function CopyAll (|string| Dest, |bool| AttrOnly=false, |ErrorInt|)
 		if !.isdir
-			return .copyto(dest.file, AttrOnly)
+			return .copyto(dest, AttrOnly)
 
 		for n in self
 			|| s = self[n]
