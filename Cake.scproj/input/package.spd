@@ -48,7 +48,7 @@ module CakeRun
 		
 
 	function string.Compile (|string?|)
-		|| args = ["-bake", "-quiet", self]
+		|| args = ["-bake", "-quiet", "-hideaway", self]
 		if debugger.WantDebug
 			args <~ "-d"
 		|| Answer = cake.speedie.ExecuteStr(args)
