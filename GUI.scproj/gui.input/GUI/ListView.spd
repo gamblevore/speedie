@@ -1255,7 +1255,7 @@ class ListView (GUIControl) {
 		for i in 1 to n
 			|| t = .TableCell(curr, i)
 			|| p = .TableCell(prev, i)
-			if (t == p)					// and t and p
+			if (t ~= p)	
 				rz |= 1<<i
 	
 	
