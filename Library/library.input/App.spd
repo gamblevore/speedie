@@ -310,11 +310,11 @@ libinternal IsQuarantined (|bool|)
 target !minilib {
 function Say (|string| s, |bool| print=true,  |ExitCode|)
 	// what if we don't want to wait. pass -1 for the timeout?
+	rz = ExitCode.ENOENT
 	if print
 		printline s
 	if "/usr/bin/say".FileExists
-		return "/usr/bin/say".execute([s])
-	return ExitCode.ENOENT
+		rz = "/usr/bin/say".execute([s])
 
 
 function AppleScript (|string| str, |ExitCode|)
