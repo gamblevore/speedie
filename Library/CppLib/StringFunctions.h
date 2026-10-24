@@ -133,7 +133,7 @@ JB_String* JB_Str_UnicodeSync(JB_String* Str);
 int JB_Str_EncodingXMLGuess(JB_String* Data);
 JB_String* JB_Str_BOM(int Encoding, bool IsBigEndian);
 double JB_Str_TextDouble(JB_String* self, Message* Where, bool Suffixes);
-int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b, iÏnt64 Fail );
+int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b, int64 Fail );
 int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b, int64 Fail );
 
 
