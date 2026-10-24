@@ -11281,7 +11281,7 @@ inline JB_String* JB_Msg_Name(Message* Self) {
 }
 
 inline bool JB_ParsedInt_SyntaxCast(ParsedInt Self) {
-	return Self != ((int)kJB__ParsedInt_Fail);
+	return Self != kJB__ParsedInt_Fail;
 }
 
 inline _cstring JB_Str_SyntaxCast(JB_StringC* Self) {
