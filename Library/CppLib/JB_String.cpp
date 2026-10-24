@@ -1232,13 +1232,6 @@ JB_String* JB_FS_SmartResult( FastString* fs, JB_Object* Orig ) {
 }
 
 
-JB_String* JB_Str_Hex(JB_String* s, int Spaces, FastString* fs_in) {
-	FastString* fs = JB_FS__FastNew( fs_in );
-	JB_FS_AppendHexData( fs, JB_Str_Address(s), JB_Str_Length(s), Spaces );
-	return JB_FS_SmartResult( fs, fs_in );
-}
-
-
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs_in) {
 	int SelfLen = JB_Str_Length(self);
 	require(SelfLen);

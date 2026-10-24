@@ -1173,12 +1173,12 @@ Message is also:
 			|| f = .First
 			if !f or fn != @unit
 				expect ((fn == @num) or fn.IsString or (strstart > 0)) (self)   // parsing p123, from index 1
-				return .name.ParseInt(StrStart, self)
+				return .name.Int(StrStart, self)
 			
 			if self == "x"
-				return F.name.ParseHex(StrStart, F)
+				return F.name.Hex(StrStart, F)
 			
-			|| Value = f.name.ParseFloat // 1.5MB
+			|| Value = f.name.Float // 1.5MB
 			|| Mul = f.Name.SuffixSize						#expect (self, "Invalid unit")
 			return (Value * Mul|float64|)|int64|
 			
@@ -1193,7 +1193,7 @@ Message is also:
 		
 	function Float (|Float64|)
 		if self
-			return .name.ParseFloat(self)
+			return .name.Float(self)
 
 	function Float32 (|float|)
 		|| d = .float|float|

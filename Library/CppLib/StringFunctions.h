@@ -98,7 +98,6 @@ JB_String* JB_Str_ReplaceAll(JB_String* self, JB_String* Old, JB_String* New, bo
 JB_String* JB_Str_MultiReplaceAll(JB_String* self, Dictionary* Dict, JB_ErrorReceiver* Rec);
 JB_String* JB_Str_ReplaceBytesSub_(JB_String* self, int lFrom, int lTo, FastString* fs);
 JB_String* JB_Str_UnHex(JB_String* self, FastString* fs = nil);
-JB_String* JB_Str_Hex(JB_String* self, int Spaces, FastString* fs = nil);
 JB_String* JB_Str_LowerCase(JB_String* self);
 JB_String* JB_Str_UpperCase(JB_String* self);
 bool JB_Str_IsAsciiName(JB_String* self);

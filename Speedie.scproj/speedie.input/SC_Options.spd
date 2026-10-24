@@ -391,7 +391,7 @@ module Feedback
 				
 		+'optimise'
 			Explain(Purpose, "Optimisation level. (0 to 3... EG: '--Optimise=1')")$
-			Options.Optimise = Value.parseint
+			Options.Optimise = Value.int
 
 		+'output_path'
 			explain(purpose, "Specifies the build product path")$
@@ -403,7 +403,7 @@ module Feedback
 
 		+'variant'
 			Explain(Purpose)$
-			Options.Variant = (Value.ParseInt|int|).Render
+			Options.Variant = (Value.Int|int|).Render
 			options.perryoutput = 1
 			Options.Color = false
 			if options.optimise < 0

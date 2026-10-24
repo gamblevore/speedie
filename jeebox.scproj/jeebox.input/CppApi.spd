@@ -249,7 +249,7 @@ The optional path is not used for anything except generating better error messag
 		description "Same as jb_string_print except it ends with a \\n."
 		
 	api int (|message|m, |int64|)
-		return .ParseInt(m)
+		return .Int(m)
 		description "Parses this string into an integer. Allows hex also, like '0xffff'. If you pass a 'message' into this, then invalid strings will get reported into jb_errors() "
 		
 	api float (|message|m, |Float64|)

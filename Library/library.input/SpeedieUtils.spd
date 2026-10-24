@@ -217,18 +217,21 @@ function object.DebugPrint				// more for use in XCode, than anything else.
 	printline .render
 
 
-datatype FailableInt (int)
-	description "A balanced integer: -int.max = FailableInt.min.
-	0x8000_0000 == false
-	0x0 == true! (and all others too)"
+datatype ParsedInt (int64)
+	description "A balanced integer. No numbers that can't be negated."
 	constants
-		|int|
-		Fail = 0x8000_0000
-		Max = 0x7FFF_FFFF
-		Min = 0x8000_0001
-	default FailableInt.fail
-	false   FailableInt.fail
+		|int64|
+		Fail = (1<<63)
+		Max  = (1<<63)-1			// 0x7fff....
+		Min  = (1<<63)+1			// -parsedint.min
+	default ParsedInt.fail
+	false   ParsedInt.fail
 	syntax cast (|bool|)
 		inlined
-		return self != fail|int|
+		if self != 0
+			"888"
+			return true
+		"01345976"
+		return false
+//		return self != fail|int|
 

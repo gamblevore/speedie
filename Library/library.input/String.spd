@@ -159,30 +159,22 @@ class String
 	function ReplaceAll (|string| from, |string| to, |bool| CaseAware=false, |Faststring|fs_in=nil, |string|)
 		cpp_wrapper JB_Str_ReplaceAll
 
-	function Hex (|int|Spaces=0, |faststring| fs=nil, |string|)
-		cpp_wrapper JB_Str_Hex
-
 	function UnHex (|faststring| fs=nil, |string|)
 		cpp_wrapper JB_Str_UnHex
 
-	function SafeInt (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
-	function ParseInt (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
+	inline ParseInt (|int| Start=0, |message?| where=nil, |ParsedInt|)
+		return .int(start, where, ParsedInt.fail)
+	
+	function Int (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
 		nil checker
-		// could be nice to add KB, MB, GB, TB suffixes to this
+		// Could be nice to add KB, MB, GB, TB suffixes to this
 		cpp_wrapper JB_Str_TextIntegerSection
 	
-	function ParseHex (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
+	function Hex (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
 		nil checker
 		cpp_wrapper JB_Str_HexIntegerSection
 	
-	inline Int (|int64|) // remove?
-		return .parseint(nil)
-	
-	inline Float (|bool| Suffixes = false, |Float64|) // rename?
-		nil checker
-		return .parsefloat(nil, suffixes)
-	
-	function ParseFloat (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
+	function Float (|Message| Where=nil, |bool| Suffixes=false, |Float64|)
 		nil checker
 		cpp_wrapper JB_Str_TextDouble
 

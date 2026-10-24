@@ -490,7 +490,7 @@ class FileViewer (ListView)
 
 		|| cuter = s.trim.TrimStart("line ")
 		if cuter.isint								// "line 1234"
-			|| Line = cuter.ParseInt
+			|| Line = cuter.Int
 				.editme.ShowLine(line)
 				return
 		
@@ -609,7 +609,7 @@ class FileViewer (ListView)
 			
 			|| t = v.quickopen.text
 			|| LineNum = t.find(':')
-				LineNum = t.parseint(LineNum+1)
+				LineNum = t.int(LineNum+1)
 			v.OpenQuick(loc)
 			if LineNum > 0
 				v.editme.ShowLine(linenum)
