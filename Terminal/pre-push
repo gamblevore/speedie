@@ -2,4 +2,6 @@
 
 || spd = file.speediedir
 main
+	|| err = "spd".execute(["--bump"])
+		return err
 	return (spd+"/make.sh").execute(["--test"])
