@@ -228,5 +228,5 @@ datatype ParsedInt (int64)
 	false   ParsedInt.fail
 	syntax cast (|bool|)
 		inlined
-		return self != fail|int|
+		return self != fail
 

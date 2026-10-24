@@ -1155,7 +1155,7 @@ static int64 ParseNumbers_( JB_String* self, int Start, Message* Where, int AsHe
 		auto S = self->Addr;
 		return ParseNumbers__( self, AsHex, Where, S+Start, S+self->Length, Failed );
 	}
-	return 0;
+	return Failed;
 }
 
 
