@@ -1092,23 +1092,25 @@ double JB_Str_TextDouble (JB_String* self, Message* Where, bool Suffixes) {
 }
 
 
-static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr S ) {
-	bool IsMinus = (S.Curr() == '-');
-	if (IsMinus)
-		S.Next();
+// Could combine Self/Where, and use ISA.
+// requires the message HAS the same name, or rlse bad errors.
+static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u8* After, int Failed ) {
+	bool IsMinus = (*S == '-');
+	S += IsMinus;
 	
-	int Mul = 10;
-	while (S and JB_Byte_IsWhite(S[0]))
-		S.Next();
-	while (S and JB_Byte_IsWhite(S[S.Length-1]))
-		S.Length--;
-	if (S.Length >= 2 and S[0] == '0') {
+	while (S<After and JB_Byte_IsWhite(S[0]))
+		S++;
+	while (S<After and JB_Byte_IsWhite(After[-1]))
+		After--;
+	if ((After-S) >= 2 and S[0] == '0') {
 		char c = S[1];
 		if (c=='x' or c == 'b') {
 			Mode = 1+(c=='x');
-			S.Next(); S.Next();
+			S+=2;
 		}
 	}
+
+	int Mul = 10;
 	if (Mode == 1) {
 		Mul = 2;
 	} else if (Mode == 2) {
@@ -1119,8 +1121,8 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 	uint64 Value = 0;
 	bool Overflow = false;
 
-	while ( S ) {
-		uint c = S.Next();
+	while ( S < After ) {
+		uint c = *S++;
 		if (c == '_')
 			continue;
 		if (c >= 'a' and c <= 'f')
@@ -1136,8 +1138,8 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 		if (__builtin_mul_overflow(Value, Mul, &Value) or __builtin_add_overflow(Value, c, &Value)) {
 			Overflow = true;
 			BadPos:;
-			ParseNumErr_(self, S.Addr, Where, Overflow);
-			break;
+			ParseNumErr_(self, S, Where, Overflow);
+			return Failed;
 		}
 	}
 
@@ -1147,26 +1149,27 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, MiniStr 
 }
 
 
-static int64 ParseNumbers_( JB_String* self, int Start, Message* Where, int AsHex ) {
+static int64 ParseNumbers_( JB_String* self, int Start, Message* Where, int AsHex, int64 Failed ) {
 // assumes valid input
 	if (self) {
-		MiniStr S = {self->Length-Start, self->Addr+Start};
-		return ParseNumbers__( self, AsHex, Where, S );
+		auto S = self->Addr;
+		return ParseNumbers__( self, AsHex, Where, S+Start, S+self->Length, Failed );
 	}
 	return 0;
 }
 
 
-int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b ) {
-	return ParseNumbers_( self, Start, b, 0 );
-}
-int64 JB_Str_TextIntegerValid( JB_String* self, Message* b ) {
-// remove this?
-	return ParseNumbers_( self, 0, b, 0 );
+int64 JB_Str_TextIntegerSection( JB_String* self, int Start, Message* b, int64 Fail ) {
+	return ParseNumbers_( self, Start, b, 0, Fail );
 }
 
-int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b ) {
-	return ParseNumbers_( self, Start, b, 2 );
+int64 JB_Str_TextIntegerValid( JB_String* self, Message* b ) {
+// remove this?
+	return ParseNumbers_( self, 0, b, 0, 0 );
+}
+
+int64 JB_Str_HexIntegerSection( JB_String* self, int Start, Message* b, int64 Fail ) {
+	return ParseNumbers_( self, Start, b, 2, Fail );
 }
 
 

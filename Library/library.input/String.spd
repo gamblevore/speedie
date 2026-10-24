@@ -165,12 +165,13 @@ class String
 	function UnHex (|faststring| fs=nil, |string|)
 		cpp_wrapper JB_Str_UnHex
 
-	function ParseInt (|int| Start=0, |message?| where=nil, |int64|)
+	function SafeInt (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
+	function ParseInt (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
 		nil checker
 		// could be nice to add KB, MB, GB, TB suffixes to this
 		cpp_wrapper JB_Str_TextIntegerSection
 	
-	function ParseHex (|int| Start=0, |message?| where=nil, |int64|)
+	function ParseHex (|int| Start=0, |message?| where=nil, |int64| Failiure=0, |int64|)
 		nil checker
 		cpp_wrapper JB_Str_HexIntegerSection
 	
