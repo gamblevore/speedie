@@ -296,7 +296,7 @@ function InitBasicStuff (|int|) // compiler.init
 	
 	TrueBool!.numberconst = 1
 
-	.AddGlobalConstNum( "__speedie__",		typeint!,		scimport.VersionNumber )
+	.AddGlobalConstNum( "__speedie__",		typeint!,		SCversion.Num )
 	.AddGlobalConstNum( "__time_id__",		typeint!,		scimport.recent.timeid )
 	.AddGlobalConstNum( "__now__",			typedate!,		date.now )
 	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)

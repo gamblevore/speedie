@@ -3,7 +3,7 @@
 function compiler.UsingScript (|file| f, |file|)
 	require (Options.Mode) and options.compile
 	require !f.isdir
-	require f.Read(16) starts "#!"
+	require f.Read(2) == "#!"
 	
 	rz = feedback.TryUseProject(f, true).ScriptLocation.file
 	
@@ -68,7 +68,7 @@ function string.ScriptContainer (|string| container = "/tmp/SpeedieApps/",  |str
 
 
 function string.ScriptLocation (|string| container = "/tmp/SpeedieApps/",  |string|)
-	|| full = .PathFix ?? self
+/	|| full = .PathFix ?? self
 	|| dest = full.Scriptcontainer(container)
 	dest.MakeEntirePath
 	rz = dest[full.SpdScriptName]

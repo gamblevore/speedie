@@ -656,11 +656,6 @@ extern "C" {
 	for i in cpp_Export.Cpp_Includes
 		fs <~ ' '
 		fs <~ i
-
-
-//		if Options.SelfReplacement and Options.BumpVersion
-//			SCImport.VersionBump
-
 	
 	Cpp_Export.SmartWrite(FS, Cpp_Export.CppProduct)
 
@@ -707,6 +702,7 @@ module
 	|[string]|					H_PostInput
 	|[string]|					Cpp_Input
 	|[string]|					Cpp_Includes
+	|uint64|					SourceHash
 
 	|SCClass|	CurrClass
 	|uint64|	LubHash
@@ -831,7 +827,9 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 	function SmartWrite (|string| S, |File| F)
 		flow off
 		FlowLog.disable // we don't care about previous file contents
-		.cpp_includes <~ s.hash|int64|.render
+		|| Hash = s.hash|int64|
+		.SourceHash ^= Hash
+		.cpp_includes <~ Hash.render
 		if F and !F.CompareData(S)
 			F.writeall(S)
 		FlowLog.enable
@@ -864,6 +862,10 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		exp.run
 		exp.WriteHeader
 		exp.FinalMergeOutputIntoACpp
+		if Options.SelfReplacement & 2
+			SCVersion.Bump(.SourceHash)
+
+		
 	
 
 	function CreateClassListHeader (|FastString| fs, |string| s)

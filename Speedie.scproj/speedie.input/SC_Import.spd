@@ -224,22 +224,6 @@ class SCImport
 		|byte|				CurrIsManuallyImported
 		|bool|				NeatenDone
 		
-		
-		function VersionFile (|file|)
-			return compiler.SpeedieProj.filechild("vers.txt")
-		
-		function VersionBump
-			|| n = .VersionNumber
-				"Bumping version"
-				|| v = .VersionFile
-				v.WriteAll((n+50).render)
-			
-		function VersionNumber (|int|)
-			opt norefcounts
-			|| v = .VersionFile
-			|| d = v.ReadAll
-				rz = d.int
-			
 			
 		function CurrFileNum (|int|)
 			if .NeatenDone

@@ -33,10 +33,9 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		StripNames				= false
-	||		BumpVersion				= false
 
 	|int8|	Optimise				= 1
-	|bool|	SelfReplacement			= 0
+	|byte|	SelfReplacement			= 0
 	|byte|	OperationCount			= 0
 	|byte|	PerryOutput				= 0
 	|bool|	HideawayScripts
@@ -67,6 +66,13 @@ module Feedback
 		cpp_part FB
 		
 	
+	function Self (|string| Value, |bool|)
+		if app.no("nocompile")
+			options.perryoutput = 1		// can't remember why. maybe just for copy/paste into perry.
+		feedback.TryUseProject( Compiler.SpeedieProj )
+		return true						// does something, counts towards operationCount
+	
+	
 	function CheckSelfModifying
 		require !Options.SingleFileInput
 		require !Options.SelfReplacement
@@ -74,7 +80,7 @@ module Feedback
 		|| p = compiler.BaseProjectPath$
 		|| spd = compiler.SpeedieProj
 		if p ~= spd
-			Options.SelfReplacement = true // isselfaltering, isselfmodifying, alteringself, modifyingself
+			Options.SelfReplacement = 1 // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.ExternalCompile = true
 			SC_Targets["self"] = true
 		  elseif p ~= compiler.jeebox
@@ -311,12 +317,9 @@ module Feedback
 			error "Missing race requested"
 			return true
 			
-		+'self' 
+		+'self'
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
-			if app.no("nocompile")
-				options.perryoutput = 1		// can't remember why. maybe just for copy/paste into perry.
-			feedback.TryUseProject( Compiler.SpeedieProj )
-			return true						// does something, counts towards operationCount
+			return .self(value)
 		
 		+'crash'
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$
@@ -338,7 +341,9 @@ module Feedback
 		
 		+'bump'
 			Explain(Purpose)$
-			Options.BumpVersion = value.optionbool
+			.self(value)
+			options.selfreplacement = 2
+			return true
 			
 		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
@@ -452,7 +457,7 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n\n v0x"
-		fs.appendhex(__speedie__)
+		fs <~ scversion.str
 		fs <~ "\nInstallation: ${file.Speediedir}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"

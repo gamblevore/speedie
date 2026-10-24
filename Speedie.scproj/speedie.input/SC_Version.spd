@@ -1,0 +1,22 @@
+
+module SCVersion	
+	function File (|config|)
+		return compiler.SpeedieProj.filechild("vers.conf").Config
+	
+	function Bump (|int64| Hash)
+		|| v = .file	
+		Hash &= (~0)>>1
+		|| s = hash.render
+		if v["hash"]!=s
+			"Bumping version"
+			v["version"] = .Num + 50
+			v["hash"] = s
+			v.save
+		
+	function Str (|string|)
+		return .File["version"]
+	
+	function Num (|int|)
+		opt norefcounts
+		return .str.int
+		
