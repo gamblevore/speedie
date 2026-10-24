@@ -2214,6 +2214,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorSeverity_Problem ((uint)3)
 #define kJB__ErrorSeverity_Warning ((uint)2)
 #define kJB__ExitCode_EINPROGRESS ((int)36)
+#define kJB__ExitCode_ENOENT ((int)2)
 #define kJB__ExitCode_SIGKILL ((int)9)
 #define kJB__FailableInt_Fail ((int)2147483648)
 #define kJB__FailableInt_Max ((int)2147483647)

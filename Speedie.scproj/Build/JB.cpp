@@ -199,15 +199,19 @@ Message* JB_App__Prefs() {
 }
 
 ExitCode JB_App__Say(JB_String* S, bool Print) {
+	ExitCode Rz = 0;
+	Rz = kJB__ExitCode_ENOENT;
 	if (Print) {
 		JB_PrintLine(S);
 	}
-	Array* _tmPf0 = (JB_Array_Constructor0(nil));
-	JB_Incr(_tmPf0);
-	JB_Array_SyntaxAppend(_tmPf0, S);
-	ExitCode _tmPf1 = JB_Str_Execute(JB_LUB[1742], _tmPf0, nil, nil, kJB__PIDM_StdOutPassThru, 0);
-	JB_EarlyDecr(_tmPf0);
-	return _tmPf1;
+	if (JB_File_Exists(JB_LUB[1742])) {
+		Array* _tmPf0 = (JB_Array_Constructor0(nil));
+		JB_Incr(_tmPf0);
+		JB_Array_SyntaxAppend(_tmPf0, S);
+		Rz = JB_Str_Execute(JB_LUB[1742], _tmPf0, nil, nil, kJB__PIDM_StdOutPassThru, 0);
+		JB_Decr(_tmPf0);
+	}
+	return Rz;
 }
 
 JB_String* JB_App__ArgValue(JB_String* Name) {
@@ -61337,4 +61341,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -5324647388561582033 8417074747559941418
+// 6010592410036834677 8417074747559941418
