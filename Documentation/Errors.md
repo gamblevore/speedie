@@ -6,7 +6,7 @@ In Speedie, we use the `#require`/`#expect`/`#error`/`#check` statements to hand
 
 Any errors you create, are stored in the global  "`StdErr`" object. Errors can be generated from any function and unlike exceptions, don't affect control-flow.
 
-heres a more full example:
+Heres a simple example:
 
     || BannedWords = ["poop", "smelly"]
     
