@@ -7,10 +7,16 @@
 |[string]| FilesMade
 |[string]| FailedLinks
 |bool| PrintMake
+|bool| IsTesting = app["test"]
 
 main
+	|| cwd = .cwd
 	.MadeFile(SpdTerm, "Compiler")
 	.LetsGo
+	.cwd = cwd
+	if IsTesting
+		return 0
+	
 	if StdErr.ok
 		app <~ "Success!"
 		
@@ -40,23 +46,23 @@ function app.LetsGo
 
 	.cwd = spd
 	|| cake = .compile("Cake", "VM")
-	|| perry = .compile("Perry", "IDE")
+	|| perry = ""
+	if !IsTesting
+		perry = .compile("Perry", "IDE")
 		
-	self <~ ("Symlinking", "symlink")
-
-	|| where = "/usr/local/bin"
-	.link("$where/spd", SpdTerm)
-	.link("$where/speedie", SpdTerm)
-	if cake
-		.link("$where/cake", cake)
-		.link("$where/🎂", cake)
-	if perry
-		.link("$where/perry", perry)
+		self <~ ("Symlinking", "symlink")
+	
+		.link("/usr/local/bin/spd", SpdTerm)
+		.link("/usr/local/bin/speedie", SpdTerm)
+		if cake
+			.link("/usr/local/bin/cake", cake)
+			.link("/usr/local/bin/🎂", cake)
+		if perry
+			.link("/usr/local/bin/perry", perry)
 
 				// Jeebox //
 	PrintMake = true
 	|| libJeebox = .compile("jeebox", "")$
-	.mkdir("/usr/local/include/")$					// Does not always exist! can you beleive it.
 	self <~ ("Install libJeebox", "Jeebox: Universal Data Format")
 	.cp(libJeebox, "/usr/local/lib/"+libJeebox.name)$
 
@@ -70,9 +76,10 @@ function app.LetsGo
 	
 	self <~ ("Compile libJeebox .cpp examples", "c++ jeebox example")
 	.compile_example("jb")
-	.compile_example("xml")
-	.compile_example("test")
-	.compile_example("users")
+	if !IsTesting
+		.compile_example("xml")
+		.compile_example("test")
+		.compile_example("users")
 
 
 function app.SyntaxAppend (|string| name, |string| type="")
@@ -126,7 +133,8 @@ function array.SplitAppend (|[string]| self, |string| name)
 
 
 function app.cp (|string| From, |string| To, |bool|)
-	if From.file.CopyTo(To.file)
+	.mkdir(to.parent)
+	if From.file.CopyTo(to)
 		return .madefile(to)
 
 	
@@ -145,9 +153,6 @@ function app.BuildSDL2 (|string| P)
 	self <~ "Checking for SDL2"
 	|| Header = "/usr/local/include/SDL2/SDL.h"
 	if header.FileExists
-		if !FileDes.stdout.isterminal
-			"SDL2 already installed"
-			return
 		require  !app.ask("SDL2 is already detected at $header.", "Skip SDL2 Update?")
 
 	self <~ "Building SDL2"
@@ -220,6 +225,9 @@ function array.operatormul (|[string]| self, |byte| c, |string|)
 
 function app.Ask (|string| Prefix, |string| Q,   |bool|)
 	print prefix
+	if IsTesting or !FileDes.stdout.isterminal
+		return true
+	
 	if app["y"] or app["n"]
 		""
 		return app["y"]
