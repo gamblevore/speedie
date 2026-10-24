@@ -430,6 +430,54 @@ Now lets look at Speedie's version:
 Wow. Same code... same result, but Speedie is just clear and simple.
 
 
+### Rust Example
+
+When I look for Rust examples online, I find them bloated and confusing. Simple things get complex, syntacically complex. But the examples fall always in to two kinds. "Parse integer", and "file-system".
+
+Both of those... aren't fair comparisons, in both ways. "file-system" examples speedie wins cos of it's inbuilt error-handling.
+
+    use std::env;
+    
+    fn double_arg(mut argv: env::Args) -> Result<i32, String> {
+        argv.nth(1)
+            .ok_or("Please give at least one argument".to_owned())
+            .and_then(|arg| arg.parse::<i32>().map_err(|err| err.to_string()))
+            .map(|n| 2 * n)
+    }
+    
+    fn main() {
+        match double_arg(env::args()) {
+            Ok(n) => println!("{}", n),
+            Err(err) => println!("Error: {}", err),
+        }
+    }
+    
+
+
+For "parse integer" rust usually won on simplicity with it's `Result` type. However even a `Result<(), u8>` takes 16-bytes. Which doesn't fit into a single register, so returning that requires 16-bytes stack-allocation plus a register to it. Its is a lot of low-level overhead.
+
+Rust is just not being fast here. Isn't that the whole point of Rust. "Fast and safe"? What are we doing on a low-level? Trying to win over-strict contests. Or... get stuff done. So lets try to get stuff done.
+
+How often do use (1<<63) as an int. (negative nine quintillion and two hundred something etc etc). Not really? So... why not just use it to mean "can't parse".
+
+What you really want is a `ParsedInt` type. So lets try Speedie's `ParsedInt` type, which is a 64-bit int, where the most positive allowed value equals the most negative allowed value. And `1<<63`, (which used to be most negative value) means fail.
+
+Speedie Version:
+
+    function double_arg (|[string]| args, |ParsedInt|)
+        || first = args[0]
+        first ?= app.input("Please give at least one argument")
+        || Value = first.parseint
+            return value * 2
+        
+    main
+        || double = double_arg(app.args)
+            printline double
+            
+Simpler and faster! Because we rely on `string.parseint`, which creates an error internally anyhow, then returns if the parse was successful and the integer in one 64-bit register. We lose the number -9,223,372,036,854,775,808, but its an acceptable loss. To make things more practical is always fair way to pass test.
+
+If you really need all values, you can use `string.int`, but now we lose the ability to easily check.
+
 
 # Conclusion:
 
