@@ -1,1 +1,5 @@
-/usr/local/speedie/make.sh
+#!/usr/local/bin/spd
+
+|| spd = file.speediedir
+main
+	return (spd+"/make.sh").execute(["--test"])
