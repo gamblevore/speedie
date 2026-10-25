@@ -1381,7 +1381,6 @@ JB_Str_First
 JB_Str_GetComponent
 JB_Str_GlobExpand
 JB_Str_HasName
-JB_Str_Hex
 JB_Str_HexIntegerSection
 JB_Str_InByte
 JB_Str_InStr
