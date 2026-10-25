@@ -37,7 +37,11 @@ function BackupPath (|string|)
 
 
 function ProductBaseName (|string|)
-	return compiler.projectname + Compiler.VariantSuffix
+	|| fs = FastString()
+	fs <~ ("lib", options.projectislibrary|int|)
+	fs <~ compiler.projectname
+	fs <~ compiler.variantsuffix
+	return fs
 
 function ProductNameFull (|string|)
 	return .ProductBaseName + .ProductSuffix
@@ -97,7 +101,7 @@ function ProjTmpPath (|string|)
 
 
 function LibTmpPath (|string|)
-	return .tmpbase("Lib", true) + .LibSuff
+	return .tmpbase("lib", true) + .LibSuff
 
 
 ////////////////////////////////////////////////////////////////////////////////

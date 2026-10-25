@@ -10357,11 +10357,17 @@ JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile) {
 }
 
 JB_String* SC_Ext__ProductBaseName() {
+	FastString* Fs = JB_FS_Constructor(nil);
+	JB_Incr(Fs);
+	JB_FS_AppendMultiStr(Fs, JB_LUB[885], ((int)SC__Options_ProjectIsLibrary));
+	JB_FS_AppendString(Fs, SC__Comp_ProjectName);
 	JB_String* _tmPf0 = SC_Comp__VariantSuffix();
 	JB_Incr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(SC__Comp_ProjectName, _tmPf0);
-	JB_Incr(_tmPf1);
+	JB_FS_AppendString(Fs, _tmPf0);
 	JB_EarlyDecr(_tmPf0);
+	JB_String* _tmPf1 = JB_FS_SyntaxCast(Fs);
+	JB_Incr(_tmPf1);
+	JB_EarlyDecr(Fs);
 	JB_SafeDecr(_tmPf1);
 	return _tmPf1;
 }
@@ -61353,4 +61359,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 102268450389953932 7952873920498268895
+// 102268450389953932 -2982574137466988971
