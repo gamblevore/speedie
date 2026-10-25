@@ -13998,10 +13998,7 @@ SCObject* SC_TypeOfChar(Message* Exp, SCNode* Name_space, Message* Side) {
 
 SCObject* SC_TypeOfDot(Message* Exp, SCNode* Name_space, Message* Side) {
 	Message* L = ((Message*)JB_Ring_Last(Exp));
-	if (!L) {
-		return nil;
-	}
-	if (L->Obj) {
+	if (!(L and (!L->Obj))) {
 		return nil;
 	}
 	SCNode* DotVar = ((SCNode*)SC_Msg_DotSpace(((Message*)JB_Ring_First(Exp)), Name_space));
@@ -14010,8 +14007,7 @@ SCObject* SC_TypeOfDot(Message* Exp, SCNode* Name_space, Message* Side) {
 		return nil;
 	}
 	SCDecl* Contains = nil;
-	bool DotVarIsaDecl = (JB_Object_Isa(DotVar, &SCDeclData));
-	if (DotVarIsaDecl) {
+	if ((JB_Object_Isa(DotVar, &SCDeclData)) or 0) {
 		SCDecl* Swiz = SC_TypeOfSwizzle(Exp, Name_space, Side, ((SCDecl*)DotVar));
 		if (Swiz) {
 			return Swiz;
@@ -14022,11 +14018,9 @@ SCObject* SC_TypeOfDot(Message* Exp, SCNode* Name_space, Message* Side) {
 			Contains = ((SCClass*)DotVar)->Contained;
 		}
 	}
-	 else {
-		if (!(JB_Object_Isa(DotVar, &SCClassData) or JB_Object_Isa(DotVar, &SCModuleData))) {
-			JB_Msg_Fail(Exp, JB_LUB[1095]);
-			return nil;
-		}
+	if (!(JB_Object_Isa(DotVar, &SCClassData) or JB_Object_Isa(DotVar, &SCModuleData))) {
+		JB_Msg_Fail(Exp, JB_LUB[1095]);
+		return nil;
 	}
 	JB_Object* O = SC_Base_LookUpDot(DotVar, Exp->Name, Exp, Name_space, Contains, Side);
 	if (!O) {
@@ -14466,10 +14460,8 @@ SCObject* SC_TypeOfNum(Message* Exp, SCNode* Name_space, Message* Side) {
 
 SCObject* SC_TypeOfNumSub(Message* Exp, SCNode* Name_space, Message* Side) {
 	JB_String* N = Exp->Name;
-	JB_Incr(N);
 	if (JB_Str_ContainsString(N, JB_LUB[392])) {
 		SCDecl* D = SC_Decl_CopyDecl(SC_Typefloat->TypeNormal, false);
-		JB_Incr(D);
 		Float64 F8 = JB_Msg_Float(Exp);
 		if ((SC_Decl_CArraySize(D, 1) == 4) and (!Side)) {
 			(SC_Decl_NumberConstSet(D, JB_f_AsInt(((float)F8))));
@@ -14477,19 +14469,14 @@ SCObject* SC_TypeOfNumSub(Message* Exp, SCNode* Name_space, Message* Side) {
 		 else {
 			(SC_Decl_NumberConstSet(D, JB_dbl_AsInt(F8)));
 		}
-		JB_EarlyDecr(N);
-		JB_SafeDecr(D);
 		return D;
 	}
-	JB_Decr(N);
 	int64 Val = JB_Msg_Int(Exp, 0);
 	SCDecl* D2 = SC_Decl_CopyDecl(SC_TypeInt->TypeNormal, false);
-	JB_Incr(D2);
 	if ((((Val << 32) >> 32) != Val) or Side) {
 		JB_SetRef(D2->Type, SC_TypeInt64);
 	}
 	(SC_Decl_NumberConstSet(D2, Val));
-	JB_SafeDecr(D2);
 	return D2;
 }
 
@@ -37293,26 +37280,18 @@ JB_String* SC_Msg_CollectFuncTableName(Message* Self) {
 
 Message* SC_Msg_CollectionPlace(Message* Self) {
 	Message* Msg = Self;
-	JB_Incr(Msg);
 	while (Msg) {
 		Message* P = ((Message*)JB_Ring_Parent(Msg));
-		JB_Incr(P);
 		if ((JB_Msg_EqualsSyx(Msg, kJB_SyxArg))) {
 			if (!P) {
-				JB_EarlyDecr(P);
-				JB_SafeDecr(Msg);
 				return Msg;
 			}
 			if (SC_Msg_OperatorIsTmp(P, JB_LUB[1636]) or SC_Msg_OperatorIsTmp(P, JB_LUB[1961])) {
-				JB_EarlyDecr(P);
-				JB_SafeDecr(Msg);
 				return Msg;
 			}
 		}
-		JB_SetRef(Msg, P);
-		JB_Decr(P);
+		Msg = P;
 	};
-	JB_EarlyDecr(Msg);
 	return nil;
 }
 
@@ -61345,4 +61324,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1225480830030589048 -6198598730151666335
+// -1225480830030589048 -6856428999769387129

@@ -1092,7 +1092,7 @@
 "NoRefCounts"
 "Node contains option-space"
 "Not a boolean value: '"
-"Not a class or module."
+"Not a class or module."
 "Not a constant"
 "Not a container class."
 "Not a number"
