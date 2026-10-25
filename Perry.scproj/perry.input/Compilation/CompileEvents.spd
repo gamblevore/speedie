@@ -2,26 +2,40 @@
 
 function ClickedCompile (GUIAction)
 	opt norefcounts
-	|| i = .ide
-	|| mode = i.WantCake(CompileMode.compiling)
-		i.compile(mode)
+	.ide.WantCompile(CompileMode.compiling)
 
 
-function perryide.WantCake (|CompileMode| Mode, |compilemode|)
+function perryide.WantCompile (|CompileMode| Mode)
 	opt norefcounts
+
+	if .IsBuilding			// They pressed it twice
+		.DebugMode = 0
+		if !.ExpandCompileSep					// Appeared to do nothing
+			ClickedCancel(.BuildButton)			// might as well just do the next thing then
+		return
+
 	|| DebugArgs = .DebugArgs
-		|| req = DebugArgs["compile"]
-			if req ~= "cake"
-				(mode is cakemode)
-			  elseif req ~= "cpp"
-				(mode isnt cakemode)
-			  else
-				Notifications <~ "Unrecognised compile mode: " + req.name
-	  else
+	if !DebugArgs
 		.RunArgsText.SetFocus
 		notifications <~ "Please fix the debug args first."
-		mode = nil	
-	return mode	
+		return	
+
+	|| req = DebugArgs["compile"]
+		if req ~= "cake"
+			(mode is cakemode)
+		  elseif req ~= "cpp"
+			(mode isnt cakemode)
+		  else
+			Notifications <~ "Unrecognised compile mode: " + req.name
+
+	if (mode isnt cakemode) and (mode is debug)
+		(mode isnt debug)
+		(mode is run)
+	
+	(mode is compiling)
+	.DebugMode = mode
+	.Actual_Compile
+	.ShowOutput
 
 
 function ClickedDebug (GUIAction)
@@ -30,36 +44,22 @@ function ClickedDebug (GUIAction)
 	if (.text == "\07")				// stop
 		i.Stop(i.RunningProd)
 		return nil
-	return i.start
+	return i.StartDebug
 	
 
-function perryide.Start (|bool|)
+function perryide.StartDebug (|bool|)
 	if .MakeNothingRunning(" before debugging?")
-		|| CakeMode = .WantCake(CompileMode.CakeMode ||| compilemode.DebugSet)
-			.compile(CakeMode)
-			.Showoutput
+		.WantCompile(CompileMode.CakeMode ||| compilemode.DebugSet)
 	return true
 
 
 function Perryide.ShowOutput
 	opt norefcounts
 	.ShowText(.ProductOut, "", false)
-	|| itm = .CompileTabs.ButtonSource[3]
+	|| itm = .CompileTab(3)
 		(itm is hidden)
 	.ProductErrors.text = ""
 
-
-function PerryIDE.Compile (|CompileMode| Mode)
-	if !.IsBuilding
-		(mode is compiling)
-		.DebugMode = mode
-		.Actual_Compile
-		return
-
-	// They pressed it twice
-	.DebugMode = 0
-	if !.ExpandCompileSep					// appeared to do nothing
-		ClickedCancel(.BuildButton)			// might as well just do the next thing then
 
 
 function PerryIDE.DebugArgs (|message|)
@@ -82,16 +82,14 @@ function PerryIDE.GUIIsCompiling (|[string]| args)
 
 
 function PerryIDE.RunCompileSub (|unixprocess?| r)
-	if r and r.PID or (r isa SpdProcess)
-		.RunningProd = r
-		if r isa SpdProcess
-			|| btn = .DebugBtns.last
-				btn.text = "\0E" // pause
+	require  r
+	require r.PID or (r isa SpdProcess)
+	.RunningProd = r
+	if r isa SpdProcess
+		|| btn = .DebugBtns.last
+			btn.text = "\0E" // pause
 
-		.ShowProductIfMoreOutput = 0
-		.RunButton.text = "\07"
-		.SetAppInfo
-
-
-
+	.ShowProductIfMoreOutput = 0
+	.RunButton.text = "\07"
+	.SetAppInfo
 

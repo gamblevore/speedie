@@ -155,7 +155,7 @@ extend PerryIDE
 		|| d = .DebugMode
 		(d isnt compiling)
 		.DebugMode = d
-		.RenableAfterCompile
+		.ReenableAfterCompile
 		return true
 
 
@@ -167,8 +167,7 @@ extend PerryIDE
 		require !IsRunning or Killed
 
 		.DebugMode &= ~CompileMode.Compiling
-		// can we call .crashlog? lets say... c.status.crashed?
-		// simplify this?
+
 		|| Bad = .CheckCrashed(c,  "compiler")
 		|| Errors = c.readstderr
 		.compilr = nil
@@ -180,7 +179,7 @@ extend PerryIDE
 			if !killed
 				.ShowCompileOK("compile")
 			.CompiledOK(killed)
-		.RenableAfterCompile
+		.ReenableAfterCompile
 
 
 	function Say (|string| str)
@@ -241,17 +240,17 @@ extend PerryIDE
 			Notifications <~ "Nothing is building"
 			beep
 		.debugmode = 0
-		return .RenableAfterCompile
+		return .ReenableAfterCompile
 
 
-	function RenableAfterCompile (|bool|)
+	function ReenableAfterCompile (|bool|)
 		|| code = .ProjectIsCode
 		(.buildbutton is enabled) = code
 		(.runbutton is enabled) = code
 		(.buildbutton is visible)
 		(.progress isnt visible)
 		.HideStuff
-		isnt active
+		.debugmodesub(.debugmode)
 		return true
 
 

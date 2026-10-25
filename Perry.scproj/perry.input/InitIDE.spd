@@ -54,7 +54,7 @@ extend PerryIDE
 		.SpeedieText		= TextView(self)
 		.ProductOut			= TextView(self)
 		.ProductErrors		= TextView(self)
-		.CompileTabs		= Button(.CompileArea,	ClickedCompileTabs)
+		.BottomCompileTabs		= Button(.CompileArea,	ClickedCompileTabs)
 		.UnNeededLabel		= TextView(self,		ClickedNoNeed)
 		.AutoComplete		= menu(self,			AutoCompleteKeys,		AutoCompleteInsertText)
 		.ViewFiles			= Button(.ViewButtons,	ClickedAView)
@@ -515,7 +515,7 @@ extend PerryIDE
 			.GNormal.CornersCut = 6
 			.GNormal.CornerSize = 6
 
-		with .CompileTabs
+		with .BottomCompileTabs
 			.id = "CompileTabs"
 			.size = the~width by 18~down
 			.itemwidth = 101

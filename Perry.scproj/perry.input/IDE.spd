@@ -70,7 +70,7 @@ class PerryIDE (Window)
 	|Button|					CommandsMenu
 	|Button|					Toolbar
 	|Button|					ProjectTabs
-	|Button|					CompileTabs // compilertabs
+	|Button|					BottomCompileTabs // compilertabs
 	|Button|					SubFindCheckBox
 	|Button|					ViewErrors
 	|Button|					ViewFiles
@@ -605,7 +605,7 @@ class PerryIDE (Window)
 	
 	
 	function Flip (|textview| s, |bool|)
-		|| Item = .compiletabs.selected
+		|| Item = .BottomCompileTabs.selected
 		if item  and  .ProductSep.isopen  and item.obj == s
 			.ProductSep.Collapsed = true
 			return false

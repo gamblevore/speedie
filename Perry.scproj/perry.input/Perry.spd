@@ -181,7 +181,7 @@ function SetTab2Name (|message| old)
 	|| f = old[@nil]
 		f.name = f.name.ProjCleanName
 		.id = "IDE: " + f.name
-		|| ii = .CompileTabs.ButtonSource[@nil, 2]
+		|| ii = .CompileTab(2)
 			ii.name = f.name + "[]"
 
 
@@ -250,7 +250,7 @@ function ShowCompileCutely (|bool| Always=false)
 
 
 function OutText (|textview|)
-	|| row = .CompileTabs.Selected
+	|| row = .BottomCompileTabs.Selected
 		return row.obj as TextView
 
 

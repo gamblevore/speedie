@@ -71,7 +71,7 @@ function PerryIDE.ShowCompileTab (|object| tab) // showtab
 
 function PerryIDE.CompileTabSelect (|object| Desired)	
 	opt norefcounts
-	for i in .CompileTabs.ButtonSource
+	for i in .BottomCompileTabs.ButtonSource
 		|| obj = i.obj as textview
 			|| vis = (Desired == i or obj)
 			(i is selected)  = vis

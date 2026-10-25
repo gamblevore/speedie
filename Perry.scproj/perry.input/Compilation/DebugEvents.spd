@@ -3,12 +3,12 @@
 datatype CompileMode (int)
 	flags
 		|CompileMode|
-		Compiling
-		Debug
-		Run
-		CakeMode
-		ReceivedHello
-		Paused
+		Compiling	// 1
+		Debug		// 2
+		Run			// 4
+		CakeMode	// 8
+		ReceivedHello // 16
+		Paused		// 32
 		Finished
 		Crashed
 		DebugSet = Debug // easier to search for. now I know which places set it.
@@ -64,7 +64,7 @@ function PerryAppInfoKeys (GUIKeyEvent) // debugkeys
 	if key.IsAccept or (key is SPACE)
 		if i.RunningProd
 			return i.debugstepevent
-		return (key is space) or i.start
+		return (key is space) or i.StartDebug
 	
 	if !i.RunningProd
 		if !key.IsModifier
@@ -203,7 +203,7 @@ function PerryIDE.DebugPath (|message| conf)
 
 
 function PerryIDE.CompileTab (|int| i, |listviewrow|) // for autocomplete
-	return .CompileTabs.ButtonSource[i]
+	return .BottomCompileTabs.ButtonSource[i]
 
 
 function PerryIDE.AddProductErr (|string| err)
@@ -248,10 +248,10 @@ function PerryIDE.ClearRun
 	.RunButton.text = "\02"
 	.DelayedRun = nil
 	.lastcakeerror = nil
-	.SetAppInfo
 	.RunningProd = nil
 	.editme.DebugLevel = TextView.DebugLevelOff	
 	.stack.clear
+	.SetAppInfo
 	
 		
 function PerryIDE.UpdateDebuggedApp (|bool| Kill, |bool|)
@@ -336,21 +336,25 @@ function PerryIDE.DebugMode (|CompileMode|)
 
 
 function PerryIDE.DebugMode (assigns:|CompileMode|)
+	if (._DebugMode != value)
+		.debugmodesub(value)
+
+
+function PerryIDE.DebugModeSub (|CompileMode| value)
 	opt norefcounts
-	require ._DebugMode != value
 
 	for btn in .DebugBtns
 		btn.Decluttered = value isnt debug
 
 	._DebugMode = value
 	(self is preparing) = value is compiling
-	|| Active = (value is Run or debug) and (value is ReceivedHello)
-
-	|| r = .CompileTabs.ListSource[2]
+	|| Active = (value is Run or debug) and (value is ReceivedHello or value isnt debug)
+//	.LogOneAction( "debug: ${value|int64|.hex}, active: $active\n${app.stacktrace}" )
+	|| r = .CompileTab(2)
 		(r is Active) = Active
 		
 	(self is active) = Active
-//	|| btn = .debugbtns[3]
+//	|| btn = .productout
 //		(btn is activelyspinning) = Active
 
 	.EditMe.DebugLevel = .DebugLevel(value)

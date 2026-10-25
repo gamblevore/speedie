@@ -5,7 +5,7 @@ function PerryIDE.ACTUAL_COMPILE
 	require .FileList.SaveAll(documentaction.saving, .CurrFileRow)
 
 	// so should I save this here? Or in saveall?
-	// lets try here. Why not... in the textview itself?
+	// lets try here. Why not... in the TextView itself?
 	// it would need to know whether to save or not...
 
 	|| args = ["--nocolor"]

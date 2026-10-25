@@ -178,9 +178,13 @@ function SetAppInfo
 	|| fs = VarPrinter
 	fs.Length = 0
 	fs.AppendRange(.project, .project.namepart)
+	|| d = .DebugMode
+	(d isnt run)
 	|| r = .RunningProd
 		fs <~ ": "
+		(d is run) = r.Status.IsRunning
 		fs <~ r.pid
+	.DebugMode = d
 
 	|| Info = .AppInfo.obj as message
 	|| extra = .AppInfoExtra(r)
