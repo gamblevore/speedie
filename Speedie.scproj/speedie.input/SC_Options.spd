@@ -457,7 +457,7 @@ module Feedback
 		fs <~ "Usage: "
 		fs <~ app.filename
 		fs <~ " /path/to/project\n\n v0x"
-		fs <~ scversion.str
+		fs <~ scversion.hex
 		fs <~ "\nInstallation: ${file.Speediedir}"
 		fs <~ "  Platform: ${platform.Name}+${platform.cpu_name}"
 		fs <~ "  SelfFlow: ${target~flow}"

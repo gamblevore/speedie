@@ -3333,7 +3333,7 @@ void SC_FB__Help() {
 	JB_FS_AppendString(Fs, _tmPf7);
 	JB_Decr(_tmPf7);
 	JB_FS_AppendString(Fs, JB_LUB[150]);
-	JB_String* _tmPf8 = SC_SCVersion__Str();
+	JB_String* _tmPf8 = SC_SCVersion__Hex();
 	JB_Incr(_tmPf8);
 	JB_FS_AppendString(Fs, _tmPf8);
 	JB_Decr(_tmPf8);
@@ -9161,6 +9161,10 @@ Message* SC_SCVersion__File() {
 	return JB_File_Config(JB_Str_ChildFile(SC_Comp__SpeedieProj(), JB_LUB[2389]), 1048576);
 }
 
+JB_String* SC_SCVersion__Hex() {
+	return JB_int64_Hex(((int64)SC_SCVersion__Num()), nil);
+}
+
 int SC_SCVersion__Num() {
 	return JB_Str_TextIntegerSection(SC_SCVersion__Str(), 0, nil, 0);
 }
@@ -10142,7 +10146,7 @@ int SC_Ext__Init_() {
 }
 
 void SC_Ext__InstallCompiler() {
-	JB_String* _tmPf2 = SC_SCVersion__Str();
+	JB_String* _tmPf2 = SC_SCVersion__Hex();
 	JB_Incr(_tmPf2);
 	JB_String* _tmPf1 = JB_Str_OperatorPlus(JB_LUB[817], _tmPf2);
 	JB_Incr(_tmPf1);
@@ -15636,6 +15640,12 @@ bool SC_int64_Fits(int64 Self, int Amount, bool Signed) {
 		X = (((uint64)X) >> Sh);
 	}
 	return X == Self;
+}
+
+JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	JB_FS_AppendHex(Fs, Self, 2);
+	return JB_FS_SmartResult(Fs, Fs_in);
 }
 
 bool JB_int64_IsPow2(int64 Self) {
@@ -61358,4 +61368,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 102268450389953932 -2982574137466988971
+// 5357474761578961359 -2982574137466988971

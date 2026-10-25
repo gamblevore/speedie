@@ -19,6 +19,10 @@ module SCVersion
 		opt norefcounts
 		return .File["version"]
 	
+	function Hex (|string|)
+		opt norefcounts
+		return .num|int64|.hex
+	
 	function Num (|int|)
 		opt norefcounts
 		return .str.int

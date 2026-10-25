@@ -3729,6 +3729,8 @@ void SC_SCVersion__Bump(int64 Hash);
 
 Message* SC_SCVersion__File();
 
+JB_String* SC_SCVersion__Hex();
+
 int SC_SCVersion__Num();
 
 JB_String* SC_SCVersion__Str();
@@ -4435,6 +4437,8 @@ int SC_int64_BitsNeeded(int64 Self);
 bool SC_int64_CanStoreAsAddK(int64 Self);
 
 bool SC_int64_Fits(int64 Self, int Amount, bool Signed);
+
+JB_String* JB_int64_Hex(int64 Self, FastString* Fs_in);
 
 bool JB_int64_IsPow2(int64 Self);
 
