@@ -10359,7 +10359,6 @@ JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile) {
 JB_String* SC_Ext__ProductBaseName() {
 	FastString* Fs = JB_FS_Constructor(nil);
 	JB_Incr(Fs);
-	JB_FS_AppendMultiStr(Fs, JB_LUB[885], ((int)SC__Options_ProjectIsLibrary));
 	JB_FS_AppendString(Fs, SC__Comp_ProjectName);
 	JB_String* _tmPf0 = SC_Comp__VariantSuffix();
 	JB_Incr(_tmPf0);
