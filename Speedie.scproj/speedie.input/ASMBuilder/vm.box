@@ -54,6 +54,13 @@ forms
 		RSmall	1
 		Jmp		j
 
+	JCmpEq2
+		Jmp		j
+		r1		r
+		r2		r
+		LSmall	1
+		RSmall	1
+
 	HALT
 		Reserved l
 
@@ -82,37 +89,17 @@ forms
 		Cmp		4
 		Jmp		j
 
-	CmpI
-		r1		R
-		r2		r
-		r3		r
-		Cmp		4
-
-	CmpF
-		r1		R
-		r2		r
-		r3		r
-		Cmp		4
-
 	JCmpF
 		r1		r
 		r2		r
 		Cmp		3
 		Jmp		j
 
-	Compare4
-		r1		R
-		r2		r
-		r3		r
-		r4		r
-		Small	1
-		
-		
-	JCmpK // assume signed?
+	JCmpK
 		r1		r
 		K		9
 		Jmp		j
-
+		
 	Bra		// bra:
 		r1		r
 		Small	1
@@ -128,7 +115,61 @@ forms
 		r2		r
 		Small	1
 		Jmp		j
+
+	JCmpK2
+		Jmp		j
+		r1		r
+		K		9 // signed
+
+	JCmpI2
+		Jmp		j
+		r1		r
+		r2		r
+		Cmp		4
+
+	JCmpF2
+		Jmp		j
+		r1		r
+		r2		r
+		Cmp		3
+
+	Bra2		// bra:
+		Jmp		j
+		r1		r
+		Small	1
+		
+	JBitTest2
+		Jmp		j
+		r1		r
+		Sh		6
 	
+	Loop2
+		Jmp		j
+		r1		R // assume one is an int64?
+		r2		r
+		Small	1
+
+
+	CmpI
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
+	CmpF
+		r1		R
+		r2		r
+		r3		r
+		Cmp		4
+
+	Compare4
+		r1		R
+		r2		r
+		r3		r
+		r4		r
+		Small	1
+		
+		
 	GTable
 		r1		R
 		Mode	1
@@ -559,47 +600,47 @@ POS 5
 		Code += Jump_JUMPi
 
 
-/**/ JMPI  (JCmpI)
+/**/ JMPI  (JCmpI2)
 		Code = JumpI(r, Op, Code)
 
 /**/ JMPF  (JCmpF)
 		Code = JumpF(r, Op, Code)
 
-/**/ JMPE  (JCmpEq)
+/**/ JMPE  (JCmpEq2)
 		Code = JumpEq(r, Op, Code)
 
-/**/ JMPN  (JCmpEq)
+/**/ JMPN  (JCmpEq2)
 		Code = JumpNeq(r, Op, Code)
 
-/**/ JMKM  (JCmpK)						// (jump more)
+/**/ JMKM  (JCmpK2)						// (jump more)
 		Code = JumpK(r, Op, Code)
 
-/**/ JMKL  (JCmpK)						// (jump less)
+/**/ JMKL  (JCmpK2)						// (jump less)
 		Code = JumpKN(r, Op, Code)
 
-/**/ JMKE  (JCmpK)
+/**/ JMKE  (JCmpK2)
 		Code = JumpKE(r, Op, Code)
 
-/**/ JMKN  (JCmpK) 
+/**/ JMKN  (JCmpK2)
 		Code = JumpKNE(r, Op, Code)
 	
-/**/ JBOR  (Bra)
+/**/ JBOR  (Bra2)
 		if (u1<<(Bra_Smallu<<5))
 			Code += Bra_Jmpi
 
-/**/ JBAN  (Bra)				
+/**/ JBAN  (Bra2)				
 		if (!(u1<<(Bra_Smallu<<5)))
 			Code += Bra_Jmpi
 
-/**/ LUPU  (Loop)
+/**/ LUPU  (Loop2)
 		if (ii1++ < ii2)
 			Code += Loop_Jmpi
 
-/**/ LUPD  (Loop)
+/**/ LUPD  (Loop2)
 		if (ii1-- > ii2)
 			Code += Loop_Jmpi
 
-/**/ JTST  (JBitTest)				
+/**/ JTST  (JBitTest2)				
 		if (!(u1&(1ull<<JBitTest_Shu)))
 			Code += JBitTest_Jmpi
 

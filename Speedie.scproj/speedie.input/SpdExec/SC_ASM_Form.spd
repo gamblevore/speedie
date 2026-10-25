@@ -29,20 +29,22 @@ class µForm
 		for line.fast in Arg
 			|| f = line.NeedFirst
 			.LoadParam(f.name, line)
-//		if .RegForJump
-//			.SetRemainder( µparam.signed + µparam.jump, 0 )
+		if .RegForJump
+			.FillRemainder(0)
 
 
-	function AddParamSub (|int| Size, |µParam| P, |int | i)
-		if size <= 0 or size > 32 // hmm??
+	function FillParam (|int| Size, |µParam| P, |int | i)
+		if size < 0 or size > 32 // hmm??
 		expect (i < –count .params) ("Defined too many ASM params")
-		.totalbits += size
-		p |= Size - 1
+		if size
+			.totalbits += size
+			p |= Size - 1
 		.params[i] = p	
+
 
 	function AddParam (|int| Size, |µParam| P, |int|)
 		|| i = .count++
-		.AddParamSub(Size, P, i)
+		.FillParam(Size, P, i)
 		if p is jump
 			.RegForJump = i+1
 		return i
@@ -54,7 +56,7 @@ class µForm
 	
 
 	function FillRemainder (|int| i)
-		.AddParamSub(24 - .TotalBits, .Params[i], 0)
+		.FillParam(24 - .TotalBits, .Params[i], 0)
 	
 	
 	function LoadParam (|string| pl, |message| Line)
@@ -81,9 +83,7 @@ class µForm
 			.FillRemainder(i)
 		  elseif p == 'j'
 			.RegForJump = 1
-			|| i = .AddParam( 0, µparam.signed + µparam.jump ) 
-			.FillRemainder(i)
-//			.AddParam( 0, µparam.signed + µparam.jump )
+			.AddParam( 0, µparam.signed + µparam.jump ) 
 //			expect (line.IsFirst) (line)
 		  elseif Line
 			error (Line)

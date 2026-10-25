@@ -173,15 +173,15 @@ extend Assembler
 			|| LS = L.isSmall|int|
 			if RS
 				|| K = .Const(L, 9, L.signed)
-					fat = exp.JMKE(R, K, 0)
+					fat = exp.JMKE(0, R, K)
 					if negate
 						fat._op = asm.JMKN
 			if !fat
-				fat = exp.JMPN(l, r, LS, RS, 0)
+				fat = exp.JMPN(0, l, r, LS, RS)
 				if !negate
 					fat._op = asm.jmpe
 		  else
-			fat = exp.JBAN(r, RS, 0)
+			fat = exp.JBAN(0, r, RS)
 			if negate
 				fat._op = asm.JBOR
 		if 0: exp.JMKN, exp.JMPE, exp.JBOR
@@ -234,7 +234,7 @@ extend Assembler
 		require l.issmall and k.fits(9, true)	
 		.NopTempConst(R)
 		k = k|uint64|.trim(9)
-		|| J = exp.JMKM(l, k)
+		|| J = exp.JMKM(0, l, k)
 		if 0: exp.JMKL
 		j._op += (mode&1)						// .JMPL
 		return J * dest
@@ -268,7 +268,7 @@ extend Assembler
 		|| kk = .JumpIntK(dest, l, r, exp, mode)		// but for if-branches that means false. So we negate.
 			return kk
 		
-		return exp.JMPI(L, R, mode, 0) * dest
+		return exp.JMPI(0, L, R, mode) * dest
 
 
 	function ConstCompareFloat (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |int| Mode, |asmreg|)

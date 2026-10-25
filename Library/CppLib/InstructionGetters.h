@@ -38,6 +38,9 @@
 #define	JCmpEq_Jmpi		((( int)((Op)<<20))>>20)
 #define	JCmpEq_Jmpu		(((uint)((Op)<<20))>>20)
 
+#define	JCmpEq2_Jmpi		((( int)((Op)<<8))>>8)
+#define	JCmpEq2_Jmpu		(((uint)((Op)<<8))>>8)
+
 #define	HALT_Reservedi		((( int)((Op)<<8))>>8)
 #define	HALT_Reservedu		(((uint)((Op)<<8))>>8)
 
@@ -55,19 +58,10 @@
 #define	JCmpI_Jmpi		((( int)((Op)<<22))>>22)
 #define	JCmpI_Jmpu		(((uint)((Op)<<22))>>22)
 
-#define	CmpI_Cmpi		((( int)((Op)<<23))>>28)
-#define	CmpI_Cmpu		(((uint)((Op)<<23))>>28)
-
-#define	CmpF_Cmpi		((( int)((Op)<<23))>>28)
-#define	CmpF_Cmpu		(((uint)((Op)<<23))>>28)
-
 #define	JCmpF_Cmpi		((( int)((Op)<<18))>>29)
 #define	JCmpF_Cmpu		(((uint)((Op)<<18))>>29)
 #define	JCmpF_Jmpi		((( int)((Op)<<21))>>21)
 #define	JCmpF_Jmpu		(((uint)((Op)<<21))>>21)
-
-#define	Compare4_Smalli		((( int)((Op)<<28))>>31)
-#define	Compare4_Smallu		(((uint)((Op)<<28))>>31)
 
 #define	JCmpK_Ki		((( int)((Op)<<13))>>23)
 #define	JCmpK_Ku		(((uint)((Op)<<13))>>23)
@@ -88,6 +82,33 @@
 #define	Loop_Smallu		(((uint)((Op)<<18))>>31)
 #define	Loop_Jmpi		((( int)((Op)<<19))>>19)
 #define	Loop_Jmpu		(((uint)((Op)<<19))>>19)
+
+#define	JCmpK2_Jmpi		((( int)((Op)<<8))>>8)
+#define	JCmpK2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	JCmpI2_Jmpi		((( int)((Op)<<8))>>8)
+#define	JCmpI2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	JCmpF2_Jmpi		((( int)((Op)<<8))>>8)
+#define	JCmpF2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	Bra2_Jmpi		((( int)((Op)<<8))>>8)
+#define	Bra2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	JBitTest2_Jmpi		((( int)((Op)<<8))>>8)
+#define	JBitTest2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	Loop2_Jmpi		((( int)((Op)<<8))>>8)
+#define	Loop2_Jmpu		(((uint)((Op)<<8))>>8)
+
+#define	CmpI_Cmpi		((( int)((Op)<<23))>>28)
+#define	CmpI_Cmpu		(((uint)((Op)<<23))>>28)
+
+#define	CmpF_Cmpi		((( int)((Op)<<23))>>28)
+#define	CmpF_Cmpu		(((uint)((Op)<<23))>>28)
+
+#define	Compare4_Smalli		((( int)((Op)<<28))>>31)
+#define	Compare4_Smallu		(((uint)((Op)<<28))>>31)
 
 #define	GTable_Modei		((( int)((Op)<<13))>>31)
 #define	GTable_Modeu		(((uint)((Op)<<13))>>31)
