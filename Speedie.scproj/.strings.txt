@@ -323,7 +323,7 @@
 "-D AS_LIBRARY=1"
 "-D __VM__"
 "-march=core2  -mfpmath=sse  -mmmx  -msse  -msse2  -msse4.1  -msse4.2"
-"-I /usr/local/include"
+"-I/usr/local/include"
 "-L"
 "-L/usr/local/lib/"
 "setter"

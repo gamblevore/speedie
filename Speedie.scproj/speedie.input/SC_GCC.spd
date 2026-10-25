@@ -226,7 +226,7 @@ function CreateCompileString (|[File]| FileList,  |string| Product,  |string| Ty
 	|| spdroot = file.Speediedir
 	rz.appendwords("-L$spdroot/Library")
 	rz.appendwords("-L/usr/local/lib/")
-	rz.appendwords("-I /usr/local/include")
+	rz.appendwords("-I/usr/local/include")
 	if platform.osx // OSX likes playing hide and seek
 		if SC_Targets["gui"] or Options.MakeExec
 			rz.appendwords("-F/Library/Frameworks  -framework Cocoa")
