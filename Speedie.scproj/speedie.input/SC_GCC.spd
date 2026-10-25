@@ -38,7 +38,7 @@ function BackupPath (|string|)
 
 function ProductBaseName (|string|)
 	|| fs = FastString()
-	fs <~ ("lib", options.projectislibrary|int|)
+//	fs <~ ("lib", options.projectislibrary|int|) // causes issues
 	fs <~ compiler.projectname
 	fs <~ compiler.variantsuffix
 	return fs
