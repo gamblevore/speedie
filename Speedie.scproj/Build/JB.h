@@ -1661,7 +1661,7 @@ extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
 extern Dictionary* SC_ClsCollectTable;
 extern Dictionary* SC_CodePointTable;
-#define kJB_codesign_native ((JB_StringC*)JB_LUB[2011])
+#define kJB_codesign_native ((JB_StringC*)JB_LUB[1649])
 extern Dictionary* SC_CppRefTable;
 extern JB_File* SC_DebugLogFile;
 extern JB_ErrorReceiver* SC_ErrorDelayer;
@@ -1806,10 +1806,10 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
-#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2010])
-#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2009])
+#define kJB__zalgo_down ((JB_StringC*)JB_LUB[2383])
+#define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2382])
 #define JB__zalgo_R JB__.zalgo_R
-#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2008])
+#define kJB__zalgo_up ((JB_StringC*)JB_LUB[2381])
 #define kJB__byte_max ((uint)255)
 #define kJB__byte_min ((uint)0)
 #define kJB__int_Max ((int)2147483647)
@@ -2453,17 +2453,17 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_WaitsTillStart ((uint)4)
 #define kJB__TerminalColor_Black ((TerminalColor)30)
 #define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[2003])
+#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[127])
 #define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[2004])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[2005])
+#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[124])
+#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[125])
 #define kJB__TerminalColor_Green ((TerminalColor)32)
 #define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[2002])
+#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[128])
 #define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
 #define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[2005])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[2006])
+#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[125])
+#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[126])
 #define kJB__TerminalColor_White ((TerminalColor)37)
 #define kJB__TerminalColor_Yellow ((TerminalColor)33)
 #define kSC__xC2xB5Param_Input ((uint)256)
@@ -2530,7 +2530,7 @@ extern uint64 SC__Cpp_SourceHash;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
-#define kJB__Rec_InternalError ((JB_StringC*)JB_LUB[2001])
+#define kJB__Rec_InternalError ((JB_StringC*)JB_LUB[898])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
 #define kJB__fix_TypeStem ((int)2)
@@ -4284,6 +4284,8 @@ SCObject* SC_TypeOfSyx(Message* Exp, SCNode* Name_space, Message* Side);
 SCObject* SC_TypeOfTernary(Message* Exp, SCNode* Name_space, Message* Side);
 
 SCObject* SC_TypeOfThg(Message* Exp, SCNode* Name_space, Message* Side);
+
+SCObject* SC_TypeOfThgSub(Message* Exp, SCNode* Name_space, Message* Side, bool FromDot);
 
 SCObject* SC_TypeOfType(Message* Exp, SCNode* Name_space, Message* Side);
 
@@ -11334,7 +11336,7 @@ inline JB_String* SC_SCObject_Name(SCObject* Self) {
 	if (Self) {
 		return Self->Name;
 	}
-	return JB_LUB[273];
+	return JB_LUB[315];
 }
 
 inline bool JB_Array_SyntaxCast(Array* Self) {
