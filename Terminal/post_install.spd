@@ -113,7 +113,7 @@ function app.compile_example (|string| name, |errorint|)
 	|| BuildFol = "Build/".file
 	.mkdir(BuildFol)
 	|| Built = BuildFol[name]
-	|| cflags = "-std=gnu++20 -lstdc++ -L/usr/local/lib/ -I /usr/local/include -I $spd/Library/CppLib -w -Os -D TARGET_UNIX=1 -g -ljeebox"
+	|| cflags = "-std=gnu++20 -lstdc++ -L/usr/local/lib/ -I /usr/local/include -I $spd/Library/CppLib -w -Os -D TARGET_UNIX=1 -g -ljeebox -llibjeebox"
 	|[string]| args
 
 	args.SplitAppend("g++ -o")
