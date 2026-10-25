@@ -175,13 +175,16 @@ function string.operatorplus (|scfunction| fn, |string|)
 
 function assembler.DepthOK (|scfunction| fn, |bool|)
 	opt inline
-	return .InlineDepth < (.InlineDepthLimit + (fn is linkinline)|uint|)
+	|| ExpectInline = (fn is linkinline)|uint|
+	if !ExpectInline and (fn isnt OptInline) and !Options.AllowMassInlines
+		return false
+	return .InlineDepth < .InlineDepthLimit + ExpectInline
 
 
 function assembler.ASMTableID (|message| Exp, |scfunction| fn, |int|)
 	rz = fn.FPackID + 31
-	if rz <= 31										// failed!
-		if !Compiler.InPerry						// shut the compiler up
+	if rz <= 31											// failed!
+		if !Compiler.InPerry							// shut the compiler up
 			if !fn.islibrary or !.state.fn.islibrary
 				error (exp, "Missing PackID[1]")
 		rz = 0xFFFF	
@@ -191,7 +194,7 @@ function scfunction.SingleASMCall (|bool|)
 	return !.ProtoType or (.ASMAndCpp != 3)
 
 
-function @ASMType.ASMFunction (fn_asm)				// dofunction
+function @ASMType.ASMFunction (fn_asm)					// dofunction
 	opt norefcounts
 	|| prms = exp.last!
 	|| TableID = 0
@@ -201,9 +204,9 @@ function @ASMType.ASMFunction (fn_asm)				// dofunction
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
-			
-		if  fn isnt NoInline // and fn is linkinline // could disable inlines?
-			|| DepthOK = .DepthOK(fn) // at least till speedie is stable.
+		
+		if  fn isnt AnyNoInline
+			|| DepthOK = .DepthOK(fn)
 				|| MiniDest = .AskForInline(prms, dest, fn)
 					return MiniDest
 			

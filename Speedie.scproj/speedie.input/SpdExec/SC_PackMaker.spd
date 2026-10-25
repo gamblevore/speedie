@@ -375,7 +375,7 @@ function SCFunction.CanLibLoad (|bool|)
 function SCFunction.CanPrepareInline (|bool|)
 	opt norefcounts
 	require (self isnt cpp) and .HasProperSpeedieCode
-	require self isnt noinline
+	require self isnt AnyNoInline
 	
 	|| Allowed = 14 + (self is OptInline)<<4
 	|| Count = .SourceArg!.InlineCount(Allowed)

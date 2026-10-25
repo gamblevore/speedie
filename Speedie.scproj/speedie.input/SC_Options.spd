@@ -33,6 +33,7 @@ module Options
 	||		Warnings				= false
 	||		ExternalCompile			= false
 	||		StripNames				= false
+	||		AllowMassInlines		= false
 
 	|int8|	Optimise				= 1
 	|byte|	SelfReplacement			= 0
@@ -81,6 +82,7 @@ module Feedback
 		|| spd = compiler.SpeedieProj
 		if p ~= spd
 			Options.SelfReplacement = 1 // isselfaltering, isselfmodifying, alteringself, modifyingself
+			Options.AllowMassInlines = true
 			Options.ExternalCompile = true
 			SC_Targets["self"] = true
 		  elseif p ~= compiler.jeebox

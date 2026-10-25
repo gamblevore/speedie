@@ -41,7 +41,7 @@ datatype FunctionType (uint)
 		NoExport = LinkInline + Disabled + InitFunc
 		DontCheckInCakeLib = Disabled + InitFunc
 		ConOrDes = Constructor + Destructor
-		NoInline = CantInline + cpp + DirectlyRecursive
+		AnyNoInline = CantInline + cpp + DirectlyRecursive
 		
 	syntax is (|functiontype| t, |bool|)
 	// used for debug
