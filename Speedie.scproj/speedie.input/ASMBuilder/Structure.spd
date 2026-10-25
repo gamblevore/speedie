@@ -237,9 +237,6 @@ extend assembler
 				return
 		
 		if fat isa asm.noop
-			target debug
-				if fat isnt param and nopmode isnt rewind // hmmmm?
-					.sanity(fat)
 			return
 		
 		if !.IsWithinCurrInline(fat)

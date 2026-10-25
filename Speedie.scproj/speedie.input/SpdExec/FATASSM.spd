@@ -334,9 +334,7 @@ struct FatASM
 
 
 	function assembler.SaferNop (|&fatasm| fat, |int64|)
-		target debug
-			|| ok = .CanDelay(fat)
-			if !ok
+		// this used to do more stuff. now it doesnt :]
 		fat._op = asm.noop
 		target debug
 			.sanity
