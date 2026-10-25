@@ -118,8 +118,8 @@ function app.compile_example (|string| name, |errorint|)
 
 	args.SplitAppend("g++ -o")
 	args <~ Built
-	args.SplitAppend(cflags)
 	args <~ "${name}.cpp"
+	args.SplitAppend(cflags)
 
 	|| Status = .Run(args)
 		status = .madefile(Built)
