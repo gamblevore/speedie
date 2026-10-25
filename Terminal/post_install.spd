@@ -144,6 +144,7 @@ function app.link (|string| From, |string| To,  |errorint|)
 		return 0
 	|| Status = made.LinkTo(to)
 		return .madefile(made)
+	StdErr.pop
 	FailedLinks <~ from
 	FailedLinks <~ To
 	return Status
