@@ -2,7 +2,7 @@
 // Copyright, Theodore H. Smith 2019.
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
-#ifdef AS_LIBRARY
+#if AS_LIBRARY
 
 extern "C" {
 	bool JB_NoExitOnCrash;
