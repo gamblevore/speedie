@@ -367,7 +367,7 @@ function MakeFatCreator (|string| name, |µform| form)
 
 function FatCreatorSub2 (|µParam| P, |message| f, |int| i, |message| fatdecl, |message| arg)
 	opt norefcounts
-	|| PIsReg = p.isreg
+	|| PIsReg = p isnt NonReg
 	|| ty = (pisreg)("asmreg", "int")
 	|| pname = f.VMMsgArgName(i)
 	|| rel = NewEqRel(@thg + pname, @thg + "nil")

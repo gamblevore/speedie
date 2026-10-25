@@ -1,20 +1,17 @@
 
 
-// vm.box
-
-
 class µForm
 	|int|			Count
 	|string|		Name
 	|µParam[5]|		Params
-	|message|		src
-	|int|			TotalBits
-	|int|			RegsAltered
-	|int|			Index
-	|int|			RegForJump // remove RegForJump and use forms count
-	
+	|message|		Src
+	|byte|			TotalBits
+	|byte|			RegsAltered
+	|byte|			Index
+	|byte|			RegForJump // remove RegForJump and use forms count
 	
 	render
+		opt norefcounts
 		fs <~ .name
 		for i in .count
 			fs <~ " "
@@ -25,27 +22,73 @@ class µForm
 		opt norefcounts
 		.src = tmp
 		.name = tmp.name
-		for line in tmp.last(@arg)
-			|| f = line.NeedFirst
-			.loadparam(f.name, f)
-		
 		.index = ++µform.count
+		check (.Index < 255) (tmp, "Too many forms")
 
-	function AddP (|int| Size, |µParam| P=0)
+		|| Arg = tmp.last(@arg)
+		for line.fast in Arg
+			|| f = line.NeedFirst
+			.LoadParam(f.name, line)
+//		if .RegForJump
+//			.SetRemainder( µparam.signed + µparam.jump, 0 )
+
+
+	function AddParamSub (|int| Size, |µParam| P, |int | i)
 		if size <= 0 or size > 32 // hmm??
-		|| i = .count++
-		.totalbits += size
 		expect (i < –count .params) ("Defined too many ASM params")
-		p |= size - 1
-		.params[i] = p
+		.totalbits += size
+		p |= Size - 1
+		.params[i] = p	
+
+	function AddParam (|int| Size, |µParam| P, |int|)
+		|| i = .count++
+		.AddParamSub(Size, P, i)
 		if p is jump
-			if .RegForJump // what?
 			.RegForJump = i+1
+		return i
 			
 
 	syntax Access (|int| i, |µParam|)
 		cpp_part AccessInt
 		return .params[i]
+	
+
+	function FillRemainder (|int| i)
+		.AddParamSub(24 - .TotalBits, .Params[i], 0)
+	
+	
+	function LoadParam (|string| pl, |message| Line)
+		if (pl.isint)
+			|| i = pl.int
+			check (i > 0 and i <= 24) (Line, "Value out of range") // 1-24
+			.AddParam(i, µparam.Number)
+			return
+		
+		expect (pl == 1) (self)
+		|| p = pl[]
+		if  p == 'r'
+			.AddParam(5, µParam.Input)
+		  elseif p == 'R'
+			.AddParam(5, µparam.Output)
+			.RegsAltered++
+		  elseif p == 'P'
+			.AddParam(5, µparam.Output + µParam.input)
+			.RegsAltered++
+		  elseif p == 'x'							// for 64/96/128 sized instructions
+			.AddParam(32, µparam.Number)
+		  elseif p == 'l'
+			|| i = .AddParam( 0, µparam.Number )
+			.FillRemainder(i)
+		  elseif p == 'j'
+			.RegForJump = 1
+			|| i = .AddParam( 0, µparam.signed + µparam.jump ) 
+			.FillRemainder(i)
+//			.AddParam( 0, µparam.signed + µparam.jump )
+//			expect (line.IsFirst) (line)
+		  elseif Line
+			error (Line)
+		  else
+			error (self)
 	
 	
 	iterator
@@ -53,37 +96,6 @@ class µForm
 		while (i < .count)
 			yield self[i] (i)
 			++i
-
-	function AddRemainder (|int| U)
-		.addp( 24 - .TotalBits, µparam.Number ||| U)
-	
-	function LoadParam (|string| pl, |message| place)
-		if (pl.isint)
-			|| i = pl.int
-			check (i > 0 and i <= 24) (place, "Value out of range") // 1-24
-			.addp(i, µparam.Number)
-			return
-		expect (pl == 1) (self)
-		|| p = pl[]
-		if  p == 'r'
-			.AddP(5, µParam.Input)
-		  elseif p == 'R'
-			.AddP(5, µparam.Output)
-			.RegsAltered++
-		  elseif p == 'P'
-			.addP(5, µparam.Output + µParam.input)
-			.RegsAltered++
-		  elseif p == 'x' // for 64/96/128 sized instructions
-			.AddP(32, µparam.Number)
-		  elseif p == 'l'
-			.addremainder(0)
-		  elseif p == 'j'
-			.addremainder( µparam.signed + µparam.jump )
-		  elseif place
-			error (place)
-		  else
-		    error (self)
-	
 
 	module
 		|{µForm}|				Forms = dictionary()
@@ -94,3 +106,4 @@ class µForm
 			if !rz
 				error (m, "Missing form: " + form)
 				rz = µform(@arg.msg)
+

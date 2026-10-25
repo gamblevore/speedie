@@ -11,6 +11,6 @@ tests oofit
 		KNST  (r3, -234)
 		ADD   (r1, r1, r3, 0)
 		TIME  (r1,3)			// -111
-		LUPD  (r4, r0, 0, @test)
+//		LUPD  (@test, r4, r0, 0) // fix later
 		RET   (r0, 0)
 

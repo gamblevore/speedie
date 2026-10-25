@@ -5,7 +5,7 @@
 
 
 
-function FatASM.AddRegParam (|message| src, |int| write)
+function FatASM.AddRegParam (|message| Src, |int| Write)
 	opt norefcounts
 	if write|uint| < –count .prms
 		.prms[write] = src.RegOrNum // what if it's the last one...
@@ -26,13 +26,10 @@ datatype µParam (uint16)
 		NonReg = [Jump, Number]
 		Signed
 		Input
-		Output // we need something thats both output and input?
+		Output
 	
 	function BitSize (|int|)
 		return (self & 31) + 1
-	
-	function IsReg (|bool|)
-		return self isnt NonReg
 
 
 

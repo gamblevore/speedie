@@ -552,7 +552,7 @@ struct FatASM
 					|| j = .JumpPrm
 					if j and (i == j - 1)
 						v = .CountActualJump(v)
-					  elseif f[i].isreg
+					  elseif f[i] isnt NonReg
 						fs <~ ('r' + v|uint| >> 30)|byte|
 						v &= 31
 					fs <~ v
