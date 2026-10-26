@@ -86,7 +86,7 @@ role AppMenu (Window)
 		
 		
 		libinternal MenuQuit (GuiMenuEvent)
-			GUI.QuitReason |= GUIActivity.exiting
+			gui.askQuit
 		
 		
 		libinternal MenuFullScreen (GuiMenuEvent)

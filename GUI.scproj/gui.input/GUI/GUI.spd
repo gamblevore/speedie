@@ -1030,21 +1030,29 @@ module GUI
 
 	libinternal StandardKeyHandler (|keys| key, |bool|)
 		opt norefcounts
-		|| w = window.front						#require
 		|| cmd = keys.cmd
+		target !osx
+			if cmd and key is q
+				gui.askQuit
+				return true
+		
+		|| w = window.front						#require
 		|| rf = w.realfocus
 			if cmd
+				if (key is f) and !(keys.shift or keys.option)
+					return rf.OpenSearch
 				if (key is g)
 					if !rf.__Search__(GUI.lastsearch, false)
 						beep
 					return true
-				if (key is f) and !(keys.shift or keys.option)
-					return rf.OpenSearch
 			  elseif (key is find or AC_SEARCH)
 				return rf.OpenSearch
 
 		|| gw = rf ?? w
 		if cmd
+			target !osx
+				if key is w
+					return w.Close
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
 			if (key is minus)
@@ -1063,7 +1071,7 @@ module GUI
 					Notifications <~ ov.ContainedName
 				  else
 					beep
-		  
+		
 		if (key is copy) or (cmd and key is c)
 			|| wf = w._FocusAttempt
 			if !rf and wf isa textview
@@ -1077,10 +1085,6 @@ module GUI
 		opt norefcounts
 		if Reason is Terminating
 			return GUIActivity.Terminating // terminate will call windowclose anyhow
-	
-//		if Reason isnt windowclose
-//			return .quit(reason)
-
 		return GUI.AskQuit
 	
 	
@@ -1218,7 +1222,7 @@ module GUI
 			|| Activity = .QuitBecauseWindowClosed(w)
 				return Activity
 			.Quitreason |= GUIActivity.activity
-			w.Close(GUIActivity.WindowClose)
+			w.Close
 			.Quitreason |= GUIActivity.activity
 			return GUIActivity.activity
 			
