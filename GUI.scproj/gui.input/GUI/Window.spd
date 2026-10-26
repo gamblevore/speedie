@@ -494,7 +494,7 @@ class Window (GUIControl)
 			.remove
 			return reason
 		
-		require !.__CancelClose__(reason) or (reason is terminating)
+		require  !.__CancelClose__(reason)  or  (reason is terminating)
 		.ClearTree
 		.remove
 		return reason

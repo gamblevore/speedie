@@ -1031,10 +1031,10 @@ module GUI
 	libinternal StandardKeyHandler (|keys| key, |bool|)
 		opt norefcounts
 		|| cmd = keys.cmd
-		target !osx
-			if cmd and key is q
+		if cmd and key is q
+			target !osx
 				gui.askQuit
-				return true
+			return true
 		
 		|| w = window.front						#require
 		|| rf = w.realfocus
@@ -1050,9 +1050,12 @@ module GUI
 
 		|| gw = rf ?? w
 		if cmd
-			target !osx
-				if key is w
+//			if key isnt LGUI and LCTRL and RGUI and RCTRL
+//				notifications <~ "K: " + key|int64|.Hex
+			if key is w
+				target !osx
 					return w.Close
+				return true
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
 			if (key is minus)
@@ -1077,6 +1080,7 @@ module GUI
 			if !rf and wf isa textview
 				return wf.CopyToClipboard
 			return gw.CopyToClipboard
+		
 		if (key is paste) or (cmd and key is v)
 			return gw.PasteFromClipboard(clipboard.text)
 
@@ -1343,11 +1347,6 @@ module GUI
 		if key.IsEaten
 			return GUIActivity.nothing
 
-		if (key is w) and (keys.cmd)
-			// i think we could try eliminate this test.
-			// later... I mean... send an event of same type that is already sent
-			// so hopefully only 1 gets through?
-			return 0
 		beep._OK = 0
 
 		keys.AddKey(key)
