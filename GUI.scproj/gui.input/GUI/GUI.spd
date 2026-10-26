@@ -1050,8 +1050,6 @@ module GUI
 
 		|| gw = rf ?? w
 		if cmd
-//			if key isnt LGUI and LCTRL and RGUI and RCTRL
-//				notifications <~ "K: " + key|int64|.Hex
 			if key is w
 				target !osx
 					return w.Close
@@ -1336,22 +1334,19 @@ module GUI
 	
 	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
 		#!keydown!
-		|| kev = ev.keysym
-		|| key = kev.sym
-
-//		beep key|int|.Render + " " + kev.scancode|int|
-		
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return GUIActivity.nothing
 		
+		|| kev = ev.keysym
+		|| key = kev.sym
+
 		if key.IsEaten
 			return GUIActivity.nothing
 
 		beep._OK = 0
-
 		keys.AddKey(key)
 
-		if !w.openedmenu and !.AllowKeyDown(kev)
+		if !w.OpenedMenu and !.AllowKeyDown(kev)
 			return GUIActivity.nothing
 		
 		if (key isnt escape) or key.IsFirstFrame
@@ -1373,7 +1368,7 @@ module GUI
 		beep
 	
 	
-	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,   |int|)
+	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,  |int|)
 		|| xy = b.xy
 		beep._OK = 0
 		if notifications.Clickedat(xy)

@@ -20,6 +20,7 @@ class Window (GUIControl)
 	|uint64|							FrameCount
 
 	visible false
+	|uint|								_CloseAttempts
 	|date|								_AlphaFader
 	|bool|								_FocusWasSet
 	|float|								BlockScale
@@ -487,14 +488,19 @@ class Window (GUIControl)
 	function Close (|GUIActivity| Reason = GUIActivity.windowclose, |GUIActivity|)
 		if !self
 			return 0
-			
+
+		|| Attempts = ._CloseAttempts++
+		if Attempts > 100 // hmmmm.
+			log "window: {$.id} closed $Attempts x"
+			log app.StackTrace
+		
 		if .IsDialog
 			isnt visible
 			.ReturnValue ?= self
 			.remove
 			return reason
-		
-		require  !.__CancelClose__(reason)  or  (reason is terminating)
+
+		require  !.__CancelClose__(reason)  or  (reason is terminating) or (Attempts > 100)
 		.ClearTree
 		.remove
 		return reason
