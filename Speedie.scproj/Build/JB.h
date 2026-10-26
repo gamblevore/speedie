@@ -167,6 +167,8 @@ typedef ASM ASM_BoolNot;
 
 typedef ASM ASM_Bra;
 
+typedef ASM ASM_Bra2;
+
 typedef ASM ASM_CNTC;
 
 typedef ASM ASM_CmpF;
@@ -203,17 +205,29 @@ typedef ASM ASM_IntConst;
 
 typedef ASM ASM_JBitTest;
 
+typedef ASM ASM_JBitTest2;
+
 typedef ASM ASM_JCmpEq;
+
+typedef ASM ASM_JCmpEq2;
 
 typedef ASM ASM_JCmpF;
 
+typedef ASM ASM_JCmpF2;
+
 typedef ASM ASM_JCmpI;
 
+typedef ASM ASM_JCmpI2;
+
 typedef ASM ASM_JCmpK;
+
+typedef ASM ASM_JCmpK2;
 
 typedef ASM ASM_Jump;
 
 typedef ASM ASM_Loop;
+
+typedef ASM ASM_Loop2;
 
 typedef ASM ASM_MemUtil;
 
@@ -1058,13 +1072,13 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 
 JBClass ( xC2xB5Form , JB_Object , 
 	int Count;
-	Message* src;
-	MuParam Params[5];
-	int TotalBits;
-	int RegsAltered;
-	int Index;
-	int RegForJump;
 	JB_String* Name;
+	byte TotalBits;
+	byte RegsAltered;
+	byte Index;
+	byte RegForJump;
+	MuParam Params[5];
+	Message* Src;
 );
 
 struct FastStringCpp_Behaviour: FastString_Behaviour {
@@ -1282,28 +1296,28 @@ struct SCFunction_Behaviour: SCBetterNode_Behaviour {
 
 JBClass ( SCFunction , SCBetterNode , 
 	NilState NilSelf;
-	byte ReturnCount;
-	byte FSOpt;
-	byte MinOpt;
-	byte MaxASM;
 	byte IsAssigns;
 	byte IsCppInBuilt;
 	ErrorSeverity BlindCasts;
 	byte IsNilChecker;
 	byte Badness;
+	byte ReturnCount;
+	byte FSOpt;
+	byte MinOpt;
+	byte MaxASM;
 	byte IntPrmCount;
+	byte InlineCount;
+	byte ASMReached;
 	byte StructReturnPos;
 	byte ASMAndCpp;
+	u16 LinkDepth;
 	u16 TmpCounter;
 	u16 LinkID;
-	u16 LinkDepth;
 	u16 xC2xB5ASMLength;
 	u16 xC2xB5SmallerLength;
 	FunctionType FuncInfo;
 	uint xC2xB5Start;
 	uint xC2xB5FATLength;
-	SCDecl* ReturnType;
-	SCFunction* DepthFinder;
 	Message* IsMacro;
 	Array* LinkTo;
 	Array* Args;
@@ -1314,6 +1328,8 @@ JBClass ( SCFunction , SCBetterNode ,
 	SCFunction* NextFunc;
 	SCDecl* HasProto;
 	SCClass* ProtoType;
+	SCDecl* ReturnType;
+	SCFunction* DepthFinder;
 );
 
 struct SCModule_Behaviour: SCBetterNode_Behaviour {
@@ -1498,6 +1514,7 @@ extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
 #define kJB__Math_iTau (0.15915494309f)
 #define kJB__Math_Phi (1.61803398875f)
+extern bool SC__Options_AllowMassInlines;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
 #define kSC__Options_cake ((int)2)
@@ -2229,6 +2246,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__FileMode_Owner ((FileMode)448)
 #define kJB__FileMode_Process ((FileMode)493)
 #define kSC__FunctionType_AlreadyExported ((FunctionType)16384)
+#define kSC__FunctionType_AnyNoInline ((FunctionType)67371520)
 #define kSC__FunctionType_API ((FunctionType)8388608)
 #define kSC__FunctionType_Behaviour ((FunctionType)4096)
 #define kSC__FunctionType_CantInline ((FunctionType)262144)
@@ -2250,7 +2268,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FunctionType_LinkInline ((FunctionType)1048576)
 #define kSC__FunctionType_NewStruct ((FunctionType)16)
 #define kSC__FunctionType_NoExport ((FunctionType)5243008)
-#define kSC__FunctionType_NoInline ((FunctionType)67371520)
 #define kSC__FunctionType_NotRefCounted ((FunctionType)8)
 #define kSC__FunctionType_NumberCreator ((FunctionType)32)
 #define kSC__FunctionType_OptInline ((FunctionType)524288)
@@ -4543,6 +4560,8 @@ ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
 
 ASM SC_ASM_BoolNot_KSet(ASM Self, uint Value);
 
+ASM SC_ASM_Bra2_JmpSet(ASM Self, uint Value);
+
 ASM SC_ASM_Bra_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_Bra_SmallSet(ASM Self, uint Value);
@@ -4599,9 +4618,13 @@ ASM SC_ASM_IntConst_InvSet(ASM Self, uint Value);
 
 ASM SC_ASM_IntConst_ValueSet(ASM Self, uint Value);
 
+ASM SC_ASM_JBitTest2_JmpSet(ASM Self, uint Value);
+
 ASM SC_ASM_JBitTest_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JBitTest_ShSet(ASM Self, uint Value);
+
+ASM SC_ASM_JCmpEq2_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpEq_JmpSet(ASM Self, uint Value);
 
@@ -4609,13 +4632,19 @@ ASM SC_ASM_JCmpEq_LSmallSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpEq_RSmallSet(ASM Self, uint Value);
 
+ASM SC_ASM_JCmpF2_JmpSet(ASM Self, uint Value);
+
 ASM SC_ASM_JCmpF_CmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpF_JmpSet(ASM Self, uint Value);
 
+ASM SC_ASM_JCmpI2_JmpSet(ASM Self, uint Value);
+
 ASM SC_ASM_JCmpI_CmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpI_JmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_JCmpK2_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpK_JmpSet(ASM Self, uint Value);
 
@@ -4624,6 +4653,8 @@ ASM SC_ASM_JCmpK_KSet(ASM Self, uint Value);
 ASM SC_ASM_Jump_JUMPSet(ASM Self, uint Value);
 
 bool SC_ASM_JumpNegatable(ASM Self);
+
+ASM SC_ASM_Loop2_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_Loop_JmpSet(ASM Self, uint Value);
 
@@ -5284,8 +5315,6 @@ int JB_TerminalColor__Init_();
 // µParam
 int SC_xC2xB5Param_BitSize(uint /*MuParam*/ Self);
 
-bool SC_xC2xB5Param_IsReg(uint /*MuParam*/ Self);
-
 bool SC_xC2xB5Param_SyntaxIs(uint /*MuParam*/ Self, uint /*MuParam*/ P);
 
 
@@ -5327,6 +5356,11 @@ ASM* SC_ASM_BoolNot__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_Bra
 ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
+// ASM_Bra2
+ASM* SC_ASM_Bra2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5420,8 +5454,18 @@ ASM* SC_ASM_JBitTest__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
+// ASM_JBitTest2
+ASM* SC_ASM_JBitTest2__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
 // ASM_JCmpEq
 ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
+// ASM_JCmpEq2
+ASM* SC_ASM_JCmpEq2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5430,13 +5474,28 @@ ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
+// ASM_JCmpF2
+ASM* SC_ASM_JCmpF2__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
 // ASM_JCmpI
 ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
+// ASM_JCmpI2
+ASM* SC_ASM_JCmpI2__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
 // ASM_JCmpK
 ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
+// ASM_JCmpK2
+ASM* SC_ASM_JCmpK2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5447,6 +5506,11 @@ ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_Loop
 ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After);
+
+
+
+// ASM_Loop2
+ASM* SC_ASM_Loop2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -8085,15 +8149,17 @@ JB_List* JB_Tree__New(JB_List* Parent, int Position);
 
 
 // JB_µForm
-void SC_xC2xB5Form_AddP(xC2xB5Form* Self, int Size, uint /*MuParam*/ P);
-
-void SC_xC2xB5Form_AddRemainder(xC2xB5Form* Self, int U);
+int SC_xC2xB5Form_AddParam(xC2xB5Form* Self, int Size, uint /*MuParam*/ P);
 
 xC2xB5Form* SC_xC2xB5Form_Constructor(xC2xB5Form* Self, Message* Tmp);
 
 void SC_xC2xB5Form_Destructor(xC2xB5Form* Self);
 
-void SC_xC2xB5Form_LoadParam(xC2xB5Form* Self, JB_String* Pl, Message* Place);
+void SC_xC2xB5Form_FillParam(xC2xB5Form* Self, int Size, uint /*MuParam*/ P, int I);
+
+void SC_xC2xB5Form_FillRemainder(xC2xB5Form* Self, int I);
+
+void SC_xC2xB5Form_LoadParam(xC2xB5Form* Self, JB_String* Pl, Message* Line);
 
 JB_String* SC_xC2xB5Form_Render(xC2xB5Form* Self, FastString* Fs_in);
 
@@ -8810,31 +8876,31 @@ bool SC_Msg_IsZero(Message* Self);
 
 void JB_Msg_Item__(Message* Self, FastString* Fs);
 
-FatASM* SC_Msg_JBAN(Message* Self, ASMReg R1, int Small, int Jmp);
+FatASM* SC_Msg_JBAN(Message* Self, int Jmp, ASMReg R1, int Small);
 
 bool JB_Msg_jbinTest(Message* Self);
 
-FatASM* SC_Msg_JBOR(Message* Self, ASMReg R1, int Small, int Jmp);
+FatASM* SC_Msg_JBOR(Message* Self, int Jmp, ASMReg R1, int Small);
 
 void jdb2(Message* Self);
 
-FatASM* SC_Msg_JMKE(Message* Self, ASMReg R1, int K, int Jmp);
+FatASM* SC_Msg_JMKE(Message* Self, int Jmp, ASMReg R1, int K);
 
-FatASM* SC_Msg_JMKL(Message* Self, ASMReg R1, int K, int Jmp);
+FatASM* SC_Msg_JMKL(Message* Self, int Jmp, ASMReg R1, int K);
 
-FatASM* SC_Msg_JMKM(Message* Self, ASMReg R1, int K, int Jmp);
+FatASM* SC_Msg_JMKM(Message* Self, int Jmp, ASMReg R1, int K);
 
-FatASM* SC_Msg_JMKN(Message* Self, ASMReg R1, int K, int Jmp);
+FatASM* SC_Msg_JMKN(Message* Self, int Jmp, ASMReg R1, int K);
 
-FatASM* SC_Msg_JMPE(Message* Self, ASMReg R1, ASMReg R2, int LSmall, int RSmall, int Jmp);
+FatASM* SC_Msg_JMPE(Message* Self, int Jmp, ASMReg R1, ASMReg R2, int LSmall, int RSmall);
 
 FatASM* SC_Msg_JMPF(Message* Self, ASMReg R1, ASMReg R2, int Cmp, int Jmp);
 
-FatASM* SC_Msg_JMPI(Message* Self, ASMReg R1, ASMReg R2, int Cmp, int Jmp);
+FatASM* SC_Msg_JMPI(Message* Self, int Jmp, ASMReg R1, ASMReg R2, int Cmp);
 
-FatASM* SC_Msg_JMPN(Message* Self, ASMReg R1, ASMReg R2, int LSmall, int RSmall, int Jmp);
+FatASM* SC_Msg_JMPN(Message* Self, int Jmp, ASMReg R1, ASMReg R2, int LSmall, int RSmall);
 
-FatASM* SC_Msg_JTST(Message* Self, ASMReg R1, int Sh, int Jmp);
+FatASM* SC_Msg_JTST(Message* Self, int Jmp, ASMReg R1, int Sh);
 
 FatASM* SC_Msg_JUMP(Message* Self, int JUMP);
 
@@ -8868,9 +8934,9 @@ void SC_Msg_LoopExit(Message* Self);
 
 void SC_Msg_LoopExitter(Message* Self, int ASMType, SCBlockage ExitCode);
 
-FatASM* SC_Msg_LUPD(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp);
+FatASM* SC_Msg_LUPD(Message* Self, int Jmp, ASMReg R1, ASMReg R2, int Small);
 
-FatASM* SC_Msg_LUPU(Message* Self, ASMReg R1, ASMReg R2, int Small, int Jmp);
+FatASM* SC_Msg_LUPU(Message* Self, int Jmp, ASMReg R1, ASMReg R2, int Small);
 
 Message* JB_Msg_MacroAvoidCopy(Message* Self, Message* Orig);
 
@@ -10790,6 +10856,8 @@ bool SC_Func_FoundOneCpp(SCFunction* Self, JB_String* N);
 
 void SC_Func_FuncParamsLoad(SCFunction* Self);
 
+void SC_Func_GiveFeedback(SCFunction* Self, Message* Feedback, JB_String* Msg);
+
 bool SC_Func_HasCVersion(SCFunction* Self);
 
 bool SC_Func_HasProperSpeedieCode(SCFunction* Self);
@@ -11392,7 +11460,11 @@ inline bool SC_FatRange_Never(FatRange* Self) {
 }
 
 inline bool SC_Pac_DepthOK(Assembler* Self, SCFunction* Fn) {
-	return Self->InlineDepth < (Self->InlineDepthLimit + ((uint)(SC_Func_SyntaxIs(Fn, kSC__FunctionType_LinkInline))));
+	uint ExpectInline = ((uint)(SC_Func_SyntaxIs(Fn, kSC__FunctionType_LinkInline)));
+	if ((!ExpectInline) and (((!SC_Func_SyntaxIs(Fn, kSC__FunctionType_OptInline))) and (!SC__Options_AllowMassInlines))) {
+		return false;
+	}
+	return Self->InlineDepth < (Self->InlineDepthLimit + ExpectInline);
 }
 
 inline bool SC_Reg_FourBytes(ASMReg Self) {

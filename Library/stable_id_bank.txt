@@ -1,6 +1,6 @@
 // beta-file. Unstable.
 GUI_AM_Constructor
-GUI_AM_ShowAsDialog
+GUI_AM__Show
 GUI_AM__SyntaxAppend
 GUI_App__Alert
 GUI_App__AskOpen
@@ -8,6 +8,7 @@ GUI_App__AskSave
 GUI_App__Beep
 GUI_App__CurrDisplaySize
 GUI_App__Cycle
+GUI_App__ForceQuit
 GUI_App__FrontDialog
 GUI_App__FullScreenSet
 GUI_App__GetScreen
@@ -19,7 +20,8 @@ GUI_App__Loop
 GUI_App__MouseButtons
 GUI_App__MouseXY
 GUI_App__OpenDocument
-GUI_App__Quit
+GUI_App__QuitReason
+GUI_App__QuitReasonSet
 GUI_App__Resized
 GUI_App__Run
 GUI_App__SavePrefs
@@ -150,9 +152,8 @@ GUI_Fade_Hide
 GUI_Fade_Strength
 GUI_File_CreateEmpty
 GUI_File_LoadQOI
-GUI_GUIActivity_SyntaxIs
-GUI_GUIKeyRecord_Clear
 GUI_GUIKeyRecord_Constructor
+GUI_GUIKeyRecord_IsEaten
 GUI_GridSection_AccessVec
 GUI_GridSection_At
 GUI_GridSection_Constructor
@@ -220,8 +221,6 @@ GUI_Img_resetarea
 GUI_JBV_Constructor
 GUI_JBV_Destructor
 GUI_JBV_KeyDown
-GUI_KS_Command
-GUI_Key_Eat
 GUI_Key_HeldKey
 GUI_Key_IsAccept
 GUI_Key_IsCMM
@@ -229,14 +228,12 @@ GUI_Key_IsCancel
 GUI_Key_IsCmd
 GUI_Key_IsCtrl
 GUI_Key_IsDelete
-GUI_Key_IsEaten
 GUI_Key_IsFirstFrame
 GUI_Key_IsModifier
 GUI_Key_IsOption
 GUI_Key_IsScan
 GUI_Key_IsShift
 GUI_Key_Length
-GUI_Key_Limit
 GUI_Key_Name
 GUI_Key_Number
 GUI_Key_OperatorIsCmd
@@ -551,7 +548,7 @@ GUI_Win_BlockYSet
 GUI_Win_CalculateSize
 GUI_Win_CancelClose
 GUI_Win_CancelReturn
-GUI_Win_Close
+GUI_Win_CloseWindow
 GUI_Win_Confirm
 GUI_Win_Constructor
 GUI_Win_ConstructorSize
@@ -574,6 +571,7 @@ GUI_Win_SyntaxCall
 GUI_Win_SyntaxIsSet
 GUI_Win_Tickle
 GUI_Win_TypedString
+GUI_Win__Front
 GUI_Win___CancelClose__
 GUI_Win___DrawBackground__
 GUI_Win___FrameStep__
@@ -666,7 +664,6 @@ GUI_inl_Destructor
 GUI_inl_Edit
 GUI_inl_SyntaxIs
 GUI_inl_SyntaxIsSet
-GUI_ivec2_SDLXY
 GUI_ivec4_Msg
 GUI_ivec4_TextCorner
 GUI_vec4_BoxVsPlane

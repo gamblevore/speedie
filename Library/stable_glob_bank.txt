@@ -1,4 +1,5 @@
 // beta-file. Unstable.
+GUI__App__QuitReason
 GUI__App_AControlWasResized
 GUI__App_BlockTextInput
 GUI__App_CanDrag
@@ -8,7 +9,6 @@ GUI__App_DuringAction
 GUI__App_FlashSelector
 GUI__App_MouseMoveInited
 GUI__App_NeedMouseMove
-GUI__App_QuitReason
 GUI__App_ResizedCounter
 GUI__App_SingleFrameDepth
 GUI__App_StartedProperly
@@ -119,9 +119,8 @@ JB__File__Speedie
 JB__Macro_TmpPrms_
 GUI__Bar_RandomBank
 GUI__Text__CounterParts
-GUI__Win_ActiveControl
+GUI__Win__Closed
 GUI__Win_All
-GUI__Win_LeakedTestObj
 GUI__AM_Menu
 GUI__cwin__asker
 GUI__Open__Asker
