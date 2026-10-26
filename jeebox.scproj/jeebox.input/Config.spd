@@ -120,14 +120,21 @@ extend message
 			|| arg = .GiveArg
 			return arg.msg(@tmp, key).msg(valuetype, DefaultName)
 	
-	
+
 	function Value (|string|)
 		if self
-			if self == @msg
-				return .FirstName
-			if self == @tmp and self in @arg
+			|| fn = .func
+			if fn == @msg or @tmp or @arg
 				return .firstname
-			if self != @arg
-				return .name
-			return .FirstName
+			return .name
 
+	function Value (assigns:|string|)
+		if self
+			|| fn = .func
+			if fn == @msg or @tmp or @arg
+				|| f = .first
+					f.name = value
+					return
+				.msg(@thg, value)
+				return
+			.name = value

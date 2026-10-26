@@ -118,6 +118,11 @@ class SCImport
 	function compiler.SetConf (|message| conf)
 		opt norefcounts
 		|| arg = conf[@arg]
+			|| about = arg["about"]
+				|| str = about.Value
+				str = str.ReplaceAll(`$apptime`, scimport.recent.timeid|int|.render)
+				str = str.ReplaceAll(`$appdate`, .CompilationDate.localtime)
+				about.value = str
 			compiler.ConfMsg = arg
 			conf.CommentOut
 

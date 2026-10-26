@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2396];
+extern JB_StringC* JB_LUB[2399];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1785,6 +1785,7 @@ bool SC_Comp__InitBasicFuncs() {
 
 int SC_Comp__InitBasicStuff() {
 	int Rz = 0;
+	SC__Comp_CompilationDate = JB_Date__Now();
 	Rz = JB_StdErr->ErrorCount;
 	if (Rz > 0) {
 		JB_StdErr->LowerErrorsTo = kJB__ErrorSeverity_Warning;
@@ -1801,7 +1802,7 @@ int SC_Comp__InitBasicStuff() {
 	(SC_Decl_NumberConstSet(SC_TrueBool, 1));
 	SC_Comp__AddGlobalConstNum(JB_LUB[1529], SC_TypeInt, SC_SCVersion__Num());
 	SC_Comp__AddGlobalConstNum(JB_LUB[1530], SC_TypeInt, JB_Date_TimeID(SC__Imp_Recent));
-	SC_Comp__AddGlobalConstNum(JB_LUB[1527], SC_TypeDate, JB_Date__Now());
+	SC_Comp__AddGlobalConstNum(JB_LUB[1527], SC_TypeDate, SC__Comp_CompilationDate);
 	SC_Comp__AddGlobalConstNum(JB_LUB[1525], SC_TypeDate, SC__Imp_Recent);
 	SC_Comp__AddGlobalConstFloat(JB_LUB[2384], SC_TypeFloat64, 4614256656552045848);
 	SC_Comp__AddGlobalConstFloat(JB_LUB[2385], SC_TypeFloat64, 4618760256179416344);
@@ -2337,6 +2338,13 @@ bool SC_Comp__ScriptRecompile(JB_File* F, JB_File* Script_build) {
 void SC_Comp__SetConf(Message* Conf) {
 	Message* Arg = JB_Msg_NeedSyx(Conf, kJB_SyxArg);
 	if (Arg) {
+		Message* About = JB_Msg_SyntaxAccess(Arg, JB_LUB[2396]);
+		if (About) {
+			JB_String* Str = JB_Msg_Value(About);
+			Str = JB_Str_ReplaceAll(Str, JB_LUB[2397], JB_int_RenderFS(((int)JB_Date_TimeID(SC__Imp_Recent)), nil), false, nil);
+			Str = JB_Str_ReplaceAll(Str, JB_LUB[2398], JB_Date_LocalTime(SC__Comp_CompilationDate, nil), false, nil);
+			(JB_Msg_ValueSet(About, Str));
+		}
 		JB_SetRef(SC__Comp_ConfMsg, Arg);
 		SC_Msg_CommentOut(Conf);
 	}
@@ -17869,6 +17877,12 @@ JB_Duration JB_Date_Ago(Date Self) {
 
 int64 JB_Date_Days(Date Self) {
 	return Self / 5662310400;
+}
+
+JB_String* JB_Date_LocalTime(Date Self, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	JB_FS_AppendLocalTime(Fs, Self);
+	return JB_FS_SmartResult(Fs, Fs_in);
 }
 
 int64 JB_Date_Minutes(Date Self) {
@@ -44587,18 +44601,32 @@ FatASM* SC_Msg_VADK(Message* Self, ASMReg R1, ASMReg R2, int High) {
 
 JB_String* JB_Msg_Value(Message* Self) {
 	if (Self) {
-		if (JB_Msg_EqualsSyx(Self, kJB_SyxMsg)) {
+		Syntax Fn = Self->Func;
+		if ((Fn == kJB_SyxMsg) or ((Fn == kJB_SyxTmp) or (Fn == kJB_SyxArg))) {
 			return JB_Msg_FirstName(Self);
 		}
-		if ((JB_Msg_EqualsSyx(Self, kJB_SyxTmp)) and JB_Msg_OperatorIn(Self, kJB_SyxArg)) {
-			return JB_Msg_FirstName(Self);
-		}
-		if (!JB_Msg_EqualsSyx(Self, kJB_SyxArg)) {
-			return Self->Name;
-		}
-		return JB_Msg_FirstName(Self);
+		return Self->Name;
 	}
 	return JB_LUB[0];
+}
+
+void JB_Msg_ValueSet(Message* Self, JB_String* Value) {
+	if (Self) {
+		Syntax Fn = Self->Func;
+		if ((Fn == kJB_SyxMsg) or ((Fn == kJB_SyxTmp) or (Fn == kJB_SyxArg))) {
+			Message* F = ((Message*)JB_Ring_First(Self));
+			JB_Incr(F);
+			if (F) {
+				JB_SetRef(F->Name, Value);
+				JB_EarlyDecr(F);
+				return;
+			}
+			JB_Decr(F);
+			JB_FreeIfDead(JB_Msg_Msg(Self, kJB_SyxThg, Value));
+			return;
+		}
+		JB_SetRef(Self->Name, Value);
+	}
 }
 
 void SC_Msg_VariableParamSafety(Message* Self) {
@@ -61464,4 +61492,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -8184449648652926937 8369058979512308208
+// -794957943461705076 2538669179280674319

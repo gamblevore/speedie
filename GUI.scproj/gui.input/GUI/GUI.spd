@@ -99,12 +99,12 @@ module GUI
 		description "1 = fullscreen, 0 = not-full, -1 = toggle"
 		target osx
 			|| n = .OSXWindow
-				|| full = .isfullscreen|int|
+				|| full = .isfullscreen
 				if (full != mode)
 					.JB_SDL_FullScreenToggle(n)
 
 		|| w = .ScreenWindow
-			|| Full = .IsFullScreen|int|
+			|| Full = .IsFullScreen
 			if mode < 0 // toggle
 				mode = (!Full)|int|
 			
@@ -391,8 +391,8 @@ module GUI
 			return s > b
 			
 		
-	function IsFullScreen (|bool|)
-		return .CurrDisplaySize.y <= .Screenraw.size.y
+	function IsFullScreen (|int|)
+		return (.CurrDisplaySize.y <= .Screenraw.size.y)|int|
 			
 	
 	function Scaling (assigns:|float| scale)
@@ -487,7 +487,7 @@ module GUI
 
 	function FrontDialog (|window|)
 		opt norefcounts
-		for w.backwards in window.all
+		for w in window.all
 			if w.IsDialog
 				return w
 	
@@ -551,7 +551,7 @@ module GUI
 				lv.TryDelayedEdit
 
 	
-	function OpenDocument (|string| path, |bool| AllowMissing,  |object|)
+	function OpenDocument (|string| path, |bool| AllowMissing, |object|)
 		require path
 		|| d = .AppDocumentOpen
 			|| f = path.Resolve(Allowmissing)
@@ -563,10 +563,9 @@ module GUI
 	
 	
 	libinternal HandleOpenFile
-		|| d = .DocumentOpened$
-		.OpenDocument(d, false)
-//		if .OpenedFirst.guiago < 3s
-//			.FixScreenBug = .FrameStart + 1s
+		opt norefcounts
+		|| d = .DocumentOpened
+			.OpenDocument(d, false)
 
 
 	libinternal OrderWindows (|window|)
@@ -590,7 +589,6 @@ module GUI
 					(w2 is visible)
 					rz = w2
 					
-
 		
 		
 	libinternal PreFrame (|GUIActivity|)
@@ -607,14 +605,14 @@ module GUI
 			(rz is Terminating)
 			return rz
 			
-		.UpdateTextFocus(W)
+		.UpdateTextFocus(w)
 		.PreFrameText(w)
 		
 		|| ed = w.inline
 		if ed.needshide
 			ed.clear
 
-		if .CanDrag >= mousedragging.DragEvenIfStill
+		if .CanDrag >= MouseDragging.DragEvenIfStill
 			.touch
 			w.DoMouseDrag(.MouseXY, true)
 			rz = GUIActivity.activity			
@@ -979,10 +977,12 @@ module GUI
 		(value isnt WindowClose)
 		(value isnt activity)
 		._QuitReason = value
+	
 		
 	function QuitReason (|guiactivity|)
 		return ._QuitReason
-		
+	
+	
 	inline IsQuitting (|bool|)
 		return .quitreason is ExitOrTerminate
 

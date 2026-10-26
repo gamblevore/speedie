@@ -1372,6 +1372,7 @@ extern Message* SC__Comp_AppInitTest;
 extern Message* SC__Comp_ASMSelf;
 extern JB_File* SC__Comp_BaseProjectPath;
 extern Array* SC__Comp_ClassList;
+extern Date SC__Comp_CompilationDate;
 extern Message* SC__Comp_ConfMsg;
 extern Message* SC__Comp_ConstantsList;
 extern int SC__Comp_CurrStage;
@@ -5060,6 +5061,8 @@ Dictionary* JB_TC__Types();
 JB_Duration JB_Date_Ago(Date Self);
 
 int64 JB_Date_Days(Date Self);
+
+JB_String* JB_Date_LocalTime(Date Self, FastString* Fs_in);
 
 int64 JB_Date_Minutes(Date Self);
 
@@ -9419,6 +9422,8 @@ FatASM* SC_Msg_VADD(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, ASMReg R4, i
 FatASM* SC_Msg_VADK(Message* Self, ASMReg R1, ASMReg R2, int High);
 
 JB_String* JB_Msg_Value(Message* Self);
+
+void JB_Msg_ValueSet(Message* Self, JB_String* Value);
 
 void SC_Msg_VariableParamSafety(Message* Self);
 
