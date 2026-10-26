@@ -72,16 +72,20 @@ linkage
 |uint16|				TmpCounter
 |uint16|				LinkID
 |nilstate|				NilSelf
-|byte|					ReturnCount
-|byte|					FSOpt
-|byte|					MinOpt
-|Byte|					MaxASM
 |Byte|					IsAssigns
 |byte|					IsCppInBuilt
 |ErrorSeverity|			BlindCasts
 |byte|					IsNilChecker
 |byte|					Badness
+
+// ASM
+|byte|					ReturnCount
+|byte|					FSOpt
+|byte|					MinOpt
+|Byte|					MaxASM
 |byte|					IntPrmCount
+|byte|					InlineCount
+|byte|					ASMReached
 |byte|					StructReturnPos
 |byte|					ASMAndCpp
 |uint16|				µASMLength

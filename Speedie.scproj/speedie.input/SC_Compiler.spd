@@ -116,6 +116,7 @@ linkage
 |[Message]|					API_List
 |[SCFunction]|				API_Funcs
 |Message|					API_Place
+|Date|						CompilationDate
 
 |SCModule|					DisamClasses
 |SCModule|					DisamModules
@@ -181,14 +182,15 @@ function CompileAll
 	StringCorrector.CorrectStrings
 	
 	.Successfulness |= StdErr.ok
-//	target debug
-//		if Compiler.InPerry: app.DebugBreaksActive(false)
+	target debug
+		if Compiler.InPerry: app.DebugBreaksActive(false)
 
 	intrinsics.Process
 	
 	if compiler.InPerry or Options.ModeCake
 		.Timer( "Assemble" )
 		PackMaker.MakePack	
+	compiler.During = 0
 
 	target debug
 		if Compiler.InPerry: app.DebugBreaksActive(true)
@@ -280,6 +282,7 @@ function InitTypes (|bool|)
 
 function InitBasicStuff (|int|) // compiler.init
 	opt norefcounts
+	.CompilationDate = date.now
 	rz = stderr.errorcount
 	if rz > 0
 		stderr.LowerErrorsTo = ErrorSeverity.Warning
@@ -298,7 +301,7 @@ function InitBasicStuff (|int|) // compiler.init
 
 	.AddGlobalConstNum( "__speedie__",		typeint!,		SCversion.Num )
 	.AddGlobalConstNum( "__time_id__",		typeint!,		scimport.recent.timeid )
-	.AddGlobalConstNum( "__now__",			typedate!,		date.now )
+	.AddGlobalConstNum( "__now__",			typedate!,		.CompilationDate )
 	.AddGlobalConstNum( "__modified__",		typedate!,		scimport.recent)
 
 	.AddGlobalConstFloat( "π",				typefloat64!,	0x400921fb54442d18)		//3.1415926535897932

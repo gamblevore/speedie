@@ -168,10 +168,9 @@ module PackMaker
 		.OrderLibGlobs
 		assembler.sh.ASMInit
 		PackMaker.AddAll
-		if stderr.OK and .BuildPackGlobs
-			if .FATCompile and options.ModeCake		// ModeCake can be false, if compiler.InPerry
-				.BakePackToDisk
-		compiler.During = 0
+		require stderr.OK and .BuildPackGlobs
+		if .FATCompile and options.ModeCake		// ModeCake can be false, if compiler.InPerry
+			.BakePackToDisk
 	
 	
 	function BakePackToDisk

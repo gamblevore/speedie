@@ -221,6 +221,7 @@ function @ASMType.ASMFunction (fn_asm)					// dofunction
 		TableID = PointerCall.reg
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 	
+	fn.ASMReached = (fn.ASMReached + 1) min 255
 	dest = .FunctionDestination(exp, dest &~ asmreg.ExitAtAll, fn)
 	|| Start = .curr
 	|asmreg[8]| Regs

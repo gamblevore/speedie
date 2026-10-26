@@ -300,17 +300,26 @@ function SCFunction.IsUnused (|bool|)
 
 
 	
+function SCFunction.GiveFeedback (|message| feedback, |string| msg)
+	opt norefcounts
+	|| src = .source$
+	feedback.msg(@tmp, .name + msg) <~ src.position
+
+
 function SCFunction.CheckUnused (|message| feedback)
 	opt norefcounts 
 	require self isnt Disabled
 	require self isnt InitFunc
-
-	if .IsUnused and Compiler.Successfulness
-		|| src = .source
+	if Compiler.Successfulness
+		if .IsUnused
 			|| str = "() is unused."
 			if .linkfrom != nil
 				str = "()'s callers are unused"
-			feedback.msg(@tmp, .name + str) <~ src.position
+			.GiveFeedback(feedback, str)
+		  elseif !.ASMReached and (.InlineCount > 2) and .islibrary
+			if self isnt LinkInline
+				.GiveFeedback(feedback, " might as well be inline.")
+
 	
 	require (self isnt cpp)
 	if !.HasProto
