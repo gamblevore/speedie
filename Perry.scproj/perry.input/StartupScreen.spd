@@ -22,7 +22,7 @@ class StartupWindow (window)			// splashscreen, startupscreen, startwindow
 		function Hide
 			opt norefcounts
 			|| w = ._win
-				w.close
+				w.CloseWindow
 
 
 		function Show

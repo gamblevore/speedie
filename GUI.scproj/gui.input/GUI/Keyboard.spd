@@ -40,7 +40,7 @@ struct SDL_Keysym
 	|Uint16|		mod				/* current key modifiers */
 	|Uint|			unused
 
-	function Command (|bool|)
+	inline Command (|bool|)
 		return .mod & (1024|||64|||128|||2048)
 	
 
@@ -71,19 +71,11 @@ dataType Keys (int)
 			return "opt"
 		if self < 128
 			return self|byte|.Render
-	
-	function Eat
-		|| r = .record
-			r.date = 0
-
-	function Limit
+		
+	libinternal Limit
 		|| r = .record
 			if r.date
 				r.date = gui.FrameStart
-
-	function IsEaten (|bool|)
-		|| r = .record
-			return !r.date
 
 	function HeldKey (|duration| durr=0.05s, |bool|)
 		|| r = .Record
@@ -91,15 +83,13 @@ dataType Keys (int)
 	
 	function Number (|ind|)
 		|uint| x = self-num0
-		if x <= 9
-			return x
-		return -1
-//		if self >= Num0 and self <= num9
-//			return self-num0
+		if x > 9
+			x = -1
+		return x
 		
 	function IsFirstFrame (|bool|)
 		|| r = .Record
-			return r is NewlyAdded
+			return r.date and r is NewlyAdded
 	
 	
 	function Length (|int| Plus,  |float| Limit,  |float|)
@@ -111,13 +101,9 @@ dataType Keys (int)
 		if limit and i.State == guikeyrecordinfo.Stable
 			if rz.length > limit
 				i.date = G
-			  else 
+			  else
 				rz = 0
 
-
-	function Scan (|SDL_Scancode|)
-		cpp_wrapper SDL_GetScancodeFromKey
-			
 	function IsAccept (|bool|)
 		return (self is RETURN or RETURN2 or Enter or AC_FORWARD)
 	
@@ -168,12 +154,6 @@ dataType Keys (int)
 		|bool|					Debug = true
 		|GUIKeyRecord[6]|		Record
 
-
-		libinternal Clear
-			// .KeyLogSub("Clear")
-			// .record = nil			// Could be allowed???? :O
-			for i in MaxKeyRecord
-				.record[i].Clear
 		
 		libinternal KeysVs (|keys| pa, |keys| pb,  |keys| ma, |keys| mb, |float| Limit,  |float|)
 			|| P = pa._ago(pb)
@@ -232,8 +212,10 @@ dataType Keys (int)
 			disabled "Keys can be disparate"
 
 		function Reset
-			.Clear
-			.Resetkeyboard
+			for i in MaxKeyRecord
+				|| r = .Record[i]
+				if !r.IsEaten
+					r.Clear
 
 		libinternal EmptySlot (|keys| Key, |&guikeyrecord|)
 			if key != 0
@@ -249,24 +231,33 @@ dataType Keys (int)
 			|| r = .EmptySlot(key)
 			if  !r  or  r.key == key  and  r.state >=  GUIKeyRecordInfo.ToAdd
 				return
-			
+				
 			r.key = key
 			r.date = GUI.FrameStart
 			r.state = GUIKeyRecordInfo.ToAdd + (key is escape)		// escape starts as "newly added"
 					
-			
+		
 		libinternal RemoveKey (|keys| Key)
 			|| r = key.record
 				r.State = guiKeyRecordInfo.ToRemove
 		
 		
+		function keys.Scan (|SDL_Scancode|)
+			// 512 max I think.
+			cpp_wrapper SDL_GetScancodeFromKey
+
+	
 		libinternal FlushKeys
-			|| Buff = .state(nil)|&byte|			// C++ bug
+			|int[1]| MaxScanCodes_						// C++ bug
+			|| Buff = .state(MaxScanCodes_)|&byte|
+			|| MaxBuff = 512 min MaxScanCodes_[0]
 			for i in MaxKeyRecord
 				|| r = .record[i]
-				|| scan = r.Key.Scan
-				if !buff[Scan]						// SDL dangling key bug work around.
-					.RemoveKey(r.key)
+				|| k = r.key
+				if k != 0
+					|| scan = k.Scan					// SDL dangling key bug work around.
+					if (scan < MaxBuff) and !buff[Scan]
+						r.clear
 				
 				|| s = r.state
 					if s == guikeyrecordinfo.ToRemove
@@ -833,14 +824,21 @@ struct GUIKeyRecord
 	|keys|	Key
 	|GUIKeyRecordInfo| State
 
-	function Clear
+	function IsEaten (|bool|)
+		return self and !.date and .key!=nil
+		
+	inline Clear
 		.date = nil
 		.key = nil
 		.state = nil
 	
+	inline Eat
+		if self
+			.date = nil
+		
+	
 	syntax is (|GUIKeyRecordInfo| V, |bool|)
 		inlined
-		// need an automatic inliner...
 		return .state == v
 
 

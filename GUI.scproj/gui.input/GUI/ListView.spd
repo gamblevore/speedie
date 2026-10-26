@@ -154,8 +154,15 @@ class ListView (GUIControl) {
 	
 	function PressReturnKey (|bool|)
 		opt norefcounts
+		|| f = .FirstSelected
+		if f isa menuitem
+			|| event = f.MenuEvent
+				(event)(self,  f,  nil)
+				rz = true
+
 		|| r = .OnReturn
-			return (r)(self, .FirstSelected)
+			if (r)(self, f)
+				rz = true
 		
 	
 	function Clear

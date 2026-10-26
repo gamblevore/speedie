@@ -589,7 +589,7 @@ class PerryIDE (Window)
 		.CanAskingAboutMissing = false
 		
 		if ("Project "+f.name+" isn't on the file-system anymore.\n\nWould you like to close it?").confirm
-			.close
+			.CloseWindow
 			rz = true
 		  elseif .IsSingleFileProject
 			f.write("") // why not f.touch?

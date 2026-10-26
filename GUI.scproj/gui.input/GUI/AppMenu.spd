@@ -13,48 +13,31 @@ role AppMenu (Window)
 		.ClickOutsideCloses = true
 		.OnKeyDown = menukeydown|GUIKeyEvent|
 		
-		|| LV = ListView(self,	nil,	MenuReturnkey)
+		|| LV = ListView(self,	nil, Close)
 		lv.id = "AppMenu"
 		.gnormal.edge = (0.5, 0.0, 1.0, 0.5).px
 		lv.gnormal = ¥.Menus
 		lv.gRowSel = ¥.MenuRowSel
 
-		lv <~ ("About " + app.filename,		MenuAbout)
+		lv <~ ("About " + app.filename,		About)
 		lv.addsep
-		lv <~ ("FullScreen",				MenuFullScreen)
-		lv <~ ("Help",						MenuHelp)
-		lv <~ ("Quit",						MenuQuit)
+		lv <~ ("FullScreen",				FullScreen)
+		lv <~ ("Help",						Help)
+		lv <~ ("Quit",						Quit)
 
 		.setfocus
 
 
 	libinternal MenuKeyDown (GUIKeyEvent)
-		require key is escape
-		.cancelreturn
-		|| c = choices()
-			c.selectnone
-		return true
-
-
-	function ShowAsDialog
-		|| c = AppMenu.Choices$
-		|| n = c.listsource.Count
-		|| mh = n * c.rowheight + 4
-		.size = 160~wide by (mh)~high
-		c.size = the~area
-		c.selectfirst
-		
-		|| p = (self)()
-		if p isa menuitem
-			c.selectnone
-			(p.MenuEvent)(self, p, nil)?
-
+		if key is escape
+			.CloseWindow
+			return true
 
 	module
 		|window| Menu
 		libinternal Choices (|ListView?|)
 			opt norefcounts
-			return .GetAppMenu["AppMenu"]|&nil||listview|
+			return .GetAppMenu["AppMenu"] as ListView
 
 		function SyntaxAppend (|string| name="", |guimenuevent| ev=nil)
 			opt norefcounts
@@ -69,14 +52,25 @@ role AppMenu (Window)
 				.menu = rz
 				rz.hide
 
-		libinternal Show (|int|)
-			|| m = .GetAppMenu
-			.choices.setfocus
-			m.ShowAsDialog
+
+		function Show (|GUIActivity|)
+			opt norefcounts
+			|| m = .getappmenu
+			|| c = AppMenu.Choices$
+			c.setfocus
+			|| n = c.listsource.Count
+			|| mh = n * c.rowheight + 4
+			m.size = 160~wide by (mh)~high
+			m.ClickOutsideCloses = true
+			c.size = the~area
+			c.selectfirst
+			m.Show
 			return GUIActivity.activity
 
+////// MENUS ///////
 
-		libinternal MenuHelp (GuiMenuEvent)
+		libinternal Help (GuiMenuEvent)
+			opt norefcounts
 			|| it = app.Conf("HelpURL")
 				app.showurl(it)
 				return 
@@ -85,20 +79,21 @@ role AppMenu (Window)
 			beep "No help available."
 		
 		
-		libinternal MenuQuit (GuiMenuEvent)
+		libinternal Close (GUIListEvent)
+			opt norefcounts
+			.window.CloseWindow
+			return true
+			
+		
+		libinternal Quit (GuiMenuEvent)
 			gui.askQuit
 		
 		
-		libinternal MenuFullScreen (GuiMenuEvent)
+		libinternal FullScreen (GuiMenuEvent)
 			gui.FullScreen(true) = (!gui.IsFullScreen)|int|
-
-
-		libinternal MenuReturnkey (GuiListEvent)
-			(.window as appmenu)!.ReturnValue = .FirstSelected
-			return true
 		
 		
-		libinternal MenuAbout (GuiMenuEvent)
+		libinternal About (GuiMenuEvent)
 			|| aboutstr = app.Conf("about")
 			if !aboutstr
 				aboutstr = `$appname v$version`

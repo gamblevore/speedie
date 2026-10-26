@@ -20,7 +20,6 @@ class Window (GUIControl)
 	|uint64|							FrameCount
 
 	visible false
-	|uint|								_CloseAttempts
 	|date|								_AlphaFader
 	|bool|								_FocusWasSet
 	|float|								BlockScale
@@ -32,7 +31,6 @@ class Window (GUIControl)
 	|date|								_LastTimeSeen
 	|byte|								_FlashSelf
 	|bool|								_NeedsResize
-	|bool|								_WindowClosed
 	|bool|								_BlockRecurseKeyDown
 	|bool|								_PostLoaded
 	|TaskGUI?|							_Scroller
@@ -149,7 +147,7 @@ class Window (GUIControl)
 		.ReturnValue = nil
 		if rz == self
 			rz = nil
-		.Close
+		.CloseWindow
 	
 
 	libinternal SetInnerFocus (|guicontrol| Focus)
@@ -283,7 +281,7 @@ class Window (GUIControl)
 			return true
 		
 		|| F = .realfocus
-			|| menu = .openedmenu
+			|| menu = .OpenedMenu
 			if !menu
 				if f.__keydown__(key)
 					return true
@@ -466,7 +464,8 @@ class Window (GUIControl)
 	libinternal GUI.AskAllQuit (|bool|)
 		|| m = window.all.array										// so we can call .show
 		rz = true
-		for w in m
+		for i in m.length
+			|window--| w = m[i]#loop
 			if !w.IsDialog
 				w.show
 				.QuitReason = GUIActivity.questioning				// in case of wierd events
@@ -477,34 +476,40 @@ class Window (GUIControl)
 	libinternal GUI.AskQuit (|GUIActivity|)
 		opt norefcounts
 		
-		require .AskAllQuit
-		rz = GUIActivity.Terminating
-		for w in Window.all
-			gui.QuitReason |= rz
-			w.Close(rz)
-
-		.QuitReason = rz
+		if !.AskAllQuit
+			return GUIActivity.Activity
+		return .Forcequit(GUIActivity.Terminating)
 		
 	
-	inline Remove
+	function Remove
 		gui.Touch
-		._WindowClosed = true // closing this immediately is not cool
+		window._Closed <~ self
 
 
-	function Close (|GUIActivity| Reason = GUIActivity.windowclose, |GUIActivity|)
+	libinternal OtherMainWindowsExist (|bool|)
+		opt norefcounts
+
+		for w.fast in window.all
+			if (w != self) and w.ismainwindow
+				return true
+
+	function CloseWindow (|GUIActivity| Reason = GUIActivity.windowclose, |GUIActivity|)
 		if !self
 			return 0
 
-		|| Attempts = ._CloseAttempts++
-		
 		if .IsDialog
 			isnt visible
 			.ReturnValue ?= self
 			.remove
 			return reason
 
-		require  !.__CancelClose__(reason)  or  (reason is terminating) or (Attempts > 100)
-		.remove
+		if reason isnt ExitOrTerminate
+			if .IsMainWindow and !.OtherMainWindowsExist // want to close a "main window" like a document editor.
+				|| Activity = gui.AskQuit // already closes all the windows
+					return Activity
+
+		if  !.__CancelClose__(reason)  or  (reason is terminating)
+			.remove
 		return reason
 	
 	
@@ -572,11 +577,13 @@ class Window (GUIControl)
 
 	module
 		|guicontrol of Window|		All = guicontrol(nil)
+		|guicontrol of Window|		_Closed = guicontrol(nil)
 		
 		function Front (|Window|)
+			opt norefcounts
 			|| w = .all.last
 			while w
-				if (w is Visible) and !w._WindowClosed
+				if w is Visible
 					return w
 				w = w.prev|&nil||window|
 

@@ -34,7 +34,7 @@ module GUI
 	|bool|						BlockTextInput
 	|date|						ForeGroundTime
 	|bool|						FlashSelector
-	|GUIActivity|				QuitReason
+	|GUIActivity|				_QuitReason
 	|GUIActivity|				DuringAction
 	|date|						FastToolTipDate
 	|date|						ChangeSelFlash
@@ -259,7 +259,7 @@ module GUI
 		while .SingleFrameSub
 			0
 		.SingleFrameDepth--
-		.quit
+		.forcequit
 		.sdl_quit
 		
 		return (!StdErr.OK)|int|
@@ -339,6 +339,8 @@ module GUI
 		.SDL_SetWindowMaximumSize(w, 2K, 2K)
 		.SDL_SetWindowMinimumSize(w,  400,  200)
 		.hint("SDL_VIDEO_ALLOW_SCREENSAVER") = true
+		.hint("SDL_QUIT_ON_LAST_WINDOW_CLOSE") = false
+		
 		.vsync = true
 		.renderer = SDL_CreateRenderer(w, -1, 0)		#expect (gui, "SDL_CreateRenderer failed")
 		
@@ -391,18 +393,7 @@ module GUI
 		
 	function IsFullScreen (|bool|)
 		return .CurrDisplaySize.y <= .Screenraw.size.y
-		
-	
-//  seems unneeded now?
-//	libinternal BumpSize
-//		description "Fixes a MacOSX bug. Not my fault!" 
-//		.FixScreenBug = 0
-//		|| n = GUI.NativeWindow
-//			|| was = .IsFullScreen
-//			.SDL_FullScreen(n, -1)
-//			if was
-//				.SDL_FullScreen(n, 1)
-	
+			
 	
 	function Scaling (assigns:|float| scale)
 		scale = scale.clamp(1.0, 8.0)
@@ -511,7 +502,7 @@ module GUI
 	libinternal ActualEvents (|GUIActivity|) // frameevents
 		while ((.SingleFrameDepth > 1) or (.QuitReason isnt ExitOrTerminate)) and .Event.Poll
 			.EventCount++
-			rz |= .CheckEvent(.event)
+			rz |= .HandleOneEvent(.event)
 			.Event.type = 0
 		if .NeedMouseMove
 			.DoFakeMouseMove
@@ -613,7 +604,7 @@ module GUI
 		
 		|| w = .OrderWindows
 		if !w
-			rz |= GUIActivity.Terminating
+			(rz is Terminating)
 			return rz
 			
 		.UpdateTextFocus(W)
@@ -807,21 +798,7 @@ module GUI
 	
 	libinternal DoSimulation
 		opt norefcounts
-		{
-			|guicontrol--| w = window.all.Last
-			while w
-				|| p = w.prev
-				if (w isa window)
-					if w._WindowClosed
-						w._windowclosed = false
-						w|list|.Remove
-				  else
-					printerror "Found non-window in the windowlist: "
-					printerror w.id // possible memory corruption
-					w|list|.remove
-				w = p
-		}
-		
+
 		|| wf = Window.front$
 		.DuringAction = guiactivity.Simulation
 		|| FrontIsDialog = .DialogIsOpen
@@ -875,6 +852,7 @@ module GUI
 		opt norefcounts
 		if .ForeGroundTime.GuiAgo < 0.1s // attempt to fix key-stickyness. we still getting this SDL2 bug!
 			keys.Reset
+			keys.Resetkeyboard
 		
 		|| HasWindow = window.front!=nil
 		|| EnoughTime = .DelayEvents
@@ -882,6 +860,7 @@ module GUI
 			|| Occur = .HandleEvents
 			require Occur isnt ExitOrTerminate
 		
+		window._Closed.clear
 		.DoSimulation
 		.CheckTaskAnimations
 		.DrawState |= (.TouchCount != 0)
@@ -995,20 +974,30 @@ module GUI
 		SDL_RenderPresent(.renderer!)
 
 
+	function QuitReason (assigns:|guiactivity| Value)
+		if Value is WindowClose					// how
+		(value isnt WindowClose)
+		(value isnt activity)
+		._QuitReason = value
+		
+	function QuitReason (|guiactivity|)
+		return ._QuitReason
+		
 	inline IsQuitting (|bool|)
 		return .quitreason is ExitOrTerminate
 
 
-	function Quit (|GUIActivity| Reason=0, |GUIActivity|)
+	function ForceQuit (|GUIActivity| Reason=0, |GUIActivity|)
 		opt norefcounts	
-		reason |= GUIActivity.Exiting
+		(reason is Exiting)
 		
 		.SavePrefs // in case we crash during quit
 
 		SDL_SetRelativeMouseMode(false)		// helpful
 		for w in window.all
 			.quitreason |= reason			// in case of wierd events clearing the reason
-			w.close(reason)
+			w.CloseWindow(reason)
+		.quitreason = reason
 
 		.SavePrefs
 		return reason
@@ -1055,7 +1044,7 @@ module GUI
 		return .MenuAt(xy, test) ?? self[xy]
 
 
-	libinternal StandardKeyHandler (|keys| key, |bool|)
+	libinternal StandardKeyHandler (|keys| key, |window| w, |bool|)
 		opt norefcounts
 		|| cmd = keys.cmd
 		if cmd and key is q
@@ -1063,7 +1052,6 @@ module GUI
 				gui.askQuit
 			return true
 		
-		|| w = window.front						#require
 		|| rf = w.realfocus
 			if cmd
 				if (key is f) and !(keys.shift or keys.option)
@@ -1117,8 +1105,9 @@ module GUI
 		return GUI.AskQuit
 	
 	
-	libinternal BackgroundChanged (|bool| back, |int|)
-		keys.Reset
+	libinternal BackgroundChanged (|bool| back, |guiactivity|)
+		target !debug
+			keys.Reset
 		|| same = .IsBackground == back
 		
 		require !same
@@ -1142,7 +1131,7 @@ module GUI
 		return .FrontDialog ?? __modules__.window.front
 	
 	
-	libinternal CheckEvent (|&SDL_Event| ev, |int|)
+	libinternal HandleOneEvent (|&SDL_Event| ev, |GUIActivity|)
 		visible, opt norefcounts
 		|| t = ev.type
 		
@@ -1153,9 +1142,9 @@ module GUI
 			.quitreason |= GUIActivity.ExitOrTerminate
 			return GUIActivity.ExitOrTerminate
 		
-		if  t is QUIT // comes from cmd-w! this code is to block this bad SDL2 design.
+		if  t is QUIT // osx: cmd-w sends this! This code is to block this bad SDL2 design.
 			if !.Quitreason
-				.Quitreason |= GUIActivity.Exiting
+				.QuitReason |= GUIActivity.Exiting
 			return .Quitreason
 		
 		if  t is WINDOWEVENT
@@ -1207,50 +1196,24 @@ module GUI
 			return .MouseUpEvent(w, xy, b.button)
 
 	
-	libinternal GestureEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal GestureEvent (|&SDL_Event| ev, |window| w, |guiactivity|)
 		|| f = ev.Gesture
 		|| rot = f.dTheta
 		|| pinch = f.dDist
 		|| mina = (π/180.0)|float|
 		if rot.length > mina or pinch.length > 0.002
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
-			
-		
-	libinternal QuitBecauseWindowClosed (|window| w, |GUIActivity|)
-		opt norefcounts
-		if !w.ismainwindow
-			return nil
-		// we closed a "main window" like a document editor.
-		// closing other windows shouldn't affect anything.
-		
-		for ww in window.all
-			if (w != ww) and ww.ismainwindow
-				// another mainwindow exists, so we are safe.
-				return nil
-		
-		if .AskQuit
-			.quitreason |= GUIActivity.exiting
-			return GUIActivity.exiting
-		
-		return GUIActivity.Activity
-			
+						
 		
 		
-	libinternal WindowEvent (|&SDL_Event| ev, |int|)
+	libinternal WindowEvent (|&SDL_Event| ev, |guiactivity|)
 		opt norefcounts
 		|| wev = ev.window
 		|| wt = wev.event
 		if wt is CLOSE										// A request to close ANY window.
 			|| w = window.front
-			if !w
-				return GUIActivity.exiting
-								// or .front should only return visible windows...
-			|| Activity = .QuitBecauseWindowClosed(w)
-				return Activity
-			.Quitreason |= GUIActivity.activity
-			w.Close
-			.Quitreason |= GUIActivity.activity
-			return GUIActivity.activity
+				return w.CloseWindow
+			return GUIActivity.exiting
 			
 		if wt is RESIZED
 			.NewSize = (wev.data1, wev.data2)
@@ -1263,7 +1226,7 @@ module GUI
 			return .BackgroundChanged(true)
 
 
-	libinternal MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |int|)
+	libinternal MouseUpEvent (|window| w, |ivec2| XY, |int| Button,  |guiactivity|)
 		SDL_CaptureMouse(false)
 		|| dd   = .drawdrag
 		|| di	= w.DroppingInto
@@ -1281,7 +1244,7 @@ module GUI
 		return GUIActivity.activity
 
 
-	libinternal MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |int|)
+	libinternal MouseMoveEvent (|?&SDL_MouseMotionEvent| ev, |window| w, |ivec2| XY, |guiactivity|)
 		// shouldn't occur in background... unless we have a DragEvent?
 		|| OldXY = .CurrMouseXY
 		|ivec2| move
@@ -1314,7 +1277,7 @@ module GUI
 		return .MouseMoveEventSub(move, w, xy)
 
 	
-	libinternal MouseMoveEventSub (|ivec2| Move, |window| w, |ivec2| XY, |int|)
+	libinternal MouseMoveEventSub (|ivec2| Move, |window| w, |ivec2| XY, |guiactivity|)
 		opt norefcounts
 		|| PrevOver = w.CurrMouseOver
 		|| Over  = w.ControlOrMenuAt(Xy, false)
@@ -1337,7 +1300,7 @@ module GUI
 				return GUIActivity.activity
 
 
-	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal TextInputEvent (|&SDL_Event| ev, |window| w, |guiactivity|)
 		#!textinput!
 		if .AllowTyping and !.BlockTextInput and (.CanDrag <= mousedragging.Handled)
 			|| e = ev.Editing.str
@@ -1345,26 +1308,27 @@ module GUI
 				rz = GUIActivity.activity
 
 
-	libinternal KeyUpEvent (|&SDL_Event| ev, |int|)
+	libinternal KeyUpEvent (|&SDL_Event| ev, |guiactivity|)
 		|| key = ev.key.key
 		keys.Removekey(key)
 		return GUIActivity.activity
 
 
-	libinternal MouseWheelEvent (|&SDL_Event| ev, |window| w,  |int|)
+	libinternal MouseWheelEvent (|&SDL_Event| ev, |window| w,  |guiactivity|)
 		w.__gesture__(ev.wheel.xy*(1,-1), 0, 0)
 		return GUIActivity.Activity
 	
 	
-	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |int|)
+	libinternal KeyDownEvent (|&SDL_Event| ev, |window| w, |GUIActivity|)
 		#!keydown!
 		if .ForeGroundTime.GuiAgo < 0.1s
 			return GUIActivity.nothing
 		
 		|| kev = ev.keysym
 		|| key = kev.sym
-
-		if key.IsEaten
+		|| rkey = key.record
+		
+		if rkey.IsEaten
 			return GUIActivity.nothing
 
 		beep._OK = 0
@@ -1373,16 +1337,15 @@ module GUI
 		if !w.OpenedMenu and !.AllowKeyDown(kev)
 			return GUIActivity.nothing
 		
-		if (key isnt escape) or key.IsFirstFrame
-			if .StandardKeyHandler(key) or w.__keydown__(key)
-				.BlockTextInput = true
-				return GUIActivity.activity
+		if (key is escape) and !key.IsFirstFrame
+			if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
+				rkey = key.record
+				rkey.eat
+				return  AppMenu.show
 		
-		// not sure why this is 2. Are we trying to stop this from dialogs?
-		// or stop it being opened just to close? Or what?
-		if (.SingleFrameDepth <= 2) and keys.escape.HeldKey(0.75s)
-			keys.escape.eat
-			return  AppMenu.show
+		if .StandardKeyHandler(key, w) or w.__keydown__(key)
+			.BlockTextInput = true
+			return GUIActivity.activity
 		
 
 	libinternal Window.GetUserAttention
@@ -1392,16 +1355,16 @@ module GUI
 		beep
 	
 	
-	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,  |int|)
+	libinternal MouseDownEvent (|window| w,  |&SDL_MouseButtonEvent| B,  |guiactivity|)
 		|| xy = b.xy
 		beep._OK = 0
 		if notifications.Clickedat(xy)
 			return GUIActivity.activity
 			
 		|| InsideWin = w.lastrect.soothe contains xy
-		if !InsideWin and (w == .FrontDialog)
+		if !InsideWin
 			if w.ClickOutsideCloses
-				w.Close
+				w.CloseWindow
 				return GUIActivity.activity
 			w.GetUserAttention
 			return GUIActivity.nothing
@@ -1471,10 +1434,9 @@ datatype GUIActivity (byte)
 		|GUIActivity|
 		Nothing = 0
 		Activity
-		Questioning
 		WindowClose
+		Questioning
 		ExitOrTerminate = [Exiting, Terminating]
-		StrongWindowClose = WindowClose+Exiting
 
 	constants
 		Resizing = 1
@@ -1482,9 +1444,15 @@ datatype GUIActivity (byte)
 		Simulation
 		EventHandling
 
-	syntax is (|GUIActivity| act, |bool|)
+	syntax is (|GUIActivity| V, |bool|)
 		inlined
-		return self & act
+		return self & V
+
+	syntax is (|GUIActivity| V, assigns:|bool|, |guiactivity|)
+		inlined
+		self &= ~V
+		self |= V*Value
+		return self
 
 
 inline Duration.syntaxcall (|float|)
