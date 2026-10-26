@@ -1067,7 +1067,7 @@ module GUI
 		if cmd
 			if key is w
 				target !osx
-					return w.Close
+					return w.Closewindow
 				return true
 			if (key is PLUS or EQUALS)
 				return .Rescale(.scale+0.5)
