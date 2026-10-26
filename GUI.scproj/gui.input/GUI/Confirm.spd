@@ -55,19 +55,6 @@ function string.Ask (|string| response="",  |string| Title="",  |stringthatwasre
 	return err
 
 
-libinternal window.TryCloseDialog (|bool|)
-	opt norefcounts
-	.cancelreturn
-	|| count = 0
-	if self isa ConfirmationDialog
-		for b in .Buttons
-			if b is visible
-				count++
-		if count == 1
-			.remove
-			return true
-
-
 function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answers,  |string| Response=string.byte(0), |ConfirmCanceller| Cancel = nil, |int|)
 	|| w = ConfirmationDialog._asker init ConfirmationDialog()
 	if !q or w is visible		// recursive... sigh

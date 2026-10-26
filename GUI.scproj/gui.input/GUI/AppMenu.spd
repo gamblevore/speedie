@@ -31,12 +31,13 @@ role AppMenu (Window)
 	libinternal MenuKeyDown (GUIKeyEvent)
 		require key is escape
 		.cancelreturn
-		Choices().selectnone
+		|| c = choices()
+			c.selectnone
 		return true
 
 
 	function ShowAsDialog
-		|| c = AppMenu.Choices!
+		|| c = AppMenu.Choices$
 		|| n = c.listsource.Count
 		|| mh = n * c.rowheight + 4
 		.size = 160~wide by (mh)~high
@@ -50,11 +51,10 @@ role AppMenu (Window)
 
 
 	module
-		|AppMenu|	Menu
-		libinternal Choices (|ListView!|)
+		|window| Menu
+		libinternal Choices (|ListView?|)
 			opt norefcounts
-			.GetAppMenu
-			return .menu["AppMenu"]|&nil||listview|!
+			return .GetAppMenu["AppMenu"]|&nil||listview|
 
 		function SyntaxAppend (|string| name="", |guimenuevent| ev=nil)
 			opt norefcounts

@@ -5,9 +5,10 @@ import "GameExamples/tetris.spd"
 
 
 main
-	FlowLog.TryStart
 	if .Yes("crash")
 		.Crash
+		
+	FlowLog.TryStart
 	
 	GUI.Init
 	Perry.Startup

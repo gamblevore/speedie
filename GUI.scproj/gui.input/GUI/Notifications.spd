@@ -67,18 +67,14 @@ module Notifications
 		opt norefcounts
 		for w in .Alerts
 			w.DrawWindow(GUI.Screen)
-
-
-	function Window.Remove
-		gui.Touch
-		super.remove
 		
 		
 	function CheckForDisappear
 		opt norefcounts
 		for w in .Alerts
 			if !.shoulddraw(w)
-				w.remove
+				gui.Touch
+				w|list|.remove
 		
 	
 	syntax append (|string| desc, |message| details=nil, |errorseverity| strength=errorseverity.ok)

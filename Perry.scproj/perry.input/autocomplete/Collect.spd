@@ -109,8 +109,9 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 			if !.UsingSpdLib
 				.UsingSpdLib = true
 				f.name = .projname.TrimExt + "()"
-			.LogOneComm(p, "feedback")
 			|| spd = (Speedie_Main).Spawn(f.name, p)
+			.LogOneComm(p, "feedback", spd)
+			if spd
 				return spd
 
 //	|| proc = file.speediedir.child("Speedie.scproj/Build/Products/Debug/Speedie")

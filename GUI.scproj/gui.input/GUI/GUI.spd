@@ -593,6 +593,14 @@ module GUI
 				w.position = -1
 				window.all.first = w
 
+		if !rz
+			for w2 in window.all
+				if !w2.IsDialog
+					(w2 is visible)
+					rz = w2
+					
+
+		
 		
 	libinternal PreFrame (|GUIActivity|)
 		opt norefcounts		
@@ -604,17 +612,21 @@ module GUI
 		.HandleOpenFile
 		
 		|| w = .OrderWindows
-			.UpdateTextFocus(W)
-			.PreFrameText(w)
+		if !w
+			rz |= GUIActivity.Terminating
+			return rz
 			
-			|| ed = w.inline
-			if ed.needshide
-				ed.clear
+		.UpdateTextFocus(W)
+		.PreFrameText(w)
+		
+		|| ed = w.inline
+		if ed.needshide
+			ed.clear
 
-			if .CanDrag >= mousedragging.DragEvenIfStill
-				.touch
-				w.DoMouseDrag(.MouseXY, true)
-				rz = GUIActivity.activity
+		if .CanDrag >= mousedragging.DragEvenIfStill
+			.touch
+			w.DoMouseDrag(.MouseXY, true)
+			rz = GUIActivity.activity			
 	
 	
 	libinternal DoDrawDrag (|window| w)
@@ -795,6 +807,21 @@ module GUI
 	
 	libinternal DoSimulation
 		opt norefcounts
+		{
+			|guicontrol--| w = window.all.Last
+			while w
+				|| p = w.prev
+				if (w isa window)
+					if w._WindowClosed
+						w._windowclosed = false
+						w|list|.Remove
+				  else
+					printerror "Found non-window in the windowlist: "
+					printerror w.id // possible memory corruption
+					w|list|.remove
+				w = p
+		}
+		
 		|| wf = Window.front$
 		.DuringAction = guiactivity.Simulation
 		|| FrontIsDialog = .DialogIsOpen
@@ -802,7 +829,7 @@ module GUI
 			keys.FlushKeys
 
 		|| Got = 0
-		for  w  in  window.all
+		for  w.backwards  in  window.all
 			|| N = w.FrameStepsAmount
 			for n
 				w.DoFrameStep(!FrontIsDialog)
@@ -846,8 +873,10 @@ module GUI
 
 	libinternal SingleFrameSub (|bool|)
 		opt norefcounts
-		if .ForeGroundTime.GuiAgo < 0.1s
+		if .ForeGroundTime.GuiAgo < 0.1s // attempt to fix key-stickyness. we still getting this SDL2 bug!
 			keys.Reset
+		
+		|| HasWindow = window.front!=nil
 		|| EnoughTime = .DelayEvents
 		if EnoughTime or SDL_Event.HasAny
 			|| Occur = .HandleEvents
@@ -856,9 +885,7 @@ module GUI
 		.DoSimulation
 		.CheckTaskAnimations
 		.DrawState |= (.TouchCount != 0)
-		
-		// draw waiting could be improved. Could simulate instead of sleeping?
-		// also drawtime could be variable...
+				
 		if .DrawState == 1
 			.StartDraw
 		if .DrawState & 2
@@ -866,7 +893,7 @@ module GUI
 			// do we need to sleep if vsync is on?
 //			if remain > 2
 //				app.Sleep(remain)
-		return true
+		return HasWindow or window.Front
 
 
 	libinternal EndDraw (|duration|)
@@ -973,7 +1000,7 @@ module GUI
 
 
 	function Quit (|GUIActivity| Reason=0, |GUIActivity|)
-		opt norefcounts
+		opt norefcounts	
 		reason |= GUIActivity.Exiting
 		
 		.SavePrefs // in case we crash during quit
@@ -1112,9 +1139,6 @@ module GUI
 
 	libinternal EventWindow (|window--|)
 		opt norefcounts
-//		|| window = 0
-//		(window) // just test that __modules__ works
-//		the c++ won't compile then. sadly.
 		return .FrontDialog ?? __modules__.window.front
 	
 	
@@ -1137,10 +1161,7 @@ module GUI
 		if  t is WINDOWEVENT
 			return .windowevent(ev)
 
-		|| w = .EventWindow
-		require w // and w.parent // why would w.parent be nil?
-				  // quitting the app during breakout in perry caused this, though
-				  // need to trap this event...
+		|| w = .EventWindow$
 
 		w.__Tickle__
 		if T is dropbegin
@@ -1199,9 +1220,12 @@ module GUI
 		opt norefcounts
 		if !w.ismainwindow
 			return nil
+		// we closed a "main window" like a document editor.
+		// closing other windows shouldn't affect anything.
 		
 		for ww in window.all
 			if (w != ww) and ww.ismainwindow
+				// another mainwindow exists, so we are safe.
 				return nil
 		
 		if .AskQuit
@@ -1217,7 +1241,7 @@ module GUI
 		|| wev = ev.window
 		|| wt = wev.event
 		if wt is CLOSE										// A request to close ANY window.
-			|| w = window.front								// should really be .frontvisible
+			|| w = window.front
 			if !w
 				return GUIActivity.exiting
 								// or .front should only return visible windows...
@@ -1459,6 +1483,7 @@ datatype GUIActivity (byte)
 		EventHandling
 
 	syntax is (|GUIActivity| act, |bool|)
+		inlined
 		return self & act
 
 

@@ -152,13 +152,13 @@ datatype MouseButton (uint)
 
 	module
 		|date|						DownAt
-		function Durr (|date|)
+		inline Durr (|date|)
 			inlined
 			return gui.FrameStart - .DownAt
 	
 
 
-function ivec2.SDLXY (|ivec2|)
+libinternal ivec2.SDLXY (|ivec2|)
 	opt norefcounts
 	|| xy = (.Vec2 / GUI.Scale).ivec2
 	|| x = xy.x
@@ -202,7 +202,7 @@ struct SDL_MouseButtonEvent
 	|int|			x				// mouse-x, window-relative
 	|int|			y				// mouse-y, window-relative
 	
-	inline XY (|ivec2|)
+	libinternal XY (|ivec2|)
 		return (.x,.y).sdlxy
 
 
