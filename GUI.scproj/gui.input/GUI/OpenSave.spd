@@ -159,7 +159,7 @@ class OpenSaveDialog (Window)
 	behaviour KeyDown
 		opt NoRefCounts
 		if (key is up or down) and !.Name.hasfocus
-			return .files.keydown(key)
+			return .files.keydown(key, Modifiers)
 		  elseif key.iscancel
 			.cancelReturn
 			return true
@@ -173,7 +173,7 @@ class OpenSaveDialog (Window)
 				  else
 					.GoIntoFolder
 				return true
-		return super.keydown(key)
+		return super.keydown(key, Modifiers)
 
 
 	libinternal AddButton (|Button| BTN,  |string| Name)

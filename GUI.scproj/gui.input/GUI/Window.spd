@@ -231,7 +231,7 @@ class Window (GUIControl)
 			if o.__TypedString__(input)
 				return true
 		if Input.LengthUTF8 == 1
-			if .__KeyDown__(input.codepoint(false))
+			if .__KeyDown__(input.codepoint(false), 0)
 				return true
 		beep
 	
@@ -271,19 +271,19 @@ class Window (GUIControl)
 	behaviour KeyDown
 		debug_require !._BlockRecurseKeyDown
 		._BlockRecurseKeyDown = true
-		rz = .KeyDownWin(key)
+		rz = .KeyDownWin(key, Modifiers)
 		._BlockRecurseKeyDown = false
 
 
-	libinternal KeyDownWin (|keys| key, |bool|)
+	libinternal KeyDownWin (|keys| key, |keymodifier| Modifiers, |bool|)
 		opt norefcounts
-		if super.KeyDown(key)
+		if super.KeyDown(key, Modifiers)
 			return true
 		
 		|| F = .realfocus
 			|| menu = .OpenedMenu
 			if !menu
-				if f.__keydown__(key)
+				if f.__keydown__(key, Modifiers)
 					return true
 			  elseif (key is tab)
 				if menu isnt typethrough
@@ -293,9 +293,9 @@ class Window (GUIControl)
 				menu.closemenu
 				return true
 			  else
-				if menu.__keydown__(key)
+				if menu.__keydown__(key, Modifiers)
 					return true
-				return (menu is typethrough or f in menu) and f.__keydown__(key)
+				return (menu is typethrough or f in menu) and f.__keydown__(key, Modifiers)
 		
 		if key is tab
 			f ?= .first

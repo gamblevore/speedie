@@ -11,6 +11,30 @@ dataType SDL_Scancode (int)
 
 
 
+datatype KeyModifier (int)
+	linkage
+		cpp_part KM
+	
+	flags
+		Shift
+		Option
+		Control
+		Command
+		
+	syntax is (|keymodifier| Mod, |bool|)
+		inlined
+		return self & mod
+	
+	module
+		function Collect (|keymodifier|)
+			rz |= Command*keys.cmd
+			rz |= Control*keys.ctrl
+			rz |= shift*keys.shift
+			rz |= option*keys.option
+
+
+
+
 struct SDL_KeyboardEvent
 	linkage: wrapper
 	|SDLEventType|				Type
@@ -112,7 +136,7 @@ dataType Keys (int)
 
 	function IsCMM  (|bool| shift=false, |bool|)
 		if shift == (keys.shift or keys.option)
-			return self is section or MacBacktick or backtick or APPLICATION or slash
+			return self is MacBacktick or backtick or APPLICATION or slash
 
 	function IsModifier (|bool|)
 		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
@@ -603,8 +627,11 @@ extend_module keys
 		RIGHTBRACKET = ']'
 		CARET = '^'
 		UNDERSCORE = '_'
-		BACKTICK = '`'
+
+//		Section = 96			// these two are the same.
+		BACKTICK = '`'			// remove one?
 		MacBackTick = 167
+
 		a = 'a'
 		b = 'b'
 		c = 'c'
@@ -631,7 +658,6 @@ extend_module keys
 		x = 'x'
 		y = 'y'
 		z = 'z'
-		Section = 96
 
 		scan = 1<<30
 		CAPSLOCK = scan + SDL_SCANCODE_CAPSLOCK

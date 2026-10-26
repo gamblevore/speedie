@@ -609,9 +609,6 @@ function FileViewerCountCode (GuiMenuEvent)
 
 function perryide.ClearIDE (|keys| key, |bool|)
 	opt norefcounts
-	if super.KeyDown(key)
-		return true
-	
 	|| t = .OutText
 	if t and t.text
 		t.text = ""

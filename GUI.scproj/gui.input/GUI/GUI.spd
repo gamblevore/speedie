@@ -1044,16 +1044,15 @@ module GUI
 		return .MenuAt(xy, test) ?? self[xy]
 
 
-	libinternal StandardKeyHandler (|keys| key, |window| w, |bool|)
+	libinternal StandardKeyHandler (|keys| key, |keymodifier| Mod, |window| w, |bool|)
 		opt norefcounts
-		|| cmd = keys.cmd
-		if cmd and key is q
+		if mod is Command and key is q
 			target !osx
 				gui.askQuit
 			return true
 		
 		|| rf = w.realfocus
-			if cmd
+			if mod is Command
 				if (key is f) and !(keys.shift or keys.option)
 					return rf.OpenSearch
 				if (key is g)
@@ -1064,7 +1063,7 @@ module GUI
 				return rf.OpenSearch
 
 		|| gw = rf ?? w
-		if cmd
+		if mod is Command
 			if key is w
 				target !osx
 					return w.Closewindow
@@ -1088,13 +1087,13 @@ module GUI
 				  else
 					beep
 		
-		if (key is copy) or (cmd and key is c)
+		if (key is copy) or (mod is Command and key is c)
 			|| wf = w._FocusAttempt
 			if !rf and wf isa textview
 				return wf.CopyToClipboard
 			return gw.CopyToClipboard
 		
-		if (key is paste) or (cmd and key is v)
+		if (key is paste) or (mod is Command and key is v)
 			return gw.PasteFromClipboard(clipboard.text)
 
 
@@ -1343,7 +1342,8 @@ module GUI
 				rkey.eat
 				return  AppMenu.show
 		
-		if .StandardKeyHandler(key, w) or w.__keydown__(key)
+		|| mod = keymodifier.collect
+		if .StandardKeyHandler(key, mod, w) or w.__keydown__(key, mod)
 			.BlockTextInput = true
 			return GUIActivity.activity
 		

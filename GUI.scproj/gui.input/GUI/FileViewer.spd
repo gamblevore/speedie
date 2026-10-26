@@ -92,7 +92,7 @@ class FileViewer (ListView)
 			if r isa filerow
 				r.AskDelete(self)
 				return true
-		rz = super.keydown(key)
+		rz = super.keydown(key, Modifiers)
 		.TryReloadPath
 
 
@@ -586,7 +586,7 @@ class FileViewer (ListView)
 			  elseif (key is escape)
 				rz = fv.HideOpenList
 			  elseif key is up or down
-				rz = l.KeyDown(key)
+				rz = l.KeyDown(key, 0)
 
 
 		libinternal QuickOpenFocus (guiaction)

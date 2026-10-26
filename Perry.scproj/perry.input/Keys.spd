@@ -2,11 +2,11 @@
 
 extend PerryIDE
 	behaviour KeyDown
-		if keys.cmd and .cmdkey(key)
+		if (modifiers is command) and .cmdkey(key)
 			return true
 		if (key is tab) and .OpenedMenu == .autocomplete
 			return .autocomplete.doreturn
-		if super.keydown(key)
+		if super.keydown(key, Modifiers)
 			return true
 		if .OpenedMenu or key.IsModifier
 			return false
@@ -14,7 +14,7 @@ extend PerryIDE
 		
 		ifn .focus isa textview		// the main listview IS considered editable!
 			.Editme.SetFocus		// should I just do this anyhow?
-			return .editme.__KeyDown__(key)
+			return .editme.__KeyDown__(key, Modifiers)
 
 
 	function RunKey (|bool|)
@@ -58,6 +58,9 @@ extend PerryIDE
 			return .ShowFind
 		
 		if key is k
+			if super.KeyDown(key, keymodifier.command)
+				return true
+			
 			return .ClearIDE(key)
 		
 		if key is i

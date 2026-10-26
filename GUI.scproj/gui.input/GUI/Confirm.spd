@@ -172,7 +172,7 @@ class ConfirmationDialog (Window)
 		if (.yes is visible) and (key.IsAccept or cans or (key is space))
 			.returnvalue = .YES
 			return true
-		return super.keydown(key)
+		return super.keydown(key, Modifiers)
 
 
 	function AddButton (|Button| BTN, |string| Oof)

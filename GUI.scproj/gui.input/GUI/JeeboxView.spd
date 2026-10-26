@@ -20,7 +20,7 @@ class MessageView (ListView)
 	behaviour KeyDown
 		if key.isdelete
 			return true
-		rz = super.keydown(key)
+		return super.keydown(key, Modifiers)
 
 	
 	

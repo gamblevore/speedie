@@ -374,7 +374,7 @@ class TextView (GUIControl)
 
 	function SendSpecialClick (|ivec2| p, |bool| IsRightClick)
 		.EditClickText(p, 0, !IsRightClick)
-		if IsRightClick and .__keydown__(keys.section)
+		if IsRightClick and .__keydown__(keys.backtick, keymodifier.control|||keymodifier.command)
 			return
 		|| Code = -2 + IsRightClick
 		(.onclicked)(self, Code)?
@@ -766,7 +766,7 @@ class TextView (GUIControl)
 		if self is Enabled
 			if (.OnKeyDown)(self, key)?
 				return true
-			if .SpecialKeyTest(key)
+			if .SpecialKeyTest(key, modifiers)
 				return true
 			|| oncl = .onclicked
 			if oncl and (self isnt editable) and (key.isaccept or key.IsCmm)
@@ -777,7 +777,7 @@ class TextView (GUIControl)
 			return true
 		
 	
-	libinternal SpecialKeyTest (|keys| key, |bool|)
+	libinternal SpecialKeyTest (|keys| key, |keymodifier| Mod, |bool|)
 		if self is editable
 			if .IsInline
 				if key.IsCancel:		return .CancelEditing
@@ -802,9 +802,8 @@ class TextView (GUIControl)
 				return true
 
 		if key is BACKTICK or MacBackTick
-			if (keys.Option or keys.Ctrl or keys.cmd)
+			|| m = mod &~ keymodifier.shift
 				return .CmmKey
-		if key is section:			return .CmmKey
 		if key is left:				return .MoveSel(-1)
 		if key is right:			return .MoveSel(1)
 		if key is up:				return .MoveSelLine(-1, 0)

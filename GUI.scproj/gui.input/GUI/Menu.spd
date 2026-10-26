@@ -162,11 +162,11 @@ class Menu (ListView)
 		if key.iscancel or (key.iscmm and .iscmm)
 			.closemenu
 			return true
-		if super.keydown(key)
+		if super.keydown(key, Modifiers)
 			return true
 		if self is typethrough
 			|| w = .outerfocus
-				return w.__keydown__(key)
+				return w.__keydown__(key, Modifiers)
 
 
 	libinternal FindTypedRow (|string| input, |listviewrow|)
