@@ -17,7 +17,7 @@ prototype ListViewRowDraw		(|ListViewrow|	self,  |int| rowy, |int| texty, |image
 
 prototype GUIAction				(|GUIControl|	self,  |int| State=0, |ListViewrow?| Row=nil, |ListViewrow?| Prev=nil, |bool|)
 prototype GUIMenuEvent			(|GUIControl|	self,  |menuitem| menu, |ListViewcell?| Clicked)
-prototype GUIKeyEvent			(|GUIControl|	self,  |keys| Key, |bool|)
+prototype GUIKeyEvent			(|GUIControl|	self,  |keys| Key, |keymodifier| Modifiers=0, |bool|)
 prototype GUIPasteEvent			(|GUIControl?|	self,  |ListViewrow?| After, |string| Data, |CopyPasteFlags| Purpose, |object|)
 prototype GUICopyEvent			(|GUIControl|	self,  |object?| Item, |string|)
 

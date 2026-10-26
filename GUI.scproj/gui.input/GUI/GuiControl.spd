@@ -77,8 +77,8 @@ class GUIControl (list)
 	virtual MouseMove	(|ivec2| P,  |ivec2| Move,   |SDL_WindowEventID| State, |bool|)
 	virtual Gesture		(|ivec2| Wheel, |float| Rotate, |float| Pinch,  |bool|)
 	virtual RightClick	(|ivec2| P)
-	virtual KeyDown		(|keys| Key, |KeyModifier| Modifiers, |bool|)
-		if (.OnKeydown)(self, key)?
+	virtual KeyDown		(|keys| Key, |KeyModifier| Modifiers=0, |bool|)
+		if (.OnKeydown)(self, key, Modifiers)?
 			return true
 	virtual MouseUp		(|ivec2| P)
 	virtual MouseDown	(|ivec2| P,  |int| Clicks, |int|)

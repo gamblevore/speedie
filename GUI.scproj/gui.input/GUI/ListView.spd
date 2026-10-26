@@ -364,13 +364,13 @@ class ListView (GUIControl) {
 	
 	behaviour KeyDown
 		opt norefcounts
-		if .KeyDownTest(key)
+		if .KeyDownTest(key, Modifiers)
 			._EditDelayed = nil
 			return true
 			
 			
-	libinternal KeyDownTest (|keys| key, |bool|)
-		if (.OnKeydown)(self, key)?
+	libinternal KeyDownTest (|keys| key,  |keymodifier| Modifiers,  |bool|)
+		if (.OnKeydown)(self, key, Modifiers)?
 			return true
 		
 		if key.iscancel

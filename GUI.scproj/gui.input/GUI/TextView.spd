@@ -764,7 +764,7 @@ class TextView (GUIControl)
 			return false
 		
 		if self is Enabled
-			if (.OnKeyDown)(self, key)?
+			if (.OnKeyDown)(self, key, 0)?
 				return true
 			if .SpecialKeyTest(key, modifiers)
 				return true
@@ -906,7 +906,7 @@ class TextView (GUIControl)
 		if .SingleLine
 			return true									// eat it
 		|| extra = 0
-		if ((.onkeydown)(self, -10)?) and !keys.shift
+		if ((.onkeydown)(self, -10, 0)?) and !keys.shift
 			.Selection = .ExtendToLineEnd(.SelAfter-1)		// move sel to end of line
 			extra = 4
 		.NewLineSub(Extra)
@@ -1037,7 +1037,7 @@ class TextView (GUIControl)
 		ifn .seltext.find(charset.Line)
 			if .InsertAutoComplete
 				return true
-			if (.onkeydown)(self, -9)?
+			if (.onkeydown)(self, -9, 0)?
 				return true
 			if !sh or .isinline
 				return .typed("\t")
@@ -1466,7 +1466,7 @@ class TextView (GUIControl)
 		  elseif input == "|"
 			input = "\\"
 		if input.LengthUTF8 == 1
-			if (.onkeydown)(self, input.codepoint(false))?
+			if (.onkeydown)(self, input.codepoint(false),  0)?
 				return true
 		return .typed(input)
 	

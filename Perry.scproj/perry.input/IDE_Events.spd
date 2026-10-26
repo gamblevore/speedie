@@ -614,7 +614,7 @@ function perryide.ClearIDE (|keys| key, |bool|)
 		t.text = ""
 		return true
 	
-	if LogAreaKeys(.CommsLogList, key)
+	if LogAreaKeys(.CommsLogList, key, 0)
 		return true
 	
 	|| r = .RunningProd

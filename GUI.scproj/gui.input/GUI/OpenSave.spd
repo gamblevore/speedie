@@ -249,7 +249,7 @@ class OpenSaveDialog (Window)
 				return nil
 		
 			if w.name is visible and editable
-				OnAskSaveName(w.name, keys.return)
+				OnAskSaveName(w.name, keys.return, 0)
 			  else
 				w.GoIntoFolder
 		

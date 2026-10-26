@@ -183,7 +183,7 @@ function PressedReplaceKeys (GUIKeyEvent)
 	if key.isaccept
 		return w.DoReplacements
 	
-	return PressedSearchKeys(self, key)
+	return PressedSearchKeys(self, key, modifiers)
 
 	
 function PressedSearchKeys (GUIKeyEvent)
