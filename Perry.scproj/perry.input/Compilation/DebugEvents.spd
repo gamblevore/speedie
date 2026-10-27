@@ -173,7 +173,7 @@ function PerryIDE.DebugEnvs (|message| env)
 	for rel in env
 		|| ch2 = rel[2]
 		if ch2 and rel[1] == "="
-			app.ChildEnv(rel.first!.name) = ch2.name
+			app.Env(rel.first!.name) = ch2.name
 
 
 function PerryIDE.DebugAppCallArgsDisplay (|file| f, |[string]| args, |faststring|)

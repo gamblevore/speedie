@@ -52,11 +52,15 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 
 
 function PerryIDE.RUN_COMPILE_WRAP (|file| product)
-	|| DebugArgs = .DebugArgs						#require
+	|| DebugArgs = .DebugArgs							#require
 	|| ArgMsg = DebugArgs["args"]
 		ArgMsg = ArgMsg.Copy
 		argmsg.Ask
-		
+	
+	// args, env, or what? pico? a separate file?
+	// pico could set an original path... i guess	
+	// args just seem the easiest, but not so fun to remove from the args list.
+
 	|[string]| args	
 	if  ArgMsg.DebugArgNames(args)
 		|| f = Product
@@ -64,8 +68,9 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 			f = product.Child("Contents/MacOS/" + f.TrimExtAndPath)!
 		
 		|| old = app.cwd
-		.DebugPath(debugargs)	
+		.DebugPath(debugargs)
 		.DebugEnvs(debugargs["env"])		
+		app.Env("OrigScriptPath") = .Project
 		.ACTUAL_DEBUG(f, args)
 		app.cwd = old
 	
@@ -73,4 +78,5 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 		.RunArgsText.FillErrors(StdErr)
 		|| err = StdErr.LastError
 			Notifications <~ err
+
 

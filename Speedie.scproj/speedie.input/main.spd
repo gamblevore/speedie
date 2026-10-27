@@ -51,7 +51,7 @@ function compiler.ClearEnvs
 	|| Allowed = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
 	for (v in app.env) (k)
 		ifn k in Allowed
-			app.childenv(k) = nil
+			app.Env(k) = nil
 
 
 

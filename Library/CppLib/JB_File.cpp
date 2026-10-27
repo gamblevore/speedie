@@ -707,41 +707,49 @@ JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 }
 
 
+JB_String* JB_App__Path (JB_String* Override) {
+	static JB_String* Result;
+	JB_String* R = Result;
+	
+	if (!Override) {
+		if (R) return R;
+		const char* Orig = getenv("OrigScriptPath");
+		if (Orig) {
+			R = JB_StrC(Orig);
+			JB_SetRef(Result, R);
+			return R;
+		}
+	} else { 
+		if (Override->Length) {
+			JB_SetRef(Result, Override);
+			return Override;
+		}
+	}
+
 #if __linux__
-	JB_String* JB_App__Path () {
-		static JB_String* Result;
-		if (!Result) {
-			char Path[ PATH_MAX ];
-			int count = (int)readlink( "/proc/self/exe", Path, PATH_MAX );
-			Result = JB_Str_CopyFromPtr((u8*)(&Path[0]), count);
-			JB_Incr(Result);
-		}
-		return Result;
-	}
+	char Path[ PATH_MAX ];
+	int count = (int)readlink( "/proc/self/exe", Path, PATH_MAX );
+	R = JB_Str_CopyFromPtr((u8*)(&Path[0]), count);
 #else
-	int _NSGetExecutablePath (char* buf, u32* length); // oh apple...
-	JB_String* JB_App__Path() {
-		static JB_String* Result;
-		if (!Result) {
-			u32 N = 0;
-			_NSGetExecutablePath(0, &N);
-			Result = JB_Str_New(N-1);
-			if (N > 0)
-				_NSGetExecutablePath((char*)(Result->Addr), &N);
-			JB_Incr(Result);
-		}
-		return Result;
-	}
+int _NSGetExecutablePath (char* buf, u32* length); // oh apple...
+	u32 N = 0;
+	_NSGetExecutablePath(0, &N);
+	R = JB_Str_New(N-1);
+	if (N > 0)
+		_NSGetExecutablePath((char*)(R->Addr), &N);
 #endif
+	
+	JB_SetRef(Result, R);
+	return R;
+}
 
 
 int JB_App__SetEnv (JB_StringC* name, JB_StringC* value) {
-	if (name) {
-		if (value)
-			return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
-		return unsetenv((const char*)(name->Addr));
-	}
-	return -999;
+//	JB_App__Env();  // collect first? It seems more consistant.
+//  but could crash (if VERY low on memory).
+	if (value)
+		return setenv((const char*)(name->Addr), (const char*)(value->Addr), 1);
+	return unsetenv((const char*)(name->Addr));
 }
 
 void JB_Flow__Report (u8* Addr, int Length);

@@ -427,7 +427,6 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	module
 		|string?| _Speedie = nil
 
-
 		libinternal FindSpeedie	(|string| start, |string|)
 			|| f = start.resolve
 			while
@@ -439,7 +438,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 
 		function SpeedieDir (|string?| Child=nil, |string|)
 			opt norefcounts
-			|| spd = ._speedie init .FindSpeedie(app.exepath)
+			|| spd = ._speedie init .FindSpeedie(app.path)
 			if child!=nil
 				spd = spd.child(Child)
 			return spd

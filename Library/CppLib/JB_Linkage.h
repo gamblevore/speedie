@@ -30,7 +30,7 @@ byte* JB_App__ErrorNumber ();
 void JB_Flow__DisabledIncr(int i);
 void JB_Flow__DisabledSet(int i);
 bool JB_Flow__IsDisabled();
-JB_String* JB_App__Path();
+JB_String* JB_App__Path(JB_String* Override);
 int JB_App__SetEnv(JB_StringC* name, JB_StringC* value);
 int JB_Rec__PrintErrors();
 JB_String* JB_App__LibInfo();   

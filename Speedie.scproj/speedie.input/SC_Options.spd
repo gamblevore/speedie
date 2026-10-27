@@ -228,7 +228,7 @@ module Feedback
 		
 		+'path'
 			Explain(Purpose)$
-			printline app.exepath
+			printline app.path
 		
 		
 		+'beep'

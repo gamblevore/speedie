@@ -9,7 +9,6 @@ module App {
 |string|					Usage
 |message|					_Conf
 |config|					_Prefs
-|string?|					_Path = nil
 |file?|						_StdOut
 |file?|						_stdin
 
@@ -102,24 +101,6 @@ function CrashPrint
 	cpp_wrapper JB_CrashTracer
 
 
-function exepath (|string|)
-	cpp_wrapper JB_App__Path
-
-
-function Path (|string|)
-	cpp_part OrigPath
-	opt norefcounts
-	visible class~file
-	|| p = ._Path
-	if p != nil
-		return p
-	p = .env["OrigScriptPath"]
-	if p == nil
-		p = .exepath
-	._Path = p
-	return p
-
-
 render StackTrace (|int| skip = 2)
 	cpp_wrapper JB_App__StackTrace
 
@@ -140,7 +121,6 @@ function AppPath (|string|)
 		return .path.backtoapp
 	return .path
 
-
 inline CallPath (assigns:|cstring| NewPath)
 	description "Sets the path that this program was called from."
 	opt norefcounts
@@ -148,8 +128,11 @@ inline CallPath (assigns:|cstring| NewPath)
 	.CallPath(NewPath)
 
 function CallPath (|?cstring| NewPath=nil, |stringzeroterminated--|)
-	description "Gets the path that this program was called from."
+	description "Gets the path that this program was called from. Even if is a link or a relative path. To get the actual full executable path, use .path"
 	cpp_wrapper JB_App__CallPath
+
+function Path (|?string| NewPath=nil, |string|)
+	cpp_wrapper JB_App__Path
 
 function TurnInto (|string| ExePath, |[string]| R=nil, |bool|)
 	description "Replaces this program, with the program at {ExePath}, with arguments {R}... Sort of like monster-transformation. Used by .Restart() which turns the program into itself..."
@@ -170,7 +153,7 @@ function GUIMode (assigns:|bool|)
 function Env (|{string}|)
 	cpp_wrapper JB_App__Env
 
-function ChildEnv (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)
+function Env (|StringZeroTerminated| s, assigns:|?StringZeroTerminated| value, |int|)
 	cpp_wrapper JB_App__SetEnv
 
 inline Input (|string| Q, |string|)
@@ -214,7 +197,8 @@ function Name (|string|)
 
 
 function FileName (|string|)
-	return .Path.Name
+	|string--| p = .path 
+	return p.Name
 
 
 function StdIn (|File!|)
