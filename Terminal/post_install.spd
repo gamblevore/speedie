@@ -154,11 +154,11 @@ function app.BuildSDL2 (|string| P)
 	self <~ "Checking for SDL2"
 	|| Header = "/usr/local/include/SDL2/SDL.h"
 	if header.FileExists
-		require  !app.ask("SDL2 is already detected at $header.", "Skip SDL2 Update?")
+		require  !app.ask("SDL2 is already detected at $header", "Skip SDL2 Update?")
 
 	self <~ "Building SDL2"
 	if p starts Spd
-		if !app.ask("Working directory is currently in $spd.", "Use /tmp/spd_install instead?")
+		if !app.ask("Working directory is currently in $spd", "Use /tmp/spd_install instead?")
 			app.quit
 		P = "/tmp/spd_install".file
 		.mkdir(P)$
@@ -227,6 +227,7 @@ function array.operatormul (|[string]| self, |byte| c, |string|)
 function app.Ask (|string| Prefix, |string| Q,   |bool|)
 	print prefix
 	if IsTesting or !FileDes.stdout.isterminal
+		""
 		return true
 	
 	if app["y"] or app["n"]
