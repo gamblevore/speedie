@@ -185,16 +185,16 @@ module GUI
 
 	libinternal NukeCursor
 		|| w = .ScreenWindow$
-		SDL_Cursor.Empty.Use
+		SystemCursor.Empty.Use
 		.ShowCursor(false)
 						
 
 	inline ShowCursor (|bool| v = true)
-		sdl_cursor.Show(v|int|)
+		SystemCursor.Show(v|int|)
 
 
 	inline CursorVisible (|bool|)
-		return sdl_cursor.Show()
+		return SystemCursor.Show()
 
 
 	libinternal ScreenRaw (assigns:|ivec4| result, |bool|)
