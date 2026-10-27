@@ -14,6 +14,10 @@ dataType SDL_Scancode (int)
 datatype KeyModifier (int)
 	linkage
 		cpp_part KM
+	// if I'm bored and drunk enough one day I can merge key with keymodifier haha.
+	// function key.syntaxequals (|key| x, |bool| aware, |bool|)
+	//     if aware: return x<<5==self<<5
+	// whatever...
 	
 	flags
 		Shift
@@ -342,248 +346,9 @@ dataType Keys (int)
 
 extend_module keys
 	constants
-		|SDL_ScanCode|		
-		SDL_SCANCODE_CAPSLOCK = 57
-
-		SDL_SCANCODE_F1 = 58
-		SDL_SCANCODE_F2 = 59
-		SDL_SCANCODE_F3 = 60
-		SDL_SCANCODE_F4 = 61
-		SDL_SCANCODE_F5 = 62
-		SDL_SCANCODE_F6 = 63
-		SDL_SCANCODE_F7 = 64
-		SDL_SCANCODE_F8 = 65
-		SDL_SCANCODE_F9 = 66
-		SDL_SCANCODE_F10 = 67
-		SDL_SCANCODE_F11 = 68
-		SDL_SCANCODE_F12 = 69
-
-		SDL_SCANCODE_PRINTSCREEN = 70
-		SDL_SCANCODE_SCROLLLOCK = 71
-		SDL_SCANCODE_PAUSE = 72
-		SDL_SCANCODE_INSERT = 73 /**< insert on PC, help on some Mac keyboards (but
-									   does send code 73, not 117) */
-		SDL_SCANCODE_HOME = 74
-		SDL_SCANCODE_PAGEUP = 75
-		SDL_SCANCODE_DELETE = 76
-		SDL_SCANCODE_END = 77
-		SDL_SCANCODE_PAGEDOWN = 78
-		SDL_SCANCODE_RIGHT = 79
-		SDL_SCANCODE_LEFT = 80
-		SDL_SCANCODE_DOWN = 81
-		SDL_SCANCODE_UP = 82
-
-		SDL_SCANCODE_NUMLOCKCLEAR = 83 /**< num lock on PC, clear on Mac keyboards
-										 */
-		SDL_SCANCODE_KP_DIVIDE = 84
-		SDL_SCANCODE_KP_MULTIPLY = 85
-		SDL_SCANCODE_KP_MINUS = 86
-		SDL_SCANCODE_KP_PLUS = 87
-		SDL_SCANCODE_KP_ENTER = 88
-		SDL_SCANCODE_Enter = 88
-		SDL_SCANCODE_KP_1 = 89
-		SDL_SCANCODE_KP_2 = 90
-		SDL_SCANCODE_KP_3 = 91
-		SDL_SCANCODE_KP_4 = 92
-		SDL_SCANCODE_KP_5 = 93
-		SDL_SCANCODE_KP_6 = 94
-		SDL_SCANCODE_KP_7 = 95
-		SDL_SCANCODE_KP_8 = 96
-		SDL_SCANCODE_KP_9 = 97
-		SDL_SCANCODE_KP_0 = 98
-		SDL_SCANCODE_KP_PERIOD = 99
-
-		SDL_SCANCODE_NONUSBACKSLASH = 100 /**< This is the additional key that ISO
-											*   keyboards have over ANSI ones
-											*   located between left shift and Y.
-											*   Produces GRAVE ACCENT and TILDE in a
-											*   US or UK Mac layout, REVERSE SOLIDUS
-											*   (backslash) and VERTICAL LINE in a
-											*   US or UK Windows layout, and
-											*   LESS-THAN SIGN and GREATER-THAN SIGN
-											*   in a Swiss German, German, or French
-											*   layout. */
-		SDL_SCANCODE_APPLICATION = 101 /**< windows contextual menu, compose */
-		SDL_SCANCODE_POWER = 102 /**< The USB document says this is a status flag
-								   *   not a physical key - but some Mac keyboards
-								   *   do have a power key. */
-		SDL_SCANCODE_KP_EQUALS = 103
-		SDL_SCANCODE_F13 = 104
-		SDL_SCANCODE_F14 = 105
-		SDL_SCANCODE_F15 = 106
-		SDL_SCANCODE_F16 = 107
-		SDL_SCANCODE_F17 = 108
-		SDL_SCANCODE_F18 = 109
-		SDL_SCANCODE_F19 = 110
-		SDL_SCANCODE_F20 = 111
-		SDL_SCANCODE_F21 = 112
-		SDL_SCANCODE_F22 = 113
-		SDL_SCANCODE_F23 = 114
-		SDL_SCANCODE_F24 = 115
-		SDL_SCANCODE_EXECUTE = 116
-		SDL_SCANCODE_HELP = 117
-		SDL_SCANCODE_MENU = 118
-		SDL_SCANCODE_SELECT = 119
-		SDL_SCANCODE_STOP = 120
-		SDL_SCANCODE_AGAIN = 121   /**< redo */
-		SDL_SCANCODE_UNDO = 122
-		SDL_SCANCODE_CUT = 123
-		SDL_SCANCODE_COPY = 124
-		SDL_SCANCODE_PASTE = 125
-		SDL_SCANCODE_FIND = 126
-		SDL_SCANCODE_MUTE = 127
-		SDL_SCANCODE_VOLUMEUP = 128
-		SDL_SCANCODE_VOLUMEDOWN = 129
-		SDL_SCANCODE_KP_COMMA = 133
-		SDL_SCANCODE_KP_EQUALSAS400 = 134
-
-		SDL_SCANCODE_INTERNATIONAL1 = 135 /**< used on Asian keyboards, see
-												footnotes in USB doc */
-		SDL_SCANCODE_INTERNATIONAL2 = 136
-		SDL_SCANCODE_INTERNATIONAL3 = 137 /**< Yen */
-		SDL_SCANCODE_INTERNATIONAL4 = 138
-		SDL_SCANCODE_INTERNATIONAL5 = 139
-		SDL_SCANCODE_INTERNATIONAL6 = 140
-		SDL_SCANCODE_INTERNATIONAL7 = 141
-		SDL_SCANCODE_INTERNATIONAL8 = 142
-		SDL_SCANCODE_INTERNATIONAL9 = 143
-		SDL_SCANCODE_LANG1 = 144				/**< Hangul/English toggle */
-		SDL_SCANCODE_LANG2 = 145				/**< Hanja conversion */
-		SDL_SCANCODE_LANG3 = 146				/**< Katakana */
-		SDL_SCANCODE_LANG4 = 147				/**< Hiragana */
-		SDL_SCANCODE_LANG5 = 148				/**< Zenkaku/Hankaku */
-		SDL_SCANCODE_LANG6 = 149				/**< reserved */
-		SDL_SCANCODE_LANG7 = 150				/**< reserved */
-		SDL_SCANCODE_LANG8 = 151				/**< reserved */
-		SDL_SCANCODE_LANG9 = 152				/**< reserved */
-
-		SDL_SCANCODE_ALTERASE = 153 /**< Erase-Eaze */
-		SDL_SCANCODE_SYSREQ = 154
-		SDL_SCANCODE_CANCEL = 155
-		SDL_SCANCODE_CLEAR = 156
-		SDL_SCANCODE_PRIOR = 157
-		SDL_SCANCODE_RETURN2 = 158
-		SDL_SCANCODE_SEPARATOR = 159
-		SDL_SCANCODE_OUT = 160
-		SDL_SCANCODE_OPER = 161
-		SDL_SCANCODE_CLEARAGAIN = 162
-		SDL_SCANCODE_CRSEL = 163
-		SDL_SCANCODE_EXSEL = 164
-
-		SDL_SCANCODE_KP_00 = 176
-		SDL_SCANCODE_KP_000 = 177
-		SDL_SCANCODE_THOUSANDSSEPARATOR = 178
-		SDL_SCANCODE_DECIMALSEPARATOR = 179
-		SDL_SCANCODE_CURRENCYUNIT = 180
-		SDL_SCANCODE_CURRENCYSUBUNIT = 181
-		SDL_SCANCODE_KP_LEFTPAREN = 182
-		SDL_SCANCODE_KP_RIGHTPAREN = 183
-		SDL_SCANCODE_KP_LEFTBRACE = 184
-		SDL_SCANCODE_KP_RIGHTBRACE = 185
-		SDL_SCANCODE_KP_TAB = 186
-		SDL_SCANCODE_KP_DELETE = 187
-		SDL_SCANCODE_KP_A = 188
-		SDL_SCANCODE_KP_B = 189
-		SDL_SCANCODE_KP_C = 190
-		SDL_SCANCODE_KP_D = 191
-		SDL_SCANCODE_KP_E = 192
-		SDL_SCANCODE_KP_F = 193
-		SDL_SCANCODE_KP_XOR = 194
-		SDL_SCANCODE_KP_POWER = 195
-		SDL_SCANCODE_KP_PERCENT = 196
-		SDL_SCANCODE_KP_LESS = 197
-		SDL_SCANCODE_KP_GREATER = 198
-		SDL_SCANCODE_KP_AMPERSAND = 199
-		SDL_SCANCODE_KP_DBLAMPERSAND = 200
-		SDL_SCANCODE_KP_VERTICALBAR = 201
-		SDL_SCANCODE_KP_DBLVERTICALBAR = 202
-		SDL_SCANCODE_KP_COLON = 203
-		SDL_SCANCODE_KP_HASH = 204
-		SDL_SCANCODE_KP_SPACE = 205
-		SDL_SCANCODE_KP_AT = 206
-		SDL_SCANCODE_KP_EXCLAM = 207
-		SDL_SCANCODE_KP_MEMSTORE = 208
-		SDL_SCANCODE_KP_MEMRECALL = 209
-		SDL_SCANCODE_KP_MEMCLEAR = 210
-		SDL_SCANCODE_KP_MEMADD = 211
-		SDL_SCANCODE_KP_MEMSUBTRACT = 212
-		SDL_SCANCODE_KP_MEMMULTIPLY = 213
-		SDL_SCANCODE_KP_MEMDIVIDE = 214
-		SDL_SCANCODE_KP_PLUSMINUS = 215
-		SDL_SCANCODE_KP_CLEAR = 216
-		SDL_SCANCODE_KP_CLEARENTRY = 217
-		SDL_SCANCODE_KP_BINARY = 218
-		SDL_SCANCODE_KP_OCTAL = 219
-		SDL_SCANCODE_KP_DECIMAL = 220
-		SDL_SCANCODE_KP_HEXADECIMAL = 221
-
-		SDL_SCANCODE_LCTRL = 224
-		SDL_SCANCODE_LSHIFT = 225
-		SDL_SCANCODE_LALT = 226		/**< alt, option */
-		SDL_SCANCODE_LGUI = 227		/**< windows, command (apple), meta */
-		SDL_SCANCODE_RCTRL = 228
-		SDL_SCANCODE_RSHIFT = 229
-		SDL_SCANCODE_RALT = 230		/**< alt gr, option */
-		SDL_SCANCODE_RGUI = 231		/**< windows, command (apple), meta */
-
-		SDL_SCANCODE_MODE = 257
-
-		SDL_SCANCODE_AUDIONEXT = 258
-		SDL_SCANCODE_AUDIOPREV = 259
-		SDL_SCANCODE_AUDIOSTOP = 260
-		SDL_SCANCODE_AUDIOPLAY = 261
-		SDL_SCANCODE_AUDIOMUTE = 262
-		SDL_SCANCODE_MEDIASELECT = 263
-		SDL_SCANCODE_WWW = 264
-		SDL_SCANCODE_MAIL = 265
-		SDL_SCANCODE_CALCULATOR = 266
-		SDL_SCANCODE_COMPUTER = 267
-		SDL_SCANCODE_AC_SEARCH = 268
-		SDL_SCANCODE_AC_HOME = 269
-		SDL_SCANCODE_AC_BACK = 270
-		SDL_SCANCODE_AC_FORWARD = 271
-		SDL_SCANCODE_AC_STOP = 272
-		SDL_SCANCODE_AC_REFRESH = 273
-		SDL_SCANCODE_AC_BOOKMARKS = 274
-		SDL_SCANCODE_BRIGHTNESSDOWN = 275
-		SDL_SCANCODE_BRIGHTNESSUP = 276
-		SDL_SCANCODE_DISPLAYSWITCH = 277 /**< display mirroring/dual display
-											   switch, video mode switch */
-		SDL_SCANCODE_KBDILLUMTOGGLE = 278
-		SDL_SCANCODE_KBDILLUMDOWN = 279
-		SDL_SCANCODE_KBDILLUMUP = 280
-		SDL_SCANCODE_EJECT = 281
-		SDL_SCANCODE_SLEEP = 282
-
-		SDL_SCANCODE_APP1 = 283
-		SDL_SCANCODE_APP2 = 284
-
-		SDL_SCANCODE_AUDIOREWIND = 285
-		SDL_SCANCODE_AUDIOFASTFORWARD = 286
-
-		/* @} *//* Mobile keys */
-		SDL_SCANCODE_SOFTLEFT = 287 /**< Usually situated below the display on phones and
-										  used as a multi-function feature key for selecting
-										  a software defined function shown on the bottom left
-										  of the display. */
-		SDL_SCANCODE_SOFTRIGHT = 288 /**< Usually situated below the display on phones and
-										   used as a multi-function feature key for selecting
-										   a software defined function shown on the bottom right
-										   of the display. */
-		SDL_SCANCODE_CALL = 289		 /**< Used for accepting phone calls. */
-		SDL_SCANCODE_ENDCALL = 290	 /**< Used for rejecting phone calls. */
-	
-	
-		/* Add any other keys here. */
-	
-		SDL_NUM_SCANCODES = 512 /**< not a key, just marks the number of scancodes
-									for array bounds */
-
-
-	constants
 		|keys|
-
 		ESCAPE = '\1B'
+		ForwardDELETE = '\b1'
 		DELETE = '\08'
 		RETURN = '\r'
 		TAB = '\t'
@@ -628,8 +393,7 @@ extend_module keys
 		CARET = '^'
 		UNDERSCORE = '_'
 
-//		Section = 96			// these two are the same.
-		BACKTICK = '`'			// remove one?
+		BACKTICK = '`'
 		MacBackTick = 167
 
 		a = 'a'
@@ -660,178 +424,168 @@ extend_module keys
 		z = 'z'
 
 		scan = 1<<30
-		CAPSLOCK = scan + SDL_SCANCODE_CAPSLOCK
-
-		F1 = scan + SDL_SCANCODE_F1
-		F2 = scan + SDL_SCANCODE_F2
-		F3 = scan + SDL_SCANCODE_F3
-		F4 = scan + SDL_SCANCODE_F4
-		F5 = scan + SDL_SCANCODE_F5
-		F6 = scan + SDL_SCANCODE_F6
-		F7 = scan + SDL_SCANCODE_F7
-		F8 = scan + SDL_SCANCODE_F8
-		F9 = scan + SDL_SCANCODE_F9
-		F10 = scan + SDL_SCANCODE_F10
-		F11 = scan + SDL_SCANCODE_F11
-		F12 = scan + SDL_SCANCODE_F12
-
-		PRINTSCREEN = scan + SDL_SCANCODE_PRINTSCREEN
-		SCROLLLOCK = scan + SDL_SCANCODE_SCROLLLOCK
-		PAUSE = scan + SDL_SCANCODE_PAUSE
-		INSERT = scan + SDL_SCANCODE_INSERT
-		HOME = scan + SDL_SCANCODE_HOME
-		PAGEUP = scan + SDL_SCANCODE_PAGEUP
-		ForwardDELETE = '\b1'
-		END = scan + SDL_SCANCODE_END
-		PAGEDOWN = scan + SDL_SCANCODE_PAGEDOWN
-		RIGHT = scan + SDL_SCANCODE_RIGHT
-		LEFT = scan + SDL_SCANCODE_LEFT
-		DOWN = scan + SDL_SCANCODE_DOWN
-		UP = scan + SDL_SCANCODE_UP
-
-		NUMLOCKCLEAR = scan + SDL_SCANCODE_NUMLOCKCLEAR
-		KP_DIVIDE = scan + SDL_SCANCODE_KP_DIVIDE
-		KP_MULTIPLY = scan + SDL_SCANCODE_KP_MULTIPLY
-		KP_MINUS = scan + SDL_SCANCODE_KP_MINUS
-		KP_PLUS = scan + SDL_SCANCODE_KP_PLUS
-		Enter = scan + SDL_SCANCODE_Enter
-		KP_1 = scan + SDL_SCANCODE_KP_1
-		KP_2 = scan + SDL_SCANCODE_KP_2
-		KP_3 = scan + SDL_SCANCODE_KP_3
-		KP_4 = scan + SDL_SCANCODE_KP_4
-		KP_5 = scan + SDL_SCANCODE_KP_5
-		KP_6 = scan + SDL_SCANCODE_KP_6
-		KP_7 = scan + SDL_SCANCODE_KP_7
-		KP_8 = scan + SDL_SCANCODE_KP_8
-		KP_9 = scan + SDL_SCANCODE_KP_9
-		KP_0 = scan + SDL_SCANCODE_KP_0
-		KP_PERIOD = scan + SDL_SCANCODE_KP_PERIOD
-
-		APPLICATION = scan + SDL_SCANCODE_APPLICATION
-		POWER = scan + SDL_SCANCODE_POWER
-		KP_EQUALS = scan + SDL_SCANCODE_KP_EQUALS
-		F13 = scan + SDL_SCANCODE_F13
-		F14 = scan + SDL_SCANCODE_F14
-		F15 = scan + SDL_SCANCODE_F15
-		F16 = scan + SDL_SCANCODE_F16
-		F17 = scan + SDL_SCANCODE_F17
-		F18 = scan + SDL_SCANCODE_F18
-		F19 = scan + SDL_SCANCODE_F19
-		F20 = scan + SDL_SCANCODE_F20
-		F21 = scan + SDL_SCANCODE_F21
-		F22 = scan + SDL_SCANCODE_F22
-		F23 = scan + SDL_SCANCODE_F23
-		F24 = scan + SDL_SCANCODE_F24
-		EXECUTE = scan + SDL_SCANCODE_EXECUTE
-		HELP = scan + SDL_SCANCODE_HELP
-		MENU = scan + SDL_SCANCODE_MENU
-		SELECT = scan + SDL_SCANCODE_SELECT
-		STOP = scan + SDL_SCANCODE_STOP
-		AGAIN = scan + SDL_SCANCODE_AGAIN
-		UNDO = scan + SDL_SCANCODE_UNDO
-		CUT = scan + SDL_SCANCODE_CUT
-		COPY = scan + SDL_SCANCODE_COPY
-		PASTE = scan + SDL_SCANCODE_PASTE
-		FIND = scan + SDL_SCANCODE_FIND
-		MUTE = scan + SDL_SCANCODE_MUTE
-		VOLUMEUP = scan + SDL_SCANCODE_VOLUMEUP
-		VOLUMEDOWN = scan + SDL_SCANCODE_VOLUMEDOWN
-		KP_COMMA = scan + SDL_SCANCODE_KP_COMMA
-
-		AltErase = scan + SDL_SCANCODE_ALTERASE
-		SYSREQ = scan + SDL_SCANCODE_SYSREQ
-		CANCEL_KEY = scan + SDL_SCANCODE_CANCEL
-		CLEAR_KEY = scan + SDL_SCANCODE_CLEAR
-		PRIOR = scan + SDL_SCANCODE_PRIOR
-		RETURN2 = scan + SDL_SCANCODE_RETURN2
-		SEPARATOR = scan + SDL_SCANCODE_SEPARATOR
-		OUT = scan + SDL_SCANCODE_OUT
-		OPER = scan + SDL_SCANCODE_OPER
-		CLEARAGAIN = scan + SDL_SCANCODE_CLEARAGAIN
-		CRSEL = scan + SDL_SCANCODE_CRSEL
-		EXSEL = scan + SDL_SCANCODE_EXSEL
-
-		KP_00 = scan + SDL_SCANCODE_KP_00
-		KP_000 = scan + SDL_SCANCODE_KP_000
-		CURRENCYUNIT = scan + SDL_SCANCODE_CURRENCYUNIT
-		CURRENCYSUBUNIT = scan + SDL_SCANCODE_CURRENCYSUBUNIT
-		KP_LEFTPAREN = scan + SDL_SCANCODE_KP_LEFTPAREN
-		KP_RIGHTPAREN = scan + SDL_SCANCODE_KP_RIGHTPAREN
-		KP_LEFTBRACE = scan + SDL_SCANCODE_KP_LEFTBRACE
-		KP_RIGHTBRACE = scan + SDL_SCANCODE_KP_RIGHTBRACE
-		KP_TAB = scan + SDL_SCANCODE_KP_TAB
-		KP_DELETE = scan + SDL_SCANCODE_KP_DELETE
-		KP_A = scan + SDL_SCANCODE_KP_A
-		KP_B = scan + SDL_SCANCODE_KP_B
-		KP_C = scan + SDL_SCANCODE_KP_C
-		KP_D = scan + SDL_SCANCODE_KP_D
-		KP_E = scan + SDL_SCANCODE_KP_E
-		KP_F = scan + SDL_SCANCODE_KP_F
-		KP_XOR = scan + SDL_SCANCODE_KP_XOR
-		KP_POWER = scan + SDL_SCANCODE_KP_POWER
-		KP_PERCENT = scan + SDL_SCANCODE_KP_PERCENT
-		KP_LESS = scan + SDL_SCANCODE_KP_LESS
-		KP_GREATER = scan + SDL_SCANCODE_KP_GREATER
-		KP_AMPERSAND = scan + SDL_SCANCODE_KP_AMPERSAND
-		KP_COLON = scan + SDL_SCANCODE_KP_COLON
-		KP_HASH = scan + SDL_SCANCODE_KP_HASH
-		KP_SPACE = scan + SDL_SCANCODE_KP_SPACE
-		KP_AT = scan + SDL_SCANCODE_KP_AT
-		KP_EXCLAM = scan + SDL_SCANCODE_KP_EXCLAM
-		KP_MEMSTORE = scan + SDL_SCANCODE_KP_MEMSTORE
-		KP_MEMRECALL = scan + SDL_SCANCODE_KP_MEMRECALL
-		KP_MEMCLEAR = scan + SDL_SCANCODE_KP_MEMCLEAR
-		KP_MEMADD = scan + SDL_SCANCODE_KP_MEMADD
-		KP_MEMDIVIDE = scan + SDL_SCANCODE_KP_MEMDIVIDE
-		KP_PLUSMINUS = scan + SDL_SCANCODE_KP_PLUSMINUS
-		KP_CLEAR = scan + SDL_SCANCODE_KP_CLEAR
-		KP_CLEARENTRY = scan + SDL_SCANCODE_KP_CLEARENTRY
-		KP_BINARY = scan + SDL_SCANCODE_KP_BINARY
-		KP_OCTAL = scan + SDL_SCANCODE_KP_OCTAL
-		KP_DECIMAL = scan + SDL_SCANCODE_KP_DECIMAL
-		LCTRL = scan + SDL_SCANCODE_LCTRL
-		LSHIFT = scan + SDL_SCANCODE_LSHIFT
-		LALT = scan + SDL_SCANCODE_LALT
-		LGUI = scan + SDL_SCANCODE_LGUI
-		RCTRL = scan + SDL_SCANCODE_RCTRL
-		RSHIFT = scan + SDL_SCANCODE_RSHIFT
-		RALT = scan + SDL_SCANCODE_RALT
-		RGUI = scan + SDL_SCANCODE_RGUI
-		MODE = scan + SDL_SCANCODE_MODE
+		CAPSLOCK = scan + 57
+		F1 = scan + 58
+		F2 = scan + 59
+		F3 = scan + 60
+		F4 = scan + 61
+		F5 = scan + 62
+		F6 = scan + 63
+		F7 = scan + 64
+		F8 = scan + 65
+		F9 = scan + 66
+		F10 = scan + 67
+		F11 = scan + 68
+		F12 = scan + 69
+		PRINTSCREEN = scan + 70
+		SCROLLLOCK = scan + 71
+		PAUSE = scan + 72
+		INSERT = scan + 73
+		HOME = scan + 74
+		PAGEUP = scan + 75
+		END = scan + 77
+		PAGEDOWN = scan + 78
+		RIGHT = scan + 79
+		LEFT = scan + 80
+		DOWN = scan + 81
+		UP = scan + 82
+		NUMLOCKCLEAR = scan + 83
+		KP_DIVIDE = scan + 84
+		KP_MULTIPLY = scan + 85
+		KP_MINUS = scan + 86
+		KP_PLUS = scan + 87
+		Enter = scan + 88
+		KP_1 = scan + 89
+		KP_2 = scan + 90
+		KP_3 = scan + 91
+		KP_4 = scan + 92
+		KP_5 = scan + 93
+		KP_6 = scan + 94
+		KP_7 = scan + 95
+		KP_8 = scan + 96
+		KP_9 = scan + 97
+		KP_0 = scan + 98
+		KP_PERIOD = scan + 99
+		APPLICATION = scan + 101
+		POWER = scan + 102
+		KP_EQUALS = scan + 103
+		F13 = scan + 104
+		F14 = scan + 105
+		F15 = scan + 106
+		F16 = scan + 107
+		F17 = scan + 108
+		F18 = scan + 109
+		F19 = scan + 110
+		F20 = scan + 111
+		F21 = scan + 112
+		F22 = scan + 113
+		F23 = scan + 114
+		F24 = scan + 115
+		EXECUTE = scan + 116
+		HELP = scan + 117
+		MENU = scan + 118
+		SELECT = scan + 119
+		STOP = scan + 120
+		AGAIN = scan + 121
+		UNDO = scan + 122
+		CUT = scan + 123
+		COPY = scan + 124
+		PASTE = scan + 125
+		FIND = scan + 126
+		MUTE = scan + 127
+		VOLUMEUP = scan + 128
+		VOLUMEDOWN = scan + 129
+		KP_COMMA = scan + 133
+		AltErase = scan + 153
+		SYSREQ = scan + 154
+		CANCEL_KEY = scan + 155
+		CLEAR_KEY = scan + 156
+		PRIOR = scan + 157
+		RETURN2 = scan + 158
+		SEPARATOR = scan + 159
+		OUT = scan + 160
+		OPER = scan + 161
+		CLEARAGAIN = scan + 162
+		CRSEL = scan + 163
+		EXSEL = scan + 164
+		KP_00 = scan + 176
+		KP_000 = scan + 177
+		CURRENCYUNIT = scan + 180
+		CURRENCYSUBUNIT = scan + 181
+		KP_LEFTPAREN = scan + 182
+		KP_RIGHTPAREN = scan + 183
+		KP_LEFTBRACE = scan + 184
+		KP_RIGHTBRACE = scan + 185
+		KP_TAB = scan + 186
+		KP_DELETE = scan + 187
+		KP_A = scan + 188
+		KP_B = scan + 189
+		KP_C = scan + 190
+		KP_D = scan + 191
+		KP_E = scan + 192
+		KP_F = scan + 193
+		KP_XOR = scan + 194
+		KP_POWER = scan + 195
+		KP_PERCENT = scan + 196
+		KP_LESS = scan + 197
+		KP_GREATER = scan + 198
+		KP_AMPERSAND = scan + 199
+		KP_COLON = scan + 203
+		KP_HASH = scan + 204
+		KP_SPACE = scan + 205
+		KP_AT = scan + 206
+		KP_EXCLAM = scan + 207
+		KP_MEMSTORE = scan + 208
+		KP_MEMRECALL = scan + 209
+		KP_MEMCLEAR = scan + 210
+		KP_MEMADD = scan + 211
+		KP_MEMDIVIDE = scan + 214
+		KP_PLUSMINUS = scan + 215
+		KP_CLEAR = scan + 216
+		KP_CLEARENTRY = scan + 217
+		KP_BINARY = scan + 218
+		KP_OCTAL = scan + 219
+		KP_DECIMAL = scan + 220
+		LCTRL = scan + 224
+		LSHIFT = scan + 225
+		LALT = scan + 226
+		LGUI = scan + 227
+		RCTRL = scan + 228
+		RSHIFT = scan + 229
+		RALT = scan + 230
+		RGUI = scan + 231
+		MODE = scan + 257
 		LOption = lalt
 		ROption = ralt
-
-		AUDIONEXT = scan + SDL_SCANCODE_AUDIONEXT
-		AUDIOPREV = scan + SDL_SCANCODE_AUDIOPREV
-		AUDIOSTOP = scan + SDL_SCANCODE_AUDIOSTOP
-		AUDIOPLAY = scan + SDL_SCANCODE_AUDIOPLAY // can i get this to work? doesnt seem to on OSX
-		AUDIOMUTE = scan + SDL_SCANCODE_AUDIOMUTE
-		MEDIASELECT = scan + SDL_SCANCODE_MEDIASELECT
-		WWW = scan + SDL_SCANCODE_WWW
-		MAIL = scan + SDL_SCANCODE_MAIL
-		CALCULATOR = scan + SDL_SCANCODE_CALCULATOR
-		COMPUTER = scan + SDL_SCANCODE_COMPUTER
-		AC_SEARCH = scan + SDL_SCANCODE_AC_SEARCH
-		AC_HOME = scan + SDL_SCANCODE_AC_HOME
-		AC_BACK = scan + SDL_SCANCODE_AC_BACK
-		AC_FORWARD = scan + SDL_SCANCODE_AC_FORWARD
-		AC_STOP = scan + SDL_SCANCODE_AC_STOP
-		AC_REFRESH = scan + SDL_SCANCODE_AC_REFRESH
-		AC_BOOKMARKS = scan + SDL_SCANCODE_AC_BOOKMARKS
-		
-		BRIGHTNESSDOWN = scan + SDL_SCANCODE_BRIGHTNESSDOWN
-		BRIGHTNESSUP = scan + SDL_SCANCODE_BRIGHTNESSUP
-		DISPLAYSWITCH = scan + SDL_SCANCODE_DISPLAYSWITCH
-		KBDILLUMTOGGLE = scan + SDL_SCANCODE_KBDILLUMTOGGLE
-		KBDILLUMDOWN = scan + SDL_SCANCODE_KBDILLUMDOWN
-		KBDILLUMUP = scan + SDL_SCANCODE_KBDILLUMUP
-		EJECT = scan + SDL_SCANCODE_EJECT
-		SLEEP = scan + SDL_SCANCODE_SLEEP
-		APP1 = scan + SDL_SCANCODE_APP1
-		APP2 = scan + SDL_SCANCODE_APP2
-
-		AUDIOREWIND = scan + SDL_SCANCODE_AUDIOREWIND
-		AUDIOFASTFORWARD = scan + SDL_SCANCODE_AUDIOFASTFORWARD
+		AUDIONEXT = scan + 258
+		AUDIOPREV = scan + 259
+		AUDIOSTOP = scan + 260
+		AUDIOPLAY = scan + 261
+		AUDIOMUTE = scan + 262
+		MEDIASELECT = scan + 263
+		WWW = scan + 264
+		MAIL = scan + 265
+		CALCULATOR = scan + 266
+		COMPUTER = scan + 267
+		AC_SEARCH = scan + 268
+		AC_HOME = scan + 269
+		AC_BACK = scan + 270
+		AC_FORWARD = scan + 271
+		AC_STOP = scan + 272
+		AC_REFRESH = scan + 273
+		AC_BOOKMARKS = scan + 274
+		BRIGHTNESSDOWN = scan + 275
+		BRIGHTNESSUP = scan + 276
+		DISPLAYSWITCH = scan + 277
+		KBDILLUMTOGGLE = scan + 278
+		KBDILLUMDOWN = scan + 279
+		KBDILLUMUP = scan + 280
+		EJECT = scan + 281
+		SLEEP = scan + 282
+		APP1 = scan + 283
+		APP2 = scan + 284
+		AUDIOREWIND = scan + 285
+		AUDIOFASTFORWARD = scan + 286
 
 
 

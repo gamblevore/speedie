@@ -17,7 +17,7 @@ module SCVersion
 		
 	function Str (|string|)
 		opt norefcounts
-		return .File["version"]
+		return .File["version"].Value
 	
 	function Hex (|string|)
 		opt norefcounts

@@ -5,8 +5,8 @@ class CheeseShop // An example to show how bad c++ is compared to speedie.
 	|string| ClerkName
 
 	constructor (|message| cfg)
-		.inventory = cfg["cheeses"]
-		.clerkName = cfg["clerk"]
+		.inventory = cfg["cheeses"].dict
+		.clerkName = cfg["clerk"].value
 
 	syntax access (|string| cheeseName, |string|)
 		if (cheeseName ~= .clerkName)

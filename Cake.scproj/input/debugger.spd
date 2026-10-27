@@ -298,9 +298,9 @@ module debugger
 		.LoadLibAndGlobs(packinfo)
 		
 		.LoadFiles(PackInfo["files"].value.decompress)
-		.SrcToCodeStr = PackInfo["breakmap"]
-		.InbuiltBreaks = PackInfo["breakpoint"]
-		.CodeToSrcStr = PackInfo["pos"]
+		.SrcToCodeStr = PackInfo["breakmap"].Value
+		.InbuiltBreaks = PackInfo["breakpoint"].Value
+		.CodeToSrcStr = PackInfo["pos"].Value
 		|| DbgLength = .CodeToSrcStr.Length >> 2
 
 		|| L2 = SpdTable.CodeLength

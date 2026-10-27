@@ -19,7 +19,7 @@ function compiler.CodeSign
 	.Stage("Code signing")
 	|| prod = .productpath.file
 	|| sign = app.prefs[codesign_native]
-		prod.codesign(sign)
+		prod.codesign(sign.value)
 	  else
 		errorreceiver.NewWarning( nil, "No code-signature found. (`speedie --codesign=\"details\" to save signature). Unable to sign " + prod )
 	// lets not scare users. it might a well be commented out at this point but I'd rather leave it.

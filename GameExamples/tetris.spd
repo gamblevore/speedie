@@ -78,7 +78,7 @@ class TetrisWin (Window)
 		.LevelField = TextView.Block(self, 13.5,  7.0,   2.0,  3.0)
 		.prefs = config.Create("tetris.spd.pref")
 		.grid.Highest = .prefs["max"].int
-		.History.text = .prefs["history"]
+		.History.text = .prefs["history"].value
 		
 		.blockheight = 24
 		.blockX(true) = -6

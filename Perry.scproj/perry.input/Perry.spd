@@ -136,7 +136,7 @@ module Perry
 			.Projects = app.prefs.giveitem("lastproj", @arg)|listviewrow|
 			.LoadWindowsSub
 		
-		|| oof = (old!=nil)(.FindProj(old), .Projects.First)
+		|| oof = (old!=nil)(.FindProj(old.value), .Projects.First)
 			oof.ide.showide
 		perry.FinishedStartUp = date.now
 
