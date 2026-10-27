@@ -138,23 +138,23 @@
 ı JMKN:;
 	Code = JumpKNE(r, Op, Code);
 ı JBOR:;
-	if (u1 << (Bra_Smallu << 5))
+	if (r[Bra_r1u].Uint << (Bra_Smallu << 5))
 	Code += Bra_Jmpi
 ;
 ı JBAN:;
-	if (!(u1 << (Bra_Smallu << 5)))
+	if (!(r[Bra_r1u].Uint << (Bra_Smallu << 5)))
 	Code += Bra_Jmpi
 ;
 ı LUPU:;
-	if (ii1++ < ii2)
+	if (r[Loop_r1u].Int32++ > r[Loop_r2u].Int32)
 	Code += Loop_Jmpi
 ;
 ı LUPD:;
-	if (ii1-- > ii2)
+	if (r[Loop_r1u].Int32-- > r[Loop_r2u].Int32)
 	Code += Loop_Jmpi
 ;
 ı JTST:;
-	if (!(u1 & (1ull << JBitTest_Shu)))
+	if (!(r[JBitTest_r1u].Uint & (1ull << JBitTest_Shu)))
 	Code += JBitTest_Jmpi
 ;
 ı EQUL:;

@@ -484,9 +484,8 @@ bool CompF_ (CakeRegister* A, CakeRegister* B, uint Mode) {
 }
 
 
-
 VMOpt ASM* JumpI (CakeRegister* r, ASM Op, ASM* Code) {
-	auto V = CompI_(i1, i2, JCmpI_Cmpu);
+	auto V = CompI_(r[JCmpI_r1u].Int, r[JCmpI_r2u].Int, JCmpI_Cmpu);
 	return Code + V*JCmpI_Jmpi;
 }
 
@@ -495,15 +494,9 @@ VMOpt void CompI (CakeRegister* r, ASM Op) {
 	i1 = V;
 }
 
-//	JCmpF
-//		r1		r
-//		r2		r
-//		Cmp		3
-//		Jmp		j
-
 
 VMOpt ASM* JumpF (CakeRegister* r, ASM Op, ASM* Code) {
-	auto V = CompF_(r+n1, r+n2, JCmpF_Cmpu);
+	auto V = CompF_(r+JCmpF_r1u, r+JCmpF_r2u, JCmpF_Cmpu);
 	return Code + V*JCmpF_Jmpi;
 }
 
@@ -528,36 +521,36 @@ inline uint64 jclip (uint64 x, uint64 s) {
 }
 
 VMOpt ASM* JumpEq (CakeRegister* r, ASM Op, ASM* Code) {
-	auto V = jclip(u1, JCmpEq_LSmallu<<5) == jclip(u2, JCmpEq_RSmallu<<5);
+	auto V = jclip(r[JCmpEq_r1u].Uint, JCmpEq_LSmallu<<5) == jclip(r[JCmpEq_r2u].Uint, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
 VMOpt ASM* JumpNeq (CakeRegister* r, ASM Op, ASM* Code) {
-	auto V = jclip(u1, JCmpEq_LSmallu<<5) != jclip(u2, JCmpEq_RSmallu<<5);
+	auto V = jclip(r[JCmpEq_r1u].Uint, JCmpEq_LSmallu<<5) != jclip(r[JCmpEq_r2u].Uint, JCmpEq_RSmallu<<5);
 	return Code + V*JCmpEq_Jmpi;
 }
 
 VMOpt ASM* JumpK (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	auto J = JCmpK_Jmpi * (ii1 > K);
+	auto J = JCmpK_Jmpi * (r[JCmpK_r1u].Int32 > K);
 	return Code + J;
 }
 
 VMOpt ASM* JumpKN (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	auto J = JCmpK_Jmpi * (ii1 <= K);
+	auto J = JCmpK_Jmpi * (r[JCmpK_r1u].Int32 <= K);
 	return Code + J;
 }
 
 VMOpt ASM* JumpKE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	auto J = JCmpK_Jmpi * (ii1 == K);
+	auto J = JCmpK_Jmpi * (r[JCmpK_r1u].Int32 == K);
 	return Code + J;
 }
 
 VMOpt ASM* JumpKNE (CakeRegister* r, ASM Op, ASM* Code) {
 	auto K = JCmpK_Ki;
-	auto J = JCmpK_Jmpi * (ii1 != K);
+	auto J = JCmpK_Jmpi * (r[JCmpK_r1u].Int32 != K);
 	return Code + J;
 }
 

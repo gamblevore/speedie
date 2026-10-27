@@ -8,47 +8,47 @@ function message.TAIL (|int| JUMP = nil, |int| Prm1 = nil, |&fatasm|) {
 }
 
 
-function message.FNC3 (|int| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+function message.FNC3 (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FNC3, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = JUMP
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2
+	rz.dest(0, r1, a)
 }
 
 
-function message.FNC (|int| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+function message.FNC (|asmreg| r1 = nil, |int| JUMP = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FNC, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = JUMP
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2
+	rz.dest(0, r1, a)
 }
 
 
-function message.FNCX3 (|int| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+function message.FNCX3 (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FNCX3, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Table
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2
+	rz.dest(0, r1, a)
 }
 
 
-function message.FNCX (|int| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
+function message.FNCX (|asmreg| r1 = nil, |int| Table = nil, |int| Prm1 = nil, |int| Prm2 = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FNCX, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Table
 	rz.numinput(2) = Prm1
 	rz.numinput(3) = Prm2
+	rz.dest(0, r1, a)
 }
 
 
@@ -133,13 +133,13 @@ function message.CONV (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Mode = nil, |
 }
 
 
-function message.FEET (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.FEET (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.FEET, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -161,22 +161,22 @@ function message.RET (|asmreg| r1 = nil, |int| Value = nil, |&fatasm|) {
 }
 
 
-function message.AFNC (|int| r1 = nil, |int| Library = nil, |int| Index = nil, |&fatasm|) {
+function message.AFNC (|asmreg| r1 = nil, |int| Library = nil, |int| Index = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.AFNC, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Library
 	rz.numinput(2) = Index
+	rz.dest(0, r1, a)
 }
 
 
-function message.ALLO (|int| r1 = nil, |int| Amount = nil, |&fatasm|) {
+function message.ALLO (|asmreg| r1 = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ALLO, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Amount
+	rz.dest(0, r1, a)
 }
 
 
@@ -202,43 +202,44 @@ function message.KNST (|asmreg| r1 = nil, |int| Cond = nil, |int| Inv = nil, |in
 }
 
 
-function message.ADDB (|int| r1 = nil, |int| K = nil, |&fatasm|) {
+function message.ADDB (|asmreg| r1 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ADDB, self)
-	rz.numinput(0) = r1
+	rz.reginput(0) = r1
 	rz.numinput(1) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.ADDK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.ADDK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ADDK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.ADAK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.ADAK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.ADAK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 	rz.dest(1, r2, a)
 }
 
 
-function message.MULK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.MULK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.MULK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -445,54 +446,54 @@ function message.BXOR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BNOT (|int| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
+function message.BNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BNOT, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.BANK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BANK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BANK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.BORK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BORK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BORK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.BXRK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BXRK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BXRK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
-function message.BANG (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BANG (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BANG, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -533,17 +534,18 @@ function message.JMPI (|int| Jmp = nil, |asmreg| r1 = nil, |asmreg| r2 = nil, |i
 }
 
 
-function message.JMPF (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |int| Jmp = nil, |&fatasm|) {
+function message.JMPF (|int| Jmp = nil, |asmreg| r1 = nil, |asmreg| r2 = nil, |int| Cmp = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.JMPF, self)
-	rz.reginput(0) = r1
-	rz.reginput(1) = r2
-	rz.numinput(2) = Cmp
-	rz.jumpinput(3) = Jmp
-	if (((Jmp << 31) >> 31) != Jmp) {
+	rz.jumpinput(0) = Jmp
+	if (((Jmp << 21) >> 21) != Jmp) {
 		error (self, `Jumped too far`)
 	}
+
+	rz.reginput(1) = r1
+	rz.reginput(2) = r2
+	rz.numinput(3) = Cmp
 }
 
 
@@ -793,25 +795,25 @@ function message.RFST (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |
 }
 
 
-function message.RFWR (|int| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
+function message.RFWR (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RFWR, self)
-	rz.numinput(0) = r1
+	rz.reginput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Save
 	rz.numinput(3) = Offset
 }
 
 
-function message.RFRD (|int| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
+function message.RFRD (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| Save = nil, |int| Offset = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.RFRD, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = Save
 	rz.numinput(3) = Offset
+	rz.dest(0, r1, a)
 }
 
 
@@ -824,24 +826,24 @@ function message.RFRT (|asmreg| r1 = nil, |asmreg| r2 = nil, |&fatasm|) {
 }
 
 
-function message.GOBJ (|int| r1 = nil, |int| Mode = nil, |int| Ref = nil, |int| Add = nil, |&fatasm|) {
+function message.GOBJ (|asmreg| r1 = nil, |int| Mode = nil, |int| Ref = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.GOBJ, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Mode
 	rz.numinput(2) = Ref
 	rz.numinput(3) = Add
+	rz.dest(0, r1, a)
 }
 
 
-function message.GTAB (|int| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
+function message.GTAB (|asmreg| r1 = nil, |int| Mode = nil, |int| Add = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.GTAB, self)
-	rz.numinput(0) = r1
 	rz.numinput(1) = Mode
 	rz.numinput(2) = Add
+	rz.dest(0, r1, a)
 }
 
 
@@ -1368,13 +1370,13 @@ function message.QDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.QADK (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.QADK (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QADK, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -1389,14 +1391,14 @@ function message.QCLM (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.QINC (|int| r1 = nil, |asmreg| r2 = nil, |int| part = nil, |int| Amount = nil, |&fatasm|) {
+function message.QINC (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| part = nil, |int| Amount = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QINC, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = part
 	rz.numinput(3) = Amount
+	rz.dest(0, r1, a)
 	rz.dest(1, r2, a)
 }
 
@@ -1479,14 +1481,14 @@ function message.QORR (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.QNOT (|int| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
+function message.QNOT (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.QNOT, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.reginput(2) = r3
 	rz.numinput(3) = K
+	rz.dest(0, r1, a)
 }
 
 
@@ -1544,13 +1546,13 @@ function message.PDIV (|asmreg| r1 = nil, |asmreg| r2 = nil, |asmreg| r3 = nil, 
 }
 
 
-function message.BSTT (|int| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
+function message.BSTT (|asmreg| r1 = nil, |asmreg| r2 = nil, |int| K = nil, |&fatasm|) {
 	visible
 	|| a = assembler.sh
 	rz = a.RequestOp(asm.BSTT, self)
-	rz.numinput(0) = r1
 	rz.reginput(1) = r2
 	rz.numinput(2) = K
+	rz.dest(0, r1, a)
 }
 
 

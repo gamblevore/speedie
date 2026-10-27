@@ -17,10 +17,8 @@ class Instruction
 	
 	constants
 		kTypeConst		= 2
-//		kTypeFunc		= 1
 	
 	constructor (|string| FormName, |string| Name, |int| Pos)
-//		.formname = formname
 		.opcode = pos
 		.name = name
 		.sizes = µform.NeedForm(FormName, nil)

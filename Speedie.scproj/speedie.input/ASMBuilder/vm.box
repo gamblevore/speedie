@@ -38,28 +38,11 @@ forms
 		r1		R
 		Amount	l
 	
-	Jump
-		JUMP	j
-		
 	RotateConst
 		r1		R
 		Rot		6
 		Inv		1
 		Value	12
-
-	JCmpEq
-		r1		r
-		r2		r
-		LSmall	1
-		RSmall	1
-		Jmp		j
-
-	JCmpEq2
-		Jmp		j
-		r1		r
-		r2		r
-		LSmall	1
-		RSmall	1
 
 	HALT
 		Reserved l
@@ -83,67 +66,44 @@ forms
 		r4		r
 		Small	1
 		
+	Jump
+		JUMP	j
+		
+	JCmpEq
+		Jmp		j
+		r1		r
+		r2		r
+		LSmall	1
+		RSmall	1
+
+	Bra
+		Jmp		j
+		r1		r
+		Small	1
+			
 	JCmpI
+		Jmp		j
 		r1		r
 		r2		r
 		Cmp		4
-		Jmp		j
 
 	JCmpF
+		Jmp		j
 		r1		r
 		r2		r
 		Cmp		3
-		Jmp		j
 
 	JCmpK
-		r1		r
-		K		9
-		Jmp		j
-		
-	Bra		// bra:
-		r1		r
-		Small	1
-		Jmp		j
-		
-	JBitTest
-		r1		r
-		Sh		6
-		Jmp		j
-	
-	Loop
-		r1		R // assume one is an int64?
-		r2		r
-		Small	1
-		Jmp		j
-
-	JCmpK2
 		Jmp		j
 		r1		r
 		K		9 // signed
-
-	JCmpI2
-		Jmp		j
-		r1		r
-		r2		r
-		Cmp		4
-
-	JCmpF2
-		Jmp		j
-		r1		r
-		r2		r
-		Cmp		3
-
-	Bra2		// bra:
-		Jmp		j
-		r1		r
-		Small	1
 		
-	JBitTest2
+	JBitTest
 		Jmp		j
 		r1		r
 		Sh		6
 	
-	Loop2
+	Loop
 		Jmp		j
 		r1		R // assume one is an int64?
 		r2		r
@@ -424,6 +384,7 @@ forms
 //		0 // Can be added or removed... just to align the jumps really!
 /**/ TIME (U2)
 		Time_(r, Op)
+
 /**/ CONV (Convert)
 		RegConv(r, Op)
 					// for SPD~>ARM conversion
@@ -448,7 +409,6 @@ forms
 POS 2
 	TAIL (Tail)
 		Code = TailStack(vm, r, Code+1, Op, *Code)
-
 
 POS 23
 	FNC3 (Func)
@@ -599,49 +559,48 @@ POS 5
 /**/ JUMP (jump)
 		Code += Jump_JUMPi
 
-
-/**/ JMPI  (JCmpI2)
+/**/ JMPI  (JCmpI)
 		Code = JumpI(r, Op, Code)
 
 /**/ JMPF  (JCmpF)
 		Code = JumpF(r, Op, Code)
 
-/**/ JMPE  (JCmpEq2)
+/**/ JMPE  (JCmpEq)
 		Code = JumpEq(r, Op, Code)
 
-/**/ JMPN  (JCmpEq2)
+/**/ JMPN  (JCmpEq)
 		Code = JumpNeq(r, Op, Code)
 
-/**/ JMKM  (JCmpK2)						// (jump more)
+/**/ JMKM  (JCmpK)						// (jump more)
 		Code = JumpK(r, Op, Code)
 
-/**/ JMKL  (JCmpK2)						// (jump less)
+/**/ JMKL  (JCmpK)						// (jump less)
 		Code = JumpKN(r, Op, Code)
 
-/**/ JMKE  (JCmpK2)
+/**/ JMKE  (JCmpK)
 		Code = JumpKE(r, Op, Code)
 
-/**/ JMKN  (JCmpK2)
+/**/ JMKN  (JCmpK)
 		Code = JumpKNE(r, Op, Code)
 	
-/**/ JBOR  (Bra2)
-		if (u1<<(Bra_Smallu<<5))
+/**/ JBOR  (Bra)
+		if (r[Bra_r1u].Uint<<(Bra_Smallu<<5))
 			Code += Bra_Jmpi
 
-/**/ JBAN  (Bra2)				
-		if (!(u1<<(Bra_Smallu<<5)))
+/**/ JBAN  (Bra)				
+		if (!(r[Bra_r1u].Uint<<(Bra_Smallu<<5)))
 			Code += Bra_Jmpi
 
-/**/ LUPU  (Loop2)
-		if (ii1++ < ii2)
+/**/ LUPU  (Loop)
+		if (r[Loop_r1u].Int32++ > r[Loop_r2u].Int32)
 			Code += Loop_Jmpi
 
-/**/ LUPD  (Loop2)
-		if (ii1-- > ii2)
+/**/ LUPD  (Loop)
+		if (r[Loop_r1u].Int32-- > r[Loop_r2u].Int32)
 			Code += Loop_Jmpi
 
-/**/ JTST  (JBitTest2)				
-		if (!(u1&(1ull<<JBitTest_Shu)))
+/**/ JTST  (JBitTest)
+		if (!(r[JBitTest_r1u].Uint & (1ull<<JBitTest_Shu)))
 			Code += JBitTest_Jmpi
 
 

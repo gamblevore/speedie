@@ -48,30 +48,33 @@ function FinishAcc
 	.XType = 0
 
 
-function GenAcc (|message| line, |int| bit_pos, |int| pname, |int| Max, |int|)
+function GenAcc (|µform| Form, |message| line, |int| bit_pos, |int| pname, |int|)
 	opt norefcounts
-	|| n = Max - bit_pos
+	|| Param = form.Params[pname]
+	|| n = param.BitSize
 	|| f = line.NeedFirst$
 	|| f0 = f.name[]
+	
 	if f0 == 'x' and bit_pos == 32 // x means an extra 4 bytes of values. like 8-byte ASM.
 		.XType = pname
 		return int.max
-	if f0 == 'r' or 'R' or 'P'
+	if (f0 == 'r' or 'R' or 'P')  and  (bit_pos-8 == pname*5)
 		.FillTypePrm(line.name, pname)
 		return 5+bit_pos
-	if f0.isint
-		n = f.int
-	expect (n >= 1)			(line, "Too many total bits")
-	expect (n <= (Max-8))	(line, "Too large field. Found: " + n)
+	if f0.isint and n != f.int
+		error (f, errorreceiver.internalerror)
+
+	expect (n <= 24)	(line, "Too large field. Found: " + n)
 	|| lname = .Parent + line.name
 	using line
-		|| fnc_src = .DefineGet(lname, Max-n, bit_pos)
+		|| fnc_src = .DefineGet(lname, 32-n, bit_pos)
 		SCFunction.NewFunc(fnc_src, nil, line)	
 	.FillTypePrm(lname, pname)
 	
-	if  (bit_pos+n) > Max  or  n > (Max-8)  // bad
+	bit_pos += n
+	if  bit_pos > 32
 		error (line, "Too many total bits")
-	return n+bit_pos
+	return bit_pos
 
 
 syntax Append (|message| M)
@@ -113,22 +116,22 @@ function GenerateForms (|message| forms, |bool| DoMore)
 	for form_msg in forms[@arg]
 		if (f < 128)									#check (form_msg, "Too many forms")
 			using form_msg
-			.AddForm(form_msg)
+			|| Form = .AddForm(form_msg)
 			++f
 			if DoMore
-				.GenerateOne(form_msg, f)
+				.GenerateOne(form, form_msg, f)
 
 
-function GenerateOne (|message| form_msg, |int| f)
+function GenerateOne (|µform| form, |message| msg, |int| f)
 	opt norefcounts
-	.dt_prm = .DataTypeCreate(form_msg, f)
-	.parent = form_msg.name + "_"
+	.dt_prm = .DataTypeCreate(msg, f)
+	.parent = msg.name + "_"
 	|| bit_pos = 8
 	|| p   = -1
-	|| arg = form_msg[@arg, -1]							#require
+	|| arg = msg[@arg, -1]								#require
 		
 	for l in arg
-		bit_pos = .GenAcc(l, bit_pos, ++p, 32)
+		bit_pos = .GenAcc(form, l, bit_pos, ++p)
 		if bit_pos > 32
 			exit
 	

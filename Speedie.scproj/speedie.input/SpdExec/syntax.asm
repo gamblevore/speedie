@@ -10,7 +10,7 @@ tests oofit
 		KNST  (r3, 555)
 		KNST  (r3, -234)
 		ADD   (r1, r1, r3, 0)
-		TIME  (r1,3)			// -111
-//		LUPD  (@test, r4, r0, 0) // fix later
+		TIME  (r1,3)			// prints -111, -345, -579
+		LUPD  (@test, r4, r0, 0) // fix later
 		RET   (r0, 0)
 
