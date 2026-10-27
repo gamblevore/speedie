@@ -167,8 +167,6 @@ typedef ASM ASM_BoolNot;
 
 typedef ASM ASM_Bra;
 
-typedef ASM ASM_Bra2;
-
 typedef ASM ASM_CNTC;
 
 typedef ASM ASM_CmpF;
@@ -205,29 +203,17 @@ typedef ASM ASM_IntConst;
 
 typedef ASM ASM_JBitTest;
 
-typedef ASM ASM_JBitTest2;
-
 typedef ASM ASM_JCmpEq;
-
-typedef ASM ASM_JCmpEq2;
 
 typedef ASM ASM_JCmpF;
 
-typedef ASM ASM_JCmpF2;
-
 typedef ASM ASM_JCmpI;
 
-typedef ASM ASM_JCmpI2;
-
 typedef ASM ASM_JCmpK;
-
-typedef ASM ASM_JCmpK2;
 
 typedef ASM ASM_Jump;
 
 typedef ASM ASM_Loop;
-
-typedef ASM ASM_Loop2;
 
 typedef ASM ASM_MemUtil;
 
@@ -1350,7 +1336,6 @@ JBClass ( SCModule , SCBetterNode ,
 );
 #define JB__App__Args JB__.App__Args
 #define JB__App__Conf JB__.App__Conf
-#define JB__App__Path JB__.App__Path
 #define JB__App__Prefs JB__.App__Prefs
 #define JB__App__stdin JB__.App__stdin
 #define JB__App__StdOut JB__.App__StdOut
@@ -2655,7 +2640,6 @@ struct JB_Globals {
 	JB_File* App__StdOut;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
-	JB_String* App__Path;
 	Dictionary* Tk__ErrorNames;
 	Array* ErrorSeverity__ErrorNames;
 	JB_String* File__Speedie;
@@ -2670,8 +2654,8 @@ struct JB_Globals {
 	RandomXOR* Random;
 	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
-	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
+	MessagePosition Tk_Using;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Constants__FuncArray[64];
@@ -2707,8 +2691,6 @@ JB_String* JB_App__MemoryUsage(int AtLeast, FastString* Fs_in);
 bool JB_App__No(JB_String* Name);
 
 SpdProcess* JB_App__Parent(bool Expect);
-
-JB_String* JB_App__OrigPath();
 
 Message* JB_App__Prefs();
 
@@ -3950,11 +3932,11 @@ void SC_VM_Builder__FillTypePrm(JB_String* Fname, int Pname);
 
 void SC_VM_Builder__FinishAcc();
 
-int SC_VM_Builder__GenAcc(Message* Line, int Bit_pos, int Pname, int Max);
+int SC_VM_Builder__GenAcc(xC2xB5Form* Form, Message* Line, int Bit_pos, int Pname);
 
 void SC_VM_Builder__GenerateForms(Message* Forms, bool DoMore);
 
-void SC_VM_Builder__GenerateOne(Message* Form_msg, int F);
+void SC_VM_Builder__GenerateOne(xC2xB5Form* Form, Message* Msg, int F);
 
 int SC_VM_Builder__Init_();
 
@@ -4561,9 +4543,9 @@ ASM SC_ASM_BFLD_upSet(ASM Self, uint Value);
 
 ASM SC_ASM_BoolNot_KSet(ASM Self, uint Value);
 
-ASM SC_ASM_Bra2_JmpSet(ASM Self, uint Value);
-
 ASM SC_ASM_Bra_JmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_Bra_r1Set(ASM Self, uint Value);
 
 ASM SC_ASM_Bra_SmallSet(ASM Self, uint Value);
 
@@ -4619,45 +4601,53 @@ ASM SC_ASM_IntConst_InvSet(ASM Self, uint Value);
 
 ASM SC_ASM_IntConst_ValueSet(ASM Self, uint Value);
 
-ASM SC_ASM_JBitTest2_JmpSet(ASM Self, uint Value);
-
 ASM SC_ASM_JBitTest_JmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_JBitTest_ShSet(ASM Self, uint Value);
+ASM SC_ASM_JBitTest_r1Set(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpEq2_JmpSet(ASM Self, uint Value);
+ASM SC_ASM_JBitTest_ShSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpEq_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpEq_LSmallSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpEq_RSmallSet(ASM Self, uint Value);
+ASM SC_ASM_JCmpEq_r1Set(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpF2_JmpSet(ASM Self, uint Value);
+ASM SC_ASM_JCmpEq_r2Set(ASM Self, uint Value);
+
+ASM SC_ASM_JCmpEq_RSmallSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpF_CmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpF_JmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpI2_JmpSet(ASM Self, uint Value);
+ASM SC_ASM_JCmpF_r1Set(ASM Self, uint Value);
+
+ASM SC_ASM_JCmpF_r2Set(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpI_CmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpI_JmpSet(ASM Self, uint Value);
 
-ASM SC_ASM_JCmpK2_JmpSet(ASM Self, uint Value);
+ASM SC_ASM_JCmpI_r1Set(ASM Self, uint Value);
+
+ASM SC_ASM_JCmpI_r2Set(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpK_JmpSet(ASM Self, uint Value);
 
 ASM SC_ASM_JCmpK_KSet(ASM Self, uint Value);
 
+ASM SC_ASM_JCmpK_r1Set(ASM Self, uint Value);
+
 ASM SC_ASM_Jump_JUMPSet(ASM Self, uint Value);
 
 bool SC_ASM_JumpNegatable(ASM Self);
 
-ASM SC_ASM_Loop2_JmpSet(ASM Self, uint Value);
-
 ASM SC_ASM_Loop_JmpSet(ASM Self, uint Value);
+
+ASM SC_ASM_Loop_r1Set(ASM Self, uint Value);
+
+ASM SC_ASM_Loop_r2Set(ASM Self, uint Value);
 
 ASM SC_ASM_Loop_SmallSet(ASM Self, uint Value);
 
@@ -5362,11 +5352,6 @@ ASM* SC_ASM_Bra__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
-// ASM_Bra2
-ASM* SC_ASM_Bra2__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
 // ASM_CNTC
 ASM* SC_ASM_CNTC__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
@@ -5457,18 +5442,8 @@ ASM* SC_ASM_JBitTest__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
-// ASM_JBitTest2
-ASM* SC_ASM_JBitTest2__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
 // ASM_JCmpEq
 ASM* SC_ASM_JCmpEq__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_JCmpEq2
-ASM* SC_ASM_JCmpEq2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5477,28 +5452,13 @@ ASM* SC_ASM_JCmpF__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
-// ASM_JCmpF2
-ASM* SC_ASM_JCmpF2__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
 // ASM_JCmpI
 ASM* SC_ASM_JCmpI__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
-// ASM_JCmpI2
-ASM* SC_ASM_JCmpI2__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
 // ASM_JCmpK
 ASM* SC_ASM_JCmpK__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_JCmpK2
-ASM* SC_ASM_JCmpK2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -5509,11 +5469,6 @@ ASM* SC_ASM_Jump__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 // ASM_Loop
 ASM* SC_ASM_Loop__Encode(FatASM* Self, ASM* Curr, ASM* After);
-
-
-
-// ASM_Loop2
-ASM* SC_ASM_Loop2__Encode(FatASM* Self, ASM* Curr, ASM* After);
 
 
 
@@ -11306,8 +11261,6 @@ inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
 
 inline bool SC_Reg_IsInt(ASMReg Self);
 
-inline JB_String* JB_config_AsString(Message* Self);
-
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
 inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed);
@@ -11527,11 +11480,6 @@ inline bool SC_Reg_IsInt(ASMReg Self) {
 	return JB_TC_IsInt(((DataTypeCode)Self));
 }
 
-inline JB_String* JB_config_AsString(Message* Self) {
-	//cpp_part;
-	return JB_Msg_Value(Self);
-}
-
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 	//cpp_name;
 	//visible;
@@ -11629,7 +11577,6 @@ struct JB_Globals {
 	JB_Object* App__StdOut;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
-	JB_Object* App__Path;
 	JB_Object* Tk__ErrorNames;
 	JB_Object* ErrorSeverity__ErrorNames;
 	JB_Object* File__Speedie;

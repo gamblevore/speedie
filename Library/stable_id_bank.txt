@@ -221,6 +221,7 @@ GUI_Img_resetarea
 GUI_JBV_Constructor
 GUI_JBV_Destructor
 GUI_JBV_KeyDown
+GUI_KM__Collect
 GUI_Key_HeldKey
 GUI_Key_IsAccept
 GUI_Key_IsCMM
@@ -235,7 +236,6 @@ GUI_Key_IsScan
 GUI_Key_IsShift
 GUI_Key_Length
 GUI_Key_Name
-GUI_Key_Number
 GUI_Key_OperatorIsCmd
 GUI_Key_SyntaxAccess
 GUI_Key__Cancel
@@ -712,7 +712,6 @@ JB_App__ID
 JB_App__IconSet
 JB_App__IsMainThread
 JB_App__MemoryUsage
-JB_App__OrigPath
 JB_App__Parent
 JB_App__ParentID
 JB_App__Path
@@ -1137,6 +1136,7 @@ JB_Msg_SyntaxUsingComplete
 JB_Msg_UnEmbedStr
 JB_Msg_Validate
 JB_Msg_Value
+JB_Msg_ValueSet
 JB_Msg_WithinType
 JB_Msg_XMLToJeebox
 JB_Msg_Yes
@@ -1902,7 +1902,6 @@ SDL_GetClipboardText
 SDL_GetCurrentDisplayMode
 SDL_GetDisplayBounds
 SDL_GetError
-SDL_GetKeyFromScancode
 SDL_GetKeyboardState
 SDL_GetMouseState
 SDL_GetNumTouchFingers
