@@ -1,14 +1,13 @@
 
 
 class µForm
-	|int|			Count
+	|byte|			Count
+	|byte|			TotalBits
+	|byte|			Index
 	|string|		Name
 	|µParam[5]|		Params
 	|message|		Src
-	|byte|			TotalBits
-	|byte|			RegsAltered
-	|byte|			Index
-	|byte|			RegForJump // remove RegForJump and use forms count
+	
 	
 	render
 		opt norefcounts
@@ -28,7 +27,7 @@ class µForm
 		|| Arg = tmp.last(@arg)
 		for line.fast in Arg
 			.LoadParam(line.FirstName, line)
-		if .RegForJump
+		if .params[0] is jump // jumps use reg0
 			.FillRemainder(0)
 
 
@@ -44,8 +43,6 @@ class µForm
 	function AddParam (|int| Size, |µParam| P, |int|)
 		|| i = .count++
 		.FillParam(Size, P, i)
-		if p is jump
-			if .RegForJump != 1 or i != 0
 		return i
 			
 
@@ -71,19 +68,15 @@ class µForm
 			.AddParam(5, µParam.Input)
 		  elseif p == 'R'
 			.AddParam(5, µparam.Output)
-			.RegsAltered++
 		  elseif p == 'P'
 			.AddParam(5, µparam.Output + µParam.input)
-			.RegsAltered++
-		  elseif p == 'x'							// for 64/96/128 sized instructions
+		  elseif p == 'x'							// for 64/96 sized instructions
 			.AddParam(32, µparam.Number)
 		  elseif p == 'l'
 			|| i = .AddParam( 0, µparam.Number )
 			.FillRemainder(i)
 		  elseif p == 'j'
-			.RegForJump = 1
-			.AddParam( 0, µparam.signed + µparam.jump ) 
-//			expect (line.IsFirst) (line)
+			.AddParam( 0, µparam.signed + µparam.jump )
 		  elseif Line
 			error (Line)
 		  else

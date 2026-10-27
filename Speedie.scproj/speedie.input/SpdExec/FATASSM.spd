@@ -12,10 +12,9 @@ struct FatASM
 	|uint|				SrcMap
 	|uint16[2]|			PrevOutput
 	|uint16|			ASMIndex
-	|byte|				Unused
+	|uint16|			Unused
 	|byte|				BreakInfo
 	|byte|				_Op
-	|byte|				JumpPrm
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
 	// we could do this better.
 	// put it after prms[] with spacer gaps, align the fatindexes
@@ -47,7 +46,6 @@ struct FatASM
 		.Info = nil
 		.BreakInfo = nil
 		._Op = value
-		.JumpPrm = nil
 		for i in –count .Inputs
 			.Inputs[i] = nil
 	
@@ -97,13 +95,6 @@ struct FatASM
 		return f
 
 	
-	function Form (|µform|)
-		|| i = instruction.typelist[.op]
-			return i.Sizes
-		debugger
-		return instruction.typelist[0]!.Sizes
-
-
 	function Vectorise (|asmreg| Dest, |asm| VOpp, |asmreg|)
 		dest.FatIndex = .index
 		
@@ -324,15 +315,18 @@ struct FatASM
 
 	
 	function Jump (|int|)
-		|| j = .JumpPrm
-			return .prms[j-1]
+		return .prms[0]
 
 
 	function JumpTo (|&fatasm|)
-		|| j = .JumpPrm
-			return self + 1 + .prms[j-1]|int|
+		return self + 1 + .prms[0]|int|
 
 
+	function IsJump (|int|)
+		|| op = .op
+		return (op >= asm.JUMP and op <= asm.JTST)|int|
+	
+	
 	function assembler.SaferNop (|&fatasm| fat, |int64|)
 		// this used to do more stuff. now it doesnt :]
 		fat._op = asm.noop
@@ -343,17 +337,15 @@ struct FatASM
 	function JumpTo (|&fatasm| Value, |assembler| sh,  |int64|)
 		// want to swap params... do later! // assembler.jumpto(value, fat)
 		// forces other things to have to change, thats the problem. spirals out and im tired rn.
-		
 		cpp_Part JumpToSet
-		|| j = .JumpPrm								#expect (value, errorreceiver.internalerror)
+		expect .IsJump								(value, errorreceiver.internalerror)
 		
 		|| D = (value - self) - 1
 		check (D != -1)								(self, "Infinite loop")
 		
-		.prms[j-1] = D
+		.prms[0] = D
 		if d and .CountActualJump(d)
 			return d
-		.JumpPrm = 0 // safer for jump calculations
 		return sh.SaferNop(self)
 
 ////////////////////////////////////////////////////////////
@@ -382,7 +374,6 @@ struct FatASM
 
 	function JumpInput (|int| a, assigns:|int| v)
 		.prms[a] = v
-		.JumpPrm = a + 1
 		.RefCount += !.RefCount // control flow is always used?
 		Assembler.sh.NextBasicBlock
 		
@@ -549,8 +540,7 @@ struct FatASM
 					  else
 						fs.Length-=2
 				  else
-					|| j = .JumpPrm
-					if j and (i == j - 1)
+					if (i == 0) and .IsJump
 						v = .CountActualJump(v)
 					  elseif f[i] isnt NonReg
 						fs <~ ('r' + v|uint| >> 30)|byte|
@@ -628,19 +618,6 @@ struct FatASM
 				return 2 + (o&1)
 			return 1
 	
-	
-	function TmpRender (|faststring| fs, |message| msg)
-		opt norefcounts
-		|| arg = msg.Find(@arg)
-		if !arg
-			msg.Render(fs)
-			return 
-		
-		|| Start = fs.Length
-		arg.Render(Fs)
-		if fs.Length > start + 30
-			fs.Length = start + 30
-
 
 	function RendaMsg (|faststring| fs)
 		opt norefcounts
@@ -683,8 +660,7 @@ struct FatASM
 	
 	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)
 		.JumpNegate
-		|| j = .JumpPrm - 1
-		.prms[j] += mid.Jump
+		.prms[0] += mid.Jump
 		sh.nop(mid)
 		return true
 	

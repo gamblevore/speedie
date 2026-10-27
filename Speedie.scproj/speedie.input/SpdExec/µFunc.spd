@@ -25,7 +25,7 @@ extend SCFunction
 		|byte| HasLabel
 		|uint| PrevFatMap
 		for fat.fat in self
-			HasLabel |= fat.JumpPrm
+			HasLabel |= fat.IsJump
 			if (rz - where) > 63K
 				error (.source, "Function too large (over 63K)")
 			fat.ASMIndex = rz - where
@@ -54,7 +54,7 @@ extend SCFunction
 
 		if HasLabel
 			for fat.fat in self
-				|| r = fat.JumpPrm
+				|| r = fat.IsJump
 					fat.BakeLabelRequest(where, rz, r-1)	
 	
 	

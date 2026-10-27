@@ -61,9 +61,6 @@ extend Assembler
 		|| x = .info
 		x.reg = pos
 		.info = x
-		|| j = .form.RegForJump				// remove JumpPrm and use forms count
-			if j != pos + 1					// what?
-		.JumpPrm = j
 		._Const = nil
 		|| name = p.name
 		|| n = name.Length
@@ -76,17 +73,13 @@ extend Assembler
 	function LoadLabelJumps (|bool|)
 		opt norefcounts
 		for A.fat in .Root_Fn
-			require textassembler.GetLabel(a)
+			if a.IsJump
+				require textassembler.GetLabel(a)
 		return true
 	
 	
 	function textassembler.GetLabel (|&FatASM| Jumper, |bool|)
 		opt norefcounts
-
-		|| i = jumper.JumpPrm
-		if !i
-			return true
-		i--
 		
 		|| name_addr = (&Jumper._const)|Cstring|
 		|| name_len = name_addr.Length
@@ -95,7 +88,7 @@ extend Assembler
 			Virtual.length = name_len
 			|| fake = (&Virtual)|string|
 			|| dest_index = textassembler.Labels.valuelower(fake)		#expect ("Missing " + fake)
-			jumper.prms[i] = dest_index[] - jumper.index
+			jumper.prms[0] = dest_index[] - jumper.index
 			return true
 				
 		error (jumper, "No label found")

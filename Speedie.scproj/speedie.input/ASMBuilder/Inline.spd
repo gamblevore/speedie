@@ -396,14 +396,13 @@ function InlineReturnToJump (|message| exp, |Fatasm| S, |asmreg| r, |asmreg| des
 	(old is DebugVars)					// Or else we lose our MARK close.
 	s.info = old
 	s.setOp = asm.jump
-	s.JumpPrm = 1
 	s.JumpFix(.curr)
 	return r
 
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
 	rz.fatindex = 1
-	target debug: || FinishTrap = ++ASMTrapper,  if FinishTrap == 150485
+	target debug: || FinishTrap = ++ASMTrapper,  if FinishTrap == -1
 	|| dest = .state.return
 	for s in R
 		|| op = s.op

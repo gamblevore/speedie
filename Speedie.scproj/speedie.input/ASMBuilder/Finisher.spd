@@ -25,7 +25,7 @@ function Assembler.FinishASM
 		if op == asm.knst
 			S.FinishConst
 //			.AskNop(s)							// Could this work now that we have phi?
-		  elseif S.JumpPrm
+		  elseif S.IsJump
 			.FinishJump(S)
 		  elseif (op == asm.noop)
 			s.FinishNoop
@@ -46,7 +46,7 @@ function Assembler.FinishASM
 
 
 function assembler.FinishJump (|fatasm| Jump, |bool|)
-	|| D = jump.JumpTo!						// Extend the destination, in case of multiple jumps
+	|| D = jump.JumpTo						// Extend the destination, in case of multiple jumps
 	|| n = 0
 	
 	while
