@@ -281,7 +281,7 @@ Array* JB_Array_Constructor0 ( Array* self ) {
 	self->Length = 0;
 	self->Capacity = 0;
 	self->_Ptr = 0;
-	self->Marker = 0;
+	self->_Marker = 0;
 	return self;
 }
 
@@ -341,7 +341,7 @@ void JB_Array_Shuffle( Array* self ) {
 	int n = JB_Array_Length(self);
 	JB_Object** Array = self->_Ptr;
 	uint64 Hash = ~1234567;
-	self->Marker = 0;
+	self->_Marker = 0;
 
 	for_(n) {
 		auto ai = Array[i];

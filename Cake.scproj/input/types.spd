@@ -20,7 +20,11 @@ class XType
 		.IsObject = (SupIndex & 1)
 		.Super = xtype.GetType(SupIndex, Sup)
 		if .IsObject and (fn == @tmp or @msg)
-			|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
+			|| name = .msg.name
+			if name ~= "array"
+				xtype.array = self
+				
+			|| JBCls = cakerun.ClassTable.valuelower(name)|&Classdata|
 				jbcls.Index = index
 	
 	function Name (|string|)
@@ -31,7 +35,7 @@ class XType
 			return .msg.name.syntaxcompare(s, aware)
 		return 1
 		
-	operator in (|xtype| Sup, |bool|)
+	operator isa (|xtype| Sup, |bool|)
 		opt norefcounts
 		while self
 			if self == sup
@@ -46,6 +50,7 @@ class XType
 	module
 		|InputStream|	Shared = InputStream("")
 		|XType|			Unreached = xtype()
+		|xtype|			Array
 		|[XType]|		Types
 
 		function LoadTypes (|message| Pack)

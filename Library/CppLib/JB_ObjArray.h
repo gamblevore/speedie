@@ -11,7 +11,7 @@
 extern "C" {
 
 JBClass( Array, JB_Object,
-	int					Marker;
+	int					_Marker;
 	JB_Object**			_Ptr;
 	int					Capacity;
 	int					Length;
