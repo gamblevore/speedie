@@ -12,7 +12,7 @@ role config (message)
 			C++
 
 	syntax cast (|string|)
-		disabled "Use .value to get a string value"
+		disabled "Use .value to get a string value from this config entry."
 		
 	function Save (|bool|)
 		flow off
@@ -66,7 +66,7 @@ extend message
 	inline GiveItem (|string| Key, |syntax| ValueType, |string| DefaultName="", |config|)
 		description "Creates the correct child type if not found"
 		if !valuetype
-			valuetype = @str // oof!
+			valuetype = @str // oof
 		return .ConfigItem(key, valuetype, defaultname)!
 
 

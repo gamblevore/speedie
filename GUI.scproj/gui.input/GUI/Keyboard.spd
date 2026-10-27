@@ -1,13 +1,26 @@
 
 
 
-dataType SDL_Scancode (int)
-	linkage
-		wrapper
-		cpp_part Scan
+struct SDL_KeyboardEvent
+	linkage: wrapper
+	|SDLEventType|				Type
+	|uint|						Timestamp
+	|SDL_Keysym|				keysym
 	
 	function Key (|keys|)
-		cpp_wrapper SDL_GetKeyFromScancode
+		inlined
+		return .keysym.sym
+
+
+
+struct SDL_Keysym
+	linkage
+		wrapper
+		cpp_part KS
+	|uint|			scancode		/* SDL physical key code - see ::SDL_Scancode for details */
+	|keys|			sym				/* SDL virtual key code - see ::SDL_Keycode for details */
+	|Uint16|		mod				/* current key modifiers */
+	|Uint|			unused
 
 
 
@@ -38,49 +51,12 @@ datatype KeyModifier (int)
 
 
 
-
-struct SDL_KeyboardEvent
-	linkage: wrapper
-	|SDLEventType|				Type
-	|uint|						Timestamp
-	|SDL_Keysym|				keysym
-	
-	function Scan (|SDL_Scancode|)
-		inlined
-		return .keysym.scancode
-
-	function Key (|keys|)
-		inlined
-		return .keysym.sym
-
-	syntax is (|keys| x, |bool|)
-		inlined
-		return .key == x
-
-
-
-struct SDL_Keysym
-	linkage
-		wrapper
-		cpp_part KS
-	|SDL_Scancode|	scancode		/* SDL physical key code - see ::SDL_Scancode for details */
-	|keys|			sym				/* SDL virtual key code - see ::SDL_Keycode for details */
-	|Uint16|		mod				/* current key modifiers */
-	|Uint|			unused
-
-	inline Command (|bool|)
-		return .mod & (1024|||64|||128|||2048)
-	
-
-
-
 dataType Keys (int)
 	linkage
 		wrapper
 		cpp_class SDL_Keycode
 		cpp_part Key
 	
-
 	libinternal Record (|&guikeyrecord|)
 		if self != 0
 			for i in keys.MaxKeyRecord
@@ -109,7 +85,7 @@ dataType Keys (int)
 		|| r = .Record
 			return r.date.guiago >= durr
 	
-	function Number (|ind|)
+	inline Number (|ind|)
 		|uint| x = self-num0
 		if x > 9
 			x = -1
@@ -210,7 +186,7 @@ dataType Keys (int)
 				a = b
 			if a
 				rz = a.date.GuiAgo + 2
-				rz.trip = a is newlyadded
+				rz = (rz & (~1)|uint64|) ||| (a is newlyadded)
 		
 		
 		libinternal Date.Trip (assigns:|bool| B, |date|)
@@ -270,8 +246,8 @@ dataType Keys (int)
 				r.State = guiKeyRecordInfo.ToRemove
 		
 		
-		function keys.Scan (|SDL_Scancode|)
-			// 512 max I think.
+		function keys.Scan (|int|)
+			// 512 max
 			cpp_wrapper SDL_GetScancodeFromKey
 
 	
@@ -554,6 +530,8 @@ extend_module keys
 		RSHIFT = scan + 229
 		RALT = scan + 230
 		RGUI = scan + 231
+		
+		
 		MODE = scan + 257
 		LOption = lalt
 		ROption = ralt
@@ -600,13 +578,13 @@ datatype GUIKeyRecordInfo (byte)
 
 
 struct GUIKeyRecord
-	|date|	Date
-	|keys|	Key
-	|GUIKeyRecordInfo| State
-
+	|date|				Date
+	|keys|				Key
+	|GUIKeyRecordInfo|	State
+	
 	function IsEaten (|bool|)
 		return self and !.date and .key!=nil
-		
+	
 	inline Clear
 		.date = nil
 		.key = nil
@@ -615,7 +593,6 @@ struct GUIKeyRecord
 	inline Eat
 		if self
 			.date = nil
-		
 	
 	syntax is (|GUIKeyRecordInfo| V, |bool|)
 		inlined

@@ -1016,7 +1016,8 @@ module GUI
 
 	libinternal AllowKeyDown (|&SDL_KeySym| Ev, |bool|)
 		opt norefcounts
-		if !.TextInputEnabledAtStart or ev.command
+		|| CommandKeyFlags = 1024|||64|||128|||2048
+		if !.TextInputEnabledAtStart or (ev.mod & CommandKeyFlags)
 			return true
 		|| k = ev.sym
 		if k is tab or escape

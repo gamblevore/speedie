@@ -1,9 +1,11 @@
 #!/usr/local/bin/spd
 
 || Speedie = "/usr/local/bin/spd"
-
+import "GUI"
 
 main (|[string]| Paths)
+	printline 1073742055
+	printline keys.RGUI//scan + 231
 	|| files = Paths.GlobExpand
 	if app["d"] // debug
 		"$Paths\n$Files\n"
