@@ -7,7 +7,7 @@ targets: flow
 
 main
 	printline file.prefs
-/	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
+	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
 
@@ -60,7 +60,7 @@ function app.TestSyntax
 	P.age = -2 // try to corrupt the age
 	"$p" // see if it worked or not?
 	|| x = ["a", "b", "c"]
-	if x == 3
+/	if x == 3
 		"$x has three items."
 	|| H = "house"
 	if H == 5

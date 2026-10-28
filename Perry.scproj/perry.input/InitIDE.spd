@@ -39,7 +39,7 @@ extend PerryIDE
 		.SubFindCheckBox	= Button(.searcharea,	PressedSearchWithin)
 		.FoundList			= ListView(.SearchArea,	ClickedError,			ReturnErrorList)
 		.ErrorList			= ListView(self,		ClickedError,			ReturnErrorList)
-		.CommsLogList		= ListView(self,		nil,					nil)
+		.CommsLogList		= ListView(self,		nil,					ReturnCommsList)
 		.EditMe				= TextView(self,		JumpToDefinition,		PressedEditKeys)
 		.ASMView			= Listview(self,		SelectedASM,			SelectedASM)
 		.ASMStretch			= SplitView.horz(self, 200~left,  113, 210)
@@ -629,14 +629,14 @@ extend PerryIDE
 		
 		
 	function SetupLogArea
-		|| g = .CommsLogList
-		g.Hierarchical = true
-		g.id = "log"
+		|| log = .CommsLogList
+		log.Hierarchical = true
+		log.id = "log"
 		require !app.prefs["nolog"]
-		g.gnormal.Separator = g.gnormal.bg
-		g.gnormal.Separator.alpha *= 0.8
+		log.gnormal.Separator = log.gnormal.bg
+		log.gnormal.Separator.alpha *= 0.8
 		
-		g.OnKeyDown = LogAreaKeys
+		log.OnKeyDown = LogAreaKeys
 		.AddBaseLog("-- feedback comms --", .logcomms)
 		.AddBaseLog("-- asm comms --", .logasm)
 		.AddBaseLog("-- perry actions --", .logactions)

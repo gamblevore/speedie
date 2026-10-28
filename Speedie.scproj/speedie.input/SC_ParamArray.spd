@@ -100,7 +100,7 @@ class SCParamArray
 		return "class"
 	
 	function ModuleName (|string|)
-		|| p = self[0] 
+		|| p = self[0]
 		if !.IsNotModule
 			p = .exp.first
 		
@@ -116,9 +116,9 @@ class SCParamArray
 	
 	function MultipleMatchingFunctions (|int| TypeCast, |SCFunction| f, |SCFunction| R, |SCFunction|)
 		if !.madeerror
-			error   (.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
-			error   (f.Source, "Candidate 1")
-			error   (R.Source, "Candidate 2")
+			error	(.Exp, "Multiple matching functions.".ArgsMatchError(TypeCast!=0) )
+			error	(f.Source, "Candidate 1")
+			error	(R.Source, "Candidate 2")
 	
 	
 	function string.NicerClassName (|string|)

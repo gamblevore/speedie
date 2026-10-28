@@ -372,15 +372,26 @@ function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp, |int| Depth)
 
 function xvar.ExpandArray (|jbin| j, |?&byte| Obj, |message?| xp, |int| depth)
 	opt norefcounts
-	j.Enter(@arg)
+	j.Enter(@arg, "array")
 	|| R = Obj|array|
 	|| RefCount = 0
-	for item in R
-		|| vars = debugger.VariablePrinter!
-		vars <~ item.class.name
-		vars <~ ": "
-		.RenderObject(vars, item|&byte|, RefCount)
-		j.AddStr(vars)
+	for (item in R) (i)
+		|| name = debugger.VariablePrinter!
+		|object--[1]| TempVar
+		TempVar[0] = Item
+		if nil|xvar|.RenderObject(name, (&TempVar[0])|&byte|, RefCount)
+			|| C = item.class
+			j.AddCString(@tmp, C.name, true) // .class already checked by .RenderObject
+		  else
+			j.add(@tmp, "BadObject", true)
+		if i >= 10K
+			name.Length = 0
+			name <~ "..."
+		j.AddStr(name)
+		j.addint(i)
+		j.exit
+		if i >= 10K
+			exit
 	j.exit
 	
 

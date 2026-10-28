@@ -512,6 +512,12 @@ function listviewrow.PerryLogClear
 	gui.touch
 
 
+function ReturnCommsList (GUIListEvent)
+	if row
+		app.alert row.Name
+		return true
+
+
 function LogAreaKeys (GuiKeyEvent)
 	opt norefcounts
 	|| Comms = .ide.CommsLogList
