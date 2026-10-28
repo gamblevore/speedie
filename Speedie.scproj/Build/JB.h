@@ -680,10 +680,9 @@ struct FatASM {
 	uint SrcMap;
 	u16 PrevOutput[2];
 	u16 ASMIndex;
-	byte Unused;
+	u16 Unused;
 	byte BreakInfo;
 	byte _Op;
-	byte JumpPrm;
 	u16 Inputs[5];
 	uint64 _Const;
 };
@@ -1057,13 +1056,11 @@ struct xC2xB5Form_Behaviour: Object_Behaviour {
 };
 
 JBClass ( xC2xB5Form , JB_Object , 
-	int Count;
-	JB_String* Name;
-	byte TotalBits;
-	byte RegsAltered;
-	byte Index;
-	byte RegForJump;
 	MuParam Params[5];
+	byte Count;
+	byte TotalBits;
+	byte Index;
+	JB_String* Name;
 	Message* Src;
 );
 
@@ -1241,6 +1238,7 @@ JBClass ( SCClass , SCBetterNode ,
 	SCDecl* SelfDecl;
 	SCDecl* ClassType;
 	JB_String* CppClass;
+	Message* RoleSkipTo;
 	SCFunction* DestructorFunc;
 	SCFunction* ConstructorFunc;
 	SCFunction* TheBoolFunc;
@@ -5946,6 +5944,8 @@ bool SC_FAT_IsFinisherWith0(FatASM* Self);
 
 bool SC_FAT_IsFunc(FatASM* Self);
 
+int SC_FAT_IsJump(FatASM* Self);
+
 bool SC_FAT_IsPartyAble(FatASM* Self);
 
 bool SC_FAT_IsRead(FatASM* Self);
@@ -7390,6 +7390,8 @@ void SC_FS_AppendVoid(FastString* Self, JB_String* S, uint /*byte*/ Extra);
 
 void SC_FS_AppendWrap(FastString* Self, SCFunction* F);
 
+void SC_FS_DumpDeclClose(FastString* Self, int Pos, int Reg);
+
 void SC_FS_EncodeLength(FastString* Self, uint64 N);
 
 void JB_FS_AppendInfo(FastString* Self, JB_String* Name, JB_String* Data);
@@ -8165,8 +8167,6 @@ void SC_bin_Cakeify(FastString* Self, SCFunction* Fn);
 
 FastString* JB_bin_Constructor(FastString* Self, Syntax Type, JB_String* Name);
 
-void SC_bin_DumpDeclClose(FastString* Self, int Pos, int Reg);
-
 jbinLeaver JB_bin_Enter(FastString* Self, Syntax Type, JB_String* Name);
 
 int JB_bin_Exit(FastString* Self, int Amount);
@@ -8174,6 +8174,10 @@ int JB_bin_Exit(FastString* Self, int Amount);
 void JB_bin_Exit0(FastString* Self);
 
 int JB_bin_FinishAdd(FastString* Self, Syntax Ty, int Start);
+
+int JB_bin_Length(FastString* Self);
+
+void JB_bin_LengthSet(FastString* Self, int Value);
 
 void SC_bin_PropertyLayout(FastString* Self, Array* List);
 
@@ -8436,7 +8440,7 @@ Message* JB_Msg_Constructor(Message* Self, Message* Parent, Syntax Func, JB_Stri
 
 Message* JB_Msg_ConstructorParser(Message* Self, Message* Parent, Syntax Func, int BytePos, JB_String* Name, int RangeLength);
 
-void SC_Msg_ConstructorAddNil(Message* Self, bool Isdot);
+void SC_Msg_ConstructorAddNil(Message* Self, bool IsDot);
 
 bool JB_Msg_ContainsInd(Message* Self, Ind P, bool AllowJustAfter);
 
@@ -10094,6 +10098,8 @@ SCObject* SC_Base_UpCheck(SCNode* Self, JB_String* Name, bool LookUp);
 
 SCNode* SC_Base_UpClass(SCNode* Self, Message* F);
 
+SCNode* SC_Base_UpTo(SCNode* Self, Message* Name);
+
 void SC_Base_Use(SCNode* Self);
 
 bool SC_Base_WasUnReached(SCNode* Self, SCNode* From);
@@ -10629,6 +10635,8 @@ SCNode* SC_Class__ProcessAs(Message* Node, SCNode* Name_space, Message* ErrPlace
 SCFunction* SC_Class__ProcessExtend(Message* C, bool PreferClass, SCModule* M);
 
 void SC_Class__ProcessExtendOld(Message* C, bool PreferClass);
+
+SCNode* SC_Class__RoleSkip(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
 SCNode* SC_Class__SetSize(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
