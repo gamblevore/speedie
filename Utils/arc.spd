@@ -13,7 +13,7 @@ function app.Process (|file| input, |file|)
 	
 	rz = input.SetExt("arc").file
 	|| out = jbin(@tmp, "archive")
-	out.file = rz
+	out|faststring|.file = rz
 	out.AddStr(input.name)
 	out.Enter
 	|| X = app["exclude"] ?? "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal,*.app,*.note,*.arc,*(experimental)*"

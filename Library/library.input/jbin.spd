@@ -24,41 +24,44 @@ extend message
 
 
 role JBin (Faststring)
+	target true//debug2
+		skipto object
 	constants
 		|int|
-		JBinHeader = 0xE2EA1001 // intel appends this backwards somehow. it works tho!
+		JBinHeader = 0xE2EA1001 // little-endian appends this backwards somehow. it works tho!
 
 	linkage: cpp_part bin
-
-	constructor				(|syntax| type=@arg, |string| name="")
+	
+	constructor				(|syntax| type=@arg, |string?| name=nil)
 		cpp_part Constructor
-		.AppendInt(JBinHeader)
+		super.AppendInt(JBinHeader)
 		.enter(type, name)
 	
 	constructor (|int| n)
 		disabled `Use jbin(@syx, "name")`
 		cpp_part Constructor0
 
-	function Start			(|syntax| type=@arg, |string| name="", |jbin|)
-		.Length = 0
-		.AppendInt(JBinHeader)
+	
+	function Start			(|syntax| type=@arg, |string?| name=nil, |jbin|)
+		super.Length = 0
+		super.AppendInt(JBinHeader)
 		.enter(type, name)
 		return self
 	
-	inline Enter			(|syntax| type=@arg, |string| name="", |jbinleaver|)
+	inline Enter			(|syntax| type=@arg, |string?| name=nil, |jbinleaver|)
 		return .add(type, name, true)
 
 	inline ExitAll
 		cpp_Part Exit0
-		.Exit(.indent)
+		.Exit(super.indent)
 	
 	function Exit			(|int| Amount=1, |int|)
-		.Indent = (.Indent - amount) max 0
+		super.Indent = (super.Indent - amount) max 0
 		|| Add = 239
 		while amount > 0
 			rz++
 			|| B  = (add + amount)  min  (255)
-			self    <~ B|byte|
+			super    <~ B|byte|
 			amount  -= (B-add)
 
 	function TmpArg			(|string| name, |jbinLeaver|)
@@ -68,11 +71,11 @@ role JBin (Faststring)
 
 	function RunHeader		(|string| name)
 		if name
-			self <~ '#'
-			self <~ '!'
-			self <~ name
-			self <~ '\n' // noice
-		self.AppendInt(JBinHeader)
+			super <~ '#'
+			super <~ '!'
+			super <~ name
+			super <~ '\n' // noice
+		super.AppendInt(JBinHeader)
 	
 	inline AddStr			(|string?| name)
 		.add(@str, name)
@@ -87,63 +90,73 @@ role JBin (Faststring)
 
 	function AddHint		(|int64| Value)
 		.WriteType(@hint, false)
-		.AppendHInt(Value|uint64|.HintLength)
-		.AppendHInt(Value)
+		super.AppendHInt(Value|uint64|.HintLength)
+		super.AppendHInt(Value)
 	
 	function AddRow			(|syntax| type, |string| Row, |string| Value)
 		.enter(@tmp, row)
 		.Add(type, value, false)
 		.exit
 	
-	function Add			(|syntax| type, |string?| name="", |bool| into = false, |jbinleaver|)
+	function Add			(|syntax| type, |string?| name=nil, |bool| into = false, |jbinleaver|)
 		.WriteType(type, into)
 		|| L = name.Length
-		.AppendHInt(L)
+		super.AppendHInt(L)
 		if L
-			.AppendMemory(name!.addr, L)
+			super.AppendMemory(name!.addr, L)
 		return into|int|
 	
 	function Add			(|syntax| type, |faststring| fs, |bool| into = false, |jbinleaver|)
 		cpp_part AddFS
 		return .add(Type, fs|string|, into)
 
-	function AddCString		(|syntax| type=@str, |cstring| name)
-		.AddMemory(type, name.length, false, name|&byte|)
+	inline AddCString		(|syntax| type=@str, |cstring| name, |bool| into=false)
+		.AddMemory(type, name.length, into, name|&byte|)
 
 	function AddMemory		(|syntax| type, |int| L, |bool| GoIn, |&byte| data, |jbinleaver|)
 		.WriteType(type, goin)
-		.AppendHInt(L)
-		.AppendMemory(data, L)
+		super.AppendHInt(L)
+		super.AppendMemory(data, L)
 		return goin|int|
 
 	function WriteType	(|syntax| type, |bool| GoIn=false)
 		|| T = (type|int|<<1) ||| (goin)
-		self <~ T|byte|
-		.Indent += goin
+		super <~ T|byte|
+		super.Indent += goin
 
 	function StartAdd (|int|)
-		self <~ (0|byte|, 5)
-		return .Length
+		super <~ (0|byte|, 5)
+		return super.Length
 		
 	function FinishAdd (|syntax| Ty, |int| Start, |int|)
-		|| NewLength = .Length
+		|| NewLength = super.Length
 		|| Gained = NewLength - Start
 		|| HLength = Gained|uint64|.hintlength
-		.Length = Start-5
-		self <~ (0|byte|, 5-(hlength+1))
-		self <~ (ty|int|<<1)|byte|
-		.AppendHInt(Gained)
-		self|faststring|.Length = NewLength // shouldn't be necessary
+		super.Length = Start-5
+		super <~ (0|byte|, 5-(hlength+1))
+		super <~ (ty|int|<<1)|byte|
+		super.AppendHInt(Gained)
+		super.Length = NewLength
 		return Gained
 	
-	libinternal uint64.HintLength (|int|)
-		rz = 1
-		if self|int64|<0
-			self = -self
-			rz++
-		while self >= 128
-			self = self >> 7
-			rz++
+	inline Length (|int|)
+		return super.Length
+	inline Length (assigns:|int|)
+		super.Length = value
+	inline Flush
+		super.Flush
+	inline GetResult (|string|)
+		return super.GetResult
+
+
+libinternal uint64.HintLength (|int|)
+	rz = 1
+	if self|int64|<0
+		self = -self
+		rz++
+	while self >= 128
+		self = self >> 7
+		rz++
 
 
 libinternal InputStream.NextMsgInfo (|uint64|)

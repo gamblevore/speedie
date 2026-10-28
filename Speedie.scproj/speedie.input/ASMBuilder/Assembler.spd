@@ -69,7 +69,7 @@ struct Assembler
 		|memory of fatasm|			HoistSpace = FatASM[0]!	// same
 		|&FatASM|					BackupSpace
 		|uint16|					StringsOutOfRange
-		|jbin?|						DebugDecls
+		|faststring?|				DebugDecls
 		|uint16[16K]|				BlockParents // this should be part of the FatASM. need to free a few bytes first.
 		|uint|						SanityCount
 

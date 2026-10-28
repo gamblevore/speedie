@@ -381,7 +381,7 @@ function perryide.LineCommand (|string| cmd, |textviewline| line, |jbin|)
 	opt norefcounts
 	|| CP = line.CompilePos
 	if CP >= 0
-		|| j = VarPrinter.start(@tmp, cmd)
+		|| j = VarPrinter|jbin|.start(@tmp, cmd)
 		j.AddStr .path
 		j.AddInt CP
 		j.AddInt line.Length

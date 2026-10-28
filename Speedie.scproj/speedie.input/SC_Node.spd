@@ -506,25 +506,26 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 	|| CanFunction	= (ParamsHere) and  (!ParamsArray.IsAddress)
 	|SCFunction--| Missing
 	|SCFunction--| f
-	|scclass--|    Owning_Cls
-	|| AllowSelfToConstructor = false
+	|int| LookupMode = 0 // 1 == AllowSelfToConstructor, 2 = Role
 	
 	// early var-reuse of fn
 	|scfunction--| CurrFunc = scfunction.currfunc
-		owning_cls = CurrFunc.cls
-		if owning_cls
-			AllowSelfToConstructor = ParamsArray.IsSelfCon
+		|scclass--| owning_cls = CurrFunc.cls
+			LookupMode |= ParamsArray.IsSelfCon
+	
+	if curr isa scclass
+		LookupMode |= (curr.RoleSkipTo!=nil)<<1
 
-	for (b.ListLookup in Curr)
-		|scobject--| o = b.syntaxaccess(paramsarray.LookupName)
-		if (!o)
-			continue
+	{
+	|scnode--| b = curr
+	while b
+		|scobject--| o = b.SyntaxAccess(ParamsArray.LookupName)
+		if (o) {
 		if (ParamsArray.IsDot)  and  (ParamsArray.IsModule)  and  (b == compiler.program) and (b!=self)
 			exit								// Stop SCFunction.Byte looking up Main.Byte...
 		
 		if o isa SCDecl
-
-			|scfunction--| HasHider = ((owning_cls != curr) or exp.isfuncdot)(o.GetHider(paramsarray) , nil) 
+			|scfunction--| HasHider = ((currfunc and CurrFunc.cls != curr) or exp.isfuncdot)(o.GetHider(paramsarray) , nil) 
 				o = HasHider|scdecl|
 			  else
 				if o.Type.FuncProto
@@ -541,7 +542,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 					curr = nil
 
 		
-		paramsarray.AllowSelfToConstructor = AllowSelfToConstructor
+		paramsarray.AllowSelfToConstructor = (LookupMode&1)|bool|
 		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
 			o = o.GetTheNewer|scmodule|
 			paramsarray.AllowSelfToConstructor = false
@@ -592,7 +593,14 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 							if (o isnt const) and (b!=compiler.program) and (b isa scmodule)  // bad?
 								error (exp, "Put a dot before this expression.")
 					return o
-
+		}
+		
+		b = b.parent
+// not too sure about this idea. I can't just pretend that jbin isn't a faststring?
+// what about... getresult? length? Just forward them?
+		if (LookupMode&2) and curr
+			b = b.Upto(curr|scclass|.RoleSkipto!)
+	}
 
 	if missing	// the missing stuff should ENTIRELY go within argsmatch? cos its called in two places.
 		return Missing.MacroFix( contains, arg_space, paramsarray )
@@ -628,9 +636,20 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 	error ( exp, ErrMsg )
 
 
-helper message.ConstructorAddNil (|bool| isdot)
+
+function scnode.UpTo (|message| name, |scnode|)
 	opt norefcounts
-	if isdot
+	while self
+		ifn self isa SCClass
+			return self
+		if .Name ~= name.name
+			return self
+		self = .parent
+	
+
+helper message.ConstructorAddNil (|bool| IsDot)
+	opt norefcounts
+	if IsDot
 		|| p = .parent
 		require p
 		.first = p.first
@@ -978,13 +997,6 @@ function LoadVisibility (|Message| p, |bool|)
 
 
 
-iterator ListLookup
-	|scnode--| Curr = self
-	while (Curr)
-		yield Curr
-		Curr = Curr.parent
-
-
 
 module {
 	|bool|			CurrVisibility = true
@@ -1096,6 +1108,7 @@ dispatch ClsCollectTable (CollectFunc)
 
 	+'class'				SCClass.NewInnerClass
 	+'role'					SCClass.NewInnerClass
+	+'skipto'				SCClass.RoleSkip
 	+'task'					sctasks.NewTask
 
 	+'initafter'			(SCModule.DoInitAfter)

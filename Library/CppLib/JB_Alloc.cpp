@@ -587,22 +587,33 @@ static int ObjIsValid (JB_Object* Obj) {
 	
 	int Count = Block->ObjCount + Block->HiddenObjCount;
 	if (Count <= 0)
-		return 1001;
+		return 1010;
 
 	if (!Block->NextBlock or !Block->PrevBlock)
-		return 1003;
+		return 1020;
 
-	if (!Block->Owner->Class)
-		return 1004;
+	auto Class = Block->Owner->Class;
+	if (!Class)
+		return 1030;
+	auto Name = Class->Name;
+	if (!Name)
+		return 1035;
+	
+	auto NameLen = strnlen(Name, 72);
+	if (NameLen >= 72 or NameLen <= 0)
+		return 1037;
 	
 	int Size = Block->ObjSize;
 	if (Size < 4 or Size >= 4096)
-		return 1005; // obj size invalid
+		return 1040; // obj size invalid
 
 	int TotalSize = Size*Count;
 	const int AllowedTotal = (int)((1<<kBlockSize)-sizeof(AllocationBlock));
 	if (TotalSize > AllowedTotal)
-		return 1002; // block itself is invalid
+		return 1050; // block itself is invalid
+	
+	if (Size > AllowedTotal)
+		return 1060;
 
 	return TestMemory((byte*)Obj, Size, 0);
 }

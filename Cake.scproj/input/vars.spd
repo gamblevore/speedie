@@ -72,12 +72,6 @@ class XVar (list)
 		Disabled "Spelt wrong!"
 	
 	
-	function PointerOK (|&nil| Ptr, |bool|)
-		if (Ptr|uint64| >= debugger.MinPointer)
-			return true
-		return !Ptr and (self is canbenil)
-	
-	
 	function NilOK (|faststring!| fs, |!&nil| Where, |bool|)
 		ifn (where|uint64| >= debugger.MinPointer) and fs.TestMem(Where, 8)
 		// both should never happen. Its like a register being nil, or an object being nil.
@@ -86,7 +80,9 @@ class XVar (list)
 			error (ErrorReceiver.internalerror)
 
 		|| Ptr = (Where|&?&nil|)[]
-		if .PointerOK(ptr)
+		if (Ptr|uint64| >= debugger.MinPointer)
+			return true
+		if !Ptr and (self and self is canbenil)
 			return true
 
 		if !ptr
@@ -326,7 +322,7 @@ class XVar (list)
 	function RenderObject (|faststring| fs, |!&nil| Addr, |$int| RefCount,  |bool|)
 		opt norefcounts
 		nil self
-		require !self or .NilOK(fs, Addr)
+		require .NilOK(fs, Addr)
 		|| obj = Addr|&object|[]
 		if !obj
 			fs <~ "nil"

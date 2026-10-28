@@ -47,6 +47,7 @@ linkage
 |SCFunction?|				TheBoolFunc
 |SCFunction?|				ConstructorFunc
 |SCFunction?|				DestructorFunc
+|message?|					RoleSkipTo
 |string?|					CppClass
 |SCDecl?|					ClassType
 |SCDecl|					SelfDecl
@@ -970,6 +971,10 @@ function MakeClassType (|scdecl| TypeNormal, |scdecl|)
 
 
 function LoadClassType
+	opt norefcounts
+	|| skip = .RoleSkipTo
+		check (.UpTo(skip)) (skip, "Can’t find class: " + skip.name)
+
 	if .isobject
 		.ClassType = .MakeClassType(.typenormal)
 
@@ -1035,14 +1040,17 @@ module
 	
 	
 	function NeuRole (CollectFunc)
+		opt norefcounts
 		|| mod = neuclass(node, name_Space, errplace)|scmodule| $
 		|| cls = mod.cls$
 		cls.IsRole = 1
-		if !(cls.properties)
+		// roles don't have properties
+		if !cls.properties
 			return mod
 		
 	
 	function NeuClass (CollectFunc)
+		opt norefcounts
 		|| cls = .NeuClassSub(node, name_space, ErrPlace, "", SCNodetype.object)
 			cls.ClassCollect
 			rz = cls.modul
@@ -1053,6 +1061,7 @@ module
 
 
 	function DataTypeSub (|Message| Node, |SCNode| Parent, |Message| ErrPlace, |string| ForInterface, |SCNodetype| BaseType, |SCModule|)
+		opt norefcounts
 		if node.obj
 			Return Compiler.program						// already done
 		
@@ -1098,6 +1107,7 @@ module
 					.typeinfo &= ~datatypecode.numeric
 			  else
 				.defawlt ?= sup.defawlt
+
 		
 		|| N = .name.lowercase
 		|| Td = DataTypeCode.Types[n]
@@ -1147,7 +1157,16 @@ module
 		AlreadyName.name = name + AlreadyName.name.UpperFirst
 		Return SCFunction.NewFunc( node, name_space, ErrPlace )
 
+
+	function RoleSkip (CollectFunc)
+		if name_space isa SCClass
+			require (name_Space.IsRole)
+			|| skip = node[@thg]
+			skip.ExpectLast
+			name_space.RoleSkipTo = skip
+		return Compiler.Program
 	
+
 	function NewInnerClass (CollectFunc)
 		if name_space isa scclass
 			return scclass.neuclass(node, name_Space.modul, errplace)

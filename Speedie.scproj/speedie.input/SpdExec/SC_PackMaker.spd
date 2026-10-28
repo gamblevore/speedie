@@ -259,7 +259,7 @@ module PackMaker
 		j.exit
 	
 	
-	helper DumpStringsSub (|jbin| strs)
+	helper DumpStringsSub (|faststring| strs)
 		opt norefcounts
 		strs.AppendHInt(.packstrings.length)
 		for s in .PackStrings

@@ -1,6 +1,6 @@
 	
 
-|jbin| VarPrinter = faststring()	
+|| VarPrinter = faststring()	
 
 extend PerryIDE {
 
@@ -403,7 +403,7 @@ extend ListViewRow
 
 
 function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
-	|jbin--| j = VarPrinter.start(@tmp, "edit")
+	|jbin--| j = VarPrinter|jbin|.start(@tmp, "edit")
 	j.addstr value
 	expect row.DebugPath(j) (Beep)
 	.SendJbin(j)
@@ -412,7 +412,7 @@ function perryide.DebugEditVar (|listviewrow| Row, |string| Value)
 
 function perryide.ReloadBreaks (|bool|)
 	if .EditorIsCode
-		|jbin--| j = VarPrinter.start(@tmp, "sendbreaks")
+		|jbin--| j = VarPrinter|jbin|.start(@tmp, "sendbreaks")
 		j.addstr .path
 		return .SendJbin(j)
 	return true
@@ -482,7 +482,7 @@ function perryide.CollectExpansion
 
 	opt norefcounts
 	|| funcs = .Stack.ListSource
-	|| j = VarPrinter.Start(@tmp, "expansion")
+	|| j = VarPrinter|jbin|.Start(@tmp, "expansion")
 	j.Enter(@arg)
 
 	for fn in funcs
