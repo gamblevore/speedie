@@ -1,13 +1,13 @@
 #!/usr/local/bin/spd
 
-|| Spd = file.SpeedieDir
-|| SpdTerm = spd["Terminal/Speedie"]
-|| User = app.BaseUser
-|string| CreationType
-|[string]| FilesMade
-|[string]| FailedLinks
-|bool| PrintMake
-|bool| IsTesting = app["test"]
+|string|	CreationType
+|[string]|	FilesMade
+|[string]|	FailedLinks
+|bool|		PrintMake
+||			Spd			= file.SpeedieDir
+||			SpdTerm		= spd["Terminal/Speedie"]
+||			User		= app.BaseUser
+|bool|		IsTesting	= app["test"]
 
 main
 	|| cwd = .cwd
@@ -118,7 +118,7 @@ function app.compile_example (|string| name, |errorint|)
 
 	args.SplitAppend("g++ -o")
 	args <~ Built
-	args <~ "${name}.cpp"
+	args <~ name + ".cpp"
 	args.SplitAppend(cflags)
 
 	|| Status = .Run(args)
@@ -180,7 +180,6 @@ function app.BuildSDL2 (|string| P)
 	.run("sudo", "make", "install")$
 	
 	self <~ "Returning To Installing Speedie! (SDL2 is done)"
-	
 
 
 function app.MadeFile (|string| f, |string| Kind=CreationType, |errorint|)
@@ -213,18 +212,18 @@ function app.Run (|string| name, |string?| arg1=nil, |string?| arg2=nil,   |fast
 
 
 function app.Run (|[string]| args,  |faststring| out=nil,  |ErrorInt|)
-	|| name = args[0]
+	|| cmd = args[0]
 		args.Remove(0)
-		rz = name.Execute(Args, out, processmode.PassThru)
+		rz = cmd.Execute(Args, out, processmode.PassThru)
 		if rz!=0
-			"Error: $rz\n\ncwd: ${app.cwd}\n$name ${args * ' '}"
+			"Error: $rz\n\ncwd: ${app.cwd}\n$cmd ${args * ' '}"
 
 
 function array.operatormul (|[string]| self, |byte| c, |string|)
 	return .join(string.byte(c))
 
 
-function app.Ask (|string| Prefix, |string| Q,   |bool|)
+function app.Ask (|string| Prefix, |string| Q, |bool|)
 	print prefix
 	if IsTesting or !FileDes.stdout.isterminal
 		""
