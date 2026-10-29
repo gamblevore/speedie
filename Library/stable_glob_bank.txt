@@ -22,7 +22,6 @@ GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
 JB__TerminalColor_RainbowTerm
-GUI__SDL_Cursor_Nothing
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
@@ -72,7 +71,6 @@ JB_ID__ByFreq
 GUI_FV_RightClickFileList
 JB__App__Args
 JB__App__Conf
-JB__App__Path
 JB__App__Prefs
 JB__App__stdin
 JB__App__StdOut
@@ -106,7 +104,7 @@ JB_Random
 JB_StdErr
 GUI_xC2xA5
 JB__ErrorSeverity__ErrorNames
-GUI__SDL_Cursor__Empty
+GUI__SystemCursor__Empty
 GUI__Sch_DefaultColors
 GUI__Doc_Cache_
 GUI__Img_CurlieQue_

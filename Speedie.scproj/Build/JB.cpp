@@ -6028,22 +6028,15 @@ void SC_PackMaker__ClassLayout(FastString* J) {
 			Syntax Fn = kJB_SyxMsg;
 			bool NeedsLayout = SC_Class_NeedsClassLayout(C);
 			if (NeedsLayout) {
-				if (SC_Base_IsLibrary(C)) {
-					Fn = kJB_SyxTmp;
-				}
-			}
-			 else {
-				Fn = kJB_SyxThg;
-				if (SC_Base_IsLibrary(C)) {
-					Fn = kJB_SyxSThg;
-				}
+				Fn = kJB_SyxTmp;
 			}
 			JB_bin_Enter(J, Fn, ((JB_String*)Names));
+			SCClass* S = C->Super;
+			uint Sid = ((uint)JB_Ternary((S != nil), S->TableID << 1, ((uint)0)));
+			JB_bin_AddHint(J, Sid + SC_Class_IsObject(C));
+			JB_bin_AddHint(J, ((int)SC_Base_IsLibrary(C)));
 			if (NeedsLayout) {
-				SC_Class_ListLayout(C, J);
-			}
-			 else {
-				JB_bin_AddHint(J, ((int)SC_Base_IsLibrary(C)));
+				SC_bin_PropertyLayout(J, C->Properties);
 			}
 			JB_bin_Exit(J, 1);
 			(JB_FS_LengthSet(Names, 0));
@@ -17668,10 +17661,11 @@ int JB_TC_ItemBitCount(uint /*DataTypeCode*/ Self) {
 }
 
 int JB_TC_NumericCount(uint /*DataTypeCode*/ Self) {
+	int Rz = 0;
 	if (JB_TC_SyntaxIs(Self, kJB__TC_Numeric)) {
-		return JB_TC_VecCount(Self);
+		Rz = JB_TC_VecCount(Self);
 	}
-	return 0;
+	return Rz;
 }
 
 int SC_TC_NumericCountBoolsToo(uint /*DataTypeCode*/ Self, SCDecl* D) {
@@ -17744,10 +17738,9 @@ JB_String* JB_TC_Render(uint /*DataTypeCode*/ Self, FastString* Fs_in) {
 }
 
 DataTypeCode JB_TC_SetSigned(uint /*DataTypeCode*/ Self, bool HasSign) {
-	if (HasSign) {
-		return Self & (~kJB__TC_Unsigned);
-	}
-	return Self | kJB__TC_Unsigned;
+	Self = (Self & (~kJB__TC_Unsigned));
+	Self = (Self | (kJB__TC_Unsigned * HasSign));
+	return Self;
 }
 
 SCClass* SC_TC_SignedStuffClass(uint /*DataTypeCode*/ Self) {
@@ -53536,13 +53529,6 @@ void SC_Class_Iterfailed(SCClass* Self, JB_String* Name, Message* Node) {
 	}
 }
 
-void SC_Class_ListLayout(SCClass* Self, FastString* J) {
-	SCClass* S = Self->Super;
-	uint Sid = ((uint)JB_Ternary((S != nil), S->TableID << 1, ((uint)0)));
-	JB_bin_AddHint(J, Sid + SC_Class_IsObject(Self));
-	SC_bin_PropertyLayout(J, Self->Properties);
-}
-
 void SC_Class_LoadClassType(SCClass* Self) {
 	Message* Skip = Self->RoleSkipTo;
 	if (Skip) {
@@ -61403,4 +61389,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -3480846178240433446 -9076062418305739237
+// -5076687339295231053 -9076062418305739237

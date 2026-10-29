@@ -10526,8 +10526,6 @@ bool SC_Class_IsTask(SCClass* Self);
 
 void SC_Class_Iterfailed(SCClass* Self, JB_String* Name, Message* Node);
 
-void SC_Class_ListLayout(SCClass* Self, FastString* J);
-
 void SC_Class_LoadClassType(SCClass* Self);
 
 void SC_Class_LoadConstructors(SCClass* Self);

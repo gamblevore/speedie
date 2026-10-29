@@ -397,7 +397,6 @@ GUI_SC_Open
 GUI_SC_Reset
 GUI_SC_StretchTo
 GUI_SC__Build
-GUI_SDL_Cursor__Empty
 GUI_SDL_TextEditingEvent_Render
 GUI_SDL_TextEditingEvent_Str
 GUI_SDL_Texture_Destructor
@@ -456,7 +455,6 @@ GUI_Sty_Strengthen
 GUI_Sty_SyntaxUsing
 GUI_Sty_SyntaxUsingComplete
 GUI_Sty_Width
-GUI_SystemCursor_Get
 GUI_SystemCursor_Use
 GUI_TFF_Tab
 GUI_Text_AddBreak
@@ -1161,6 +1159,7 @@ JB_Obj_ID
 JB_Obj_Layer
 JB_Obj_Print
 JB_Obj_Render
+JB_Obj_SafeRender
 JB_Object_As
 JB_Object_Fail
 JB_Object_FailStr
@@ -1581,7 +1580,6 @@ JB_Wrap_Destructor
 JB_Wrap_Render
 JB_ZalgoLine
 JB_bin_Add
-JB_bin_AddCString
 JB_bin_AddFS
 JB_bin_AddHint
 JB_bin_AddInt
