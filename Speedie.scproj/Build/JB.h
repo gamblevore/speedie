@@ -8179,7 +8179,7 @@ int JB_bin_Length(FastString* Self);
 
 void JB_bin_LengthSet(FastString* Self, int Value);
 
-void SC_bin_PropertyLayout(FastString* Self, Array* List);
+void SC_bin_PropertyLayout(FastString* Self, Array* List, bool All);
 
 void JB_bin_RunHeader(FastString* Self, JB_String* Name);
 

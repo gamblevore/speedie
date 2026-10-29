@@ -6036,7 +6036,7 @@ void SC_PackMaker__ClassLayout(FastString* J) {
 			JB_bin_AddHint(J, Sid + SC_Class_IsObject(C));
 			JB_bin_AddHint(J, ((int)SC_Base_IsLibrary(C)));
 			if (NeedsLayout) {
-				SC_bin_PropertyLayout(J, C->Properties);
+				SC_bin_PropertyLayout(J, C->Properties, true);
 			}
 			JB_bin_Exit(J, 1);
 			(JB_FS_LengthSet(Names, 0));
@@ -6054,7 +6054,7 @@ void SC_PackMaker__DebugClassesAndGlobals(FastString* J) {
 	if (!SC__Options_MakeExec) {
 		G = SC__PackMaker_PackGlobs;
 	}
-	SC_bin_PropertyLayout(J, G);
+	SC_bin_PropertyLayout(J, G, false);
 	JB_bin_Exit(J, 1);
 }
 
@@ -35437,7 +35437,7 @@ void JB_bin_LengthSet(FastString* Self, int Value) {
 	(JB_FS_LengthSet(Self, Value));
 }
 
-void SC_bin_PropertyLayout(FastString* Self, Array* List) {
+void SC_bin_PropertyLayout(FastString* Self, Array* List, bool All) {
 	int S = JB_bin_StartAdd(Self);
 	{
 		int _if0 = 0;
@@ -35446,7 +35446,9 @@ void SC_bin_PropertyLayout(FastString* Self, Array* List) {
 			if (P == nil) {
 				break;
 			}
-			SC_Decl_DumpDeclOpen(P, Self, SC_Decl_ExportPosition(P), SC_Decl_Reg(P), false);
+			if (All or ((!SC_Decl_SyntaxIs(P, kSC__SCDeclInfo_ClassObj)))) {
+				SC_Decl_DumpDeclOpen(P, Self, SC_Decl_ExportPosition(P), SC_Decl_Reg(P), false);
+			}
 			(++_if0);
 		};
 	}
@@ -61389,4 +61391,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -5076687339295231053 -9076062418305739237
+// 8374258237572200573 -9076062418305739237
