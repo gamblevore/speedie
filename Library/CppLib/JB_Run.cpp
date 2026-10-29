@@ -49,8 +49,8 @@ int			JB_BasicCareTaker(PicoDate D);
 
 // im pretty sure the only string we subclass is stringshared?
 JBClassPlace( JB_String,		JB_Object,	"String",	JB_BA_Destructor,	JB_Str_Render );
-JBClassPlace( JB_StringC,		JB_String,	"String",	0,		JB_Str_Render );
-JBClassPlace( JB_StringShared,	JB_String,	"String",	JB_Str_Destructor,JB_Str_Render );
+JBClassPlace( JB_StringC,		JB_String,	"String",	0,					JB_Str_Render );
+JBClassPlace( JB_StringShared,	JB_String,	"String",	JB_Str_Destructor,	JB_Str_Render );
 JBClassPlace( JB_StringExternal,JB_String,	"String",	JB_XStr_Destructor,	JB_Str_Render );
 JBClassPlace( JB_String8,		JB_String,	"String",	0,					JB_Str_Render );
 JBClassPlace( JB_String16,		JB_String,	"String",	0,					JB_Str_Render );

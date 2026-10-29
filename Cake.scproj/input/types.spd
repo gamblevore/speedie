@@ -88,7 +88,13 @@ datatype Wierdness (uint)
 	flags
 		Pointer
 		Reference
-		CArray
 	syntax is (|Wierdness| N, |bool|)
 		return self & N
+	syntax is (|Wierdness| N, assigns:|bool|, |wierdness|)
+		return (self & ~N) ||| (N*value)
+	function Carray (|int|)
+		return self >> 2
+	function Pointerlike (|bool|)
+		return self&~Reference
+
 

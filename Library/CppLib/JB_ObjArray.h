@@ -13,8 +13,8 @@ extern "C" {
 JBClass( Array, JB_Object,
 	int					_Marker;
 	JB_Object**			_Ptr;
-	int					Capacity;
-	int					Length;
+	int					_Capacity;
+	int					_Length;
 );
 
 void SpdSort (void* fp, JB_Object** low, JB_Object** high);

@@ -370,47 +370,62 @@ function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp, |int| Depth)
 		v.DescribeJBin(j, Obj+v.position, xp, depth)
 
 
-function xvar.ExpandArray (|jbin| j, |?&byte| Obj, |message?| xp, |int| depth)
-	opt norefcounts
-	j.Enter(@arg, "array")
-	|| R = Obj|array|
+function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items_, |message?| xp, |int| depth, |int| Count)
+	j.Enter(@arg, "")
+	|| Items = Items_|&object|
 	|| RefCount = 0
-	for (item in R) (i)
-		|| name = debugger.VariablePrinter!
-		|object--[1]| TempVar
-		TempVar[0] = Item
-		if nil|xvar|.RenderObject(name, (&TempVar[0])|&byte|, RefCount)
+	|| i = 0
+	|| name = debugger.VariablePrinter!
+	(Count min= 10K)
+	while i++ < Count
+		if nil|xvar|.RenderObject(name, Items, RefCount)
+			|| item = Items[0]!
 			|| C = item.class
-			j.AddCString(@tmp, C.name, true) // .class already checked by .RenderObject
+			j.AddCString(@tmp, C.name, true)		// .class already checked by .RenderObject
 		  else
 			j.add(@tmp, "BadObject", true)
-		if i >= 10K
+		if i == 10K
 			name.Length = 0
 			name <~ "..."
 		j.AddStr(name)
 		j.addint(i)
 		j.exit
-		if i >= 10K
-			exit
-	j.exit
-	
+		Items++
+	j.exit	
+
+
+function xvar.ExpandArray (|jbin| j, |&byte| Obj, |message?| xp, |int| depth, |int|)
+	opt norefcounts
+	|| R = Obj|array|
+	|| ptr = r._Ptr
+	|| length = r._Length
+	if ptr and length
+		.ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
+
 
 function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp, |int| Depth)
 // Vars are already good by the time we get here. Or should be.
 	opt norefcounts
 	require obj and type and (depth < 6)
+	
 	j.Enter(@arg)
 	xp = .IsExpanded(xp)
 	if xp
 		Type.ExpandSub(j, Obj, xp, depth)
-		if type isa xtype.Array // what about: obj|object| isa array?
+		if type isa xtype.Array
 			.ExpandArray(j, obj, xp, depth)
+		  elseif Type.IsObject
+			|| Carray = .Weird.Carray
+				.ExpandObjectMemory(j, obj|&uint64|, xp, depth, carray)
 		
 	j.exit
 
 
+function XVar.Weird (|wierdness|)
+	return .Weirdness[0]
 
-function xvar.DescribeJBin (|jbin| j, |&nil| Where, |message?| xp, |int| Depth)
+
+function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 	opt norefcounts
 	j.Enter(@tmp, .name)
 	
@@ -422,11 +437,11 @@ function xvar.DescribeJBin (|jbin| j, |&nil| Where, |message?| xp, |int| Depth)
 	|| vars = debugger.VariablePrinter!
 	|| OK = true
 	|| Type = .Type
-	if type and Type.IsObject
+	if type and Type.IsObject and !.Weird
 		Type = type.TestObjectType(Where)
-		OK &= type!=nil
+		OK = type!=nil
 	
-	OK &= .RenderType(vars, type)
+	.RenderType(vars, type)
 	j.AddStr(vars)
 	
 	|| RefCount = int.min

@@ -53,7 +53,7 @@ void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
 
 
 void OutOfMem_ (Array*self, int Count=0) {
-    JB_OutOfUserMemory((self->Capacity+Count)*sizeof(void*));
+    JB_OutOfUserMemory((self->_Capacity+Count)*sizeof(void*));
 }
 
 
@@ -62,15 +62,15 @@ static bool ReAlloc_ (Array* self, int C) {
 	if (!X)
 		return false;
 	self->_Ptr = X;
-	self->Capacity = (int)(JB_msize(X)/sizeof(void*));
+	self->_Capacity = (int)(JB_msize(X)/sizeof(void*));
 	return true;
 }
 
 
 static bool GrowToLength_ (Array* self, int N, bool Extra) {
-	int C = self->Capacity;
+	int C = self->_Capacity;
 	if (N <= C) {				// fast grow length
-		self->Length = N;
+		self->_Length = N;
 		return true;
 	}
 	
@@ -79,15 +79,15 @@ static bool GrowToLength_ (Array* self, int N, bool Extra) {
 	if_rare (!ReAlloc_(self, N+((N*Extra)>>1)))
 		return false;
 
-	self->Length = N;
+	self->_Length = N;
 	return true;
 }
 
 
 static void ArrayClear (Array* self) {
 	auto P = self->_Ptr;
-	self->Capacity = 0;
-	self->Length = 0;
+	self->_Capacity = 0;
+	self->_Length = 0;
 	self->_Ptr = 0;
 	JB_Free(P);
 }
@@ -96,13 +96,13 @@ static void ArrayClear (Array* self) {
 static void ShrinkCapacity_ (Array* self, uint Length) {
 	if (Length <= 0)
 		return ArrayClear(self);
-	self->Length = Length;
+	self->_Length = Length;
 
-	int C = self->Capacity;
+	int C = self->_Capacity;
 	if (C <= 5  or  Length*2 > C)
 		return;
 	C = std::max((int)Length, 8);
-	self->Capacity = C;
+	self->_Capacity = C;
 	self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
 }
 
@@ -110,7 +110,7 @@ static void ShrinkCapacity_ (Array* self, uint Length) {
 int JB_Array_Find (Array* Self, JB_Object* F) {
 	if (Self) {
 		auto P = Self->_Ptr; 
-		int N = Self->Length;
+		int N = Self->_Length;
 		int i = 0; 
 		while (i < N) {
 			if (P[i] == F)
@@ -126,7 +126,7 @@ int JB_Array_Find (Array* Self, JB_Object* F) {
 
 bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	require (Value and Count > 0);
-	int n = self->Length; 
+	int n = self->_Length; 
 	require(GrowToLength_(self, n+Count, true));
 	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
 	auto P = self->_Ptr + n;
@@ -143,7 +143,7 @@ bool JB_Array_Append( Array* self, JB_Object* Value ) {
 
 
 bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
-	int n = self->Length;
+	int n = self->_Length;
 	if ( (uint)Pos > n  or  !JB_Array_AppendCount(self, Value, 1) )
 		return false;
 	if (Pos == n)
@@ -164,7 +164,7 @@ bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
 
 
 static void ArrayDecrDownTo_(Array* self, int64 NewLength) {
-	JB_Object** Curr = self->_Ptr + self->Length-1;
+	JB_Object** Curr = self->_Ptr + self->_Length-1;
 	JB_Object** First = self->_Ptr + NewLength;
 	while ( Curr >= First ) // backwards is safer.
 		JB_Decr( *Curr-- );
@@ -172,15 +172,15 @@ static void ArrayDecrDownTo_(Array* self, int64 NewLength) {
 
 
 void JB_Array_Shrink (Array* self) {
-	int L = self->Length;
-	if (L < self->Capacity) {
-		self->Capacity = L;
+	int L = self->_Length;
+	if (L < self->_Capacity) {
+		self->_Capacity = L;
 		self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, L*sizeof(void*));
 	}
 }
 
 void JB_Array_LengthSet( Array* self, int NewLength ) {
-    int Length = self->Length;	
+    int Length = self->_Length;	
     if (NewLength >= Length)
 		return;
 	ArrayDecrDownTo_(self, NewLength);
@@ -208,7 +208,7 @@ JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
 
 
 void JB_Array_Reverse( Array* self ) {
-    int n = (int)(self->Length)/2;
+    int n = (int)(self->_Length)/2;
     auto F = self->_Ptr;
     for_(n)
         F[i] = F[n-(i+1)];
@@ -218,7 +218,7 @@ void JB_Array_Reverse( Array* self ) {
 void JB_Array_Remove( Array* self, int Pos ) {
 	auto Item = JB_Array_Value(self, Pos);
 	if (Item) {
-		int N = self->Length;
+		int N = self->_Length;
 		while (Pos < N) {
 			self->_Ptr[Pos] = self->_Ptr[Pos+1];
 			Pos++;  
@@ -240,7 +240,7 @@ void JB_Array_Destructor( Array* self ) {
 
 int JB_Array_Length( Array* self ) {
     if (self)
-        return (int)(self->Length);
+        return (int)(self->_Length);
     return 0;
 }
 
@@ -248,7 +248,7 @@ int JB_Array_Length( Array* self ) {
 Array* JB_Array_Copy(Array* self) {
     require(self);
 	Array* Result = JB_Array_Constructor0(nil);
-	int n = self->Length;
+	int n = self->_Length;
 	if (!n)
 		return Result;
 	if (!GrowToLength_(Result, n, false)) {
@@ -278,8 +278,8 @@ void JB_Array_Swap (Array* self, uint i, uint j) {
 
 Array* JB_Array_Constructor0 ( Array* self ) {
 	JB_New2(Array);
-	self->Length = 0;
-	self->Capacity = 0;
+	self->_Length = 0;
+	self->_Capacity = 0;
 	self->_Ptr = 0;
 	self->_Marker = 0;
 	return self;
@@ -294,7 +294,7 @@ int JB_Array_Wipe (Array* self) {
 
 
 void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
-	if ((u32)Pos < (u32)(self->Length)) {
+	if ((u32)Pos < (u32)(self->_Length)) {
 		JB_SetRef( self->_Ptr[Pos], Value );
 	}
 }
@@ -302,7 +302,7 @@ void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
 
 JB_Object* JB_Array_Pop(Array* self) {
 	if (self) {
-		int n = self->Length - 1;
+		int n = self->_Length - 1;
 		if (n >= 0) {
 			JB_Object* rz = self->_Ptr[n];
 			ShrinkCapacity_(self, n);
@@ -314,7 +314,7 @@ JB_Object* JB_Array_Pop(Array* self) {
 
 
 JB_Object* JB_Array_Value( Array* self, int Pos ) {
-    if (self and (u32)Pos < self->Length) {
+    if (self and (u32)Pos < self->_Length) {
         return self->_Ptr[ Pos ];
     }
     return 0;
@@ -322,7 +322,7 @@ JB_Object* JB_Array_Value( Array* self, int Pos ) {
 
 JB_Object* JB_Array_Last( Array* self, int Pos ) {
     if (self) {
-		int N = self->Length;
+		int N = self->_Length;
 		Pos = N - (Pos+1);
 		if ((uint)Pos < (uint)N)
 			return self->_Ptr[ Pos ];

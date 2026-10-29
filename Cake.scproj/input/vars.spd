@@ -56,8 +56,7 @@ class XVar (list)
 		.RenderForPrint(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
 		printline Printer|&nil||string|
 		printer.Length = 0
-	
-	
+		
 	module
 		|| Printer = faststring()
 		|| Expansion = message()
@@ -116,7 +115,7 @@ class XVar (list)
 
 		expect (self isnt BareStruct)							(value, "Unalterable")
 
-		if .weirdness[0] is reference
+		if .Weird is reference
 			where = where|&&nil|[]
 
 		|| C = .Type
@@ -243,16 +242,13 @@ class XVar (list)
 		opt norefcounts
 		expect (msg.length < 60)						(msg, "SizeOverflow")
 
-		|| W = .Weirdness[0]
-		expect (W isnt CArray)							(msg, "Unwriteable") // surely it should be expanded first?
+		|| W = .Weird
+		expect !W.Carray								(msg, "Unwriteable") // surely it should be expanded first?
 			
 		// pointers can be altered... im sure of it
 		// and references just need to be dereferenced...
 		// i guess its a pointer TO data. So... just alter the value?
 		
-		
-		
-
 		|| T = .DataType
 		|| V = t.VecCount
 		|| BC = t.ByteCount
@@ -322,7 +318,7 @@ class XVar (list)
 	function RenderObject (|faststring| fs, |!&nil| Addr, |$int| RefCount,  |bool|)
 		opt norefcounts
 		nil self
-		require .NilOK(fs, Addr)
+		require .NilOK(fs, Addr)	
 		|| obj = Addr|&object|[]
 		if !obj
 			fs <~ "nil"
@@ -341,24 +337,35 @@ class XVar (list)
 				obj.render(Fs)
 			  elseif .ViewStrength == 0
 				obj.DebugRender(fs)
-			  elseif .ViewStrength == 1						// What if crash in here? ooof
-				obj.render(Fs)								// How to quote so looks distinct? «abc » is used .renderAST
+			  elseif .ViewStrength == 1							// What if crash in here? ooof
+				obj.render(Fs)									// How to quote so looks distinct? «abc » is used .renderAST
 				// I could pre-check the entire tree that it is safe? THEN render?
 			  else
 				obj.RenderAST(Fs)
 			return true
 
-		if obj isa Array
-			fs <~ "("
-			fs <~ obj.length						// Could be expandable... I guess?
-			fs <~ ") "
-
 		fs <~ "0x"
 		fs <~ obj.objectid
+
+		if obj isa Array
+			fs <~ " ("
+			fs <~ obj.length
+			fs <~ ")"
 		return true
 	
 	
-	function RenderType (|faststring| fs, |xtype?| type, |bool|)
+	function RenderType (|faststring| fs, |xtype?| type)
+		opt norefcounts
+		.RenderTypeSub(fs, type)
+		
+		for W in .Weirdness
+			loop W
+			w >>= 2
+			if w
+				fs <~ "[$w]"
+	
+	
+	function RenderTypeSub (|faststring| fs, |xtype?| type)
 		opt norefcounts
 		for W in .Weirdness
 			loop W
@@ -366,36 +373,31 @@ class XVar (list)
 				fs <~ "$"
 			if w is Pointer
 				fs <~ "&"
-			w >>= 2
-			if w
-				fs <~ "[$w]"
 		
 		if .flags is CString
 			fs <~ "CString"
-			return true
+			return
 		
 		if .flags is Prototype
 			fs <~ "(function)"
-			return true
+			return
 
 		|| C = .type
 		if !C and !type
 			|| T = .DataType ||| datatypecode.Numeric
 			T.Render(Fs)
-			return true
+			return
 		
-		if C
-			if type and type.IsObject
-				|| Good = type isa C
-				if !good
-					fs <~ "!"
-				fs <~ type.name
-				if !good
-					fs <~ "!"
-			  else
-				fs <~ C.Name
-			
-		return true
+		require C
+		if type and type.IsObject
+			|| Good = type isa C
+			if !good
+				fs <~ "!"
+			fs <~ type.name
+			if !good
+				fs <~ "!"
+		  else
+			fs <~ C.Name
 		
 	
 	function faststring.TestObj (|object| Obj, |bool|)
@@ -415,14 +417,23 @@ class XVar (list)
 	function RenderValue (|faststring| fs, |!&nil| Where, |$int| RefCount,  |bool|)
 		opt norefcounts
 		if .Reg
-			require fs.TestMem(Where, 16, "BadStack")		// we still need to check for readability, though!
+			require fs.TestMem(Where, 16, "BadStack")				// We still need to check for readability, though!
+
+		|| w = .Weird
+		if W is Reference								// Barestructs already handled in rendervalue
+			|| Ptr = Where|&uint64|[]
+			Ptr = (Ptr<<1)>>1										// Clear high bit.
+			if !Ptr
+				fs <~ "nil"
+				return false
+			Where = Ptr|&nil|
 		
 		|| C = .type
-		if c and c.IsObject
+		if c and c.IsObject and !W.Pointerlike
 			return .RenderObject(fs, Where, RefCount)
 		
 		if self is BareStruct
-			return .RenderBareStruct(Fs, where)				// what about structs in general?
+			return .RenderBareStruct(Fs, where)						// What about structs in general?
 
 		return .RenderData(fs, Where)
 
@@ -452,40 +463,36 @@ class XVar (list)
 		|| V = t.VecCount
 		|| BC = t.ByteCount
 		if (bc >= 12): bc = 16		
-		|| W = .weirdness[0]
+		|| W = .Weird
 		|| F = .flags
 
-		if (W is pointer or reference) or (F is prototype or f is cstring)
+		if (W.pointerlike) or (F is prototype or f is cstring)
 			require .NilOK(fs, addr)
-
+			
 			|| Ptr = addr|&&nil|[]|int64|
-			if (w is Reference)										// barestructs already handled in rendervalue
-				expect (Ptr) (ErrorReceiver.internalerror)
-				Addr = ((ptr>>1)<<1)|&nil|
-				
-			  else
-				if !ptr
-					fs <~ "nil"
+			if !ptr
+				fs <~ "nil"
+				return true
+			
+			if f is CString
+				|| len = ptr|cstring|.Length(256)
+				if fs.TestMem(ptr|&byte|, len)
+					fs <~ '"'
+					fs.AppendMemory(ptr|&byte|, len)
+					fs <~ '"'
 					return true
-				if f is CString
-					|| len = ptr|cstring|.Length(256)
-					if fs.TestMem(ptr|&byte|, len)
-						fs <~ '"'
-						fs.AppendMemory(ptr|&byte|, len)
-						fs <~ '"'
-						return true
-					return false
-				fs <~ "0x"
-				fs.AppendHex(ptr, 2)
-				
-				if .Weirdness[1]
-					return fs.TestMem(addr, bc)		// dont render pointer to a pointer
-				
-				if f is Prototype
-					return true
-				addr = ptr|&ivec4|
-				fs <~ ": "
-		
+				return false
+			
+			fs <~ "0x"
+			fs.AppendHex(ptr, 2)
+			
+			if .Weirdness[1]
+				return fs.TestMem(addr, bc)		// dont render pointer to a pointer
+			if (f is Prototype) or w.Carray
+				return true
+			addr = ptr|&ivec4|
+			fs <~ ": "
+
 		require fs.TestMem(addr, bc)
 				
 		if t is bool
