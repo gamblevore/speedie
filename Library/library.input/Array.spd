@@ -12,7 +12,10 @@ class Array
 	default		array.new
 	contains	object
 
-	|int|		_Marker
+	|int|			_Marker
+	|?&object|		_Ptr
+	|int|			_Capacity
+	|int|			_Length
 	
 
 ////////////////////////////////////////////////////////////////////////////
@@ -32,11 +35,15 @@ class Array
 		description "Shuffles. Also Resets the marker." // but should it?
 		cpp_wrapper JB_Array_Shuffle
 
+	setter _Ptr: disabled
+	setter _Capacity: disabled
+	setter _Length: disabled
+	
 	function Last (|int| Backwards=0, ||)
 		cpp_wrapper JB_Array_Last
 	
 	inline First (||)
-		return self[0]		
+		return self[0]
 
 	function Next (||)
 		if ._marker < .length
