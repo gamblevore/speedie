@@ -157,15 +157,16 @@ class XVar (list)
 			self <~ "InvalidLength: "
 			self <~ N
 			return false
+
 		if !addr												// testmem allows nil addr...
 			self <~ "nil!"
 			return false
-		
-		require .TestMem(addr, n, "BadString")					// check string
 
 		if !n
 			self <~ `""`
 			return true
+
+		require .TestMem(addr, n, "BadString")					// check string
 		
 		|VirtualJBString| Skkrt
 		Skkrt.Addr = Addr
@@ -185,15 +186,14 @@ class XVar (list)
 		require fs.testobj(name)
 
 		fs <~ .func.name
-		fs <~ "@"
-		
+		fs <~ " @ "
 		if name isa string
-			fs.AppendQuotedEscape(name)
 			return true
 
+	// bad class. not a string!
 		fs <~ name.class.name
 		fs <~ "!"
-		return true
+		return false
 
 
 	function ParseObj (|object| Old, |string| Value, |object?|)
@@ -333,24 +333,29 @@ class XVar (list)
 			return fs.DisplayString(str.addr, str.length)
 
 		if (obj.class == Message) and (obj isa message)			// avoid rendering error as a message
-			if !self
-				obj.render(Fs)
-			  elseif .ViewStrength == 0
-				obj.DebugRender(fs)
-			  elseif .ViewStrength == 1							// What if crash in here? ooof
-				obj.render(Fs)									// How to quote so looks distinct? «abc » is used .renderAST
-				// I could pre-check the entire tree that it is safe? THEN render?
-			  else
+			if self and .viewstrength == 2
 				obj.RenderAST(Fs)
-			return true
+				return true
+
+			require obj.DebugRender(fs)
+/			return obj.saferender(Fs) == 0
 
 		fs <~ "0x"
 		fs <~ obj.objectid
 
-		if obj isa Array
+		if obj isa Array or list
 			fs <~ " ("
-			fs <~ obj.length
+			if obj isa list
+				fs <~ obj.count
+			if obj isa Array
+				fs <~ obj.length
 			fs <~ ")"
+//		  elseif obj isa Dictionary// or list
+//			0 //
+//		  else
+//			fs <~ " "
+//			obj.SafeRender(fs) // might crash...
+			
 		return true
 	
 	
@@ -551,29 +556,57 @@ class XVar (list)
 		return true
 	
 	
-	function vec4.SmallerVec4Render (|Faststring| fs)
-		if self == vec4()
-			fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell
-		  else
-			fs <~ "("
-			for i in 4
-				|| v = self[i]
-					fs <~ v
-				  else
-					fs <~ "0"
-				if i < 3
-					fs <~ ", "
-			fs <~ ")"
-	
+function vec4.SmallerVec4Render (|Faststring| fs)
+	if self == vec4()
+		fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell
+	  else
+		fs <~ "("
+		for i in 4
+			|| v = self[i]
+				fs <~ v
+			  else
+				fs <~ "0"
+			if i < 3
+				fs <~ ", "
+		fs <~ ")"
 
-	function faststring.EscapeByte (|byte| value)
-		opt norefcounts
-		if  value > 32  and  value != 9 and 10 and 13
-			|| str = jeebox.EscapeStr[value|byte|.render]
-				self <~ str
-				return
-		self <~ value|byte|
-	
+
+function faststring.EscapeByte (|byte| value)
+	opt norefcounts
+	if  value > 32  and  value != 9 and 10 and 13
+		|| str = jeebox.EscapeStr[value|byte|.render]
+			self <~ str
+			return
+	self <~ value|byte|
+
+
+
+function jbin.RenderListObject (|object| Item, |int| i, |bool|)
+	|object--[1]| Temp
+	Temp[0] = item
+	return .RenderListItem((&Temp[0])|&uint64|, i)
+
+
+function jbin.RenderListItem (|&uint64| Items_, |int| i, |bool|)
+	opt norefcounts
+	if i >= 10K
+		.AddStr("...")
+		return true
+		
+	|| RefCount = 0
+	|| name = debugger.VariablePrinter!
+	name.Length = 0
+	|| Items = Items_|&object|
+	if !nil|xvar|.RenderObject(name, Items, RefCount)
+		.add(@tmp, "BadObject", true)
+		.AddStr(name)
+		return false
+		
+	|| item = Items[0]!
+	|| C = item.class
+	.AddCString(@tmp, C.name, true)		// .class already checked by .RenderObject
+	.AddStr(name)
+	return true
 
 
 function message.xvariables (|[xvar]|)

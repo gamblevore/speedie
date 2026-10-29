@@ -9,23 +9,19 @@ class XType
 	
 	constructor
 		.msg = @emb + "(unreached)"
-	
+		
 	constructor (|message| msg, |int| index)
 		opt norefcounts
 		|| fn = msg.func
-		.IsLib = fn == @tmp or @sthg
 		.msg = msg
 		|| Sup = msg[@nil]
 		|| SupIndex = Sup.Int
 		.IsObject = (SupIndex & 1)
+		.IsLib = msg.second.int
 		.Super = xtype.GetType(SupIndex, Sup)
 		if .IsObject and (fn == @tmp or @msg)
-			|| name = .msg.name
-			if name ~= "array"
-				xtype.array = self
-				
-			|| JBCls = cakerun.ClassTable.valuelower(name)|&Classdata|
-				jbcls.Index = index
+			|| JBCls = cakerun.ClassTable.valuelower(.msg.name)|&Classdata|
+				JBCls.Index = index
 	
 	function Name (|string|)
 		return .msg.name
@@ -51,27 +47,41 @@ class XType
 		|InputStream|	Shared = InputStream("")
 		|XType|			Unreached = xtype()
 		|xtype|			Array
+		|xtype|			List
+		|xtype|			Dictionary
 		|[XType]|		Types
 
-		function LoadTypes (|message| Pack)
-			opt norefcounts
-			.LoadTypesSub(pack)
-
-			for T in .types
-				|| P = T.msg.Second
-					P.LoadXVars(nil, T.properties)
-		
-		
-		function LoadTypesSub (|message| list)
+		function LoadTypes (|message| List)
 			opt norefcounts
 			|| i = 0
 			for Type.fast in List
 				++i
 				|| fn = Type.Func
-				if fn == @msg or @tmp or @thg or @sthg
+				if fn == @msg or @tmp
 					.types <~ XType(Type, i)
 				  else
 					.types <~ .unreached
+
+		
+		function AfterLoadTypes
+			opt norefcounts
+			.Array = .GetType("array")
+			.dictionary = .GetType("dictionary")
+			.List = .GetType("list")
+
+			for T in .types
+				|| P = T.msg[2]
+					P.LoadXVars(nil, T.properties)
+		
+		
+		
+		function GetType (|string| name, |xtype|)
+			opt norefcounts
+			|| Cls = CakeRun.ClassTable[name]|&classdata|
+				|| i = cls.index
+					|| T = .types[i - 1]
+						return T
+			error ("Can't load class: " + name)
 		
 		
 		function GetType (|int| i, |message| err, |xtype|)

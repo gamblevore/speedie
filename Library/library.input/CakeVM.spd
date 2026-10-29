@@ -76,6 +76,12 @@ prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode, |uint| Break, |int64|)
 }
 
 
+autogen object.SafeRender (|!FastString| fs, |int|)
+	description "A 'hardened' renderer, that can survive memory errors. Slower. Used by my debugger"
+	nil self
+	cpp_wrapper JB_Obj_SafeRender
+
+
 
 struct CakeStack
 	linkage

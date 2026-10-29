@@ -370,55 +370,95 @@ function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp, |int| Depth)
 		v.DescribeJBin(j, Obj+v.position, xp, depth)
 
 
-function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items_, |message?| xp, |int| depth, |int| Count)
-	j.Enter(@arg, "")
-	|| Items = Items_|&object|
-	|| RefCount = 0
+function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items, |message?| xp, |int| depth, |int| Count, |bool|)
+	opt norefcounts
+	j.Enter(@arg)
 	|| i = 0
-	|| name = debugger.VariablePrinter!
 	(Count min= 10K)
-	while i++ < Count
-		if nil|xvar|.RenderObject(name, Items, RefCount)
-			|| item = Items[0]!
-			|| C = item.class
-			j.AddCString(@tmp, C.name, true)		// .class already checked by .RenderObject
-		  else
-			j.add(@tmp, "BadObject", true)
-		if i == 10K
-			name.Length = 0
-			name <~ "..."
-		j.AddStr(name)
-		j.addint(i)
+	|| OK = true
+	while (i++ < Count)
+		OK &= j.RenderListItem(Items, i)
+		j.addint(i-1)
 		j.exit
 		Items++
-	j.exit	
+	j.exit
+	return OK
 
 
-function xvar.ExpandArray (|jbin| j, |&byte| Obj, |message?| xp, |int| depth, |int|)
+function xvar.ExpandDictionary (|jbin| j, |dictionary--| D, |message?| xp, |int| depth, |bool|)
+	j.Enter(@arg)
+	|| nav = D.Navigate
+	|| i = 0
+	|| OK = true
+	while (i++ < 10K)
+		|| value = nav.NextValue				#loop
+		OK &= j.RenderListObject(value, i)
+		|| key = nav.name
+		j.addstr(key)
+		j.exit
+	j.exit
+	return OK
+
+
+function xvar.ExpandList (|jbin| j, |list| Obj, |message?| xp, |int| depth, |bool|)
 	opt norefcounts
-	|| R = Obj|array|
-	|| ptr = r._Ptr
+	require obj.mustbe(list)
+	j.Enter(@arg)
+	|| i = 0
+	|| Curr = obj.first
+	|| OK = true
+	while (i++ < 10K)
+		loop Curr
+		OK &= j.RenderListObject(Curr, i)
+		j.addint(i-1)
+		j.exit
+		Curr++
+	j.exit
+	return OK
+
+
+function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |bool|)
+	opt norefcounts
+	require R.mustbe(array)
 	|| length = r._Length
-	if ptr and length
-		.ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
+		|| ptr = r._Ptr
+			return .ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
 
 
-function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp, |int| Depth)
+function xvar.ExpandGoodContainer (|jbin| j, |&byte| Obj, |xtype| Type, |message?| xp, |int| Depth, |bool|)
+	|| w = .Weird
+		|| Carray = W.Carray
+		if w is Pointer
+			Carray = 1
+		if Carray
+			return .ExpandObjectMemory(j, obj|&uint64|, xp, depth, carray)
+	  else
+		if type isa xtype.Array
+			return .ExpandArray(j, obj|array|, xp, depth)
+
+		if type isa XType.List
+			return .ExpandList(j, obj|list|, xp, depth)
+
+		if Type isa XType.Dictionary
+			return .ExpandDictionary(j, obj|dictionary|, xp, depth)
+	return true
+
+
+function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| xp, |int| Depth, |bool|)
 // Vars are already good by the time we get here. Or should be.
 	opt norefcounts
-	require obj and type and (depth < 6)
+	ifn obj and type and (depth < 6)
+		return true
 	
 	j.Enter(@arg)
 	xp = .IsExpanded(xp)
+	rz = true
 	if xp
 		Type.ExpandSub(j, Obj, xp, depth)
-		if type isa xtype.Array
-			.ExpandArray(j, obj, xp, depth)
-		  elseif Type.IsObject
-			|| Carray = .Weird.Carray
-				.ExpandObjectMemory(j, obj|&uint64|, xp, depth, carray)
-		
+		if Type.IsObject									// for now
+			rz = .ExpandGoodContainer(j, obj, type, xp, depth)
 	j.exit
+	
 
 
 function XVar.Weird (|wierdness|)
@@ -453,8 +493,8 @@ function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 		j.AddHint(refcount)
 
 	if ok
-		.ExpandGoodVar(j, where|&&byte|[], type, xp, Depth+1)
-	  else
+		ok = .ExpandGoodVar(j, where|&&byte|[], type, xp, Depth+1)
+	if !ok
 		j.add(@thg, "bad")
 
 	j.exit

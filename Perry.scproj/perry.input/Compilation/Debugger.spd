@@ -296,10 +296,14 @@ function listviewrow.ImproveArray (|int| Depth, |bool| CanHide)
 		fs.Length = 0
 		item.PerryAppendMsg("|", -1)
 		fs <~ " "
-		item.PerryAppendMsg("", 1)
+		|string| quotes = nil
+		if item.first.IsString
+			quotes = "\""
+
+		item.PerryAppendMsg(quotes, 1)
 		fs <~ " = "
 		fs <~ (' ', 6 - fs.LengthUTF8)
-		item.PerryAppendMsg("", 0)
+		item.PerryAppendMsg(nil, 0)
 		item.name = fs
 		p <~ item							// haha
 	.remove
@@ -353,7 +357,7 @@ function message.MemPrint (|string| s, |int| item, |int| Mode, |faststring| fs)
 		ch.int.StrSize(fs)
 
 
-function message.PerryAppendMsg (|string| s, |int| Item)
+function message.PerryAppendMsg (|string?| s, |int| Item)
 	opt norefcounts
 	|| v = VarPrinter
 	v <~ s

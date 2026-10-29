@@ -22,9 +22,7 @@ Design:
 
 
 extern "C" {
-jmp_buf 		CakeRestore;
 byte			SubCrash;							// If the crash reporting system itself crashes.
-uint			CrashCount;
 CakeVM*			JB_GlobalVM;
 
 
@@ -353,19 +351,17 @@ static ivec4* CakeCrashed (CakeVM* V, int Error, ASM* Code) {
 }
 
 
-void CakeCorrupt (int Sig) {
-	CrashCount++;
-	longjmp(CakeRestore, Sig|128);
-}
+void JB_MemoryAccessError(int Sig);
+extern jmp_buf JB_MemFailJump;
 
 
 ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	static_assert((sizeof(CakeRegister) == sizeof(CakeStack)), "sizeof type");
 //	V = VMClearHigh(V)								// ruins CanDebug
-	auto OldSeg = signal(SIGSEGV, CakeCorrupt);
-	auto OldBus = signal(SIGBUS,  CakeCorrupt);
+	auto OldSeg = signal(SIGSEGV, JB_MemoryAccessError);
+	auto OldBus = signal(SIGBUS,  JB_MemoryAccessError);
 
-	int Error = setjmp(CakeRestore);
+	int Error = setjmp(JB_MemFailJump);
 	ivec4* Reg =  Error  ?  CakeCrashed(V, Error, 0)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);

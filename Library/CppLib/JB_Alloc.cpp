@@ -40,7 +40,7 @@ What about this idea? Pointer compression:
 extern "C" {
 
 bool			DoTotalMemoryTest;
-jmp_buf 		MemFailJump;
+jmp_buf 		JB_MemFailJump;
 byte			MemFailKeeper;
 JB_MemoryWorld	MemoryManager;
 
@@ -542,8 +542,8 @@ bool JB_DebugAllMemory (bool b)  {
 }
 
 
-static void MemoryAccessError (int sig) {
-	longjmp(MemFailJump, sig);
+void JB_MemoryAccessError (int sig) {
+	longjmp(JB_MemFailJump, sig|128);
 }
 
 
@@ -622,9 +622,9 @@ static int ObjIsValid (JB_Object* Obj) {
 int JB_TestMemory (void* B, int N, int Mode) {
 	if (!B or !N) return -1;
 
-	auto OldSeg = signal(SIGSEGV, MemoryAccessError);
-	auto OldBus = signal(SIGBUS, MemoryAccessError);
-	int Err = setjmp(MemFailJump);
+	auto OldSeg = signal(SIGSEGV, JB_MemoryAccessError);
+	auto OldBus = signal(SIGBUS, JB_MemoryAccessError);
+	int Err = setjmp(JB_MemFailJump);
 	if (!Err)
 		Err =  (N < 0)  ?  ObjIsValid((JB_Object*)B)  :  TestMemory((byte*)B, N, Mode);
 	signal(SIGSEGV, OldSeg);

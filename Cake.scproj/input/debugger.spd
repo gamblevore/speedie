@@ -285,6 +285,7 @@ module debugger
 		opt norefcounts
 		|| LibInfo = cakerun.LibDebug.parse
 		xtype.LoadTypes(PackInfo["type"])
+		xtype.AfterLoadTypes
 		
 		|| g = PackInfo.giveitem("glob", @msg)
 		.Globs = g

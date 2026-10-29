@@ -188,18 +188,24 @@ void JB_Array_LengthSet( Array* self, int NewLength ) {
 }
 
 
-JB_String* JB_Array_Render(Array* self, FastString* fs_in) {
+JB_String* JB_Array_Render (Array* self, FastString* fs_in) {
 	FastString* fs = JB_FS__FastNew(fs_in);
 	if (!self) {
 		JB_FS_AppendCString(fs, "nil");
 	} else {
 		JB_FS_AppendByte(fs, '[');
-		int n = JB_Array_Length(self);
-		for_(n) {
-			JB_Object* obj = JB_Array_Value(self, i);
-			if (i)
-				JB_FS_AppendCString(fs, ", ");
-			JB_Obj_Render(obj, fs);
+		if (self->RefCount & 1<<31) {
+			JB_FS_AppendCString(fs, "..."); // infinite loop!
+		} else {
+			self->RefCount |= 1<<31;
+			int n = JB_Array_Length(self);
+			for_(n) {
+				JB_Object* obj = JB_Array_Value(self, i);
+				if (i)
+					JB_FS_AppendCString(fs, ", ");
+				JB_Obj_Render(obj, fs);
+			}
+			self->RefCount &= ~(1<<31);
 		}
 		JB_FS_AppendByte(fs, ']');
 	}

@@ -449,7 +449,7 @@ function Message.IsCake (|bool|)
 
 function scclass.NeedsClassLayout (|bool|)
 	opt norefcounts
-	if (.IsLibrary == options.MakeExec)
+	if .IsLibrary == options.MakeExec
 		return true
 	|| r = .MyReacher
 		if R.IsLibrary == Options.MakeExec
@@ -467,18 +467,15 @@ function packmaker.ClassLayout (|jbin| j)
 		c.exportname.MiniName(names, c.IsObject)
 		|| fn = @msg
 		|| NeedsLayout = c.NeedsClassLayout
-			if c.IsLibrary
-				fn = @tmp // whatever
-		  else
-			fn = @thg
-			if c.IsLibrary
-				fn = @sthg
-		
+			fn = @tmp
+
 		j.Enter(fn, names|string|)
+		|| s = c.super
+		|| sid = (s!=nil)(s.tableid<<1, 0)
+		j.AddhInt(sid + c.isobject)
+		j.AddhInt(c.islibrary|int|)
 		if NeedsLayout
-			c.ListLayout(j)
-		  else
-			j.AddHint(c.islibrary|int|)
+			j.PropertyLayout(c.Properties)
 		j.exit
 		names.Length = 0
 

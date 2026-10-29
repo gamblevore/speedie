@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include "float.h"
 #include <string.h>
+#include <setjmp.h>
 
 
 extern "C" {
@@ -46,7 +47,7 @@ bool JB_Byte_IsWhite (byte self) {
 }
 
 
-bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
+bool JB_BA_Realloc_ ( JB_String* self, int Length ) { // is a c-string
     if (Length <= 0) {
         JB_FreeString( self->Addr );
         self->Addr = 0; self->Length = 0;
@@ -66,13 +67,13 @@ bool JB_BA_Realloc_( JB_String* self, int Length ) { // is a c-string
 }
     
 
-void JB_BA_Destructor( JB_String* self ) {
+void JB_BA_Destructor ( JB_String* self ) {
     JB_FreeString( self->Addr );
     JB_Obj_Destructor(self);
 }
 
 
-JB_String* JB_Str_CopyFromPtr( const void* Addr, int N ) {
+JB_String* JB_Str_CopyFromPtr ( const void* Addr, int N ) {
     JB_String* s = JB_Str_New( N );
     if (s and N > 0) {
         CopyBytes(Addr, s->Addr, N);
@@ -80,19 +81,19 @@ JB_String* JB_Str_CopyFromPtr( const void* Addr, int N ) {
     return s;
 }
 
-JB_String* JB_Str_CopyFromCString( const char* C ) {
+JB_String* JB_Str_CopyFromCString ( const char* C ) {
 	if (C)
 		return JB_Str_CopyFromPtr(C, (int)strlen(C));
 	return 0;
 }
 
-JB_String* JB_Str_Copy( JB_String* self ) {
+JB_String* JB_Str_Copy ( JB_String* self ) {
     if (self)
         return JB_Str_CopyFromPtr(self->Addr, self->Length);
     return 0;
 }
 
-JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj) {
+JB_String* JB_StrFromPtr (void* c, int N, void* Free, void* Obj) {
 	if (N > 0) {
 		JB_StringExternal* S = JB_New( JB_StringExternal );
 		S->Addr = (uint8*)c;
@@ -104,12 +105,12 @@ JB_String* JB_StrFromPtr(void* c, int N, void* Free, void* Obj) {
 	return JB_Str__Empty();
 }
 
-JB_StringC* JB_StrC( const char* c ) {
+JB_StringC* JB_StrC ( const char* c ) {
 	int n = c ? (int)strlen(c) : 0;
 	return JB_StrCN(c, n);
 }
 
-JB_StringC* JB_StrCN( const void* c, int N ) {
+JB_StringC* JB_StrCN ( const void* c, int N ) {
 	if (N > 0) {
 		JB_StringC* S = JB_New( JB_StringC );
 		S->Addr = (uint8*)c;
@@ -120,27 +121,27 @@ JB_StringC* JB_StrCN( const void* c, int N ) {
 }
 
 
-JB_String* JB_Str__Freeable0(const char* Msg) {
+JB_String* JB_Str__Freeable0 (const char* Msg) {
 	return JB_Str__Freeable((uint8*)Msg, (int)strlen(Msg));
 }
 
 
 		// Utilities
 
-int JB_Str_Length( JB_String* self ) {
+int JB_Str_Length ( JB_String* self ) {
 	if (self)
 		return self->Length;
 	return 0;
 }
 
-uint8* JB_Str_Address( JB_String* self ) {
+uint8* JB_Str_Address ( JB_String* self ) {
 	if (self) 
 		return (uint8*)self->Addr;
 	return (uint8*)"";
 }
 
       
-JB_String* JB_Str_NewInlined(int Length, JB_Class* Cls) {
+JB_String* JB_Str_NewInlined (int Length, JB_Class* Cls) {
     if (!Length)
         return JB_Str__Empty();
     
@@ -220,7 +221,7 @@ JB_String* Str_Shrink (JB_String* u, int Length) {
 
 
 
-void JB_Str_Destructor(JB_StringShared* self) {
+void JB_Str_Destructor (JB_StringShared* self) {
 	JB_Decr( self->_Parent );
 	JB_Obj_Destructor(self);
 }
@@ -228,7 +229,7 @@ void JB_Str_Destructor(JB_StringShared* self) {
 
 typedef void (*XStrFree)(const char* Addr, void* Param);
 
-void JB_XStr_Destructor(JB_StringExternal* self) {
+void JB_XStr_Destructor (JB_StringExternal* self) {
     auto F = self->Free;
     auto O = self->Obj;
     auto A = self->Addr;
@@ -245,7 +246,7 @@ void JB_XStr_Destructor(JB_StringExternal* self) {
 
 
 
-static uint8* u8Read( uint8* source, u32* pch ) {
+static uint8* u8Read ( uint8* source, u32* pch ) {
 	u32 ch = *source++;
     
 	if (ch >= 0x80) {
@@ -300,7 +301,7 @@ uint8* u8Write_ ( uint8* target, u32 ch ) {
 }
 
 
-inline u16* u16Read( u16* source, u32* ch ) {
+inline u16* u16Read ( u16* source, u32* ch ) {
 	*ch = *source++;
 	if (*ch >= UNI_SUR_HIGH_START and *ch <= UNI_SUR_HIGH_END) {
 		u32 ch2 = *source++;
@@ -310,7 +311,7 @@ inline u16* u16Read( u16* source, u32* ch ) {
 }
 
 
-JB_String* JB_Str_UTF16To8(JB_String* Str, FastString* fs_in, int SrcIsBig) {
+JB_String* JB_Str_UTF16To8 (JB_String* Str, FastString* fs_in, int SrcIsBig) {
 	int N = JB_Str_Length(Str)/2;
 	if (N < 1)
 		return 0;
@@ -496,7 +497,7 @@ u32 JB_u8_Size ( uint8 FirstChar ) {
 
 
 // Tells us how many bytes on the end of the UTF8 are not a complete byte
-int JB_Str_Scan_BadUTF8AtEnd(JB_String* u) {
+int JB_Str_Scan_BadUTF8AtEnd (JB_String* u) {
 	int Len = u->Length;
 	if ( Len ) {
         char* Last = (char*)u->Addr + Len;
@@ -547,12 +548,12 @@ void JB_FS_AppendHexData( FastString* fs, uint8* Addr, int Len, int Spaces ) {
 }
 
 
-void JB_FS_AppendHex(FastString* fs, int64 tVal, int RoundTo) {
+void JB_FS_AppendHex (FastString* fs, int64 tVal, int RoundTo) {
     JB_FS_AppendHexSub(fs, tVal, RoundTo, EscapeTable_);
 }
 
 
-void JB_FS_AppendHex3(FastString* fs, int tVal) {
+void JB_FS_AppendHex3 (FastString* fs, int tVal) {
     JB_FS_AppendHexSub(fs, tVal, 1, EscapeTable_ + 10);
 }
 
@@ -560,9 +561,7 @@ void JB_FS_AppendHex3(FastString* fs, int tVal) {
 
          //  Main subroutines. These are generalised, and need interfacing routines.
 
-
-
-inline uint8* u8Pos( MiniStr S, uint8 TheChar ) {
+inline uint8* u8Pos ( MiniStr S, uint8 TheChar ) {
 	while (	S ) {
 		if (S.Next() == TheChar)
 			return S;
@@ -571,7 +570,7 @@ inline uint8* u8Pos( MiniStr S, uint8 TheChar ) {
 }
 
 
-inline uint8* u8PosLex( MiniStr S, uint8 TheChar ) {
+inline uint8* u8PosLex ( MiniStr S, uint8 TheChar ) {
 	TheChar = LowerCaseB(TheChar);
 	while (	S ) {
 		if (S.NextLower() == TheChar)
@@ -581,7 +580,7 @@ inline uint8* u8PosLex( MiniStr S, uint8 TheChar ) {
 }
 
 
-inline MiniStr Theo2Pos( MiniStr S, uint8 Find1, uint8 Find2 ) {
+inline MiniStr Theo2Pos ( MiniStr S, uint8 Find1, uint8 Find2 ) {
     u32 Read1 = S.Next();
     while (	S ) {
         u32 Read2 = S.Next();
@@ -596,7 +595,7 @@ inline MiniStr Theo2Pos( MiniStr S, uint8 Find1, uint8 Find2 ) {
 
 
 
-inline MiniStr Theo2PosLex( MiniStr S, uint8 Find1, uint8 Find2 ) {
+inline MiniStr Theo2PosLex ( MiniStr S, uint8 Find1, uint8 Find2 ) {
     u32 Read1 = S.NextLower();
     while (	S ) {
         u32 Read2 = S.NextLower();
@@ -610,7 +609,7 @@ inline MiniStr Theo2PosLex( MiniStr S, uint8 Find1, uint8 Find2 ) {
 }
 
 
-inline uint8* u8PosRev( MiniStr S, uint8 TheChar ) {
+inline uint8* u8PosRev ( MiniStr S, uint8 TheChar ) {
 	while (	S ) {
 		if (S.Prev() == TheChar)
 			return S;
@@ -619,7 +618,7 @@ inline uint8* u8PosRev( MiniStr S, uint8 TheChar ) {
 }
 
 
-inline uint8* u8PosRevLex( MiniStr S, uint8 TheChar ) {
+inline uint8* u8PosRevLex ( MiniStr S, uint8 TheChar ) {
 	TheChar = LowerCaseB(TheChar);
 	while (	S ) {
 		if (S.PrevLower() == TheChar)
@@ -629,7 +628,7 @@ inline uint8* u8PosRevLex( MiniStr S, uint8 TheChar ) {
 }
 
 
-inline MiniStr Theo2PosRev( MiniStr S, uint8 Find1, uint8 Find2 ) {
+inline MiniStr Theo2PosRev ( MiniStr S, uint8 Find1, uint8 Find2 ) {
     u32 Read1 = S.Prev();
     while (	S ) {
         u32 Read2 = S.Prev();
@@ -649,7 +648,7 @@ inline MiniStr Theo2PosRev( MiniStr S, uint8 Find1, uint8 Find2 ) {
 
 
 
-inline MiniStr Theo2PosLexRev( MiniStr S, uint8 Find1, uint8 Find2 ) {
+inline MiniStr Theo2PosLexRev ( MiniStr S, uint8 Find1, uint8 Find2 ) {
     u32 Read1 = S.PrevLower();
     while (	S ) {
         u32 Read2 = S.PrevLower();
@@ -662,7 +661,7 @@ inline MiniStr Theo2PosLexRev( MiniStr S, uint8 Find1, uint8 Find2 ) {
 }
 
 
-uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
+uint8* SearchForward_ ( MiniStr S, MiniStr F, bool Lex ) {
     u32 FirstChar = F.Next();
     if (!F) {
 		if (Lex)
@@ -696,7 +695,7 @@ uint8* SearchForward_( MiniStr S, MiniStr F, bool Lex ) {
 }
 
 
-uint8* SearchBackward_( MiniStr S, MiniStr F, bool Lex ) {
+uint8* SearchBackward_ ( MiniStr S, MiniStr F, bool Lex ) {
     u32 FirstChar = F.Next();
     if (!F) {
 		if (Lex)
@@ -732,7 +731,7 @@ uint8* SearchBackward_( MiniStr S, MiniStr F, bool Lex ) {
 
 
 
-inline bool OffsetEquals_( uint8* S, MiniStr F ) {
+inline bool OffsetEquals_ ( uint8* S, MiniStr F ) {
 	// you need to compare the length before calling this function!
 
 	if (S != F.Addr)
@@ -1767,7 +1766,7 @@ JB_String* JB_Obj_GenericRender(JB_Object* self, FastString* fs_in) {
 }
 
 
-JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
+JB_String* JB_Obj_Render (JB_Object* self, FastString* fs_in) {
     if (!self) {
         return JB_CStr_Render("(nil)", fs_in);
     }
@@ -1782,6 +1781,29 @@ JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in) {
     return (FN)(self, fs_in);
 }
 
+void JB_MemoryAccessError(int Sig);
+extern jmp_buf JB_MemFailJump;
+
+int JB_Obj_SafeRender (JB_Object* self, FastString* fs) {
+	// what if... a render function corrupts memory?
+	// then what? I think we are kinda screwed at that point. the best thing we could do
+	// is to mark that object as "damaged" somehow. Nvm for now!
+	int Err = JB_TestMemory(fs, -1, 0);
+	if (Err)
+		return Err;
+	if (self)
+		Err = JB_TestMemory(self, -1, 0);
+	if (Err)
+		return Err;
+	auto OldSeg = signal(SIGSEGV, JB_MemoryAccessError);
+	auto OldBus = signal(SIGBUS, JB_MemoryAccessError);
+	Err = setjmp(JB_MemFailJump);
+	if (!Err)
+		JB_Obj_Render(self, fs);
+	signal(SIGSEGV, OldSeg);
+	signal(SIGBUS, OldBus);
+	return Err;
+}
 
 
 
