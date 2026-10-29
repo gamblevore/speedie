@@ -27,7 +27,7 @@ class XVar (list)
 	constructor (|InputStream| s, |int| pos, |int| reg, |int| After)
 		.Flags = s.Byte
 		.SrcMap = s.hint
-		.ViewStrength = 0
+		.ViewStrength = 1
 		.position = pos
 		.reg = reg
 		.name = s.CString
@@ -41,6 +41,14 @@ class XVar (list)
 				x = s.hint
 			.Weirdness[i] = x
 	
+	function ByteSize (|int|)
+		|| w = .Weird
+		if w is Pointer // references aren't real :]
+			return 8
+		|| s = .DataType.ByteCount
+		w >>= 2
+		return s * (w + !w)						// at least 1
+		
 	function Type (|xtype|)
 		opt norefcounts
 		return .obj|&nil||xtype|
@@ -350,11 +358,12 @@ class XVar (list)
 			if obj isa Array
 				fs <~ obj.length
 			fs <~ ")"
-//		  elseif obj isa Dictionary// or list
-//			0 //
-//		  else
-//			fs <~ " "
-//			obj.SafeRender(fs) // might crash...
+		
+		  elseif !(obj isa Dictionary)
+			fs <~ " "
+			if !self or .ViewStrength >= 1
+				obj.SafeRender(fs) // might crash...
+				// rpg hero not seeing this? we render but nothing comes out
 			
 		return true
 	
@@ -462,6 +471,12 @@ class XVar (list)
 			fs <~ ">"
 
 
+	function IsObject (|bool|)
+		opt norefcounts
+		|| t = .Type
+			return t.IsObject
+	
+	
 	function RenderData (|faststring| fs, |!&nil| Addr, |bool|)
 		opt norefcounts
 		|| T = .DataType
@@ -493,7 +508,7 @@ class XVar (list)
 			
 			if .Weirdness[1]
 				return fs.TestMem(addr, bc)		// dont render pointer to a pointer
-			if (f is Prototype) or w.Carray
+			if (f is Prototype) or w.Carray or .isobject
 				return true
 			addr = ptr|&ivec4|
 			fs <~ ": "

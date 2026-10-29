@@ -1784,22 +1784,49 @@ JB_String* JB_Obj_Render (JB_Object* self, FastString* fs_in) {
 void JB_MemoryAccessError(int Sig);
 extern jmp_buf JB_MemFailJump;
 
-int JB_Obj_SafeRender (JB_Object* self, FastString* fs) {
+int JB_Obj_SafeRender (JB_Object* self, FastString* fs, int Maximum) {
 	// what if... a render function corrupts memory?
 	// then what? I think we are kinda screwed at that point. the best thing we could do
 	// is to mark that object as "damaged" somehow. Nvm for now!
 	int Err = JB_TestMemory(fs, -1, 0);
 	if (Err)
 		return Err;
-	if (self)
+	if (self) {
 		Err = JB_TestMemory(self, -1, 0);
-	if (Err)
-		return Err;
+		if (Err)
+			return Err;
+	}
+	if (fs->_Lock) // how?
+		return -2;
+	
+	// now what? we need to "lock" the faststring.
+	Maximum = std::min(Maximum, 1*1024*1024);
+	Maximum = std::max(Maximum, 128);
+	
+	if (!JB_FS_NeedSpare(fs, Maximum))
+		return -1;
+	
+	int OldSize = fs->_Size;
+	auto OldResult = fs->_Result;
+	fs->_Size = fs->Length + Maximum;
+	fs->_Lock = 1;
+	fs->_Result = nil; // simulate lock.
+	
 	auto OldSeg = signal(SIGSEGV, JB_MemoryAccessError);
-	auto OldBus = signal(SIGBUS, JB_MemoryAccessError);
+	auto OldBus = signal(SIGBUS,  JB_MemoryAccessError);
+	
 	Err = setjmp(JB_MemFailJump);
 	if (!Err)
 		JB_Obj_Render(self, fs);
+	
+	fs->_Size = OldSize;
+	fs->_Result = OldResult;
+	if (fs->_Lock > 1) {
+		JB_FS_LengthSet(fs, fs->Length-5); // we often get "close" stuff added.
+		JB_FS_AppendCString(fs, "...");
+	}
+	fs->_Lock = 0;
+	
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	return Err;

@@ -9,8 +9,7 @@ module PackMaker
 	|int|					PackFuncIndex
 	|int|					PackGlobSize
 	|int|					LibGlobSize
-	|HairyMan|				PackSaved
-	
+	|HairyMan|				PackSaved	
 	
 	helper scfunction.NeedsLibExport (|bool|)
 		opt norefcounts
@@ -403,7 +402,7 @@ function packmaker.FinalPrepare
 
 
 
-struct HairyMan 
+struct HairyMan
 // i just went a little insane while writing this code.
 // What do you expect writing a compiler on your own?
 // I might have been drunk too.
@@ -488,7 +487,8 @@ function packmaker.DebugClassesAndGlobals (|jbin| j)
 	
 	j.Enter(@msg, "glob")
 	|| G = PackMaker.LibGlobs
-	if !options.makeexec
+	if !options.MakeExec
 		g = PackMaker.PackGlobs
-	j.PropertyLayout(G)
+	j.PropertyLayout(G, false)
 	j.exit
+

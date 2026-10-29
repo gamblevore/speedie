@@ -20,7 +20,7 @@ class FastString {
 	|int|			_Size
 	|uint16|		Indent
 	|Byte|			IndentChar
-	
+	|byte|			_Lock
 /////
 
 	constructor							{ cpp_wrapper JB_FS_Constructor }
@@ -29,8 +29,10 @@ class FastString {
 
 	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
-	setter _Result (|int|)				{ disabled }
-	setter _Addr (|int|)				{ disabled }
+	setter _Result (|int|):				disabled
+	setter _WrittenLength (|int64|):	disabled
+	setter _Addr (|int|):				disabled
+	setter _Lock (|int|):				Disabled
 	
 	function AppendLower (|string| data)
 		cpp_wrapper JB_FS_AppendLower

@@ -289,10 +289,12 @@ function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata?|)
 		if err != nil
 			j.add(@tmp, err)
 			exit
-		|| File = .CollectStack(stack, j, Count)$
+		|| File = .CollectStack(stack, j, Count) #loop
 		if ++count == 1
 			rz = file
 		Stack = .prev(stack)
+
+	.CollectGlobs(j)
 	
 
 
@@ -314,6 +316,26 @@ function jbin.SyntaxExpect (|string| s, |int64| Code)
 	.AddhInt(Code)
 	.exit
 
+
+
+function cakevm.CollectGlobs (|jbin| j)
+	opt norefcounts
+	j.Enter(@tmp, "Globals")
+	j.AddStr(nil|string|)
+	j.AddHint(0)
+	j.AddHint(0)
+	
+	|| xp = xvar.Expansion.last.Last
+	ifn (xp == "Globals") and !xp.FirstName
+		xp = nil	
+	j.Enter
+	for g in debugger.PackGlobs
+		|| p = g.Position
+		|| after = P + g.bytesize
+		if (p > 0)  and  (after <= globals.PackGlobSize|int|)
+			g.DescribeJBin(j, globals.PackGlobs! + p, xp, 0)
+	j.exit
+	j.exit
 
 
 function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWithData?|)
@@ -347,9 +369,10 @@ function cakevm.CollectStack (|CakeStack| Stack, |jbin| j, |int| Count, |FileWit
 	
 	|| xp = fn.IsExpanded(rz)
 	index -= fn.Position
+	
 	|| Locals = fn.obj|&nil||[xvar]|
 		j.Enter
-		if xp or (count == 0)
+		if xp or !count
 			for v in Locals
 				if v contains index
 					v.DescribeJBin(j, stack + v, xp, 0)

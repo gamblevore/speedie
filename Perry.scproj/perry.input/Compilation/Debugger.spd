@@ -288,7 +288,7 @@ function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 // maybe creation is the answer. a holy holey creation
 
 
-function listviewrow.ImproveArray (|int| Depth, |bool| CanHide)
+function listviewrow.ImproveArray// (|int| Depth, |bool| CanHide)
 	opt norefcounts
 	|| p = .parent$
 	|| fs = VarPrinter
@@ -297,7 +297,7 @@ function listviewrow.ImproveArray (|int| Depth, |bool| CanHide)
 		item.PerryAppendMsg("|", -1)
 		fs <~ " "
 		|string| quotes = nil
-		if item.first.IsString
+		if item.second.IsString
 			quotes = "\""
 
 		item.PerryAppendMsg(quotes, 1)
@@ -336,11 +336,13 @@ function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	.ImproveVarSub(dbname, fs)
 	.name = fs
 
+	expect (Depth < 64) "Can't expand variables beyond 64 levels deep" // could be some recursion bug.
+	
 	|| Fields = .Last
 	if fields == @arg
 		for prop in Fields
 			if prop == @arg
-				prop.ImproveArray(Depth+1, CanHide)			
+				prop.ImproveArray//(Depth+1, CanHide)
 			  else
 				prop.ImproveVar(depth+1, CanHide)
 

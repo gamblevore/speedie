@@ -6,7 +6,8 @@ module debugger
 	|bool|					WantDebug
 	|bool|					BreakMapBad
 	|message|				PackInfo
-	|Message|				Globs
+	|Message|				GlobMsg
+	|[xvar]|				PackGlobs
 	|[FileWithData]|		FileList
 	|{FileWithData}|		FileMap
 	|string|				CodeToSrcStr
@@ -287,10 +288,16 @@ module debugger
 		xtype.LoadTypes(PackInfo["type"])
 		xtype.AfterLoadTypes
 		
-		|| g = PackInfo.giveitem("glob", @msg)
-		.Globs = g
-		|| LibGlobs = LibInfo["glob"]					// probably need to keep the libglobs.
-			g.Appendall(libglobs)						// merge!
+		|| g = PackInfo.GiveItem("glob", @msg)
+		.globmsg = g
+		|| Dump = g.first
+			Dump.LoadXVars(nil, .PackGlobs)
+
+//		|| LibGlobs = LibInfo["glob"].First // typeid missing somehow.
+											// fix later
+///			LibGlobs.LoadXVars(nil, .PackGlobs)
+
+			
 	
 	
 	function LoadSub (|message| PackInfo, |bool|)

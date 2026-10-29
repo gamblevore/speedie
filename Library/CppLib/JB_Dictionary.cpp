@@ -703,27 +703,31 @@ void JB_Leaf_Destructor(DictionaryLeaf* self) {
 
 
 void JB_FS_AppendEscape(FastString* self, JB_String* s);
+bool ObjContainerOK_ (JB_Object* Self, FastString* FS);
 JB_String* JB_Dict_Render(Dictionary* self, FastString* fs_in) {
 	//visible;
 	FastString* fs = JB_FS__FastNew(fs_in);
     DictionaryReader* Nav = JB_Dict_Navigate(self);
 	JB_FS_AppendByte(fs, '{');
-    bool Started = false;
-    while (JB_Nav_MoveNext(Nav)) {
-        if (Started) {
-            JB_FS_AppendByte(fs, ',');
-            JB_FS_AppendByte(fs, ' ');
-        }
-        Started = true;
-        
-        JB_String* S = JB_Nav_Name(Nav);
-        JB_FS_AppendByte(fs, '"');
-        JB_FS_AppendEscape(fs, S);
-        JB_FS_AppendByte(fs, '"');
-        JB_FreeIfDead(S);
-        JB_FS_AppendByte(fs, ':');
-        JB_Obj_Render(JB_Nav_Value(Nav), fs);
-    };
+	if (ObjContainerOK_(self, fs)) {
+		bool Started = false;
+		while (JB_Nav_MoveNext(Nav)) {
+			if (Started) {
+				JB_FS_AppendByte(fs, ',');
+				JB_FS_AppendByte(fs, ' ');
+			}
+			Started = true;
+			
+			JB_String* S = JB_Nav_Name(Nav);
+			JB_FS_AppendByte(fs, '"');
+			JB_FS_AppendEscape(fs, S);
+			JB_FS_AppendByte(fs, '"');
+			JB_FreeIfDead(S);
+			JB_FS_AppendByte(fs, ':');
+			JB_Obj_Render(JB_Nav_Value(Nav), fs);
+		};
+		self->RefCount &= ~(1<<31);
+	}
 	JB_FS_AppendByte(fs, '}');
     JB_FreeIfDead(Nav);
 	return JB_FS_SmartResult(fs, fs_in);

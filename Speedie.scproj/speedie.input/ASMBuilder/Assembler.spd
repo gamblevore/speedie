@@ -575,11 +575,12 @@ struct Assembler
 		return ss
 	
 	
-	function jbin.PropertyLayout (|[scdecl]| List)
+	function jbin.PropertyLayout (|[scdecl]| List, |bool| All=true)
 		opt norefcounts
 		|| S = .Startadd
 		for p in list
-			p.DumpDeclOpen(self, p.exportposition, p.reg, false)
+			if All or (p isnt ClassObj)
+				p.DumpDeclOpen(self, p.exportposition, p.reg, false)
 		.FinishAdd(@bin, S)
 
 		

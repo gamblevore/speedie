@@ -11,7 +11,7 @@ struct FastString;
 typedef JB_String* (*fpRenderer)(JB_Object* self, FastString* FS);
 
 JB_String* JB_Obj_Render(JB_Object* self, FastString* fs_in);
-int JB_Obj_SafeRender(JB_Object* self, FastString* fs);
+int JB_Obj_SafeRender(JB_Object* self, FastString* fs, int Maximum);
 
 // StringCore
 

@@ -76,8 +76,8 @@ prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode, |uint| Break, |int64|)
 }
 
 
-autogen object.SafeRender (|!FastString| fs, |int|)
-	description "A 'hardened' renderer, that can survive memory errors. Slower. Used by my debugger"
+autogen object.SafeRender (|!FastString| fs, |int| MaxLength=128,  |int|)
+	description "A 'hardened' renderer, that can survive some (but not all) memory errors. Slower. Used by Cake's debugger."
 	nil self
 	cpp_wrapper JB_Obj_SafeRender
 

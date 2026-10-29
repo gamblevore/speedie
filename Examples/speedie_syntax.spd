@@ -9,16 +9,17 @@ main
 	|object[10]| Objs
 	|&object| ObjPtr = &Objs[0]
 	for i in 10
-		Objs[i] = "abc"+i
+		Objs[i] = "abc" + i
 
 	|| R = []
 	R <~ R						// put an array into itself
-	|| str = r.Render			// then test rendering the array. This could kill some languages.
-	printline str				// seems to survive!
-/	printline file.prefs
-	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
+	printline r					// seems to survive!
+	|| err = error.new(nil, "Anything", file.prefs)
+	printline err
+/	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
+	(err)
 
 
 
@@ -66,7 +67,7 @@ function app.TestSyntax
 	printnum(9524600)
 
 	|| D = ["abc":"def", "def":"ghi"]
-/	printline D
+	printline D
 	
 	|| P = person(12, "fred")
 	P.age = -2 // try to corrupt the age
@@ -76,13 +77,14 @@ function app.TestSyntax
 		"$x has three items."
 		x <~ "d"
 	
-	|| H = "house"
+	|| H = "house".file
 	if H == 5
 		"'$H' has five letters"
-	|| L = "(a,b,c,d)".parse
-/	if L == 4
+	|| L = "(aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk,aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk,aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk)".parse
+	if L == 4
 		"The list $L has four items!"
 	(x)
+	
 	|| zz = 0
 	for i in 1 to 6
 		if i isa 2
@@ -109,9 +111,11 @@ function FunctionPointers (|fn_doaction!|)
 	|dictionary of fn_doaction| EmptyDict
 	|| x = EmptyDict["hello"]
 		(x[])(G, "no reason")		// will never run
+	printline DoAction.Render
 	|| j = DoAction["jump"]
 		j[](G, "hes scared")
-	if x
+	printline g
+/	if x
 		return x[]
 	return DoAction_duck
 
@@ -134,7 +138,20 @@ class RPGHero // for a tile-based board game
 		.OnGround = true
 		.IsDucking = false
 		.name = name
+	
 	render
+		fs <~ .Name
+		fs <~ " (currently "
+		if .IsDucking
+			fs <~ "ducking, "
+		if .GroundSpeed
+			fs <~ "moving at $.groundspeed, "
+		if .OnGround
+			fs <~ "onground, "
+		if .YSpeed > 0
+			fs <~ "jumping"
+		fs <~ ")"
+		
 
 
 dispatch DoAction (|rpghero|self, |string| Reason)

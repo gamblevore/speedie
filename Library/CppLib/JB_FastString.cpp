@@ -121,10 +121,6 @@ uint8* JB_FS_Reserve(FastString* fs, int GrowBy) {
 	return Where;
 }
 
-int JB_FS_FreeSize(FastString* fs) {
-	return fs->_Size - fs->Length;
-}
-
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
     int Spare = JB_FS_FreeSize(fs);
     if (Spare < Extra)
@@ -132,6 +128,11 @@ uint8* JB_FS_NeedSpare(FastString* fs, int Extra) { // JB_FS_FreeSizeSet
 			return 0;
     return fs->_Addr + fs->Length;
 }
+
+int JB_FS_FreeSize(FastString* fs) {
+	return fs->_Size - fs->Length;
+}
+
 
 void JB_FS_AppendLocalTime (FastString* fs, Date self) {
     time_t t = self >> 16; // lol
@@ -153,7 +154,7 @@ JB_String* JB_FS_Copy (FastString* fs) {
 
 static byte DummySpace[4];
 
-bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
+static bool ResizeTo_Sub (FastString* fs, int NewLength) {
     FS_SanityCheck_(fs);
     if (NewLength == fs->_Size)
         return true;
@@ -177,6 +178,14 @@ bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
 	fs->Length = Min(NewLength, fs->Length);
 
     return true;
+}
+
+bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
+	if_usual (ResizeTo_Sub(fs, NewLength))
+		return true;
+	if (fs->_Lock==1)
+		fs->_Lock = 2;
+	return false;
 }
 
 

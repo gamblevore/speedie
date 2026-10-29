@@ -34,7 +34,7 @@ function SCDecl.DumpFlags (|byte|)
 		rz |= (t == TypeCString) << 4
 
 
-function SCDecl.DumpDeclOpen (|faststring!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true) // decldump, debugdump
+function SCDecl.DumpDeclOpen (|faststring!| dd, |int| Pos, |int| Reg, |bool| IsLocal=true)	// decldump, debugdump
 	opt norefcounts
 	|| Mark = dd.Length
 	dd <~ '\0'											// range-length

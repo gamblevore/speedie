@@ -25,6 +25,7 @@ JBClass( FastString, JB_Object,
 	int 			_Size;			// reserved size of buffer. here for speeeed.
     u16             Indent;			// Jeebox itself needs this.
     uint8           IndentChar;
+    uint8           _Lock;
 );
 
 
