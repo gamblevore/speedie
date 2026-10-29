@@ -156,13 +156,13 @@ datatype DataTypeCode (uint16)
 		return !(self & unsigned)
 	
 	function SetSigned (|bool| HasSign, |DataTypeCode|)
-		if hasSign
-			return self  &~ unsigned
-		return self ||| unsigned
+		self &= ~Unsigned
+		self |= unsigned*HasSign
+		return self
 	
 	function NumericCount (|int|)
 		if (self is numeric)
-			return .VecCount
+			rz = .VecCount
 	
 	inline ItemBitCount (|int|)
 		return 8 << .ByteShift
