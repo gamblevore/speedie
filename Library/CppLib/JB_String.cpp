@@ -1779,12 +1779,14 @@ JB_String* JB_Obj_Render (JB_Object* self, FastString* fs_in) {
     }
 
 
+#if __VM__
 	if (((IntPtr)FN)>>63) {
 		auto V = JB_GlobalVM;
 		((JB_Object**)((V->ProposedStack)+2))[0] = self;
 		((JB_Object**)((V->ProposedStack)+3))[0] = fs_in;
 		return ((JB_String**)JB_ASM_CallBack(V, (u32*)FN))[0];
 	}
+#endif
     
     return (FN)(self, fs_in);
 }
