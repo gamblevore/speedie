@@ -290,9 +290,9 @@ function listviewrow.ImproveVarSub (|string| dbname, |faststring| fs)
 
 function listviewrow.ImproveArray (|int| Depth, |bool| CanHide)
 	opt norefcounts
-	|| fs = VarPrinter
 	|| p = .parent$
-	for (item in self) (i)
+	|| fs = VarPrinter
+	for item in self
 		fs.Length = 0
 		item.PerryAppendMsg("|", -1)
 		fs <~ " "

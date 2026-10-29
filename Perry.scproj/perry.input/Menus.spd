@@ -28,17 +28,18 @@ function string.NameOrRoot (|string|)
 function PressingTabs (guiaction)
 	opt norefcounts
 	if self isa Button
-		|| p = .submenu|listview|
-			|| ide = row.ide
-				p.ListSource.clear
-				|| obj = ide.lineinfo // prevent leak, by not refering to the IDE but a thing inside of it
-				p <~ ("Copy " + ide.projname,	MenuCopyProject, obj)
-				p <~ ("Show In Desktop",		MenuShowProject, obj)
-				p <~ ("Close",					MenuCloseProject, obj)
-				if ide.RunningProd.Status.IsRunning
-					p <~ ("Kill",				MenuKillProject, obj)
-					
-				.OpenMenu(row)
+		|| p = .submenu|listview|$
+		|| ide = row.ide$
+		p.ListSource.clear
+		|| obj = ide.lineinfo // prevent leak, by not refering to the IDE but a thing inside of it
+		p <~ ("Copy " + ide.projname,	MenuCopyProject, obj)
+		p <~ ("Show In Desktop",		MenuShowProject, obj)
+		if ide.RunningProd.Status.IsRunning
+			p <~ ("Kill",				MenuKillProject, obj)
+		p <~ ("", nil)
+		p <~ ("Close",					MenuCloseProject, obj)
+			
+		.OpenMenu(row)
 
 
 function message.IDE (|perryide|)
