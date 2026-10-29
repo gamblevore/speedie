@@ -510,10 +510,9 @@ JB_Class* JB_Obj_Class (JB_Object* Obj) {
 
   
 
-uint8* JB_Obj_ClassBehaviours (JB_Object* Obj) {
-    // assume exists.
+void** JB_Obj_ClassBehaviours (JB_Object* Obj) {
     auto Block = ObjBlock_(Obj);
-    return (uint8*)(Block->Virtuals);
+    return (void**)(Block->Virtuals);
 }
 
 

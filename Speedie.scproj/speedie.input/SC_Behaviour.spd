@@ -48,7 +48,7 @@ class SCBehaviour (SCNode)
 			b.add(m)
 	
 		
-	function SCModule.OneOrOther (|SCModule| B, |string| name,  |SCModule|)
+	function SCModule.OneOrOther (|SCModule| B, |string| name, |SCModule|)
 		if (self and b)
 			.NameConflict(b, name)
 		return B
@@ -95,7 +95,7 @@ class SCBehaviour (SCNode)
 			b = b.upwards
 
 	
-	function SCClass.FillInterFaceIn  (|SCFunction| fn, |bool| Late)
+	function SCClass.FillInterFaceIn (|SCFunction| fn, |bool| Late)
 		|| Interface = .InterfaceForBehaviour(fn)					#require
 		|| prm = fn.source.find(@prm,true)							#require
 		
@@ -129,7 +129,7 @@ class SCBehaviour (SCNode)
 
 		require stderr.ok
 	
-		|| CakeAlso = options.makeexec and .IsLibrary
+		|| CakeAlso = options.MakeExec and .IsLibrary
 
 		while
 			|| prms = fn.source!.findnested(@sthg, "...")			#require
@@ -350,10 +350,10 @@ function $InterName (,$InterName)
 			|| required = (thg isarel "++")
 				thg = thg.replacewith(thg.first!)
 
-			expect (thg==@thg) (node, "Interface has no name.")
+			expect (thg==@thg)				(node, "Interface has no name.")
 			|| s = Thg.name
-			expect (!s.UnderScoreAtAnyEnd) (thg, "Interfaces can’t start or end with underscore.")
-			expect (s~!="destructor")      (thg, "Bad name.")
+			expect (!s.UnderScoreAtAnyEnd)	(thg, "Interfaces can’t start or end with underscore.")
+			expect (s~!="destructor")		(thg, "Bad name.")
 			Thg.name = s.moat
 			
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require

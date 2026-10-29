@@ -12,7 +12,7 @@ class Task (list)
 		visible
 		cpp_class JB_Task
 
-	|taskstate| 		_State
+	|taskstate|			_State
 	|int|				_Object
 	|&nil|				_func
 	
@@ -35,14 +35,14 @@ class Task (list)
 			i = i.log2
 			jb_decr( curr[i] )          // noice
 			
-	syntax is (|taskstate| s, |bool|) 
+	syntax is (|taskstate| s, |bool|)
+		inlined
 		return ._state & s
 			
 	syntax is (|taskstate| s, assigns:|bool|)
-		if value
-			._state |= s
-		  else
-			._state &= ~s
+		|| s2 = ._State &~ s
+		s2 |= s*value
+		._State = s2
 
 
 datatype TaskState (byte)
@@ -57,5 +57,6 @@ datatype TaskState (byte)
 		Finished
 	
 	syntax is (|TaskState| t, |bool|)
+		inlined
 		return self & t
 

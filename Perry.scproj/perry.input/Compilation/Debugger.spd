@@ -336,8 +336,6 @@ function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	.ImproveVarSub(dbname, fs)
 	.name = fs
 
-	expect (Depth < 64) "Can't expand variables beyond 64 levels deep" // could be some recursion bug.
-	
 	|| Fields = .Last
 	if fields == @arg
 		for prop in Fields
@@ -483,15 +481,15 @@ function perryide.UpdateStack (|message| stack)
 
 
 
-function jbin.ExpandDebug (|listviewrow| list)
+function jbin.ExpandDebug (|listviewrow| list, |int| Depth)
 	opt norefcounts
 	.enter
 	for var in list
 		|| arg = var.last
-		if (arg == @arg) and (var is expanded)
-			|| name = var.obj as string
+		if (arg == @arg) and (var is expanded) and (depth < 24) // in case a bug mass expands somehow
+			|| name = var.obj as string							// we don't want some recursive object to destroy the stack
 				.enter(@tmp, name)
-				.ExpandDebug(arg)
+				.ExpandDebug(arg, depth+1)
 				.exit
 	.exit
 		
@@ -518,7 +516,7 @@ function perryide.CollectExpansion
 			j.AddStr(fn.firstname) // path
 			|| loc = fn[2]
 			j.Add(loc.func, loc.name)
-			j.ExpandDebug(arg)
+			j.ExpandDebug(arg, 0)
 			j.exit
 	
 	.SendJbin(j)

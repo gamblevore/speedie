@@ -15,7 +15,7 @@ class UnixProcess
 	|&Pico|					Pico
 	|string|				Path
 	|[string]?|				Args
-    |int64|					UserFlags
+	|int64|					UserFlags
 
 
 	constructor (|string| Path, |ProcessMode| Mode=processmode.CaptureAll, |[string]| Args=nil, |&pico| Pico = nil)

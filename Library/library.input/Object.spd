@@ -19,7 +19,7 @@ class Object
 	function Class (|&ClassData|)
 		cpp_wrapper JB_Obj_Class
 
-	autogen ClassBehaviours (|&byte|)
+	autogen ClassBehaviours (|&&nil|)
 		cpp_wrapper JB_Obj_ClassBehaviours
 
 	function MemoryLayer (|MemoryLayer|)

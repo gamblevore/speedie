@@ -346,12 +346,13 @@ class XVar (list)
 				return true
 
 			require obj.DebugRender(fs)
-/			return obj.saferender(Fs) == 0
+			return obj.saferender(Fs) == 0
 
 		fs <~ "0x"
-		fs <~ obj.objectid
+		fs <~ obj.ObjectID
 
-		if obj isa Array or list
+		|| Renderer = obj.ClassBehaviours[1]
+		if Renderer == (Array).Virtuals|&&nil|[1]  or  Renderer == (list).Virtuals|&&nil|[1]
 			fs <~ " ("
 			if obj isa list
 				fs <~ obj.count
@@ -360,7 +361,8 @@ class XVar (list)
 			fs <~ ")"
 		
 		  elseif !(obj isa Dictionary)
-			fs <~ " "
+			fs <~ ":"
+			fs <~ (' ', 2)
 			if !self or .ViewStrength >= 1
 				obj.SafeRender(fs) // might crash...
 				// rpg hero not seeing this? we render but nothing comes out

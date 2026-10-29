@@ -6,20 +6,15 @@
 targets: flow
 
 main
+	ObjRenderTest()
 	|object[10]| Objs
 	|&object| ObjPtr = &Objs[0]
 	for i in 10
 		Objs[i] = "abc" + i
 
-	|| R = []
-	R <~ R						// put an array into itself
-	printline r					// seems to survive!
-	|| err = error.new(nil, "Anything", file.prefs)
-	printline err
 /	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
-	(err)
 
 
 
@@ -50,15 +45,6 @@ function ByteCountTest (|DataTypeCode| A, |DataTypeCode| B)
 	|| BC = B.ByteCount
 	printline "Datatype ${A.render} has $AC bytes"
 	printline "Datatype ${B.render} has $BC bytes"
-	
-
-
-//function app.TestSyntax2 (|int| z=1, |int|)
-//	opt noinline
-//	|| B = (z!=0)(1, 2)
-//	|| A = (z!=0)(mesayer, shesayer)
-//	return z+1
-////	(fn)("hello")
 
 
 function app.TestSyntax
@@ -101,8 +87,25 @@ function app.TestSyntax
 		|| fn = (0.5[])(mesayer, shesayer)
 		(fn)("hello")
 	Flowlog.enable
-
 	FunctionPointers()
+
+
+function ObjRenderTest
+	|| err = Error.new(nil, "im ok!", nil, "anywhere")
+/	|| G = RPGHero("fred")
+	printline g.__Render__
+
+	|| R = []
+	R <~ R						// put an array into itself
+	printline r					// seems to survive!
+
+	printline err
+	|| proc = UnixProcess("abc")
+/	printline proc
+	(proc)
+	(err)
+	(r)
+	(g)
 
 
 function FunctionPointers (|fn_doaction!|)
@@ -114,8 +117,7 @@ function FunctionPointers (|fn_doaction!|)
 	printline DoAction.Render
 	|| j = DoAction["jump"]
 		j[](G, "hes scared")
-	printline g
-/	if x
+	if x
 		return x[]
 	return DoAction_duck
 
