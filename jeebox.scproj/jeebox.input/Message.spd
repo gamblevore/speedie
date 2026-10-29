@@ -16,12 +16,12 @@ The tree represents your data, and acts as a super-set of many formats:  XML,  J
 
 The Message class is versatile enough to good at all of these. Like a universal data-format. Like the UTF-8 of data.
 
-Message is also:
-	* Memory tight (64-bytes per-node, excluding string-name).
-	* More expressive (leading to less nodes needed).
-	* Saveable as text (jeebox) or binary (jbin).
-	* Elegant due to a simple model, and many utility functions.
-	* Reliable via it's error-reporting system.
+Message is also
+	* Memory tight:			64-bytes per-node (excluding string-name)
+	* Expressive:			Less nodes needed overall
+	* Flexible:				Jeebox text or jbin binary
+	* Elegant:				Simple model (jeebox = tree of nodes containing type + name)
+	* Reliable:				Error reporting system greatly eases error detection
 "
 	contains Message
 
