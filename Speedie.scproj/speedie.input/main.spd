@@ -19,10 +19,9 @@ function Compiler.EnterCompile (|bool|)
 	opt norefcounts
 	require !.TryVariousStartModes
 	require FeedBack.ParseArgs
-	if app["perry"] and app.yes("check")
-		if interact.EnterAutoComplete
-			return false
-	return true
+	ifn app["perry"] and app.yes("check")
+		return true
+	interact.EnterAutoComplete()
 
 
 function Compiler.PrintResults

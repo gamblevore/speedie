@@ -368,7 +368,7 @@ function ImportLibs
 	compiler.program.CreateInitFuncSub(.AppInitCode,	"InitAppCode_")
 
 
-function ImportProj 
+function ImportProj
 	opt norefcounts
 	SCImport.STDLibTime = false
 	|| proj = compiler.Project!

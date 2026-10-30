@@ -169,6 +169,7 @@ class SCImport
 	
 
 	function ImportSpd (|File| c, |SCFile|)
+		expect !(c isa "cake") (c, "Well yeah... this cake is already compiled. So how can you compile it again?")
 		expect (scimport.allfiles < 64K) (c, "Too many files included")
 		|| path = c.LowerCase
 		check !compiler.files[ path ] (c, "File included twice")

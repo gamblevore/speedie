@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2398];
+extern JB_StringC* JB_LUB[2399];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -863,12 +863,11 @@ bool SC_Comp__EnterCompile() {
 	if (!SC_FB__ParseArgs()) {
 		return nil;
 	}
-	if (JB_Str_Exists(JB_App__ArgValue(JB_LUB[2044])) and JB_App__Yes(JB_LUB[1632])) {
-		if (SC_AC__EnterAutoComplete()) {
-			return false;
-		}
+	if (!(JB_Str_Exists(JB_App__ArgValue(JB_LUB[2044])) and JB_App__Yes(JB_LUB[1632]))) {
+		return true;
 	}
-	return true;
+	SC_AC__EnterAutoComplete();
+	return false;
 }
 
 JB_String* SC_Comp__exe() {
@@ -31418,6 +31417,11 @@ void SC_Imp_ImportMsg(SCImport* Self, Message* J) {
 SCFile* SC_Imp_ImportSpd(SCImport* Self, JB_File* C) {
 	SCFile* Rz = nil;
 	JB_Incr(Rz);
+	if ((JB_Str_OperatorIsa(C, JB_LUB[1626]))) {
+		JB_File_Fail(C, JB_LUB[2398]);
+		JB_EarlyDecr(Rz);
+		return nil;
+	}
 	if (JB_Array_SyntaxCompare(SC__Imp_AllFiles, 65536) >= 0) {
 		JB_File_Fail(C, JB_LUB[1344]);
 		JB_EarlyDecr(Rz);
@@ -61388,4 +61392,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -62376969195831221 -341496043603873294
+// -62376969195831221 2794167902268500389
