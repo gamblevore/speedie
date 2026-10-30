@@ -73,7 +73,7 @@ module Platform
 		L.write("\n")
 	
 	libinternal OpenLog (|file|)
-		rz = file.logs[app.appname + ".log"]!
+		rz = file.logs[app.name + ".log"]!
 		.logger_ = rz
 		rz.OpenEmpty
 	

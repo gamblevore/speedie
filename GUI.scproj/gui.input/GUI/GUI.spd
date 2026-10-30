@@ -420,7 +420,7 @@ module GUI
 			return it
 		with app.Conf("name")
 			return it
-		return app.appname
+		return app.name
 	
 	
 	function Init (|float| Scaling=1.0, |bool|) // startup
@@ -919,8 +919,11 @@ module GUI
 
 
 	libinternal CheckQuarantine
-		if platform.osx and app.isQuarantined
-			.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning")
+		target osx
+			if platform.osx
+				if app.path contains "/AppTranslocation/"
+					.alert("Please drag this app to the /Applications/ folder to stop MacOSX quarantining it.", "Quarantine Warning")
+
 
 
 	libinternal ReScale (|float| NewScale, |bool|)
@@ -972,7 +975,7 @@ module GUI
 		SDL_RenderPresent(.renderer!)
 
 
-	function QuitReason (assigns:|guiactivity| Value)
+	libinternal QuitReason (assigns:|guiactivity| Value)
 		if Value is WindowClose					// how
 		(value isnt WindowClose)
 		(value isnt activity)
@@ -987,7 +990,7 @@ module GUI
 		return .quitreason is ExitOrTerminate
 
 
-	function ForceQuit (|GUIActivity| Reason=0, |GUIActivity|)
+	libinternal ForceQuit (|GUIActivity| Reason=0, |GUIActivity|)
 		opt norefcounts	
 		(reason is Exiting)
 		

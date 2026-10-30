@@ -19,7 +19,7 @@ role AppMenu (Window)
 		lv.gnormal = ¥.Menus
 		lv.gRowSel = ¥.MenuRowSel
 
-		lv <~ ("About " + app.filename,		About)
+		lv <~ ("About " + app.name,			About)
 		lv.addsep
 		lv <~ ("FullScreen",				FullScreen)
 		lv <~ ("Help",						Help)
@@ -97,7 +97,7 @@ role AppMenu (Window)
 			|| aboutstr = app.Conf("about")
 			if !aboutstr
 				aboutstr = `$appname v$version`
-			aboutstr = aboutstr.ReplaceAll(`$appname`, app.filename)
+			aboutstr = aboutstr.ReplaceAll(`$appname`, app.name)
 			aboutstr = aboutstr.ReplaceAll(`$version`, app.Conf("version"))
 			aboutstr = aboutstr.ReplaceAll(`$creator`, app.Conf("creator"))
 			app.alert aboutstr

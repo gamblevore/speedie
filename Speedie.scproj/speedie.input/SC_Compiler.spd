@@ -960,7 +960,7 @@ function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|
 
 
 function IsTest (|bool|)
-	return (App.fileName contains "Test")
+	return (App.name contains "Test")
 
 
 function VariantSuffix (|string|)

@@ -457,7 +457,7 @@ module Feedback
 		|| fs		 = faststring.new
 		|| fs_tester = faststring.new
 		fs <~ "Usage: "
-		fs <~ app.filename
+		fs <~ app.name
 		fs <~ " /path/to/project\n\nVersion: 0x"
 		fs <~ scversion.hex
 		fs <~ "\nInstallation: ${file.Speediedir}"

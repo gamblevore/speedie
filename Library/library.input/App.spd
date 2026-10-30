@@ -112,7 +112,7 @@ inline Restart
 function ThreadName (assigns:|string|)
 	cpp_wrapper JB_App__SetThreadName
 
-function AppName (|string|)
+inline Name (|string|)
 	opt norefcounts
 	return .path.name
 
@@ -163,10 +163,10 @@ inline Input (|string| Q, |string|)
 function Input (|string|)
 	cpp_wrapper JB_App__Readline
 
-function IsMainThread (|bool|)
+inline IsMainThread (|bool|)
 	return !.IsThreadedAsLib
 
-libinternal IsThreadedAsLib (|bool|)
+function IsThreadedAsLib (|bool|)
 	cpp_wrapper JB_LibIsThreaded
 	
 function ParentID (|pid_int|)
@@ -190,15 +190,6 @@ function Quit (|string?| Err = nil, |int| Code=0)
 
 function ErrorNumber (|&byte|)
 	cpp_wrapper JB_App__ErrorNumber
-
-
-function Name (|string|)
-	disabled ".Filename (terminal) or .appname (gui package osx)"
-
-
-function FileName (|string|)
-	|string--| p = .path 
-	return p.Name
 
 
 function StdIn (|File!|)
@@ -289,10 +280,6 @@ libinternal LeakMarkMemory
 libinternal LeakUnMarkMemory
 	cpp_wrapper JB_Mem_Unmark
 	
-libinternal IsQuarantined (|bool|)
-	opt norefcounts
-	return .path contains "/AppTranslocation/"
-
 
 
 target !minilib {

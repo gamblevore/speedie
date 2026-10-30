@@ -4,27 +4,19 @@ target !minilib {
 class SpdProcess (UnixProcess)
 	linkage
 		cpp_part Proc
-	description "SpdProcess is a process, that happens to be made by Speedie. Speedie processes come with a pico (message-passer), so they can be talked to, if you want.
-
-We also make it easier to send and receive message objects, instead of pure strings.
-
-SpdProcess handles your subprocess dying, or needing resetting.
-
-The DebugName is normally a file-path, but might not be, for example you are in fact running a function in a thread and using that function as a subprocess.
-
-(This is possible if the function is an entire speedie program, complete with 'main', loaded from a library.)
-"
+	description "SpdProcesses are normal unix processes. But they were made by Speedie, allowing you to talk to them, via sending and receiving messages."
+	
 	contains SpdProcess
 	|jbin|						Writer
-	|?MicroProcess|				SubProcess		// mostly exists for debug
+	|?MicroProcess|				LibraryProcess		// To allow running a "process" that is actually just another library, compiled by speedie. To allow talking to a lib with messages.
 	|int|						DeathLimit
 	|bool|						AlreadyWarnedDied
 
-	constructor	(|string| path, |?MicroProcess| fn, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.StdErrCapture)
+	constructor	(|string| path, |pico| pico, |[string]| params=nil,  |ProcessMode| Mode=ProcessMode.StdErrCapture, |?MicroProcess| fn=nil)
 		mode |= ProcessMode.MsgPassing
 		super.constructor(path, mode, params, pico)
 		.deathlimit = 12
-		.SubProcess = fn
+		.LibraryProcess = fn
 		.writer = FastString()
 
 			
@@ -35,13 +27,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 		if self
 			return .pico.MessageError == 0
 	
-	
-	libinternal ParentAlive (|bool|)
-		return app.ParentID > 1
-
 
 	libinternal ChildAlive (|bool|)
-		if .SubProcess
+		if .LibraryProcess
 			return .CommsOpen
 		return .status.isrunning
 
@@ -164,7 +152,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 				comms = pico.new
 			if comms
 				if app.IsThreadedAsLib or comms.CompleteExec
-					|| p = SpdProcess(comms.name, nil, comms)
+					|| p = SpdProcess(comms.name, comms)
 					SpdProcess._parent = p
 					return p
 				comms.Close("Parent lost connection")
@@ -181,57 +169,36 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 		libinternal CreateArgs (|string| path, |[string]!| Args, |&cstring|)
 			cpp_wrapper
-
-
-		inline string.Spawn (|string| Name, |[string]| Params=nil, |spdprocess|)
-			return SpdProcess.Spawn(self, params, name)		
 		
 		
 		function Spawn (|string| app_path, |[string]| params=[], |ProcessMode| Mode=ProcessMode.CaptureAll, |string| Name, |SpdProcess|)
 			require app_path.file.mustexist
 			|| pico = pico.new(name)
-				rz = SpdProcess(app_path, nil, pico, params, Mode)
+				rz = SpdProcess(app_path, pico, params, Mode)
 				if !rz.SpawnAsChild
 					rz = nil
 
 
-		function SpawnFork (|ProcessMode| Mode=ProcessMode.CaptureAll, |SpdProcess|)
-			disabled "This function needs rework. Feel free to fix it"
-//			|| p = pico.new$
-//			|| id = p.spawnfork
-//			if id < 0
-//				pico.destroy(p, "fork failed")
-//				return nil
-//
-//			if id == 0 // we are child
-//				id = app.parentid
-//				mode = ProcessMode.PassThru
-//			rz = spdprocess(app.path, nil, p, nil, mode)
-//			rz.pid = id
-
-	
 prototype MicroProcess (|&pico| Comms, |int64| Mode, |&cstring| args, |int|)
 	linkage
 		cpp_part MPC
 	function Spawn (|string| ThreadName,  |[string]!| R = [],  |SpdProcess|)
+		
 		description `This is meant to run a "main-function" from a lib, as if it were a subprocess. Its usually a wrapper around main(). Just needed this to debug speedie from within Perry.`
 		
 		|| c_args = SpdProcess.CreateArgs("", r)
 		// its the called-threads responsibility to free the std-args received.
 		// (Look at Speedie_Main in Speedie.scproj for example)
 		|| pico_fn = pico.new(threadname)
-			|| proc = SpdProcess(threadname, self, pico_fn, r)
+			|| proc = SpdProcess(threadname, pico_fn, r, self)
 			if proc.pico.SpawnThread(self|picothreadfn|, 7, c_Args)
 				return proc
 		// free cos we never had a chance to free it.
 		memory.free(c_args)
 
 
-
-//prototype SpdDeathActionFn
-
 }
 
 
-// too many "function spawn" things all over the place. 7! Need to reduce them somehow?
+// too many "function spawn" things all over the place. 6! Need to reduce them somehow?
 

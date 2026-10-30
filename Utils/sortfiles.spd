@@ -1,6 +1,6 @@
 #!/usr/local/bin/speedie
 
-app.usage = `Usage: ` + app.filename + ` path1 [path2, path3]
+app.usage = `Usage: ` + app.name + ` path1 [path2, path3]
 
 Prints a list of files that match the extensions. Default extension is spd. Sorts the files by file-size. Useful to see how big your speedie projects are. Also sums the total file-size.
 

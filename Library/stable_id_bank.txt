@@ -8,7 +8,6 @@ GUI_App__AskSave
 GUI_App__Beep
 GUI_App__CurrDisplaySize
 GUI_App__Cycle
-GUI_App__ForceQuit
 GUI_App__FrontDialog
 GUI_App__FullScreenSet
 GUI_App__GetScreen
@@ -21,7 +20,6 @@ GUI_App__MouseButtons
 GUI_App__MouseXY
 GUI_App__OpenDocument
 GUI_App__QuitReason
-GUI_App__QuitReasonSet
 GUI_App__Resized
 GUI_App__Run
 GUI_App__SavePrefs
@@ -687,7 +685,6 @@ JB_ASM_Run
 JB_ASM_SetDebug
 JB_ASM__VM
 JB_AllClasses
-JB_App__AppName
 JB_App__AppPath
 JB_App__AppleScript
 JB_App__ArgValue
@@ -703,12 +700,10 @@ JB_App__CrashOnInterupt
 JB_App__DocumentOpened
 JB_App__Env
 JB_App__ErrorNumber
-JB_App__FileName
 JB_App__GUIMode
 JB_App__GetChar
 JB_App__ID
 JB_App__IconSet
-JB_App__IsMainThread
 JB_App__MemoryUsage
 JB_App__Parent
 JB_App__ParentID
@@ -1010,6 +1005,7 @@ JB_Kill
 JB_LOK_Constructor
 JB_Layer_Constructor
 JB_Layer_Use
+JB_LibIsThreaded
 JB_LibShutdown
 JB_List_Render
 JB_Lk_Constructor
@@ -1167,7 +1163,6 @@ JB_Object_Isa
 JB_Object_MustBe
 JB_Object___Render__
 JB_OutOfMemoryOccurred
-JB_PIDM_SyntaxIs
 JB_Pico_Get
 JB_Pico_Name
 JB_Pico_NameSet
@@ -1313,8 +1308,6 @@ JB_SS_UInt
 JB_SS_UIntBE
 JB_Sh_Constructor
 JB_Sh_Destructor
-JB_Sh_DiedCount
-JB_Sh_IsParent
 JB_Sh_Kill
 JB_Sh_PID
 JB_Sh_ReadStdErr

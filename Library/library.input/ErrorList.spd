@@ -91,7 +91,7 @@ class ErrorReceiver
 	syntax append (|string| LogString)
 		cpp_part Log
 		if !._LogFunc
-			.LogFile = app.filename + ".log"
+			.LogFile = app.name + ".log"
 		|| log = ._logfunc
 			(log)(self, LogString)
 

@@ -24,10 +24,10 @@ class UnixProcess
 	destructor
 		cpp_wrapper
 	
-	function IsParent (|bool|)
+	inline IsParent (|bool|)
 		return .pico.config.IsParent
 	
-	function DiedCount (|int|)
+	inline DiedCount (|int|)
 		return .pico.config.deathcount
 		
 	function Status (|ExitCode|)
@@ -54,6 +54,7 @@ class UnixProcess
 		
 	module
 		function Spawn (|String| app, |[string]| R=[], |processmode| Mode = nil, |UnixProcess?|)
+			// could remove this by adding a "Start" mode... which auto-starts this.
 			opt norefcounts
 			rz = UnixProcess(app, mode, r)
 			if rz.start != 0
@@ -82,6 +83,7 @@ datatype ProcessMode (byte)
 		OwnGroup = 128 // has no effect right now.
 
 	syntax is (|ProcessMode| M, |bool|)
+		inlined
 		return self|int|&M|int|
 
 

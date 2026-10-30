@@ -1137,7 +1137,7 @@ struct SpdProcess_Behaviour: UnixProcess_Behaviour {
 JBClass ( SpdProcess , ShellStream , 
 	bool AlreadyWarnedDied;
 	int DeathLimit;
-	FP_MicroProcess SubProcess;
+	FP_MicroProcess LibraryProcess;
 	FastString* Writer;
 );
 
@@ -2216,7 +2216,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ExitCode_EINPROGRESS ((int)36)
 #define kJB__ExitCode_ENOENT ((int)2)
 #define kJB__ExitCode_ENOMEM ((int)12)
-#define kJB__ExitCode_SIGKILL ((int)9)
+#define kJB__ExitCode_SIGKILL ((int)137)
 #define kSC__FatNopMode_Hard ((int)0)
 #define kSC__FatNopMode_KeepInputs ((int)1)
 #define kSC__FatNopMode_NopTemp ((int)4)
@@ -2667,15 +2667,11 @@ extern JB_Globals JB__;
 
 
 // App
-JB_String* JB_App__AppName();
-
 JB_String* JB_App__Conf(JB_String* Name);
 
 void JB_App__Crash(JB_String* Reason);
 
 ErrorInt JB_App__CWDSet(JB_String* Value);
-
-JB_String* JB_App__FileName();
 
 int JB_App__Init_();
 
@@ -2686,6 +2682,8 @@ ErrorInt JB_Main();
 SortComparison JB_App__MemorySorter(JB_Class* Self, JB_Class* B);
 
 JB_String* JB_App__MemoryUsage(int AtLeast, FastString* Fs_in);
+
+JB_String* JB_App__Name();
 
 bool JB_App__No(JB_String* Name);
 
@@ -10112,7 +10110,7 @@ SCNode* SC_Base__LoadCppPart(Message* Node, SCNode* Name_space, Message* ErrPlac
 // JB_SpdProcess
 bool JB_Proc_CommsOpen(SpdProcess* Self);
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_MicroProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode);
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode, FP_MicroProcess Fn);
 
 void JB_Proc_Destructor(SpdProcess* Self);
 

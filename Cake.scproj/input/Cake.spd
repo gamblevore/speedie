@@ -42,7 +42,7 @@ module Cake
 				app.CallPath = p.Addr|cstring|
 				return p
 			
-		|| name = app.filename
+		|| name = app.name
 		quit "Usage:
 	$name /path/to/app.cake
 	$name /path/to/project.scproj

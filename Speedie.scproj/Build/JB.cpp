@@ -27,13 +27,9 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2399];
+extern JB_StringC* JB_LUB[2398];
 
 extern Object_Behaviour JB_Object_FuncTable_;
-
-JB_String* JB_App__AppName() {
-	return JB_Str_Name(JB_App__Path(nil));
-}
 
 JB_String* JB_App__Conf(JB_String* Name) {
 	return JB_Msg_Value(JB_Msg_SyntaxAccess(JB__App__Conf, Name));
@@ -53,11 +49,6 @@ ErrorInt JB_App__CWDSet(JB_String* Value) {
 	ErrorInt _tmPf1 = JB_File__chdir(_tmPf0);
 	JB_EarlyDecr(_tmPf0);
 	return _tmPf1;
-}
-
-JB_String* JB_App__FileName() {
-	JB_String* P = JB_App__Path(nil);
-	return JB_Str_Name(P);
 }
 
 int JB_App__Init_() {
@@ -131,6 +122,10 @@ JB_String* JB_App__MemoryUsage(int AtLeast, FastString* Fs_in) {
 	return _tmPf2;
 }
 
+JB_String* JB_App__Name() {
+	return JB_Str_Name(JB_App__Path(nil));
+}
+
 bool JB_App__No(JB_String* Name) {
 	return (!JB_App__Yes(Name));
 }
@@ -147,7 +142,7 @@ SpdProcess* JB_App__Parent(bool Expect) {
 		}
 		if (Comms) {
 			if (JB_LibIsThreaded() or PicoRestoreExec(Comms)) {
-				SpdProcess* P = JB_Proc_Constructor(nil, JB_Pico_Name(Comms), nil, Comms, nil, kJB__PIDM_StdErrCapture);
+				SpdProcess* P = JB_Proc_Constructor(nil, JB_Pico_Name(Comms), Comms, nil, kJB__PIDM_StdErrCapture, nil);
 				JB_SetRef(JB__Proc__Parent, P);
 				return P;
 			}
@@ -167,7 +162,7 @@ Message* JB_App__Prefs() {
 	if (!P) {
 		JB_String* Path = JB_App__Conf(JB_LUB[2053]);
 		if (!JB_Str_Exists(Path)) {
-			Path = JB_Str_OperatorPlus(JB_Str_LowerCase(JB_App__FileName()), JB_LUB[399]);
+			Path = JB_Str_OperatorPlus(JB_Str_LowerCase(JB_App__Name()), JB_LUB[399]);
 		}
 		if (JB_Str_First(Path) != '/') {
 			Path = JB_File__Prefs(Path);
@@ -1953,7 +1948,7 @@ JB_File* SC_Comp__InputFileAlways(JB_String* S) {
 }
 
 bool SC_Comp__IsTest() {
-	JB_String* _tmPf0 = JB_App__FileName();
+	JB_String* _tmPf0 = JB_App__Name();
 	JB_Incr(_tmPf0);
 	bool _tmPf1 = (JB_Str_ContainsString(_tmPf0, JB_LUB[1305]));
 	JB_EarlyDecr(_tmPf0);
@@ -3318,7 +3313,7 @@ void SC_FB__Help() {
 	FastString* Fs_tester = JB_FS_Constructor(nil);
 	JB_Incr(Fs_tester);
 	JB_FS_AppendString(Fs, JB_LUB[1393]);
-	JB_String* _tmPf7 = JB_App__FileName();
+	JB_String* _tmPf7 = JB_App__Name();
 	JB_Incr(_tmPf7);
 	JB_FS_AppendString(Fs, _tmPf7);
 	JB_Decr(_tmPf7);
@@ -8237,7 +8232,7 @@ JB_File* JB_Platform__OpenLog() {
 	JB_Incr(Rz);
 	JB_File* _tmPf0 = JB_File__Logs();
 	JB_Incr(_tmPf0);
-	JB_String* _tmPf2 = JB_App__AppName();
+	JB_String* _tmPf2 = JB_App__Name();
 	JB_Incr(_tmPf2);
 	JB_String* _tmPf1 = JB_Str_OperatorPlus(_tmPf2, JB_LUB[407]);
 	JB_Incr(_tmPf1);
@@ -50145,7 +50140,7 @@ bool JB_Proc_CommsOpen(SpdProcess* Self) {
 	return false;
 }
 
-SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_MicroProcess Fn, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode) {
+SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, PicoComms* Pico, Array* Params, uint /*ProcessMode*/ Mode, FP_MicroProcess Fn) {
 	if (Self == nil) {
 		Self = ((SpdProcess*)JB_NewClass(&SpdProcessData));
 	}
@@ -50153,7 +50148,7 @@ SpdProcess* JB_Proc_Constructor(SpdProcess* Self, JB_String* Path, FP_MicroProce
 	JB_Sh_Constructor(Self, Path, Mode, Params, Pico);
 	Self->AlreadyWarnedDied = false;
 	Self->DeathLimit = 12;
-	Self->SubProcess = Fn;
+	Self->LibraryProcess = Fn;
 	JB_Incr2(Self->Writer, JB_FS_Constructor(nil));
 	return Self;
 }
@@ -60290,7 +60285,7 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls) {
 	}
 	 else {
 		if (!(!JB_Msg_SyntaxEquals(F, JB_LUB[1216], true))) {
-			JB_Msg_Fail(F, JB_LUB[2398]);
+			JB_Msg_Fail(F, JB_LUB[430]);
 		}
 	}
 	JB_Decr(F);
@@ -61393,4 +61388,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -7610519868670290958 -5545547652129292564
+// -62376969195831221 -341496043603873294
