@@ -398,14 +398,16 @@ function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items, |message?| xp, |int
 	j.Enter(@arg)
 	|| i = 0
 	(Count min= 10K)
-	|| OK = true
 	while (i++ < Count)
-		OK &= j.RenderListItem(Items, i)
+		|| OK = j.RenderListItem(Items, i)
 		j.addint(i-1)
+		if !OK
+			j.add(@thg, "bad")
+		
 		j.exit
 		Items++
 	j.exit
-	return OK
+	return true // I still want to see bad vars
 
 
 function xvar.ExpandDictionary (|jbin| j, |dictionary--| D, |message?| xp, |int| depth, |bool|)

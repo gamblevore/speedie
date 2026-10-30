@@ -615,7 +615,7 @@ function jbin.RenderListItem (|&uint64| Items_, |int| i, |bool|)
 	name.Length = 0
 	|| Items = Items_|&object|
 	if !nil|xvar|.RenderObject(name, Items, RefCount)
-		.add(@tmp, "BadObject", true)
+		.add(@tmp, "", true)
 		.AddStr(name)
 		return false
 		

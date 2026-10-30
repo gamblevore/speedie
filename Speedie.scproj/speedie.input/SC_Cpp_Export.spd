@@ -402,11 +402,6 @@ function scclass.WriteStructOrUnion (|faststringcpp| fs)
 function ExportStruct (|SCClass| cls, |bool| IsBehaviour=false)
 	|| fs = .TypesProj
 	cls.WriteStructOrUnion(fs)
-//	if Cls.IsModel // should remove this
-//		fs <~ "__attribute__((__packed__)) "
-	
-//	|| con = cls.ConstructorFunc
-//		printline con.Render
 	fs <~ cls.cstructname
 	if cls.super
 		fs <~ ": "
@@ -463,8 +458,6 @@ function ExportBehaviourInstance (|SCClass| cls,  |FastStringCpp| fs,  |bool|)
 	|scclass--| TableCls = b.FuncTable!.cls
 	|| N		= TableCls.CstructName
 	|| CN		= cls.CStructName
-	
-	if cls == "vobj"
 	
 	fs <~ N
 	fs <~ " InitTable"

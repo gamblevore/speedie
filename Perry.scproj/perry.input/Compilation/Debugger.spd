@@ -251,26 +251,41 @@ function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 	if InputArg == @arg
 		.givearg|listviewrow|.ReStitchAndFixup(InputArg, Depth)
 		
+	// AAAA
+	// BBBB (O)
+	// CCCC
 	
+	// AAAA (N)
+	// CCCC
+
 function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
 	opt norefcounts
 	|| O = .last
 	
 	while (|| N = NewList.Last)
-		if o and o.IsSameItem(n, Depth)
-			o.CopyDebugData(n, Depth+1)
+		|listviewrow| Same
+		if !o
+			0
+		  elseif o.IsSameItem(n, Depth)
+			same = o
+		  else
+			Same = o.FindSameItem(n, depth)
+			if Same
+				o.next = same
+				o.remove
+				o = same
+			
+		if Same
+			same.CopyDebugData(n, Depth+1)
 			n.remove
 			o--
 		  else
-			|| Found = o.FindSameItem(n, depth)
-				0
+			if o
+				o.next = n
 			  else
-				if o
-					o.next = n
-				  else
-					.first = n
-				if n is error
-					n.badvar
+				.first = n
+			if n is error
+				n.badvar
 
 	o.RemoveBefore
 	o.remove
@@ -305,6 +320,10 @@ function listviewrow.ImproveArray// (|int| Depth, |bool| CanHide)
 	|| p = .parent$
 	|| fs = VarPrinter
 	for item in self
+		|| last = item.last
+		|| bad = (Last == @thg and "bad")
+		(item is error) = bad
+
 		fs.Length = 0
 		item.PerryAppendMsg("|", -1)
 		fs <~ " "

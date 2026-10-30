@@ -131,7 +131,7 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 
 	function TimedOut (|date| Durr, |bool|)
 		if (.TimeWaitingForReply > durr)
-			error (self, "child timed out.")
+			error (self, "Child timed out: " + .pid)
 			return true
 	
 		

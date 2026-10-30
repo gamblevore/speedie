@@ -144,7 +144,7 @@ class Error (Message)
 		return true
 
 
-	render Render
+	render
 		opt norefcounts
 		fs <~ "error"
 		++fs.indent

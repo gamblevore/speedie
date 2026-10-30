@@ -789,14 +789,6 @@ extend Parser
 		if .WillEnd
 			return result
 		
-/*		
-ignore
-			return a, b
-			return a,
-			return {}
-			return a, {}
-			return a {},
-*/
 		|| CanUseCommas = true
 		|| p = result.parent
 			if p.RangeLength == 1 and p.func == @arg
