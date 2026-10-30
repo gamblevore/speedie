@@ -287,8 +287,6 @@ struct ArgArrayCounter;
 
 struct AtomicLock;
 
-struct CakeVM;
-
 struct CompressionStats;
 
 struct DDA_Caster;

@@ -7,7 +7,7 @@ module SCVersion
 	function Bump (|int64| Hash)
 		opt norefcounts
 		|| v = .file	
-		Hash &= (~0)>>1
+		Hash &= (~0)|uint64|>>1
 		|| s = hash.render
 		if v["hash"]!=s
 			"Bumping version"

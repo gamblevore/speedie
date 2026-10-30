@@ -7302,6 +7302,13 @@ Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags) {
 	if (JB_Tk__WillEnd()) {
 		return Result;
 	}
+	bool CanUseCommas = true;
+	Message* P = ((Message*)JB_Ring_Parent(Result));
+	if (P) {
+		if ((P->RangeLength == 1) and (P->Func == kJB_SyxArg)) {
+			CanUseCommas = false;
+		}
+	}
 	if (JB_Tk__CanStatement()) {
 		while (true) {
 			Message* Item = JB_Tk__ProcessSyxParent(Result, OpFlags, ThingFlags);
@@ -7309,7 +7316,9 @@ Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags) {
 				break;
 			}
 			JB_Tree_SyntaxAppend(Result, Item);
-			JB_Tk__Allow(kJB__Tk_kComma);
+			if (CanUseCommas) {
+				JB_Tk__Allow(kJB__Tk_kComma);
+			}
 			if (JB_Tk__WillEnd()) {
 				return Result;
 			}
@@ -9131,7 +9140,7 @@ SCNode* SC_SCThe__NewInsertion(Message* Node, SCNode* Name_space, Message* ErrPl
 
 void SC_SCVersion__Bump(int64 Hash) {
 	Message* V = SC_SCVersion__File();
-	Hash = (Hash & (((~0)) >> 1));
+	Hash = (Hash & (((uint64)((~0))) >> 1));
 	JB_String* S = JB_int64_Render(Hash, nil);
 	if (!JB_Msg_SyntaxEquals(JB_Msg_SyntaxAccess(V, JB_LUB[1837]), S, false)) {
 		JB_PrintLine(JB_LUB[595]);
@@ -61402,4 +61411,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4862309925522409546 -4643003549468761350
+// 4562687603248663576 -4643003549468761350
