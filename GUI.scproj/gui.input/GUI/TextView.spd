@@ -991,7 +991,8 @@ class TextView (GUIControl)
 		return ._CanAutoComplete
 
 	function AutoCompleteString (|string|)
-		opt inline, visible
+		opt inline
+		visible
 		return ._AutoCompleteString
 	
 	

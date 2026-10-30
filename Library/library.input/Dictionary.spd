@@ -70,7 +70,10 @@ class Dictionary
 
 	// "..." means "Whatever it is that we contain"
 	// so.. we return a dictionary reader containing whatever we contain.
-	function Navigate (|DictionaryReader of ...|) { cpp_wrapper JB_Dict_Navigate, nil checker }
+	function Navigate (|DictionaryReader of ...|) {
+		cpp_wrapper JB_Dict_Navigate
+		nil checker
+	}
 	
 	function List (|[...]|)
 		for V in self

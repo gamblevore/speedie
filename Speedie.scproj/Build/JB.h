@@ -287,6 +287,8 @@ struct ArgArrayCounter;
 
 struct AtomicLock;
 
+struct CakeVM;
+
 struct CompressionStats;
 
 struct DDA_Caster;
@@ -2215,6 +2217,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorSeverity_Warning ((uint)2)
 #define kJB__ExitCode_EINPROGRESS ((int)36)
 #define kJB__ExitCode_ENOENT ((int)2)
+#define kJB__ExitCode_ENOMEM ((int)12)
 #define kJB__ExitCode_SIGKILL ((int)9)
 #define kSC__FatNopMode_Hard ((int)0)
 #define kSC__FatNopMode_KeepInputs ((int)1)

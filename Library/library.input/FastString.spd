@@ -27,7 +27,9 @@ class FastString {
 	constructor (|int| BufferSize)		{ cpp_wrapper JB_FS_ConstructorSize }
 	destructor							{ cpp_wrapper JB_FS_Destructor }
 
-	function Length (|int|)				{ nil safe, cpp_wrapper JB_FS_Length }
+	function Length (|int|)				{
+		nil safe 
+		cpp_wrapper JB_FS_Length }
 	setter Length (|int|)				{ cpp_wrapper JB_FS_LengthSet }
 	setter _Result (|int|):				disabled
 	setter _WrittenLength (|int64|):	disabled

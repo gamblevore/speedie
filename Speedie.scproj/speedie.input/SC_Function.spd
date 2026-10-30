@@ -2031,7 +2031,7 @@ function message.MainFix (|message|)
 		prms <~ "hello world"
 
 	.name = "function"
-	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main, visible true}".ParseClean
+	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main; visible true}".ParseClean
 		|| src_arg = fn_src.Last!
 		
 		|| fn = prms.func

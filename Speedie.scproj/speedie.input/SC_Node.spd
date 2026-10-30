@@ -1067,7 +1067,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'datatype'				SCClass.NewDataType
 	+'extend'				SCClass.StoreExtend
 	+'extend_module'		SCClass.StoreExtendModule
-	+'extends'				{ error (node, "I think you mean 'extend'"), return compiler.program }
+	+'extends'				{ error (node, "I think you mean 'extend'"); return compiler.program }
 	+'main'					SCFunction.NeuMain
 	+'library'				SCFunction.NeuLibrary
 	+'ignore'				(DontRemove)

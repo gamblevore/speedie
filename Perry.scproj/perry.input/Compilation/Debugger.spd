@@ -213,6 +213,14 @@ function message.IsSameItem (|message| row, |int| Depth, |bool|)
 		return .NameCheck(row, index)
 
 
+function message.FindSameItem (|message| row, |int| Depth, |listviewrow|)
+	opt norefcounts
+	while self
+		if .IsSameItem(row, depth)
+			return self
+		self--
+
+
 function listviewrow.BadVar
 	opt norefcounts
 	Notifications <~ "Something wrong with var: " + .name
@@ -247,18 +255,22 @@ function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
 	opt norefcounts
 	|| O = .last
+	
 	while (|| N = NewList.Last)
 		if o and o.IsSameItem(n, Depth)
 			o.CopyDebugData(n, Depth+1)
 			n.remove
 			o--
 		  else
-			if o
-				o.next = n
+			|| Found = o.FindSameItem(n, depth)
+				0
 			  else
-				.first = n
-			if n is error
-				n.badvar
+				if o
+					o.next = n
+				  else
+					.first = n
+				if n is error
+					n.badvar
 
 	o.RemoveBefore
 	o.remove

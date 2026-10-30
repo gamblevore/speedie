@@ -127,8 +127,8 @@ class String
 	function Copy		(|string|)					{ cpp_wrapper }
 
 // altering
-	function UpperCase	(|string|)					{ nil checker, cpp_wrapper JB_Str_UpperCase }
-	function LowerCase	(|string|)					{ nil checker, cpp_wrapper JB_Str_LowerCase }
+	function UpperCase	(|string|)					{ nil checker; cpp_wrapper JB_Str_UpperCase }
+	function LowerCase	(|string|)					{ nil checker; cpp_wrapper JB_Str_LowerCase }
 
 	render TitleCase
 		opt norefcounts

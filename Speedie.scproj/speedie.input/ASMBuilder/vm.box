@@ -3,11 +3,11 @@
 
 // vm.box
 forms
-	U0:
-	U1:		r1 R
-	U2:		r1 R,  r2 r
-	U3:		r1 R,  r2 r,  r3 r
-	U4:		r1 R,  r2 r,  r3 r,  r4 r
+	U0		{}
+	U1		{r1 R}
+	U2		{r1 R;  r2 r}
+	U3		{r1 R;  r2 r;  r3 r}
+	U4		{r1 R;  r2 r;  r3 r;  r4 r}
 
 
 	Func

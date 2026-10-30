@@ -788,18 +788,25 @@ extend Parser
 		opt norefcounts
 		if .WillEnd
 			return result
-
+		
+/*		
+ignore
+			return a, b
+			return a,
+			return {}
+			return a, {}
+			return a {},
+*/
 		if parser.CanStatement
 			while
 				|| item = .ProcessSyxParent( result, opflags, thingflags ) #loop
 				result <~ item
-
+				.allow(kcomma)
 				if .WillEnd
 					return result
 				
 				if item == @Arg
 					|| SubTmp = .Process( kTemporalWordColon, .UnTmpPlace(result) )
-					if SubTmp or item == ":" // wait thats not true anymore
 						return result
 				thingflags |= kColonArg
 
@@ -1055,7 +1062,7 @@ ive been~running #since morning
 				if ((State&1) and lin.Lines)
 					.erroradd("Can't have tabs after spaces.", n-1)
 
-			  elseif (c == ',')
+			  elseif c == ',' or ';'
 				commas++
 				|| l = parent.last
 					lin.dentine = l.indent

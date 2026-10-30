@@ -125,7 +125,7 @@ class RayTracer
 	
 	
 	libinternal AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
-		opt min 3, opt norefcounts
+		opt min 3; opt norefcounts
 		|| C = pxl.color
 		for i in 4
 			|| sh = ((i&1, i>>1).Vec2 - 0.5) * 0.70711
@@ -162,7 +162,7 @@ class RayTracer
 
 
 	libinternal ObjColor (|vobject?| B, |vobject| S, |vec4|)
-		opt min 3,   opt norefcounts
+		opt min 3; opt norefcounts
 		if B
 			|| C = .colorsub(b)
 			if c.a >= 0.996
@@ -182,7 +182,7 @@ class RayTracer
 
 		
 	libinternal FindBestObj (|vobject?| sp, |vobject?| ignore=nil,  |vobject|)
-		opt min 3,   opt norefcounts
+		opt min 3; opt norefcounts
 		|| Best = float.max
 		._RayHit = rayinfo.miss
 		while sp
@@ -325,7 +325,7 @@ class RayTracer
 		
 	libinternal TraceCell (|&raytracecell| cell, |!&imagepixel| pxl)
 		// making it look easy
-		opt min 3, opt norefcounts
+		opt min 3; opt norefcounts
 		cell.Link
 		|| P = cell.xy
 		|| pxl3 = pxl - cell.stride * cell.h
@@ -426,7 +426,8 @@ struct RayBoost
 	
 
 	libinternal raytracer.Quadditch (|RayBoost| ff, |VObject| v, |int| i=-1)
-		real self,  opt min 3
+		real self
+		opt min 3
 		if i >= 0
 			|| D = ff.depth
 			ff = ff.quad[i]!
@@ -471,7 +472,7 @@ struct RayBoost
 	function Divide (|raytracer| T)
 		opt min 3
 		|| S = .size.vec4
-		require s.IsPositive            			// do nothing
+		require s.IsPositive								// do nothing
 		|| Sh = .px+.depth
 		|| mid = s.xy+(1 << sh)|float|
 		.yDiv = t.plane((  s.x2, mid.y,   s.x, mid.y)).MakeSane
@@ -535,7 +536,7 @@ struct RayTraceCell
 			return n.draw
 			
 	libinternal Link
-		opt min 3, opt norefcounts
+		opt min 3; opt norefcounts
 		|| curr = .Node
 		while curr
 			|| obj = curr.Draw$

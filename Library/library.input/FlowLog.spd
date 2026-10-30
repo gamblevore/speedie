@@ -33,7 +33,7 @@ module FlowLog
 
 
 	function Stop
-		flow off, opt norefcounts
+		flow off; opt norefcounts
 		
 		require .Enabled
 		self <~ "end-of-line"
@@ -84,7 +84,8 @@ module FlowLog
 	
 	
 	autogen Input (|int64| Hash, |int64| CodePoint)
-		visible,  flow off,  opt norefcounts
+		visible; flow off; opt norefcounts
+		
 		require .Enabled
 
 		._Enabled = 0
@@ -112,7 +113,7 @@ module FlowLog
 		
 	
 	syntax append (|[string]| Lines)
-		embedded,  cpp_part InputStrings,  opt norefcounts,  flow off
+		embedded; cpp_part InputStrings; opt norefcounts; flow off
 		
 		require .Enabled
 		for s in lines
@@ -124,7 +125,7 @@ module FlowLog
 		
 		
 	function StartGen (|string| name)
-		flow off, opt norefcounts, embedded
+		flow off; opt norefcounts; embedded
 
 		|| path = .FlowPath(name)
 		if path.Size > 0
@@ -139,14 +140,15 @@ module FlowLog
 
 	
 	function StartTest (|string| name)
-		flow off,  opt norefcounts
+		flow off; opt norefcounts; embedded
+		
 		|| path = .FlowPath(name)
 		|| I = path.InputStream
 		.FlowIn = I
 		._Enabled = (I!=nil)|int|
 
 
-	inline TryStart (|string| name=–project, |bool|)
+	inline TryStart (|string| name = –project, |bool|)
 		flow off
 		(name)
 		target flow

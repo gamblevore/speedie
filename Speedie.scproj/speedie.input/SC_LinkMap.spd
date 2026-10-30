@@ -220,7 +220,8 @@ function compiler.DeadStrip
 
 
 function scdecl.TypeReach (|SCNode| from, |message| src)
-	opt norefcounts, flow off
+	opt norefcounts
+	flow off
 	if self
 		return .type.reach(from, src)
 

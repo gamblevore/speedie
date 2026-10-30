@@ -7309,12 +7309,13 @@ Message* JB_Tk__fTmpSub(Message* Result, int OpFlags, int ThingFlags) {
 				break;
 			}
 			JB_Tree_SyntaxAppend(Result, Item);
+			JB_Tk__Allow(kJB__Tk_kComma);
 			if (JB_Tk__WillEnd()) {
 				return Result;
 			}
 			if (JB_Msg_EqualsSyx(Item, kJB_SyxArg)) {
 				Message* SubTmp = JB_Tk__Process(kJB__Tk_kTemporalWordColon, false, JB_Tk__UnTmpPlace(Result));
-				if (SubTmp or (JB_Msg_SyntaxEquals(Item, JB_LUB[470], false))) {
+				if (SubTmp) {
 					return Result;
 				}
 			}
@@ -7695,7 +7696,7 @@ void JB_Tk__NextLineAndIndent(Message* Parent, ParserLineAndIndent* Lin) {
 				JB_FreeIfDead(JB_Tk__ErrorAdd(JB_LUB[639], N - 1));
 			}
 		}
-		 else if (C == ',') {
+		 else if ((C == ',') or (C == ';')) {
 			(++Commas);
 			Message* L = ((Message*)JB_Ring_Last(Parent));
 			if (L) {
@@ -51581,7 +51582,7 @@ SCFunction* SC_Beh__MakeVirtualCaller(SCModule* Mod, SCClass* Cls, Message* ErrP
 	JB_FS_AppendString(Fs, JB_LUB[155]);
 	JB_FS_AppendString(Fs, InterName);
 	JB_Decr(InterName);
-	JB_FS_AppendString(Fs, JB_LUB[321]);
+	JB_FS_AppendString(Fs, JB_LUB[75]);
 	JB_FS_AppendString(Fs, Type);
 	JB_Decr(Type);
 	JB_FS_AppendString(Fs, JB_LUB[2353]);
@@ -51592,7 +51593,7 @@ SCFunction* SC_Beh__MakeVirtualCaller(SCModule* Mod, SCClass* Cls, Message* ErrP
 		JB_FS_AppendString(Fs, JB_LUB[76]);
 	}
 	 else {
-		JB_FS_AppendString(Fs, JB_LUB[75]);
+		JB_FS_AppendString(Fs, JB_LUB[321]);
 	}
 	//using;
 	MessagePosition _usingf0 = ((MessagePosition){});
@@ -61401,4 +61402,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4969763005256069837 -6803577087616037837
+// -4862309925522409546 -4643003549468761350

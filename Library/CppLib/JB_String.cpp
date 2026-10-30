@@ -1827,17 +1827,17 @@ int JB_Obj_SafeRender (JB_Object* self, FastString* fs, int Maximum) {
 	Err = setjmp(JB_MemFailJump);
 	if (!Err)
 		JB_Obj_Render(self, fs);
+	signal(SIGSEGV, OldSeg);
+	signal(SIGBUS, OldBus);
 	
 	fs->_Size = OldSize;
 	fs->_Result = OldResult;
-	if (fs->_Lock > 1) {
+	if (!Err and fs->_Lock > 1) {
 		JB_FS_LengthSet(fs, fs->Length-5); // we often get "close" stuff added.
 		JB_FS_AppendCString(fs, "...");
 	}
 	fs->_Lock = 0;
 	
-	signal(SIGSEGV, OldSeg);
-	signal(SIGBUS, OldBus);
 	return Err;
 }
 

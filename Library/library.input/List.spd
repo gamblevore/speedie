@@ -23,26 +23,26 @@ class list
 
 	
 	constructor							{ cpp_wrapper JB_Ring_Constructor0 }
-	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor, stores_self }
+	constructor (|| Parent)				{ cpp_wrapper JB_Ring_Constructor; stores_self }
 
 	destructor							{ cpp_wrapper JB_Ring_Destructor }
 	
-	function Parent (||)				{ cpp_wrapper JB_Ring_Parent, nil checker }
+	function Parent (||)				{cpp_wrapper JB_Ring_Parent; nil checker}
 	function Parent (assigns:|...?|)
 		nil self // for .remove
 		cpp_wrapper JB_Ring_ParentSet // allows set parent to nil, also self can be nil if parent is nil 
 		cpp_refs {disturbs self} 
 	
-	function Next (||)					{ cpp_wrapper JB_Ring_NextSib, nil checker }
+	function Next (||)					{ cpp_wrapper JB_Ring_NextSib; nil checker }
 	function Next (assigns:||)			{ cpp_wrapper JB_Ring_NextSibSet }
 
-	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib, nil checker  }
+	function Prev (||)					{ cpp_wrapper JB_Ring_PrevSib; nil checker  }
 	function Prev (assigns:|...?|)		{ cpp_wrapper JB_Ring_PrevSibSet }
 
-	function First (||)					{ cpp_wrapper JB_Ring_First, nil checker }
-	function First (assigns:||)			{ cpp_wrapper JB_Ring_FirstSet, nil safe }
+	function First (||)					{ cpp_wrapper JB_Ring_First; nil checker }
+	function First (assigns:||)			{ cpp_wrapper JB_Ring_FirstSet; nil safe }
 	
-	function Last (||)					{ cpp_wrapper JB_Ring_Last, nil checker }
+	function Last (||)					{ cpp_wrapper JB_Ring_Last; nil checker }
 	function Last (assigns:||)			{ cpp_wrapper JB_Ring_LastSet}
 
 	syntax Append (|| Last)
@@ -57,13 +57,15 @@ class list
 
 
 	function Root		(|...!|)		{ cpp_wrapper JB_Ring_Root }
-	function IsRoot		(|bool|)		{ cpp_wrapper JB_Ring_IsRoot, nil checker }
-	inline IsFirst		(|bool|)		{ opt norefcounts, return .prev == nil }
-	inline IsLast		(|bool|)		{ opt norefcounts, return .next == nil}
+	function IsRoot		(|bool|)		{ cpp_wrapper JB_Ring_IsRoot
+		nil checker }
+	inline IsFirst		(|bool|)		{ opt norefcounts; return .prev == nil }
+	inline IsLast		(|bool|)		{ opt norefcounts; return .next == nil}
 
-	function HasAny		(|bool|)		{ cpp_wrapper JB_Ring_HasChildren, nil checker }
+	function HasAny		(|bool|)		{ cpp_wrapper JB_Ring_HasChildren
+		nil checker }
 	function HasChildren (|bool|)		{ Disabled ".hasany" }
-	function HasChildCount (|int| Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount, nil checker }
+	function HasChildCount (|int| Count, |bool|) { cpp_wrapper JB_Ring_HasChildCount; nil checker }
 		
 
 	function PrependAll (|| src)
@@ -142,11 +144,9 @@ class list
 			return p.FlatLast
 		return .parent
 	
-	function FlatNextDepth  (|$int| Depth, |bool| Down=true, ||)
-		cpp_wrapper JB_Ring_FlatNextDepth, nil checker
+	function FlatNextDepth (|$int| Depth, |bool| Down=true, ||) {cpp_wrapper JB_Ring_FlatNextDepth; nil checker}
 	
-	function FlatAfter (||)
-		cpp_wrapper JB_Ring_FlatAfter, nil checker
+	function FlatAfter (||)						{ cpp_wrapper JB_Ring_FlatAfter; nil checker }
 			
 	function IsAncestor (|| root, |bool|)
 		disabled "Use inside or contains operator"
@@ -555,15 +555,4 @@ class list
 
 		function Sorter (SorterComparer of list)
 			return .position < b.position
-
-
-
-//module RingTree
-//	function New ()
-//		disabled "Use List() instead of ringtree()"
-
-//datatype notind (int)
-//	syntax cast (|bool|)
-//		disabled "sigh"
-
 

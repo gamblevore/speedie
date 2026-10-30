@@ -71,9 +71,9 @@ linkage
 |{SCImport}|				ImportedNames = Dictionary.new
 |message|					ASMSelf = `|| self` ~ parse
 
-|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit, opt norefcounts, {||E=AppInitSub_(), if E!=0: return E}}`~parse).WipePos
-|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_, opt norefcounts}`~parse).WipePos
-|Message|					AppInitTest = (`{^"NilChecking", if (1==nil): return 12}`~parse).WipePos // enomem == 12
+|Message|					AppInitCode = (`{cpp_name JB_SP_AppInit; opt norefcounts; {||E=AppInitSub_(); if E!=0: return E}}`~parse).WipePos
+|Message|					AppInitGlobals = (`{cpp_name JB_SP_AppInitSub_; opt norefcounts}`~parse).WipePos
+|Message|					AppInitTest = (`{^"NilChecking"; if (1==nil): return ExitCode.ENOMEM}`~parse).WipePos
 
 |SCModule|					Program = InternalFile.Proj.Mod
 |[SCClass]|					ClassList
