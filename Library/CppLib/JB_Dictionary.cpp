@@ -726,7 +726,7 @@ JB_String* JB_Dict_Render(Dictionary* self, FastString* fs_in) {
 			JB_FS_AppendByte(fs, ':');
 			JB_Obj_Render(JB_Nav_Value(Nav), fs);
 		};
-		self->RefCount &= ~(1<<31);
+		self->RefCount &= ~(1<<30);
 	}
 	JB_FS_AppendByte(fs, '}');
     JB_FreeIfDead(Nav);

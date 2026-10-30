@@ -67,8 +67,11 @@ function app.TestSyntax
 	if H == 5
 		"'$H' has five letters"
 	|| L = "(aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk,aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk,aaaaa,bbbbb,ccccc,ddddd,eeeee,fffff,ggggg,hhhhh,iiiii,jjjjj,kkkkk)".parse
+	L = "(a,b,c,d)".parse
 	if L == 4
 		"The list $L has four items!"
+	  else
+		"Error?"
 	(x)
 	
 	|| zz = 0
@@ -94,15 +97,12 @@ function ObjRenderTest
 	|| G = RPGHero("fred")
 	printline g.__Render__
 
-	|| err = Error.new(nil, "im ok!", nil, "anywhere")
 	|| R = []
 	R <~ R						// put an array into itself
 	printline r					// seems to survive!
 
-	printline err
 	|| proc = UnixProcess("abc")
 	printline proc
-	(err)
 	(r)
 	(g)
 

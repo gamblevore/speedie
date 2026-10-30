@@ -189,11 +189,11 @@ void JB_Array_LengthSet( Array* self, int NewLength ) {
 
 
 bool ObjContainerOK_ (JB_Object* Self, FastString* FS) {
-	if (Self->RefCount & 1<<31) {
+	if (Self->RefCount & 1<<30) {
 		JB_FS_AppendCString(FS, "..."); // infinite loop!
 		return false;
 	}
-	Self->RefCount |= 1<<31;
+	Self->RefCount |= 1<<30;
 	return true;
 }
 
@@ -212,7 +212,7 @@ JB_String* JB_Array_Render (Array* self, FastString* fs_in) {
 					JB_FS_AppendCString(fs, ", ");
 				JB_Obj_Render(obj, fs);
 			}
-			self->RefCount &= ~(1<<31);
+			self->RefCount &= ~(1<<30);
 		}
 		JB_FS_AppendByte(fs, ']');
 	}
@@ -352,13 +352,14 @@ void JB_FillInts(int* Start, int N, int Value) {
 #ifndef AS_LIBRARY
 void JB_Array_Shuffle( Array* self ) {
 	int n = JB_Array_Length(self);
+	require0(n);
 	JB_Object** Array = self->_Ptr;
-	uint64 Hash = ~1234567;
+	uint64 Hash = JB_Date__Now();
 	self->_Marker = 0;
 
 	for_(n) {
 		auto ai = Array[i];
-		Hash = JB_uint64_hash(RDTSC() xor (~(uint64)ai) xor Hash);
+		Hash = JB_uint64_hash(JB_uint64_hash(~(uint64)ai xor Hash) + i);
 		int i2 = Hash % n;
 		Array[i] = Array[i2];
 		Array[i2] = ai;

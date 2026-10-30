@@ -130,7 +130,6 @@ function assembler.MarkVarOpen (|message| Exp, |ASMReg| Declared, |scdecl| Ty, |
 		start -= .IsCurrBlock(start-1)|int|		// and it gets replaced into a .gobj
 
 	last = exp.mark(),   last.refcount = 1
-//	last.OutputPrms = 1
 	last.prms[0] = Declared.reg
 	last.Const = ty|uint64|
 	(Last is DebugVarOpen)	
