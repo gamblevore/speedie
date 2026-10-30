@@ -5887,8 +5887,6 @@ void SC_FAT_BakeLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 int SC_FAT_BaseOp(FatASM* Self);
 
-bool SC_FAT_CanCloseRegs(FatASM* Self, int R);
-
 int SC_FAT_CanTrashRegisters(FatASM* Self);
 
 void SC_FAT_CheckHasOutput(FatASM* Self);

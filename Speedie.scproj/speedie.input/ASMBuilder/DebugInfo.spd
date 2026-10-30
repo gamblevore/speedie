@@ -112,31 +112,14 @@ function SCDecl.DumpWierdness (|faststring| j)
 		expect (++Count < 5) (.source, "Too much wierdness")
 		j.AppendHInt(W)
 		self = .Internal$
-	
-
-
-function FatASM.CanCloseRegs (|int| R, |bool|)
-	if .Index|int| <= 0 // oof
-	|| op = ._Op
-	if op == asm.ret or asm.RFRT
-		return true
-	if  (op == asm.MARK) and (self isnt debugvaropen)
-		return true
-		
-	if (op == asm.rfun) and (R&(R-1) == 0)
-		|| v = R.log2
-		if  .RegOnly(0) == v  and  .regonly(1) == v  and  .regonly(2) == 0
-			return true
 
 
 	
 function Assembler.MarkVarClosed (|int| RegBits)
 	.RegDebugInfo &= ~RegBits
 	|| Mark = .last
-	if !mark.CanCloseRegs(RegBits)
-		mark = mark.source.MARK()
-		mark.refcount = 1
-		
+	mark = mark.source.MARK()
+	mark.refcount = 1
 	(mark is DebugVarClose)
 	mark._Const |= RegBits
 

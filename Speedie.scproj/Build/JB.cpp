@@ -20684,25 +20684,6 @@ int SC_FAT_BaseOp(FatASM* Self) {
 	return F;
 }
 
-bool SC_FAT_CanCloseRegs(FatASM* Self, int R) {
-	if (((int)SC_FAT_Index(Self)) <= 0) {
-	}
-	uint Op = Self->_Op;
-	if ((Op == kSC__ASM_RET) or (Op == kSC__ASM_RFRT)) {
-		return true;
-	}
-	if ((Op == kSC__ASM_MARK) and ((!SC_FAT_SyntaxIs(Self, kSC__Reg_DebugVarOpen)))) {
-		return true;
-	}
-	if ((Op == kSC__ASM_RFUN) and ((R & (R - 1)) == 0)) {
-		int V = JB_Int_Log2(R);
-		if ((SC_FAT_RegOnly(Self, 0) == V) and ((SC_FAT_RegOnly(Self, 1) == V) and (SC_FAT_RegOnly(Self, 2) == 0))) {
-			return true;
-		}
-	}
-	return false;
-}
-
 int SC_FAT_CanTrashRegisters(FatASM* Self) {
 	ASM B = SC_FAT_Op(Self);
 	if ((B == kSC__ASM_FNCX) or ((B == kSC__ASM_FNCX3) or ((B == kSC__ASM_FNC) or (B == kSC__ASM_FNC3)))) {
@@ -24656,10 +24637,8 @@ ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMRe
 void SC_Pac_MarkVarClosed(Assembler* Self, int RegBits) {
 	Self->RegDebugInfo = (Self->RegDebugInfo & (~RegBits));
 	FatASM* Mark = SC_Pac_Last(Self);
-	if (!SC_FAT_CanCloseRegs(Mark, RegBits)) {
-		Mark = SC_SourceLocation_MARK(SC_FAT_Source(Mark));
-		Mark->RefCount = 1;
-	}
+	Mark = SC_SourceLocation_MARK(SC_FAT_Source(Mark));
+	Mark->RefCount = 1;
 	(SC_FAT_SyntaxIsSet(Mark, kSC__Reg_DebugVarClose, true));
 	Mark->_Const = (Mark->_Const | RegBits);
 }
@@ -61414,4 +61393,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 4562687603248663576 -5545547652129292564
+// -7610519868670290958 -5545547652129292564
