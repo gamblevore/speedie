@@ -985,7 +985,6 @@ JB_FloatRange_Constructor
 JB_Flow__AppendStr
 JB_Flow__Enabled
 JB_Flow__Input
-JB_Flow__StartTest
 JB_Flow__Stop
 JB_Fn_Constructor
 JB_Fn_Destructor
@@ -1494,11 +1493,9 @@ JB_TC_SetSigned
 JB_TC_SpecialReg
 JB_TC_SyntaxIsSet
 JB_TC__Types
-JB_TaskState_SyntaxIs
 JB_Task_Constructor
 JB_Task_ConstructorEmpty
 JB_Task_Destructor
-JB_Task_SyntaxIs
 JB_Task_SyntaxIsSet
 JB_TerminalColor_Colorise
 JB_TerminalColor_Render

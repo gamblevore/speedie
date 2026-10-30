@@ -37,16 +37,16 @@ datatype ExitCode (int)
 		ENOMEM = 12
 		ENOENT = 2
 		EINPROGRESS = 36
-		SIGKILL = 9
+		SIGKILL = 9|||128
 	
 	description "Can describe both signal errors, and exit codes."
 	
 	inline Killed (|bool|)
-		return self == SIGKILL|||128
+		return self == SIGKILL
 	
 	inline Crashed (|bool|)
 		// not all signals are really a crash? what about sigkill?
-		description "This is a signal error (a crash)" 
+		description "This is a signal error (a crash)"
 		return  self > 128
 		
 	inline NoErrors (|bool|)
