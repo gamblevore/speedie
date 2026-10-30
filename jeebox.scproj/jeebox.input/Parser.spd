@@ -797,11 +797,16 @@ ignore
 			return a, {}
 			return a {},
 */
+		|| CanUseCommas = true
+		|| p = result.parent
+			if p.RangeLength == 1 and p.func == @arg
+				CanUseCommas = false
 		if parser.CanStatement
 			while
 				|| item = .ProcessSyxParent( result, opflags, thingflags ) #loop
 				result <~ item
-				.allow(kcomma)
+				if CanUseCommas
+					.allow(kcomma)
 				if .WillEnd
 					return result
 				
