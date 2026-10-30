@@ -19898,9 +19898,8 @@ NilState SC_nil__List(Message* Msg, NilCheckMode Test) {
 	{
 		Message* S = ((Message*)JB_Ring_First(Msg));
 		while (S) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(S));
 			SC_nil__FlowJump(S, 0);
-			S = _Nf1;
+			S = ((Message*)JB_Ring_NextSib(S));
 		};
 		;
 	}
@@ -31539,10 +31538,9 @@ void SC_Imp_LoadBanned(SCImport* Self, Message* List) {
 	{
 		Message* Item = ((Message*)JB_Ring_First(List));
 		while (Item) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(Item));
 			JB_Msg_Expect(Item, kJB_SyxThg, nil);
 			(JB_Dict_ValueLowerSet(X, Item->Name, JB_LUB[2336]));
-			Item = _Nf1;
+			Item = ((Message*)JB_Ring_NextSib(Item));
 		};
 		;
 	};
@@ -31601,14 +31599,13 @@ void SC_Imp_PrepareAll(SCImport* Self) {
 
 void SC_Imp_ReloadImports(SCImport* Self, SCFile* Index) {
 	{
-		Message* _LoopSrcf2 = SC_File_AST(Index);
-		Message* J = ((Message*)JB_Ring_First(_LoopSrcf2));
+		Message* _LoopSrcf1 = SC_File_AST(Index);
+		Message* J = ((Message*)JB_Ring_First(_LoopSrcf1));
 		while (J) {
-			Message* _Nf1 = ((Message*)JB_Ring_NextSib(J));
 			if (SC_Msg_OperatorIsTmp(J, JB_LUB[1852])) {
 				SC_Imp_ImportMsg(Self, J);
 			}
-			J = _Nf1;
+			J = ((Message*)JB_Ring_NextSib(J));
 		};
 		;
 	};
@@ -38659,7 +38656,6 @@ Message* SC_Msg_find(Message* Self, Syntax P, Syntax Ch, JB_String* Name) {
 	{
 		Message* S = ((Message*)JB_Ring_First(Self));
 		while (S) {
-			Message* _Nf1 = (((Message*)JB_Ring_NextSib(S)));
 			if (S->Func == P) {
 				Message* F = ((Message*)JB_Ring_First(S));
 				if (F) {
@@ -38668,7 +38664,7 @@ Message* SC_Msg_find(Message* Self, Syntax P, Syntax Ch, JB_String* Name) {
 					}
 				}
 			}
-			S = _Nf1;
+			S = (((Message*)JB_Ring_NextSib(S)));
 		};
 		;
 	}
@@ -39606,11 +39602,10 @@ Message* SC_Msg_GetMarker(Message* Self, JB_String* S) {
 	{
 		Message* A = ((Message*)JB_Ring_First(Self));
 		while (A) {
-			Message* _Nf1 = (((Message*)JB_Ring_NextSib(A)));
 			if (SC_Msg_OperatorIsTmp(A, S)) {
 				return A;
 			}
-			A = _Nf1;
+			A = (((Message*)JB_Ring_NextSib(A)));
 		};
 		;
 	}

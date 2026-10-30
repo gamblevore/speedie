@@ -176,7 +176,7 @@ function Rel (NilTrackerFn)									// x + y
 
 function List (NilTrackerFn)
 	opt norefcounts
-	for s in msg
+	for s.fast in msg
 		.jump(s)
 	return nilstate.Real
 

@@ -71,7 +71,7 @@ class SCImport
 
 	function ReloadImports (|scfile| index)
 		opt norefcounts
-		for j in index.AST
+		for j.fast in index.AST
 			if J IsTmp "import"
 				.ImportMsg(j)
 
@@ -163,7 +163,7 @@ class SCImport
 		require list.expect(@list)
 
 		|| x = options.BannedClasses init Dictionary()
-		for item in list
+		for item.fast in list
 			item.expect(@thg)
 			x.valuelower(item.name) = "x"
 	

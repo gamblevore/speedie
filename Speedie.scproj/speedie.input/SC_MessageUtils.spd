@@ -429,7 +429,7 @@ function Message.CopyAllAfterInto (|Message| into, |Message| copylayer)
 
 function Message.GetMarker (|String| s, |Message|)
 	opt norefcounts
-	for a in self
+	for a.fast in self
 		if a isTmp s
 			return a
 
@@ -598,7 +598,7 @@ function Message.PrmFuncStructMsg (|message|)
 
 function Message.find (|syntax| P, |syntax| Ch, |string| name, |message|)
 	opt norefcounts
-	for s in self
+	for s.fast in self
 		if s.func == P
 			|| f = s.first
 				if f.func == ch and f.name ~= name
