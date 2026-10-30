@@ -10347,7 +10347,7 @@ JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile) {
 			JB_Print(_tmPf0);
 			JB_Decr(_tmPf0);
 			if (SC_Options__ModeCake()) {
-				JB_Print(JB_LUB[2398]);
+				JB_Print(JB_LUB[2302]);
 				JB_String* _tmPf2 = JB_Str_ReadAll(Rz, 16777216, true);
 				JB_Incr(_tmPf2);
 				JB_String* _tmPf1 = JB_int64_Render(((int64)(JB_Str_CRC(_tmPf2, 0) >> 1)), nil);
@@ -27601,8 +27601,6 @@ bool SC_Cpp_ExportBehaviourInstance(Cpp_Export* Self, SCClass* Cls, FastStringCp
 	JB_Incr(N);
 	JB_String* CN = SC_Class_CStructName(Cls);
 	JB_Incr(CN);
-	if (SC_Class_EqualsName(Cls, JB_LUB[2302])) {
-	}
 	JB_FS_AppendString(Fs, N);
 	JB_FS_AppendString(Fs, JB_LUB[189]);
 	JB_FS_AppendString(Fs, CN);
@@ -60299,19 +60297,24 @@ bool SC_Func__Tran_Render(Message* Msg, SCClass* Cls) {
 
 bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls) {
 	JB_SetRef(Msg->Name, JB_LUB[1816]);
-	Message* _tmPf0 = ((Message*)JB_Ring_First(Msg));
-	JB_Incr(_tmPf0);
-	bool IsPureRender = (!JB_Msg_EqualsSyx(_tmPf0, kJB_SyxThg));
-	JB_Decr(_tmPf0);
+	Message* F = ((Message*)JB_Ring_First(Msg));
+	JB_Incr(F);
+	bool IsPureRender = (!JB_Msg_EqualsSyx(F, kJB_SyxThg));
 	if (IsPureRender) {
-		Message* _tmPf1 = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1216]);
-		JB_Incr(_tmPf1);
-		(JB_Ring_FirstSet(Msg, _tmPf1));
-		JB_Decr(_tmPf1);
+		Message* _tmPf0 = JB_Syx_OperatorPlus(kJB_SyxThg, JB_LUB[1216]);
+		JB_Incr(_tmPf0);
+		(JB_Ring_FirstSet(Msg, _tmPf0));
+		JB_Decr(_tmPf0);
 		if (Cls) {
 			JB_SetRef(Msg->Name, JB_LUB[1593]);
 		}
 	}
+	 else {
+		if (!(!JB_Msg_SyntaxEquals(F, JB_LUB[1216], true))) {
+			JB_Msg_Fail(F, JB_LUB[2398]);
+		}
+	}
+	JB_Decr(F);
 	Message* Arg = SC_Msg_NormaliseFunc(Msg, nil);
 	JB_Incr(Arg);
 	if (!Arg) {
@@ -60341,10 +60344,10 @@ bool SC_Func__Tran_RenderSub(Message* Msg, SCClass* Cls) {
 	}
 	JB_Decr(Arg);
 	if (SC_Msg_IsBehaviour(Msg)) {
-		Message* _tmPf2 = ((Message*)JB_Tree_Second(Msg));
-		JB_Incr(_tmPf2);
-		JB_Tree_Remove(_tmPf2);
-		JB_EarlyDecr(_tmPf2);
+		Message* _tmPf1 = ((Message*)JB_Tree_Second(Msg));
+		JB_Incr(_tmPf1);
+		JB_Tree_Remove(_tmPf1);
+		JB_EarlyDecr(_tmPf1);
 		return true;
 	}
 	return false;
@@ -61411,4 +61414,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 4562687603248663576 -4643003549468761350
+// 4562687603248663576 -5545547652129292564
