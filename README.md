@@ -28,7 +28,9 @@
 
 Speedie has been written as a passion project with a large amount of hacker mentality. And we are proud of this. Just love it or leave it.
 
-**Note:** _Currently, Speedie has issues compiling outside of OSX._ It is compiling on Debian Linux, however there is some dependancy work to solve, especially around SDL2. SDL2 is not needed for the compiler but Perry and other graphical apps will not compile, unless SDL2 is already setup.
+**Note:** _Currently, Speedie has issues compiling outside of OSX._
+
+Ongoing our main focus will be OSX ARM, Win x86, and Debian x86. As a linux user, if it does not compile on a non-debian Linux, try on Debian first, then submit patches.
 
 If you'd like to support the ongoing development of Speedie, consider [sponsoring through GitHub](https://github.com/sponsors/gamblevore).
 
