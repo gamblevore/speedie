@@ -58,9 +58,9 @@ The DebugName is normally a file-path, but might not be, for example you are in 
 			.writer.length = 0
 
 
-	syntax append (|faststring| fs, |bool|)
+	syntax append (|faststring| fs)
 		inlined
-		rz = (self <~ fs|string|)
+		self <~ fs|string|
 		fs.Length = 0
 	
 	
