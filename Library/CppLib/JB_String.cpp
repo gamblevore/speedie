@@ -1778,7 +1778,6 @@ JB_String* JB_Obj_Render (JB_Object* self, FastString* fs_in) {
         return JB_Obj_GenericRender(self, fs_in);
     }
 
-
 #if __VM__
 	if (((IntPtr)FN)>>63) {
 		auto V = JB_GlobalVM;

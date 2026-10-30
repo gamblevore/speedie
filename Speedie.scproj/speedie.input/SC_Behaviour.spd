@@ -331,6 +331,7 @@ function $InterName (,$InterName)
 		
 
 		function NewVirtual (CollectFunc)
+			opt norefcounts
 			require errplace
 			using (errplace)
 			|| cls = name_space.ShouldBeClass(errplace)
@@ -346,6 +347,7 @@ function $InterName (,$InterName)
 		
 		
 		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
+			opt norefcounts
 			|| Thg = node.first!
 			|| required = (thg isarel "++")
 				thg = thg.replacewith(thg.first!)
@@ -356,7 +358,7 @@ function $InterName (,$InterName)
 			expect (s~!="destructor")		(thg, "Bad name.")
 			Thg.name = s.moat
 			
-			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s) #require
+			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s)		#require
 			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod )
 			|| mcls = mod.cls
