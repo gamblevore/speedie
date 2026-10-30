@@ -952,7 +952,7 @@ function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|
 		|| sz = rz.filesize
 			print " // "
 			print sz.strsize
-			if Options.cake
+			if Options.modecake
 				print " : 0x"
 				print (rz.ReadAll.hash>>1)|int64|.render
 			

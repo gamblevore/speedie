@@ -331,7 +331,7 @@ function $InterName (,$InterName)
 		
 
 		function NewVirtual (CollectFunc)
-			opt norefcounts
+//			opt norefcounts
 			require errplace
 			using (errplace)
 			|| cls = name_space.ShouldBeClass(errplace)
@@ -347,7 +347,7 @@ function $InterName (,$InterName)
 		
 		
 		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
-			opt norefcounts
+//			opt norefcounts
 			|| Thg = node.first!
 			|| required = (thg isarel "++")
 				thg = thg.replacewith(thg.first!)

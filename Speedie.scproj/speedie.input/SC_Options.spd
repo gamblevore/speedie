@@ -1,7 +1,7 @@
 
 
 module Options
-	flags: cpp, cake
+	flags: kCpp, kCake
 	
 	||		BannedClasses			= nil|dictionary|
 	||		exe_path				= ""		// if not exist, use output_path
@@ -14,7 +14,7 @@ module Options
 	||		Beep					= false
 
 	|bool|	InlineLib				= true
-	|byte|	Mode					= Cpp
+	|byte|	Mode					= kCpp
 	||		MakeExec				= false
 	||		Compile					= true
 	||		TargetDebug				= false
@@ -48,10 +48,10 @@ module Options
 		return TerminalColor.RainbowTerm
 	
 	function ModeCake (|bool|)
-		return .mode == cake
+		return .mode == kcake
 	
 	function ModeCpp (|bool|)
-		return .mode == cpp
+		return .mode == kcpp
 	
 	function ShouldBuildTrap (|bool|)
 		return .TargetDebug or Compiler.InPerry
@@ -330,12 +330,12 @@ module Feedback
 		+'cpp'
 			explain(purpose, "Compiles to cpp. Will not compile cake")$
 			if value.optionbool
-				options.Mode = options.cpp
+				options.Mode = options.kcpp
 
 		+'b'
 			Explain(Purpose, "Same as --bake but silent.")$
 			Options.Silent = true
-			options.Mode = options.cake
+			options.Mode = options.kcake
 		
 		+'strip'
 			Explain(Purpose)$
@@ -350,7 +350,7 @@ module Feedback
 		+'bake'
 			explain(purpose, "Compiles to cake. Will not compile to cpp")$
 			if value.optionbool
-				options.Mode = options.cake
+				options.Mode = options.kcake
 
 		+'cake'
 			Explain(Purpose)$

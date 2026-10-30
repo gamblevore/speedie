@@ -122,9 +122,9 @@ function string.InBuiltTarget (|message| err=nil, |SortComparison|)	// target tr
 		return 0
 		
 	if self ~= "cake"
-		return options.mode == options.cake
+		return options.mode == options.kcake
 	if self ~= "cpp"
-		return options.mode == options.cpp
+		return options.mode == options.kcpp
 	if self ~= "debug"
 		return options.TargetDebug
 	if self ~= "perry"

@@ -44,7 +44,7 @@ module Linkage
 			SC_Targets["cake_interpreter"] = true
 			Options.MakeExec = true
 			if Options.ModeCake
-				options.mode = Options.cpp
+				options.mode = Options.kcpp
 				"Removing bake"
 		s.remove
 	
