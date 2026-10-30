@@ -91,18 +91,17 @@ function app.TestSyntax
 
 
 function ObjRenderTest
-	|| err = Error.new(nil, "im ok!", nil, "anywhere")
-/	|| G = RPGHero("fred")
-//	printline g.__Render__
+	|| G = RPGHero("fred")
+	printline g.__Render__
 
+	|| err = Error.new(nil, "im ok!", nil, "anywhere")
 	|| R = []
 	R <~ R						// put an array into itself
 	printline r					// seems to survive!
 
 	printline err
 	|| proc = UnixProcess("abc")
-/	printline proc
-	(proc)
+	printline proc
 	(err)
 	(r)
 	(g)
