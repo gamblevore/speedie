@@ -1501,9 +1501,7 @@ extern Message* SC__Macros_WhileDecl;
 extern bool SC__Options_AllowMassInlines;
 extern Dictionary* SC__Options_BannedClasses;
 extern bool SC__Options_Beep;
-#define kSC__Options_cake ((int)2)
 extern bool SC__Options_Compile;
-#define kSC__Options_cpp ((int)1)
 extern JB_String* SC__Options_exe_path;
 extern bool SC__Options_ExternalCompile;
 extern bool SC__Options_ForceRecompile;
@@ -1511,6 +1509,8 @@ extern bool SC__Options_GenFlowLogCode;
 extern bool SC__Options_HideawayScripts;
 extern bool SC__Options_InlineLib;
 extern bool SC__Options_IsDirectTest;
+#define kSC__Options_kCake ((int)2)
+#define kSC__Options_kCpp ((int)1)
 extern bool SC__Options_KeepAllErrors;
 extern bool SC__Options_MakeExec;
 extern byte SC__Options_Mode;

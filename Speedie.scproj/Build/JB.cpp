@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2398];
+extern JB_StringC* JB_LUB[2399];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2838,7 +2838,7 @@ bool SC_FB__AppOptions_b(JB_String* Name, JB_String* Value, FastString* Purpose)
 		return nil;
 	}
 	SC__Options_Silent = true;
-	SC__Options_Mode = kSC__Options_cake;
+	SC__Options_Mode = kSC__Options_kCake;
 	return false;
 }
 
@@ -2847,7 +2847,7 @@ bool SC_FB__AppOptions_bake(JB_String* Name, JB_String* Value, FastString* Purpo
 		return nil;
 	}
 	if (SC_Str_OptionBool(Value)) {
-		SC__Options_Mode = kSC__Options_cake;
+		SC__Options_Mode = kSC__Options_kCake;
 	}
 	return false;
 }
@@ -2953,7 +2953,7 @@ bool SC_FB__AppOptions_cpp(JB_String* Name, JB_String* Value, FastString* Purpos
 		return nil;
 	}
 	if (SC_Str_OptionBool(Value)) {
-		SC__Options_Mode = kSC__Options_cpp;
+		SC__Options_Mode = kSC__Options_kCpp;
 	}
 	return false;
 }
@@ -5679,7 +5679,7 @@ void SC_Linkage__CompilerCollect(Message* S) {
 		(SC_SC_Targets__SyntaxAccessSet(JB_LUB[1627], true));
 		SC__Options_MakeExec = true;
 		if (SC_Options__ModeCake()) {
-			SC__Options_Mode = kSC__Options_cpp;
+			SC__Options_Mode = kSC__Options_kCpp;
 			JB_PrintLine(JB_LUB[1215]);
 		}
 	}
@@ -5800,7 +5800,7 @@ int SC_Options__Init_() {
 		SC__Options_SingleCppOutput = true;
 		SC__Options_NilTestAllocNeverFails = true;
 		SC__Options_InlineLib = true;
-		SC__Options_Mode = kSC__Options_cpp;
+		SC__Options_Mode = kSC__Options_kCpp;
 		SC__Options_Compile = true;
 		SC__Options_ForceRecompile = true;
 		SC__Options_Optimise = 1;
@@ -5810,11 +5810,11 @@ int SC_Options__Init_() {
 }
 
 bool SC_Options__ModeCake() {
-	return SC__Options_Mode == kSC__Options_cake;
+	return SC__Options_Mode == kSC__Options_kCake;
 }
 
 bool SC_Options__ModeCpp() {
-	return SC__Options_Mode == kSC__Options_cpp;
+	return SC__Options_Mode == kSC__Options_kCpp;
 }
 
 bool SC_Options__ShouldBuildTrap() {
@@ -10336,6 +10336,16 @@ JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile) {
 			JB_Incr(_tmPf0);
 			JB_Print(_tmPf0);
 			JB_Decr(_tmPf0);
+			if (SC_Options__ModeCake()) {
+				JB_Print(JB_LUB[2398]);
+				JB_String* _tmPf2 = JB_Str_ReadAll(Rz, 16777216, true);
+				JB_Incr(_tmPf2);
+				JB_String* _tmPf1 = JB_int64_Render(((int64)(JB_Str_CRC(_tmPf2, 0) >> 1)), nil);
+				JB_Incr(_tmPf1);
+				JB_Decr(_tmPf2);
+				JB_Print(_tmPf1);
+				JB_Decr(_tmPf1);
+			}
 		}
 		JB_PrintLine(nil);
 	}
@@ -33522,10 +33532,10 @@ SortComparison SC_Str_InBuiltTarget(JB_String* Self, Message* Err) {
 		return ((SortComparison)0);
 	}
 	if (JB_Str_Equals(Self, JB_LUB[1626], true)) {
-		return ((SortComparison)(SC__Options_Mode == kSC__Options_cake));
+		return ((SortComparison)(SC__Options_Mode == kSC__Options_kCake));
 	}
 	if (JB_Str_Equals(Self, JB_LUB[1666], true)) {
-		return ((SortComparison)(SC__Options_Mode == kSC__Options_cpp));
+		return ((SortComparison)(SC__Options_Mode == kSC__Options_kCpp));
 	}
 	if (JB_Str_Equals(Self, JB_LUB[1688], true)) {
 		return ((SortComparison)SC__Options_TargetDebug);
@@ -61391,4 +61401,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 8374258237572200573 -9076062418305739237
+// -4969763005256069837 -6803577087616037837
