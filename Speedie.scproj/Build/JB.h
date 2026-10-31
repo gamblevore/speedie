@@ -1075,7 +1075,7 @@ struct Message_Behaviour: list_Behaviour {
 };
 
 JBClass ( Message , JB_List , 
-	Syntax Func;
+	Syntax Type;
 	byte Indent;
 	u16 RangeLength;
 	MessageFlags Flags;
@@ -1176,7 +1176,7 @@ struct MessageID_Behaviour: StringShared_Behaviour {
 };
 
 JBClass ( MessageID , JB_StringShared , 
-	Syntax Func;
+	Syntax Type;
 	int Position;
 	int64 Frequency;
 	int64 ID;
@@ -5276,11 +5276,11 @@ Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
 
 Message* JB_Syx_PlusNum(Syntax Self, int64 M);
 
-Syntax JB_Syx__Func(JB_String* Name, Message* Where);
-
 int JB_Syx__Init_();
 
 Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* LongName, int ID);
+
+Syntax JB_Syx__Type(JB_String* Name, Message* Where);
 
 
 
@@ -8295,7 +8295,7 @@ FatASM* SC_Msg_BANG(Message* Self, ASMReg R1, ASMReg R2, int K);
 
 FatASM* SC_Msg_BANK(Message* Self, ASMReg R1, ASMReg R2, int K);
 
-void JB_Msg_BecomeStr(Message* Self, Syntax Fn, JB_String* Name);
+void JB_Msg_BecomeStr(Message* Self, Syntax Type, JB_String* Name);
 
 void JB_Msg_BecomeMsg(Message* Self, Message* Src);
 
@@ -8433,9 +8433,9 @@ Message* JB_Msg_ConstructorCopy(Message* Self, Message* Other);
 
 Message* JB_Msg_ConstructorEmpty(Message* Self);
 
-Message* JB_Msg_Constructor(Message* Self, Message* Parent, Syntax Func, JB_String* Name);
+Message* JB_Msg_Constructor(Message* Self, Message* Parent, Syntax Type, JB_String* Name);
 
-Message* JB_Msg_ConstructorParser(Message* Self, Message* Parent, Syntax Func, int BytePos, JB_String* Name, int RangeLength);
+Message* JB_Msg_ConstructorParser(Message* Self, Message* Parent, Syntax Type, int BytePos, JB_String* Name, int RangeLength);
 
 void SC_Msg_ConstructorAddNil(Message* Self, bool IsDot);
 
@@ -9631,6 +9631,8 @@ Message* SC_Decl_CreateStructNil(SCDecl* Self, Message* Where);
 
 Message* SC_Decl_CreateStructNilSub(SCDecl* Self);
 
+SCFunction* SC_Decl_DeclFunc(SCDecl* Self);
+
 Message* SC_Decl_DeclToAddr(SCDecl* Self, SCDecl* P0);
 
 Message* SC_Decl_DeclToDot(SCDecl* Self, SCDecl* P0);
@@ -9670,8 +9672,6 @@ int SC_Decl_FloatCast(SCDecl* Self, SCDecl* Orig, Message* Exp);
 SCDecl* SC_Decl_ForContained(SCDecl* Self);
 
 bool SC_Decl_Found(SCDecl* Self);
-
-SCFunction* SC_Decl_Func(SCDecl* Self);
 
 SCDecl* SC_Decl_GetAddress(SCDecl* Self, DeclMode Purpose);
 
@@ -10299,7 +10299,7 @@ Array* JB_Macro__TmpPrms();
 
 
 // JB_MessageID
-MessageID* JB_ID_Constructor(MessageID* Self, JB_String* Name, Syntax Fn, uint64 ID);
+MessageID* JB_ID_Constructor(MessageID* Self, JB_String* Name, Syntax Type, uint64 ID);
 
 void JB_ID_Destructor(MessageID* Self);
 
@@ -10508,8 +10508,6 @@ bool SC_Class_IsCurrentlyBeingUsed(SCClass* Self);
 bool SC_Class_IsDataTypeOnly(SCClass* Self);
 
 bool SC_Class_IsDataTypeOrFP(SCClass* Self);
-
-bool SC_Class_IsFunc(SCClass* Self);
 
 bool SC_Class_IsInterface(SCClass* Self);
 
@@ -11196,9 +11194,9 @@ inline bool JB_FileSizeInt_SyntaxCast(FileSizeInt Self);
 
 inline bool JB_Ind_SyntaxCast(Ind Self);
 
-inline Syntax JB_Msg_Func(Message* Self);
-
 inline JB_String* JB_Msg_Name(Message* Self);
+
+inline Syntax JB_Msg_Type(Message* Self);
 
 inline bool JB_ParsedInt_SyntaxCast(ParsedInt Self);
 
@@ -11301,18 +11299,18 @@ inline bool JB_Ind_SyntaxCast(Ind Self) {
 	return Self >= 0;
 }
 
-inline Syntax JB_Msg_Func(Message* Self) {
-	if (Self) {
-		return Self->Func;
-	}
-	return nil;
-}
-
 inline JB_String* JB_Msg_Name(Message* Self) {
 	if (Self) {
 		return Self->Name;
 	}
 	return JB_LUB[0];
+}
+
+inline Syntax JB_Msg_Type(Message* Self) {
+	if (Self) {
+		return Self->Type;
+	}
+	return nil;
 }
 
 inline bool JB_ParsedInt_SyntaxCast(ParsedInt Self) {

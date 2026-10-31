@@ -1129,7 +1129,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 		|| s = call_point.source
 			|| item = arg.msg(@tmp, "line")
 			|| pos = -1
-			|| f = s.typePos(fn, pos)
+			|| f = s.FuncPos(fn, pos)
 			item <~ (@sstr, f)
 			item <~ call_point.CallFromName
 			item <~ pos
@@ -1146,7 +1146,7 @@ function message.AutoFoundFunc (|scfunction| f, |bool|)
 		return o.IsLookupOnly == f
 
 
-helper Message.typePos (|scfunction| fn, |$int| pos,  |string|)				
+helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
 	rz = .originalfilepath
 	for ss.flat in self

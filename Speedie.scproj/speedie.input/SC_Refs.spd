@@ -164,7 +164,7 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	
 	using msg		
 		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-		msg.typeWrap( free_if_dead )
+		msg.FuncWrap( free_if_dead )
 	parser.using.position = -1
 
 
@@ -448,7 +448,7 @@ function RC_RelConstructor (|Message| rel)
 
 
 
-function Message.typeWrap (|Message| fnc)
+function Message.FuncWrap (|Message| fnc)
 	opt norefcounts
 	.Prev = fnc
 	fnc.Last! <~ self
