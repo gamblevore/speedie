@@ -33,7 +33,6 @@ JB__Flow_LastCodePoint
 GUI__App_EventCount
 GUI__App_Scale
 GUI__ScrollInfo_InDrag_
-JB__Syx_CurrFuncID_
 GUI__Ray_AdjustmentFinder
 GUI__VObject_DrawScale
 GUI__VObject_ObjID
@@ -87,7 +86,6 @@ GUI__App_Renderer
 GUI__App_Screen
 GUI__App_ScreenWindow
 GUI__App_ToolTip
-JB__Constants__SyxDict
 JB__Constants_EscapeChr
 JB__Constants_EscapeStr
 JB__Constants_JS_EscapeStr
@@ -104,6 +102,7 @@ JB_Random
 JB_StdErr
 GUI_xC2xA5
 JB__ErrorSeverity__ErrorNames
+JB__Syx_Types
 GUI__SystemCursor__Empty
 GUI__Sch_DefaultColors
 GUI__Doc_Cache_
@@ -133,4 +132,4 @@ GUI__App_Event
 GUI__Key_Record
 GUI__SystemCursor__Cursors
 JB__CharSet_Props
-JB__Constants__FuncArray
+JB__Syx_TypeList

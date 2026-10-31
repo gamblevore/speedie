@@ -981,7 +981,6 @@ JB_Flow__AppendStr
 JB_Flow__Enabled
 JB_Flow__Input
 JB_Flow__Stop
-JB_Fn_Constructor
 JB_Fn_Destructor
 JB_Fn_Render
 JB_Free
@@ -1474,11 +1473,10 @@ JB_Str__Freeable
 JB_Str__FromPico
 JB_Str__Hash
 JB_Str__Sorter
-JB_Syx_LongName
+JB_Syx_FullName
 JB_Syx_Name
 JB_Syx_NilCheck
-JB_Syx__Func
-JB_Syx__StdNew
+JB_Syx__AccessName
 JB_TC_BitCount
 JB_TC_NumericCount
 JB_TC_Render
@@ -1956,5 +1954,3 @@ sqrtf
 strcmp
 strlen
 strnlen
-JB_Msg_FuncSet
-JB_Syx__Type

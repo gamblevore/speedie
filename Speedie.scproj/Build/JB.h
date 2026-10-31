@@ -1037,7 +1037,7 @@ struct SyntaxObj_Behaviour: Object_Behaviour {
 
 JBClass ( SyntaxObj , JB_Object , 
 	Syntax ID;
-	JB_String* LongName;
+	JB_String* FullName;
 	JB_String* Name;
 	FP_fpMsgExport ExportAddr;
 	FP_fpMsgRender RenderAddr;
@@ -1464,8 +1464,6 @@ extern int SC__AC_Total;
 extern Array* SC__Intrinsics_Floats;
 extern Array* SC__Intrinsics_Vectors;
 #define JB__API_NilHappened_ JB__.API_NilHappened_
-#define JB__Constants__FuncArray JB__.Constants__FuncArray
-#define JB__Constants__SyxDict JB__.Constants__SyxDict
 #define JB__Constants_EscapeChr JB__.Constants_EscapeChr
 #define JB__Constants_EscapeStr JB__.Constants_EscapeStr
 #define JB__Constants_JS_EscapeStr JB__.Constants_JS_EscapeStr
@@ -2445,7 +2443,8 @@ extern Array* SC__NilReason_values;
 #define kSC__SCObjInfo_Stateful ((int)256)
 #define kSC__SCObjInfo_Stateless ((int)128)
 #define kSC__SCObjInfo_Visible ((int)2)
-#define JB__Syx_CurrFuncID_ JB__.Syx_CurrFuncID_
+#define JB__Syx_TypeList JB__.Syx_TypeList
+#define JB__Syx_Types JB__.Syx_Types
 #define kJB__TaskState_Animation ((uint)16)
 #define kJB__TaskState_Finished ((uint)64)
 #define kJB__TaskState_HadErrors ((uint)8)
@@ -2612,12 +2611,11 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
-	int Flow_LastCodePoint;
-	int Flow__Enabled;
 	uint Flow_FlowWhile;
-	int Syx_CurrFuncID_;
+	int Flow__Enabled;
+	int Flow_LastCodePoint;
+	FastString* Flow_FlowOut;
 	JB_File* App__stdin;
-	Dictionary* Constants__SyxDict;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* Constants_XML_EscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
@@ -2631,7 +2629,7 @@ struct JB_Globals {
 	JB_String* App_Usage;
 	JB_File* Platform_Logger_;
 	JB_ErrorReceiver* StdErr;
-	FastString* Flow_FlowOut;
+	Dictionary* Syx_Types;
 	Message* App__Conf;
 	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
@@ -2649,15 +2647,15 @@ struct JB_Globals {
 	FP_SorterComparer ID__ByFreq;
 	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
-	PicoComms* Proc__ForceParent;
 	RandomXOR* Random;
-	RandomXOR RandomShared;
+	PicoComms* Proc__ForceParent;
 	RandomXOR zalgo_R;
-	CompressionStats MzSt_All;
+	RandomXOR RandomShared;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
-	SyntaxObj* Constants__FuncArray[64];
+	SyntaxObj* Syx_TypeList[64];
 };
 extern JB_Globals JB__;
 
@@ -5260,11 +5258,11 @@ void SC_SourceLocation_SyntaxExpect(SourceLocation Self, JB_String* Error);
 // Syntax
 void SC_Syx_ExportAddrSet(Syntax Self, FP_fpMsgExport Value);
 
+JB_String* JB_Syx_FullName(Syntax Self);
+
 bool JB_Syx_IsList(Syntax Self);
 
 bool JB_Syx_IsString(Syntax Self);
-
-JB_String* JB_Syx_LongName(Syntax Self);
 
 Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 
@@ -5280,7 +5278,7 @@ int JB_Syx__Init_();
 
 Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* LongName, int ID);
 
-Syntax JB_Syx__Type(JB_String* Name, Message* Where);
+Syntax JB_Syx__AccessName(JB_String* Name, Message* Where);
 
 
 
@@ -11551,12 +11549,11 @@ struct JB_Globals {
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
 	u16 Tk__StopBars;
-	int Flow_LastCodePoint;
-	int Flow__Enabled;
 	uint Flow_FlowWhile;
-	int Syx_CurrFuncID_;
+	int Flow__Enabled;
+	int Flow_LastCodePoint;
+	JB_Object* Flow_FlowOut;
 	JB_Object* App__stdin;
-	JB_Object* Constants__SyxDict;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
@@ -11570,7 +11567,7 @@ struct JB_Globals {
 	JB_Object* App_Usage;
 	JB_Object* Platform_Logger_;
 	JB_Object* StdErr;
-	JB_Object* Flow_FlowOut;
+	JB_Object* Syx_Types;
 	JB_Object* App__Conf;
 	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
