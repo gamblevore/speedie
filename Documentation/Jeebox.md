@@ -34,7 +34,7 @@ If you look at the `Message` class's definition, you'll see this:
         ...
 
 
-The Syntax is a `byte` on a hardware level, but acts like a C enum, allowing only certain values. You can set or compare the type, to syntax constants like `@str` or `@num`.
+`Syntax` is a `byte` on a hardware level, but acts like a C enum, allowing only certain values. You can set or compare the type, to syntax constants like `@str` or `@num`.
 
 `@` is used in Speedie to represent `syntax` types. `Syntax` types look like `@str`, `@num`, `@thg`, etc. This makes Jeebox easy to write code for.
 
