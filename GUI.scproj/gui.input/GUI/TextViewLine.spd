@@ -246,7 +246,7 @@ class TextViewLine (list)
 
 			|| par = curr.parent						// special coloring
 			if par and par.contains(ToFind, true)
-				|| pt = par.func
+				|| pt = par.type
 				if (pt == @type)  
 					if (par.After > ToFind)
 						return par

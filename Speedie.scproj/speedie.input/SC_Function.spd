@@ -105,9 +105,9 @@ syntax is (|FunctionType| k, |bool|) // assumes ANY match. Asking "x is a+b", th
 
 
 syntax is (|FunctionType| k, assigns:|bool|)
-	|| f = .funcinfo &~ k
+	|| f = .FuncInfo &~ k
 	f |= k*value
-	.funcinfo = f
+	.FuncInfo = f
 
 
 
@@ -176,7 +176,7 @@ Render
 
 function Message.TestFuncName (|bool|)
 	opt norefcounts
-	|| fn = .func
+	|| fn = .type
 	expect (fn != @Func and @prm and @list)	(self, "Need space between bracket and name.")
 	expect (fn == @Thg)						(self, "Doesn't follow 'function name (|Type| Name)'")
 	return true
@@ -186,7 +186,7 @@ function ParseName (|Message| node, |bool|)
 	opt norefcounts
 	|| fType = node.name
 	|| cname = node.first	#require
-	cname.func = @thg
+	cname.type = @thg
 	.Name = cname.name
 	
 	if ftype == "libinternal"
@@ -261,14 +261,14 @@ function SubFuncParamsLoad (|message| P)
 		.AddConstructorReturn(p)
 	
 	|| fc = p.first
-		if (fc.func == @thg or @dot or @rel)
+		if (fc.type == @thg or @dot or @rel)
 			.DeclsProtoTypeClass( fc )
 	
 	|| A = .SourceArg
 	|| space = a.SCArg(self)
 
 	if P.isparams
-		p.Func = @prm
+		p.type = @prm
 		.CollectDeclsParams( P, space )
 	
 	.CollectStats
@@ -289,7 +289,7 @@ function SubFuncParamsLoad (|message| P)
 
 function @scfunction.NameList (|string|)
 	|| fs = faststring()
-	for fn in compiler.FuncList
+	for fn in compiler.funclist
 		fs <~ fn.exportname
 		fs <~ '\n'
 	return fs
@@ -302,7 +302,7 @@ function @scfunction.TransformAll
 		|| fn = compiler.AppInitCode.find(@func, @thg, "AppInitSub_")
 			fn.parent.remove
 	(Compiler is Transforming)
-	for f in compiler.FuncList
+	for f in compiler.funclist
 		require !stderr.TooMany
 		f.Transform
 
@@ -329,7 +329,7 @@ function MacroFix (|SCDecl?| contains, |SCNode| name_space, |SCParamArray| Incom
 
 function message.FailOrCopy (|message| p, |message|)
 	opt norefcounts
-	|| f = .func
+	|| f = .type
 	if f == @Thg
 		return .copy
 	|| ch = .first
@@ -349,7 +349,7 @@ function message.AssignsFix (|scfunction| f)
 	List <~ RightSide
 	// a.b(c) = c
 
-	list.func = @prm
+	list.type = @prm
 	
 	|| L = rp.last!
 	|| c = f.cls
@@ -499,17 +499,17 @@ function ErrorIsHere
 function message.DefaultPrmFix (|scdecl?| Base)
 	opt norefcounts
 	for s.flat in self
-		if (s.func == @sthg) and (s in @bra)
+		if (s.type == @sthg) and (s in @bra)
 			expect (base) (s, "Can't use this here.")
 			s = s.parent!
-			s.func = @thg
+			s.type = @thg
 			s.name = base.type.Name
 			s.clear
 			
 
 
 function message.IntSmallness (|scdecl| T, |int|)
-	if self and T and (.func == @num)
+	if self and T and (.type == @num)
 		if .name contains "."
 			if .name.iszero
 				return kTypeCastFromZero
@@ -551,7 +551,7 @@ function DescribeParamFail (|SCParamArray| params, |int| bad)
 		fs <~ "Missing param $num (${badarg.name})"
 	if !RefToFail
 		fs <~ ". Expected: "
-		badarg.rendertypename(fs)
+		badarg.RenderTypeName(fs)
 	  elseif RefToFail == 1
 		fs <~ " (Pointer params can't accept references)"			// is this error no longer possible?
 	  elseif reftofail == 2
@@ -616,7 +616,7 @@ function ArgsMatch2 (|SCDecl| base, |int| TypeCast, |SCNode| name_space, |SCPara
 		return missing
 
 	if BestMatch  &  (kNeeds|||kUseDefaultParams)
-		Incoming.Exp.Last!.Func = @prm
+		Incoming.Exp.Last!.type = @prm
 		rz.Argsmatch3( TypeCast, base, true, name_space, Incoming )
 
 
@@ -681,7 +681,7 @@ function DeclsPrototypeClass (|Message!| ch0)
 	|| fpType = p.FindClassMsg(Ty)										#require
 
 	|message| Route
-	if !fptype.funcproto
+	if !fptype.FuncProto
 		|| task = fptype.modul.FindClass("interface", nil, scnode.DontGoUp)
 			fpType = task
 			route = fptype.modul.parent.Route("interface")
@@ -787,7 +787,7 @@ function DeclsProtoCleanUpContainedness (|message| P, |message| ch0, |scclass!| 
 	for s in p
 		if s == @decl
 			|| ty = s.first!
-			if ty.func == @sthg
+			if ty.type == @sthg
 				using s
 				if ch0 == @rel
 					ty.becomecopy(ch0.last!)
@@ -803,7 +803,7 @@ function DeclsProtoCleanup (|SCClass| fpType, |Message| ch0, |bool| AssumeSelf, 
 	|| Proto = fpType.FuncProto									#expect (ch0, "This isn't a prototype!")
 	|| fParams = Proto.Source[ @prm, 1 ]						#require
 	|| p = ch0.Parent!
-	p.Func = @prm
+	p.type = @prm
 
 	using (ch0)
 		fParams.CopyAllInto( p )
@@ -898,7 +898,7 @@ function CheckReturnValue (|Message| msg, |scnode| name_space)
 function Message.SelfUsedForProperty (|int|)
 	opt norefcounts
 	|| R = .parent
-	require r and .func == @dot  and  r.func == @rel
+	require r and .type == @dot  and  r.type == @rel
 	if .first IsThing "self"
 		if .IsProperty
 			|| op = r.second
@@ -1087,7 +1087,7 @@ function Message.ExpectParamsTransform (|int| P, |message| errnode, |string| Typ
 	if (!L)
 		On = @thg + "nil"
 	  elseif L.isparams
-		L.Func = @prm
+		L.type = @prm
 		on = L.first
 	  else
 		L = nil
@@ -1159,9 +1159,9 @@ function FixCnjSub (|Message| exp)
 	//  (!a #require)			-->		if (a)	  {return}
 	//
 	// if (a() #require) {code}	-->		|| tmp = a(), if (!tmp) {return}, {code}
-	// (a() #require).Func		-->		|| tmp = a(), if (!tmp) {return}, tmp.Func
+	// (a() #require).type		-->		|| tmp = a(), if (!tmp) {return}, tmp.type
 	// if (a #require) {code}	-->		if (!a) {return}, {code}
-	// (a #require).Func		-->		if (!a) {return}, a.Func
+	// (a #require).type		-->		if (!a) {return}, a.type
 	
 	|Message|	Thg
 	|Message|	pp
@@ -1350,7 +1350,7 @@ function NewProtoTypeSub (|Message| node, |SCNode!| parent, |Message| ErrPlace, 
 	expect (f isa scfunction) (node, "Can't extend a class with a prototype. (in this version)") // not yet anyhow.
 	// we'd have to process this later... not too bad, though? its just on compiler.ExtendList!
 		
-	Compiler.FuncList.Pop
+	Compiler.funclist.Pop
 	
 	|| Using = node.SyntaxUsing
 	|| tmp = @tmp + "datatype"
@@ -1718,7 +1718,7 @@ function Tran_Problem (TranFunc)
 		stuff = stuff.wrapwith(@list)
 
 	using (node)
-		stuff.func = @prm
+		stuff.type = @prm
 		|| Dot = node.msg(@dot, "Syntax" + node.name)
 		node.become(@bra)
 		Dot <~ stuff.first
@@ -1762,7 +1762,7 @@ function Tran_Return (TranFunc)  // exitter
 
 
 function message.IsParams (|bool|)
-	|| fn = .func
+	|| fn = .type
 	return fn == @prm or @list or @bra
 
 function NewCppWrapper (CollectFunc)
@@ -1809,7 +1809,7 @@ function message.InDecl (|bool|)
 	opt norefcounts
 	while
 		self = .parent$
-		|| fn = .func
+		|| fn = .type
 		if fn == @decl
 			return true
 		if fn != @bra
@@ -1818,7 +1818,7 @@ function message.InDecl (|bool|)
 
 function message.NeedsPreprocess (|bool|)
 	opt norefcounts
-	|| fn = .func
+	|| fn = .type
 	if fn == @TRel
 		return true
 	if fn == @arel and self == "$"
@@ -1870,7 +1870,7 @@ function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
 		prm = .msg(@prm)
 	  else
 		expect (prm.isparams) (prm)
-		prm.Func = @prm
+		prm.type = @prm
 	if (addself)
 		|| d = prm.first
 		ifn (d == @decl) and (d.second isthing "self")
@@ -1921,7 +1921,7 @@ function SCFunction.UpdateSourceSub (|message| src, |[message]| list, |bool|)
 
 	|| f = src.first$
 	if f == @dot
-		f.func = @thg
+		f.type = @thg
 		f.clear
 	|| StillOK = StdErr.Mark
 	.IntPrmCount = 0
@@ -1958,7 +1958,7 @@ function SCFunction.Init_Sub (|message| node, |SCNode| name_space)
 
 	if name_space
 		if node != "iterator"
-			Compiler.FuncList <~ self
+			Compiler.funclist <~ self
 		.FLookup = name_space				// Sets as a module even if parent is a class
 		.refs = name_space.SpaceModule$.defaultrefs
 
@@ -2034,7 +2034,7 @@ function message.MainFix (|message|)
 	|| fn_src = "function app.Main (|ErrorInt|,) {cpp_name JB_Main; visible true}".ParseClean
 		|| src_arg = fn_src.Last!
 		
-		|| fn = prms.func
+		|| fn = prms.type
 		|message| inc_arg
 		if fn == @list or @bra
 			inc_arg = prms.next(@arg)

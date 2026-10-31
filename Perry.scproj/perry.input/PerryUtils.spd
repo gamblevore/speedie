@@ -89,7 +89,7 @@ function message.GoodArgName (|bool| NeedName=false, |string|)
 	
 function message.GoodArgNameSub (|string|)
 	opt norefcounts
-	|| f = .func
+	|| f = .type
 	if f.IsString or f == @thg or @num
 		return .name
 	if (f == @tmp) and !.IsFirst

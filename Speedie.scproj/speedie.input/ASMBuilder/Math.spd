@@ -459,7 +459,7 @@ extend Assembler
 
 	function asmreg.PointerMulSub (|message| exp, |bool| swapped, |scdecl|)
 		opt norefcounts
-		|| fn = exp.Func
+		|| fn = exp.type
 		if fn == @opp
 			exp = exp.step(swapped)!
 			

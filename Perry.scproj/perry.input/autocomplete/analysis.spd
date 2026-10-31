@@ -122,8 +122,8 @@ function FuncListSorter (SorterComparer of message)
 	|| bb = b[]
 	if (!aa or !bb)
 		return (aa < bb)
-	if aa.func != bb.func
-		return bb.func|int| - aa.func|int|
+	if aa.type != bb.type
+		return bb.type|int| - aa.type|int|
 	
 	if aa == @emb
 		// replace with aa.name.syntaxcompare and just replace the number
@@ -136,7 +136,7 @@ function FuncListSorter (SorterComparer of message)
 	|| an = af.name
 	|| bn = bf.name
 	|| cmp = an.SyntaxCompare(bn, true)
-	cmp ?= (Af.func|int| - bf.func|int|)
+	cmp ?= (Af.type|int| - bf.type|int|)
 	cmp ?= aa.name.SyntaxCompare(bb.name, true)
 	return cmp
 

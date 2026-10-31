@@ -158,8 +158,8 @@ class SCDecl (SCObject) {
 		opt norefcounts
 										// int+float-->float
 										// int+double-->double
-		|| S =  .type.typeinfo
-		|| T = o.type.typeinfo
+		|| S =  .type.TypeInfo
+		|| T = o.type.TypeInfo
 		if mode isnt MakesSigned
 			if (mode is losebits)
 				if (s.basictype == t.basictype)
@@ -170,27 +170,27 @@ class SCDecl (SCObject) {
 			if (s &~ datatypecode.unsigned) == (t &~ datatypecode.unsigned)
 				return self
 		|| cls = .better_numeric_sub(o, Mode, left, right)!
-		if cls.typeinfo == s
+		if cls.TypeInfo == s
 			return self					// in case of: || x = (date(), 0)(test)
-		if cls.typeinfo == t
+		if cls.TypeInfo == t
 			return o
 		return cls.typenormal
 
 
 	function IsFloat (|bool|)
-		return .type.typeinfo.isfloat
+		return .type.TypeInfo.isfloat
 
 	function IsInt (|bool|)
-		return .type.typeinfo.isint
+		return .type.TypeInfo.isint
 
 
 	function BestFloat (|scdecl| OT, |int|)
-		|| t = ot.type.typeinfo
+		|| t = ot.type.TypeInfo
 		|| bt = t.itembitcount
 		if self is const
 			return bt
 		
-		|| s = .type.typeinfo
+		|| s = .type.TypeInfo
 		|| bme = s.itembitcount
 		if ot is const
 			return bme
@@ -200,8 +200,8 @@ class SCDecl (SCObject) {
 
 	function Better_Numeric_Sub (|scdecl| ot, |opmode| Op, |message!| Left, |message!| Right, |SCClass|)
 		opt norefcounts
-		|| s = .type.typeinfo
-		|| t = ot.type.typeinfo
+		|| s = .type.TypeInfo
+		|| t = ot.type.TypeInfo
 			
 		if .isfloat or t.isfloat
 			|| bits = .bestfloat(ot)
@@ -403,7 +403,7 @@ class SCDecl (SCObject) {
 		|| d = .obj as scdecl		#require
 		if d.isnormal
 			|| t = d.type
-			return t.funcproto
+			return t.FuncProto
 
 
 	function IsObject (|bool|)
@@ -468,7 +468,7 @@ class SCDecl (SCObject) {
 
 	
 	function CanWrap (|bool|)
-		if (.pointercount or .type.funcproto)
+		if (.pointercount or .type.FuncProto)
 			return true
 
 		require !.IsBareStruct and !.IsCArray
@@ -600,7 +600,7 @@ class SCDecl (SCObject) {
 	
 	
 	function IsUintLike (|bool|)
-		|| t = .type.typeinfo
+		|| t = .type.TypeInfo
 		if .isnormal and t.isint
 			return !t.IsSigned
 		
@@ -812,7 +812,7 @@ class SCDecl (SCObject) {
 		if .HasStruct
 			return .type.destructorfunc
 
-	function Func (|SCFunction|)
+	function DeclFunc (|SCFunction|)
 		opt norefcounts
 		|| fn = .IsLookupOnly
 		if fn isa SCFunction
@@ -1019,7 +1019,7 @@ class SCDecl (SCObject) {
 	render
 		if self
 			fs <~ "|"
-			.rendertypename(fs)
+			.RenderTypeName(fs)
 			fs <~ "|"
 			fs <~ " "
 			fs <~ .name
@@ -1043,7 +1043,7 @@ class SCDecl (SCObject) {
 			if (.IsNil) 
 				fs <~ "nil"
 			  elseif .IsCArray
-				.internal!.rendertypename(fs)
+				.internal!.RenderTypeName(fs)
 				fs <~ '['
 				fs <~ .c_Array
 				fs <~ ']'
@@ -1053,7 +1053,7 @@ class SCDecl (SCObject) {
 					|scdecl--| i = .internal!
 					if i.internal
 						fs <~ '('
-					i.rendertypename(fs)
+					i.RenderTypeName(fs)
 					if i.internal
 						fs <~ ')'
 				  else
@@ -1110,15 +1110,15 @@ class SCDecl (SCObject) {
 		if .PointerCount					// what about objects?
 			return DataTypeCode._voidptr
 		if .IsCArray
-			return .internal!.typeinfo
-		return .Type.typeinfo				// perhaps this is already set correctly.
+			return .internal!.TypeInfo
+		return .Type.TypeInfo				// perhaps this is already set correctly.
 	
 	
 //	function GlobInfo (|DataTypeCode|)
 //		opt norefcounts
 //		if .pointercount
 //			return datatypecode._voidptr
-//		return .Type.typeinfo
+//		return .Type.TypeInfo
 		
 		
 	function Alignment (|bool| PutStructsAfter=false, |int|)
@@ -1146,7 +1146,7 @@ class SCDecl (SCObject) {
 			|| Ty = .type
 			if (ty.BaseType.HasASMPtrs)
 				return datatypecode._voidptr
-			return ty.asmtypeinfo
+			return ty.ASMTypeInfo
 		
 		
 	function PointerIncrement (|int|)
@@ -1163,7 +1163,7 @@ class SCDecl (SCObject) {
 	function SetSelfProp (|message| exp, |functiontype| Ty,  |bool|)
 		opt norefcounts
 		if exp and (SCFunction._Info & ty) and (self is Property)
-			if exp.func == @dot
+			if exp.type == @dot
 				|| f = exp.first
 				return f isthing "self"
 

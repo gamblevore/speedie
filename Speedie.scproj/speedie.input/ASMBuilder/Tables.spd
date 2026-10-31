@@ -76,7 +76,7 @@ function InitAccess
 
 function Debugger (fn_asm)
 	opt norefcounts
-	|| fn = exp.func
+	|| fn = exp.type
 	if (fn == @tmp) and (exp is BreakPoint)
 //		.Breakrequest |= assembler.BreakPoint		// unnecessary? argumentsub does it.
 		return nil
@@ -393,7 +393,7 @@ function StatExpr (fn_asm)
 	
 	while ch
 		|| sent = dest
-		if ch.func == @decl
+		if ch.type == @decl
 			if ch.obj != Rejoined
 				sent = nil
 			rz = decl(self, ch, sent)
@@ -419,7 +419,7 @@ function ArgumentSub (|assembler| self=assembler.sh, |message| exp, |asmreg| Mas
 		.BreakRequest |= assembler.Breakable
 		if (ch is BreakPoint)
 			.Breakrequest |= assembler.BreakPoint
-		if ch.func == @decl
+		if ch.type == @decl
 			rz = decl(self, ch, nil)
 		  else
 			rz = .µ(ch, asmreg.discard)
@@ -481,7 +481,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 
 function DotConst (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| Prop, |AsmReg|)
 	opt norefcounts // wait? don't these all get pre-transformed? SHOULD they be?
-	|| fn = prop.Func
+	|| fn = prop.declfunc
 		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 		return DoGlobal(self, dest, exp, prop)
 	return ConstFromThgName(self, exp, dest, prop)
@@ -511,7 +511,7 @@ function Dot (fn_asm)										// a.b
 	|| Index = prop.ExportPosition
 	if (Index >= 1MB) or (prop.TypeSuffers and dest.ByteCount != 8) // what?
 		debugger
-		prop.typeinfo
+		prop.TypeInfo
 	
 	if dest isnt set
 		if (!dest.reg) and (obj is temp)
@@ -592,7 +592,7 @@ function ThgSub (|assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 	if dest is Discard
 		return asmreg()	
 
-	|| fn = d.Func
+	|| fn = d.declfunc
 		.ASMreach(fn)	// This is actually a function, stored in a global. So the func is also reached.
 	return DoGlobal(self, dest, exp, d)
 		
@@ -801,7 +801,7 @@ function Ignore			(fn_asm)
 
 function Unexpected		(fn_asm)
 	if !exp.ASMType
-		|| f = exp.func|int|
+		|| f = exp.type|int|
 			exp.asmtype = f
 			return .µGetASM(exp, dest)
 	error (exp, "bad ASMType")
@@ -823,10 +823,10 @@ function DotAddr (|message| exp, |AsmReg| Dest, |int| Pos, |scdecl| prop, |asmre
 function message.ASMUnbra (|message|)
 	opt	norefcounts
 	real self
-	|| fn = .func 
+	|| fn = .type 
 	while (fn == @bra) or ((fn == @type) and .TypeCastDoesnothing)
 		self = .first!
-		fn = .func
+		fn = .type
 	return self
 
 
@@ -835,7 +835,7 @@ function ExistingVar (|message| m, |asmreg|)
 	opt	norefcounts
 
 	m = m.ASMUnbra
-	|| fn = m.Func
+	|| fn = m.type
 	
 	require fn == @thg or @num
 	
@@ -931,7 +931,7 @@ function message.HasAsmStuff (|bool|)
 	nil checker
 	for ch in self
 		|| chh = ch.ASMUnbra
-		|| fn = chh.func
+		|| fn = chh.type
 		if fn != @sheb and @num and @char
 			return true
 
@@ -993,5 +993,5 @@ function message.DeclFunc (|scfunction|)
 	opt norefcounts
 	|| D = .obj
 	if D isa SCDecl
-		return d.Func
+		return d.declFunc
 

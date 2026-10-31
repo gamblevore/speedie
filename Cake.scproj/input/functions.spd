@@ -6,14 +6,14 @@ role SpdFunc (message)
 		.tag = -1
 		.RangeLength = 0
 		.name = "(unused code)"
-		.func = @tmp
+		.Type = @tmp
 		.Position = -1			// Position in the compiled code.
 
 	
 	function message.CodeToVM
 		opt norefcounts
 		|| Code = .name
-		if .func == @tmp
+		if .Type == @tmp
 			|| first = self[@nil]$
 			Code = first.name
 
@@ -32,8 +32,8 @@ role SpdFunc (message)
 
 			|| dest = cake.BeginCode + .Position
 			memory.Copy(dest, CodeAddr, n << 2)
-			if .func != @tmp
-				.func = @tmp
+			if .Type != @tmp
+				.Type = @tmp
 				.name = "(unnamed)"
 		  elseif n
 			error										(Code, "ASM oversized")

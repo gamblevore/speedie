@@ -19,7 +19,7 @@ function Rename (|message| name)
 	opt norefcounts
 	expect !(name.HasAny) (name, "Missing variable name on iterator")
 	for n in .nodes
-		n.func = name.func
+		n.type = name.type
 		n.name = name.name
 		n.position = name.position	
 

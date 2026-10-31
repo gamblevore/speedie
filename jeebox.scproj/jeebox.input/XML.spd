@@ -225,9 +225,9 @@ libinternal message.XMLToJeeboxSub
 	if self == @xpi
 		.remove
 	  elseif self == @xml
-		.func = @tmp
+		.type = @tmp
 		|| prms = .first
-			prms.func = @list // shoulda been this already.
+			prms.type = @list // shoulda been this already.
 			prms.remove
 		|message| arg
 		while 
@@ -246,11 +246,11 @@ libinternal message.XMLToJeeboxSub
 			  else
 				self <~ arg
 	  elseif self == @xtxt or @xcdt
-		.func = @str
+		.type = @str
 	  elseif self == @xatt
-		.func = @item
+		.type = @item
 		|| f = .first
-			f.func = @str
+			f.type = @str
 			|| s = .name
 			|| fn = @emb
 			ifn s[].IsLetter and (CharSet.NameMid contains s)

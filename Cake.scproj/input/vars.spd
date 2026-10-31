@@ -193,7 +193,7 @@ class XVar (list)
 		|| name = .name
 		require fs.testobj(name)
 
-		fs <~ .func.name
+		fs <~ .Type.name
 		fs <~ " @ "
 		if name isa string
 			return true
@@ -206,17 +206,17 @@ class XVar (list)
 
 	function ParseObj (|object| Old, |string| Value, |object?|)
 		|| msg = Value.parse
-			|| fn = msg.func
+			|| fn = msg.Type
 			if fn.IsString and !msg.HasAny
 				rz = msg.name
 			  elseif fn == @name
-				|| NewType = Syntax.Func(msg.name, msg)
+				|| NewType = Syntax.Type(msg.name, msg)
 					|message--| ch = msg.first
 					if !ch.IsString or ch.HasAny
 						ch = nil
 					|string--| NewName = ch.Name
 					if old isa Message
-						old.func = NewType
+						old.Type = NewType
 						old.name = NewName
 						rz = old
 					  else
@@ -279,7 +279,7 @@ class XVar (list)
 
 		if v > 1
 			|| items = value.parse
-				|| fn = items.func
+				|| fn = items.Type
 				expect (fn == @arg or @list or @arr)	(msg)
 				|| i = 0
 				|| ch = items.first

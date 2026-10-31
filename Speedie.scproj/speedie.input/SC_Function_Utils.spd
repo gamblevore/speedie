@@ -165,7 +165,7 @@ function SettingMemory (|Message| Rel, |bool|)
 	require Rel.IsSetRel
 
 	|| f = Rel.first$
-	if f.func == @acc
+	if f.type == @acc
 		return true
 	|| d = f.obj
 	if d isa scdecl

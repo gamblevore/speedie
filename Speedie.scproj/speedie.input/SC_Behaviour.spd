@@ -113,7 +113,7 @@ class SCBehaviour (SCNode)
 			prms.BecomeMacro(CakeVirtualReturn, prms, tmp) // just use .run?
 			tmp.clear
 		  else
-			prms.func = @sheb
+			prms.type = @sheb
 		writeto.first = "|| _r = _v.callback(_fn|&uint|)" ~ Parse
 		writeto.first = "|| _v = cakevm.vm" ~ parse
 		writeto.allflags = messageflags.inserted
@@ -141,7 +141,7 @@ class SCBehaviour (SCNode)
 			if CakeAlso
 				CopyFrom.StartCakeVirtual(prms, writeto)
 			  else
-				WriteTo.func = @prm
+				WriteTo.type = @prm
 				prms.Remove
 			
 			WriteTo.VirtualAdd("self", cakealso, nil, 0)
@@ -201,7 +201,7 @@ class SCBehaviour (SCNode)
 	
 	function SCClass.ProcessInterfaces
 		require .IsInterface
-		|| fn = .funcproto					#require
+		|| fn = .FuncProto					#require
 		|| L = fn.parent
 		if (L isa scmodule)
 			|| cls = L.cls

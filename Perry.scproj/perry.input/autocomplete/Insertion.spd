@@ -213,7 +213,7 @@ function message.FindPrms (|int| p, |message|)
 	opt norefcounts
 	for ch.flat in self
 		require ch.position < p
-		|| fn = ch.func
+		|| fn = ch.type
 		if (fn == @bra or @list) and (ch.after > p)
 			return ch
 
@@ -387,7 +387,7 @@ function message.IsInAProperTmp (|bool|)
 		self = .parent
 		if !self
 			return false
-		|| fn = .func
+		|| fn = .type
 		if fn == @arg
 			return false
 		if fn == @tmp

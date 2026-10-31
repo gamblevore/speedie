@@ -221,7 +221,7 @@ struct ArchonPurger
 				rec.LowerErrorsTo = ErrorSeverity.Warning
 
 			using rec
-				for xoxo in compiler.funclist
+				for xoxo in compiler.Funclist
 					target debug
 						if (xoxo.islibrary) and (!IntMaxObj or xoxo.intprmcount > IntMaxObj!.intprmcount)
 							IntMaxObj = xoxo

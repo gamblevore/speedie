@@ -1956,3 +1956,5 @@ sqrtf
 strcmp
 strlen
 strnlen
+JB_Msg_FuncSet
+JB_Syx__Type

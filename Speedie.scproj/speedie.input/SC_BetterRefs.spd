@@ -2,7 +2,7 @@
 
 /*
 	* refcounter passing properties as function param, SHOULD NOT assume it won't be cleared... not without disturbance checker
-	* can fold the refcount optimiser into the nilchecker... mostly in .function and .variableset
+	* can fold the refcount optimiser into the nilchecker... mostly in .Function and .variableset
 	* can just store each class disturbance as one bit? just use 128 bits per... function?
 		* if list is disturbed, everything is disturbed... because list could be a message, and message could have an obj... which could be anything.
 	* look into how things like "Disowner checking" would work within the nil-checker.
@@ -68,7 +68,7 @@ class CppRefs
 			c.expect(@tmp)
 			expect (c=="disturbs" or c=="disowns") (c, "Should be 'disturbs' or 'disowns'")
 			|| ch = c.first
-			if (ch == @bra): ch.func = @prm
+			if (ch == @bra): ch.type = @prm
 			expect (ch == @thg or @prm or @num) (ch)
 			ch.expectlast
 

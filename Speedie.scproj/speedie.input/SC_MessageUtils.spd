@@ -39,13 +39,13 @@ function Message.MsgOwningFunc (|SCFunction|)
 			|| pf = o.ParentFunc
 				Return pf
 		  elseif (O isa SCFunction) and (ch != @prm)
-			// could be a func associated with the lst on "obj.func".
+			// could be a func associated with the lst on "obj.type".
 			Return o
 
 
 function message.CommentOut // ignorenode ()  makeignored ()
 	.ASMType = ASMType.kIgnore
-	.func = @Sheb
+	.type = @Sheb
 	.clear
 
 
@@ -66,13 +66,13 @@ function Message.Negate (|Message!|)
 	opt norefcounts
 	real self
 	|| upon = self
-	|| f = .func
+	|| f = .type
 	if f == @thg
 		return .negatethg
 	
 	if f == @bra
 		upon = .unbra
-		if upon.func == @thg
+		if upon.type == @thg
 			upon.negatethg
 			.obj = upon.obj
 			return self
@@ -81,7 +81,7 @@ function Message.Negate (|Message!|)
 		upon.become(@bra)
 		return self
 	
-	if upon.func == @rel
+	if upon.type == @rel
 		|| opmsg = upon.second!
 		|| op = scoperator.dict[opmsg.name]
 			|| nega = op.opposite
@@ -99,7 +99,7 @@ function Message.Negate (|Message!|)
 function Message.IsAssignable (|bool|)
 	opt norefcounts
 	self = .unbra
-	|| f = .func
+	|| f = .type
 	if f == @acc // hmmmmm
 		|| L = .first!.unbra
 		|| fn = l.MsgFunc
@@ -118,7 +118,7 @@ function Message.UpToArg (|Message|)
 	opt norefcounts
 	while
 		|| p = .parent!
-		if p.func == @arg
+		if p.type == @arg
 			return self
 		self = p 
 
@@ -147,7 +147,7 @@ function Message.MsgArg (|SCArg|)
 function Message.MsgFunc (|SCFunction|)
 	opt norefcounts
 	if self
-		|| s = .func
+		|| s = .type
 		if s == @Dot or @Func
 			|| sc = .second
 				|| fnc = sc.obj
@@ -181,10 +181,10 @@ function Message.DeclName (|Message|)
 function Message.VarName (|string|)
 	opt norefcounts
 	|| ch = self[@nil, 1]
-		|| f = ch.func
+		|| f = ch.type
 		if f == @rel
 			ch = ch.first!
-			f = ch.func
+			f = ch.type
 		if f == @thg
 			return ch.name
 		error (ch)
@@ -273,7 +273,7 @@ function Message.ReplaceWithChild (||)
 
 
 function message.SpdFunc (assigns:|syntax|)
-	.func = value
+	.type = value
 	.asmtype = 0
 
 
@@ -599,9 +599,9 @@ function Message.PrmFuncStructMsg (|message|)
 function Message.find (|syntax| P, |syntax| Ch, |string| name, |message|)
 	opt norefcounts
 	for s.fast in self
-		if s.func == P
+		if s.type == P
 			|| f = s.first
-				if f.func == ch and f.name ~= name
+				if f.type == ch and f.name ~= name
 					return f
 
 

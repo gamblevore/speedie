@@ -13,7 +13,7 @@ extend_module Message
 		ifn orig and reparse
 			return CompareError(orig, reparse)
 
-		if (orig.func != reparse.func) or (orig.name != reparse.name)
+		if (orig.type != reparse.type) or (orig.name != reparse.name)
 			return CompareError(orig, reparse)
 
 		|| r1 = reparse.First
@@ -32,7 +32,7 @@ function Message.Locate (|string|)
 		return "(nil)"
 	
 	|| s = .Render
-	|| fname = .func.name
+	|| fname = .type.name
 	|| fs = faststring.new
 
 	.name.render(fs)

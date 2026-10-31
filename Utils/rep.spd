@@ -20,7 +20,7 @@ function file.SyntacticReplace (|bool|)
 	|| fs = faststring()
 	rep.ReplaceAll(ch, fs, str)
 	printline fs
-	return true //	return .Data(fs) not sure this is safe yet
+	return true //	return .writeall(fs) not sure this is safe yet
 		
 
 
@@ -28,12 +28,15 @@ function file.SyntacticReplace (|bool|)
 module rep
 	|string?|	From  = app.args[2]
 	|string?|	To    = app.args[3]
-	|syntax?|	Func  = syntax.Func(app.args[1])
+	|syntax?|	Type  = rep.GetType
 	|int|		Where = 0
 	|bool|		Aware = app["caseaware"].yes
 	
+	function GetType (|syntax|)
+		return syntax.Type(app.args[1]??"")
+	
 	function Match (|message| msg, |bool|)
-		return (msg == .func)  and  msg.syntaxequals(.from, .aware)
+		return (msg == .type)  and  msg.syntaxequals(.from, .aware)
 		
 
 	function DoReplace (|message| msg, |faststring| out, |string| str)

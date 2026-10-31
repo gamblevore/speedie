@@ -45,7 +45,7 @@ Message is also
 //		parser.CountStats++ // better to put in the memory manager itself... right?
 		.Position	= other.Position
 		.Name		= other.Name
-		.func		= other.func
+		.type		= other.type
 		.Obj		= other.obj
 		.indent		= other.indent
 		.flags		= other.flags ||| parser.using.flags // copies global insertedness flags over
@@ -58,7 +58,7 @@ Message is also
 	constructor
 		cpp_part ConstructorEmpty
 		
-		.func = @arg
+		.type = @arg
 		.Position	= parser.Using.position
 		.flags		= parser.using.Flags
 		.RangeLength= parser.Using.Length
@@ -67,7 +67,7 @@ Message is also
 		._trap
 
 			
-	constructor (|Message| Parent=nil, |Syntax| Func,  |string?| name=nil)
+	constructor (|Message| Parent=nil, |Syntax| Type,  |string?| name=nil)
 		description "Default message constructor function. Intended for general-use"
 		opt norefcounts
 		super.constructor(Parent)
@@ -75,7 +75,7 @@ Message is also
 			name = ""
 		.name		= name
 		.Position	= parser.using.Position
-		.func		= func
+		.type		= Type
 		.RangeLength= parser.using.Length
 		.flags		= parser.using.Flags
 		.tag		= parser.Using.Tag
@@ -83,14 +83,14 @@ Message is also
 		._trap
 
 
-	constructor (|Message| Parent, |Syntax| Func, |int| BytePos, |string| name, |int| RangeLength)
+	constructor (|Message| Parent, |Syntax| Type, |int| BytePos, |string| name, |int| RangeLength)
 		cpp_part ConstructorParser
 		description "Intended for use by the parser only, not other code." 
 
 		super.constructor(Parent)
 		.name		= name
 		.Position	= BytePos
-		.func		= func
+		.type		= Type
 		.RangeLength= RangeLength
 		.flags		= 0 // not set, because parsing shouldn't have default flags! These are parse-variables!
 		.tag		= parser.Using.Tag
@@ -104,19 +104,10 @@ Message is also
 			0 // if "".trap
 
 ///////////////////////////////////////////////////////////////////////////////
-			
-//	function Func (|syntax|)
-//		cpp_part FuncGet
-//		return .type
-
-	inline Func (|Syntax|)
+	inline Type (|Syntax|)
 		nil safe
 		if self
 			return .type
-		
-	function Func (assigns:|syntax|)
-		cpp_part FuncSet
-		.type = value
 
 
 
@@ -211,7 +202,7 @@ Message is also
 			if HasArg // hanging args
 				fs.IndentLine
 			|| spaces = 1
-			|| fn = ch.func
+			|| fn = ch.type
 			if fn == @arg
 				spaces = (ch isnt Style2)|int|
 			  elseif fn == @tmp
@@ -670,7 +661,7 @@ Message is also
 			if m == @item
 				|| Tmp = m[@nil] // a string
 					m.prev = Tmp
-					Tmp.Func = @tmp
+					Tmp.type = @tmp
 					|| value = m.first
 					Tmp <~ value
 					m.remove
@@ -687,10 +678,10 @@ Message is also
 	render RenderAST (|bool| RenderRoot=false)		//  function ast,  message.ast
 		opt norefcounts
 		if !RenderRoot
-			RenderRoot = !((.func == @arg) and (.parent == nil) and !.name)
+			RenderRoot = !((.type == @arg) and (.parent == nil) and !.name)
 		if RenderRoot
 			fs <~ "«"
-			fs <~ .Func.name
+			fs <~ .type.name
 			fs <~ ' '
 			fs.indent ++
 
@@ -717,7 +708,7 @@ Message is also
 			rz = Message(into, @arg, .name)
 		  else
 			require .Expect(@msg)
-			|| fn = Syntax.Func(.name, self)
+			|| fn = Syntax.Type(.name, self)
 			rz = Message(into, fn, curr.name)
 			curr++
 		while curr
@@ -764,7 +755,7 @@ Message is also
 
 	function FuncName (|string|)
 		opt norefcounts
-		return .Func.LongName.lowercase
+		return .type.LongName.lowercase
 	
 	
 	inline Length (|int|)
@@ -775,7 +766,7 @@ Message is also
 		if !self
 			return !B
 		if B
-			return (.func == b.func) and .name.syntaxequals(b.name, aware)
+			return (.type == b.type) and .name.syntaxequals(b.name, aware)
 
 	
 	function DeepEquals (|message?| B, |bool| Aware=false, |bool|)
@@ -861,7 +852,7 @@ Message is also
 			fs.MsgErrorName(name)
 			fs <~ s.longName
 			fs <~ " but found "
-			fs <~ found.Func.longName
+			fs <~ found.type.longName
 		  else
 			if s
 				fs <~ "Missing "
@@ -893,7 +884,7 @@ Message is also
 	function Expect (|syntax| type, |string?| name=nil, |bool|)
 		nil checker
 		require self
-		if (!type or (.Func == type))
+		if (!type or (.type == type))
 			if (name == nil) or (.name ~= name)
 				return true
 		
@@ -903,7 +894,7 @@ Message is also
 			fs <~ Type.longname
 		fs.MsgErrorName(name)
 		fs <~ ", but found "//@"
-		fs <~ .Func.longname
+		fs <~ .type.longname
 		fs.MsgErrorName(.name)
 		error (self, fs)
 	
@@ -955,7 +946,7 @@ Message is also
 		cpp_Part NeedSyx
 		Opt NoRefCounts
 		|| found = .first
-			if s == nil or found.func == s
+			if s == nil or found.type == s
 				return found
 		if self
 			return .ReportFailiure(s, "", found)
@@ -965,7 +956,7 @@ Message is also
 		cpp_Part NeedSyxInt
 		Opt NoRefCounts
 		|| Ch = self[n]
-			if !s or ch.func==s
+			if !s or ch.type==s
 				return ch
 		return .ReportFailiure(s, Nil, ch)
 	
@@ -1009,22 +1000,22 @@ Message is also
 		return l.msg(@tmp, key)
 
 	
-	inline Become (|syntax| fn, |string| name="")
+	inline Become (|syntax| Type, |string| name="")
 		cpp_part BecomeStr
-		.func = fn
+		.type = Type
 		.name = name
 
 
 	function Become (|message| src)
 		cpp_part BecomeMsg
-		.func = src.func
+		.type = src.type
 		.name = src.name
 		.clear
 		.PrependAll(src)
 	
 
 	function BecomeCopy (|message| src)
-		.func = src.func
+		.type = src.type
 		.name = src.name
 		.clear
 		src.CopyAllInto(self)
@@ -1050,7 +1041,7 @@ Message is also
 		nil checker
 		if (self)
 			|| ch = .next
-				if (!need or ch.func==Need)  and  (name == nil or ch.name ~= name)
+				if (!need or ch.type==Need)  and  (name == nil or ch.name ~= name)
 					return ch
 			return .ReportFailiure(Need, nil, ch)
 
@@ -1061,14 +1052,14 @@ Message is also
 
 	syntax Equals (|Syntax| X, |bool|)
 		cpp_part EqualsSyx
-		return self and (.Func == X)
+		return self and (.type == X)
 
 //	syntax equals (|byte| B, |bool|Aware, |bool|)
 	//	sadly... this would mess up anything that tests msg == 1. bytes aren't really numbers...
 
 	function Export (|FastString| fs)
 		opt norefcounts
-		|| fn = (.func.obj!.exportaddr)
+		|| fn = (.type.obj!.exportaddr)
 		(fn)( self, fs )
 
 	function MiniName (|string|prefix="", |string|)
@@ -1171,7 +1162,7 @@ Message is also
 	function Int (|int| StrStart = 0, |int64|)
 		opt norefcounts
 		if self
-			|| fn = .func
+			|| fn = .type
 			if fn == @hint
 				return .name.ParseHInt(StrStart, self)
 			|| f = .First
@@ -1241,10 +1232,10 @@ Message is also
 	operator In (|syntax| f, |bool|)
 		opt norefcounts
 		|| p = .parent
-			return p.func == f
+			return p.type == f
 
 	function IsContainer (|bool|)
-		|| f = .func
+		|| f = .type
 		if (f >= @bra and f <= @arr) or (f == @arg) or (f == @msg)
 			return true
 
@@ -1271,5 +1262,5 @@ Message is also
 function FastString.SyntaxAppend (|Message| msg)
 	Opt NoRefCounts
 	if (msg)
-		(msg.Func.obj!.RenderAddr)( msg, self )
+		(msg.type.obj!.RenderAddr)( msg, self )
 

@@ -98,10 +98,10 @@ function scdecl.TypeMatch (|SCDecl?| O, |int| TypeCast, |Message?| exp = nil, |i
 		if (ooop)
 			return ooop
 
-	if (TypeCast & kTypeCastTrue) and (.IsvoidPtr) and (o.pointercount or o.type.funcproto)
+	if (TypeCast & kTypeCastTrue) and (.IsvoidPtr) and (o.pointercount or o.type.FuncProto)
 		if (!exp)
 			return kNeedsTypeCast ||| kVoidPtrMatch
-		if (o.type.funcproto)
+		if (o.type.FuncProto)
 			return exp.CastFPToVoidPtr // actually do it.
 		return kCastedMatch
 
@@ -238,8 +238,8 @@ function scdecl.TryTypeCast (|SCDecl| O, |Message| OExp, |int| TypeCast,  |int|)
 			if ff == 0
 				return kNumericMatch
 			if (ff == 2)
-				|| L = .typeinfo
-				|| R = o.typeinfo
+				|| L = .TypeInfo
+				|| R = o.TypeInfo
 				if (L.ByteCount == R.ByteCount)
 					return kNumericMatch
 				if (typecast&kTypeCastSetToMemory)

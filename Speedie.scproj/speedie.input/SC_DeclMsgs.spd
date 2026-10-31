@@ -17,7 +17,7 @@ function MakeDecl (|string| Type, |string| Name, |Message| Value, |SCDeclInfo| P
 
 	f = f.msg(@emb)
 	if Type
-		f.func = @name
+		f.type = @name
 		f.name = type
 	
 	if !Value
@@ -227,7 +227,7 @@ function scdecl.AddToGlobs (|bool|)
 // add more in perry mode?
 	
 	if  self is Library and self isnt ClassObj
-		|| fn = .func
+		|| fn = .declfunc
 			if fn|scnode| is LibInternal
 				return true								// no error. just ignore.
 		if !fn or (fn|scnode| isnt embeddedonly)
@@ -341,7 +341,7 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	if mode isnt Properties								// the old .obj is needed
 		nameitm.obj = dcl
 	
-	if (Mode & declmode.functionbody) and NoOriginalDcl						// functionbody
+	if (Mode & declmode.FunctionBody) and NoOriginalDcl						// functionbody
 		if sdcl isnt StayBorrowed
 			(Dcl Isnt Borrowed)
 		dcl.nildeclared = NilState.real >> dcl.TypeSuffers

@@ -75,7 +75,7 @@ function FindModuleMsg (|Message| where, |SCNodeFindMode| Mode=0, |SCModule?|)
 	opt norefcounts
 	real self
 	
-	|| fn = where.func
+	|| fn = where.type
 	if fn == @dot
 		|| f = where.first!
 		f.next.expect(@emb)
@@ -383,7 +383,7 @@ function FindCppWrapper (|message| place, |bool|isclass, |message|)
 
 function Message.FindAndRemove2 (|message| place,  |bool| NothingOK,  |bool| IsClass,  |Message|)
 	opt norefcounts
-	place.func = @sheb
+	place.type = @sheb
 	place.ASMType = ASMType.kIgnore
 	
 	|| ch = place.first
@@ -436,7 +436,7 @@ function SCBetterNode.LoadExportName
 
 
 	if self isa SCFunction
-		|| fn = cw.func
+		|| fn = cw.type
 		.IsCppInBuilt ?= (fn == @list or @bra)|int|
 		(self is cpp) = cw
 		|| CppWrapper = cw.WrapperCpp
@@ -543,7 +543,7 @@ function LookUpSub (|String| OrigName, |Message?| Exp, |SCNode| Arg_Space, |SCDe
 
 		
 		paramsarray.AllowSelfToConstructor = (LookupMode&1)|bool|
-		if (paramshere and paramshere.func == @prm) and (o isa scmodule)
+		if (paramshere and paramshere.type == @prm) and (o isa scmodule)
 			o = o.GetTheNewer|scmodule|
 			paramsarray.AllowSelfToConstructor = false
 		
@@ -851,7 +851,7 @@ function SCBetterNode.SetExportName (|String| name, |bool| Explicit)
 function message.IsFuncDot (|bool|)
 	opt norefcounts
 	|| l = .last
-	return l and (l.func == @prm)
+	return l and (l.type == @prm)
 
 
 function message.InsideFunc (|SCFunction|) //owningfunc, infunc

@@ -107,7 +107,7 @@ class Validator
 		return .msg_.SyntaxEquals(s, aware)
 			
 	syntax Equals (|syntax| fn, |bool|)
-		return .msg_.func == fn
+		return .msg_.type == fn
 			
 	syntax Expect (|string?| Description=nil)
 		inlined

@@ -7,7 +7,7 @@ function message.ASMDecl (|SCDecl!|)
 	rz = .fastdecl
 	if !rz.ExportPosition and (rz is Global)
 		|| inner = self
-		while inner.func == @arel
+		while inner.type == @arel
 			inner = inner.first!
 		|| inner_decl = inner.FastDecl
 		|| x = inner_decl.ExportPosition
@@ -192,7 +192,7 @@ function scdecl.CalculateDataTypeSub (|datatypecode|)
 	if b > scnodetype.DataType
 		return datatypecode._voidptr
 	
-	return t.typeinfo
+	return t.TypeInfo
 
 
 function scdecl.CalculateASMType (|asmreg|)

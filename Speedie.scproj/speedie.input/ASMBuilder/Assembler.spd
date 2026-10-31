@@ -90,7 +90,7 @@ struct Assembler
 		return .FuncStart_ + 1
 		
 	function FnLength (|int|)
-		return .curr_ - .funcstart
+		return .curr_ - .FuncStart
 
 	function TotalIndex (|int|)
 		return .curr_ - .TotalStart
@@ -336,7 +336,7 @@ struct Assembler
 		opt norefcounts
 		
 		while self
-			if (.func == @prm)
+			if (.type == @prm)
 				|| fn = .obj as SCFunction
 				if !fn									// a function pointer
 					return nil
@@ -668,7 +668,7 @@ struct Assembler
 		opt norefcounts
 		|| fn = .Root_Fn
 		|| After = .curr_
-		|| Start = .funcstart
+		|| Start = .FuncStart
 		fn.µfatlength = After - Start
 		
 		|| Count = 0

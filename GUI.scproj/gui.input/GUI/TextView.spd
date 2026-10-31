@@ -254,14 +254,14 @@ class TextView (GUIControl)
 		
 	
 	libinternal message._CanExpandClick (|bool|)
-		|| fn = .func
+		|| fn = .type
 		if (.IsContainer or .IsString)
 			return !((fn == @arg) and (self is style2))
 		return fn == @decl or @type
 	
 	
 	libinternal message.ContainerLength (|int|)
-		|| fn = .Func
+		|| fn = .type
 		if fn == @sstr
 			return 3
 		if self == @arg and self is Style2

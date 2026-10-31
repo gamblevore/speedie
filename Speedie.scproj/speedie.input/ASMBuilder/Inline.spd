@@ -124,7 +124,7 @@ struct InlineInfo
 	function PreInlineOneParam (|message| msg, |scdecl| param, |assembler| sh, |int| i, |asmreg|)
 		opt norefcounts
 		msg = msg.ASMUnbra
-		require (msg.func == @thg)
+		require (msg.type == @thg)
 		|| passed = msg.ASMDecl
 		require passed is local
 		|| v = sh.LocalThg(passed)

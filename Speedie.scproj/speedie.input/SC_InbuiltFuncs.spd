@@ -10,7 +10,7 @@ function scclass.Falsify (|message| ques, |message|)
 	|| f = .false #debug_require
 	if f.hasany
 		return f.copy
-	ques.func = f.func
+	ques.type = f.type
 	if f isthing "nil"
 		ques.obj = TypeNil
 	  else
@@ -23,7 +23,7 @@ function Message.FalsifyNil (|message|)
 	|| ret = scfunction.currfunc!.returntype
 	if ret and ret.IsNormal
 		return ret.type.Falsify(self)
-	.func = @thg
+	.type = @thg
 	.obj = typenil
 
 	
@@ -102,7 +102,7 @@ function TypeOfQues (ExprResolver)
 		prm++
 	|| type
 	if prm
-		// replacing with TypeOfExpr, requires being able to return a "Typeinfo" object
+		// replacing with TypeOfExpr, requires being able to return a "FuncInfo" object
 		// which isn't even a class. like:   x = –sizeof MyStruct
 		// what is the 'MyStruct' here? Or should we do that explicitly in the sizeof operator?
 		// rather than collect it before, like I'm doing now.

@@ -74,7 +74,7 @@ function @scclass.NewDylib (CollectFunc)
 
 
 function message.DylibFix (|scfunction| F, |scdecl| D, |scfunction|)
-	// curl.func(1,2,3) --> (curl.func)(1,2,3)
+	// curl.type(1,2,3) --> (curl.type)(1,2,3)
 	opt norefcounts
 	expect (self) // should never fail
 
@@ -102,7 +102,7 @@ function scfunction.ProtectGlobals
 	
 	|| arg = .SourceArg
 	for rel.flat in arg
-		if (rel.func == @rel) and (rel in @arg) and rel.IsSetRel
+		if (rel.type == @rel) and (rel in @arg) and rel.IsSetRel
 			.ProtectOneGlobal(rel, tocopy)
 
 
@@ -111,7 +111,7 @@ function scfunction.ProtectOneGlobal (|message| Rel, |message| test)
 	opt norefcounts
 	|| f = rel.first!
 	|| d = f.AsDecl
-	|| fn = f.func
+	|| fn = f.type
 	
 	//
 	require d and (fn == @thg or @dot) and (d is global or property)

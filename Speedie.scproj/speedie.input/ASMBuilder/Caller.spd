@@ -5,7 +5,7 @@ extend Assembler {
 
 
 function IsASMConst (|message| exp, |bool|)
-	|| fn = exp.func
+	|| fn = exp.type
 	if fn == @num
 		return true
 	if fn == @thg
@@ -275,7 +275,7 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 	|| func = exp.FNC(dest, TableID, P, PExt)
 	|| NArgs = fn.args.Length
 	func.TotalFuncInputs = nargs
-	nargs.funcfill(regs, &func.Inputs[0])
+	nargs.FuncFill(regs, &func.Inputs[0])
 	
 	if Cpp
 		func._op = asm.FNCX

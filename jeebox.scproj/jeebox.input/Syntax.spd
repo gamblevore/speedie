@@ -37,7 +37,7 @@ datatype Syntax (Byte)
 		return self >= @bra and self <= @Arr
 
 	inline Message.Translateable (|bool|)
-		return .Func.Translateable
+		return .type.Translateable
 			
 	operator plus (|string| m, |message|)
 		inlined
@@ -84,7 +84,7 @@ datatype Syntax (Byte)
 	module 
 		|int|		CurrFuncID_
 		
-		function Func (|string?| name, |message| where=nil, |syntax|)
+		function Type (|string| name, |message| where=nil, |syntax|)
 			visible
 			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax: " + name)
 			return obj.id

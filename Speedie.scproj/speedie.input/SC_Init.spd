@@ -77,7 +77,7 @@ module SC_Init
 
 function Message.AllowedMoveToInit (|bool|)
 	opt norefcounts
-	|| type = .func
+	|| type = .type
 	if (type == @dot or @sdot or @func or @rel or @decl)
 		return true
 
@@ -200,7 +200,7 @@ function message.HasActualCode (|bool|)
 
 function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 	opt norefcounts
-	require (declmsg.func == @Decl)
+	require (declmsg.type == @Decl)
 	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
 	
 	|| decl = .LookUpVarRootDecl( name.name, name )
@@ -234,7 +234,7 @@ function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
 
 function message.IsNilOrZero (|bool|)
 	opt norefcounts
-	|| f = .func
+	|| f = .type
 	|| n = .name
 	if f == @thg
 		if .obj == typenil or FalseBool

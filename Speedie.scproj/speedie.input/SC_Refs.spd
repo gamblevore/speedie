@@ -118,7 +118,7 @@ function RC_Rel (|Message| rel)
 	require RelNeedsRef( first )
 	
 	|| last = rel.last!
-	if first.func == @thg and first.obj == last.obj // oof
+	if first.type == @thg and first.obj == last.obj // oof
 		return // do nothing!
 	
 	using rel
@@ -150,7 +150,7 @@ function RC_CheckNoObjPms (|message| msg)
 function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	opt norefcounts
 	require RefBasis( msg, false ) == kBasisObj
-	require msg.func == @func
+	require msg.type == @func
 	
 	|| Prm = msg.last!
 	|| fn = Prm.obj|scfunction|
@@ -164,7 +164,7 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 	
 	using msg		
 		|| free_if_dead = RefMsg0( "JB_FreeIfDead", Compiler.RefFreeIfDead! )
-		msg.FuncWrap( free_if_dead )
+		msg.typeWrap( free_if_dead )
 	parser.using.position = -1
 
 
@@ -331,7 +331,7 @@ function RelNeedsRef (|Message| first, |bool|)
 
 function Message.IsProperty (|bool|)
 	opt norefcounts
-	if .func == @Dot
+	if .type == @Dot
 		|| d = .obj
 		if d isa scdecl
 			Return (d is property)
@@ -436,7 +436,7 @@ function RC_RelInit (|Message| rel)
 		|| func = rel.WrapWith(@func)
 		func.first = @thg + "JB_Incr2"
 		rel.second.remove
-		rel.func = @prm
+		rel.type = @prm
 		func.become(compiler.RefIncr2!)
 
 
@@ -448,7 +448,7 @@ function RC_RelConstructor (|Message| rel)
 
 
 
-function Message.FuncWrap (|Message| fnc)
+function Message.typeWrap (|Message| fnc)
 	opt norefcounts
 	.Prev = fnc
 	fnc.Last! <~ self
@@ -476,7 +476,7 @@ function Message.NiceParent (|Message|)
 
 function message.RefTransparent (|bool|)
 	opt norefcounts
-	|| f = .func
+	|| f = .type
 	if f == @bra
 		return true
 	if f == @type
@@ -506,7 +506,7 @@ function Message.UseNonRefChangers (|bool| parent=false, |Message|)
 		curr = curr.parent
 		if !curr : return last
 
-		|| f = curr.func
+		|| f = curr.type
 		if f == @type
 			|| D = Curr.Obj
 			if (D isa SCDecl)
@@ -606,10 +606,10 @@ function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 
 function Message.RefDisappears (|bool|)
 	opt norefcounts
-	if .func == @func
+	if .type == @func
 		self = .parent // sigh
 	for (P.up in self)
-		|| f = p.func
+		|| f = p.type
 		if (f == @Type)
 			|| D = P.AsDecl
 			if !D
@@ -831,7 +831,7 @@ function SCFunction.AnalyseRefs (|[message]| list)
 
 	for (msg.backwards in list)
 		parser.using.position = -1
-		|| f = msg.func
+		|| f = msg.type
 		if (f == @Rel)
 			if (IsConstructor and SettingSelfProperty( msg ))
 				SCRefs.RC_RelConstructor( msg )

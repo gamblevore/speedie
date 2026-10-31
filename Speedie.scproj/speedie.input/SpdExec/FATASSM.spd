@@ -165,7 +165,7 @@ struct FatASM
 	
 	
 	function Index (|uint|)					// for storing in uint16 actually
-		return self - Assembler.sh.funcstart_
+		return self - Assembler.sh.FuncStart_
 
 	target debug
 		function ID (|uint|)
@@ -177,7 +177,7 @@ struct FatASM
 
 	function uint.FAT (|&FATASM|)
 		if self
-			rz = Assembler.sh.funcstart_ + self
+			rz = Assembler.sh.FuncStart_ + self
 	
 	operator isa (|asm| m, |bool|)
 		nil checker
@@ -203,7 +203,7 @@ struct FatASM
 
 	function CopyJump (|fatasm| D, |bool|)
 		// only jumps were using this... So I named it so its obvious
-		// So no need to worry about it being used for asm.func, which has 8 inputs.
+		// So no need to worry about it being used for asm.type, which has 8 inputs.
 		(self)[0] = (d)[0]
 		for i.FatInputs in self
 			if i 
@@ -215,7 +215,7 @@ struct FatASM
 	
 	function assembler.IsWithinCurrInline (|fatasm| f, |bool|)
 		|| st = .state
-		|| findex = f - .funcstart
+		|| findex = f - .FuncStart
 		return findex >= st.FuncStart
 	
 	
@@ -223,7 +223,7 @@ struct FatASM
 		|| Changed = info.prm
 		.prms[a] = changed
 		changed &= 31
-		info.FatIndex = self - sh.funcstart_
+		info.FatIndex = self - sh.FuncStart_
 
 		if info
 			target debug

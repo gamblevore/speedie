@@ -79,11 +79,11 @@ function Jump (NilTrackerFn)
 	cpp_part FlowJump
 	target flow
 		if FlowLog.Active
-			FlowLog <~ msg.func|byte|
+			FlowLog <~ msg.type|byte|
 			FlowLog.input("", msg.name)
 	|| t = msg.ASMType
 		return (NilTable[t]!)(msg, test)
-	t = msg.func|ASMType|
+	t = msg.type|ASMType|
 	msg.ASMType = t
 	return (NilTable[t]!)(msg, test)
 		
@@ -93,12 +93,12 @@ function PropertyToFunc (|message!| dot, |scfunction!| fn, |nilstate|)
 	opt norefcounts
 	// a.b
 	// b(a)
-	dot.func = @func
+	dot.type = @func
 	dot.ASMType = (@func)|ASMType|
 	|| upon = dot.First!
 	|| Prms = dot.Last!
 	Prms.obj = fn
-	Prms.Func = @prm
+	Prms.type = @prm
 	Prms.First = upon
 
 	.NewFuncsLoaded = true
@@ -196,7 +196,7 @@ function Access (NilTrackerFn)
 function Property (NilTrackerFn)
 	opt norefcounts
 	|| second = msg.second
-		second.func = @emb // clean up for ASM
+		second.type = @emb // clean up for ASM
 	return .UseChildAsReal(msg, test, nilreason.property)
 
 
@@ -472,7 +472,7 @@ function SuperSmartMagicCompare (|message| ll, |message| rr, |nilcheckmode| test
 	opt norefcounts
 	|| todo = 3
 	
-	if  ll.func == @thg and rr.func == @thg and test is Active
+	if  ll.type == @thg and rr.type == @thg and test is Active
 		if (scop Is EqualOrNot) and ((test is positive) == (scop is ExactlyEquals)|bool|)
 		//	if real == x
 		//		x becomes real
@@ -760,7 +760,7 @@ function VariableSet (|scdecl| Recv, |message| RecvMsg, |scdecl| Sent, |message|
 		if (SentState is realish)
 			return .BecomeReal(sent, SentMsg, NilReason.using)
 		
-		if (recv is property) and (recvmsg.func == @dot)
+		if (recv is property) and (recvmsg.type == @dot)
 			if (scfunction.currfunc is constructor) and (recvmsg.first!.fastdecl is self)
 				error (RecvMsg, "Property should be non-nil in constructor: " + recv.name)
 				return nilstate.real
@@ -846,7 +846,7 @@ function message.Trueness (|nilstate| found, |maybebool|)
 
 
 function message.operatormatches (|message| m, |bool|)
-	return self and m and (.func == m.func)  and  (.name ~= m.name)
+	return self and m and (.type == m.type)  and  (.name ~= m.name)
 
 
 function scdecl.Paramfix
@@ -857,7 +857,7 @@ function scdecl.Paramfix
 function message.VariableParamSafety
 	opt norefcounts
 	require .HasAny
-	|| fn = .func
+	|| fn = .type
 	if fn == @brel or @arel
 		|| s = .name[]
 		if s == '-' or '+'
@@ -865,7 +865,7 @@ function message.VariableParamSafety
 			return .DenyPreviousUse(self)
 	  else
 		for ch.flat in self
-			fn = ch.func
+			fn = ch.type
 			if fn == @brel or @arel
 				|| s = ch.name[]
 				if s == '&' or '-' or '+'
@@ -875,7 +875,7 @@ function message.VariableParamSafety
 function message.DenyPreviousUse (|message| msg)
 	opt norefcounts
 	|| thg = msg.first!.UnBra
-	require thg.func == @thg
+	require thg.type == @thg
 	|| decl = thg.obj #require
 
 	for ch.flat in .parent

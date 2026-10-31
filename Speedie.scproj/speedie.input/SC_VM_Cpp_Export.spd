@@ -106,7 +106,7 @@ extern \"C\" void** JB_App__LibGlobs() {
 function GlobalLibProtoTypes (|faststring| fs)
 	opt norefcounts
 	for dcl in PackMaker.LibGlobs
-		|| fn = dcl.Func
+		|| fn = dcl.declFunc
 			fs <~ "\tJBC__."
 			fs.AppendLibGlob(dcl)
 			fs <~ " = JB_LibFunc("

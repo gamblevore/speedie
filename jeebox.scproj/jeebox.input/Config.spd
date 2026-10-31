@@ -80,13 +80,13 @@ extend message
 	libinternal ConfigValue (|message| item, |syntax| ValueType, |message|)
 		opt norefcounts
 		nil checker
-		if item.func == @msg
+		if item.type == @msg
 			if (!ValueType or ValueType == @msg)	// handle @msg differently
 				return item
 			return .ReportFailiure(ValueType, "", item)
 		
 		|| f = item.first
-			if ValueType == nil or f.func			// matched
+			if ValueType == nil or f.type			// matched
 				return f
 			return .ReportFailiure(ValueType, "", f)
 
@@ -106,14 +106,14 @@ extend message
 
 	function Value (|string|)
 		if self
-			|| fn = .func
+			|| fn = .type
 			if fn == @msg or @tmp or @arg
 				return .firstname
 			return .name
 
 	function Value (assigns:|string|)
 		if self
-			|| fn = .func
+			|| fn = .type
 			if fn == @msg or @tmp or @arg
 				|| f = .first
 					f.name = value

@@ -329,11 +329,11 @@ __nodebug void jb_decr(jbobject* s) {
 function Run
 	opt norefcounts
 	for c in Compiler.ClassList
-		if !c.IsFunc
+		if !c.FuncProto
 			WriteType( c, .AllTypes, true )
 	
 	for c in Compiler.ClassList
-		if c.IsFunc
+		if c.FuncProto
 			WriteType( c, .AllTypes, false )
 	
 	for c in Compiler.ModuleList
@@ -1047,7 +1047,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 			type.exportName.safe(fs)
 		  else
 			if type is Dylib
-				cpp_export.FunctionPointerCast(type.hiderfunc!, fs)
+				cpp_export.functionPointerCast(type.hiderfunc!, fs)
 			|| CloseStr = cpp_export.CDotType( self, fs, type, type is upgradeablecontained )
 	
 			ch.Export( fs )

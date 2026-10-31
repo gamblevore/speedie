@@ -295,7 +295,7 @@ function Tran_WhileSub (|SCNode| name_space, |Message| node)
 		arg ?= node.GiveArg
 		|| decl = cond.first
 		if (decl == @decl)
-			cond.func = @bra
+			cond.type = @bra
 			cond = Cond.msg(@Thg, "true")
 			arg.first = decl
 			|| dname = decl.declname
@@ -354,7 +354,7 @@ function Tran_Print (TranFunc)
 function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 	opt norefcounts
 	require !StdErr.TooMany
-	|| f = s.func
+	|| f = s.type
 	
 	if (f == @Arg)
 		|| pr = s.parent
@@ -401,7 +401,7 @@ function Tran_All (|SCFunction?| fn, |Message| s, |SCNode!| p) // transform ()
 
 
 function Tran_All_Final (|SCFunction?| fn, |Message| s, |SCNode!| p, |syntax| f) // transform ()
-	if s.func != @sheb
+	if s.type != @sheb
 		if (s == @arg) and (f != @arg)
 			p = s.scarg(p)! // Resync
 		
@@ -684,7 +684,7 @@ function Tran_Sdt (|Message| exp)
 	|| f = @thg + "self"
 	f.RangeLength = 1 // simpler for autocomplete
 	exp.First = f
-	exp.Func = @dot
+	exp.type = @dot
 
 
 function Tran_ForStart (|Message| arg, |Message| index, |SCNode| p)
@@ -812,16 +812,16 @@ function Tran_FuncTable (|Message| msg, |bool|) // tran_Dispatch
 		if (protofirst != @thg)								// seems to work???
 			protomsg.replacewith( @thg + protoname )
 			protoname = "Fn_" + name
-			protomsg.func = @prm
+			protomsg.type = @prm
 			|| protoMsg2 = @tmp + "prototype"
 			protoMsg2 <~ (@thg, ProtoName)
 			protoMsg2 <~ protomsg
 			msg.next = protomsg2	
 		
 		items.name = "dispatch"
-		items.Func = @arr
+		items.type = @arr
 		msg.clear
-		msg.func = @decl
+		msg.type = @decl
 		msg <~ @emb
 		msg <~ NewEqRel( @thg + name, items )
 	
@@ -917,7 +917,7 @@ function message.MiniTran (|SCNode| name_space, |string| On="app")
 		.msg(@prm) <~ f
 		(f) // oof? can't just simplify this. not sure why.
 		.first = @thg + on
-		.func = @dot
+		.type = @dot
 	TypeOfExpr( self, name_space )
 
 
@@ -1028,7 +1028,7 @@ function Tran_Log (TranFunc)
 		|| f = node.first
 		node <~ (@Thg, "platform")			// this seems better... than tran_print
 		node.msg(@prm) <~ f					// probably tranprint should use this instead.
-		node.func = @dot					// like Platform.print, Platform.printline, Platform.printerror
+		node.type = @dot					// like Platform.print, Platform.printline, Platform.printerror
 	TypeOfExpr( node, name_space )			// Platform.log
 
 
@@ -1054,7 +1054,7 @@ function Tran_Time (TranFunc)
 	if !name_space.LookUpVar("_StartTime", nil, nil)
 		node.next = `|date| _StartTime` ~ parse
 
-	node.func = @sheb
+	node.type = @sheb
 
 
 

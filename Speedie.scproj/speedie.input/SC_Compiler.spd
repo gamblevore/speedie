@@ -508,7 +508,7 @@ function ImportAll
 	require StdErr.OK
 	
 	require .Stage( "Parsing Function Params" )
-	for f in .FuncList
+	for f in .funcList
 		f.FuncParamsLoad
 		f.LoadExportName
 		f.StoreExport

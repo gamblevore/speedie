@@ -82,7 +82,7 @@ extend message
 		
 		if (c == '_'  and  n > 1) and n.IsInt(1)
 			|| oop = prms[n.int|int|]							#expect (root, "Not enough params.")
-			|| f = .func
+			|| f = .type
 			if f == @dot or @sdot or @str or @sstr or @char		// anything except @thg?
 				return .MacroSame(orig, oop)
 			return oop.MacroAvoidCopy(orig)
@@ -104,7 +104,7 @@ extend message
 		opt norefcounts
 		|| s = m.source
 			.clear
-			.func = s.func
+			.type = s.type
 			.name = s.name
 			.appendmacro(m, orig, prms)
 	

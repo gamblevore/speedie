@@ -6,13 +6,13 @@
 
 function message.Declable (|message!|)
 	opt norefcounts
-	|| fn = .func
+	|| fn = .type
 	if fn == @decl
 		self = .second!
-		fn = .func
+		fn = .type
 	while fn == @type
 		self = .first! // no go into the type!
-		fn = .func
+		fn = .type
 	if fn == @func
 		return .second!
 	return self

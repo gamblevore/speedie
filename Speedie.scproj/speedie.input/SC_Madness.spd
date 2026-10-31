@@ -53,7 +53,7 @@ function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_sp
 	|| cst = @type + ":)"
 	.prev = cst
 	cst <~ self
-	cst.msg(@thg, typeName).obj = Type.TypeNormal 
+	cst.msg(@thg, TypeName).obj = Type.TypeNormal 
 	cst.obj = Type.TypeNormal	 		// hmmm.... why not do it anyhow?
 	Return loss	
 
@@ -61,11 +61,11 @@ function Message.CastToType (|string| TypeName, |SCClass| type, |SCNode| name_sp
 
 function message.GetAddrButNicer (|message|)
 	opt norefcounts
-	if .func == @acc
+	if .type == @acc
 		|| L = .last
 		|| num = L.first
 		if num == @num and "0"
-			.func = @bra
+			.type = @bra
 			l.remove
 			return self
 	rz = @brel + "&"
@@ -107,13 +107,13 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 	expect rel and internal    (rel, "AccessToMemCpy fail")
 	
 	|| F = rel.first!
-	rel.func = @func
+	rel.type = @func
 	|| Name = @thg + "memcpy"
 	rel.first = name
 	rel.obj = typevoid
 	rel.asmtype = 0
 	|| prms = F.next!
-	prms.func = @prm
+	prms.type = @prm
 	prms <~ f
 	
 	|| nxt = prms.next

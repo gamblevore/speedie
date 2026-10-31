@@ -9,9 +9,9 @@
 module CodeSorter
 	function LeafsFirst
 		opt norefcounts
-		for f in compiler.FuncList
+		for f in compiler.funclist
 			f.FindDepths
-		compiler.FuncList.sort(Leafness)
+		compiler.funclist.sort(Leafness)
 
 
 	helper PropertyOrder (sortercomparer of scdecl)

@@ -84,31 +84,31 @@ target debug and !cake
 
 extend Message {
 	function IsAddr (|bool|)
-		Return (self) and (.func == @brel) and (.name == "&")
+		Return (self) and (.type == @brel) and (.name == "&")
 		
 	operator IsThing (|String| name, |bool|)
 	// case aware....
 	// if I had my... "nil.fnc always returns nil"... then I could
 	// remove the self-check! :D So beautiful code.
-		Return (self) and (.func == @Thg) and (.name ~= name)
+		Return (self) and (.type == @Thg) and (.name ~= name)
 
 	operator IsOpp (|string|name, |bool|)
-		Return (self) and (.func == @Opp) and (.name ~= name)
+		Return (self) and (.type == @Opp) and (.name ~= name)
 
 
 	operator IsTmp (|String| name, |bool|)
 	// case blind...
-		Return (self) and (.func == @Tmp) and (.name == name)
+		Return (self) and (.type == @Tmp) and (.name == name)
 
 
 	operator IsARel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (.func == @Arel) and (.name == name)
+		Return (self) and (.type == @Arel) and (.name == name)
 
 
 	operator IsBRel (|String| name, |bool|)
 	// case blind...
-		Return (self) and (.func == @Brel) and (.name == name)
+		Return (self) and (.type == @Brel) and (.name == name)
 
 	
 	function TrueOrFalse (|bool|)

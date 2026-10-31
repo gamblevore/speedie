@@ -248,7 +248,7 @@ function SCDecl.CheckUnusedDecl (|message| feedback, |byte| dbg)
 	if self is SetTo and Reference
 		return // no problem
 	require self isnt ClassObj
-	|| fn = .Func
+	|| fn = .declFunc
 		require fn isnt Behaviour and VirtualCaller
 
 	.MarkUnused(feedback, dbg)
@@ -452,7 +452,7 @@ function message.CmdImprove (|message|)
 		return self
 	|| ch = .first
 	if ch == @func
-		return ch		// Probably came from:    a >= b   -->   a.func(b) >= 1
+		return ch		// Probably came from:    a >= b   -->   a.type(b) >= 1
 	return self
 
 
@@ -489,7 +489,7 @@ function GetFunc (|message| cmd, |scfile| myfile, |int| ff, |int| n, |scfunction
 	|| f = src.first!
 	|| parent = compiler.FindModuleOrClass(f, false)
 	if !parent
-		f.func = @name
+		f.type = @name
 		parent = compiler.FindModuleOrClass(f, true)
 	
 	expect parent "noparent"
@@ -635,7 +635,7 @@ function GetScope (|message| orig, |$int| types, |SCNode|)
 		return compiler.program
 	|| f	= orig.CutifyCopy
 	|| arg	= orig.MsgArg
-	|| fn	= f.func
+	|| fn	= f.type
 	if arg and fn == @dot
 		|| decl = TypeOfExprModulesOK(f.first!, arg)
 		if !decl
@@ -881,9 +881,9 @@ function @AutoItem.Sorter (sortercomparer of autoitem)
 
 function FuncTmps (|message|)
 	if .func_tmp_src.cleaned
-		return .func_tmp_src.Source
-	.func_tmp_src.cleaned = true
-	rz = .func_tmp_src.Source
+		return .Func_tmp_src.Source
+	.Func_tmp_src.cleaned = true
+	rz = .Func_tmp_src.Source
 	
 	for ch.fast in rz
 		if ch != @dot
@@ -892,7 +892,7 @@ function FuncTmps (|message|)
 			|| f = ch.first
 				if f.name.last!='.'
 					f.name += " "
-		ch.func = @dot
+		ch.type = @dot
 
 
 function message.Autocomplete_State (|int|)
@@ -926,7 +926,7 @@ function TmpAutoComplete (|message!| f, |string| name, |string| type, |message|)
 	rz = @tmp + type
 	|| arg = rz.msg(@arg, name)
 	if name ~!= "r" // too annoying.
-		for ch.fast in .functmps
+		for ch.fast in .Functmps
 			if ch starts name
 				ifn ch.name > 2  and  ch.name ~= name
 					|| cf = ch.first
@@ -981,7 +981,7 @@ helper message.GetTypeLimiter (|message|)
 
 function AutoComplete (|message| ff, |string| name, |string| Purpose, |message|)
 	require ff
-	|| f = ff.func
+	|| f = ff.type
 	// maybe better to restrict it to an allowed-list... than a banned-list
 	if f != @bra and @prm and @list and @arg and @arr and @acc and @decl and @rel
 		|| tmp = @tmp.msg(Purpose)
@@ -1042,7 +1042,7 @@ function Diissplay (|message| msg, |message| s, |string| purpose, |message|)
 	if msg == @name
 		if purpose == "display"  and  s istmp "prototype"
 			return s
-		msg.func = @thg							// findmoduleorclass needs this
+		msg.type = @thg							// findmoduleorclass needs this
 		|| obj = compiler.findmoduleorclass(msg, true)
 			return obj.DiissplayObj(rz)
 	
@@ -1129,7 +1129,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 		|| s = call_point.source
 			|| item = arg.msg(@tmp, "line")
 			|| pos = -1
-			|| f = s.FuncPos(fn, pos)
+			|| f = s.typePos(fn, pos)
 			item <~ (@sstr, f)
 			item <~ call_point.CallFromName
 			item <~ pos
@@ -1146,7 +1146,7 @@ function message.AutoFoundFunc (|scfunction| f, |bool|)
 		return o.IsLookupOnly == f
 
 
-helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
+helper Message.typePos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
 	rz = .originalfilepath
 	for ss.flat in self
@@ -1280,7 +1280,7 @@ function scfunction.RenderSheBless (|string|)
 		|| f = src.first
 			f.name = .ExportName
 		for s.fastflat in b
-			if s.func == @sheb
+			if s.type == @sheb
 				s.remove
 		rz = src.Render
 
@@ -1338,7 +1338,7 @@ function message.CutifyCopy (|message!|)
 					mod.obj = space //oop
 					rz.first = mod
 				if !prm.hasany
-					prm.func = @emb
+					prm.type = @emb
 				name.remove
 
 
@@ -1363,7 +1363,7 @@ function IdentifyBetter (|message| node, |string| name) // p.firstname
 	opt NoRefCounts
 	node.become( @emb )
 	node = node.first!
-	node.func = @dot
+	node.type = @dot
 	node <~ (@thg, name)
 	node <~ @emb
 	
@@ -1373,7 +1373,7 @@ function Message.ModuleSrc (|message|)
 	|| name = .name
 		|| found = compiler.program.FindModule(name, nil)
 			|| c = found.cls
-				|| fp = c.funcproto
+				|| fp = c.FuncProto
 					return fp.source
 				return c.sourcearg
 			return found.source
@@ -1425,7 +1425,7 @@ function LocateDefinitionSub (|message!| msg, |SCObject| already_defined, |scdec
 		return msg.ModuleSrc
 	
 	if ty.type == SCNodetype.ProtoType
-		|| l = ty.Func
+		|| l = ty.declfunc
 			return l.source
 	
 	if !displayonly and msg == @decl

@@ -28,7 +28,7 @@ class Error (Message)
 		.name = desc
 		.path = path
 		.when = date.now
-		.func = @sstr
+		.type = @sstr
 		.ErrorFlags = parser._ErrorFlags
 		.UpgradeWithNode
 	
@@ -39,7 +39,7 @@ class Error (Message)
 		.position = -1
 		.severity = ErrorSeverity.ok
 		.when = date.now
-		.func = @arg
+		.type = @arg
 
 
 	constructor (|error| orig)
@@ -53,7 +53,7 @@ class Error (Message)
 		.path = orig.path
 		.OriginalData = orig.OriginalData
 		.when = orig.when
-		.func = @sstr
+		.type = @sstr
 	
 	
 	function UpgradeWithNode

@@ -134,7 +134,7 @@ extend_module scfunction
 //	
 //		|| Using = msg.SyntaxUsing
 //		|| name = UniqueTmpVar(msg.MsgOwningFunc)
-//		|| Stealer = msg.func.msg(msg.name)
+//		|| Stealer = msg.type.msg(msg.name)
 //		stealer.takeallfrom  msg
 //		
 //		|| p = msg.UpToArg!

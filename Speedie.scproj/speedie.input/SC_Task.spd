@@ -26,7 +26,7 @@ function NewTaskActual (|Message| node, |SCNode| name_space)
 	|| name = node[@thg, @dot]$
 	|| fields = name.Next
 	if fields == @bra or @list
-		fields.func = @bra
+		fields.type = @bra
 	  else
 		fields = @bra.msg
 		name.next = fields
@@ -141,7 +141,7 @@ function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 			|| ss = fields.first
 				prms <~ ss.copy
 	  else
-		|| pf = prms.func
+		|| pf = prms.type
 		expect (pf == @bra or @list) (prms)
 	
 	|| arg = prms.next
@@ -154,9 +154,9 @@ function Message.BuildRunTask (|message| fields, |int| level, |bool|)
 	|| ff = fields.first
 	if (p1 == @thg or @dot) and ff == @sdot
 		ff.name = "task"
-		ff.func = @thg
+		ff.type = @thg
 			
-	|| f = p1.func
+	|| f = p1.type
 	if !(f == @thg or @dot)
 		|| brah = @bra.msg
 		brah <~ (@thg, "interface")
@@ -179,7 +179,7 @@ function message.FindAll (|syntax| fn=@tmp, |string| name, |[message]|)
 	opt norefcounts
 	nil self // remove once we improve the nil-checker to "link" variables
 	for s.fast in self
-		if s.func == fn and s.name == name
+		if s.type == fn and s.name == name
 			rz <~ s
 
 

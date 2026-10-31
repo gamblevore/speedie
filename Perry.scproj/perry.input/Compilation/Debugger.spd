@@ -358,7 +358,7 @@ function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	if depth > 0
 		|| s1 = .second
 			s1.name = .name
-			s1.func = @thg
+			s1.type = @thg
 
 	|| f = .first
 		f.name = dbname
@@ -546,7 +546,7 @@ function perryide.CollectExpansion
 			j.Enter(@tmp, fn.name)
 			j.AddStr(fn.firstname) // path
 			|| loc = fn[2]
-			j.Add(loc.func, loc.name)
+			j.Add(loc.type, loc.name)
 			j.ExpandDebug(arg, 0)
 			j.exit
 	

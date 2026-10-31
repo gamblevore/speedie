@@ -113,7 +113,7 @@ extend Message {
 //		return Shader
 
 
-//	function FindShader (|string| TypeName, |Message|)
+//	function FindShader (|string| FuncName, |Message|)
 //		|| U = .find(@tmp, "type")							#require
 //		|| C = U.first!.ModelType							#require
 //		|| N = C.name.lowercase
@@ -125,13 +125,13 @@ extend Message {
 //
 //		// We want to get stuff... alpha and depth
 //
-//		SCGame3D.NeedShader(TypeName + ".frag")				#require
+//		SCGame3D.NeedShader(FuncName + ".frag")				#require
 //		if (F.Length >= 2) // Cube, sdf, etc... use a standard vertex shader
 //			F = F[0, 1]
 //		  else
 //			// actually .vert but ignore that this entire code is
 //			// going to go :D
-//			SCGame3D.NeedShader(TypeName + ".frag")			#require
+//			SCGame3D.NeedShader(FuncName + ".frag")			#require
 //		
 //		// "type points" --> "type P"
 //		// and then the temporal_statement is removed.
@@ -171,7 +171,7 @@ extend SCDecl
 		expect !(.PointerCount) (.source, "Can’t be a pointer")
 
 		|| T = .type
-		|| ti = t.typeinfo
+		|| ti = t.TypeInfo
 		check (ti is numeric) ( .source, "Unrecognised type '${T.Name}'." )
 		return ti
 

@@ -78,10 +78,10 @@ function message.TargetTestOp (|message| C, |int|)
 function message.TargetTest (|bool|) // target true, target false,
 	opt norefcounts
 	real self
-	while .func == @bra
+	while .type == @bra
 		self = .first!
 
-	|| fn = .func
+	|| fn = .type
 	if fn == @rel
 		|| C = .last
 		|| op = .second!.TargetTestOp(C)$

@@ -148,7 +148,7 @@ dispatch ClassOrModuleLinkage (TranFunc)
 		if name_space.mustbe(SCClass, node)
 			expect (name_space.isdatatypeOnly) (node, "Expected this for a datatype")
 			|| type = node[@thg]$
-			name_space.typeinfo = 0
+			name_space.TypeInfo = 0
 			if type == "false" or "symbol"
 				(name_space is symbol)
 			  elseif type == "flags"

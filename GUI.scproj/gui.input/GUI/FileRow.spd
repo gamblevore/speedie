@@ -24,8 +24,8 @@ class FileRow (ListViewRow)
 	
 	constructor (|FileRow| R, |string?--| OverRideName = nil)
 		cpp_Part ConstructorCopy
-		.func = r.func
-		.FilePath = R.FilePath
+		.type		= r.type
+		.FilePath	= R.FilePath
 		.dirfile	= r.DirFile
 		.asdir		= r.asdir
 		if !OverRideName
@@ -39,7 +39,7 @@ class FileRow (ListViewRow)
 	
 	
 	constructor (|string| path, |string| name, |string| DirFile="")
-		.func		= @file
+		.type		= @file
 		.rangelength = 0 // for the sorter
 
 		.FilePath	= (DirFile!="")(path.PathDir, path)

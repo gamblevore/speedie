@@ -18,7 +18,7 @@ class_api Message (msg)
 	
 	api func (|syntax|)
 		.nil$
-		return .func
+		return .type
 		description `The node's syntactic-type. For example parsing "{}" would give a node of type 'arg', but parsing "()" would give a node of type 'list'.`
 	
 	api position (|int|)
@@ -38,7 +38,7 @@ class_api Message (msg)
 		
 	api funcset (|syntax| Result)
 		.nil$
-		.func = Result
+		.type = Result
 		description "Sets the syntactic type"
 
 
@@ -259,7 +259,7 @@ The optional path is not used for anything except generating better error messag
 
 api syntax (|string| name, |syntax|)
 	opt norefcounts
-	return Syntax.Func(name)
+	return Syntax.Type(name)
 	description `Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.)`
 
 

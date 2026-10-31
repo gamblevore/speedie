@@ -104,7 +104,7 @@ function scdecl.AsConst (|message| value, |$datatypecode| Ty, |uint64| )
 
 function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64|)
 	opt norefcounts
-	|| f = value.func
+	|| f = value.type
 	if f == @num
 		if value.name contains '.'
 			value.TypeExpect(ty, datatypecode.float)
@@ -169,13 +169,13 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	|SCDecl--|	CurrType
 
 	for line1 in arg
-		|| LF = line1.first.func
-		|| LL = line1.Last.func
+		|| LF = line1.first.type
+		|| LL = line1.Last.type
 		if (line1 == @rel) and (LF == @arr) or (LL == @arr)
 			.ConstantExpand( line1 )
 		  elseif (line1 == @tmp)
 			expect !line1.hasany (line1)
-			line1.Func = @thg
+			line1.type = @thg
 
 
 	for (Line in arg)
@@ -201,7 +201,7 @@ function SCNode.CollectConstantsSub (|Message| ch)
 				NextNum++
 
 			if currtype
-				currtype.copytypeinfoto(newitem)
+				currtype.CopyTypeInfoTo(newitem)
 				newitem.AssignabilityCheck(nil, newnum, newitem)
 			
 		  elseif line == @bra

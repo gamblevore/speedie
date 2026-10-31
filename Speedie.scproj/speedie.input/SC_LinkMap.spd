@@ -120,7 +120,7 @@ function message.HateUnusedFuncs
 	|| imp = scimport.FindImport(.name)
 		imp.WarnUnusedFuncs = true
 	  else
-		.expect(.func, "Can't find project")
+		.expect(.type, "Can't find project")
 
 
 function scnode.WasUnReached (|SCNode| from, |bool|)
@@ -186,10 +186,10 @@ function compiler.DeadStrip
 	|| main = .MainFunc
 		main.DetectIfReached
 	
-	for f in .FuncList
+	for f in .funclist
 		f.DetectIfReached
 
-	for f in .FuncList
+	for f in .funclist
 		|| cb = f.HasProto
 			|| ty = cb.type
 			if !ty.IsInterface and (.InPerry or Options.ModeCpp or f.ReachedByPack)

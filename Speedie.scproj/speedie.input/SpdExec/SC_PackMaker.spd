@@ -52,7 +52,7 @@ module PackMaker
 	
 	function AddAll
 		opt norefcounts
-		for f in Compiler.FuncList
+		for f in Compiler.funclist
 			if f.CanLibLoad
 				.addfunc(f)
 			
@@ -112,7 +112,7 @@ module PackMaker
 		opt norefcounts
 		// this is pretty much a definition of "what does stuff in C" :]
 		for s.flat in self
-			|| fn = s.func
+			|| fn = s.type
 			if fn == @char or @opp or @brel or @num or @acc or @dot or @type or @tmp
 				rz++
 			  elseif fn == @arel
@@ -315,7 +315,7 @@ module PackMaker
 		|| up = b.upwards
 			.CollectBehaviours(j, up)
 
-		|| ft = b.functable$
+		|| ft = b.FuncTable$
 		|| ftc = ft.cls!
 		for (M in ftc.properties)					// could I change the cpp exporter to use this same approach?
 			|| fn = .BestBehaviourFor(m.name)		// might as well?

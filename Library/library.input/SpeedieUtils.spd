@@ -147,7 +147,7 @@ function message.LinesOfContent (|ivec2|)
 	for s.flat in self
 		++(rz[1])
 		|| p = s.parent
-			|| pf = p.func
+			|| pf = p.type
 			rz[0] += (pf == @arg) or (pf == @tmp  and  s == @tmp)
 
 // Maybe the compiler should have some kind of "Cleanlyness" feature.

@@ -38,7 +38,7 @@ module SpdTable
 	
 	function Message.PreLoadLength (|int|)
 		opt norefcounts
-		if .func != @tmp
+		if .Type != @tmp
 			return .Length
 		|| f = .first
 			return f.Length
@@ -72,7 +72,7 @@ module SpdTable
 		opt norefcounts
 		.InitialiseFuncs(code)
 		for spd.fast in code
-			|| fn = spd.func
+			|| fn = spd.Type
 			if fn != @num and @hint
 				spd.CodeToVM
 	

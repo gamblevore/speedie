@@ -38,10 +38,10 @@ You can also count the number of times that this messageID was applied, via the 
 	|int64|				ID
 	|int64|				Frequency	// user-value. system doesnt use it.
 	|int|				Position	// also
-	|Syntax|			Func
+	|Syntax|			Type
 	
 	render
-		fs <~ .func.name
+		fs <~ .type.name
 		fs <~ "@"
 		fs.AppendQuotedEscape(self)
 			
@@ -49,23 +49,23 @@ You can also count the number of times that this messageID was applied, via the 
 		inlined
 		return self!=nil
 	
-	constructor (|string| Name, |Syntax| Fn=@str, |uint64| ID=0)
+	constructor (|string| Name, |Syntax| Type=@str, |uint64| ID=0)
 		super.constructor(name)
-		.Func = fn
+		.type = Type
 		.obj = nil								// c++ generator fails otherwise
 		.ID = ID
 
 	constructor (|message| s, |uint64| ID=0)
 		cpp_part Msg
 		super.constructor(s.name)
-		.Func = s.func
+		.type = s.Type
 		.obj = nil
 		.ID = ID
 
 	constructor
 		cpp_part Empty
 		super.constructor("")
-		.Func = @arg
+		.Type = @arg
 		.ID = 0
 				
 

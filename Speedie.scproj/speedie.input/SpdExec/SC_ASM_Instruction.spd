@@ -55,7 +55,7 @@ class Instruction
 			return .OpDict.valuelower(m.name)			#expect (m, "Isn't a valid instruction.")
 
 		syntax Access (|int| pos, |instruction|)
-			return .TypeList[pos]!
+			return .Typelist[pos]!
 		
 		function Add (|string| FormName, |string| name, |int| pos)
 			opt norefcounts
@@ -63,13 +63,13 @@ class Instruction
 			if !ins
 				ins = instruction(formname, name, pos)
 				.OpDict.valuelower(name) = ins
-			.typelist[pos] = ins
+			.Typelist[pos] = ins
 	
 		function InstructionInit
 			__instructionlist__
-			|| ERR = .typelist[0]
+			|| ERR = .Typelist[0]
 				for i in 256
-					.typelist[i] ?= ERR 
+					.Typelist[i] ?= ERR 
 			  else
 				debugger 
 			.OpDict["bra"] = .OpDict["jbor"]

@@ -68,7 +68,7 @@ function message.GenWhileFlow
 			|| g = .GenFlow
 			arg.first = g
 			g = g.first!
-			g.func = @thg
+			g.type = @thg
 			g.name = "app"
 
 

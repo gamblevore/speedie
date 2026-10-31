@@ -40,14 +40,14 @@ function message.BecomeAppend (|string| s)
 	require p.expect(@rel)
 	p.become(@dot, s)
 	.obj = nil
-	.func = @prm
+	.type = @prm
 	|| n = .next
 		|| b = n.unbra
 		if b == @msg
 			b.MsgFix // «
 	if n == @list // fs <~ (' ', 1)
 		.ReplaceWith(n)
-		n.func = @prm
+		n.type = @prm
 	  else
 		.last = n
 
@@ -58,7 +58,7 @@ function message.MsgFix (|message!|)	// «
 
 	|| f = .first
 	|| n = f.next
-	.func = @list
+	.type = @list
 	.first = @name + .name
 	.name = ""
 
@@ -81,7 +81,7 @@ function message.Tran_QMark				//"?"
 	|| IsNormal		= (thedot == @dot or @sdot or @func)
 	if !isnormal							// if x? --> if (x)
 		expect (thedot == @thg) (thedot, "Question-mark must be:  a.b?  or  (a)(b)?  or  a.b?=c")
-		.func = @bra
+		.type = @bra
 		return
 	if thedot == @sdot
 		scfunction.Tran_Sdt(thedot)

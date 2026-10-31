@@ -69,12 +69,12 @@ function NewRender (CollectFunc)
 
 function ObjectifyString (|Message| func)
 	opt norefcounts
-	func.func = @sstr
+	func.type = @sstr
 
 /*
 	// this causes extra refcounting... due to it being a function
 	// which speedie doesn't know is fully owned.
-	func.func = @dot
+	func.type = @dot
 	func <~ (@thg, "string")
 	|| prm = func.msg(@prm)
 	prm <~ func.name[0]
@@ -112,7 +112,7 @@ function Tran_Strings (|Message| start, |SCFunction| fn)
 	// instead of per arg, we can remove this!
 	opt norefcounts
 	for msg.flat in start		
-		|| f = msg.Func
+		|| f = msg.type
 		if (f == @Str)
 			using msg
 			String_Expand( msg, fn )
@@ -131,7 +131,7 @@ function InBuiltFunc (|message| self, |string| name, |bool|)
 function String_Expand (|Message| msg, |SCFunction| fn) {
 	|| P = msg.parent !
 	if (P istmp "disabled" or "description")
-		msg.Func = @str								// in case of description ''
+		msg.type = @str								// in case of description ''
 		return
 	
 	|| URL = msg in @url
@@ -159,7 +159,7 @@ function String_Expand (|Message| msg, |SCFunction| fn) {
 	point.Prev = decl
 	|| errpos = msg
 	for item in msg
-		|| syx = item.func
+		|| syx = item.type
 		if syx == @Emb or @Str
 			if syx == @emb
 				errpos = item
@@ -224,7 +224,7 @@ function Message.Clean (|bool| erl = false)
 		if curr == QEscape
 			QEscape = nil
 		
-		|| f = curr.func
+		|| f = curr.type
 		if (f != @Back and @Str and @sstr and @bin and @hint)
 			expect !(curr.name contains "\A0") (curr, "Node contains option-space")
 
@@ -232,7 +232,7 @@ function Message.Clean (|bool| erl = false)
 			curr.name = ""
 			
 		  elseif (f == @Back or @sstr or @bin)
-			Curr.Func = @Str
+			Curr.type = @Str
 		
 		  elseif (f == @Rel)
 			Curr.RelFix(false)
@@ -372,7 +372,7 @@ function message.Tran_With
 	using (obj)
 	|| name = obj.name
 	|| If = self
-	if obj.func == @thg
+	if obj.type == @thg
 		.name = "if"
 	  else
 		.become(@arg)
@@ -393,7 +393,7 @@ function message.Tran_With
 			  elseif ch == "with"
 				continue_with ch.flatafter
 		  elseif ch == @sdot
-			ch.func = @dot
+			ch.type = @dot
 			ch.first = @thg + name
 		  elseif ch == @thg
 			if ch == "it"
@@ -478,7 +478,7 @@ module StringCorrector
 		require oldid < .Count
 		expect (!old.length == !oldid) (old, "Invalid string table")	// "" must come first
 		s.ID = oldid
-		s.func = @num													// mark as used
+		s.type = @num													// mark as used
 		old.remove
 		return true
 
@@ -497,7 +497,7 @@ module StringCorrector
 		// now like: 1,3,4,6
 
 		for s in .CppStrings
-			if (s.func != @num) and !.useid(s, disk.first)
+			if (s.type != @num) and !.useid(s, disk.first)
 				// we have more ids than they do!
 				s.id = nextID++
 			

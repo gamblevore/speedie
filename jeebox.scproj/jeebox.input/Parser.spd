@@ -160,7 +160,7 @@ extend Parser
 		f.next = adj
 		adj <~ Adverb
 		adj <~ adj.next
-		rel.func = @pinn
+		rel.type = @pinn
 		return rel
 	
 	
@@ -215,7 +215,7 @@ extend Parser
 			if (parent == @arg) and .CanDot
 				|| p = .ProcessSyxParent(prms, kopp, kthing)
 					prms <~ p
-					prms.func = @prm
+					prms.type = @prm
 		
 
 
@@ -305,7 +305,7 @@ extend Parser
 		if parent
 			require .NeedName(parent)
 			.NextStart = .data.inwhite(start)
-			parent.Func = @url
+			parent.type = @url
 			parent.RangeLength += 3
 			parent <~ parser.new( nil, @str, start+3, .NextStart )
 		return parent
@@ -325,7 +325,7 @@ extend Parser
 	function fAtNamedExp (ParseHandler)
 		opt norefcounts
 		require  parent and .needname(parent)
-		parent.func = @name
+		parent.type = @name
 		parent <~ parser.ProcessThing(0, Parser.kExpect)
 		return parent
 
@@ -518,13 +518,13 @@ extend Parser
 	function fHint (ParseHandler)
 		opt norefcounts
 		rz = .Numbersub(start+1, start)
-		if (rz.func != @num) or rz.HasAny or !rz.Length
+		if (rz.type != @num) or rz.HasAny or !rz.Length
 			error rz
 		  else
 			|| fs = FastString.Shared
 			fs.AppendHInt(rz.int(1))
 			rz.name = fs.GetResult(nil)
-			rz.func = @hint
+			rz.type = @hint
 
 
 	function fNumber (ParseHandler)
@@ -583,17 +583,17 @@ extend Parser
 			x = x (a > 0) z
 		|| bra = parser.new( nil, @Bra, start )
 		|| inside = .ProcessThing			// "oppify" the things...
-			|| fn = inside.func
+			|| fn = inside.type
 			if fn == @thg
-				inside.func = @opp
+				inside.type = @opp
 			  elseif fn == @rel
 				|| f = inside.first
 				|| op = f.next
 				|| s = op.next
 				if f == @thg
-					f.func = @opp
+					f.type = @opp
 				if s == @thg
-					s.func = @opp
+					s.type = @opp
 			bra <~ inside
 
 		parser.ExpectEndChar( start, ")" )
@@ -672,7 +672,7 @@ extend Parser
 	function fArgName (ParseHandler)
 		opt norefcounts
 		if parent
-			|| f = parent.func
+			|| f = parent.type
 			if f == @arg or @list or @bra or @arr
 				|| name = .CharName(start+1, '"')
 				if name != nil
@@ -754,7 +754,7 @@ extend Parser
 		opt norefcounts
 		rz = parser.new(nil, @list, start)
 		parser.ParseLoopFlags( rz, "#/", kTemporalSyxNoBar )
-		rz.Func = @scom
+		rz.type = @scom
 
 
 	function fTemporalRelSyx (ParseHandler)
@@ -791,7 +791,7 @@ extend Parser
 		
 		|| CanUseCommas = true
 		|| p = result.parent
-			if p.RangeLength == 1 and p.func == @arg
+			if p.RangeLength == 1 and p.type == @arg
 				CanUseCommas = false
 		if parser.CanStatement
 			while
@@ -808,7 +808,7 @@ extend Parser
 				thingflags |= kColonArg
 
 
-		result.func = @thg
+		result.type = @thg
 		if result.hasany						// a is b = true		// rare
 			return result						// oops
 		result = DecorateThing(result, kOpp)
@@ -895,7 +895,7 @@ ive been~running #since morning
 				ThisAfter &= ~kFuncAfterNoSpace
 			
 			|| d = .Process( ThisAfter, result ) #loop
-			|| fn = d.func
+			|| fn = d.type
 			if (fn != @name and @badj and @url)
 				result.prev = d // insert
 				d.First = Result
@@ -915,7 +915,7 @@ ive been~running #since morning
 		Rel <~ Opp
 		
 		if .Eats("=")
-			Rel.Func = @ERel
+			Rel.type = @ERel
 			opp.RangeLength++
 		
 		|| Mode = Parser.kAllow
@@ -956,7 +956,7 @@ ive been~running #since morning
 		
 		if ch in @arg
 			if ch == @thg
-				ch.func = @tmp
+				ch.type = @tmp
 				ch <~ fArgColon(ns, ch)
 			return ch
 
@@ -973,7 +973,7 @@ ive been~running #since morning
 	libinternal Message.GoIntoInvisArg (|message| tmp, |int| pos, |message|)
 		Opt NoRefCounts
 		|| i = .indent|int| align 4
-		|| f = tmp.func
+		|| f = tmp.type
 		ifn f == @tmp or @item or @decl
 			return parser.ErrorAdd("Indented blocks not allowed here.", tmp.position)
 		
@@ -990,7 +990,7 @@ ive been~running #since morning
 			|| last = tmp.last!
 			if last != @emb
 				return parser.fUnexpected(last.position)
-			last.func = @arg
+			last.type = @arg
 			(last is style2)
 			return last
 	
@@ -1113,11 +1113,11 @@ ive been~running #since morning
 				lin.IsDebug = (c == '\r')|int|
 				commas = 0
 				State = 2
-				if parent.func == @list
+				if parent.type == @list
 					(parent is style2)
 
 		lin.Lines += commas
-		if !lin.lines and (parent.func == @arg and parent isnt style2) // we can't have an indent if we have no lines
+		if !lin.lines and (parent.type == @arg and parent isnt style2) // we can't have an indent if we have no lines
 			lin.Dentine = 252
 		.NextStart = n
 		
@@ -1143,8 +1143,8 @@ ive been~running #since morning
 
 	function ElseIfAdder (|Message| prev,  |message| curr, |message|)
 		opt norefcounts
-		|| cf = curr.func
-		if (prev.func != @tmp) or (cf != @tmp and @bra)
+		|| cf = curr.type
+		if (prev.type != @tmp) or (cf != @tmp and @bra)
 			return parser.erroradd("Multiple-of-4 white-space indent required here.", curr.position)
 		if curr.indent & 1 // we never seem to get this?
 			return .ErrorAdd("Indent is odd", curr.position)
@@ -1156,7 +1156,7 @@ ive been~running #since morning
 	
 	function AddToOutput (|Message!| Output,  |message| Curr,  |message| Prev,  |ParserLineAndIndent| Info,  |message?|)
 		Opt NoRefCounts
-		|| f = Output.func
+		|| f = Output.type
 		if (prev and !f.IsList and f!=@msg)
 			|| Extra = curr.PrevIndentCheck(prev)
 			if Extra < 0
@@ -1207,9 +1207,9 @@ ive been~running #since morning
 
 	function EndArg (|message| output, |ParserLineAndIndent| info, |int|)
 		opt norefcounts
-		if output  and (output.func == @arg and output is style2)
+		if output  and (output.type == @arg and output is style2)
 			while output
-				if output.func == @arg
+				if output.type == @arg
 					loop output is style2
 					output.After = info.FirstLine
 				output = output.parent

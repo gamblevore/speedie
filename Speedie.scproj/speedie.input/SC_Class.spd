@@ -241,13 +241,13 @@ function compiler.CollectInbuiltSizes
 
 function CalculateSize (|int| Depth=0, |int|)
 	opt norefcounts
-	if .IsFunc
+	if .FuncProto
 		return .mini_size(Platform.PointerBytes)
 	
 	if .IsDataTypeOnly
 		|| sz = .clssize // for vectors, etc
 			return sz
-		return .mini_size(.typeinfo.ByteCount)
+		return .mini_size(.TypeInfo.ByteCount)
 	
 	expect (Depth < 16) (.SourceArg, "Class hierarchy too deep")
 	|| AlignTo = 1
@@ -380,7 +380,7 @@ function LoadSuperClass
 	  else
 		|| thg = supc[@nil]								#require
 		if thg == @sdot
-			thg.func = @thg
+			thg.type = @thg
 			S = .modul.findclassmsg( thg, 0 )
 		  elseif oldmod
 			S = oldmod.findclassmsg( thg )
@@ -747,7 +747,8 @@ function AfterFuncsDecled
 
 
 function IsFunc (|bool|)
-	Return .FuncProto
+	disabled "aa"
+	Return .funcProto
 
 
 function IsObject (|bool|)
@@ -1018,11 +1019,11 @@ module
 		cls.BaseType = base
 		if base is Object
 			(cls is SortsProperties)
-			cls.typeinfo = datatypecode._Voidptr
+			cls.TypeInfo = datatypecode._Voidptr
 		  elseif cls.IsDataTypeOrFP
 			(cls|scnode| is stateless)
 			if base is prototype
-				cls.Typeinfo = DataTypeCode._voidptr
+				cls.TypeInfo = DataTypeCode._voidptr
 		cls.ASMTypeInfo = cls.TypeInfo
 		cls.IsRole = (node ~= "role")|int|
 		(cls is dylib) = (node ~= "dylib")
@@ -1093,7 +1094,7 @@ module
 		opt norefcounts
 		require .IsDataTypeOnly
 		if self == "_void"
-			.typeinfo = 0
+			.TypeInfo = 0
 			return
 
 		|| node = .Source!
@@ -1104,7 +1105,7 @@ module
 			.ASMTypeInfo = .TypeInfo
 			|| nr = .NumericReduction
 				if nr & classinfo.symbol
-					.typeinfo &= ~datatypecode.numeric
+					.TypeInfo &= ~datatypecode.numeric
 			  else
 				.defawlt ?= sup.defawlt
 
@@ -1210,14 +1211,14 @@ module
 		M ?= Compiler.findmodulemsg(name)
 		require m
 		dot.clear
-		dot.func = @thg
+		dot.type = @thg
 		|SCNode| B = M
 		if name == @name		// it's a module
 			PreferClass = false // whatever
 		|| mcls = m.cls
 		if (PreferClass and MCls)
 			B = MCls
-		name.func = @thg
+		name.type = @thg
 
 		|| imp = c.obj as scimport
 			imp.use

@@ -107,7 +107,7 @@ function TypeOfARel (ExprResolver)
 	if Exp == "..."
 		return TypeOfDotDotDot(exp, name_Space)
 	|| Brel = exp.niceparent == @arg
-		exp.func = @brel
+		exp.type = @brel
 	return SCFunction.Tran_AfterOrBeforeRel(exp, name_space, side)
 
 
@@ -226,7 +226,7 @@ function TypeOfBRel (ExprResolver)
 		Return SubType
 	
 	if n == '&'
-		if Subtype.type.funcproto
+		if Subtype.type.FuncProto
 			return TypeOfFuncPointer(F, name_space, side)
 		subtype.MarkAsAltered(nil)
 
@@ -342,7 +342,7 @@ function TypeOfChar (ExprResolver)
 		(char_decl is const)			//	compiler.NewConst(char_decl) // no!
 		char_decl.ExportPosition = cp	//  nice!
 	if !IsByte
-		exp.Func = @num
+		exp.type = @num
 		exp.name = str	
 	exp.obj = char_decl
 	return char_decl
@@ -360,7 +360,7 @@ function TypeOfUnit (ExprResolver)
 	|message--| it = exp.first!
 	if exp == "l"
 		exp.become(@bra)
-		it.func = @num
+		it.type = @num
 		return typeofnum(it, name_space, exp)
 
 	|scclass--| Type = TypeInt!
@@ -405,7 +405,7 @@ function TypeOfUnit (ExprResolver)
 	|| str = ""
 	|| D = type.typenormal.copydecl
 	|| X = val|uint64|
-	|| CanFloat = type.typeinfo.isfloat
+	|| CanFloat = type.TypeInfo.isfloat
 	if !CanFloat// and !(type == typeint and mul != 0.0)
 		CanFloat = it.name contains '.'
 	if type == TypeDuration
@@ -501,7 +501,7 @@ function scdecl.ExtractAmount (|Message| Amount, |scnode?| name_space, |scdecl|)
 		|| R = name_space.LookUpvar( num.name, Amount, nil )
 		if r isa SCDecl
 			if (r is Const) and r.IsInteger
-				num.func = @num
+				num.type = @num
 				num.name = r.ExportPosition.Render
 			
 	
@@ -516,7 +516,7 @@ function scdecl.ExtractAmount (|Message| Amount, |scnode?| name_space, |scdecl|)
 function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth=0, |SCDecl?|)
 	opt norefcounts
 	// a bit recursive!
-	|| f = c.func
+	|| f = c.type
 	if (f == @Thg)		// usual case
 		if c == "nil"	// nice
 			return TypeVoid
@@ -551,7 +551,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 			return R.ExtractAmount( Prms, name_space )
 			
 		f = @rel
-		c.func = f
+		c.type = f
 		prms.remove
 		c <~ (@thg, "memory")
 		c <~ (@opp, "of")
@@ -588,7 +588,7 @@ function ExtractDecl (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |i
 		return r
 
 	if (F == @name)
-		c.func = @thg
+		c.type = @thg
 		|| d = ExtractDecl(c, name_Space, purpose, depth)$
 		(d is compilercreated)
 		return d
@@ -640,7 +640,7 @@ function message.NeatenDict
 	|| f = .first
 	if !f
 		f = @thg + "object"
-	.func = @rel
+	.type = @rel
 	.msg(@thg, "dictionary")
 	.msg(@opp, "of")
 	self <~ f
@@ -650,11 +650,11 @@ function message.NeatenDict
 function ExtractContainer (|Message!| c, |SCNode?| name_space, |declmode| Purpose, |int| Depth, |scdecl| input, |bool|)
 	opt norefcounts
 	|| ch = c.first!
-	|| fn = ch.func
+	|| fn = ch.type
 	expect (fn != @Item) (c)
 	require ch.ExpectLast
 	if fn == @tmp
-		ch.func = @thg
+		ch.type = @thg
 	|| dcl = ExtractDecl( ch, name_space, purpose, depth )
 		input.Contains = dcl.MakeContainedOptional
 		return true
@@ -682,7 +682,7 @@ function SCDecl.MakeDataObject (|SCNode| Name_Space, |declmode| Purpose, |scdecl
 	
 function SCDecl.LoadContainedSub (|SCDecl| Cont, |Message| wrap, |SCNode| Name_Space, |declmode| Purpose, |bool|)
 	|| R = ExtractDecl( wrap, name_space, purpose )			#require
-	R.Copytypeinfoto(self)
+	R.CopyTypeInfoTo(self)
 	.contains = cont.MakeContainedOptional
 	if TypeWrapper!.typenormal.TypeMatch(R, ktypecastfalse).IsNormalMatch
 		check (!Cont.isnormalobject)  ( wrap, "Datatype-wrappers can't contain this." )
@@ -716,7 +716,7 @@ function TypeOfExprSub (|Message| Exp, |SCNode| name_space, |Message?| side = ni
 			Return d
 
 	if name_space
-		|| f = ExprFuncs[Exp.func|int|]					#expect ( exp )
+		|| f = ExprFuncs[Exp.type|int|]					#expect ( exp )
 		|| obj = (f)(Exp, name_space, side)
 			exp.obj = obj
 		return obj|SCObject|
@@ -772,7 +772,7 @@ function LowlevelArrayTransform (|Message| exp, |SCClass| Cls, |SCDecl|)
 	exp.become( @dot, "object" )
 	ty.name  = "memory"
 
-	prms.Func = @prm
+	prms.type = @prm
 	using exp
 		prms <~ cls.ClsSize
 	
@@ -793,9 +793,9 @@ function TypeOfVecAccess (|message| exp, |message| index, |scdecl| ty0, |message
 			w = 4
 		expect (index.int inrange w) (index, "Vector access is too large.")
 	
-	if ty0.isfloat != ty0.type.typeinfo.isfloat // ??? use this instead?
+	if ty0.isfloat != ty0.type.TypeInfo.isfloat // ??? use this instead?
 
-	if ty0.type.typeinfo.isfloat
+	if ty0.type.TypeInfo.isfloat
 		return typefloat!.NotConst
 	return typeint!.NotConst
 
@@ -847,7 +847,7 @@ function TypeOfAccess (ExprResolver)
 					return TypeOfVecAccess(exp, index, ty0, side)
 				return ty0.MemAccess(exp, side)
 
-	arr.Func = @prm
+	arr.type = @prm
 	exp.become(@dot, "SyntaxAccess")
 	exp.range = arr.range 
 	
@@ -1026,7 +1026,7 @@ function TypeOfArr (ExprResolver)
 			result.type = c.type						// so we might as well make a c-array
 			result.contains = nil
 			result.IsCArray(IsDispatch-1, c)
-			exp.func = @arg
+			exp.type = @arg
 			tran_argarray(exp, name_space, result)
 		  elseif  !c.type.isobject
 			result.Contains = c.newwrapper(c)
@@ -1060,7 +1060,7 @@ function TypeOfSwizSub (|message--| Exp, |scdecl| Type, |SCNode--| name_space, |
 		swiz &= 7
 		expect (swiz < W) (prms, "Vector access is too large.")
 		exp.become(@acc)
-		prms.func = @arr
+		prms.type = @arr
 		prms.DeclAddNumbInt(swiz, name_space)
 		t = TypeOfVecAccess(exp, prms.first, type, side)
 	  else
@@ -1151,7 +1151,7 @@ function string.IsSwizzle (|int| Width, |int|)
 
 
 function TypeOfSyx (ExprResolver)
-	exp.func = @thg
+	exp.type = @thg
 	exp.name = "syx" + exp.name
 	return typeofthg(exp, name_space, side)
 
@@ -1201,7 +1201,7 @@ function TypeOfDot (ExprResolver)
 		// for __modules__.String // one day namespace.myclass ?
 		|| f = exp.first
 		if f == @thg
-			exp.Func = @thg
+			exp.type = @thg
 			|| IsClassList = f == "__classes__"
 			f.remove
 			if IsClassList
@@ -1243,7 +1243,7 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 			
 
 function message.BecomeSetRel
-	.func = @rel
+	.type = @rel
 	.asmtype = ASMType.kSetRel
 
 
@@ -1302,7 +1302,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 		exp.name = "syntaxis"
 	opch.become(@prm)
 	opch.obj = nil		// needed
-	rn.func = @dot
+	rn.type = @dot
 
 	while rn.hasany
 		opch <~ rn.first
@@ -1396,7 +1396,7 @@ function error.FromSamePlace (|message| s, |bool|)
 
 
 function scdecl.ConstInRangeSub (|int64| Value, |bool| WasHex, |int64|)
-	|| T = .type.typeinfo
+	|| T = .type.TypeInfo
 	|| S = t.ByteCount<<3
 	require t.isint and (S <= 32)
 
@@ -1497,7 +1497,7 @@ function TypeOfRel (ExprResolver)
 	
 	side = nil
 	|| P = exp.NiceParent
-	|| ParentFunc = P.func
+	|| ParentFunc = P.type
 	|| ShouldBeSet = (ParentFunc == @Arg or @Decl)
 
 	if (comp isnt Assigns) and (exp != @erel)
@@ -1688,7 +1688,7 @@ function TypeOfList (ExprResolver)
 			if (s is inserted)  and  typ matches TypeSyntax // (@thg, "abc")  -->  @thg + "abc"
 				if !s.next
 					s.next = «str »
-				exp.func = @rel
+				exp.type = @rel
 				s.next = «opp "+"»
 				return TypeOfRel(exp, name_space, side)
 			numeric = false
@@ -1698,7 +1698,7 @@ function TypeOfList (ExprResolver)
 				HasBig = true
 
 			if (typ.mustbe(SCDecl, s))
-				|| T = typ.type.typeinfo
+				|| T = typ.type.TypeInfo
 				if s.IsZero
 					AllowType = T.floatintmerge(AllowType, s)
 				  else
@@ -1725,7 +1725,7 @@ function TypeOfList (ExprResolver)
 	exp.AppendAllInto(list)
 	exp <~ (@thg, name)
 	exp <~ list
-	exp.func = @func
+	exp.type = @func
 	return TypeOfExpr(exp, name_space)
 
 
@@ -1787,7 +1787,7 @@ function Message.FixErl
 	  else // if name == "?="
 		using opp
 				
-		.Func = @rel
+		.type = @rel
 		opp.Name = "="
 
 		ch = ch.copy
@@ -1880,7 +1880,7 @@ function SCFunction.DotFuncToNormalFunc (|Message| dot)
 	using (dot)	
 	|| first = dot.First!
 	|| L = dot.Last!
-	L.Func = @prm
+	L.type = @prm
 
 	// a.b( c )
 	// b(a, c)
@@ -1921,7 +1921,7 @@ function TypeOfArgArr (ExprResolver)
 	|| Count = 0
 	for itm in exp
 		if itm == @tmp
-			itm.func = @thg
+			itm.type = @thg
 		|| Contained = TypeOfExpr( itm, name_space )
 			check (Contained.type.isdatatypeOrFP or contained.PointerCount) (itm, "Must be a datatype.")
 			if (result)
@@ -1953,7 +1953,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 	|| d = thg.asdecl
 		d.default = nil
 
-	rel.func = @sheb			// comment
+	rel.type = @sheb			// comment
 	rel.ASMType = ASMType.kIgnore
 	if place == rel
 		rel.next = thg
@@ -1961,7 +1961,7 @@ function Tran_ArgArray (|Message| Exp, |SCNode| name_space, |scdecl| decl)
 	  else
 		rel.replacewith(Thg)
 		place.next = rel
-		exp.func = @str
+		exp.type = @str
 
 	using (exp)
 	|ArgArrayCounter| Counter

@@ -109,7 +109,7 @@ function TryStringAppend (|message| s)
 			exit
 		|| oof = p.last.last
 		if oof == @char // damn! well it was from appendbyte. anyhow. Lets change it back.
-			oof.func = @sstr
+			oof.type = @sstr
 			oof.obj = typestring!.typenormal
 			.StrRemoved-- 
 		prms <~ oof
@@ -130,7 +130,7 @@ function FS (|Message| exp, |Message| GetResult)
 	require arg.expect(@arg)
 	
 	|| fs1 = getresult.prev!
-	require fs1.func == @thg
+	require fs1.type == @thg
 	
 	|| name2 = fs2.name
 	for ch.flat in arg
@@ -149,7 +149,7 @@ function StringToByte (|Message| str)
 	str.obj = typebyte!.typenormal
 
 	str.parent!.obj = .fnbyte
-	str.func = @char
+	str.type = @char
 	TypeOfChar(str, nil)
 	.StrRemoved++
 }

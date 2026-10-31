@@ -80,7 +80,7 @@ class ColorScheme
 	libinternal Load (|message| s)
 		|| list = s["syx"]$
 		for syx in list
-			|| num = syntax.Func(syx.Name, syx)
+			|| num = syntax.Type(syx.Name, syx)
 				|| c = &.syxcol[num]
 				c.load(syx.first)
 				c.a = 255
@@ -128,7 +128,7 @@ libinternal message.ColorDeclNicely (|message?|)
 	opt norefcounts
 	while self
 		|| p = .parent$
-		|| f = p.func
+		|| f = p.type
 		if f == @decl
 			require .IsFirst
 			return p
@@ -176,7 +176,7 @@ libinternal colorscheme.GetColor (|message| msg, |int| HasColor, |int| pos, |ima
 		|| fixed_msg = FixupColor(msg, pos)
 			if fixed_msg.UseRootTmpColor
 				return .RootTmp
-			return .SyxCol[fixed_msg.func|uint| & 63]
+			return .SyxCol[fixed_msg.type|uint| & 63]
 	if HasColor == 3
 		return .None
 	if hascolor == 2
