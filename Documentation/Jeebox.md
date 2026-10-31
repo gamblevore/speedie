@@ -24,9 +24,11 @@ Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
     
 **Unlike** XML which has many different kinds of nodes, each `Message` returned is interchangeable, and has only two things defining it, the type and the name.
 
-Jeebox is defined only terms of a name and a type. The name is a `string`. The type is an `int` on a hardware level. On a conceptual level, the type is not an `int`, but is a `syntax` type. Meaning you can set it or compare it, to constants like `@str` or `@num`.
+Jeebox is defined only terms of a name and a type. The name is a `string`.
 
-`@` is used in Speedie to represent `syntax` types _(just `int` in hardware)_. `Syntax` types are just integers from 1 to 63, but we *never* use the numbers directly. We compare to the `syntax` constants (`@str`, `@num`, etc). This makes the system neat and consistant
+The type is a `byte` on a hardware level. On a conceptual level, the type is actually an 'enum' (enum like in C). Only certain values are allowed, coming from named constants. It is defined as `|Syntax| Type`. You can set or compare the type, to constants like `@str` or `@num`.
+
+`@` is used in Speedie to represent `syntax` types. `syntax` types look like `@str`, `@num`, `@thg`, etc. This makes Jeebox easy to write code for.
 
 OK lets try parsing this:
 
