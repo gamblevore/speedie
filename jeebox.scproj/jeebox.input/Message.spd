@@ -708,7 +708,7 @@ Message is also
 			rz = Message(into, @arg, .name)
 		  else
 			require .Expect(@msg)
-			|| fn = Syntax.Type(.name, self)
+			|| fn = Syntax[.name, self]
 			rz = Message(into, fn, curr.name)
 			curr++
 		while curr
@@ -755,7 +755,7 @@ Message is also
 
 	function FuncName (|string|)
 		opt norefcounts
-		return .type.LongName.lowercase
+		return .type.FullName.lowercase
 	
 	
 	inline Length (|int|)
@@ -850,13 +850,13 @@ Message is also
 		if found
 			fs <~ "Expected "
 			fs.MsgErrorName(name)
-			fs <~ s.longName
+			fs <~ s.FullName
 			fs <~ " but found "
-			fs <~ found.type.longName
+			fs <~ found.type.FullName
 		  else
 			if s
 				fs <~ "Missing "
-				fs <~ s.longName
+				fs <~ s.FullName
 			  else
 				/fs <~ "Missing syntax"
 			fs.MsgErrorName(name)
@@ -891,10 +891,10 @@ Message is also
 		|| fs = faststring.new
 		fs <~ "Expected "
 		if (type)
-			fs <~ Type.longname
+			fs <~ Type.FullName
 		fs.MsgErrorName(name)
 		fs <~ ", but found "//@"
-		fs <~ .type.longname
+		fs <~ .type.FullName
 		fs.MsgErrorName(.name)
 		error (self, fs)
 	
@@ -1129,7 +1129,7 @@ Message is also
 		|| i = .int(StrStart)
 		if i >= low and i <= high
 			return i
-		error (self, "Value out of range")
+		error (self, "Value out of range: " + i)
 	
 	
 	function string.ParseHInt (|$int| StrStart, |message| Error=nil, |int64|)
@@ -1138,7 +1138,7 @@ Message is also
 		|| n = .Length
 		|| i = StrStart
 		require n or i
-		expect (i|uint| < n|uint|) (Error, "Value out of range")
+		expect (i|uint| < n|uint|) (Error, "Value out of range: " + i)
 
 		// size-oriented, not speed. HInt is great at this.
 		// speed-orient needs final-app-specific knowledge

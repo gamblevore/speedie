@@ -202,7 +202,7 @@ class_api Syntax (syx)
 		 
 	api longname (|string|)
 		.nil$
-		return .longname
+		return .FullName
 		description `The syntax's human-readable name, for example "a=b" would return "relationship".`
 
 
@@ -259,7 +259,7 @@ The optional path is not used for anything except generating better error messag
 
 api syntax (|string| name, |syntax|)
 	opt norefcounts
-	return Syntax.Type(name)
+	return Syntax(name)
 	description `Looks up the syntax of that name from the syntax-table. The name must be in short-form, like "arg", not "argument". (The list of short-form names is in api.h, you will see $arg, $acc... its those minus the $.)`
 
 

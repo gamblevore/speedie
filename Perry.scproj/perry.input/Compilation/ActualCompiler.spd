@@ -55,7 +55,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 	|| DebugArgs = .DebugArgs							#require
 	|| ArgMsg = DebugArgs["args"]
 		ArgMsg = ArgMsg.Copy
-		argmsg.Ask
+		.Ask(argmsg)
 	
 	// args, env, or what? pico? a separate file?
 	// pico could set an original path... i guess	

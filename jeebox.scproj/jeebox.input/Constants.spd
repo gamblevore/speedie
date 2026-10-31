@@ -7,8 +7,6 @@
 
 
 Module Jeebox
-	|SyntaxObj[64]|				_FuncArray
-	|{SyntaxObj}|	_SyxDict = Dictionary.New
 	linkage
 		cpp_part Constants
 	
@@ -90,19 +88,19 @@ Module Jeebox
 		.EscapeStr![`${`] = `$\{`
 
 
-	libinternal string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
-		after = after min .length
-		while (off < after)
-			|| c = self[off++]
-			if (c == '\\')
-				off++
-			  elseif c == find
-				if find == '$'
-					if off >= after: exit
-					|| nxt = self[off]
-					ifn (nxt == '{' or '.') or CharSet.LettersUnderScore[nxt]
-						continue
-				return off - 1
+libinternal string.JBFind (|Byte|find, |int|Off, |int| After, |ind|)
+	after = after min .length
+	while (off < after)
+		|| c = self[off++]
+		if (c == '\\')
+			off++
+		  elseif c == find
+			if find == '$'
+				if off >= after: exit
+				|| nxt = self[off]
+				ifn (nxt == '{' or '.') or CharSet.LettersUnderScore[nxt]
+					continue
+			return off - 1
 	
 
 inline String.Unescape (|string|)

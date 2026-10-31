@@ -64,7 +64,7 @@ extend Assembler
 		._Const = nil
 		|| name = p.name
 		|| n = name.Length
-		expect (n <= 7)						(p, "Value out of range")
+		expect (n <= 7)						(p, "Value out of range: " + name)
 		Memory.Copy(&._const, name.addr, n)
 		
 		

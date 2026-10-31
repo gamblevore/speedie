@@ -172,7 +172,7 @@ libinternal InputStream.NextMsgInfo (|uint64|)
 	|| T = (info >> 1)|syntax|
 	if (t < @max  and  T > @nil)					// 01 --> T=@nil
 		|| N = .hint
-		expect !(N>>31) (self, "Value out of range")
+		expect !(N>>31) (self, "Value out of range: " + n)
 		msg = msg.msg(t, .str(N))
 				
 		if info & 1

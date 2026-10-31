@@ -80,7 +80,7 @@ class ColorScheme
 	libinternal Load (|message| s)
 		|| list = s["syx"]$
 		for syx in list
-			|| num = syntax.Type(syx.Name, syx)
+			|| num = syntax(syx.Name, syx)
 				|| c = &.syxcol[num]
 				c.load(syx.first)
 				c.a = 255

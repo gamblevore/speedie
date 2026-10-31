@@ -58,7 +58,7 @@ class µForm
 	function LoadParam (|string| pl, |message| Line)
 		if (pl.isint)
 			|| i = pl.int
-			check (i > 0 and i <= 24) (Line, "Value out of range") // 1-24
+			check (i > 0 and i <= 24) (Line, "Value out of range: " + i) // 1-24
 			.AddParam(i, µparam.Number)
 			return
 		

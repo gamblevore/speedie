@@ -210,7 +210,7 @@ class XVar (list)
 			if fn.IsString and !msg.HasAny
 				rz = msg.name
 			  elseif fn == @name
-				|| NewType = Syntax.Type(msg.name, msg)
+				|| NewType = Syntax(msg.name, msg)
 					|message--| ch = msg.first
 					if !ch.IsString or ch.HasAny
 						ch = nil

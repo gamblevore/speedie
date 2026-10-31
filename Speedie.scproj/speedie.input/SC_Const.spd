@@ -284,7 +284,7 @@ function message.ConstIntValueSub (|$int64| v, |bool|)
 		v = s.int
 		return true
 	if (s == @thg) and s.name[0,"syx"]
-		|| find = jeebox._syxdict.valuelower(s.name[3...])
+		|| find = syntax.types.valuelower(s.name[3...])
 			v = find.id|int64|
 			s.become(@num, v.render)
 			return true

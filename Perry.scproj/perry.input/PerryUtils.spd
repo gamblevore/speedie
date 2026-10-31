@@ -122,10 +122,12 @@ function message.AsError (|error|)
 		rz.path = ""
 
 
-function message.ask
+function perryide.ask (|message| args)
 	opt norefcounts
-	for a in self
-		if a == @arel
+	for a in args
+		if a.IsString and a.HasAny
+/			.PathFix(a)
+		  elseif a == @arel
 			expect (a == "?") (a)
 			|| str = a.firstname.Ask				#require
 			a.Become(@str, str)

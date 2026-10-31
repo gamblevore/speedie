@@ -1,14 +1,9 @@
 
 
-function string.Path_Expand (|{string}| dict, |string|)
-	// @lib/abc --> /usr/local/lib/abc
-	// or other paths that you input into dict
-	if self[0] != '@'
-		return self
-	|| i = .Find2('/')
-	|| name = self[1, i]
-	|| found = dict[name]
-		return found.TrimSlashes + self[i...]
+function string.Path_Expand (|string| From, |string| To,   |string|)
+	|| i = .find(from, 0, int.max, true)
+		return .Insert(to, (i, i+from.length))
+	return self
 
 
 function PerryIDE.DebugArgsFile (|file|)

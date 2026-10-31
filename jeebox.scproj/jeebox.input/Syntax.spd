@@ -57,15 +57,15 @@ datatype Syntax (Byte)
 				return o.name
 		return "child"
 	
-	function LongName (|string|)
+	function FullName (|string|)
 		Opt NoRefCounts
 		if self
 			|| o = .obj
-				return o.longname
+				return o.FullName
 		return "child"
 	
 	inline Obj (|syntaxobj|)
-		return jeebox._FuncArray[self|int|]
+		return Syntax.TypeList[self|byte|&63]
 	
 	
 	inline Msg ( |string?| name=nil, |Message| )
@@ -81,24 +81,51 @@ datatype Syntax (Byte)
 		disabled "Use int64.msg instead"
 	
 	
-	module 
-		|int|		CurrFuncID_
+	module
+		|SyntaxObj[64]|				TypeList
+		|{SyntaxObj}|				Types = dictionary.new
 		
-		function Type (|string| name, |message| where=nil, |syntax|)
+		inline New (|string| name, |message| where=nil, |syntax|)
+			return .SyntaxAccess(name, where)
+
+		syntax access (|string| name, |message| where=nil, |syntax|)
 			visible
-			|| obj = jeebox._syxdict.valuelower(name)		#expect (where, "Unknown syntax: " + name)
+			cpp_part AccessName
+			|| obj = .Types.valuelower(name)		#expect (where, "Unknown syntax: " + name)
 			return obj.id
 			
-		function StdNew (|fpMsgRender| Render, |string| Name, |String| LongName, |int| ID, |Syntax|)
+//		syntax access (|int| i, |message| where=nil, |SyntaxObj|)
+//			embedded // never needed?
+//			visible
+//			if i|uint| < –count .TypeList
+//				|| obj = .TypeList[i]		#expect (where, "Unknown syntax: " + i)
+//				return obj
+		
+		function Join (|faststring| fs_in=nil, |string| Sep=", ", |string|)
+			embedded // rarely needed
 			opt norefcounts
+			|| fs = FastString(fs_in)
+			|| i = 0
+			while ++i < –count .TypeList
+				|| syx = .typelist[i]
+					if i > 1
+						fs <~ sep
+					fs <~ syx.name
+			return fs.GetResult(fs_in)
+				
+			
+			
+		libinternal StdNew (|fpMsgRender| Render, |string| Name, |String| LongName, |int| ID, |Syntax|)
+			opt norefcounts
+			expect (ID < –count .TypeList) ("Value out of range: " + id)
 			|| result = Syntaxobj.new(Render, name, ID)
-			jeebox._syxdict[name] = result
-			jeebox._Funcarray[ID] = result
+			.types[name] = result
+			.TypeList[ID] = result
 			if (LongName)
-				jeebox._syxdict[LongName] = result
-				result.LongName = LongName
+				.types[LongName] = result
+				result.FullName = LongName
 			  else
-				result.LongName = Name
+				result.FullName = Name
 			return ID|syntax|
 
 
@@ -111,11 +138,11 @@ class SyntaxObj
 	|fpMsgRender|			RenderAddr // shouldn't change after creation
 	|fpMsgExport|			ExportAddr
 	|String|				Name
-	|String|				LongName
+	|String|				FullName
 	|Syntax|				ID
 
-
 	constructor (|fpMsgRender| msg, |string| name, |int| ID)
+		libinternal
 		.RenderAddr = msg
 		.Name		= Name
 		.ID			= ID|syntax|
@@ -124,8 +151,8 @@ class SyntaxObj
 	
 	render
 		if !fs_in
-			return .LongName.lowercase
-		fs_in.appendlower(.LongName)
+			return .FullName.lowercase
+		fs_in.appendlower(.FullName)
 	
 
 

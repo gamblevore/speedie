@@ -6,7 +6,6 @@
 
 module Perry
 	|ListViewRow|					Projects = Message()
-	|{string}|						PathDict
 	|listviewrow|					RecentProjects = message()
 	|date|							FinishedStartUp
 	|byte|							FindID	

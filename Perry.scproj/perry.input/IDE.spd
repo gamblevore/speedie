@@ -147,11 +147,47 @@ class PerryIDE (Window)
 		.EditStatus.text = str
 
 
-	function @perryide.PathExpand (|string| path, |string|)
-		if !perry.pathdict
-			perry.pathdict = [ "spd"  :  file.speediedir ]
-		rz = path.Path_Expand(perry.PathDict)					#expect ("Unrecognised @ in: " + path)
-		rz = rz.resolve(true)
+	// this could replace the function below!
+	// make use of jeebox!
+	function PathFix (|message| path)
+		opt norefcounts
+		|| fs = FastString()
+		for item in path
+			|| ty = item.type
+			|| name = item.name
+			if ty == @thg
+				if name ~= "spd"
+					name = file.speediedir
+				  elseif name ~= "proj"
+					name = .project
+				  elseif name ~= "date"
+					name = date.now|int64|.render
+				  else
+					error item
+			  else
+				check (ty == @emb) (item)
+			fs <~ name
+			
+		path.clear
+		path.Become(@str, fs.getresult)
+/*
+«str 
+	«thg "proj"»
+	«emb "///"»
+»
+*/
+
+	function PathExpandSub (|string| path, |string|)
+		path = path.Path_Expand("@spd", file.speediedir)
+		path = path.Path_Expand("@proj", .project)
+		path = path.Path_Expand("@date", date.now|int64|.render)
+		expect !(path contains '@') ("Unrecognised @ in: " + path)
+		return path
+		
+
+	function PathExpand (|string| path, |string|)
+	// @spd/abc --> /usr/local/speedie/abc
+		return .PathExpandSub(path).resolve(true)
 	
 
 	function PerryError (|error?|)
