@@ -24,9 +24,11 @@ Imagine we wanted to parse it. Lets put it in "example.box" and parse that file.
     
 **Unlike** XML which has many different kinds of nodes, each `Message` returned is interchangeable, and has only two things defining it, the type and the name.
 
-The name is accessed via `.name`, and is just a string. The type is accessed `.func`, and is a datatype called `Syntax`. On the CPU, `Syntax` is just an `int`. Datatypes have their own functions that you can call, so you must think of `Syntax` as it's own type that just happens to have efficient CPU representation.
+Jeebox is defined only terms of a name and a type. The name is a `string`. The type is an `int` on a hardware level. On a conceptual level, the type is not an `int`, but is a `syntax` type. Meaning you can set it or compare it, to constants like `@str` or `@num`.
 
-OK, lets try parsing this:
+`@` is used in Speedie to represent `syntax` types _(just `int` in hardware)_. `Syntax` types are just integers from 1 to 63, but we *never* use the numbers directly. We compare to the `syntax` constants (`@str`, `@num`, etc). This makes the system neat and consistant
+
+OK lets try parsing this:
 
     return a > c
 
@@ -38,11 +40,11 @@ Well, that leads to this tree:
             opp ">"
             thg "c"
 
-The message "`return`" has a type of `@tmp`.
+The message "`return`" has a type of `@tmp`
 
 And "`>`" has a type of `@opp`.
 
-Jeebox (and it's `Message` class), is useful for almost anytime you need a new or custom data-format of any kind.
+Jeebox is useful for almost anytime you need a new or custom data-format of any kind.
 
 Here are some things I've (practically) used Jeebox for, so far:
 
@@ -272,8 +274,3 @@ If you want to go even more advanced, you could do things like compress the jeeb
 
 `jbin` parses between 2x to 20x faster than Jeebox. [Learn more about jbin](jbin.md)
 
-**What about compression?**
-
-Jeebox has inbuilt decompression, of it's own format "mz" that is inbuilt in Speedie. Perry, Speedie and Jeebox all transparently handle compressed files.
-
-However, the compression right now is not finalised, I feel its not good enough yet. (It seems good on large files but not so good on smaller files, which most jeebox files are.) I'll probably add `gz` decompression to Jeebox, as it seems widely used, and gz is good on small files.
