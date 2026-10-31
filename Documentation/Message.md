@@ -27,7 +27,7 @@ Message has a lot of other functions such as `.Last` or `.Root`. They are comput
 ### Definition Properties:
 
     |String| Name
-    |Syntax| Func // syntax is uint8
+    |Syntax| Type // syntax is uint8
 
 These two properties define the `message` itself. The `name` is just the text that the `message` contains.
     
@@ -38,7 +38,7 @@ For example if you parse `"a = b"` you will get these `messages`:
         opp "="
         thg "b"
 
-The quoted text (like "`a`") is the `name`, and `rel` / `opp` / `thg` are the `func`. `Func` is actually just stored as a byte in memory, so it takes up very little RAM.
+The quoted text (like "`a`") is the `name`, and `rel` / `opp` / `thg` are the `Type`. `Type` is actually just stored as a byte in memory, so it takes up very little RAM.
 
 
 ### Parse Properties:
