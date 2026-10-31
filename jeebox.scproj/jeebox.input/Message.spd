@@ -27,7 +27,7 @@ Message is also
 
 ////////////////////////////////
 	|string|				Name		// Decides the meaning of the node
-	|Syntax|				Func		// Decides the meaning of the node
+	|Syntax|				Type		// Decides the meaning of the node
 
 	|Byte|					Indent		// Re-purposeable.  Output only
 	|uint16|				RangeLength // Re-purposeable.  Output only
@@ -104,12 +104,21 @@ Message is also
 			0 // if "".trap
 
 ///////////////////////////////////////////////////////////////////////////////
-	
-/*	setter Obj (|object|)
-		if .objectid == 1234
-		super.obj = value
-*/
+			
+//	function Func (|syntax|)
+//		cpp_part FuncGet
+//		return .type
+
+	inline Func (|Syntax|)
+		nil safe
+		if self
+			return .type
 		
+	function Func (assigns:|syntax|)
+		cpp_part FuncSet
+		.type = value
+
+
 
 	function Copy (|message| pos_msg=nil, |Message!|)
 		opt norefcounts
@@ -791,11 +800,6 @@ Message is also
 			return .Name
 
 
-	inline Func (|Syntax|)
-		nil safe
-		if self
-			return .func
-
 
 	function FirstName (|string|)
 		nil checker
@@ -1246,7 +1250,7 @@ Message is also
 
 	inline IsString (|bool|) // use .expectstring if you need this to be a string
 		if self
-			|| fn = .func
+			|| fn = .type
 			if fn >= @sstr and fn <= @str
 				return true
 

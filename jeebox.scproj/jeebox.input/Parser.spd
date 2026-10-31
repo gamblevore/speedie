@@ -1403,10 +1403,6 @@ extend Message
 		parser.ErrorAlwaysAdd( "Indents mismatch (${prin|int|} vs ${chin|int|} spaces)", .position )
 
 
-	function Type (|syntax|)
-		disabled "Use .func instead"
-
-
 	syntax is (|MessageFlags| F, |bool|)
 		if self
 			return .flags & F
