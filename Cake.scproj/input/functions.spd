@@ -20,25 +20,24 @@ role SpdFunc (message)
 		|| n = Code.length >> 2
 		.RangeLength = n
 		
-		if (n-1)|uint| < (16~bits)|uint|
-			|| CodeAddr = code.addr|&asm|
-			
-			target debug
-				|| i = 0
-				while i < n
-					|| Op = CodeAddr[i]
-					ifn Op>>24
-					i += op.Size
+		if (n-1)|uint| >= (16~bits)|uint| // failed
+			|| msg = (n > 0)("ASM oversized", "Empty function")
+			error (Code, msg)
+			return
 
-			|| dest = cake.BeginCode + .Position
-			memory.Copy(dest, CodeAddr, n << 2)
-			if .Type != @tmp
-				.Type = @tmp
-				.name = "(unnamed)"
-		  elseif n
-			error										(Code, "ASM oversized")
-		  else
-			error										(Code, "Empty function")
+		|| CodeAddr = code.addr|&asm|
+		target debug
+			|| i = 0
+			while i < n
+				|| Op = CodeAddr[i]
+				ifn Op>>24
+				i += op.Size
+
+		|| dest = cake.BeginCode + .Position
+		memory.Copy(dest, CodeAddr, n << 2)
+		if .Type != @tmp
+			.Type = @tmp
+			.name = "(unnamed)"
 	
 
 	function Run (|?&ivec4|)

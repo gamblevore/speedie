@@ -621,9 +621,7 @@ function File.TestSpeedie (|string| v, |bool|)
 	
 
 function array.AppendWords (|array of string| self, |string| R)		// appendoptions, addoptions
-	for S in R / ' '
-		if s
-			self <~ s
+	r.Splitsub(' ', true, self)
 
 
 function string.MakeAndGoInto (|File|)

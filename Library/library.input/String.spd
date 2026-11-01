@@ -241,15 +241,21 @@ class String
 	inline Words (|[String]|)
 		return .Split(' ')
 
-
 	function Split (|Byte| sep = '\n', |[String]|)
+		opt norefcounts
+		|[string]| result
+		.SplitSub(sep, false, result)
+		return result
+	
+	autogen SplitSub (|Byte| sep, |bool| IgnoreEmpty, |[String]| Into)
 		opt norefcounts
 		|| Last = 0
 		while
 			|| Word = .NextField(sep, Last)
 			if Word == nil
 				exit
-			rz <~ Word
+			if !IgnoreEmpty or word.Length
+				into <~ Word
 
 	function Before (|string| s, |string|)
 		|| f = .find(s)
