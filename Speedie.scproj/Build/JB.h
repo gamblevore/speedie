@@ -137,7 +137,7 @@ typedef int SizeInt;
 
 typedef int SortComparison;
 
-typedef uint64 SourceLocation;
+typedef uint64 SortableLocation;
 
 typedef byte Syntax;
 
@@ -539,7 +539,7 @@ typedef bool (*FP_ShellOption)(JB_String* Name, JB_String* Value, FastString* Pu
 
 typedef SortComparison (*FP_SorterComparer)(JB_Object* Self, JB_Object* B);
 
-typedef int (*FP_SourceSorter)(SourceLocation A, SourceLocation B);
+typedef int (*FP_SourceSorter)(SortableLocation A, SortableLocation B);
 
 typedef bool (*FP_TranFunc)(SCFunction* Fn, Message* Node, SCNode* Name_space);
 
@@ -677,7 +677,7 @@ struct FatASM {
 	u16 BasicBlock;
 	s16 RefCount;
 	ASMReg Info;
-	uint SrcMap;
+	uint SrcLoc;
 	u16 PrevOutput[2];
 	u16 ASMIndex;
 	u16 Unused;
@@ -804,7 +804,7 @@ struct Assembler {
 	byte StackSize;
 	InlineState InlineState[8];
 	SCFunction* Root_Fn;
-	SourceLocation Declarations[32];
+	SortableLocation Declarations[32];
 	u16 DelayedNops[32];
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
@@ -1400,7 +1400,6 @@ extern SCFunction* SC__Comp_RefClear;
 extern SCFunction* SC__Comp_RefDecr;
 extern SCFunction* SC__Comp_RefDecrMulti;
 extern SCFunction* SC__Comp_RefEarlyDecr;
-extern SCFunction* SC__Comp_RefEarlyDecrMulti;
 extern SCFunction* SC__Comp_RefFreeIfDead;
 extern SCFunction* SC__Comp_RefIncr;
 extern SCFunction* SC__Comp_RefIncr2;
@@ -1490,7 +1489,6 @@ extern Message* SC__Macros_MainArgBasicReq;
 extern Message* SC__Macros_MainArgDefault;
 extern Message* SC__Macros_MainArgNone;
 extern Message* SC__Macros_MultiDecr;
-extern Message* SC__Macros_MultiEarlyDecr;
 extern Message* SC__Macros_TernQMark;
 extern Message* SC__Macros_WhileDecl;
 #define kJB__Math_E (2.7182818284590452353602874713526f)
@@ -3634,7 +3632,7 @@ int SC__Init_();
 // Refs
 void SC_Refs__DeclInit(SCFunction* Fn, Message* Dcl, bool IsJustAnArg);
 
-Message* SC_Refs__DecrMulti(SCDecl* D, Message* M, bool IsReturn);
+Message* SC_Refs__DecrMulti(SCDecl* D, Message* M);
 
 void SC_Refs__Destructable(Message* Blocker, Message* Arg, Message* Name);
 
@@ -3762,7 +3760,7 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value);
 
 
 // SourceMap
-int SC_SourceMap__BreakableSorter(SourceLocation A, SourceLocation B);
+int SC_SourceMap__BreakableSorter(SortableLocation A, SortableLocation B);
 
 bool SC_SourceMap__Check(SCFunction* Fn, int T);
 
@@ -3879,6 +3877,8 @@ void SC_Ext__SayTest(JB_String* N);
 bool SC_Ext__ShouldCppComp();
 
 bool SC_Ext__TestNewCompiler();
+
+bool SC_Ext__TestNewCompilerSub(JB_File* Test1, JB_File* Test2, JB_File* Cpp2, JB_File* Cpp3, JB_File* Cake);
 
 void SC_Ext__TestNewestLib(JB_File* Cpplib);
 
@@ -4123,6 +4123,8 @@ int JB_SP_AppInit();
 int JB_InitCode_();
 
 SCDecl* SC_IsPointerMath(SCDecl* L, SCDecl* R, SCOperator* Opp, Message* Exp);
+
+void JB_DecrMulti(JB_Object** Start, int Count);
 
 void SC_ListFunctionsSub(JB_Object* O, Array* Out);
 
@@ -5242,16 +5244,16 @@ bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D);
 // SortComparison
 
 
-// SourceLocation
-SCFile* SC_SourceLocation_File(SourceLocation Self);
+// SortableLocation
+SCFile* SC_SortableLocation_File(SortableLocation Self);
 
-FatASM* SC_SourceLocation_MARK(SourceLocation Self);
+FatASM* SC_SortableLocation_MARK(SortableLocation Self);
 
-int SC_SourceLocation_Position(SourceLocation Self);
+int SC_SortableLocation_Position(SortableLocation Self);
 
-void SC_SourceLocation_Render(SourceLocation Self, FastString* Fs, int Max);
+void SC_SortableLocation_Render(SortableLocation Self, FastString* Fs, int Max);
 
-void SC_SourceLocation_SyntaxExpect(SourceLocation Self, JB_String* Error);
+void SC_SortableLocation_SyntaxExpect(SortableLocation Self, JB_String* Error);
 
 
 
@@ -6029,7 +6031,9 @@ void SC_FAT_SetOpSet(FatASM* Self, uint /*byte*/ Value);
 
 bool SC_FAT_SimpleConst(FatASM* Self, uint64 V, int Space);
 
-SourceLocation SC_FAT_Source(FatASM* Self);
+SortableLocation SC_FAT_Source(FatASM* Self);
+
+bool SC_FAT_StillBreakable(FatASM* Self);
 
 ASMReg SC_FAT_SyntaxCall(FatASM* Self, uint I);
 
@@ -6221,6 +6225,8 @@ void SC_Pac_AddFuncParams(Assembler* Self, SCFunction* Fn);
 FatASM* SC_Pac_AddMissingReturn(Assembler* Self);
 
 ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, int64 Amount, ASMReg Stronger);
+
+uint SC_Pac_Allocated(Assembler* Self);
 
 ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L);
 
@@ -6494,6 +6500,8 @@ ASMReg SC_Pac_MainBrancher(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R, fn_ASMConstifier Fn);
 
+void SC_Pac_MarkInlinedFunction(Assembler* Self, Message* Fnc);
+
 void SC_Pac_MarkVarClosed(Assembler* Self, int RegBits);
 
 ASMReg SC_Pac_MarkVarOpen(Assembler* Self, Message* Exp, ASMReg Declared, SCDecl* Ty, FatASM* Start);
@@ -6636,7 +6644,7 @@ bool SC_Pac_RegIsConst(Assembler* Self, ASMReg R, int64 K);
 
 FatASM* SC_Pac_Register(Assembler* Self, int I);
 
-FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SourceLocation Map);
+FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SortableLocation Map);
 
 void SC_Pac_RevertFAT(Assembler* Self, bool Check, int TrapCount);
 
@@ -7973,6 +7981,8 @@ JB_String* JB_Str_Sibling(JB_String* Self, JB_String* Name);
 JB_String* SC_Str_SpdScriptName(JB_String* Self);
 
 Array* JB_Str_Split(JB_String* Self, uint /*byte*/ Sep);
+
+void JB_Str_SplitSub(JB_String* Self, uint /*byte*/ Sep, bool IgnoreEmpty, Array* Into);
 
 JB_String* JB_Str_Squeeze(JB_String* Self);
 
@@ -10260,7 +10270,9 @@ void JB_File_SyntaxProblem(JB_File* Self, JB_String* Error);
 
 bool SC_File_TestBatch(JB_File* Self);
 
-bool SC_File_TestCake(JB_File* Self);
+bool SC_File_TestCakeProjects(JB_File* Self);
+
+bool SC_File_TestCakeVM(JB_File* Self, JB_File* CakeProj);
 
 bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
 
@@ -11208,7 +11220,7 @@ inline bool JB_int_OperatorInRange(int Self, int Length);
 
 inline int SC_FatRange_Length(FatRange* Self);
 
-inline uint SC_Msg_SrcMap(Message* Self);
+inline uint SC_Msg_SrcLoc(Message* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
 
@@ -11343,7 +11355,7 @@ inline int SC_FatRange_Length(FatRange* Self) {
 	return Self->After - Self->Start;
 }
 
-inline uint SC_Msg_SrcMap(Message* Self) {
+inline uint SC_Msg_SrcLoc(Message* Self) {
 	int P = Self->Position;
 	uint FileNum = ((uint)Self->Tag) >> 5;
 	return (FileNum << 21) | (P & (((1 << 21) - 1)));

@@ -788,6 +788,7 @@ JB_Date__Now
 JB_Date__Sleep
 JB_Date__TrySleep
 JB_DebugAllMemory
+JB_DecrMulti
 JB_Dict_Constructor
 JB_Dict_Destructor
 JB_Dict_Dispose
@@ -1437,7 +1438,7 @@ JB_Str_Rotate
 JB_Str_SetExt
 JB_Str_Sort
 JB_Str_SpacesToTabs
-JB_Str_Split
+JB_Str_SplitSub
 JB_Str_Squeeze
 JB_Str_StreamWithHeader
 JB_Str_StretchyFind

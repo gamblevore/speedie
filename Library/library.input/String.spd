@@ -241,7 +241,7 @@ class String
 	inline Words (|[String]|)
 		return .Split(' ')
 
-	function Split (|Byte| sep = '\n', |[String]|)
+	inline Split (|Byte| sep = '\n', |[String]|)
 		opt norefcounts
 		|[string]| result
 		.SplitSub(sep, false, result)

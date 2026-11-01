@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2399];
+extern JB_StringC* JB_LUB[2398];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -1741,8 +1741,7 @@ bool SC_Comp__InitBasicFuncs() {
 	JB_SetRef(SC__Comp_RefDecr, SC_Comp__LoadRefFunc(JB_LUB[926]));
 	JB_SetRef(SC__Comp_RefEarlyDecr, SC_Comp__LoadRefFunc(JB_LUB[930]));
 	JB_SetRef(SC__Comp_RefClear, SC_Comp__LoadRefFunc(JB_LUB[924]));
-	JB_SetRef(SC__Comp_RefDecrMulti, SC_Comp__LoadRefFunc(JB_LUB[927]));
-	JB_SetRef(SC__Comp_RefEarlyDecrMulti, SC_Comp__LoadRefFunc(JB_LUB[931]));
+	JB_SetRef(SC__Comp_RefDecrMulti, SC_Comp__FindFunction(JB_LUB[927]));
 	JB_SetRef(SC__Comp_RefFreeIfDead, SC_Comp__LoadRefFunc(JB_LUB[941]));
 	JB_SetRef(SC__Comp_RefSafeDecr, SC_Comp__LoadRefFunc(JB_LUB[955]));
 	JB_SetRef(SC__Comp_RefNew, SC_Comp__LoadRefFunc(JB_LUB[948]));
@@ -4500,9 +4499,9 @@ bool SC_AC__FeedBackViewASMSub(Message* Out, SCFunction* Fn, FastString* Fs, boo
 			JB_FS_AppendMultiByte(Fs, ' ', 2);
 			SC_FAT_RenderFat(Fat, Fs, 8);
 			Message* Tmp = JB_Msg_Msg(Out, kJB_SyxTmp, JB_FS_SyntaxCast(Fs));
-			SourceLocation Map = SC_FAT_Source(Fat);
-			JB_Msg_AppendNum(Tmp, SC_SourceLocation_Position(Map));
-			SCFile* Mapfile = SC_SourceLocation_File(Map);
+			SortableLocation Map = SC_FAT_Source(Fat);
+			JB_Msg_AppendNum(Tmp, SC_SortableLocation_Position(Map));
+			SCFile* Mapfile = SC_SortableLocation_File(Map);
 			if ((!JB_File_SyntaxEquals(Mapfile, Curr_file, false)) and (Mapfile != nil)) {
 				Curr_file = Mapfile;
 				Message* File = JB_Syx_OperatorPlus(kJB_SyxTmp, JB_LUB[1765]);
@@ -5759,7 +5758,6 @@ int SC_Macros__Init_() {
 		JB_SetRef(SC__Macros_TernQMark, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[47])), 1073741824), false));
 		JB_SetRef(SC__Macros_DoubleQQ, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[46])), 1073741824), false));
 		JB_SetRef(SC__Macros_MultiDecr, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[43])), 1073741824), false));
-		JB_SetRef(SC__Macros_MultiEarlyDecr, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[44])), 1073741824), false));
 		JB_SetRef(SC__Macros_ConstructorNew, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[28])), 1073741824), false));
 		JB_SetRef(SC__Macros_ConstructorNewTask, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[27])), 1073741824), false));
 		JB_SetRef(SC__Macros_MainArgBasic, JB_Macro_Constructor(nil, JB_Str_ParseJbin(((JB_LUB[4])), 1073741824), false));
@@ -8348,25 +8346,15 @@ void SC_Refs__DeclInit(SCFunction* Fn, Message* Dcl, bool IsJustAnArg) {
 	};
 }
 
-Message* SC_Refs__DecrMulti(SCDecl* D, Message* M, bool IsReturn) {
+Message* SC_Refs__DecrMulti(SCDecl* D, Message* M) {
 	Message* Rz = nil;
-	Message* Int = JB_int_Msg(D->C_Array);
-	JB_SetRef(Int->Obj, SC_TypeInt->TypeNormal);
-	if (IsReturn) {
-		Rz = JB_Macro_CallFast(SC__Macros_MultiEarlyDecr, M, Int, nil);
-	}
-	 else {
-		Rz = JB_Macro_CallFast(SC__Macros_MultiDecr, M, Int, nil);
-	}
-	(SC_Msg_ASMTypeSet(Rz, kSC__ASMType_kRefCount));
+	Message* MultiSize = JB_int_Msg(D->C_Array);
+	SCObject* Decl = SC_TypeOfNum(MultiSize, nil, nil);
+	JB_SetRef(MultiSize->Obj, Decl);
+	Rz = JB_Macro_CallFast(SC__Macros_MultiDecr, M, MultiSize, nil);
 	Message* Prm = ((Message*)JB_Tree_Second(Rz));
 	if (Prm) {
-		if (IsReturn) {
-			JB_SetRef(Prm->Obj, SC__Comp_RefEarlyDecrMulti);
-		}
-		 else {
-			JB_SetRef(Prm->Obj, SC__Comp_RefDecrMulti);
-		}
+		JB_SetRef(Prm->Obj, SC__Comp_RefDecrMulti);
 		JB_SetRef(Rz->Obj, SC_TypeVoid);
 	}
 	return Rz;
@@ -8774,7 +8762,7 @@ void SC_Refs__RefDecr(Message* Msg, Message* Place, int Basis, bool IsReturn) {
 	}
 	Message* What = nil;
 	if (Basis & kSC__Refs_kBasisCArray) {
-		What = SC_Refs__DecrMulti(SC_Msg_AsDecl(((Message*)JB_Ring_Parent(Msg))), JB_Msg_Copy(Msg, nil), IsReturn);
+		What = SC_Refs__DecrMulti(SC_Msg_AsDecl(((Message*)JB_Ring_Parent(Msg))), JB_Msg_Copy(Msg, nil));
 	}
 	 else {
 		What = SC_Refs__RefDecrMsg(Msg, IsReturn);
@@ -9415,7 +9403,7 @@ void SC_SC_Targets__SyntaxAccessSet(JB_String* Name, bool Value) {
 }
 
 
-int SC_SourceMap__BreakableSorter(SourceLocation A, SourceLocation B) {
+int SC_SourceMap__BreakableSorter(SortableLocation A, SortableLocation B) {
 	return A - B;
 }
 
@@ -10545,20 +10533,16 @@ bool SC_Ext__ShouldCppComp() {
 }
 
 bool SC_Ext__TestNewCompiler() {
-	JB_File* S = SC_Comp__ProductFile();
-	JB_Incr(S);
-	JB_File* Test1 = S;
+	bool Rz = false;
+	JB_File* Test1 = SC_Comp__ProductFile();
 	JB_Incr(Test1);
-	JB_String* _tmPf0 = JB_Str_OperatorPlus(S, JB_LUB[468]);
+	JB_String* _tmPf0 = JB_Str_OperatorPlus(Test1, JB_LUB[468]);
 	JB_Incr(_tmPf0);
 	JB_File* Test2 = JB_Str_AsFile((_tmPf0));
-	JB_Incr(Test2);
 	JB_Decr(_tmPf0);
-	JB_String* _tmPf1 = JB_Str_OperatorPlus(S, JB_LUB[469]);
+	JB_String* _tmPf1 = JB_Str_OperatorPlus(Test1, JB_LUB[469]);
 	JB_Incr(_tmPf1);
-	JB_Decr(S);
 	JB_File* Test3 = JB_Str_AsFile((_tmPf1));
-	JB_Incr(Test3);
 	JB_Decr(_tmPf1);
 	JB_File* Cpp1 = SC_Cpp__CppProduct();
 	JB_Incr(Cpp1);
@@ -10571,48 +10555,48 @@ bool SC_Ext__TestNewCompiler() {
 	JB_Incr(_tmPf3);
 	JB_Decr(Cpp1);
 	JB_File* Cpp3 = JB_Str_AsFile(_tmPf3);
-	JB_Incr(Cpp3);
 	JB_Decr(_tmPf3);
+	JB_File* Cake = SC_Comp__SpeedieDir(JB_LUB[931]);
+	JB_Incr(Cake);
 	JB_Array_SyntaxAppend(SC__Ext_Cleanup, Test2);
 	JB_Array_SyntaxAppend(SC__Ext_Cleanup, Test3);
-	JB_Decr(Test3);
+	Rz = SC_Ext__TestNewCompilerSub(Test1, Test2, Cpp2, Cpp3, Cake);
+	JB_Decr(Test1);
+	JB_Decr(Cpp2);
+	JB_EarlyDecr(Cake);
+	return Rz;
+}
+
+bool SC_Ext__TestNewCompilerSub(JB_File* Test1, JB_File* Test2, JB_File* Cpp2, JB_File* Cpp3, JB_File* Cake) {
 	SC_Ext__SayTest(JB_LUB[466]);
 	if (!SC_File_TestSpeedie(Test1, JB_LUB[468])) {
-		JB_EarlyDecr(Cpp3);
-		JB_EarlyDecr(Cpp2);
-		JB_EarlyDecr(Test2);
-		JB_EarlyDecr(Test1);
 		return nil;
 	}
-	JB_Decr(Test1);
 	SC_Ext__SayTest(JB_LUB[468]);
 	if (!SC_File_TestSpeedie(Test2, JB_LUB[469])) {
-		JB_EarlyDecr(Cpp3);
-		JB_EarlyDecr(Cpp2);
-		JB_EarlyDecr(Test2);
 		return nil;
 	}
 	SC_Ext__SayTest(JB_LUB[469]);
 	JB_PrintLine(nil);
 	if (!(JB_File_MustExist(Cpp2, JB_LUB[0]) and JB_File_MustExist(Cpp3, JB_LUB[0]))) {
-		JB_EarlyDecr(Cpp3);
-		JB_EarlyDecr(Cpp2);
-		JB_EarlyDecr(Test2);
 		return nil;
 	}
 	if (SC_Comp__ConfBool(JB_LUB[1651], true)) {
 		if (!SC_File_FileCompare(Cpp2, Cpp3, Cpp3)) {
-			JB_EarlyDecr(Cpp3);
-			JB_EarlyDecr(Cpp2);
-			JB_EarlyDecr(Test2);
 			return nil;
 		}
 	}
-	JB_Decr(Cpp2);
-	JB_EarlyDecr(Cpp3);
-	bool _tmPf4 = SC_File_TestBatch(Test2) and SC_File_TestCake(Test2);
-	JB_EarlyDecr(Test2);
-	return _tmPf4;
+	SC_Ext__SayTest(JB_LUB[2397]);
+	if (!SC_File_TestCakeVM(Test2, Cake)) {
+		return nil;
+	}
+	if (!SC_File_TestBatch(Test2)) {
+		return nil;
+	}
+	if (!SC_File_TestCakeProjects(Test2)) {
+		return nil;
+	}
+	return true;
 }
 
 void SC_Ext__TestNewestLib(JB_File* Cpplib) {
@@ -11590,7 +11574,7 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1695], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_ClsCollectTable_description)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1636], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__NewInnerClass)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2120], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__NewInnerClass)))));
-	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2397], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__RoleSkip)))));
+	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[603], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Class__RoleSkip)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2207], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_SCTasks__NewTask)))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1857], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__DoInitAfter))))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1850], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))))));
@@ -12905,6 +12889,16 @@ SCDecl* SC_IsPointerMath(SCDecl* L, SCDecl* R, SCOperator* Opp, Message* Exp) {
 		}
 	}
 	return nil;
+}
+
+void JB_DecrMulti(JB_Object** Start, int Count) {
+	//visible;
+	//cpp_name;
+	JB_Object** End = Start + Count;
+	while (Start < End) {
+		JB_SetRef(Start[0], nil);
+		(++Start);
+	};
 }
 
 void SC_ListFunctionsSub(JB_Object* O, Array* Out) {
@@ -18197,25 +18191,25 @@ bool SC_SCNodeType_SyntaxIs(SCNodeType Self, SCNodeType D) {
 
 
 
-SCFile* SC_SourceLocation_File(SourceLocation Self) {
+SCFile* SC_SortableLocation_File(SortableLocation Self) {
 	return ((SCFile*)JB_Array_Value(SC__Imp_AllFiles, Self >> 21));
 }
 
-FatASM* SC_SourceLocation_MARK(SourceLocation Self) {
+FatASM* SC_SortableLocation_MARK(SortableLocation Self) {
 	return SC_Pac_RequestOp((&SC__Pac_Sh), kSC__ASM_MARK, nil, Self);
 }
 
-int SC_SourceLocation_Position(SourceLocation Self) {
+int SC_SortableLocation_Position(SortableLocation Self) {
 	return Self & ((1 << 21) - 1);
 }
 
-void SC_SourceLocation_Render(SourceLocation Self, FastString* Fs, int Max) {
-	SCFile* F = SC_SourceLocation_File(Self);
+void SC_SortableLocation_Render(SortableLocation Self, FastString* Fs, int Max) {
+	SCFile* F = SC_SortableLocation_File(Self);
 	if (!F) {
 		JB_FS_AppendMultiStr(Fs, JB_LUB[511], 3);
 		return;
 	}
-	int Start = SC_SourceLocation_Position(Self);
+	int Start = SC_SortableLocation_Position(Self);
 	int After = Start;
 	JB_String* Str = F->FData;
 	{
@@ -18233,9 +18227,9 @@ void SC_SourceLocation_Render(SourceLocation Self, FastString* Fs, int Max) {
 	JB_FS_AppendRange(Fs, Str, Start, After);
 }
 
-void SC_SourceLocation_SyntaxExpect(SourceLocation Self, JB_String* Error) {
+void SC_SortableLocation_SyntaxExpect(SortableLocation Self, JB_String* Error) {
 	FastString* Fs = JB_FS_Constructor(nil);
-	SC_SourceLocation_Render(Self, Fs, 128);
+	SC_SortableLocation_Render(Self, Fs, 128);
 	if (true) {
 		JB_Object_FailStr(Error, JB_FS_SyntaxCast(Fs));
 	}
@@ -21111,7 +21105,7 @@ void SC_FAT_MsgSet(FatASM* Self, Message* Value) {
 			Value = P;
 		}
 	}
-	Self->SrcMap = SC_Msg_SrcMap(Value);
+	Self->SrcLoc = SC_Msg_SrcLoc(Value);
 }
 
 FatASM* SC_FAT_Next(FatASM* Self) {
@@ -21327,10 +21321,10 @@ void SC_FAT_RendaKnst(FatASM* Self, FastString* Fs, int SoFar) {
 }
 
 void SC_FAT_RendaMsg(FatASM* Self, FastString* Fs) {
-	SourceLocation Map = SC_FAT_Source(Self);
+	SortableLocation Map = SC_FAT_Source(Self);
 	JB_FS_AppendString(Fs, JB_LUB[418]);
 	JB_FS_AppendByte(Fs, ' ');
-	SC_SourceLocation_Render(Map, Fs, 40);
+	SC_SortableLocation_Render(Map, Fs, 40);
 	JB_FS_AppendByte(Fs, ' ');
 	JB_FS_AppendString(Fs, JB_LUB[334]);
 }
@@ -21479,8 +21473,12 @@ bool SC_FAT_SimpleConst(FatASM* Self, uint64 V, int Space) {
 	return false;
 }
 
-SourceLocation SC_FAT_Source(FatASM* Self) {
-	return Self->SrcMap;
+SortableLocation SC_FAT_Source(FatASM* Self) {
+	return Self->SrcLoc;
+}
+
+bool SC_FAT_StillBreakable(FatASM* Self) {
+	return (Self->_Op == kSC__ASM_MARK) and ((!SC_Reg_SyntaxIs(Self->Info, kSC__Reg_DebugVars)));
 }
 
 ASMReg SC_FAT_SyntaxCall(FatASM* Self, uint I) {
@@ -21493,7 +21491,7 @@ ASMReg SC_FAT_SyntaxCall(FatASM* Self, uint I) {
 
 void SC_FAT_SyntaxExpect(FatASM* Self, JB_String* Error) {
 	if (true) {
-		SC_SourceLocation_SyntaxExpect(SC_FAT_Source(Self), Error);
+		SC_SortableLocation_SyntaxExpect(SC_FAT_Source(Self), Error);
 	}
 }
 
@@ -22187,6 +22185,10 @@ ASMReg SC_Pac_AddToReg(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Orig, 
 		Rz = SC_Pac_Assign(Self, Exp, Dest, Rz, Start);
 	}
 	return Rz;
+}
+
+uint SC_Pac_Allocated(Assembler* Self) {
+	return Self->VTemps_ | Self->VDecls_;
 }
 
 ASMReg SC_Pac_AlreadyABool(Assembler* Self, ASMReg L) {
@@ -23218,7 +23220,7 @@ ASMReg SC_Pac_DeclareMe(Assembler* Self, Message* Where, ASMReg V) {
 	D = (D | FreeBit);
 	int Index = JB_uint_Log2(FreeBit);
 	V = SC_Reg_RegSet(V, Index);
-	Self->Declarations[Index] = ((uint)JB_Ternary((Where != nil), SC_Msg_SrcMap(Where), nil));
+	Self->Declarations[Index] = ((uint)JB_Ternary((Where != nil), SC_Msg_SrcLoc(Where), nil));
 	(SC_Pac_vdeclsSet(Self, D));
 	if (FreeBit and (!(D & SC_Pac_vtemps(Self)))) {
 		if ((Index < kSC__Reg_DontWantTempsHere) or (Self->InlineDepth == 0)) {
@@ -23817,7 +23819,7 @@ bool SC_Pac_FinishJump(Assembler* Self, FatASM* Jump) {
 		 else if (SC_FAT_OperatorIsa(D, kSC__ASM_JUMP)) {
 			D = SC_FAT_JumpTo(D);
 			if ((++N) >= 30) {
-				SC_SourceLocation_SyntaxExpect(SC_FAT_Source(Jump), nil);
+				SC_SortableLocation_SyntaxExpect(SC_FAT_Source(Jump), nil);
 				return nil;
 			}
 		}
@@ -23825,7 +23827,7 @@ bool SC_Pac_FinishJump(Assembler* Self, FatASM* Jump) {
 			break;
 		}
 	};
-	if (!D->SrcMap) {
+	if (!D->SrcLoc) {
 		if (D != SC_Pac_Curr(Self)) {
 			JB_Object_Fail(nil);
 			return nil;
@@ -24634,10 +24636,18 @@ ASMReg SC_Pac_MakeConstFromTwo(Assembler* Self, Message* Exp, ASMReg Dest, ASMRe
 	return SC_Pac_NumToReg(Self, Exp, Dest, K, SC_Reg_xC2xB5Type(Dest));
 }
 
+void SC_Pac_MarkInlinedFunction(Assembler* Self, Message* Fnc) {
+	uint Br = Self->BreakRequest;
+	if (Br) {
+		FatASM* Fat = SC_Pac_RequestOp(Self, kSC__ASM_MARK, Fnc, nil);
+		Fat->BreakInfo = Br;
+	}
+}
+
 void SC_Pac_MarkVarClosed(Assembler* Self, int RegBits) {
 	Self->RegDebugInfo = (Self->RegDebugInfo & (~RegBits));
 	FatASM* Mark = SC_Pac_Last(Self);
-	Mark = SC_SourceLocation_MARK(SC_FAT_Source(Mark));
+	Mark = SC_SortableLocation_MARK(SC_FAT_Source(Mark));
 	Mark->RefCount = 1;
 	(SC_FAT_SyntaxIsSet(Mark, kSC__Reg_DebugVarClose, true));
 	Mark->_Const = (Mark->_Const | RegBits);
@@ -25774,7 +25784,7 @@ FatASM* SC_Pac_Register(Assembler* Self, int I) {
 	return nil;
 }
 
-FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SourceLocation Map) {
+FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SortableLocation Map) {
 	FatASM* P = SC_Pac_Curr(Self);
 	if (P < Self->End) {
 		Self->Curr_ = (P + 1);
@@ -25782,7 +25792,7 @@ FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SourceLocation M
 		uint64 Info = ((uint64)SC_Pac_Index(Self, P)) << 48;
 		P->Info = ((ASMReg)Info);
 		(SC_FAT__opSet(P, Op));
-		P->SrcMap = Map;
+		P->SrcLoc = Map;
 		if (Exp) {
 			(SC_FAT_MsgSet(P, Exp));
 		}
@@ -25917,7 +25927,7 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Reg, ASMReg NopDest, FatASM* Alte
 	if ((Reg == 0) and Oldi) {
 		return NopDest;
 	}
-	int P = Self->Regs.Phi & (~(1 << Reg));
+	uint P = Self->Regs.Phi & (~(1 << Reg));
 	if ((Oldi > 1) and (SC_Reg_SyntaxIs(NopDest, kSC__Reg_AllowNopDest))) {
 		FatASM* Old = SC_Pac_Fat(Self, Oldi);
 		if (SC_Pac_CanNop(Self, Old, Reg)) {
@@ -25929,7 +25939,9 @@ ASMReg SC_Pac_SetRegister(Assembler* Self, int Reg, ASMReg NopDest, FatASM* Alte
 	}
 	int N = 0;
 	if (Alterer) {
-		P = (P | (1 << Reg));
+		if ((1 << Reg) & SC_Pac_Allocated(Self)) {
+			P = (P | (1 << Reg));
+		}
 		N = (Alterer - Self->FuncStart_);
 		if (Field >= 0) {
 			uint Post_nop_oldi = JB_uint_OperatorMax(((uint)Self->Regs.Setters[Reg]), 1);
@@ -26070,7 +26082,7 @@ ASMReg SC_Pac_TempMe(Assembler* Self, Message* Where, ASMReg T) {
 	int Free = JB_uint_Log2(((~R)));
 	R = (R | (1 << Free));
 	T = SC_Reg_RegSet(T, Free);
-	Self->Declarations[Free] = ((uint)JB_Ternary((Where != nil), SC_Msg_SrcMap(Where), nil));
+	Self->Declarations[Free] = ((uint)JB_Ternary((Where != nil), SC_Msg_SrcLoc(Where), nil));
 	(SC_Pac_vtempsSet(Self, R));
 	T = SC_Reg_SyntaxIsSet(T, kSC__Reg_Const, (!true));
 	T = SC_Reg_SyntaxIsSet(T, kSC__Reg_Temp, true);
@@ -26265,6 +26277,7 @@ ASMReg SC_Pac_TryInlineSub(Assembler* Self, Message* Prms, SCFunction* Fn, int A
 	LL->Start = SC_Pac_Curr(Self);
 	SavedRegisters Svregs = ((SavedRegisters){});
 	SC_SavedRegisters_Collect((&Svregs), Fn->Args, Self);
+	SC_Pac_MarkInlinedFunction(Self, ((Message*)JB_Ring_Parent(Prms)));
 	InlineInfo Info = ((InlineInfo){});
 	SC_Pac_InlineParams(Self, Prms, (&Info), Fn);
 	FatASM* RealStart = SC_Pac_Curr(Self);
@@ -26741,9 +26754,9 @@ void SC_Pac__DumpRegs(FastString* Fs) {
 				JB_FS_AppendByte(Fs, ' ');
 			}
 			JB_FS_AppendString(Fs, JB_LUB[186]);
-			SourceLocation Msg = SC__Pac_Sh.Declarations[I];
+			SortableLocation Msg = SC__Pac_Sh.Declarations[I];
 			if (Msg) {
-				SC_SourceLocation_Render(Msg, Fs, 40);
+				SC_SortableLocation_Render(Msg, Fs, 40);
 			}
 			 else {
 				JB_FS_AppendByte(Fs, '?');
@@ -27039,25 +27052,7 @@ JB_Object* JB_Object_TypeFailed(JB_Object* Self, JB_Class* Cls, Message* Where) 
 
 
 void SC_Array_AppendWords(Array* Self, JB_String* R) {
-	{
-		Array* _LoopSrcf2 = JB_Str_OperatorDivide(R, ' ');
-		JB_Incr(_LoopSrcf2);
-		int _if0 = 0;
-		while (true) {
-			JB_String* S = ((JB_String*)JB_Array_Value(_LoopSrcf2, _if0));
-			JB_Incr(S);
-			if (S == nil) {
-				JB_EarlyDecr(S);
-				break;
-			}
-			if (JB_Str_Exists(S)) {
-				JB_Array_SyntaxAppend(Self, S);
-			}
-			JB_Decr(S);
-			(++_if0);
-		};
-		JB_Decr(_LoopSrcf2);
-	};
+	JB_Str_SplitSub(R, ' ', true, Self);
 }
 
 int SC_Array_CArraySize(Array* Self, int Size) {
@@ -31424,7 +31419,7 @@ SCFile* SC_Imp_ImportSpd(SCImport* Self, JB_File* C) {
 	SCFile* Rz = nil;
 	JB_Incr(Rz);
 	if ((JB_Str_OperatorIsa(C, JB_LUB[1626]))) {
-		JB_File_Fail(C, JB_LUB[2398]);
+		JB_File_Fail(C, JB_LUB[44]);
 		JB_EarlyDecr(Rz);
 		return nil;
 	}
@@ -34496,16 +34491,22 @@ JB_String* SC_Str_SpdScriptName(JB_String* Self) {
 }
 
 Array* JB_Str_Split(JB_String* Self, uint /*byte*/ Sep) {
-	Array* Rz = ((Array*)JB_Array_Constructor0(nil));
+	Array* Result = JB_Array_Constructor0(nil);
+	JB_Str_SplitSub(Self, Sep, false, Result);
+	return Result;
+}
+
+void JB_Str_SplitSub(JB_String* Self, uint /*byte*/ Sep, bool IgnoreEmpty, Array* Into) {
 	int Last = 0;
 	while (true) {
 		JB_String* Word = JB_Str_NextField(Self, Sep, Last);
 		if (Word == nil) {
 			break;
 		}
-		JB_Array_SyntaxAppend(Rz, Word);
+		if ((!IgnoreEmpty) or Word->Length) {
+			JB_Array_SyntaxAppend(Into, Word);
+		}
 	};
-	return Rz;
 }
 
 JB_String* JB_Str_Squeeze(JB_String* Self) {
@@ -46323,7 +46324,7 @@ void SC_Decl_DumpDeclOpen(SCDecl* Self, FastString* Dd, int Pos, int Reg, bool I
 	JB_FS_AppendHInt(Dd, Reg);
 	JB_FS_AppendByte2(Dd, SC_Decl_DumpFlags(Self));
 	Message* S = Self->Source;
-	uint SrcMap = ((uint)JB_Ternary((S != nil), SC_Msg_SrcMap(S), ((uint)0)));
+	uint SrcMap = ((uint)JB_Ternary((S != nil), SC_Msg_SrcLoc(S), ((uint)0)));
 	JB_FS_AppendHInt(Dd, SrcMap);
 	SC_Decl_MiniName(Self, Dd);
 	JB_FS_AppendByte2(Dd, '\x00');
@@ -47467,7 +47468,7 @@ JB_String* SC_Decl_RealName(SCDecl* Self) {
 Message* SC_Decl_RefDestructor(SCDecl* Self) {
 	Message* M = SC_Decl_DeclToDot(Self, SC_Func_Self(SC_Func__CurrFunc()));
 	if (SC_Decl_IsCArray(Self)) {
-		return SC_Refs__DecrMulti(Self, M, false);
+		return SC_Refs__DecrMulti(Self, M);
 	}
 	return SC_Refs__RefClearMsg(M);
 }
@@ -51170,7 +51171,7 @@ bool SC_File_TestBatch(JB_File* Self) {
 	return JB_Rec_OK(JB_StdErr);
 }
 
-bool SC_File_TestCake(JB_File* Self) {
+bool SC_File_TestCakeProjects(JB_File* Self) {
 	uint Mode = kJB__PIDM_StdOutSilence + kJB__PIDM_StdErrCapture;
 	Array* List = SC_Str_BatchSpds(JB_LUB[602]);
 	JB_Incr(List);
@@ -51208,11 +51209,17 @@ bool SC_File_TestCake(JB_File* Self) {
 		};
 	}
 	;
-	JB_Decr(List);
-	JB_String* _tmPf3 = JB_Str_OperatorPlusWithInt64(JB_LUB[603], OK);
-	JB_Incr(_tmPf3);
-	JB_PrintLine(_tmPf3);
-	JB_EarlyDecr(_tmPf3);
+	JB_EarlyDecr(List);
+	return JB_Rec_OK(JB_StdErr);
+}
+
+bool SC_File_TestCakeVM(JB_File* Self, JB_File* CakeProj) {
+	uint Mode = kJB__PIDM_StdErrCapture;
+	Array* Args = (JB_Array_Constructor0(nil));
+	JB_Incr(Args);
+	JB_Array_SyntaxAppend(Args, CakeProj);
+	ExitCode Status = JB_Str_Execute(Self, Args, nil, nil, Mode, 0);
+	JB_EarlyDecr(Args);
 	return JB_Rec_OK(JB_StdErr);
 }
 
@@ -55263,24 +55270,26 @@ ASM* SC_Func_ASMBake(SCFunction* Self, ASM* Where, ASM* After, uint* Positions) 
 			ASM* Curr = Rz;
 			Rz = SC_FAT_xC2xB5BakeInto(Fat, Rz, After);
 			if (Positions) {
-				uint Pos = Fat->SrcMap;
-				if ((Pos >> 21) == 0) {
-					Pos = 0;
+				uint SrcLoc = Fat->SrcLoc;
+				if ((SrcLoc >> 21) == 0) {
+					SrcLoc = 0;
 					FatASM* Prev = Fat - 1;
 					if (Prev >= SC_Func_FatFirst(Self)) {
-						Pos = PrevFatMap;
+						SrcLoc = PrevFatMap;
 					}
 				}
-				PrevFatMap = Pos;
+				PrevFatMap = SrcLoc;
+				uint Break = Fat->BreakInfo;
+				if (Break) {
+					if ((Curr < Rz) or SC_FAT_StillBreakable(Fat)) {
+						SC_FAT_BakeBreak(Fat, SrcLoc, Break);
+					}
+				}
 				if (Curr < Rz) {
-					uint Break = Fat->BreakInfo;
-					Positions[0] = Pos;
+					Positions[0] = SrcLoc;
 					while (Curr++ < Rz) {
 						(++Positions);
 					};
-					if (Break) {
-						SC_FAT_BakeBreak(Fat, Pos, Break);
-					}
 				}
 				if (SC_Reg_SyntaxIs(Fat->Info, kSC__Reg_DebugVars)) {
 					SC_FAT_OutputDebugVars(Fat, Rz - Where);
@@ -61396,4 +61405,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3463813062162670373 -7828895396652110614
+// -1187372597366489652 -548489669601195747
