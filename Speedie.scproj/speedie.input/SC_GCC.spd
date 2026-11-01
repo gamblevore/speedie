@@ -443,38 +443,41 @@ function SayTest (|string| n)
 
 
 function TestNewCompiler (|bool|) // self_test, selftest, testself, test_self, testcompiler
-	|| S = compiler.ProductFile
-	|| Test1 = S
-	|| Test2 = (S+"2").file
-	|| Test3 = (S+"3").file
+	|| Test1 = compiler.ProductFile
+	|file--| Test2 = (test1+"2").file
+	|file--| Test3 = (test1+"3").file
 
 	|| Cpp1 = Cpp_Export.CppProduct
 	|| Cpp2 = Cpp1.ReplacePathComponent(-2, "BuildTest2").File
-	|| Cpp3 = Cpp1.ReplacePathComponent(-2, "BuildTest3").File
+	|file--| Cpp3 = Cpp1.ReplacePathComponent(-2, "BuildTest3").File
+	|| Cake = compiler.speedieDir("Cake.scproj")
 
 	.Cleanup <~ Test2
 	.Cleanup <~ Test3
 	
-// OldSpeedie has compiled SpeedyTest, at Test1. It is different.
-	.saytest("1")
+	rz = .TestNewCompilerSub(test1, test2, cpp2, cpp3, cake)
+
+
+function TestNewCompilerSub (|file| test1, |file| test2, |file| cpp2, |file| cpp3, |file| Cake,  |bool|) // self_test, selftest, testself, test_self, testcompiler
+	.saytest("1", /* OldSpeedie has compiled SpeedyTest, at Test1. It is different.*/ )
 	require Test1.TestSpeedie("2")
 
-
-// Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.
-
-	.saytest("2")
+	.saytest("2", /* Test1 has been run. It created Test2. Test2 is different than Test1, because Test1 had a chance to optimise itself.*/ )
 	require Test2.TestSpeedie("3")
 
-
-// Test2 creates Test3 in .cpp form only, for speed. The outputs SHOULD match.
-	.saytest("3")
+	.saytest("3", /* Test2 creates Test3 in .cpp form only, for speed. The outputs MUST match.*/ )
 	printline
 	
-	require cpp2.mustexist and cpp3.mustexist
+	require cpp2.MustExist and cpp3.MustExist
 	if compiler.ConfBool("compare_speedie")
-		require (Cpp2.CompareFile(Cpp3,cpp3))
+		require Cpp2.CompareFile(Cpp3, cpp3)
 
-	return Test2.TestBatch and test2.testcake
+	.saytest(" Cake") // cake is pretty important and needs building/testing too.
+	
+	require Test2.TestCakeVM(cake)
+	require Test2.TestBatch
+	require Test2.TestCakeProjects
+	return true
 
 
 	
@@ -549,8 +552,15 @@ function string.BatchSpds (|[file]|)
 		if c.visible and c isa "spd"
 			rz <~ c
 	
+
+function File.TestCakeVM (|file| CakeProj, |bool|)
+	|| mode = processmode.StdErrCapture
+	|| args = [CakeProj]
+	|| Status = .Execute(args, nil, mode)
+	return stderr.ok
+
 	
-function file.TestCake (|bool|)
+function file.TestCakeProjects (|bool|)
 	|| mode = ProcessMode.StdOutSilence+processmode.StdErrCapture
 	|| list = "CakeTest".BatchSpds
 	|| OK = 0
@@ -561,7 +571,6 @@ function file.TestCake (|bool|)
 			OK++
 		  else
 			error ("Cake failed: " + c)
-	printline "Cakes OK: " + OK
 	return stderr.ok
 
 
@@ -583,15 +592,11 @@ function file.TestBatch (|bool|)
 
 
 function File.TestSpeedie (|string| v, |bool|)
-	require (.MustExist)
+	require .MustExist
 	expect !(self contains " ") ("Path contains a space: " + self)
 
 	|| variant = "--variant=" + v
 	|| cmd_args = ["--self",  "--nocolor",  Variant]
-	//if v == "3"
-	//	cmd_args <~ "--final" // i guess we dont do this anymore
-//	if Options.arch
-//		cmd_args <~ "--arch="+options.arch // its march on linux anyway
 	if options.PrintCompileString
 		cmd_args <~ "--noisy"
 		printline self

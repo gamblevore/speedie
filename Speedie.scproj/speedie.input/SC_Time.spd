@@ -65,7 +65,6 @@ function compiler.PrintCompileErrors
 
 function compiler.TimeTest (|date| elapsed, |bool|)
 	flow off
-
 	|| CanInstall = true
 	FlowLog.disable
 	if (Options.SelfReplacement) and (Options.Variant ~= "Test") and (platform.release)
@@ -85,10 +84,9 @@ function compiler.CompileTime
 	if !options.scripting
 		if options.SelfReplacement	// avoid failing needlessly
 			.FileSanityTests		// sometimes this fails due to lack of permissions in xcode...
-									// xcode gives lower perms to it's builder scripts, strangely.
-		.VariousSelfTests
+		.VariousSelfTests			// xcode gives lower perms to it's builder scripts, strangely.
 
-	|| elapsed = .CompileAll~timeit
+	|| Elapsed = .CompileAll ~ timeit
 	.PrintCompileTime(elapsed)
 
 	require stderr.ok

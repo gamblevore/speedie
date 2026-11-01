@@ -35,7 +35,6 @@ function perryide.WantCompile (|CompileMode| Mode)
 	(mode is compiling)
 	.DebugMode = mode
 	.Actual_Compile
-	.ShowOutput
 
 
 function ClickedDebug (GUIAction)
@@ -51,14 +50,6 @@ function perryide.StartDebug (|bool|)
 	if .MakeNothingRunning(" before debugging?")
 		.WantCompile(CompileMode.CakeMode ||| compilemode.DebugSet)
 	return true
-
-
-function Perryide.ShowOutput
-	opt norefcounts
-	.ShowText(.ProductOut, "", false)
-	|| itm = .CompileTab(3)
-		(itm is hidden)
-	.ProductErrors.text = ""
 
 
 
@@ -89,7 +80,11 @@ function PerryIDE.RunCompileSub (|unixprocess?| r)
 		|| btn = .DebugBtns.last
 			btn.text = "\0E" // pause
 
+	|| itm = .CompileTab(3)
+		(itm is hidden)
+	.ProductErrors.text = ""
+	.productout.text = ""
+
 	.ShowProductIfMoreOutput = 0
 	.RunButton.text = "\07"
 	.SetAppInfo
-

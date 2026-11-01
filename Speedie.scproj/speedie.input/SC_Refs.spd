@@ -169,7 +169,7 @@ function RC_IgnoreReturn (|scfunction| self, |Message| msg)
 
 
 function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
-	// a = nil   ->   JB_decr(a),  a = nil 
+	// a = nil   ->   JB_decr(a),  a = nil
 	opt norefcounts
 	
 	|| OldPrev = place.Prev
@@ -185,8 +185,6 @@ function RefDecr (|Message| msg, |Message| place, |int| Basis, |bool| IsReturn)
 		
 	|message| what
 	if basis & kBasisCArray
-		check (!isreturn) (msg, "Can't refcount this.")
-		// i never wrote JB_EarlyDecrMulti anyhow.
 		what = DecrMulti( msg.parent!.asdecl!, msg.copy )
 	  else
 		what = RefDecrMsg( msg, IsReturn )
