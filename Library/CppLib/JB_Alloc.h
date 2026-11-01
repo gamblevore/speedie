@@ -330,16 +330,6 @@ inline void JB_Clear_(JB_Object** Place) {
 	JB_Decr(self);
 }
 
-#define JB_DecrMulti(a, b)  (JB_DecrMulti_((JB_Object**)(a),b))
-inline void JB_DecrMulti_(JB_Object** Start, int n) {
-    #if DEBUG
-		JB_TotalSanity(JB_TotalSanity_Force);
-	#endif
-	JB_Object** End = Start+n;
-	while (Start < End) {
-		JB_Decr(*Start++);
-	}
-}
 
 inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     if (self) {
@@ -371,6 +361,7 @@ inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
 	*Place = New;
 	JB_Decr(Old); // Decr MUST come last.
 }
+
 
 inline void JB_Incr2_(JB_Object** Place, JB_Object* New) {
 	JB_Incr(New);

@@ -58,7 +58,7 @@ function assembler.FinishJump (|fatasm| Jump, |bool|)
 		  else
 			exit
 
-	if !d.SrcMap
+	if !d.SrcLoc
 		expect (d == .curr)					// Yikes. well we can still fix this.
 		.MissingReturn
 		

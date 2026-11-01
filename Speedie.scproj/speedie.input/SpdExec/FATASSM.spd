@@ -9,7 +9,7 @@ struct FatASM
 	|uint16|			BasicBlock
 	|int16|				RefCount
 	|ASMReg|			Info
-	|uint|				SrcMap
+	|uint|				SrcLoc
 	|uint16[2]|			PrevOutput
 	|uint16|			ASMIndex
 	|uint16|			Unused
@@ -17,12 +17,12 @@ struct FatASM
 	|byte|				_Op
 	|uint16[5]|			Inputs			// overwrites if we want more space (for functions, which don't use _Const)
 	// we could do this better.
-	// put it after prms[] with spacer gaps, align the fatindexes
+	// put _Const after prms[] with spacer gaps, align the fatindexes
 	|uint64|			_Const
 
 	
-	function Source (|sourcelocation|)
-		return .SrcMap
+	function Source (|SortableLocation|)
+		return .SrcLoc
 	
 	function Msg (|message|)
 		disabled
@@ -33,7 +33,7 @@ struct FatASM
 		if value == @prm
 			|| p = value.parent
 				value = p
-		.SrcMap = Value.SrcMap
+		.SrcLoc = Value.Srcloc
 
 	function Op (|byte|)
 		return ._op
@@ -412,7 +412,6 @@ struct FatASM
 	
 ////////////////////////////////////////////////////////////
 
-
 	syntax call (|uint| i, |asmreg|)
 		|| p = .Prms[i]
 		if p.reg
@@ -427,6 +426,10 @@ struct FatASM
 				error (self, "Missing ASM output")
 		}
 	
+
+	function StillBreakable (|bool|)
+		return (._op == asm.mark) and (.info isnt DebugVars)
+		
 	
 	function µBakeInto (|!&asm| Where, |!&asm| After, |!&asm|)
 		opt inline

@@ -1,14 +1,35 @@
 
+function Message.SrcLoc (|uint|)
+	opt inline
+	|| P = .Position
+	// 11-bits for the file num, 21-bits for the position
+	// 2K files and 2MB per-file max
+	// File Num goes at the top, to make it more significant
+
+	|| FileNum = .tag|uint|>>5
+	return (FileNum << 21) ||| (P&(21~bits))
 
 
-datatype SourceLocation (uint64)
+function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
+	|| i = .ASMIndex + sourcemap.ASMTotal
+	if break & Assembler.BreakPoint
+		SourceMap.BreakPoints!.AppendInt(I)
+	
+	|| value = (SrcMap|uint64| << 32) ||| I
+	SourceMap.Breakable!.AppendInt64(Value)
+
+
+datatype SortableLocation (uint64)
+// we only use 32-bits of this. Another 32 are for
+// making it possible to sort using SpdSort
+// The appender above is a red-herring. We are just appending two things at once :)
+
 	syntax expect (|string?| error=nil)
 		opt norefcounts
 		|| fs = FastString()
 		.Render(fs, 128)
 		error (error, fs)
-		
-		
+			
 	function Position (|int|)
 		return self & 21~bits
 	
@@ -41,7 +62,6 @@ module SourceMap
 	|int|				ASMTotal
 	|FastString|		BreakPoints
 	|FastString|		Breakable
-
 	
 	function Clear
 		opt norefcounts
@@ -73,7 +93,7 @@ module SourceMap
 		return p.Reserve(T)|&uint|
 
 
-	prototype SourceSorter (|SourceLocation| A, |SourceLocation| B, |int|)
+	prototype SourceSorter (|SortableLocation| A, |SortableLocation| B, |int|)
 
 	function BreakableSorter (SourceSorter)
 		return A - B
@@ -86,14 +106,4 @@ module SourceMap
 
 
 	////	////	////	////	////	////	////	////	////	////	////	////	////	////
-
-
-function fatasm.BakeBreak (|uint| SrcMap, |uint| Break)
-	|| i = .ASMIndex + sourcemap.ASMTotal
-	if break & Assembler.BreakPoint
-		SourceMap.BreakPoints!.AppendInt(I)
-	
-	|| value = (SrcMap|uint64| << 32) ||| I
-	SourceMap.Breakable!.AppendInt64(Value)
-
 

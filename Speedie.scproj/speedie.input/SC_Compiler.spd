@@ -93,7 +93,6 @@ linkage
 |SCFunction|				RefEarlyDecr
 |SCFunction|				RefClear
 |SCFunction|				RefDecrMulti
-|SCFunction|				RefEarlyDecrMulti
 |SCFunction|				RefFreeIfDead
 |SCFunction|				RefSafeDecr
 |SCFunction|				RefSetRef
@@ -325,8 +324,7 @@ function InitBasicFuncs (|bool|)
 	.RefDecr		= .LoadRefFunc( "JB_Decr" )
 	.RefEarlyDecr	= .LoadRefFunc( "JB_EarlyDecr" )
 	.RefClear		= .LoadRefFunc( "JB_Clear" )
-	.RefDecrMulti	= .LoadRefFunc( "JB_DecrMulti" )
-	.RefEarlyDecrMulti	= .LoadRefFunc( "JB_EarlyDecrMulti" )
+	.RefDecrMulti	= .FindFunction( "JB_DecrMulti" ) // written normally
 	.RefFreeIfDead	= .LoadRefFunc( "JB_FreeIfDead" )
 	.RefSafeDecr	= .LoadRefFunc( "JB_SafeDecr" )
 	.RefNew			= .LoadRefFunc( "JB_NewClass" )

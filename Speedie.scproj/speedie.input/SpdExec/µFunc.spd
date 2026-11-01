@@ -1,17 +1,5 @@
 
 
-function Message.SrcMap (|uint|)
-	opt inline
-	|| P = .Position
-	// 11-bits for the file num, 21-bits for the position
-	// 2K files and 2MB per-file max
-	// File Num goes at the top, to make it more significant
-
-	|| FileNum = .tag|uint|>>5
-	return (FileNum << 21) ||| (P&(21~bits))
-
-
-
 extend SCFunction
 	function FatFirst (|&fatasm|)
 		return Assembler.sh.TotalStart + .µstart
@@ -20,7 +8,7 @@ extend SCFunction
 	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)
 		opt norefcounts
 		rz = where
-		assembler.sh.FuncStart_ = .fatfirst - 1			// for debug
+		assembler.sh.FuncStart_ = .fatfirst - 1			// For debug
 		
 		|byte| HasLabel
 		|uint| PrevFatMap
@@ -35,20 +23,23 @@ extend SCFunction
 			rz = fat.µBakeInto(rz, after)
 
 			if Positions
-				|| pos = fat.SrcMap
-				if pos >> 21 == 0						// init code... has no file
-					pos = 0
+				|| SrcLoc = fat.SrcLoc
+				if SrcLoc >> 21 == 0						// Init code... has no file
+					SrcLoc = 0
 					|| prev = fat-1
 					if prev >= .FatFirst
-						Pos = PrevFatMap
-				PrevFatMap = Pos
+						SrcLoc = PrevFatMap
+				PrevFatMap = SrcLoc
+				
+				|| Break = fat.BreakInfo
+					if (curr < rz) or fat.Stillbreakable
+						fat.BakeBreak(SrcLoc, break)
+					
 				if curr < rz
-					|| Break = fat.BreakInfo
-					Positions[] = pos
+					Positions[] = SrcLoc
 					while (Curr++ < rz)
-						Positions++
-					if break
-						fat.BakeBreak(Pos, break)
+						Positions++				
+				
 				if fat.info is DebugVars
 					fat.OutputDebugVars(rz-where)
 

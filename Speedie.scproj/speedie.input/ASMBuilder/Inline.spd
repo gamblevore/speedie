@@ -200,6 +200,12 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 		(dest2 is discard)
 		
 	return dest2
+	
+
+function MarkInlinedFunction (|message| fnc)
+	|| br = .BreakRequest
+		|| fat = .RequestOp(asm.mark, fnc, nil)
+		fat.BreakInfo = br
 
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
@@ -209,6 +215,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	|SavedRegisters| svregs
 	svregs.Collect(fn.args, self)
 
+	.MarkInlinedFunction(prms.parent!)
 	|InlineInfo| Info
 	.InlineParams(prms, info, fn)					// Params need to be done anyhow... so don't count them.
 	

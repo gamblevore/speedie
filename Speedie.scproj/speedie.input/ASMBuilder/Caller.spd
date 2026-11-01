@@ -197,10 +197,12 @@ function scfunction.SingleASMCall (|bool|)
 function @ASMType.ASMFunction (fn_asm)					// dofunction
 	opt norefcounts
 	|| prms = exp.last!
-	|| TableID = 0
-	|asmreg| PointerCall
+	||		TableID = 0
+	|ASMReg| PointerCall
 	
 	.ParentSanity
+//	target debug
+//		if prms.AsFunc == "JB_DecrMulti"
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
