@@ -257,6 +257,8 @@ struct Assembler
 	function vtemps (|uint|)
 		return .vtemps_
 
+	function Allocated (|uint|)
+		return .vtemps_ ||| .vdecls_
 
 	setter vdecls (|uint|)
 		if value & .vtemps_ // huh?
@@ -514,7 +516,7 @@ struct Assembler
 						f.DebugPrint
 						debugger
 
-
+		return
 		|| s = .TotalStart
 		|| a = .curr
 		|| C = SanityCount++
@@ -562,7 +564,7 @@ struct Assembler
 
 			if !ss.fatindex 
 				if ss.reg or ((currfat-1).countactualJump(.curr-currfat) > 0)
-					"!output has no fat!"
+					#!output has no fat!
 					.µdebug(exp, dest)
 
 			if !(ss.fatindex(0))  or  (dest is set)  or  (ss is set or discard)

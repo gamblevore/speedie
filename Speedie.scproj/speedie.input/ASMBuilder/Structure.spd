@@ -327,8 +327,10 @@ extend assembler
 			debugger
 			return NopDest
 				
-		|| P = .regs.Phi &~ (1<<Reg)
-
+		|uint| P = .regs.Phi &~ (1<<Reg)
+		
+//		|| xxx = ++asmtrapper
+//		if xxx == 458150
 		if (oldi > 1) and (NopDest is AllowNopDest)
 			target debug: if !alterer							// Can't happen,  .Dest sets this.
 			|| old = .fat(oldi)
@@ -341,10 +343,14 @@ extend assembler
 		
 		|| N = 0
 		target debug
-			if P != .regs.Phi &~ (1<<Reg)
+			|uint| P2 = .regs.Phi &~ (1<<Reg)
+			if P != P2
 
 		if Alterer
-			P |= 1 << Reg
+			// if we are rewinding and set a already closed var to the phi, thats bad.
+			if (1 << reg) & .allocated // keep our pies clean
+				P |= 1 << Reg
+			
 			N = Alterer - .FuncStart_							// Set value
 			if Field >= 0
 				|| post_nop_oldi = .regs.Setters[Reg]|uint| max 1
