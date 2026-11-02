@@ -244,10 +244,11 @@ class String
 	inline Split (|Byte| sep = '\n', |[String]|)
 		opt norefcounts
 		|[string]| result
-		.SplitSub(sep, false, result)
+		.Split(sep, false, result)
 		return result
 	
-	autogen SplitSub (|Byte| sep, |bool| IgnoreEmpty, |[String]| Into)
+	autogen Split (|Byte| sep, |bool| IgnoreEmpty, |[String]| Into)
+		cpp_part SplitSub
 		opt norefcounts
 		|| Last = 0
 		while
