@@ -242,6 +242,8 @@ I think its important to not get overweighed by blazing headlines, in the era of
 
 Clever but not so well-thought-through ideas, can end up gaining too much traction, hiding the results of hand-coded and wonderfully designed systems.
 
+(Code is available at [`Comparisons/strlist.goose`](Comparisons/strlist.goose) and [`Comparisons/strlist.spd`](Comparisons/strlist.spd) if you have downloaded speedie.)
+
 
 
 #### Overview
