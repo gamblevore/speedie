@@ -8,8 +8,10 @@ role SpdFunc (message)
 		.name = "(unused code)"
 		.Type = @tmp
 		.Position = -1			// Position in the compiled code.
-
 	
+	syntax Expect (|string| err)
+		errorreceiver.newerror(self, .name + ": " + err)
+		
 	function message.CodeToVM
 		opt norefcounts
 		|| Code = .name

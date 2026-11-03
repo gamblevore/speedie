@@ -113,31 +113,31 @@ module SpdTable
 			.FillCallBacks(boomer)
 
 
-	function spdfunc.Link❗
-		// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
-		|| Code = .position
-		require code >= 0
-		spdtable.CurrFunc = self
-		|| Base = Cake.BeginCode + Code
-		|| after = base + .RangeLength
+function spdfunc.Link❗
+	// could be multi-threaded... doesn't allocate / alter ptrs :] // no need for now.
+	|| Code = .position
+	require code >= 0
+	spdtable.CurrFunc = self
+	|| Base = Cake.BeginCode + Code
+	|| after = base + .RangeLength
 
-		while base < after
-			|| µ = base[]
-			|| Op = µ.op
-			if op.IsSPDFunc
-				base.LightCandles(µ)
-			  elseif µ.IsLibGlob and op.IsGlob
-				base.LibGlob(µ, op == asm.GOBJ)
-			base += µ.size
+	while base < after
+		|| µ = base[]
+		|| Op = µ.op
+		if op.IsSPDFunc
+			.LightCandles(base, µ)
+		  elseif µ.IsLibGlob and op.IsGlob
+			.LibGlob(base, µ, op == asm.GOBJ)
+		base += µ.size
 
 
-function asm.LightCandles (|&asm| self, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
+function spdfunc.LightCandles (|&asm| base, |asm| JumpAndReg) // SPDLink, LinkFunction, linkall
 	opt norefcounts
-	|| err = .MusicalSoaps(jumpandreg)
-		error (SpdTable.CurrFunc, err)
+	|| err = .MusicalSoaps(base, jumpandreg)
+		error (self, err)
 
 
-function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
+function spdfunc.MusicalSoaps (|&asm| base, |asm| JumpAndReg, |string?|) // SPDLink, LinkFunction, linkall
 	description "Yes I am bored... why else with these names?" 
 	opt norefcounts
 	// JumpAndReg(FNC) == Op(8), Reg(5), Jump(19)
@@ -153,16 +153,16 @@ function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink,
 	require  ID > 0	
 	|| fn = SpdTable.Funcs[id]
 		|| Pos = fn.ASMStart								// Fast-branch for speed.
-			|| Jump = (Pos - Self)|int|						// 19-bits
+			|| Jump = (Pos - base)|int|						// 19-bits
 			Jump -= 2
 			Jump -= op&1
 			if op == asm.tail
-				self[] = (Jump&24~bits) ||| (Op <<24)
+				base[] = (Jump&24~bits) ||| (Op <<24)
 				return nil
 				
 			|| EncodedJump = Jump&19~bits
 			if  (EncodedJump<<13)>>13  ==  Jump
-				self[] = (EncodedJump) ||| (Reg << 19) ||| (Op <<24)
+				base[] = (EncodedJump) ||| (Reg << 19) ||| (Op <<24)
 				return nil
 			return "Executable too large to link: " + fn.name
 		return "Function was trimmed: " + fn.name
@@ -170,14 +170,14 @@ function asm.MusicalSoaps (|&asm| self, |asm| JumpAndReg, |string?|) // SPDLink,
 
 
 
-function asm.LibGlob (|&asm| self, |asm| Old, |bool| GOBJ)				// Globlink, DoGlobs
+function spdfunc.LibGlob (|&asm| base, |asm| Old, |bool| GOBJ)				// Globlink, DoGlobs
 	opt norefcounts
 	|| Shift = 14 + GOBJ
 	|| ID = (Old << Shift) >> Shift
-	expect (ID > 0 and ID < globals.LibMax)					(SpdTable.Currfunc, "Bad LibGlob ID: " + ID )
+	expect (ID > 0 and ID < globals.LibMax)					(self, "Bad LibGlob ID: " + ID )
 	
 	ID = globals.LibLink![ID-1]
-	expect (ID != 16~bits)									(SpdTable.currfunc, "Global missing in library")
+	expect (ID != 16~bits)									(self, "Global missing in library")
 	
 	if (GOBJ)
 		old = (Old >> 17) << 17
@@ -185,7 +185,7 @@ function asm.LibGlob (|&asm| self, |asm| Old, |bool| GOBJ)				// Globlink, DoGlo
 	  else													// GTAB
 		old = (Old >> 18) << 18
 		old |= ID
-	self[] = old
+	base[] = old
 
 
 
