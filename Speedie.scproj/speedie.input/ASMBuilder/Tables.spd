@@ -743,7 +743,7 @@ function Incrementa (|assembler| self, |message| exp, |AsmReg| Dest, |int| Mode,
 		problem (exp, "No nice way to say this: x = x++ is fucked up code.")	// x = x++ makes no sense
 		return src
 	
-	(src is noscale)
+	(src is NoScale)
 	dest.µType = src.µType									// right? it can't be different.
 	|| p = exp.parent!										// better positions
 	if src is ContainsAddr

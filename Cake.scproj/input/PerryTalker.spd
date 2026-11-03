@@ -479,16 +479,12 @@ function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| x
 	xp = .IsExpanded(xp)
 	rz = true
 	if xp
-		Type.ExpandSub(j, Obj, xp, depth)
+		if !type.IsObject or (.weird isnt pointer)
+			Type.ExpandSub(j, Obj, xp, depth)
 		if Type.IsObject									// for now
 			rz = .ExpandGoodContainer(j, obj, type, xp, depth)
 	j.exit
 	
-
-
-function XVar.Weird (|wierdness|)
-	return .Weirdness[0]
-
 
 function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 	opt norefcounts

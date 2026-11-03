@@ -1073,6 +1073,8 @@ class SCDecl (SCObject) {
 
 
 	function SizeOfQuery (|int|)
+		if .IsNormalObject
+			return .Type.ClsSize
 		return .CArraySize
 
 
@@ -1135,7 +1137,7 @@ class SCDecl (SCObject) {
 				return al
 			return 32 // sigh // fallback
 		// CalculateSizeRaw sets function prototype sizes to platform.pointerbytes
-		return t.clssize
+		return t.ClsSize
 	
 
 	function ASMRegType (|datatypecode|)
@@ -1150,14 +1152,13 @@ class SCDecl (SCObject) {
 		
 		
 	function PointerIncrement (|int|)
-		// only called on pointers
-		if .pointercount > 1
-			rz = Platform.PointerBytes
-		  else
-			rz = .type.clssize
-		if .IsCArray
-			// not true for carrays of carrays.
-			rz *= .CArrayTotal
+		|| PC = .PointerCount
+		|| Size = .type.clsSize
+		if  PC + .IsObject  >  1
+			Size = Platform.PointerBytes
+		if .IsCArray						// not true for carrays of carrays.
+			Size *= .CArrayTotal
+		return Size
 
 
 	function SetSelfProp (|message| exp, |functiontype| Ty,  |bool|)

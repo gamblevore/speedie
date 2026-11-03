@@ -41,6 +41,7 @@ class XVar (list)
 				x = s.hint
 			.Weirdness[i] = x
 	
+
 	function ByteSize (|int|)
 		|| w = .Weird
 		if w is Pointer // references aren't real :]
@@ -49,6 +50,9 @@ class XVar (list)
 		w >>= 2
 		return s * (w + !w)						// at least 1
 		
+	function Weird (|wierdness|)
+		return .Weirdness[0]
+	
 	function Type (|xtype|)
 		opt norefcounts
 		return .obj|&nil||xtype|

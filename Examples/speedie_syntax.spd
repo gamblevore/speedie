@@ -6,7 +6,14 @@
 targets: flow
 
 main
-	ObjRenderTest()
+	|| list = &Syntax.TypeList[0]
+	// viewing list in debugger is buggered
+	for i in 63
+		|| item = list[]
+/		list++
+		(item)
+	
+/	ObjRenderTest()
 	|object[10]| Objs
 	|&object| ObjPtr = &Objs[0]
 	for i in 10
@@ -97,6 +104,8 @@ function ObjRenderTest
 	|| G = RPGHero("fred")
 	printline g.__Render__
 
+//	target debug
+//	printline Syntax.join
 	|| R = []
 	R <~ R						// put an array into itself
 	printline r					// seems to survive!
@@ -154,6 +163,7 @@ class RPGHero // for a tile-based board game
 		fs <~ ")"
 		
 
+|| ShowMe = doaction_Duck
 
 dispatch DoAction (|rpghero|self, |string| Reason)
 	jump
