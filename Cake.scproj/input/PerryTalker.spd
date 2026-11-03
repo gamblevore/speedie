@@ -283,6 +283,10 @@ function cakevm.StartStack (|string| name, |int| ErrorCode,  |jbin--|)
 
 function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata?|)
 	opt norefcounts
+
+//	.CollectGlobs(j) // ideally this would come first
+//  perry needs updating.
+
 	|| Count = 0
 	while stack
 		|| err = .CheckStack(stack)

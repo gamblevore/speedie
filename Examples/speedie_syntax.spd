@@ -10,7 +10,7 @@ main
 	// viewing list in debugger is buggered
 	for i in 63
 		|| item = list[]
-/		list++
+		list++
 		(item)
 	
 /	ObjRenderTest()

@@ -4,7 +4,6 @@
 
 extend PerryIDE {
 
-
 function HandleCake (|message| msg)
 	opt norefcounts
 	if msg ~= "run"
@@ -51,7 +50,6 @@ function SetBreaks (|message| breaks)
 	require file ~= .Path
 
 	|| All = breaks.second.int
-//		.editme.debuglevel = TextView.DebugLevelDebugging
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
 			(l isnt CodeReached)
@@ -371,7 +369,7 @@ function listviewrow.ImproveVar (|int| Depth, |bool| CanHide)
 	if fields == @arg
 		for prop in Fields
 			if prop == @arg
-				prop.ImproveArray//(Depth+1, CanHide)
+				prop.ImproveArray // (Depth+1, CanHide)
 			  else
 				prop.ImproveVar(depth+1, CanHide)
 
@@ -449,10 +447,10 @@ extend ListViewRow
 		
 		if self != @arg
 			if p.isroot
-				j.addHInt(.index)
+				j.AddHint(.index)
 			  else
 				|| f = .first #require
-				j.addstr(f.debugname)
+				j.AddStr(f.debugname)
 		return true
 	
 
@@ -490,7 +488,6 @@ function perryide.UpdateStack (|message| stack)
 	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.name = "vars"
 	
-	//Notifications <~ stack.Render
 	|| Break = stack != "stack"
 		|| m = .DebugMode
 		|| crash = stack == "crash"
