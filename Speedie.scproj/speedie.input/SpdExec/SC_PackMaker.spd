@@ -78,7 +78,7 @@ module PackMaker
 			  elseif (options.MakeExec)
 				error (d.source, d.name + "'s ExportPosition doesn't match. Please revert export-table. To remove an item, replace it with a carray of bytes.")
 			  elseif (x <= globals)
-				error (d.source, d.name + " exportposition seems inserted? Regen export-table?")
+				error (d.source, d.name + " ExportPosition seems inserted? Regen export-table?")
 			
 			globals += s
 

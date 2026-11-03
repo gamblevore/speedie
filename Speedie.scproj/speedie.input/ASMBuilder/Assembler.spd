@@ -562,7 +562,7 @@ struct Assembler
 			if .EntireInlineFailed
 				return ss // doesnt matter
 
-			if !ss.fatindex 
+			if !ss.fatindex
 				if ss.reg or ((currfat-1).countactualJump(.curr-currfat) > 0)
 					#!output has no fat!
 					.µdebug(exp, dest)
@@ -581,7 +581,7 @@ struct Assembler
 		opt norefcounts
 		|| S = .Startadd
 		for p in list
-			if All or (p isnt ClassObj)
+			if All or ((p isnt ClassObj) and (!p.declfunc))
 				p.DumpDeclOpen(self, p.exportposition, p.reg, false)
 		.FinishAdd(@bin, S)
 

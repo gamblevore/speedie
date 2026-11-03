@@ -50,7 +50,7 @@ extern \"C\" unsigned short* JB_App__GlobTable() {
 "
 
 
-function FillCake
+function CreateCakeVM
 	LibStability.StabiliseFuncs
 	LibStability.StabiliseGlobs
 
