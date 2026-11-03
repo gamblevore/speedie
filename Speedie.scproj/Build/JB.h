@@ -9615,6 +9615,8 @@ int64 SC_Decl_ConstInRangeSub(SCDecl* Self, int64 Value, bool WasHex);
 
 SCDecl* SC_Decl_Constructor(SCDecl* Self, SCClass* Type);
 
+void SC_Decl_ConstZeroBoolCheck(SCDecl* Self, SCDecl* O, Message* Where);
+
 SCDecl* SC_Decl_Containedfix(SCDecl* Self);
 
 SCDecl* SC_Decl_ContainedReplace(SCDecl* Self, SCDecl* Contains, bool NeedsName);

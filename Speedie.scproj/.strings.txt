@@ -1376,7 +1376,7 @@
 "Unable to get type"
 "Unable to inline function: "
 "Unchanging unsigned comparison vs zero."
-"Unclear signed vs unsigned comparison."
+"Ambiguous signed vs unsigned comparison."
 "Unclear what type to use here. Use |int| or |int64| to specify"
 "Unexpected "
 "Unexpected Params. This variable is not a function."
@@ -2395,3 +2395,4 @@
 " might as well be inline."
 "about"
 " Cake"
+"Multiplying zero by a value always gives zero."

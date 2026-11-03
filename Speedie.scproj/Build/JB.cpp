@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2398];
+extern JB_StringC* JB_LUB[2399];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -15184,6 +15184,16 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 	int Extra = 0;
 	if (LN and RN) {
 		bool GotABool = ((kJB__TC_bool == LNT) or (kJB__TC_bool == RNT));
+		if (GotABool) {
+			if (SC_Opp_SyntaxIs(Comp, kSC__OpMode_Multiply)) {
+				if (LNT == kJB__TC_bool) {
+					SC_Decl_ConstZeroBoolCheck(LC, RC, MsgRel);
+				}
+				if (RNT == kJB__TC_bool) {
+					SC_Decl_ConstZeroBoolCheck(RC, LC, MsgRel);
+				}
+			}
+		}
 		if (LNT != RNT) {
 			if ((GotABool and SC_Opp_SyntaxIs(Comp, kSC__OpMode_Compare))) {
 				JB_Msg_Fail(MsgRel, JB_LUB[665]);
@@ -46069,6 +46079,14 @@ SCDecl* SC_Decl_Constructor(SCDecl* Self, SCClass* Type) {
 	return Self;
 }
 
+void SC_Decl_ConstZeroBoolCheck(SCDecl* Self, SCDecl* O, Message* Where) {
+	if ((SC_Decl_SyntaxIs(O, kSC__SCDeclInfo_Const)) and (!SC_Decl_ExportPosition(O))) {
+		if (!SC_Decl_SyntaxIs(Self, kSC__SCDeclInfo_Const)) {
+			JB_Msg_Fail(Where, JB_LUB[2398]);
+		}
+	}
+}
+
 SCDecl* SC_Decl_Containedfix(SCDecl* Self) {
 	SCDecl* Rz = nil;
 	SCClass* T = Self->Type;
@@ -61409,4 +61427,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 3584199084725099044 6479656751858112798
+// -2798398994615909963 3535215894872379622
