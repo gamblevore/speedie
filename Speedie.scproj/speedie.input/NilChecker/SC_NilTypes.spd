@@ -81,7 +81,7 @@ datatype NilCheckMode (int)
 datatype NilReason (byte)
 	constants
 		|nilreason|
-		Accessing
+		Accessing = 1
 		Property
 		Reading
 		Using

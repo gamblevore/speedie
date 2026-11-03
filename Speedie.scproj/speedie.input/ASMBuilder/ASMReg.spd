@@ -252,6 +252,7 @@ datatype ASMReg (uint64)
 	function datatypecode.zero (|asmreg|)
 		|| K = asmreg.Const
 		K.µtype = self
+		K.FatIndex = 1
 		return K
 	
 		
