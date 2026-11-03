@@ -402,6 +402,13 @@ function scdecl.IsZero (|bool|)
 	return (self is directnumber) and !.ExportPosition
 
 
+function scdecl.ConstZeroBoolCheck (|scdecl| O, |message| where)
+	if (O is Const) and !o.ExportPosition
+		// allow 0*0
+		// just not 0*var... which seems like an error.
+		check (self is const) (where, "Multiplying zero by a value always gives zero.")
+
+
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
 	opt norefcounts
 
@@ -425,7 +432,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 		if (comp is Ordering) and (lnt.issigned != rnt.issigned)
 			// What are we comparing?   byte vs int is ok.   uint vs int NOT OK
 			if lc.CompareUnclear(rc, (comp is less)|bool|) or rc.CompareUnclear(lc, (comp is more)|bool|)
-				error (MsgRel, "Unclear signed vs unsigned comparison.")
+				error (MsgRel, "Ambiguous signed vs unsigned comparison.")
 
 		if comp is Ordering
 			|| always = 0
@@ -457,6 +464,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 	|| extra = 0
 	if LN and RN
 		|| GotABool = (DataTypeCode.bool == lnt or rnt)
+			if (comp is Multiply)
+				if lnt == DataTypeCode.bool
+					lc.ConstZeroBoolCheck(rc, msgrel)
+				if rnt == DataTypeCode.bool
+					rc.ConstZeroBoolCheck(lc, msgrel)
+			
 		if lnt != rnt
 			expect !(GotABool and comp is compare) (MsgRel, "Cant compare bools to non-bools")
 			if (comp is mathlike)
