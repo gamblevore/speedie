@@ -202,7 +202,7 @@
 " bytes in "
 " datatype"
 " doesn‘t have 'syntax is' specified."
-" exportposition seems inserted? Regen export-table?"
+" ExportPosition seems inserted? Regen export-table?"
 " f "
 " for class: "
 " found\n"

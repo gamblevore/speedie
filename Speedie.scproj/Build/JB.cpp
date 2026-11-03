@@ -17799,6 +17799,7 @@ int JB_TC_VecCount(uint /*DataTypeCode*/ Self) {
 ASMReg SC_TC_zero(uint /*DataTypeCode*/ Self) {
 	ASMReg K = kSC__Reg_Const;
 	K = SC_Reg_xC2xB5TypeSetWithTC(K, Self);
+	K = SC_Reg_FatIndexSet(K, 1);
 	return K;
 }
 
@@ -27538,6 +27539,14 @@ void SC_Cpp_CppFunc(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F) {
 	JB_FS_AppendString(Fs, JB_LUB[81]);
 }
 
+void SC_Cpp_CreateCakeVM(Cpp_Export* Self) {
+	SC_LibStability__StabiliseFuncs();
+	SC_LibStability__StabiliseGlobs();
+	SC__PackMaker_LibGlobSize = SC_PackMaker__GlobalsSize(SC__PackMaker_LibGlobs, false);
+	SC_Pac_FillDebugInfo((&SC__Pac_Sh));
+	SC_Cpp_WriteVMGlobsAndPtrs(Self, Self->ModuleProperties);
+}
+
 void SC_Cpp_Destructor(Cpp_Export* Self) {
 	//cpp_part;
 	JB_Clear(Self->Outputs_cpp);
@@ -27852,14 +27861,6 @@ void SC_Cpp_ExportSyx(Cpp_Export* Self) {
 	}
 	;
 	JB_Decr(Fs);
-}
-
-void SC_Cpp_FillCake(Cpp_Export* Self) {
-	SC_LibStability__StabiliseFuncs();
-	SC_LibStability__StabiliseGlobs();
-	SC__PackMaker_LibGlobSize = SC_PackMaker__GlobalsSize(SC__PackMaker_LibGlobs, false);
-	SC_Pac_FillDebugInfo((&SC__Pac_Sh));
-	SC_Cpp_WriteVMGlobsAndPtrs(Self, Self->ModuleProperties);
 }
 
 void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* Self) {
@@ -29165,7 +29166,7 @@ void SC_Cpp__ExportAllSource() {
 	SC_Cpp_PreRun(Exp);
 	SC_Cpp_ExportSyx(Exp);
 	if (SC__Options_MakeExec) {
-		SC_Cpp_FillCake(Exp);
+		SC_Cpp_CreateCakeVM(Exp);
 	}
 	 else {
 		SC_PackMaker__OrderLibGlobs();
@@ -34497,6 +34498,7 @@ Array* JB_Str_Split(JB_String* Self, uint /*byte*/ Sep) {
 }
 
 void JB_Str_SplitSub(JB_String* Self, uint /*byte*/ Sep, bool IgnoreEmpty, Array* Into) {
+	//cpp_part;
 	int Last = 0;
 	while (true) {
 		JB_String* Word = JB_Str_NextField(Self, Sep, Last);
@@ -35450,7 +35452,7 @@ void SC_bin_PropertyLayout(FastString* Self, Array* List, bool All) {
 			if (P == nil) {
 				break;
 			}
-			if (All or ((!SC_Decl_SyntaxIs(P, kSC__SCDeclInfo_ClassObj)))) {
+			if (All or (((!SC_Decl_SyntaxIs(P, kSC__SCDeclInfo_ClassObj))) and ((!SC_Decl_DeclFunc(P))))) {
 				SC_Decl_DumpDeclOpen(P, Self, SC_Decl_ExportPosition(P), SC_Decl_Reg(P), false);
 			}
 			(++_if0);
@@ -39827,8 +39829,9 @@ Message* SC_Msg_InBuiltContained(Message* Self, SCDecl* Dcl) {
 	return JB_Syx_OperatorPlus(kJB_SyxThg, Cnt->Type->Name);
 }
 
-Message* SC_Msg_InBuiltSizeOf(Message* Self, SCDecl* Sulf) {
-	return SC_NewDeclNumConst(SC_Decl_Constructor(nil, SC_TypeInt), SC_Decl_SizeOfQuery(Sulf), JB_LUB[0], false);
+Message* SC_Msg_InBuiltSizeOf(Message* Self, SCDecl* Decl) {
+	int S = SC_Decl_SizeOfQuery(Decl);
+	return SC_NewDeclNumConst(SC_Decl_Constructor(nil, SC_TypeInt), S, JB_LUB[0], false);
 }
 
 Message* SC_Msg_InBuiltTypeOf(Message* Self, SCDecl* Dcl) {
@@ -47302,17 +47305,15 @@ NilCheckMode SC_Decl_PerhapsSoft(SCDecl* Self) {
 }
 
 int SC_Decl_PointerIncrement(SCDecl* Self) {
-	int Rz = 0;
-	if (Self->PointerCount > 1) {
-		Rz = JB_Platform__PointerBytes();
-	}
-	 else {
-		Rz = Self->Type->ClsSize;
+	uint PC = Self->PointerCount;
+	uint Size = Self->Type->ClsSize;
+	if ((PC + SC_Decl_IsObject(Self)) > 1) {
+		Size = JB_Platform__PointerBytes();
 	}
 	if (SC_Decl_IsCArray(Self)) {
-		Rz = (Rz * SC_Decl_CArrayTotal(Self));
+		Size = (Size * SC_Decl_CArrayTotal(Self));
 	}
-	return Rz;
+	return Size;
 }
 
 bool SC_Decl_PointeryMatch(SCDecl* Self, SCDecl* O) {
@@ -47665,6 +47666,9 @@ bool SC_Decl_SetSelfProp(SCDecl* Self, Message* Exp, FunctionType Ty) {
 }
 
 int SC_Decl_SizeOfQuery(SCDecl* Self) {
+	if (SC_Decl_IsNormalObject(Self)) {
+		return Self->Type->ClsSize;
+	}
 	return SC_Decl_CArraySize(Self, 1);
 }
 
@@ -61405,4 +61409,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -1187372597366489652 -548489669601195747
+// 3584199084725099044 6479656751858112798

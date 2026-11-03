@@ -2305,11 +2305,11 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__khalai_While ((NilCheckMode)32)
 #define kSC__khalai_WhileNeg ((NilCheckMode)801)
 #define kSC__khalai_WhilePos ((NilCheckMode)802)
-#define kSC__NilReason_Accessing ((uint)0)
-#define kSC__NilReason_Passing ((uint)4)
-#define kSC__NilReason_Property ((uint)1)
-#define kSC__NilReason_Reading ((uint)2)
-#define kSC__NilReason_Using ((uint)3)
+#define kSC__NilReason_Accessing ((uint)1)
+#define kSC__NilReason_Passing ((uint)5)
+#define kSC__NilReason_Property ((uint)2)
+#define kSC__NilReason_Reading ((uint)3)
+#define kSC__NilReason_Using ((uint)4)
 extern Array* SC__NilReason_values;
 #define kSC__NilState_ActuallyNil ((uint)21)
 #define kSC__NilState_Basic ((uint)2)
@@ -7090,6 +7090,8 @@ Cpp_Export* SC_Cpp_Constructor(Cpp_Export* Self);
 
 void SC_Cpp_CppFunc(Cpp_Export* Self, FastStringCpp* Fs, SCFunction* F);
 
+void SC_Cpp_CreateCakeVM(Cpp_Export* Self);
+
 void SC_Cpp_Destructor(Cpp_Export* Self);
 
 void SC_Cpp_ExportBehaviourHeader(Cpp_Export* Self, SCClass* Cls);
@@ -7107,8 +7109,6 @@ void SC_Cpp_ExportProperties(Cpp_Export* Self, SCClass* Cls, FastStringCpp* Fs, 
 void SC_Cpp_ExportStruct(Cpp_Export* Self, SCClass* Cls, bool IsBehaviour);
 
 void SC_Cpp_ExportSyx(Cpp_Export* Self);
-
-void SC_Cpp_FillCake(Cpp_Export* Self);
 
 void SC_Cpp_FinalMergeOutputIntoACpp(Cpp_Export* Self);
 
@@ -8749,7 +8749,7 @@ SCFunction* SC_Msg_IdentifyFunc(Message* Self);
 
 Message* SC_Msg_InBuiltContained(Message* Self, SCDecl* Dcl);
 
-Message* SC_Msg_InBuiltSizeOf(Message* Self, SCDecl* Sulf);
+Message* SC_Msg_InBuiltSizeOf(Message* Self, SCDecl* Decl);
 
 Message* SC_Msg_InBuiltTypeOf(Message* Self, SCDecl* Dcl);
 
