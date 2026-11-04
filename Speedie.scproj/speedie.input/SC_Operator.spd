@@ -403,10 +403,24 @@ function scdecl.IsZero (|bool|)
 
 
 function scdecl.ConstZeroBoolCheck (|scdecl| O, |message| where)
+	opt norefcounts
+	// the logic behind this check is this:
+	// X = Module.MyConst * SomeBool
+	// now, if myconst == 0, what is the point of this code?
+	
+	// it expands to this:
+	// if SomeBool
+	//     X = 0
+	//   else
+	//     X = 0
+	
+	// it obviously just means, that the user expected MyConst to be a non-zero value.
+	// but didn't realise.
+	
 	if (O is Const) and !o.ExportPosition
 		// allow 0*0
 		// just not 0*var... which seems like an error.
-		check (self is const) (where, "Multiplying zero by a value always gives zero.")
+		check (self is const) (where, "Did you expect '" + O.name + "' to be non-zero? Well it is zero.")
 
 
 function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |message| MsgRel, |int|)
@@ -443,7 +457,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 			if always
 				error (MsgRel, "Unchanging unsigned comparison vs zero.")
 	
-	ifn LN and LN == RN	   		// not both same numbers
+	ifn LN and LN == RN			// not both same numbers
 		if ln and rn and (ln == 1 or rn == 1)
 			if (comp is CompOrSet)
 				return CustomOps.Needed

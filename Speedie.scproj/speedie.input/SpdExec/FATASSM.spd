@@ -45,12 +45,19 @@ struct FatASM
 		.RefCount = nil
 		.Info = nil
 		.BreakInfo = nil
-		._Op = value
+		.Op(value)
 		for i in –count .Inputs
 			.Inputs[i] = nil
 	
-	setter _op (|byte|)
+	setter op (|byte|)
+		opt inline
+		target debug
+			if (.id == -1) and "".trap
 		._op = value
+	
+	setter _op (|byte|)
+		opt inline
+		.op(value)
 
 	function InputFat (|int| i, |&fatasm|)
 		|uint| r = (.prms[i] << 1) >> 16
@@ -100,7 +107,7 @@ struct FatASM
 		
 		.info = dest
 		if dest.IsVec
-			._op = VOpp
+			.op = VOpp
 		return dest
 	
 	
@@ -109,9 +116,9 @@ struct FatASM
 		.info = dest
 		if dest.IsVec
 			if !vopp // oof?
-			._op = VOpp
+			.op = VOpp
 		  elseif dest.issmall
-			._op = sopp
+			.op = sopp
 		return dest
 	
 	
@@ -329,7 +336,7 @@ struct FatASM
 	
 	function assembler.SaferNop (|&fatasm| fat, |int64|)
 		// this used to do more stuff. now it doesnt :]
-		fat._op = asm.noop
+		fat.op = asm.noop
 		target debug
 			.sanity
 	
@@ -418,17 +425,18 @@ struct FatASM
 			return p.ASMReg
 	
 	
-	function CheckHasOutput
-		target debug {
+	function CheckHasOutput {
+	target debug 
 		require !(self isa asm.noop)
-		for (b.bits in .OutputMap|int|) (i)
-			if !.regonly(i)
-				error (self, "Missing ASM output")
-		}
+
+		for i in 2
+			|| p = .prevoutput[i]
+				check .regonly(i)			(self, "Missing ASM output")
+	}
 	
 
 	function StillBreakable (|bool|)
-		return (._op == asm.mark) and (.info isnt DebugVars)
+		return (.op == asm.mark) and (.info isnt DebugVars)
 		
 	
 	function µBakeInto (|!&asm| Where, |!&asm| After, |!&asm|)
@@ -658,7 +666,7 @@ struct FatASM
 		if m == asm.jmpi or asm.jmpf
 			.prms[2] xor= 1
 		  else
-			._op = m xor 1
+			.op = m xor 1
 	
 	
 	function JumpNegate (|assembler| sh,  |fatasm| mid,  |bool|)

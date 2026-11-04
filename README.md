@@ -69,7 +69,7 @@ Beta Release:
 
 Proper Release:
 
-* Needs to run smoothly on (Mac + Window + Linux) * (x86 + ARM). So thats 6 combinations.
+* Needs to run smoothly on OSX ARM, Win x86, and Debian x86.
 * GPU acceleration via OpenCL
 
 Unfortunately I am one person who has created a very large piece of work. Things will take much longer than we would have liked. But overall... Speedie is in a very good state.
@@ -119,15 +119,15 @@ On a personal level, outside of Speedie, I'd love to work on anything helping to
 
 Thats all!
 
-This little build script, knows how to build Speedie, collect dependancies (SDL2), and works on both MacOS and Linux. Its a very smart little build-script, mostly written in Speedie.
+This little build script, knows how to build Speedie, collect dependancies (SDL2), and works on both MacOS and Linux.
 
-You don't need to clone, just run `speedie/make.sh` if you have the `speedie` folder.
+If you downloaded `speedie` without cloning, the script `speedie/make.sh` still works the same.
 
 # SymLinks #
 
-Some systems may need `sudo speedie/make.sh` to install symlinks into `/usr/local/bin`
+Some systems may need you to run `sudo speedie/make.sh` to install symlinks into `/usr/local/bin`
 
-The recommended place for your Speedie folder at `/usr/local/speedie/` . It doesn't have to be there, but installed command-line symlinks will break if the destination can't be found, if the speedie folder was moved after install. So you might as well settle on a fixed location. Or you will have to fix symlinks yourself.
+Installed command-line symlinks will break if the folder is moved after install. So you will want to settle on a fixed location. I recommend using `/usr/local/speedie/`.
 
 
 

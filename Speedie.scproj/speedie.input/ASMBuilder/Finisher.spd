@@ -80,9 +80,11 @@ function assembler.FinishJump (|fatasm| Jump, |bool|)
 
 function fatasm.FinishNoop
 	require (.breakinfo&assembler.breakpoint)
-	._op = asm.addb
+	.op = asm.addb
 	for i in (–count .prms)
 		.prms[i] = 0
+	.prevoutput[0] = 0
+	.prevoutput[1] = 0
 
 
 function assembler.TryTail (|fatasm| FNC)
@@ -103,11 +105,14 @@ function assembler.TryTail (|fatasm| FNC)
 	// If tail's inputs overwrite some params... then we need to copy params
 	// We could adapt the TAIL encoder! That should do it.
 
+	// can't just move it. The output params need to be moved too.
+	
 	Fnc.prms[0] = Fnc.prms[1]
 	Fnc.prms[1] = Fnc.prms[2]
 	Fnc.prms[2] = 0
-//	Fnc.OutputPrms = 0
 	Fnc._op = asm.tail
+	fnc.PrevOutput[0] = 0
+	fnc.PrevOutput[1] = 0
 	fnc.incr
 	(Fnc is exit)
 	
@@ -133,16 +138,16 @@ function fatasm.SimpleConst (|uint64| v, |int| Space,  |bool|)
 function fatasm.FinishConst
 	|| v = .const|uint64|
 	if .SimpleConst(v, 17)
-		._op = asm.KNST		// Already set, but its for clarity
+		.op = asm.KNST		// Already set, but its for clarity
 		return
 	if .RotateConst(V)
-		._op = asm.KNSR
+		.op = asm.KNSR
 		return
 	if .SimpleConst(v, 49)
-		._op = asm.KNST2
+		.op = asm.KNST2
 		return
 	.SimpleConst(v, 64)		// this is the only one that uses prms[5]. But why?
-	._op = asm.KNST3		// we could just... use ._Const?? 
+	.op = asm.KNST3		// we could just... use ._Const?? 
 
 
 
