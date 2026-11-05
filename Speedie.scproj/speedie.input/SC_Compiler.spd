@@ -884,7 +884,7 @@ function FastString.Normal (|string| s)
 	if (options.RainbowTerm):  self <~ TerminalColor.normal
 	self <~ "\n"
 	self <~ s
-	self <~ (' ', 18-s.LengthUTF8)
+	self <~ (' ', 19-s.LengthUTF8)
 	if (options.RainbowTerm):  self <~ TerminalColor.good
 		
 
@@ -951,7 +951,9 @@ function @transcompiler.PrintProduct (|string| s, |bool| ActualCompile, |string|
 			print sz.strsize
 			if Options.modecake
 				print " : 0x"
-				print (rz.ReadAll.hash>>1)|int64|.render
+				|int64| hash = rz.ReadAll.hash
+				hash ^= hash >> 32
+				print hash|uint|.render
 			
 		printline
 

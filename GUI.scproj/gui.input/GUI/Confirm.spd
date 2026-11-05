@@ -14,8 +14,6 @@ extend_module app
 	
 	function Beep (|string?| q=nil)
 		if beep._OK < date.now
-			if app.prefs["dev"]
-				file.Logs["beep_log"].WriteAll(app.stacktrace) // why is this beeping?
 			.BeepSub
 			beep._OK = date.now + (1s/12) // really must be date.now, NOT framestart!
 		if q
