@@ -223,7 +223,7 @@ function message.InsertMainArgs (|message| prms)
 	for ch in prms
 		Found |= ch.MainOneArg(self, i++, Found)
 
-	self <~ "require stderr.ok"~parse
+	self <~ "if !stderr.ok:return exitcode.einval"~parse
 
 
 

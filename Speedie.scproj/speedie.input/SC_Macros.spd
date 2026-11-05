@@ -37,9 +37,9 @@ module Macros {
 	self = task(–taskvars, &run)|_0|
 }`.macro
 
-|| MainArgBasic		= `|| _0 =  _1.MainArg(_2+1, "_0"),				`.macro
-|| MainArgBasicReq	= `|| _0 =  _1.MainArg(_2+1, "_0") #require,	`.macro
-|| MainArgDefault	= `|| _0 =  _1.MainArg(-(_2+1), "_0"),_0 ?= _3	`.macro
+|| MainArgBasic		= `|| _0 =  _1.MainArg(_2+1, "_0"),					`.macro
+|| MainArgBasicReq	= `|| _0 =  _1.MainArg(_2+1, "_0"), if !_0: return exitcode.EINVAL`.macro
+|| MainArgDefault	= `|| _0 =  _1.MainArg(-(_2+1), "_0"),	_0 ?= _3	`.macro
 || MainArgArray		= `
 |[_1]| _0
 || __ArgCurr = _2
@@ -48,7 +48,7 @@ while __ArgCurr < __ArgCount
 `.macro
 
 || MainArgNone = `
-	check (__ArgCount <= _0) ("Unexpected argument: " + app.args[_0]!)
+	if (__ArgCount > _0) {error ("Unexpected argument: " + app.args[_0]!), app.errornumber[] = exitcode.EINVAL}
 `.macro
 }
 

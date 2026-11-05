@@ -9,10 +9,12 @@ extend String
 		cpp_wrapper JB_Str_IsOK
 		nil checker
 	
-	function FileThatExists (|string| operation="access",  |File|)
+	inline FileThatExists (|string| operation="access",  |File|)
+		opt inline
 		|| f = .file
-		if f.MustExist(operation)
-			return f
+		if !f.MustExist(operation)
+			f = nil
+		return f
 
 	function FileExists (|bool|)
 		nil checker

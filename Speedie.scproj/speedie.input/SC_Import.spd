@@ -53,9 +53,8 @@ class SCImport
 		|| P	= Compiler.FindProject(Name)
 		if !P
 			if name[0] != '/'
-				P = file.Speediedir(name).FileThatExists
-			  else
-				P = name.FileThatExists
+				name = file.Speediedir(name)
+			P = name.FileThatExists
 		expect P ( J, "Can’t find import: '$name'" )
 
 		scimport.CurrIsManuallyImported++

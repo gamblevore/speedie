@@ -19,6 +19,7 @@ datatype PID_Int (int)
 
 datatype ExitCode (int)
 	constants
+		EINVAL = 22
 		ENOMEM = 12
 		ENOENT = 2
 		EINPROGRESS = 36

@@ -333,7 +333,7 @@ class SCDecl (SCObject) {
 		.nildeclared = nilstate.realish
 
 
-	function WriteDeclFull (|String| DeclName = "", |int| minimal = 0, |Message|)
+	function WriteDeclFull (|String| DeclName, |int| minimal = 0, |Message|)
 		DeclName ?= .Name
 		expect DeclName or !.default
 		

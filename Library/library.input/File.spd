@@ -193,8 +193,8 @@ class File (stringshared)
 	
 	function ChildExisting (|string| name, |File|)
 		rz = .child(name)
-		expect (rz.exists) (Self, "Can't find file/folder: " + rz)
-	
+		if !rz.MustExist
+			rz = nil	
 	
 	inline Parent (|File|)
 		opt norefcounts
@@ -212,7 +212,7 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		cpp_wrapper JB_File_ReadAll
 	
 	
-	function MustExist (|string| operation = "", |bool|)
+	function MustExist (|string?| operation = nil, |bool|)
 		if .exists
 			return true
 		|| fs = faststring()
@@ -225,6 +225,8 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			fs <~ operation
 		fs <~ " "
 		fs <~ super
+		|| err = app.ErrorNumber
+		err[] ?= ExitCode.ENOENT
 		error (self, fs)
 
 	
