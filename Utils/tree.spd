@@ -8,8 +8,7 @@ function app.tree (|file| path, |int| Indent=0)
 	for c.files in path
 		if c.Visible
 			print "\t"*Indent
-			|| GoBig = c.IsDir and file.StdOut.IsTerminal
-				0
+			|| GoBig = c.IsDir and file.Std.out.IsTerminal
 				print terminalcolor.bold + terminalcolor.green
 			print c.name
 			if GoBig
