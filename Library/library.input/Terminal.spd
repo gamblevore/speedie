@@ -11,13 +11,14 @@ datatype TerminalColor (int)
 		Italic		= 3<<4
 		Underline	= 4<<4
 		Blink		= 5<<4
-		Unused		= 6<<4 // rapid blink, rarely supported
+		// RapidBlink = 6<<4 // rarely supported
 		Inverse		= 7<<4
 		
 		Normal		= 0
 		Good		= Bold + Green
 		Warn		= Bold + Yellow
 		Error		= Bold + Red
+	
 	
 	render (|string?| Info=nil)
 		opt norefcounts
