@@ -225,7 +225,7 @@ function array.operatormul (|[string]| self, |byte| c, |string|)
 
 function app.Ask (|string| Prefix, |string| Q, |bool|)
 	print prefix
-	if IsTesting or !FileDes.stdout.isterminal
+	if IsTesting or !File.std.out.isterminal
 		""
 		return true
 	

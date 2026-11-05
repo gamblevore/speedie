@@ -194,12 +194,12 @@ function ErrorNumber (|&byte|)
 
 function StdIn (|File!|)
 	opt norefcounts
-	return ._Stdin init File.newpipe(filedes.stdin)
+	return ._Stdin init File.newpipe(File.std.in)
 
 
 function StdOut (|file!|)
 	opt norefcounts
-	return ._StdOut init file.NewPipe(filedes.stdout)
+	return ._StdOut init file.NewPipe(File.std.out)
 
 
 libinternal dictionary._BaseUser (|dictionary of string| self, |string| s, |string?|)

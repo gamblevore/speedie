@@ -34,6 +34,7 @@ module Options
 	||		ExternalCompile			= false
 	||		StripNames				= false
 	||		AllowMassInlines		= false
+	||		RainbowTerm				= false
 
 	|int8|	Optimise				= 1
 	|byte|	SelfReplacement			= 0
@@ -42,10 +43,10 @@ module Options
 	|bool|	HideawayScripts
 	
 	function Color (assigns:|bool|)
-		TerminalColor.RainbowTerm = Value
+		.RainbowTerm = Value
 
 	function Color (|bool|)
-		return TerminalColor.RainbowTerm
+		return .RainbowTerm
 	
 	function ModeCake (|bool|)
 		return .mode == kcake

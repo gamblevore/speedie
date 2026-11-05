@@ -1,6 +1,7 @@
 
 
 class StringShared (string)
+	size 24
 	linkage
 		wrapper
 		cpp_class JB_StringShared

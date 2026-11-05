@@ -5,12 +5,15 @@
 
 
 class File (stringshared)
+	size 32
 	linkage
 		cpp_class JB_File
 		wrapper
 	default			nil
 	false			nil
-	|filedes|		Descriptor
+	|FileDescriptor|		Descriptor
+	|byte|					_OpenMode
+	|byte|					_FileFlags
 
 	constants
 		AllowMissing	= true
@@ -23,17 +26,20 @@ class File (stringshared)
 		WriteMode		= 0x001			/* open for writing only */
 		ReadWriteMode	= 0x002			/* open for reading and writing */
 
+
 	flags
 		AllowInvisible
 		AllowSymLinks
 		WantFileObjects
 		Unsorted
 
+
 ////////////////////////////////////////////////////////////////////////////
 
 	constructor (|string?| path = "" )
 		cpp_wrapper JB_File_Constructor
 		description `The file constructor cleans up filepaths, by calling string.pathfix (see string.pathfix)`
+	
 	destructor
 		cpp_wrapper JB_File_Destructor
 
@@ -69,12 +75,8 @@ class File (stringshared)
 	function IsOpen (|bool|)
 		disabled "Use .opened"
 	
-	function Opened (|bool|) // isopen
-		inlined
+	inline Opened (|bool|) // isopen
 		return .descriptor >= 0
-
-	function Name (assigns:|string|Name, |errorint|)
-		return .MoveTo( super.Parent[Name] )
 	
 	syntax cast (|Cstring|)
 		cpp_part CastZero // files ARE zeroterminated always
@@ -238,11 +240,10 @@ Creates an error, if the file is bigger than the 'Limit' param."
 	autogen ListStart (|DirectoryReader|)
 		cpp_wrapper
 
-	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |filedes|)
+	function Open (|int| Flags = File.ReadWriteMode ||| File.CreateMode, |bool|AllowMissing=false, |FileDescriptor|)
 		cpp_wrapper
 
-	function OpenForRead (|bool| AllowMissing = false, |filedes|)
-		inlined
+	inline OpenForRead (|bool| AllowMissing = false, |FileDescriptor|)
 		return .open(0, AllowMissing)
 	
 	function OpenEmpty (|ErrorInt|)
@@ -306,14 +307,6 @@ Creates an error, if the file is bigger than the 'Limit' param."
 						rz = tmp
 		if !KeepSelf and rz == 0
 			rz = .Delete
-
-	function IsFile (|bool|)
-		inlined
-		return !.isdir
-
-//	operator isdir (|string| ext, |bool|)
-//		inlined
-//		return .isdir and self isa ext
 		
 	function DirectoryContains (|string| path, |bool|)
 		return path.PathFix starts .PathDir
@@ -450,12 +443,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			return bb - aa
 			
 
-		function NewPipe (|filedes| Pipe, |file|)
+		function NewPipe (|FileDescriptor| Pipe, |file|)
 			cpp_wrapper JB_File__NewPipe
 		
 
-		function TrashPath (|string|)
-			inlined
+		inline TrashPath (|string|)
 			target OSX
 				return "~/.Trash"
 			target win
@@ -463,15 +455,13 @@ Creates an error, if the file is bigger than the 'Limit' param."
 			target linux
 				return "~/.local/share/Trash"
 		
-		function SystemDrive (|string|)
-			inlined
+		inline SystemDrive (|string|)
 			target win
 				return getenv("%ProgramFiles%")
 			  else
 				return "/"
 		
-		function Applications (|string|)
-			inlined
+		inline Applications (|string|)
 			target OSX
 				return "/Applications"
 			  else
@@ -488,16 +478,13 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		function ReadCPath (|cstring| path, |bool| AllowMissingFile, |int| MaxSize = 100000000, |string|)
 			cpp_wrapper JB_CPath_ReadAll
 
-		function Documents (|file|)
-			inlined
+		inline Documents (|file|)
 			return "~/Documents/".file			// .file calls pathfix already
 
-		function Desktop (|file|)
-			inlined
+		inline Desktop (|file|)
 			return "~/Desktop/".file
 
-		function Logs (|file|)
-			inlined 
+		inline Logs (|file|)
 			return "/tmp/logs/".file
 
 		function Prefs (|string?| name=nil, |file|)
@@ -521,37 +508,11 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				return f
 
 
-//	function AnyDate (|date|)
-//		return .created ?? .modified
-
-
-
-struct DirectoryReader
-	linkage
-		wrapper
-		cpp_class JB_DirReader
-	size 24
-
-	autogen ListEnd
-		cpp_wrapper JB_File_ListEnd
-
-	autogen MoveNext (|bool|)
-		cpp_wrapper JB_File_MoveNext
-
-	autogen CurrChild (|int| MakeDirsObvious=0, |String|)
-		cpp_wrapper JB_File_CurrChild
-	
-
-
-
-datatype FileMode (int)
-	constants
-		|FileMode|
-		Owner	= 7<<6
-		Group	= 7<<3
-		Other	= 7<<0
-		CanExec	= 1<<6  + 1<<3 + 1<<0
-		Process	= Owner + 5<<3 + 5<<0
-		Data	= 6<<6  + 4<<2 + 4<<2
+		module std
+			constants
+				|FileDescriptor|
+				In  = 0
+				Out = 1
+				Err = 2
 
 

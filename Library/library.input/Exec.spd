@@ -4,21 +4,6 @@
 */
 
 
-datatype FileDes (int)
-	constants
-		|FileDes|
-		StdIn  = 0
-		StdOut = 1
-		StdErr = 2
-
-	function IsTerminal (|bool|)
-		cpp_wrapper JB_IsTerminal
-		
-	syntax cast (|bool|)
-		inlined
-		return self >= 0
-
-
 
 datatype PID_Int (int)
 	description "This is the process ID of a process."

@@ -65,7 +65,7 @@ class XVar (list)
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
-		.RenderForPrint(Printer, Stack.reg0, true, TabTo, TerminalColor.RainbowTerm)
+		.RenderForPrint(Printer, Stack.reg0, true, TabTo, RainbowTerm)
 		printline Printer|&nil||string|
 		printer.Length = 0
 		

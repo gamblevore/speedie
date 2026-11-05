@@ -127,7 +127,7 @@ module Perry
 	
 		app.GoddamnXcodeBugs // work around for Xcode bug
 
-		if filedes.StdOut.IsTerminal
+		if file.Std.Out.IsTerminal
 			app.AllowInteruptCrash = true	// fails with 0 params... sigh whatever
 		
 

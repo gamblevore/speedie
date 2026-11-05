@@ -68,14 +68,14 @@ module Platform
 		opt norefcounts
 		// logging should merge with stderr logging? cos we'll want that too... usually.
 		// should not printline... that should be it's own function...
-		|| L = .logger_ init openlog()
+		|| L = ._Logger init openlog()
 		L.write(s)
 		L.write("\n")
 	
 	libinternal OpenLog (|file|)
 		rz = file.logs[app.name + ".log"]!
-		.logger_ = rz
+		._Logger = rz
 		rz.OpenEmpty
 	
-	|file| Logger_
+	|file| _Logger
 		

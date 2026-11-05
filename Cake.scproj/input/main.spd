@@ -2,6 +2,8 @@
 
 // Super 🎂cake🎂 running program!
 
+|bool| RainbowTerm
+
 main
 	opt NoRefCounts	
 	target debug
