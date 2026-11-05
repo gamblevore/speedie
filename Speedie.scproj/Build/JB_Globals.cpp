@@ -148,6 +148,7 @@ bool SC__Options_HideawayScripts;
 bool SC__Options_InlineLib;
 bool SC__Options_IsDirectTest;
 bool SC__Options_KeepAllErrors;
+bool SC__Options_LogASM;
 bool SC__Options_MakeExec;
 byte SC__Options_Mode;
 bool SC__Options_NilTestAllocNeverFails;

@@ -1509,6 +1509,7 @@ extern bool SC__Options_IsDirectTest;
 #define kSC__Options_kCake ((int)2)
 #define kSC__Options_kCpp ((int)1)
 extern bool SC__Options_KeepAllErrors;
+extern bool SC__Options_LogASM;
 extern bool SC__Options_MakeExec;
 extern byte SC__Options_Mode;
 extern bool SC__Options_NilTestAllocNeverFails;
@@ -4500,6 +4501,8 @@ uint JB_uint_LowestBit(uint Self);
 bool JB_uint_OperatorIsa(uint Self, uint N);
 
 uint JB_uint_OperatorMax(uint Self, uint Other);
+
+JB_String* JB_uint_Render(uint Self, FastString* Fs_in);
 
 
 

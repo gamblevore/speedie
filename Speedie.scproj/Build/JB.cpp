@@ -3111,6 +3111,7 @@ bool SC_FB__AppOptions_noisy(JB_String* Name, JB_String* Value, FastString* Purp
 	bool B = JB_Str_Yes(Value, nil);
 	SC__Options_PrintCompileString = B;
 	SC__Options_PrintLibraries = B;
+	SC__Options_LogASM = B;
 	return false;
 }
 
@@ -5879,12 +5880,11 @@ bool SC_PackMaker__AnyClassesNeeded() {
 }
 
 bool SC_PackMaker__BakeAllFuncs(FastString* J, FastString* Bmr) {
-	FastString* Fs = nil;
-	JB_Incr(Fs);
-	if (!SC__Comp_InPerry) {
+	FastString* Dump = nil;
+	if ((!SC__Comp_InPerry) and SC__Options_LogASM) {
 		JB_File* _tmPf0 = SC_Pac__ASMDump();
 		JB_Incr(_tmPf0);
-		JB_SetRef(Fs, JB_Str_OutputStream(_tmPf0));
+		Dump = JB_Str_OutputStream(_tmPf0);
 		JB_Decr(_tmPf0);
 	}
 	int I = 0;
@@ -5893,12 +5893,11 @@ bool SC_PackMaker__BakeAllFuncs(FastString* J, FastString* Bmr) {
 		if ((!Fn)) {
 			break;
 		}
-		if (!SC_PackMaker__TryBakeOneFunc(J, Bmr, Fs, Fn)) {
+		if (!SC_PackMaker__TryBakeOneFunc(J, Bmr, Dump, Fn)) {
 			I = -1;
 			break;
 		}
 	};
-	JB_EarlyDecr(Fs);
 	return I >= 0;
 }
 
@@ -10339,13 +10338,15 @@ JB_String* SC_Ext__PrintProduct(JB_String* S, bool ActualCompile) {
 			JB_Decr(_tmPf0);
 			if (SC_Options__ModeCake()) {
 				JB_Print(JB_LUB[2302]);
-				JB_String* _tmPf2 = JB_Str_ReadAll(Rz, 16777216, true);
-				JB_Incr(_tmPf2);
-				JB_String* _tmPf1 = JB_int64_Render(((int64)(JB_Str_CRC(_tmPf2, 0) >> 1)), nil);
+				JB_String* _tmPf1 = JB_Str_ReadAll(Rz, 16777216, true);
 				JB_Incr(_tmPf1);
-				JB_Decr(_tmPf2);
-				JB_Print(_tmPf1);
+				int64 Hash = JB_Str_CRC(_tmPf1, 0);
 				JB_Decr(_tmPf1);
+				Hash = (Hash ^ (Hash >> 32));
+				JB_String* _tmPf2 = JB_uint_Render(((uint)Hash), nil);
+				JB_Incr(_tmPf2);
+				JB_Print(_tmPf2);
+				JB_Decr(_tmPf2);
 			}
 		}
 		JB_PrintLine(nil);
@@ -15749,6 +15750,12 @@ uint JB_uint_OperatorMax(uint Self, uint Other) {
 		return Self;
 	}
 	return Other;
+}
+
+JB_String* JB_uint_Render(uint Self, FastString* Fs_in) {
+	FastString* Fs = JB_FS__FastNew(Fs_in);
+	JB_FS_AppendInt64(Fs, ((int64)Self));
+	return JB_FS_SmartResult(Fs, Fs_in);
 }
 
 
@@ -30382,8 +30389,7 @@ void SC_FS_Normal(FastString* Self, JB_String* S) {
 	}
 	JB_FS_AppendByte(Self, '\n');
 	JB_FS_AppendString(Self, S);
-	JB_FS_AppendByte(Self, ':');
-	JB_FS_AppendMultiByte(Self, ' ', 18 - JB_Str_LengthUTF8(S));
+	JB_FS_AppendMultiByte(Self, ' ', 19 - JB_Str_LengthUTF8(S));
 	if (SC__Options_RainbowTerm) {
 		JB_FS_AppendTermCol(Self, kJB__TerminalColor_Good);
 	}
@@ -61452,4 +61458,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 1648680426038657611 -7705980028566519545
+// 3360658417823885273 3900920503115197650
