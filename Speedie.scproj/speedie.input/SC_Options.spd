@@ -35,6 +35,7 @@ module Options
 	||		StripNames				= false
 	||		AllowMassInlines		= false
 	||		RainbowTerm				= false
+	||		SwapTest				= false // general A-B test swapping for testing ASM/whatever
 
 	|int8|	Optimise				= 1
 	|byte|	SelfReplacement			= 0
@@ -323,6 +324,10 @@ module Feedback
 		+'self'
 			Explain(Purpose, "Compiles and installs new Speedie, after self-test.")$
 			return .self(value)
+			
+		+'swap'
+			Explain(Purpose)$
+			options.SwapTest = !options.SwapTest
 		
 		+'crash'
 			explain(purpose, "Crashes speedie to test it's crash handlers.")$

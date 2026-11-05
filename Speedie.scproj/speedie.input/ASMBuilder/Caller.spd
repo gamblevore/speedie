@@ -201,8 +201,6 @@ function @ASMType.ASMFunction (fn_asm)					// dofunction
 	|ASMReg| PointerCall
 	
 	.ParentSanity
-//	target debug
-//		if prms.AsFunc == "JB_DecrMulti"
 	|| fn = prms.AsFunc
 		|| intrin = fn.Intrinsic
 			return .DoIntrinsic(exp, dest, fn, intrin)
@@ -224,7 +222,10 @@ function @ASMType.ASMFunction (fn_asm)					// dofunction
 		fn = f.ASMDecl.Type.FuncProto						#expect (exp)
 	
 	fn.ASMReached = (fn.ASMReached + 1) min 255
-	dest = .FunctionDestination(exp, dest &~ asmreg.ExitAtAll, fn)
+
+	if !Options.SwapTest // now I can test it more easily
+		(dest isnt ExitAtAll)
+	dest = .FunctionDestination(exp, dest, fn)
 	|| Start = .curr
 	|asmreg[8]| Regs
 
@@ -246,9 +247,7 @@ function @ASMType.ASMFunction (fn_asm)					// dofunction
 		.GrabbedRegisters(exp, Start, fat)
 		return fat.info // already set in asmcall
 
-//	|| HighBit = .TempMe(exp, datatypecode.uint64|asmreg|)
 	|| branch = exp.JTST(PointerCall, 63)
-//	branch.OperatorMul(highbit)							// this returns nothing? so no need to add.
 	.ASMCall(exp, dest, fn, tableid, regs, false)
 	|| J = exp.jump
 	

@@ -5,15 +5,14 @@ main (|file.existing| path=".".file)
 	.tree(path)
 
 function app.tree (|file| path, |int| Indent=0)
-	for c.files in path
-		if c.Visible
-			print "\t"*Indent
-			|| GoBig = c.IsDir and file.Std.out.IsTerminal
-				print terminalcolor.good
-			print c.name
-			if GoBig
-				print terminalcolor.normal
-			printline
-			if c.isdir and !c.IsSymLink
-				.tree(c, indent+1)
-	
+	for c in path.ListFiles
+		print "\t"*Indent
+		|| GoBig = c.IsDir and file.Std.out.IsTerminal
+			print terminalcolor.good
+		print c.name
+		if GoBig
+			print terminalcolor.normal
+		printline
+		if c.isdir and !c.IsSymLink
+			.tree(c, indent+1)
+
