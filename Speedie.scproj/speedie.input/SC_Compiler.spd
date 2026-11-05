@@ -884,7 +884,6 @@ function FastString.Normal (|string| s)
 	if (options.RainbowTerm):  self <~ TerminalColor.normal
 	self <~ "\n"
 	self <~ s
-	self <~ ":"
 	self <~ (' ', 18-s.LengthUTF8)
 	if (options.RainbowTerm):  self <~ TerminalColor.good
 		
