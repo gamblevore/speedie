@@ -44,7 +44,7 @@ extend String
 		
 	inline file.Sibling (|string| name, |file|)
 		opt norefcounts
-		return super.sibling(name).file // .file should store the path as it doesn't need correction
+		return .ReplacePathComponent(-1, Name).file // .file should store the path as it doesn't need correction
 	
 	function Components (|[string]|)
 		|| i = 0
