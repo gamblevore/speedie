@@ -7,7 +7,7 @@
 	0
 ;
 	else
-	CakeCrashed(&vm, EILSEQ, Code)
+	CakeCrashed(&vm, EILSEQ, Code, 0)
 ;
 	// sigill
 

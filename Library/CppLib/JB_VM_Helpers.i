@@ -32,8 +32,7 @@ extern "C" {
 // Using the SIMD registers.
 typedef void (*FFI_Fn)			();
 pid_t		  getpid			();
-static ivec4* CakeCrashedSub	(CakeVM* V, int ErrorKind, CakeStack* Stack, int Signal);
-static ivec4* CakeCrashed		(CakeVM* V, int Signal, ASM* Code);
+static ivec4* CakeCrashed		(CakeVM* V, int Error, ASM* Code, CakeStack* Stack);
 
 
 #define TryTrap() if (CanTrap(&vm, Op, Code)) {Op = *Code++; goto BREAK;}
@@ -213,9 +212,8 @@ static __boiling ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* se
 	{
 		auto OldStack = (CakeStack*)(r-1);
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
-		if_rare (NewStack >= End) {					// Stackoverflow
-			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV|128);
-			vm.Registers[2] = {.Int = errno};		// Clear stack. Its gone. And we already reported it.
+		if_rare (NewStack >= End) {						// Stackoverflow
+			CakeCrashed(&vm, SIGSEGV|128, nil, OldStack);
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
@@ -684,8 +682,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		auto OldStack = (CakeStack*)(r-1);
 		if_rare (NewStack >= End) {				// Stackoverflow
-			CakeCrashedSub(&vm, kOverFlowStack, OldStack, SIGSEGV|128);
-			vm.Registers[2] = {.Int = errno};	// Clear stack. Its gone. And we already reported it.
+			CakeCrashed(&vm, SIGSEGV|128, nil, OldStack);
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		

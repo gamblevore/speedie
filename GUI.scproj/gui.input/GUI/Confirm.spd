@@ -1,4 +1,4 @@
- 
+
 // confirm, ask, confirmit, beep, alert
 module beep
 	syntax expect (|string?| s=nil)

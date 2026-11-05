@@ -303,25 +303,6 @@ VMOpt ivec4* JB_ASM_Run_ (CakeVM& V, int CodeIndex) {
 }
 
 
-static ivec4* CakeCrashedSub (CakeVM* V, int ErrorKind, CakeStack* Stack, int Error) {
-	char ErrorBuff[40];
-	const char* ErrStr = "Run CakeVM";					SubCrash = 3;
-	if (Stack) {
-		int Depth = Stack->Depth;
-		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
-		ErrStr = ErrorBuff;
-	}
-	
-	V->CakeFail = Error;
-	Stack = VMClearHigh(Stack);
-	(V->__VIEW__)(V, Stack, Error, 0);					SubCrash = 30;
-	JB_ErrorHandleFileC(nil, Error, ErrStr);			SubCrash = 40;
-	V->Registers[2] = {.Int = Error};
-	
-	return 0; 
-}
-
-
 static CakeStack* GetMaxStack (CakeVM* V) {
 	auto Curr = &(V->Registers[2].Stack);
 	while (true) {
@@ -338,15 +319,35 @@ static CakeStack* GetMaxStack (CakeVM* V) {
 }
 
 
-static ivec4* CakeCrashed (CakeVM* V, int Error, ASM* Code) {
-	// EILSEQ (instead of SIGILL) can come here. 
-	if (SubCrash) {
-		printf("Crashed inside crash handler, at point: %i\n", SubCrash);
+static ivec4* CakeCrashed (CakeVM* V, int Error, ASM* Code, CakeStack* Stack) {
+	if (int SubC = SubCrash; SubC) {
+		if (SubC >= 16)
+			exit(ENOTCAPABLE); // no idea what to exit with. ECRASHHANDLERCRASHED?
+		
+		SubCrash = 16;
+		printf("Crashed inside crash handler, at point: %i\n", SubC);
 		return 0;
-	}													SubCrash = 2;
-	errno = Error;
-	int Where = JB_ASM_Index(V, Code);
-	CakeCrashedSub(V, kStillInRange, GetMaxStack(V), Error);
+	}
+	//int Where = JB_ASM_Index(V, Code);
+														SubCrash = 15;
+	if (!Error) Error = errno;
+	if (!Stack) Stack = GetMaxStack(V);
+
+	char ErrorBuff[40];
+	const char* ErrStr = "Run CakeVM";					SubCrash = 14;
+	if (Stack) {
+		int Depth = Stack->Depth;
+		snprintf(ErrorBuff, sizeof(ErrorBuff), "StackOverFlow: Stack is %i deep", Depth);
+		ErrStr = ErrorBuff;
+	}
+	
+	V->CakeFail = Error;
+	Stack = VMClearHigh(Stack);
+	(V->__VIEW__)(V, Stack, Error, 0);					SubCrash = 13;
+	JB_ErrorHandleFileC(nil, Error, ErrStr);			SubCrash = 12;
+	V->Registers[2] = {.Int = Error};
+	SubCrash = 0;
+	
 	return 0;
 }
 
@@ -362,7 +363,7 @@ ivec4* JB_ASM_Run (CakeVM* V, int Code) {
 	auto OldBus = signal(SIGBUS,  JB_MemoryAccessError);
 
 	int Error = setjmp(JB_MemFailJump);
-	ivec4* Reg =  Error  ?  CakeCrashed(V, Error, 0)  :  JB_ASM_Run_(*V, Code);
+	ivec4* Reg =  Error  ?  CakeCrashed(V, Error, 0, 0)  :  JB_ASM_Run_(*V, Code);
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
 	SubCrash = 0;
