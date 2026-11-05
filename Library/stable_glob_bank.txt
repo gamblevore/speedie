@@ -21,7 +21,6 @@ JB__Tk__ErrorFlags
 GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
-JB__TerminalColor_RainbowTerm
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
@@ -96,7 +95,7 @@ JB__Constants_XML_UnEscapeStr
 GUI__Note_Alerts
 JB__Tk__EndOfLineMarker
 JB__Tk__ErrorNames
-JB__Platform_Logger_
+JB__Platform__Logger
 GUI__font_small_
 JB_Random
 JB_StdErr

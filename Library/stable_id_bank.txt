@@ -944,7 +944,6 @@ JB_File_MoveNext
 JB_File_MoveTo
 JB_File_MoveToTrash
 JB_File_MustExist
-JB_File_NameSet
 JB_File_NewerThanFile
 JB_File_Offset
 JB_File_OffsetSet
@@ -1422,7 +1421,6 @@ JB_Str_Preview
 JB_Str_Print
 JB_Str_PrintError
 JB_Str_PrintLine
-JB_Str_PrintlineColor
 JB_Str_Protocol
 JB_Str_Range
 JB_Str_RangeVec
@@ -1489,16 +1487,8 @@ JB_Task_Constructor
 JB_Task_ConstructorEmpty
 JB_Task_Destructor
 JB_Task_SyntaxIsSet
-JB_TerminalColor_Colorise
 JB_TerminalColor_Render
-JB_TerminalDisplay_Beep
 JB_TerminalDisplay_Destructor
-JB_TerminalDisplay_Display
-JB_TerminalDisplay_DrawRect
-JB_TerminalDisplay_Flat
-JB_TerminalDisplay_FrameText
-JB_TerminalDisplay_SyntaxAppend
-JB_TerminalDisplay__New
 JB_TestMemory
 JB_TotalSanity
 JB_Tree_Across
