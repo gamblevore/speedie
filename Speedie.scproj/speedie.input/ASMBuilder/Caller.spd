@@ -70,6 +70,15 @@ function message.RegCheck (|int| Bad)
 		error (self, "Too many registers in use. No space for result.")
 
 
+function CanSafelyInlineReturn (|bool|)
+	|| i = .actionindex
+	while i > 0
+		|| Action = .Actions[--i]
+		if action == asmtype.kreturn
+			return true
+		require action == @bra or @type
+		
+
 function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  |asmreg|)
 	opt norefcounts
 	.CurrFuncGrab++
@@ -77,7 +86,7 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 	|uint| v = 0
 	
 	|| ret = .state.return
-	if ret and (dest is ExitAtAll) // inlined return
+	if ret and (dest is ExitAtAll) and .CanSafelyInlineReturn // inlined return
 		v = ret.reg
 		|| SafeDest = .state.parentvars|uint|.log2 + 1
 		if !V

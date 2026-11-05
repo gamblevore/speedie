@@ -295,11 +295,6 @@ extend assembler
 			
 	function Trash (|uint| Reg)
 		while  ++reg <= 31
-			target debug
-//				ASMDebug()
-				|| V = .vdecls
-				if (1<<reg)&v
-				
 			if .regs.setters[reg]
 				.ClearRegister(Reg)
 	

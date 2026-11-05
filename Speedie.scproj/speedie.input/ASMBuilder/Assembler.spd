@@ -41,16 +41,17 @@ struct Assembler
 	|byte|						EntireInlineFailed
 	|byte|						CurrFuncGrab
 	|byte|						DelayedNopCount
+	|byte|						ActionIndex
 	|bool|						NeedsRework				// hoisting
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
-	|byte|						StackSize
 	|InlineState[8]|			InlineState
 	|scfunction--|				Root_Fn
 	|SortableLocation[32]|		Declarations
 
 	|uint16[32]|				DelayedNops
+	|byte[256]|					Actions
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
 	|&FatASM|					TotalStart
@@ -535,22 +536,24 @@ struct Assembler
 		cpp_part GetASM
 		(dest isnt const)				// a dest is a dest. so it should never be a const, right?
 										// I mean it can be, but WE have to decide that, not the caller.
-		target debug
-//			.Sanity
-			.TempCheck(dest)
-			|| StackSize = ++.StackSize
-			|| µTrap = ++ASMTrapper
-			|| CurrFat = .curr
-			if µtrap == -1 or stacksize > 30 // ugh
-		  else
+		target !debug
 			opt inline
 		
-		|| fn = fn_asm_table[exp.ASMType]!
+		  else
+			.TempCheck(dest)
+			|| µTrap = ++ASMTrapper
+			|| CurrFat = .curr
+			if µtrap == -1 or .ActionIndex > 30 // ugh
+
+		|| Type = exp.ASMType
+		.Actions[++.ActionIndex] = Type
+		
+		|| fn = fn_asm_table[Type]!
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
 			.Sanity
-			.StackSize--
+			.ActionIndex--
 
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
@@ -563,7 +566,7 @@ struct Assembler
 				return ss // doesnt matter
 
 			if !ss.fatindex
-				if ss.reg or ((currfat-1).countactualJump(.curr-currfat) > 0)
+				if ss.reg or ((currfat-1).CountActualJump(.curr-currfat) > 0)
 					#!output has no fat!
 					.µdebug(exp, dest)
 

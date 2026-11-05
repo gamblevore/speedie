@@ -78,12 +78,16 @@ function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest,
 	if B
 		.PhiMergeSub(exp, T.Start,	.regs,		B, liftup)
 	
-	|| S = &.regs.Setters[0]
-	|| M = &(t.middle.Setters[0])
+	|| C = &.regs.Setters[0]
+	|| M = &(t.middle.Setters[0])	// M is needed to merge branches, undoing the earlier restoration. 
+	|| S = &(t.start.setters[0])	// S is needed, because of trashers
 
-	// maybe just go over XM bits?
+	// || y = 123
+	// if x: return .func(y) // trashes y
+	// we need y untrashed now!
+	
 	for i in 32
-		S[i] = S[i]|uint| max M[i]
+		C[i] = (C[i]|uint| max M[i]) max S[i]
 	return dest
 
 
