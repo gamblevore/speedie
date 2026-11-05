@@ -34,7 +34,7 @@ module Options
 	||		ExternalCompile			= false
 	||		StripNames				= false
 	||		AllowMassInlines		= false
-	||		RainbowTerm				= false
+	||		RainbowTerm				= file.std.out.isterminal
 	||		SwapTest				= false // general A-B test swapping for testing ASM/whatever
 
 	|int8|	Optimise				= 1

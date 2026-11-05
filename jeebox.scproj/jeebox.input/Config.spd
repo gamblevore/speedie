@@ -54,7 +54,7 @@ extend message
 	libinternal ConfArg (|config|)
 		opt norefcounts
 		nil checker
-		if self == @arg or nil
+		if self == nil or @arg
 			return self
 		|| w = .next
 		if self == @tmp

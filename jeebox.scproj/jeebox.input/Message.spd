@@ -1047,6 +1047,7 @@ Message is also
 
 
 	syntax Equals (|string?| name, |bool| Aware=false, |bool|)
+		opt noinline
 		return self and .name.SyntaxEquals( name, aware )
 
 

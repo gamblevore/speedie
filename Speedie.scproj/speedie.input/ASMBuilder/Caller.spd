@@ -79,7 +79,12 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 	|| ret = .state.return
 	if ret and (dest is ExitAtAll) // inlined return
 		v = ret.reg
-		v ?= .state.parentvars|uint|.log2 + 1
+		|| SafeDest = .state.parentvars|uint|.log2 + 1
+		if !V
+			v = SafeDest
+		  elseif !fn.hascversion
+			v = v max safedest
+			
 		dest = dest.Tempness(ret)
 
 		// this could trash a valid reg!!!
@@ -223,8 +228,8 @@ function @ASMType.ASMFunction (fn_asm)					// dofunction
 	
 	fn.ASMReached = (fn.ASMReached + 1) min 255
 
-	if !Options.SwapTest // now I can test it more easily
-		(dest isnt ExitAtAll)
+	if Options.SwapTest // now I can test it more easily
+		(dest isnt ExitAtAll) // this seems to not be necessary? just makes code worse??
 	dest = .FunctionDestination(exp, dest, fn)
 	|| Start = .curr
 	|asmreg[8]| Regs
@@ -282,10 +287,10 @@ function assembler.ASMCall (|message| exp, |asmreg| dest, |scfunction| fn, |int|
 		func._op = asm.FNCX
 		if PExt > 0
 			func._op = asm.fncx3
-	  elseif PExt > 0
-		func._op = asm.fnc3
-	
-	.Trash(dest.reg)
+	  else
+		if PExt > 0
+			func._op = asm.fnc3
+		.Trash(dest.reg)
 
 	if fn|scobject| isnt stateless
 		func.incr					// NOICE!

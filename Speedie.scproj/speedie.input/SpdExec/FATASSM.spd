@@ -143,9 +143,12 @@ struct FatASM
 		cpp_part AsReg
 		
 		target debug
-			|| m = .OutputRegMap
-				|| v = flags.reg
-				ifn (m & 1<<v)
+			|| v = flags.reg
+				|| m = .OutputRegMap
+					ifn (m & 1<<v)
+		// for increments: we optionally return a value
+		// If not, then flags uses r0, and the regmap won't include r0.
+		
 		return .OperatorDivide(flags)
 
 	

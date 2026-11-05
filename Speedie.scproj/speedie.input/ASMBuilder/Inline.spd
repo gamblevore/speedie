@@ -210,6 +210,8 @@ function MarkInlinedFunction (|message| fnc)
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
+	target debug
+		if fn == "JB_Msg_SyntaxEquals"
 	LL.Start = .curr
 	
 	|SavedRegisters| svregs
@@ -217,13 +219,13 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 
 	.MarkInlinedFunction(prms.parent!)
 	|InlineInfo| Info
-	.InlineParams(prms, info, fn)					// Params need to be done anyhow... so don't count them.
-	
-	|| RealStart = .curr
 	target debug
 		|| InlineTrap = ++asmtrapper
 		if InlineTrap == -1
 		.sanity
+	.InlineParams(prms, info, fn)					// Params need to be done anyhow... so don't count them.
+	
+	|| RealStart = .curr
 	asmtype.ArgumentSub(self, fn.SourceArg!)
 	info.NopParams(fn.args.length, .state.return, self)
 	svregs.Restore(fn.args)

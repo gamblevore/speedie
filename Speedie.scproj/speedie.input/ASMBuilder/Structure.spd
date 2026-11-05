@@ -236,9 +236,6 @@ extend assembler
 					.sanity(fat)
 				return
 		
-		if fat isa asm.noop
-			return
-		
 		if !.IsWithinCurrInline(fat)
 			|| fatty = .CanDelay(fat)$
 			|| C = .DelayedNopCount++
@@ -248,13 +245,16 @@ extend assembler
 
 		|| HasBreak = .nop_sub_keep(fat, NopMode)
 		if (nopmode is rewind)		// asmtodo: what about ((or .iscurrblock))
-		// The problem is jumps, if something jumped to a point, and then we nop the jump-dest
-		// it goes wrong. It happens during returnopt. But could it happen elsewhere? who knows
-		// might as well play safe.
+		// If something jumped to a point, and then we nop the jump-dest, it goes wrong.
+		// It happens during returnopt. But could it happen elsewhere? who knows.
+		// Might as well play safe.
 			|| C = .Last
 			if fat == C
 				.curr_ = C							// Do it before both kinds of nop...
 
+		if fat isa asm.noop
+			return
+		
 		depth++
 		if depth > 7
 		
@@ -295,6 +295,11 @@ extend assembler
 			
 	function Trash (|uint| Reg)
 		while  ++reg <= 31
+			target debug
+//				ASMDebug()
+				|| V = .vdecls
+				if (1<<reg)&v
+				
 			if .regs.setters[reg]
 				.ClearRegister(Reg)
 	
