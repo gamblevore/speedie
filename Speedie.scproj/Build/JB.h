@@ -81,7 +81,7 @@ typedef int ExitCode;
 
 typedef byte FatNopMode;
 
-typedef int FileDes;
+typedef int FileDescriptor;
 
 typedef int FileMode;
 
@@ -797,15 +797,16 @@ struct Assembler {
 	byte EntireInlineFailed;
 	byte CurrFuncGrab;
 	byte DelayedNopCount;
+	byte ActionIndex;
 	bool NeedsRework;
 	uint RegDebugInfo;
 	uint VDecls_;
 	uint VTemps_;
-	byte StackSize;
 	InlineState InlineState[8];
 	SCFunction* Root_Fn;
 	SortableLocation Declarations[32];
 	u16 DelayedNops[32];
+	byte Actions[256];
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
 	FatASM* TotalStart;
@@ -1522,12 +1523,14 @@ extern bool SC__Options_PrintMemoryUsage;
 extern bool SC__Options_PrintStages;
 extern bool SC__Options_ProjectIsLibrary;
 extern bool SC__Options_ProjectIsMiniLib;
+extern bool SC__Options_RainbowTerm;
 extern bool SC__Options_Scripting;
 extern byte SC__Options_SelfReplacement;
 extern bool SC__Options_Silent;
 extern bool SC__Options_SingleCppOutput;
 extern JB_String* SC__Options_SingleFileInput;
 extern bool SC__Options_StripNames;
+extern bool SC__Options_SwapTest;
 extern bool SC__Options_TargetDebug;
 extern JB_String* SC__Options_Variant;
 extern bool SC__Options_Warnings;
@@ -1593,7 +1596,7 @@ extern Array* SC__PackMaker_PackStrings;
 #define kJB__PicoNoise_Events ((int)12)
 #define kJB__PicoNoise_EventsChild ((int)4)
 #define kJB__PicoNoise_EventsParent ((int)8)
-#define JB__Platform_Logger_ JB__.Platform_Logger_
+#define JB__Platform__Logger JB__.Platform__Logger
 extern Message* SC__PostIncrementNil_Msgs[32];
 extern int SC__PostIncrementNil_Size;
 extern bool SC__PostIncrementNil_Sync;
@@ -1803,6 +1806,9 @@ extern SCDecl* SC_TypeVoid;
 extern SCClass* SC_TypeVoid_;
 extern SCDecl* SC_TypeVoidPtr;
 extern SCClass* SC_TypeWrapper;
+#define kJB__std_Err ((FileDescriptor)2)
+#define kJB__std_In ((FileDescriptor)0)
+#define kJB__std_Out ((FileDescriptor)1)
 #define kJB__zalgo_down ((JB_StringC*)JB_LUB[2383])
 #define kJB__zalgo_mid ((JB_StringC*)JB_LUB[2382])
 #define JB__zalgo_R JB__.zalgo_R
@@ -2210,6 +2216,7 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kJB__ErrorSeverity_Problem ((uint)3)
 #define kJB__ErrorSeverity_Warning ((uint)2)
 #define kJB__ExitCode_EINPROGRESS ((int)36)
+#define kJB__ExitCode_EINVAL ((int)22)
 #define kJB__ExitCode_ENOENT ((int)2)
 #define kJB__ExitCode_ENOMEM ((int)12)
 #define kJB__ExitCode_SIGKILL ((int)137)
@@ -2217,9 +2224,6 @@ extern ASM SC__ASMType_WriteASM[5];
 #define kSC__FatNopMode_KeepInputs ((int)1)
 #define kSC__FatNopMode_NopTemp ((int)4)
 #define kSC__FatNopMode_Rewind ((int)2)
-#define kJB__FileDes_StdErr ((FileDes)2)
-#define kJB__FileDes_StdIn ((FileDes)0)
-#define kJB__FileDes_StdOut ((FileDes)1)
 #define kJB__FileMode_CanExec ((FileMode)73)
 #define kJB__FileMode_Data ((FileMode)416)
 #define kJB__FileMode_Group ((FileMode)56)
@@ -2450,21 +2454,24 @@ extern Array* SC__NilReason_values;
 #define kJB__TaskState_Started ((uint)1)
 #define kJB__TaskState_Successful ((uint)32)
 #define kJB__TaskState_WaitsTillStart ((uint)4)
-#define kJB__TerminalColor_Black ((TerminalColor)30)
-#define kJB__TerminalColor_Blue ((TerminalColor)34)
-#define kJB__TerminalColor_Bold ((JB_StringC*)JB_LUB[127])
-#define kJB__TerminalColor_Cyan ((TerminalColor)36)
-#define kJB__TerminalColor_Error ((JB_StringC*)JB_LUB[124])
-#define kJB__TerminalColor_Good ((JB_StringC*)JB_LUB[125])
-#define kJB__TerminalColor_Green ((TerminalColor)32)
-#define kJB__TerminalColor_Magenta ((TerminalColor)35)
-#define kJB__TerminalColor_Normal ((JB_StringC*)JB_LUB[128])
-#define JB__TerminalColor_RainbowTerm JB__.TerminalColor_RainbowTerm
-#define kJB__TerminalColor_Red ((TerminalColor)31)
-#define kJB__TerminalColor_Underline ((JB_StringC*)JB_LUB[125])
-#define kJB__TerminalColor_Warn ((JB_StringC*)JB_LUB[126])
-#define kJB__TerminalColor_White ((TerminalColor)37)
-#define kJB__TerminalColor_Yellow ((TerminalColor)33)
+#define kJB__TerminalColor_Black ((TerminalColor)0)
+#define kJB__TerminalColor_Blink ((TerminalColor)80)
+#define kJB__TerminalColor_Blue ((TerminalColor)4)
+#define kJB__TerminalColor_Bold ((TerminalColor)16)
+#define kJB__TerminalColor_Cyan ((TerminalColor)6)
+#define kJB__TerminalColor_Dim ((TerminalColor)32)
+#define kJB__TerminalColor_Error ((TerminalColor)17)
+#define kJB__TerminalColor_Good ((TerminalColor)18)
+#define kJB__TerminalColor_Green ((TerminalColor)2)
+#define kJB__TerminalColor_Inverse ((TerminalColor)112)
+#define kJB__TerminalColor_Italic ((TerminalColor)48)
+#define kJB__TerminalColor_Magenta ((TerminalColor)5)
+#define kJB__TerminalColor_Normal ((TerminalColor)0)
+#define kJB__TerminalColor_Red ((TerminalColor)1)
+#define kJB__TerminalColor_Underline ((TerminalColor)64)
+#define kJB__TerminalColor_Warn ((TerminalColor)19)
+#define kJB__TerminalColor_White ((TerminalColor)7)
+#define kJB__TerminalColor_Yellow ((TerminalColor)3)
 #define kSC__xC2xB5Param_Input ((uint)256)
 #define kSC__xC2xB5Param_Jump ((uint)32)
 #define kSC__xC2xB5Param_NonReg ((uint)96)
@@ -2604,7 +2611,6 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
-	bool TerminalColor_RainbowTerm;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
@@ -2612,8 +2618,9 @@ struct JB_Globals {
 	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Flow_LastCodePoint;
+	InputStream* Flow_FlowIn;
 	FastString* Flow_FlowOut;
-	JB_File* App__stdin;
+	JB_File* App__StdOut;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* Constants_XML_EscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
@@ -2622,17 +2629,16 @@ struct JB_Globals {
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	Message* Tk__EndOfLineMarker;
-	InputStream* Flow_FlowIn;
+	JB_File* App__stdin;
 	Dictionary* TC_Types_Dict;
 	JB_String* App_Usage;
-	JB_File* Platform_Logger_;
+	JB_File* Platform__Logger;
 	JB_ErrorReceiver* StdErr;
 	Dictionary* Syx_Types;
 	Message* App__Conf;
-	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
-	JB_File* App__StdOut;
+	Message* App__Prefs;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	Dictionary* Tk__ErrorNames;
@@ -2645,12 +2651,12 @@ struct JB_Globals {
 	FP_SorterComparer ID__ByFreq;
 	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
-	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
-	RandomXOR zalgo_R;
+	RandomXOR* Random;
 	RandomXOR RandomShared;
-	MessagePosition Tk_Using;
+	RandomXOR zalgo_R;
 	CompressionStats MzSt_All;
+	MessagePosition Tk_Using;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Syx_TypeList[64];
@@ -2997,6 +3003,8 @@ bool SC_FB__AppOptions_single(JB_String* Name, JB_String* Value, FastString* Pur
 bool SC_FB__AppOptions_stages(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_strip(JB_String* Name, JB_String* Value, FastString* Purpose);
+
+bool SC_FB__AppOptions_swap(JB_String* Name, JB_String* Value, FastString* Purpose);
 
 bool SC_FB__AppOptions_target(JB_String* Name, JB_String* Value, FastString* Purpose);
 
@@ -4298,6 +4306,9 @@ SCClass* SC_VecType(bool Isfloat, int Count);
 
 
 
+// std
+
+
 // zalgo
 int JB_zalgo__Init_();
 
@@ -5102,7 +5113,7 @@ bool SC_FatNopMode_SyntaxIs(uint /*FatNopMode*/ Self, uint /*FatNopMode*/ F);
 
 
 
-// FileDes
+// FileDescriptor
 
 
 // FileMode
@@ -5290,9 +5301,7 @@ Syntax JB_Syx__AccessName(JB_String* Name, Message* Where);
 // TerminalColor
 JB_String* JB_TerminalColor_Colorise(TerminalColor Self, JB_String* S);
 
-JB_String* JB_TerminalColor_Render(TerminalColor Self, FastString* Fs_in);
-
-int JB_TerminalColor__Init_();
+JB_String* JB_TerminalColor_Render(TerminalColor Self, JB_String* Info, FastString* Fs_in);
 
 
 
@@ -5875,8 +5884,6 @@ void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
 
 // JB_FatASM
-void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value);
-
 ASMReg SC_FAT_ASMReg(FatASM* Self, int A);
 
 void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint Break);
@@ -6191,8 +6198,6 @@ uint SC_RegFile_ActualPhi(RegFile* Self, uint /*u16*/ From);
 
 
 // JB_TerminalDisplay
-void JB_TerminalDisplay_Beep(TerminalDisplay* Self);
-
 void JB_TerminalDisplay_Destructor(TerminalDisplay* Self);
 
 void JB_TerminalDisplay_Display(TerminalDisplay* Self);
@@ -6299,6 +6304,8 @@ Ind SC_Pac_CanMergeBits(Assembler* Self, int UpA, int DownA, int UpB, int DownB,
 bool SC_Pac_CanNop(Assembler* Self, FatASM* F, int Changed);
 
 FatASM* SC_Pac_CanOptRFUN(Assembler* Self, Message* Exp, ASMReg Obj, FatASM* Last);
+
+bool SC_Pac_CanSafelyInlineReturn(Assembler* Self);
 
 void SC_Pac_CapASM(Assembler* Self);
 
@@ -7833,8 +7840,6 @@ JB_File* JB_Str_AsFile(JB_String* Self);
 JB_File* JB_Str_ChildFile(JB_String* Self, JB_String* Ch);
 
 int64 JB_Str_FileSize(JB_String* Self);
-
-JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
 Ind JB_Str_FindByte(JB_String* Self, uint /*byte*/ Find, int Start, int After);
 
@@ -11220,6 +11225,8 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
 
 inline bool JB_int_OperatorInRange(int Self, int Length);
 
+inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value);
+
 inline int SC_FatRange_Length(FatRange* Self);
 
 inline uint SC_Msg_SrcLoc(Message* Self);
@@ -11243,6 +11250,8 @@ inline bool JB_Safe_SyntaxCast(JB_String* Self);
 inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
+
+inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value);
 
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After);
 
@@ -11277,6 +11286,8 @@ inline bool SC_Reg_IsInt(ASMReg Self);
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
 inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed);
+
+inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src, FatASM* Start);
 
@@ -11353,6 +11364,10 @@ inline bool JB_int_OperatorInRange(int Self, int Length) {
 	return false;
 }
 
+inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value) {
+	Self->_Op = Value;
+}
+
 inline int SC_FatRange_Length(FatRange* Self) {
 	return Self->After - Self->Start;
 }
@@ -11414,6 +11429,10 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (P)(S, E, F, JB_Tk__GetData());
 }
 
+inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value) {
+	SC_FAT_opSet(Self, Value);
+}
+
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After) {
 	return (SC__ASM_Encoders[SC_FAT_Op(Self)])(Self, Where, After);
 }
@@ -11467,7 +11486,9 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest) {
 	//cpp_part;
 	Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Const, (!true));
-	fn_asm Fn = SC_fn_asm_table[SC_Msg_ASMType(Exp)];
+	uint Type = SC_Msg_ASMType(Exp);
+	Self->Actions[(++Self->ActionIndex)] = Type;
+	fn_asm Fn = SC_fn_asm_table[Type];
 	ASMReg Ss = (Fn)(Self, Exp, Dest);
 	return Ss;
 }
@@ -11501,6 +11522,16 @@ inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 
 inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed) {
 	return SC_Pac_SetRegister(Self, Changed, nil, nil, nil);
+}
+
+inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
+	JB_File* F = JB_Str_AsFile(Self);
+	JB_Incr(F);
+	if (!JB_File_MustExist(F, Operation)) {
+		JB_SetRef(F, nil);
+	}
+	JB_SafeDecr(F);
+	return F;
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src, FatASM* Start) {
@@ -11558,7 +11589,6 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
-	bool TerminalColor_RainbowTerm;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
@@ -11566,8 +11596,9 @@ struct JB_Globals {
 	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Flow_LastCodePoint;
+	JB_Object* Flow_FlowIn;
 	JB_Object* Flow_FlowOut;
-	JB_Object* App__stdin;
+	JB_Object* App__StdOut;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
@@ -11576,17 +11607,16 @@ struct JB_Globals {
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* Flow_FlowIn;
+	JB_Object* App__stdin;
 	JB_Object* TC_Types_Dict;
 	JB_Object* App_Usage;
-	JB_Object* Platform_Logger_;
+	JB_Object* Platform__Logger;
 	JB_Object* StdErr;
 	JB_Object* Syx_Types;
 	JB_Object* App__Conf;
-	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
-	JB_Object* App__StdOut;
+	JB_Object* App__Prefs;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* Tk__ErrorNames;
