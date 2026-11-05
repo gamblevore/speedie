@@ -9,7 +9,7 @@ function app.tree (|file| path, |int| Indent=0)
 		if c.Visible
 			print "\t"*Indent
 			|| GoBig = c.IsDir and file.Std.out.IsTerminal
-				print terminalcolor.bold + terminalcolor.green
+				print terminalcolor.good
 			print c.name
 			if GoBig
 				print terminalcolor.normal
@@ -17,4 +17,3 @@ function app.tree (|file| path, |int| Indent=0)
 			if c.isdir and !c.IsSymLink
 				.tree(c, indent+1)
 	
-

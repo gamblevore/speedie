@@ -30,7 +30,7 @@ function Compiler.PrintResults
 	if app.parent != nil
 		"Exiting Speedie ${app.id}"
 
-	if options.SelfReplacement and FileDes.StdOut.IsTerminal
+	if options.SelfReplacement and File.Std.Out.IsTerminal
 		if ok and !StdErr.ok // how?
 		if .VariantSuffix ~= "Test"
 			|| msg =  (ok)("Success", "Failed")
@@ -60,12 +60,12 @@ function compiler.SetupEnv
 	.ClearEnvs
 	if !app.IsMainThread
 		app.ThreadName = "SpeedieDebug"
-	TerminalColor.RainbowTerm = FileDes.StdOut.IsTerminal
+	options.RainbowTerm = File.Std.Out.IsTerminal
 	target debug
 		stderr.PrintNewErrors = errorflags.PrintFirst
 	if app.parent
 		stderr.PrintNewErrors = 0
-		TerminalColor.RainbowTerm = false
+		options.RainbowTerm = false
 	file.SpeedieDir
 	
 

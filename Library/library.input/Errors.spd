@@ -108,7 +108,7 @@ class Error (Message)
 	
 	function GrabLine (|faststring| fs, |bool| Usecolor=false)
 		if Usecolor
-			fs <~ TerminalColor.Normal
+			TerminalColor.Normal.render(FS)
 
 		|| d = .OriginalData
 		require d and .HasPosition
@@ -125,7 +125,7 @@ class Error (Message)
 		if spaces > 200: spaces = 0 // stop bugs.
 		
 		fs <~ '\n'
-		if Usecolor: fs <~ TerminalColor.Underline
+		if Usecolor: TerminalColor.Underline.render(fs)
 		fs <~ (' ', Spaces)
 		fs <~ '^'
 

@@ -3,45 +3,45 @@
 datatype TerminalColor (int)
 	constants
 		|TerminalColor|
-		Black = 30
+		Black = 0
 		Red, Green, Yellow, Blue, Magenta, Cyan, White
+		Bold		= 1<<4
+		Dim			= 2<<4
+		Italic		= 3<<4
+		Underline	= 4<<4
+		Blink		= 5<<4
+		IDK			= 6<<4
+		Inverse		= 7<<4
+		
+		Normal		= 0
+		Good		= Bold + Green
+		Warn		= Bold + Yellow
+		Error		= Bold + Red
 	
 	constants
 		|TerminalColorString|
 		// could these be replaced with numbers?
-		Normal		= "\1b[0m"
-		Bold		= "\1b[0;1m"
-		Error		= "\1b[0;1;31m"
-		Good		= "\1b[0;1;32m"
-		Underline	= "\1b[0;1;32m" // these two are the same?
-		Warn		= "\1b[0;1;33m"
+		sNormal		= "\1b[0m"
+		sBold		= "\1b[0;1m"
+		sError		= "\1b[0;1;31m"
+		sGood		= "\1b[0;1;32m"
+		sUnderline	= "\1b[0;4;32m" // these two are the same?
+		sWarn		= "\1b[0;1;33m"
 
 
-// todo: add more stuff.
-//ESC[1m	ESC[22m	set bold mode.
-//ESC[2m	ESC[22m	set dim/faint mode.
-//ESC[3m	ESC[23m	set italic mode.
-//ESC[4m	ESC[24m	set underline mode.
-//ESC[5m	ESC[25m	set blinking mode
-//ESC[7m	ESC[27m	set inverse/reverse mode
-//ESC[8m	ESC[28m	set hidden/invisible mode
-//ESC[9m	ESC[29m	set strikethrough mode.
-//ESC[38;2;{r};{g};{b}m	Set foreground color as RGB.
-//ESC[48;2;{r};{g};{b}m	Set background color as RGB.
-
-
-	render
+	render (|string?| Info=nil)
 		opt norefcounts
-		fs <~ "\1b[${self|int|}m"
-		
-	operator plus (|terminalcolor| other, |string|)
-		embedded
-		opt norefcounts
-		|| fs = FastString.shared
-		|| nope = .Render(fs)
-		nope = other.Render(Fs)
-		return fs
-	
+		|| Style = (self>>4)&15
+		fs <~ "\1b["
+		if style <= 8
+			fs <~ style|int|
+			fs <~ ";"
+		|| Col = self|int|&7
+			Col += 30		// color range from 30 (Black) to 37 (white)
+		fs <~ Col
+		fs <~ "m"
+		fs <~ Info
+
 	syntax cast (|string|)
 		inlined
 		return .Render
@@ -49,18 +49,19 @@ datatype TerminalColor (int)
 
 inline FastString.SyntaxAppend (|TerminalColor| Col)
 	cpp_part AppendTermCol
-	col.Render(self)
+	opt norefcounts
+	|| nope = col.Render(self)
 
 
 role TerminalColorString (string)
-	operator plus (|terminalcolor| other, |string|)
-		embedded
-		opt norefcounts
-		|| fs = FastString.shared
-		fs <~ self
-		|| nope = other.Render(Fs)
-		return fs
-	
+//	operator plus (|terminalcolor| other, |string|)
+//		embedded
+//		opt norefcounts
+//		|| fs = FastString.shared
+//		fs <~ self
+//		|| nope = other.Render(Fs)
+//		return fs
+//	
 
 
 
@@ -68,14 +69,14 @@ target !minilib {
 
 function TerminalColor.Colorise (|string| S, |string|)
 	// handy trick of using high-bits on objects
-	|int64| C = (self-Black)&7
+	|int64| C = self&7
 	C = C<<60
 	|| S2 = (s|int64|<<3)>>3
 	return (S2|||C)|string|
 
 
 inline string.TerminalColor (|terminalcolor|)
-	return (self|int64| >> 60) + TerminalColor.black
+	return self|int64| >> 60
 
 
 

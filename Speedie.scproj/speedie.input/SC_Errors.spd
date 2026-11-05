@@ -212,7 +212,6 @@ extend Error
 			|| fn = node.msgowningfunc // could be an error in a variable outside of a func! (module/global)
 				fs <~ " in:\n"
 				fn.render(fs)
-		
 		fs <~ ' '
 		if options.color
 			if (.iswarning)
