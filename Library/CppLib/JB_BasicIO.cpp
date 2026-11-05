@@ -32,7 +32,7 @@ void JB_File_UseAsStdOut (JB_File* f) {
 	if (f) {
 		int D = f->Descriptor;
 		if (D >= 0) {
-			f->FileFlags |= 4;
+			f->_FileFlags |= 4;
 			PrintFile = D;
 		}
 	} else {

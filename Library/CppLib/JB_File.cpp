@@ -441,7 +441,7 @@ int JB_File__CheckLeaks (int From, int To, bool Print) {
 int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 	if (!f)
 		return -1;
-	if (HasFD(f)  and  ((OpenFlags & (~f->OpenMode)) & O_RDWR)) {
+	if (HasFD(f)  and  ((OpenFlags & (~f->_OpenMode)) & O_RDWR)) {
 		JB_File_Close(f); // sigh
 	}
 	int FD = f->Descriptor;
@@ -450,7 +450,7 @@ int JB_File_Open (JB_File* f, int OpenFlags, bool AllowMissing) {
 	FD = StrOpen_(f, OpenFlags, AllowMissing);
 	if (FD >= 0) {
 		f->Descriptor = FD;
-		f->OpenMode = OpenFlags;
+		f->_OpenMode = OpenFlags;
 	}
     return FD;
 }
@@ -995,8 +995,8 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	self->_Parent = JB_Incr(Path);
 	
     self->Descriptor = -1;
-    self->FileFlags = 0;
-    self->OpenMode = 0;
+    self->_FileFlags = 0;
+    self->_OpenMode = 0;
         
 	if (WorthTestingCase())
 		CaseTest_(self);
@@ -1039,10 +1039,10 @@ void JB_File_Destructor (JB_File* self) {
 
 void JB_File_StopSHM (JB_File* self) {
 	#ifndef AS_LIBRARY
-	if (self->FileFlags & 1) { // 1 == server!
+	if (self->_FileFlags & 1) { // 1 == server!
 //		printf("unlinking %s\n", self->Addr);
 		shm_unlink((const char*)(self->Addr));
-		self->FileFlags &= ~1;
+		self->_FileFlags &= ~1;
 	}
 	#endif
 }
@@ -1050,7 +1050,7 @@ void JB_File_StopSHM (JB_File* self) {
 void JB_File_CloseSub ( JB_File* self ) {
 	int R = self->Descriptor;
 	self->Descriptor  = -1;
-	self->OpenMode = 0;
+	self->_OpenMode = 0;
     if (R >= 0)
 		ErrorHandle_(close( R ), self, nil, "closing");
 }
@@ -1374,13 +1374,13 @@ JB_File* JB_File__NewPipe (int Pipe) {
 		return nil;
 	JB_File* F = JB_File_Constructor( 0, JB_Str__Error() );
 	F->Descriptor = Pipe;
-	F->FileFlags |= 2;
+	F->_FileFlags |= 2;
 	return F;
 }
 
 
 bool JB_File_IsPipe (JB_File* f) {
-	return f->FileFlags & 2;
+	return f->_FileFlags & 2;
 }
 
 
