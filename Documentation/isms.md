@@ -149,15 +149,8 @@ Speedie uses custom operators a lot. For string appends obviously, but for all s
     
 We can also set bits on ints even. Like above where I did `x[i] = true`, that is setting an individual bit on an int.
 
-We have ternary expressions too. Useful sometimes.
+Strings can be multiplied.
     
-    function Which (|bool| BeLeft)
-        || x = (.LeftHand (BeLeft) .RightHand)
-
-Strings can be divided and multiplied. Dividing just calls `.split`.
-    
-    printline "hello,goodbye,away" / ','
-    // prints: ["hello", "goodbye", "away"]
     Printline "abc"*4
     // prints: "abcabcabcabc"
 
