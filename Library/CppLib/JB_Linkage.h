@@ -142,6 +142,7 @@ int			JB_ASM_Index		(CakeVM* V, u32* Code);
 int			JB_ASM_StackCode	(CakeVM* V, ivec4* Reg0);
 void		JB_ASM_FillTable	(CakeVM* V, byte* LibGlobs,  byte* PackGlobs,  void** CppFuncs);
 ivec4*		JB_ASM_Run			(CakeVM* V, int CodeIndex);
+void		JB_ASM_CrashTest	();
 void**		JB_ASM_InitTable	(CakeVM* V, int n, int g);
 ivec4*		JB_ASM_Registers	(CakeVM* V, bool Clear);
 uint*		JB_ASM_SetDebug		(CakeVM* V, int Level);
