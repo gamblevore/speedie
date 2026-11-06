@@ -127,7 +127,7 @@ function app.compile_example (|string| name, |errorint|)
 	
 
 function array.SplitAppend (|[string]| self, |string| name)
-	for item in (name / ' ')
+	for item in (name.split(' '))
 		if item
 			self <~ item
 
@@ -169,7 +169,7 @@ function app.BuildSDL2 (|string| P)
 		.cwd(SDL)$
 		.run("git", "pull")$
 	  else
-		.run("git clone https://github.com/libsdl-org/SDL.git -b SDL2" / ' ')$
+		.run("git clone https://github.com/libsdl-org/SDL.git -b SDL2".split(' '))$
 
 	.cwd(SDL)$
 	printline .cwd

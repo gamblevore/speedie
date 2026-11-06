@@ -31,7 +31,7 @@ class Country
 main
 	|[country]| Europe
 	"\nWelcome to Europe Simulator 2000!!"
-	|| names = "Netherlands/United Kingdom/France/Germany/Italy" / '/'
+	|| names = "Netherlands/United Kingdom/France/Germany/Italy".split('/')
 	for s in names
 		Europe <~ Country(s)
 	printline
@@ -42,6 +42,6 @@ main
 			if !cu.alive
 				Europe.remove(i)
 			printline
-            app.sleep(0.2s)
+			app.sleep(0.2s)
 
 	"Europe is gone."

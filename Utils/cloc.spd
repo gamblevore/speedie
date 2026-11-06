@@ -53,7 +53,7 @@ module Counts
 				.MaxNodeLength = pt.int
 		ss = ss.trim
 		ss ?= .DefaultExt
-		for s in (ss / '/')
+		for s in (ss.split('/'))
 			.exts[s] = s
 
 	function Count (|message| Msg)

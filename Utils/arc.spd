@@ -17,7 +17,7 @@ function app.Process (|file| input, |file|)
 	out.AddStr(input.name)
 	out.Enter
 	|| X = app["exclude"] ?? "*.git*,*/cpp,*.strings.txt,*/build*,*.xcodeproj,*.ds_store,*Terminal,*.app,*.note,*.arc,*(experimental)*"
-	out.ArchiveSub(input, X  /  ',')
+	out.ArchiveSub(input, X.split(','))
 	out.Exit(2)
 	
 
