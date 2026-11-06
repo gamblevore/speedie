@@ -675,6 +675,7 @@ JB_API__Parse
 JB_ASM_BaseStack
 JB_ASM_CallBack
 JB_ASM_Code
+JB_ASM_CrashTest
 JB_ASM_FillTable
 JB_ASM_GlobalVM
 JB_ASM_Index
@@ -723,6 +724,7 @@ JB_App__StdOut
 JB_App__Sudo
 JB_App__Switches
 JB_App__TurnInto
+JB_Array_Append
 JB_Array_AppendCount
 JB_Array_AppendMany
 JB_Array_Clear
@@ -1360,7 +1362,6 @@ JB_Str_Exists
 JB_Str_ExtractPathAndLine
 JB_Str_Fail
 JB_Str_FileSize
-JB_Str_FileThatExists
 JB_Str_Find2
 JB_Str_FindCharset
 JB_Str_FindExt

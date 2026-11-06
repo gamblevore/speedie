@@ -697,7 +697,7 @@
 "Classes"
 "Classes can only subclass classes."
 "Classes should look like: class ClassName (SuperName)"
-"Cleaned"
+"Cleaning"
 "Close-tag malformed"
 "Code signing"
 "Code signs an app."

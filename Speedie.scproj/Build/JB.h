@@ -7041,8 +7041,6 @@ JB_String* JB_Array_join(Array* Self, JB_String* Sep);
 
 JB_String* JB_Array_join_sub(Array* Self, JB_String* Sep, int N);
 
-void JB_Array_SyntaxAppend(Array* Self, JB_Object* Item);
-
 int JB_Array_SyntaxCompare(Array* Self, int N);
 
 bool JB_Array_SyntaxEquals(Array* Self, int N);
@@ -7913,8 +7911,6 @@ JB_String* SC_Str_NicerClassName(JB_String* Self);
 bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 
 bool JB_Str_ContainsByte(JB_String* Self, uint /*byte*/ B);
-
-Array* JB_Str_OperatorDivide(JB_String* Self, uint /*byte*/ Sep);
 
 bool JB_Str_OperatorEndsWith(JB_String* Self, JB_String* S);
 
