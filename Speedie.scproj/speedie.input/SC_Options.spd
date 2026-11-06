@@ -442,9 +442,7 @@ module Feedback
 		
 		+'clean'
 			Explain(Purpose, "Remove temp files.")$
-			if TransCompiler.Clean
-				"Cleaned"
-			return true // does something, counts towards operationCount
+			return TransCompiler.Clean // does something, counts towards operationCount
 		
 		+'help'
 			Explain(Purpose, "This.")$
