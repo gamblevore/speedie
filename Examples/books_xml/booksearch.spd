@@ -2,7 +2,7 @@
 file:///usr/local/speedie/Documentation/Messages.md						 // docs here
 
 main (|file.existing| File)
-	|| jb = File.parse$
+	|| jb = File.parse								#require
 	if file isa "xml"
 		jb.XMLToJeebox
 		|| boxfile = File.SetExt("box")
