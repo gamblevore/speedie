@@ -139,19 +139,3 @@ Its a good question, but the answer is usually... use `list`. Its not always tru
 
 `list` is useful for trees in general, but also for linked-lists. Otherwise, you'll have to clear the ref-cycles yourself, in order to free memory.
 
-...
-
-## Using Lists for Tabbed Windows (vs Ref Cycles)
-
-This last case is a bit advanced, and most people will rarely encounter this, but its worth mentioning.
-
-So what about a tricky case of reference cycles, that a simple tree can't avoid? For example, a `window` (which is a `list`) containing a tabbed-interface `button`. That button will have a `list` of `message` that stores the tab info (`Message` is a `list` subclass). We'd store that `window` reference in `message.Obj`.
-
-So that `list` of tabs refers to other windows. So now we have a cyclical reference, we have things refering to ancestors of themself in the tree!
-
-You can avoid this neatly: Instead of referring to the `window` within the `button`'s source list, refer to one of the subcontrols of the `window`! (not the button itself!) Like "place-holder" technology. Now, to get to the actual window, just do `(message.obj as guicontrol).window`, to get the window. Then you can show it. And not suffer cyclical references.
-
-Its a general principle that can be used outside of windows and tabbed interfaces. Refer to a direct child of the node, without refering to your own parent. That way, no cyclical references occur, but you have fast access to that node.
-
-Little tricks like this are what makes the difference between bloated over-complex solutions and fast small simple code. Thats what makes a good programmer. Knowing all the little tricks.
-
