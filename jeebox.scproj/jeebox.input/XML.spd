@@ -125,7 +125,8 @@ function parser.fXML_Comment (ParseHandler)
 
 function parser.fXML_DTD (ParseHandler)
 	opt norefcounts
-	|| d = .data	|| i = .nextstart
+	|| d = .data
+	|| i = .nextstart
 	
 	while (|| c = d[i++])
 		if c == '>'
@@ -215,11 +216,12 @@ extend message
 
 
 function message.XMLToJeebox (|bool|)
-	for ch.fast in self
+	opt norefcounts
+	for ch in self
 		rz ?= ch == @xml
 		ch.XMLToJeeboxSub
 	check rz (self, "No XML found.")
- 
+
 
 libinternal message.XMLToJeeboxSub
 	if self == @xpi
@@ -229,7 +231,7 @@ libinternal message.XMLToJeeboxSub
 		|| prms = .first
 			prms.type = @list // shoulda been this already.
 			prms.remove
-		|message| arg
+		|message--| arg
 		while 
 			|| ch = .first #loop
 			arg ?= @arg.msg
@@ -240,7 +242,7 @@ libinternal message.XMLToJeeboxSub
 			for ch.fast in prms
 				ch.XMLToJeeboxSub
 		if arg
-			|| first = arg.first
+			|message--| first = arg.first
 			if (first == @str) and first.IsLast
 				self <~ first
 			  else
@@ -249,9 +251,9 @@ libinternal message.XMLToJeeboxSub
 		.type = @str
 	  elseif self == @xatt
 		.type = @item
-		|| f = .first
+		|message--| f = .first
 			f.type = @str
-			|| s = .name
+			|string--| s = .name
 			|| fn = @emb
 			ifn s[].IsLetter and (CharSet.NameMid contains s)
 				fn = @str
