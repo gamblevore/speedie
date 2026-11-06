@@ -229,10 +229,18 @@ As an easter egg, try writing just `main` as your entire program. Nothing else. 
 ### FastString Tricks
 You can append an string with embedded values, into a FastString. This actually is an optimised operation, and runs at full-speed.
 
-     || fs = faststring()
-     fs <~ "My name is $name and my age is $age"
+Imagine this function:
 
-this expands to:
+    function Example (|string| Name, |int| Age)
+        || fs = faststring()
+        fs <~ "My name is $name and my age is $age"
+        printline fs
+
+But just focus on this one line:
+
+        fs <~ "My name is $name and my age is $age"
+
+this line expands to:
 
      || fs = faststring()
      fs <~ "My name is "
