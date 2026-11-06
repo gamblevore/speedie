@@ -154,7 +154,7 @@ extend PerryIDE
 			.OnSearchWithin	= PerrySearchWithin
 			.onpaste		= PerryOpenDoc
 			.newcmm				// for the hideside test
-			.sizecheckers	= "spd,txt" / ','
+			.sizecheckers	= "spd,txt".split(',')
 			if self.Project.isdir
 				.NoFind			= "jb.cpp,jb.h,jb_globals.cpp".dict(',')
 			isnt drawsfocus

@@ -47,7 +47,7 @@ function Compiler.MiniTests
 
 
 function compiler.ClearEnvs
-	|| Allowed = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__" / ' '
+	|| Allowed = "HOME LOGNAME PATH PWD SUDO_USER __PicoSock__".split(' ')
 	for (v in app.env) (k)
 		ifn k in Allowed
 			app.Env(k) = nil

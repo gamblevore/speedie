@@ -80,11 +80,7 @@ class String
 	syntax access (|byte|)
 		cpp_wrapper JB_Str_First
 		
-	operator divide (|byte| sep, |[string]|)
-		inlined
-		return .split(sep)
-	
-	operator minus (|string|s, |int|)
+	operator minus (|string| s, |int|)
 		inlined
 		return .length - s.length
 	

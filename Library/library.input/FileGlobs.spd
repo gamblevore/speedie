@@ -76,7 +76,7 @@ function array.GlobExpand (|[string]| self, |[file]|)
 		if Fixed contains "**"
 			error "Can't glob '**' in: " + Fixed
 		  else
-			base.FileGlobSub(fixed / '/', rz, 1)
+			base.FileGlobSub(fixed.split('/'), rz, 1)
 
 
 libinternal file.FileGlobSub (|[string]| GlobParts, |[file]| result, |int| pi)

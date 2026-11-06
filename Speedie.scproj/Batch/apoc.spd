@@ -30,7 +30,7 @@ class Country
 main
 	|[country]| Europe
 	"\nWelcome to Europe Simulator 2000!!"
-	|| names = "Netherlands/United Kingdom/France/Germany/USA" / '/'
+	|| names = "Netherlands/United Kingdom/France/Germany/USA".split('/')
 	RandomShared.timeseed
 	for s in names
 		Europe <~ Country(s)

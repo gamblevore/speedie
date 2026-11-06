@@ -4,9 +4,9 @@ extend_module Autocomplete
 	|| Owners			= "module/extend_module/class/struct/role/task/datatype/extend"
 	|| Owner_dict		= owners.dict('/')
 	
-	|| FunctionClsList = autocomplete.function_cls_only / '/'
-	|| FunctionAnywhereList = autocomplete.function_anywhere  / '/'
-	|| OwnerList = autocomplete.Owners / '/'
+	|| FunctionClsList = autocomplete.function_cls_only.split('/')
+	|| FunctionAnywhereList = autocomplete.function_anywhere.split('/')
+	|| OwnerList = autocomplete.Owners.split('/')
 
 
 function PerryIDE.BuildTmp (|string| reason, |message| where, |string| name,  |message|)

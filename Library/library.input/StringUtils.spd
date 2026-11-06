@@ -206,7 +206,7 @@ function String.ExtractPathAndLine (|message|)
 				msg <~ Sub
 				return msg
 
-	|| parts = self / ':'
+	|| parts = .split(':')
 	msg.name = parts[0].trim.PathFix
 	msg.rangelength = parts[1].int
 	msg.position = parts[2].int
