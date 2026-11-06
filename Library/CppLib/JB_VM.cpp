@@ -365,7 +365,6 @@ static void CakeCrashSignal (int sig) {
 	if (C) { // again?
 		if (CakeCrashCode < 64) {
 			CakeCrashCode = 64;
-			auto ErrStr = "CakeCrashedHard\n";
 			fprintf(stderr,"Crashed inside crash handler, at point: %i\n", C);
 		}
 		exit(ENOTCAPABLE);
