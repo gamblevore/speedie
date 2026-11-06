@@ -131,7 +131,7 @@ The "`array of ...`" means "this array contains whatever type it is that we cont
 ## Reference Cycles?
 You might find yourself wondering: _"Well how do I make a tree, or a double-linked-list in Speedie, without suffering from ref-count-cycles?"_
 
-Its a good question, but the answer is usually... use `list`. Its not always true, but its a good place to start. List takes care of all the reference issues, so it just works intuitively. You own the list root, and the list root owns all it's children and their descendants. (The list root owns it's entire tree). [Full list documentation here](list.md).
+Its a good question, but the answer is usually... use `list`. Its not always true, but its a good place to start. List takes care of all the reference issues, so it just works intuitively. You own the list root, and the list root owns all it's children and their descendants. (The list root owns it's entire tree). [Full list documentation here](lists.md).
 
 `list` isnt just a normal list... its a tree-list! So it is very generally useful.
 
