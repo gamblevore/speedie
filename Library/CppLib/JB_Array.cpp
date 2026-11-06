@@ -137,14 +137,23 @@ bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 }
 
 
+
 bool JB_Array_Append( Array* self, JB_Object* Value ) {
-	return JB_Array_AppendCount(self, Value, 1);
+	if (Value) {
+		int n = self->_Length; 
+		if (GrowToLength_(self, n+1, true)) {
+			JB_SetRef(self->_Ptr[n], Value);
+			return true;
+		}
+	}
+	return false;
 }
+
 
 
 bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
 	int n = self->_Length;
-	if ( (uint)Pos > n  or  !JB_Array_AppendCount(self, Value, 1) )
+	if ( (uint)Pos > n  or  !JB_Array_Append(self, Value) )
 		return false;
 	if (Pos == n)
 		return true; // already done.
