@@ -9,6 +9,8 @@
 	#define DebugOnly(x) ;
 #endif
 
+#define ESTACK1 126
+#define ESTACK2 127
 
 void _StackSanity (CakeStack* Stack, ASM* CodePtr) {
 	#if VMDEBUG
@@ -213,7 +215,7 @@ static __boiling ASM* VM_RefDelete (CakeVM& vm, CakeRegister*& rp, JB_Object* se
 		auto OldStack = (CakeStack*)(r-1);
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		if_rare (NewStack >= End) {						// Stackoverflow
-			CakeCrashed(&vm, SIGSEGV|128, nil, OldStack);
+			CakeCrashed(&vm, ESTACK2, CodePtr, OldStack);
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		
@@ -682,7 +684,7 @@ VMOpt ASM* BumpStack (CakeVM& vm, CakeRegister*& rp, ASM* CodePtr, ASM Op, u64 C
 		auto End = (CakeStack*)(((byte*)(&vm)) + CakeStackSize-1024);
 		auto OldStack = (CakeStack*)(r-1);
 		if_rare (NewStack >= End) {				// Stackoverflow
-			CakeCrashed(&vm, SIGSEGV|128, nil, OldStack);
+			CakeCrashed(&vm, ESTACK1, CodePtr, OldStack);
 			return VMCodePtr(&vm)+CakeCodeMax-1;
 		}
 		

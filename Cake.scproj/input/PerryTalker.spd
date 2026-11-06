@@ -303,13 +303,17 @@ function cakevm.StackToPerry (|cakestack| stack, |jbin| j, |filewithdata?|)
 
 
 function cakevm.CheckStack (|cakestack| stack, |string?|)
-	if !Memory.Readable(Stack, 16):			return "StackCorrupt!"
-	if stack < .basestack:					return "StackUnderflow!"
+	if !Memory.Readable(Stack, 16)
+/		return "StackCorrupt!"
+	if stack < .basestack
+/		return "StackUnderflow!"
 	|| Depth = stack.Depth - 1
 	|| Down = stack.Down
-	if !Down or Down > 31:					return "BadStack!"
+	if !Down or Down > 31
+		/return "BadStack!"
 	Stack -= Down + 1
-	if stack.Depth > Depth:					return "StackTripped!"
+	if stack.Depth > Depth
+/		return "StackTripped!"
 	return nil
 
 
@@ -450,8 +454,10 @@ function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |boo
 	opt norefcounts
 	require R.mustbe(array)
 	|| length = r._Length
-		|| ptr = r._Ptr
-			return .ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
+	if !length
+		return true
+	|| ptr = r._Ptr
+		return .ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
 
 
 function xvar.ExpandGoodContainer (|jbin| j, |&byte| Obj, |xtype| Type, |message?| xp, |int| Depth, |bool|)

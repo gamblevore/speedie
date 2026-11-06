@@ -1790,45 +1790,63 @@ JB_String* JB_Obj_Render (JB_Object* self, FastString* fs_in) {
     return (FN)(self, fs_in);
 }
 
-void JB_MemoryAccessError(int Sig);
-extern jmp_buf JB_MemFailJump;
 
-int JB_Obj_SafeRender (JB_Object* self, FastString* fs, int Maximum) {
-	// what if... a render function corrupts memory?
-	// then what? I think we are kinda screwed at that point. the best thing we could do
-	// is to mark that object as "damaged" somehow. Nvm for now!
+jmp_buf* 		RenderRecover;
+static void RenderFailed (int sig) {
+	longjmp(*RenderRecover, sig|128);
+}
+
+
+static int SafeRenderTests (JB_Object* self, FastString* fs, int Maximum) {
 	int Err = JB_TestMemory(fs, -1, 0);
 	if (Err)
 		return Err;
+	
 	if (self) {
 		Err = JB_TestMemory(self, -1, 0);
 		if (Err)
 			return Err;
 	}
+	
 	if (fs->_Lock) // how?
 		return -2;
+
+	if (RenderRecover)
+		return -4;
 	
 	// now what? we need to "lock" the faststring.
-	Maximum = std::min(Maximum, 1*1024*1024);
-	Maximum = std::max(Maximum, 128);
 	
 	if (!JB_FS_NeedSpare(fs, Maximum))
 		return -1;
 	
+	return 0;
+}
+
+int JB_Obj_SafeRender (JB_Object* self, FastString* fs, int Maximum) {
+	Maximum = std_clamp(Maximum, 128, 1*1024*1024);
+	if (int Err = SafeRenderTests(self, fs, Maximum); Err < 0)
+		return Err;
+
+	jmp_buf Recover;
+	RenderRecover = &Recover;
+
+	auto OldSeg = signal(SIGSEGV, RenderFailed);
+	auto OldBus = signal(SIGBUS,  RenderFailed);
+
 	int OldSize = fs->_Size;
 	auto OldResult = fs->_Result;
+	
 	fs->_Size = fs->Length + Maximum;
 	fs->_Lock = 1;
-	fs->_Result = nil; // simulate lock.
-	
-	auto OldSeg = signal(SIGSEGV, JB_MemoryAccessError);
-	auto OldBus = signal(SIGBUS,  JB_MemoryAccessError);
-	
-	Err = setjmp(JB_MemFailJump);
+	fs->_Result = nil; // the actual lock.
+
+	int Err = setjmp(Recover);
 	if (!Err)
 		JB_Obj_Render(self, fs);
+		
 	signal(SIGSEGV, OldSeg);
 	signal(SIGBUS, OldBus);
+	RenderRecover = 0;
 	
 	fs->_Size = OldSize;
 	fs->_Result = OldResult;

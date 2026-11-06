@@ -69,6 +69,10 @@ target cpp or vm {
 			cpp_wrapper JB_ASM_GlobalVM // how to remove it? some target? which? no idea.
 }
 
+		
+autogen app.CakeCrashTest
+	cpp_wrapper JB_ASM_CrashTest
+
 
 prototype CakeChef (|&CakeStack| Stack,  |int| ErrorCode, |uint| Break, |int64|)
 	// return 0 to continue onwards. return 1-256 to exit the program. Return -1 or less to jump backwards

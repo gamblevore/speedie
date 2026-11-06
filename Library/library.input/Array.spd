@@ -146,8 +146,7 @@ class Array
 		return .length > 0
 	
 	syntax Append (|...?| item)
-		inlined
-		.SyntaxAppend(item, 1)
+		cpp_wrapper JB_Array_Append
 	
 	function Append (|[...]| R)
 		cpp_part AppendMany

@@ -29,6 +29,7 @@ int JB_Sh_Status (ShellStream* F);
 JB_String* JB_Sh_Render (ShellStream* Self, FastString* Fs_in);
 JB_StringC* JB_Err_SignalName (int Sig);
 JB_StringC* JB_Err_Name (int Sig);
+const char* JB_strerror (int Err);
 
 
 

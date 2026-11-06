@@ -68,8 +68,8 @@ static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* 
 				str = EmptyPath;
 		}
 		if (!str) {
-			if (err > 0 and err <= ELAST)
-				str = strerror(err);
+			if (err > 0 and err < 128)
+				str = JB_strerror(err);
 			  else if (err >= 128 and err < 256) {
 				str = strsignal(err&~128);
 			}

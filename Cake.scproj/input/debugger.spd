@@ -296,9 +296,6 @@ module debugger
 //		|| LibGlobs = LibInfo["glob"].First // typeid missing somehow.
 											// fix later
 ///			LibGlobs.LoadXVars(nil, .PackGlobs)
-
-			
-	
 	
 	function LoadSub (|message| PackInfo, |bool|)
 		opt norefcounts
