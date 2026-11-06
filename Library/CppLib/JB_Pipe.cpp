@@ -105,14 +105,6 @@ JB_StringC* JB_Err_SignalName (int Sig) {
 	return JB_StrC(S);
 }
 
-const char* JB_strerror (int Err) {
-	if (Err == 126)
-		return "StackOverFlow";
-	if (Err == 127)
-		return "DestructorOverFlow";
-	return strerror(Err);
-}
-
 
 JB_StringC* JB_Err_Name (int Err) {
 	if (Err >= 128)

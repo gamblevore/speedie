@@ -57,6 +57,15 @@ JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in) {
 }
 
 
+const char* JB_strerror (int Err) {
+	if (Err == 126)
+		return "StackOverFlow";
+	if (Err == 127)
+		return "DestructorOverFlow";
+	return strerror(Err);
+}
+
+
 static JB_String* Desc_(JB_String* self, JB_String* other, int err, const char* str, const char* Operation, const char* verb) {
     FastString* FS = JB_FS__FastNew(0);
     static const char* EmptyPath = "Path was empty";
