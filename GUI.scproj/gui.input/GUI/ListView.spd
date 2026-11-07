@@ -11,6 +11,7 @@ class ListView (GUIControl) {
 	|byte|							XIndentPerDepth
 
 	|bool|							MultiSelection		// These two...
+	|bool|							AllowMultiExpand
 	|bool|							KeepOneSelected		// Should be merged.  Maybe _Hierarchical also.
 	|ListViewHierarchy|				_Hierarchical
 
@@ -49,6 +50,7 @@ class ListView (GUIControl) {
 		super.constructor(Parent)
 		.RowHeight		= 13
 		.takesfocus		= takesfocusflag.On
+		.AllowMultiExpand = true
 		.onreturn		= return
 		.onselected		= Select
 		.oncopy			= (&listview.defaultcopy)|GUICopyEvent|
@@ -189,23 +191,20 @@ class ListView (GUIControl) {
 	
 	libinternal Replaced (|ListViewrow| gone, |ListViewrow?| orig, |ListViewrow|)
 		opt norefcounts
+		require orig
 		if orig == gone
 			return .ListNext(orig) ?? .ListPrev(orig)
 		return orig
 	
 
 	autogen ListStart (|ListViewrow|)
-		inlined
+		opt norefcounts
 		return .listsource.first
 	
 
-	function ListEdge (|listviewrow|)
-		disabled "use .Edge"
-
-
 	libinternal ListEnd (|ListViewrow|)
 		opt norefcounts
-		|| li = .listsource 
+		|| li = .listsource
 		|| H = ._Hierarchical
 			return li.hierend(li, H)
 		return li.Last
@@ -300,7 +299,7 @@ class ListView (GUIControl) {
 		.Show(r)
 		|| inl = .InlineCell(true)
 			expect inl.edit(rc, self)			(beep)
-			if .istree
+			if .Hierarchical
 				inl.Editor!.selectall
 		return true
 	
@@ -433,7 +432,7 @@ class ListView (GUIControl) {
 				.MoveSelection(i)
 			return true
 		
-		if .IsTree and (key is left or right)
+		if .Hierarchical and (key is left or right)
 			return .ExpandRow((key is right).dir<<keys.option)
 
 		
@@ -515,7 +514,7 @@ class ListView (GUIControl) {
 
 	function EnableDrag
 		.OnDragRow = nil
-		if !.istree
+		if !.Hierarchical
 			.ondragrow = &BasicRowDrag
 	
 
@@ -591,7 +590,8 @@ class ListView (GUIControl) {
 		for .VisibleRowsGap
 			if last == s
 				s = nil
-			last = .listPrev(last) #loop
+			loop last
+			last = .listPrev(last)
 		if !s
 			.scrollset(last)
 	
@@ -742,8 +742,9 @@ class ListView (GUIControl) {
 	libinternal CanDrawDrag (|ListViewrow| wantsbefore, |bool|)
 		if ._DraggingRowTo or (.FirstSelected != .lastselected)
 			return true
-		require .draggingrowfrom != WantsBefore
-		require .listnext(.draggingrowfrom) != wantsbefore
+		|| From = .draggingrowfrom #require
+		require From != WantsBefore
+		require .listnext(From) != wantsbefore
 		return true
 
 
@@ -757,7 +758,7 @@ class ListView (GUIControl) {
 
 	function ClickedExpand (|ivec2| P, |int|)
 		opt norefcounts
-		require .Istree
+		require .Hierarchical
 		|| T = .ColumnStart(0)
 		|| R = .findClicked(P.y)
 		if r and r != .columns
@@ -765,9 +766,9 @@ class ListView (GUIControl) {
 			|| T2 = T + font.width + 6
 			|| x = p.x
 			if (x >= T and x <= t2)			// and ((r is selected) or keys.option or keys.gui)
-				.ExpandRow(R, (R isnt expanded).dir<<keys.option)
+				.ExpandRow(R, (R isnt expanded).dir << keys.option)
 				._SelJustChanged = true		// block mouseup editing a cell
-				return MouseDragging.Handled
+				return MouseDragging.Handled ||| MouseDragging.Eaten
 
 
 	behaviour MouseDown
@@ -846,7 +847,7 @@ class ListView (GUIControl) {
 			  else
 				.Select(L)
 
-		if (!.IsTree  and  .OnDragRow  and  l is editable)
+		if (!.Hierarchical  and  .OnDragRow  and  l is editable)
 			.DraggingRowFrom = L
 			._DraggingRowTo = nil
 			return mousedragging.DragWithin
@@ -862,7 +863,7 @@ class ListView (GUIControl) {
 			l = .listPrev(l)
 			
 		
-	function ListEdge (|bool| Last, |ListViewrow|)
+	function SelectableEdge (|bool| Last=false, |ListViewrow|)
 		opt norefcounts
 		if Last
 			rz = .listend
@@ -956,32 +957,59 @@ class ListView (GUIControl) {
 			return true
 		
 		|| Expand = WantExpand >= 0
-		|| Force = wantexpand.abs > 1
+		|| Deeper = WantExpand.abs > 1
+		
 		if  !Expand  and  (sel isnt expanded)
-			sel = .listparent(sel)
-			if sel and sel isnt Selected
+			// collapsing already collapsed row
+			sel = .listparent(sel) // collapse its parent instead
+			if sel isnt Selected
 				.Select(sel)
-			Force = true
+			Deeper = true
 		
 		if sel != .listsource
 			if (!Expand and sel contains .scrollstart)
 				.show(sel)
 
-		if !force and !expand and (sel.AllExpandState & 2)
+		if !Deeper and !expand and (sel.AllExpandState == 3)
+			// some expanded some not?
 			for r in sel
-				(r isnt expanded)
-		  else
-			Force |= (Expand == (sel is expanded))
-			while sel
-				(sel is expanded) = Expand
-				loop force
-				sel = .listnext(sel)
+				.ExpandRowSub(r, false)
 
-		|| fn = .OnExpandRow
-			(fn)(self, expand)
+		  else
+			Deeper |= (Expand == (sel is expanded))
+			Deeper &= .AllowMultiExpand
+			|| Curr = sel
+			while Curr
+				.ExpandRowSub(curr, expand)
+				loop Deeper
+				Curr = .HierStep(Curr, true, Sel)
 		
+		if .Hierarchical
+			.LostExpandedStart
 		return true
+
+
+	libinternal LostExpandedStart
+		opt norefcounts
+		|| Scroll = .ScrollStart
+		|| best = Scroll
+		|| LS = .liststart
+		while 
+			Scroll = Scroll.parent
+			require  Scroll and Scroll != LS
+			if Scroll isnt Expanded
+				best = nil
+			  elseif !best
+				best = Scroll
+		.ScrollSet(best)
+		best = best
 	
+	
+	libinternal ExpandRowSub (|listviewrow| r, |bool| Expand)
+		if r is Expanded != expand
+			(r is expanded) = Expand
+			|| fn = .OnExpandRow
+				(fn)(self, r, expand)
 
 	function SelectAtLeastFirst	
 		opt norefcounts
@@ -1020,7 +1048,7 @@ class ListView (GUIControl) {
 
 	function SelectEdge (|bool| Last=false, |ListViewSelectMode| Mode = ListViewSelectMode.normal, |bool|)
 		opt norefcounts
-		.select(.ListEdge( Last ), mode)
+		.select(.SelectableEdge( Last ), mode)
 		return true
 
 	function SelectShift (|ListViewrow| l, |ListViewrow| m, |bool|)
@@ -1054,7 +1082,7 @@ class ListView (GUIControl) {
 		  else
 			l = .FirstSelected
 		if !l
-			|| f = .ListEdge(i>0)
+			|| f = .SelectableEdge(i>0)
 			return .Select(f)
 		
 		|| m = .bmove(l, i)
@@ -1272,7 +1300,7 @@ class ListView (GUIControl) {
 		|ListViewRow| prev
 		for sk.visible in self
 			|| ind = 0
-			if !.IsTree
+			if !.Hierarchical
 				ind = .CalculateSkip(sk, prev, n)
 			sk.indent = ind
 			prev = sk
@@ -1405,7 +1433,7 @@ class ListView (GUIControl) {
 
 	libinternal ScrollSlide (|int|)
 		|| shl	= .scrollshift
-		if !shl or .ScrollPixelsSub(0)
+		if !shl or .MoveScrollByPixelCount(0)
 			return 0
 		
 		|| real = ._ScrollRealigner
@@ -1422,7 +1450,7 @@ class ListView (GUIControl) {
 
 	function ScrollPixels (|int| rem)
 		if rem
-			.ScrollPixelsSub(rem)
+			.MoveScrollByPixelCount(rem)
 			.TouchScrollBar
 			._ScrollRealigner = 48*(.scrollshift!=0)
 			GUI.touch(self)
@@ -1432,16 +1460,19 @@ class ListView (GUIControl) {
 		opt norefcounts
 		rz = .listend
 		for .VisibleRowsGap
-			rz = .ListPrev(rz) #loop
+			require  rz
+			rz = .ListPrev(rz)
 	
 	
-	libinternal ScrollPixelsSub (|int| rem, |bool|)
-		rem += .scrollShift
+	libinternal MoveScrollByPixelCount (|int| rem, |bool|)
+		opt norefcounts
+		rem += .ScrollShift
 		|| cmp = .liststart
 		if rem >= 0
 			cmp = .scrollend
 		if cmp == .scrollstart
-			rem = 0
+			.ScrollShift = 0
+			return true
 		
 		while (rem < 0)
 			.ScrollByRows -1
@@ -1541,7 +1572,7 @@ class ListView (GUIControl) {
 	libinternal IndentDepth (|listviewRow| Row, |int|)
 		// maybe better to just return an indent... 
 		opt norefcounts
-		if .Istree
+		if .Hierarchical
 			rz = -1
 			|| root = .listsource
 			|| c = Row

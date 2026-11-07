@@ -9,7 +9,7 @@ role ListViewRow (message)
 		super.Constructor(@arg, "")
 		is editable
 		
-	constructor (|string| name, |ListViewState| state = ListViewState.editable)
+	constructor (|string?| name=nil, |ListViewState| state = ListViewState.editable)
 		cpp_part Named
 		super.Constructor(@arg, name)
 		.tag = state
@@ -43,7 +43,7 @@ role ListViewRow (message)
 
 	libinternal AllExpandState (|int|)
 		opt norefcounts
-		for r in self
+		for r.fast in self
 			if (r is expanded) and r.hasany
 				rz |= 2
 			  else
@@ -187,7 +187,7 @@ role ListViewRow (message)
 			|imagepixel| Col = Shading.y
 				textcol = Col
 		
-		  elseif (Column==0) and parent.Istree and (self!=parent.Columns)
+		  elseif (Column==0) and parent.Hierarchical and (self!=parent.Columns)
 			if parent.CanExpand(self)
 				|| exp = (self isnt expanded)("\02", "\03")
 				|| VCol = vec4(1, 0.5)
@@ -273,9 +273,8 @@ datatype ListViewHierarchy (int8)
 	constants
 		Flat = 0
 		Hierarchical = -1		// a normal tree, we are the container.
-		Last = -2				// our last item is used as the container
-		First = 1
-		Second = 2
+		Last = -2				// This should be removed. Use .obj instead to contain extra info.
+								// having a hierarchy that is not actually the hierarchy just creates a mess.
 								
 
 	syntax is (|ListViewHierarchy| s, |bool|)
@@ -285,7 +284,7 @@ datatype ListViewHierarchy (int8)
 
 
 extend ListView
-	inline IsTree (|bool|)
+	inline Hierarchical (|bool|)
 		return ._Hierarchical
 	
 	setter Hierarchical (|bool|)
@@ -297,20 +296,19 @@ extend ListView
 		inlined
 		._Hierarchical = value
 	
-	libinternal HierStep (|ListViewrow| l, |bool| Forward, |ListViewrow|)
+	libinternal HierStep (|ListViewrow| l,  |bool| Forward, |listviewrow| Within=nil, |ListViewrow|)
 		opt norefcounts
-		if L
-			|| H = ._Hierarchical
-				|| root = .ListSource
-				if Forward
-					return l.hiernext(root, H)
-				  else
-					return l.hierprev(root, H)
+
+		|| H = ._Hierarchical
+		if !H
+			if Forward
+				return l.next
 			  else
-				if Forward
-					return l.next
-				  else
-					return l.prev
+				return l.prev
 
-
+		Within ?= .ListSource
+		if Forward
+			return l.hiernext(Within, H)
+		  else
+			return l.hierprev(Within, H)
 

@@ -5,7 +5,7 @@
 prototype GUIDrawBackground		(|object|		self,	|image| where)
 prototype GUIListDragEvent		(|ListView|		self,	|ListViewrow?| Before, |ListViewrow?| Into, |bool|)
 prototype GUIListEvent			(|ListView|		self,	|ListViewrow?| Row, |listviewselectmode| Mode = ListViewSelectMode.normal, |bool|)
-prototype GUIListExpandEvent	(|ListView|		self,	|bool| Expanded)
+prototype GUIListExpandEvent	(|ListView|		self,	|ListViewrow| Row, |bool| Expanded)
 prototype GUIListEditEvent		(|ListView|		self,	|ListViewcell!| Cell, |string?| Value=nil, |string?|)
 	description "Returning nil means cancelled set/get"
 prototype GUIListFilterEvent	(|ListView|		self,	|string?| Value=nil, |bool|)
