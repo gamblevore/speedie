@@ -399,6 +399,10 @@ struct Compression {
 };
 
 
+extern "C" void  JB_GZIP_Free		(void* C);
+extern "C" void* JB_GZIP_Alloc		(int Str);
+extern "C" int   JB_GZIP_Max		(void* C, int Length);
+extern "C" int   JB_GZIP_Compress	(void* C, const void* In, int Length, void* Out, int Space);
 
 int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	Compression Fnd = {};
