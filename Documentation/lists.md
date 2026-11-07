@@ -15,7 +15,7 @@ _(We talk about a list containing "nodes", but you can think of it as a list con
 
 ### Containership
 
-The list class, is a container class, like arrays and dictionaries. For example, you can make a `list of MyFunClass`.
+The list class, is a container class, like arrays and dictionaries. For example, you can make a `list of MyListSubClass`.
 
 Basically this means, that for a `list of MyListSubClass`, you can only add `MyListSubClass` into the list, and will only get `MyListSubClass` out of the list, or `nil` if the list is empty.
 
