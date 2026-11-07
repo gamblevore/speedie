@@ -224,38 +224,46 @@ function message.XMLToJeebox (|bool|)
 
 
 libinternal message.XMLToJeeboxSub
-	if self == @xpi
+	opt norefcounts
+	|| fn = .type
+	if fn == @xpi
 		.remove
-	  elseif self == @xml
-		.type = @tmp
-		|| prms = .first
-			prms.type = @list // shoulda been this already.
-			prms.remove
-		|message--| arg
-		while 
-			|| ch = .first #loop
-			arg ?= @arg.msg
-			arg <~ ch
-			ch.XMLToJeeboxSub
-		if prms.HasAny
-			self <~ prms
-			for ch.fast in prms
-				ch.XMLToJeeboxSub
-		if arg
-			|message--| first = arg.first
-			if (first == @str) and first.IsLast
-				self <~ first
-			  else
-				self <~ arg
-	  elseif self == @xtxt or @xcdt
-		.type = @str
-	  elseif self == @xatt
-		.type = @item
-		|message--| f = .first
-			f.type = @str
-			|string--| s = .name
-			|| fn = @emb
-			ifn s[].IsLetter and (CharSet.NameMid contains s)
-				fn = @str
-			.first = fn + s
-			.name = ""
+		return
+	
+	require fn == @xml
+	
+	.type = @tmp
+	|| prms = .first	
+	|message| arg
+	while (|| ch = prms.next)
+		fn = ch.type
+		if fn == @xtxt or @xcdt
+			ch.type = @str
+			if !arg and  ch.IsLast
+				self <~ ch
+				exit
+		arg ?= @arg.msg
+		arg <~ ch
+		ch.XMLToJeeboxSub
+	
+	self <~ arg
+
+	if !prms.HasAny
+		prms.remove
+		return
+	
+	prms.type = @list			// shoulda been this already.
+	.first = prms
+	for ch.fast in prms
+		if ch == @xatt
+			ch.type = @item
+			|| f = ch.first
+				f.type = @str
+				|| s = ch.name
+				fn = @emb
+				ifn s[].IsLetter and (CharSet.NameMid contains s)
+					fn = @str
+				ch.first = fn + s
+				ch.name = ""
+
+

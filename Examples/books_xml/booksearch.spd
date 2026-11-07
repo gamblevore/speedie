@@ -1,10 +1,12 @@
 #!/usr/local/bin/spd
 file:///usr/local/speedie/Documentation/Messages.md						 // docs here
 
+
 main (|file.existing| File)
 	|| jb = File.parse								#require
 	if file isa "xml"
 		jb.XMLToJeebox
+		printline jb
 		|| boxfile = File.SetExt("box")
 		if boxfile.writeall(jb.render) // write file to disk
 			"Converted XML to Jeebox: $boxfile"
