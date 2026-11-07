@@ -40,12 +40,9 @@ Anything you can do with bit math instead of other approaches is usually going t
     // Faster
     class HappyClass
     	|HappyFlags| Flags
-    	
-    	syntax is (|happyflags| F, |bool|)
-    		return (.flags & f) == f
-    		
+    	    		
     	function Happyness (|int|)
-    		return .flags|int|.CountBits
+    		return .flags.CountBits
     		
     	function Passed (|bool|)
     		return .flags is abc
