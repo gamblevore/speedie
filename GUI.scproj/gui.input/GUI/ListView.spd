@@ -802,7 +802,7 @@ class ListView (GUIControl) {
 			if (p.y+p2.y >= visrect.y2) or (!i and p.y > visrect.y2-p2.y)				// above
 				DesiredDest = .ListSource
 				|| s = .ScrollStart
-					DesiredDest = .bmove(s, -1)
+					DesiredDest = .ListStep(s, -1)
 				.ScrollByRows(-1)
 			  elseif !i								// below
 				DesiredDest = .listsource
@@ -882,13 +882,13 @@ class ListView (GUIControl) {
 		return .listNext(l) ?? .liststart
 	
 	
-	libinternal BMove (|ListViewrow| l, |int| Req, |ListViewrow|)
+	libinternal ListStep (|ListViewrow| L, |int| Req, |bool| Select=false, |ListViewrow|)
 		opt norefcounts
 		rz = l
-		|| n = req.abs
+		|| n = Req.abs
 		while n > 0 
-			l = .hierstep(l, req > 0)			#loop
-			if l isnt UnSelectable				// skip as if non-existing
+			l = .HierStep(l, Req > 0)					#loop
+			if !Select or (l isnt UnSelectable)
 				rz = l
 				n--
 
@@ -1085,7 +1085,7 @@ class ListView (GUIControl) {
 			|| f = .SelectableEdge(i>0)
 			return .Select(f)
 		
-		|| m = .bmove(l, i)
+		|| m = .ListStep(l, i, true)
 		ifn .multiselection and multi
 			return .Select(m)
 		
@@ -1157,14 +1157,14 @@ class ListView (GUIControl) {
 	function ScrollByRows (|int| Rows)
 		opt norefcounts
 		|| s = .scrollstart
-			.scrollset( .bmove(s, rows) )
+			.scrollset( .ListStep(s, rows) )
 			.TouchScrollBar
 
 	
 	function ScrollMoveTo (|int| v)
 		opt norefcounts
 		|| s = .liststart
-			.scrollset(.bmove(s, v))
+			.scrollset(.ListStep(s, v))
 	
 	
 	function ExpandParents (|ListViewrow?| i)
@@ -1179,7 +1179,7 @@ class ListView (GUIControl) {
 		.ExpandParents(i)
 		require !.InView(i)
 		|| n = .visiblerows|float|*0.34
-		.scrollset(.bmove(i, -n|int|))
+		.scrollset(.ListStep(i, -n|int|))
 	
 	
 	function Use (|ListViewrow!| PL, |bool| SendClickEvent=false)
@@ -1206,9 +1206,9 @@ class ListView (GUIControl) {
 	libinternal FindClickedMenu (|int| y, |ListViewRow|)
 		opt norefcounts
 		if y <= .lastBottom
-			return .bmove(.LastVisible$, 1)
+			return .ListStep(.LastVisible$, 1, true)
 		if y > .lastTop
-			return .bmove(.scrollstart$, -1)
+			return .ListStep(.scrollstart$, -1, true)
 		return .FindClicked(y)
 	
 	
@@ -1467,6 +1467,7 @@ class ListView (GUIControl) {
 	libinternal MoveScrollByPixelCount (|int| rem, |bool|)
 		opt norefcounts
 		rem += .ScrollShift
+		if keys.shift
 		|| cmp = .liststart
 		if rem >= 0
 			cmp = .scrollend
@@ -1477,9 +1478,11 @@ class ListView (GUIControl) {
 		while (rem < 0)
 			.ScrollByRows -1
 			rem += .rowheight
+			
 		while (rem >= .rowheight)
 			.ScrollByRows(1)
 			rem -= .rowheight
+		
 		.scrollshift = rem
 		return !rem
 

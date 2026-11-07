@@ -273,8 +273,7 @@ datatype ListViewHierarchy (int8)
 	constants
 		Flat = 0
 		Hierarchical = -1		// a normal tree, we are the container.
-		Last = -2				// This should be removed. Use .obj instead to contain extra info.
-								// having a hierarchy that is not actually the hierarchy just creates a mess.
+		Last = -2
 								
 
 	syntax is (|ListViewHierarchy| s, |bool|)

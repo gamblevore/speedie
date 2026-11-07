@@ -63,7 +63,7 @@ module Notifications
 				return true
 
 
-	function Draw  // drawnotifications, drawnote
+	function Draw  // DrawNotifications, DrawNote
 		opt norefcounts
 		for w in .Alerts
 			w.DrawWindow(GUI.Screen)

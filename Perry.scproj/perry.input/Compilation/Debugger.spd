@@ -1,40 +1,42 @@
 	
 
-|| VarPrinter = faststring()	
+|| VarPrinter = FastString()
 
 extend PerryIDE {
 
-Constants
+constants
 	kCrash
 	kStackUpdate
 	kBreak
+
 
 function HandleCake (|message| msg)
 	opt norefcounts
 	if msg ~= "run"
 		.DelayedRun = date.now
 		.UpdateDebugButtons
-	  else
-		.DelayedRun = nil
-		if msg ~= "stack"
-			.UpdateStack(msg, kStackUpdate)
-		  elseif msg ~= "break"
-			.UpdateStack(msg, kBreak)
-		  elseif msg ~= "crash"
-			.UpdateStack(msg, kCrash)
-		  elseif msg ~= "hoi :3"
-			.GotHello(msg.name)
-		  elseif msg ~= "breakpoint"
-			.SetBreaks(msg)
-		  elseif msg ~= "error"
-			|| ch = msg.first
-			if ch == @arg
-				Notifications <~ (ch.FirstName, msg)
-			  else
-				.LastCakeError = msg
-				.SetAppInfo
+		return
+	
+	.DelayedRun = nil
+	if msg ~= "stack"
+		.UpdateStack(msg, kStackUpdate)
+	  elseif msg ~= "break"
+		.UpdateStack(msg, kBreak)
+	  elseif msg ~= "crash"
+		.UpdateStack(msg, kCrash)
+	  elseif msg ~= "hoi :3"
+		.GotHello(msg.name)
+	  elseif msg ~= "breakpoint"
+		.SetBreaks(msg)
+	  elseif msg ~= "error"
+		|| ch = msg.first
+		if ch == @arg
+			Notifications <~ (ch.FirstName, msg)
 		  else
-			Notifications <~ ("unrecognised message", msg)
+			.LastCakeError = msg
+			.SetAppInfo
+	  else
+		Notifications <~ ("unrecognised message", msg)
 	
 	
 function CakeTalk (|SpdProcess| Cake)
@@ -57,7 +59,7 @@ function SetBreaks (|message| breaks)
 	opt norefcounts
 	|| file = breaks.FirstName
 	require file ~= .Path
-
+	
 	|| All = breaks.second.int
 		for l.lines in .editme
 			(l isnt ActiveBreakPoint)
