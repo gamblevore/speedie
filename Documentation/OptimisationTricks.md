@@ -163,11 +163,6 @@ This one is a bit of a silly one, but a good advice actually. There are all sort
 
 * If you are searching through an (unchanging) array for some items... you could speed it up by making sure the array is sorted, and using a binary-search.
 
-* In making Speedie, I actually kind of "invented" a new approach to replacing dictionaries with an array (in my linker). Its a bit complex to explain, so I won't, but I'll just say that I placed an integer property in my linker, and used it to check if a function had been linked already. Its a bit more subtle than it sounds... not obvious at all if you look at the original use-case. It didn't **look** like something that could have been sped up in this way. But it was a better strategy, thats all that counted.
-
-The last example saved me about 1/3rd of the RAM use, and the program ran much faster.
-
-
 
 ### Don't Do Dumb Things
 
