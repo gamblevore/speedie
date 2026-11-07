@@ -369,13 +369,16 @@ extend PerryIDE
 			is   visible
 			is   UnSearchable
 			isnt DrawsFocus
+			
+			
 			.OnKeyDown		= PerryStackKeyDown
 			.ColumnFinder	= &Perry.VariableFinder
-			.OnExpandRow	= &Perry.collectexpansion
+			.OnExpandRow	= &listview.PerryCollectExpansion
 			.Hierarchical	= ListViewHierarchy.Last
 			.RowHeight		= .rowheight + 3
 			.IsMainEditor	= true
 			.MultiSelection	= true
+			.AllowMultiExpand = false
 			.OnEditCell = PerryStackEditCell
 			.AlwaysSendChangeEvent = true
 			.tooltip		= "Variables and the Stack"

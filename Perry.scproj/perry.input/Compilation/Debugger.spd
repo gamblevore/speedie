@@ -4,6 +4,11 @@
 
 extend PerryIDE {
 
+Constants
+	kCrash
+	kStackUpdate
+	kBreak
+
 function HandleCake (|message| msg)
 	opt norefcounts
 	if msg ~= "run"
@@ -11,8 +16,12 @@ function HandleCake (|message| msg)
 		.UpdateDebugButtons
 	  else
 		.DelayedRun = nil
-		if msg ~= "stack" or "break" or "crash"
-			.UpdateStack(msg)
+		if msg ~= "stack"
+			.UpdateStack(msg, kStackUpdate)
+		  elseif msg ~= "break"
+			.UpdateStack(msg, kBreak)
+		  elseif msg ~= "crash"
+			.UpdateStack(msg, kCrash)
 		  elseif msg ~= "hoi :3"
 			.GotHello(msg.name)
 		  elseif msg ~= "breakpoint"
@@ -420,7 +429,7 @@ function PerryStackKeyDown (guikeyevent)
 	if (key is up or down) and (self isa ListView)
 		|| i = .ide
 		|| sel = .FirstSelected
-		|| Edge = .ListEdge(key is down)
+		|| Edge = .SelectableEdge(key is down)
 		if sel == edge
 			.selectnone
 			i.AppInfo.SetFocus
@@ -471,14 +480,24 @@ function perryide.ReloadBreaks (|bool|)
 	return true
 
 
+function ListViewRow.AddSpacers
+	opt norefcounts
+	|| curr = .first
+	// this is confusing the listview somehow?
+	// and causing flicker? why. // maybe the startrow is wrong?
+	while curr
+		if (curr isnt Disabled) and (curr.prev isnt Disabled)
+			curr.prev = ListViewRow(listviewstate.disabled)
+		curr = curr.Next
 
-function perryide.UpdateStack (|message| stack)
+
+function perryide.UpdateStack (|message| stack, |int| Mode)
 	opt norefcounts
 	
 	|| arg = stack.last$
 	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
-	
+
 	for m in Arg
 		|| l = m.Last
 		if l == @arg					// Assume its a var-dump
@@ -486,24 +505,29 @@ function perryide.UpdateStack (|message| stack)
 				s|ListViewRow|.ImproveVar(0, .DebugHideUnderscore)
 
 	StackSrc.ReStitchAndFixup(arg, 0)
+	StackSrc.AddSpacers
 	StackSrc.name = "vars"
 	
-	|| Break = stack != "stack"
+	|| CurrFunc = .stack.SelectableEdge
+	if !CurrFunc
+/		beep "no CurrFunc?"// how???
+
+	if currfunc and Mode != kStackUpdate
+		if Mode == kBreak
+			.stack.SelectFirst
+			(CurrFunc is expanded)
+		
 		|| m = .DebugMode
-		|| crash = stack == "crash"
-			(M is Crashed)
 		(m is paused)
+		if mode == kCrash
+			(M is Crashed)
+			(CurrFunc is error)
 		.DebugMode = m
 
 		|| l = .editme._ActiveLine
-			l.Flags = crash|int|
+			l.Flags = (mode == kCrash)|int|
 
-		|| f = .stack.liststart|listviewrow|
-			if !.stack.FirstSelected
-				.stack.ExpandRow(f)
-			if crash
-				(f is error)
-			.UpdateCodePointer(F, PerryUpdateStack)
+		.UpdateCodePointer(CurrFunc, PerryUpdateStack)
 
 	.SetAppInfo
 
@@ -522,18 +546,13 @@ function jbin.ExpandDebug (|listviewrow| list, |int| Depth)
 	.exit
 		
 
-function @perry.CollectExpansion (GUIListExpandEvent)
-	opt norefcounts
-	.ide.CollectExpansion
-
-
-function perryide.CollectExpansion
+function listview.PerryCollectExpansion (GUIListExpandEvent)
 	// This would expand ALL vars of the same function... even if recursive.
 	// So how to deal with recursive funcs? Whatever... too much is still OK??
 //	main: "/usr/local/speedie/Examples/hello_world.spd" \150 \4
 
 	opt norefcounts
-	|| funcs = .Stack.ListSource
+	|| funcs = .ListSource
 	|| j = VarPrinter|jbin|.Start(@tmp, "expansion")
 	j.Enter(@arg)
 
