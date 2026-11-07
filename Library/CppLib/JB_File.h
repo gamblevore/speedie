@@ -1,3 +1,6 @@
+#ifndef __PRINTF__
+	#define __PRINTF__ AS_LIBRARY
+#endif
 
 
 #ifndef __JB_FILE__

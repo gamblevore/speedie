@@ -10,7 +10,6 @@
 #include <unistd.h>
 
 
-#define __PRINTF__ AS_LIBRARY
 
 extern "C" {
 
