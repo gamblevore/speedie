@@ -61,8 +61,8 @@ role JBin (Faststring)
 		while amount > 0
 			rz++
 			|| B  = (add + amount)  min  (255)
-			super    <~ B|byte|
-			amount  -= (B-add)
+			super <~ B|byte|
+			amount -= (B-add)
 
 	function TmpArg			(|string| name, |jbinLeaver|)
 		.Enter(@tmp, name)
