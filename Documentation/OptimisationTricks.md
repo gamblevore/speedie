@@ -61,9 +61,6 @@ Anything you can do with bit math instead of other approaches is usually going t
     	
 Using this approach above, you can actually test for many things at once.
 
-In fact, if you are allocating objects **just** to pass around multiple boolean values, and nothing else... you can reduce it simply to an integer datatype.
-
-
 
 ### Combine multiple-passes
 
