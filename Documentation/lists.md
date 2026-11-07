@@ -75,18 +75,29 @@ This means my list class, unlike many others, doesn't need 5 pointers to describ
 
 ### Stateless Tree-Traversal
 
-The list class... being a tree, actually has a "Stateless tree-traversal" function. This is a function that lets you find the "next" node in the tree, from a particular node. This is very handy and is used all over Speedie's code-base.
+The list class... being a tree, actually has a "Stateless tree-traversal" function, `list.flatnext`.
+
+This is a function that lets you find the "next" node as if the tree was flat. This is very handy and is used all over Speedie's code-base.
+
+So a loop like this, will go over an entire tree.
+
+    || Curr = node
+    || After = node.flatafter
+    while Curr != After
+        Curr = Curr.flatnext
+
+We use`list.flatafter`, because we sometimes want to go over a subset of a tree, rather than over the entire tree. `flatafter` is also pretty fast.
 
 Other libraries will force you to have to create some kind of separate "tree iterator" object or perhaps even will "flatten" the entire tree into an array. How wasteful. And less fun to work with.
 
 In fact you can travel backwards and forwards using stateless tree-traversal. The list class has a lot of useful functions for doing tree-operations in it.
 
-to flatly loop over a node's tree contents... do this:
+Speedie has `iterators` which make the process of writing loop code much easier. You can write simple code like this to 'flatly-loop' over an entire tree:
 
-    for item.flat in node     // stateless tree traversal
+    for item.flat in node     // stateless tree traversal using .flatnext
         printline "we found item $item"
 
-otherwise, a non-flattened loop is this:
+Otherwise, a non-flattened loop is this:
 
     for item in node         // dont go deeper than immediate children
         printline "we found item $item"
@@ -108,8 +119,3 @@ The list class has many utility functions, including:
 
 Quite handy in general.
     
-
-
-
-
-
