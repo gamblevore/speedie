@@ -41,14 +41,6 @@ role ListViewRow (message)
 		return !((.Indent)&(1<<i))
 		
 
-	libinternal AllExpandState (|int|)
-		opt norefcounts
-		for r.fast in self
-			if (r is expanded) and r.hasany
-				rz |= 2
-			  else
-				rz |= 1
-
 
 	libinternal HierEnd (|listviewrow| root, |listviewhierarchy| H, ||)
 		opt norefcounts
@@ -76,14 +68,13 @@ role ListViewRow (message)
 		return p
 
 
-	libinternal HierNext (|listviewrow| root, |listviewhierarchy| H, ||)
-		opt norefcounts
-		// listviewhierarchy isnt so easy to get working...
-		if (self is expanded) or (self == root)
-			if h is Last
-				self = .last
-			return .flatnext
-		return .next ?? .flatafter
+	libinternal listview.HierNext (|listviewrow| Row, |listviewrow| Root, |listviewrow|)
+		opt norefcounts		// listviewhierarchy isnt so easy to get working...
+		if (row is expanded) or (row == root)
+			if ._hierarchical is Last
+				row = row.last
+			return row.flatnext
+		return row.next ?? row.flatafter
 	
 
 	function NextSelected (||)
@@ -210,7 +201,15 @@ role ListViewRow (message)
 						// Cos we need some way to ask a server/process for open a folder
 		if .listchild(row)
 			return true // also
-		
+	
+	
+	libinternal listview.AllExpandState (|listviewrow| Row, |int|)
+		opt norefcounts
+		|| r = .ListChild(Row)
+		while r
+			rz |= 1 + (r is expanded)
+			r = .hiernext(r, row)
+
 	
 	module
 		function NewSeparator (|int| Pos = 0, |listviewrow|)
@@ -307,7 +306,7 @@ extend ListView
 
 		Within ?= .ListSource
 		if Forward
-			return l.hiernext(Within, H)
+			return .hiernext(l, Within)
 		  else
 			return l.hierprev(Within, H)
 

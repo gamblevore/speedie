@@ -558,10 +558,13 @@ class ListView (GUIControl) {
 					  // in terms of the nodes and mousewheel.
 
 	libinternal ScrollSet (|ListViewrow?| s)
+		opt norefcounts
 		s ?= .ListStart
+		require s != .listsource
+		require s != .scrollstart
+		
 		.ScrollShift = 0
 		._ScrollRealigner = 0
-		debug_require s != .listsource
 		.ScrollStart = s
 		.ExpandParents(s)
 		|| w = .window
@@ -953,15 +956,14 @@ class ListView (GUIControl) {
 		opt norefcounts
 		if !sel
 			sel = .LastSelected$
-		if WantExpand == 0 and sel is Expanded // no change :]
+		if WantExpand == 0 and sel is Expanded			// No change :]
 			return true
 		
 		|| Expand = WantExpand >= 0
 		|| Deeper = WantExpand.abs > 1
 		
-		if  !Expand  and  (sel isnt expanded)
-			// collapsing already collapsed row
-			sel = .listparent(sel) // collapse its parent instead
+		if  !Expand  and  (sel isnt expanded)			// Collapsing already collapsed row
+			sel = .listparent(sel)$						// Collapse its parent instead
 			if sel isnt Selected
 				.Select(sel)
 			Deeper = true
@@ -970,11 +972,17 @@ class ListView (GUIControl) {
 			if (!Expand and sel contains .scrollstart)
 				.show(sel)
 
-		if !Deeper and !expand and (sel.AllExpandState == 3)
-			// some expanded some not?
-			for r in sel
-				.ExpandRowSub(r, false)
-
+//		if !Deeper and !expand and (.AllExpandState(sel) == 3)
+//			|| r = .ListChild(sel)
+//			while r										// Some expanded some not? Make it consistant.
+//				.ExpandRowSub(r, false)
+//				r = r.next								// Its flat at this point
+//
+			// too annoying to get working
+//		  elseif
+		if !.CanExpand(sel)								// Tried to expand something we shouldn't
+			.ExpandRowSub(sel, false)					// In case it was accidentally expanded somehow.
+			
 		  else
 			Deeper |= (Expand == (sel is expanded))
 			Deeper &= .AllowMultiExpand
