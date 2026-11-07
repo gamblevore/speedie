@@ -17,7 +17,7 @@ _(We talk about a list containing "nodes", but you can think of it as a list con
 
 The list class, is a container class, like arrays and dictionaries. For example, you can make a `list of MyFunClass`.
 
-Basically this means, that for a `list of MyFunClass`, you can only add `MyFunClass` into the list, and will only get `MyFunClass` out of the list, or `nil` if the list is empty.
+Basically this means, that for a `list of MyListSubClass`, you can only add `MyListSubClass` into the list, and will only get `MyListSubClass` out of the list, or `nil` if the list is empty.
 
 The compiler knows about this and uses this info to make sure all the types are correct... and also saves you from having to check for the types of things.
 
@@ -30,9 +30,6 @@ The list class an "intrusive list". You have to subclass it to use it as a list.
 This makes it [much faster, more RAM efficient](https://www.google.com/search?q=intrusive+list+speed), and more natural to use! Especially for operations where our nodes are already meant to be a list. _<small>(In fact... I wouldn't call it "intrusive" as its basically "just a list". Intrusive is more of a C++ thing because of C++ wierdness where the list might be a property of a class rather than the super-class.)</small>_
 
 Looking at some online C++ tests (Speedie is about as fast as C++), you can see that "intrusive lists" are 2-4x faster than non-intrusive lists. And simpler to use! Its just better.
-
-_(The `list` class used to be called "`RingTree`". Thats because internally it uses a ring, a half-ring really. So the first child's prev sibling is actually the last child. But you don't see that, its just internal. The only difference, is that finding/appending the last item is fast.)_
-
 
 ___
 
