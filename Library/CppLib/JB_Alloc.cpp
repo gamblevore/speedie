@@ -8,32 +8,15 @@
 // 												easy way to list all blocks in the world!
 // * Simpler to have only one world?
 
-/*
-What about this idea? Pointer compression:
-
-    void* addr = mmap(
-        NULL, // address hint
-        1<<MemoryManager.SuperSize, // size
-        PROT_READ | PROT_WRITE, // permissions
-        MAP_32BIT | MAP_PRIVATE | MAP_ANONYMOUS, // flags
-        -1, // file descriptor
-        0 // offset
-    );
-
-    All our super-blocks can be allocated that way.
-    
-    We also need -pagezero_size,0x1000 linker flag. Or else OSX will flip out.
-
-	We'll need some way to make sure our pointers only take 32-bits. Not sure if theres a built in way in C for that.
- */
 
 #include "JB_Alloc.h"
 #include <setjmp.h>
+#include <sys/mman.h>
 
 
 
+#define kUltraAlloc (1ull<<35)
 #define kBlockSize          13  // 8K!
-#define BadBit				3
 
 
 
@@ -113,8 +96,6 @@ void JB_ClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Pare
     if (!MemoryManager.Name) {
         MemoryManager.Name           = (uint8*)"JB Standard Memory";
         MemoryManager.SuperSize      = 20;
-        MemoryManager.BlockSize      = kBlockSize;
-        MemoryManager.Alignment      = 4;
         MemoryManager.SpareTrigger   = 0.75f;
     }
 	
@@ -169,7 +150,7 @@ MemStats JB_MemoryStats (JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
             do {
                 int C = Start->ObjCount + Start->HiddenObjCount;
                 Result.Objs += C;
-                Start = JBShift(Start, 1 << World->BlockSize);
+                Start = JBShift(Start, 1 << kBlockSize);
             } while (Start < Finish);
         }
 
@@ -196,7 +177,7 @@ void BlockIsFreeMark (JB_Object* self) {};
 
 u64 JB_MemCount () {
     JB_MemoryWorld* World = JB_MemStandardWorld();
-    return (u64)( JB_MemoryStats(World, false, 0).Blocks ) << World->BlockSize;
+    return (u64)( JB_MemoryStats(World, false, 0).Blocks ) << kBlockSize;
 }
 
 JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
@@ -218,7 +199,7 @@ JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 				failed("corrupt freeobj next chain");
 			}
 		}
-		if (((IntPtr)(Obj->Next)) & BadBit)
+		if (((IntPtr)(Obj->Next)) & 3)
 			failed("corrupt freeobj next ptr");
 		return Obj->Next;
 	}
@@ -350,7 +331,7 @@ JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 			} else {
 				TestMemory_(Curr);
 			}
-			Curr = JBShift( Curr, 1 << World->BlockSize );
+			Curr = JBShift( Curr, 1 << kBlockSize );
 		}
 	}
 
@@ -691,7 +672,7 @@ Sanity(First->NextBlock, false);
 static inline void SetupSuper_ (SuperBlock* Super, JB_MemoryWorld* W) {
     AllocationBlock* Curr = StartBlock_( Super );
     AllocationBlock* End =  EndBlock_( Super );
-    int Size = 1 << W->BlockSize;
+    const int Size = 1 << kBlockSize;
 
     Super->FirstBlock = Curr;
 
@@ -709,18 +690,18 @@ static inline void SetupSuper_ (SuperBlock* Super, JB_MemoryWorld* W) {
 
 
 
-void* JB_BlockShadow (AllocationBlock* B) {
-	SuperBlock* S = B->Super;
-	JB_MemoryWorld* W = S->World;
-	int Shadow = (1 << W->ShadowSize) &~ 1;
-	return (void*)JBShift(B, -Shadow);
-}
+//void* JB_BlockShadow (AllocationBlock* B) {
+//	SuperBlock* S = B->Super;
+//	JB_MemoryWorld* W = S->World;
+//	int Shadow = (1 << W->ShadowSize) &~ 1;
+//	return (void*)JBShift(B, -Shadow);
+//}
 
 
 static void InitObjectsInBlock_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock, JB_MemoryWorld* W, int Size) {
 	NewBlock->ObjSize = Size;
     auto oof = NewBlock->Owner;
-    int BS = W->BlockSize;
+    int BS = kBlockSize;
     int BlockBits = (1 << BS) - 1;
     FreeObject* Curr = (FreeObject*)(((IntPtr)NewBlock) &~ BlockBits);
     NewBlock->FirstFree = Curr; // for LinkIn_
@@ -735,12 +716,12 @@ static void InitObjectsInBlock_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     
     FreeObject* End =  (FreeObject*)NewBlock;		// we aren't using shadows anymore...
     dbgexpect(Curr < End);							// it was a bad design...
-    dbgexpect(!W->ShadowSize or W->ShadowSize > 3);
-    int Shadow = (1 << W->ShadowSize) &~ 1;		// incase it's 0
-    End = JBShift(End, -Shadow);
+//    dbgexpect(!W->ShadowSize or W->ShadowSize > 3);
+//    int Shadow = (1 << W->ShadowSize) &~ 1;			// incase it's 0
+//    End = JBShift(End, -Shadow);
     dbgexpect(Curr < End);
-    void* ShadowEnd = JB_BlockShadow(NewBlock);
-    dbgexpect(End == ShadowEnd);
+//    void* ShadowEnd = JB_BlockShadow(NewBlock);
+//    dbgexpect(End == ShadowEnd);
     
     NewBlock->FirstFree = Curr; // for LinkIn_
 	
@@ -805,6 +786,9 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     NewBlock->Owner = Mem;
 
 	int Size = Class->Size;
+	if (Size&4) {
+		debugger; // shouldn't it be 8?
+	}
     if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
 
@@ -849,14 +833,64 @@ bool JB_OutOfMemoryOccurred () {
 }
 
 
+byte* JB_Mem__mmap (uint64 Request) {
+// I could allocate 32-GB of memory for pointer-compression
+// test it on arrays, first? then dicts, etc. :]
+// This could make memory-management simpler!
+// no need to allocate one super-block at a time. I mean...
+// do we even NEED super-blocks anymore??? Probably not?
+// Some kind of "total-header info" is needed. Like... for the 
+// "first free block" basically. So we can allocate new blocks.
+
+// we can remove the memoryworld too! Just one super-system for all!
+// we can get the memoryworld from ANY object/block/whatever
+
+    byte* Addr = (byte*)mmap(0, Request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+
+    if (Addr != MAP_FAILED)
+		return Addr;
+	
+	JB_OutOfMainMemory(Request);
+	return 0; // oof;
+}
+
+
+
+static void PointerCompressionBoom (byte* boom) {
+	if (boom) {
+		munmap(boom, kUltraAlloc);
+	}
+}
+
+
+static byte* PointerCompressionAlloc () {
+// this can help me do pointer compression!!
+// each pointer is now the base-pointer.
+// we can remove the memory world too? nice.
+	byte* Got = JB_Mem__mmap(kUltraAlloc); // 32GB.
+	if (!((uint64)Got&(kUltraAlloc-1)))
+		return Got;
+	PointerCompressionBoom(Got);
+	Got = JB_Mem__mmap(kUltraAlloc<<1); // oof
+	if (!Got)
+		return 0;
+	Got = (byte*)((((uint64)Got) + kUltraAlloc)&~(kUltraAlloc-1));
+	return Got;
+}
+
+
 static SuperBlock* Super_calloc (JB_MemoryWorld* World) {
     int N = (1 << World->SuperSize);
-    int Align = (1 << World->BlockSize);
-
+    int Align = (1 << kBlockSize);
+//    for (int i = 0; i < 1024*1024; i++) {
+//		auto X = PointerCompressionAlloc();
+//		if (!X)
+//			debugger;
+////		PointerCompressionBoom(X);
+//    }
     while (N >= Align*4) {
 		SuperBlock* bla = (SuperBlock*)JB_AlignedAlloc(N, Align);
         if (bla) {
-//            printf("allocating %i (%s): %X\n", N, World->Name, (void*)bla);
             memset(bla, 0, N);
             bla->BlockEnd = ((uint8*)bla) + N;
             return bla;
@@ -881,11 +915,11 @@ static SuperBlock* AllocSuper (JB_MemoryWorld* World) {
     
     NewSuper->ID = World->SupersMade++;
 
-    int BlockSize = 1 << World->BlockSize;
+    const int BlockSize = 1 << kBlockSize;
 
     FreeObject* FirstWriteable = (FreeObject*)JBShift(NewSuper, sizeof(SuperBlock));
     
-    int Alignment = 1 << World->Alignment;
+    const int Alignment = 16;
     IntPtr Extra = (IntPtr)(FirstWriteable) & (Alignment - 1);
     if (Extra) {
         FirstWriteable = (FreeObject*)JBShift(FirstWriteable, Alignment - Extra);
@@ -1014,8 +1048,7 @@ static JB_Class* ResetClass_ ( JB_Class* Cls ) {
 
 
 static void CleanSpares_ ( SuperBlock* Super ) {
-    JB_MemoryWorld* World = Super->World;
-    int N = 1 << World->BlockSize;
+    int N = 1 << kBlockSize;
     AllocationBlock* Curr = StartBlock_(Super);
     AllocationBlock* End = EndBlock_(Super);
 
@@ -1231,7 +1264,7 @@ static void SuperFindLeakedObject_ (SuperBlock* Super, JB_Object* Obj,  Array* R
 	do {
 		if (Start->Owner)
 			BlockFindLeakedObject_(Start, Obj, R);
-		Start = JBShift(Start, 1 << MemoryManager.BlockSize);
+		Start = JBShift(Start, 1 << kBlockSize);
 	} while (Start < Finish);
 }
 
@@ -1260,7 +1293,7 @@ int64 JB_Class_MemoryUsed (JB_Class* Cls) {
 		do {
 			auto Owner = Start->Owner;
 			C += (Owner and Owner->Class == Cls);
-			Start = JBShift(Start, 1 << World->BlockSize);
+			Start = JBShift(Start, 1 << kBlockSize);
 		} while (Start < Finish);
 		Super = Super->Next;
     } while (Super != First);
@@ -1286,7 +1319,7 @@ void JB_Mem_ClassLeakCounter () {
 			int C = Start->ObjCount + Start->HiddenObjCount;
 			if (Owner and Owner->Class)
 				Owner->Class->LeakCounter += Mode == 1 ? C : -C;
-			Start = JBShift(Start, 1 << World->BlockSize);
+			Start = JBShift(Start, 1 << kBlockSize);
 		} while (Start < Finish);
 		Super = Super->Next;
     } while (Super != First);

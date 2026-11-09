@@ -1,5 +1,5 @@
-#ifndef __PRINTF__
-	#define __PRINTF__ AS_LIBRARY
+#ifndef __JB_PRINTF__
+	#define __JB_PRINTF__ AS_LIBRARY
 #endif
 
 

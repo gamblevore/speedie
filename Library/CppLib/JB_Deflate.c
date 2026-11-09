@@ -1,9 +1,10 @@
 
-// Pull in the public API types and signatures
+#if 0 // disable till i can get this working on all targets.
+	  // not just from within xcode.
+
 #include "libdeflate/lib/lib_common.h"
 #include "libdeflate/libdeflate.h"
 
-// 1. Force libdeflate's internal build configuration options
 #define LIBDEFLATE_ENABLE_GZIP
 #undef LIBDEFLATE_DLL
 
@@ -62,3 +63,4 @@ int JB_GZIP_Decompress (void* C, const void* In, int* Length, void* Out, int Spa
 }
 
 
+#endif

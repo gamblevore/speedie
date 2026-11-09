@@ -268,8 +268,8 @@ GUI_LV_JumpTo
 GUI_LV_KeyDown
 GUI_LV_LastSelected
 GUI_LV_LastVisible
-GUI_LV_ListEdge
 GUI_LV_ListFiles
+GUI_LV_ListStart
 GUI_LV_LostFocus
 GUI_LV_MouseDown
 GUI_LV_MouseMove
@@ -297,6 +297,7 @@ GUI_LV_SelectAtLeastFirst
 GUI_LV_SelectEdge
 GUI_LV_SelectNone
 GUI_LV_SelectShift
+GUI_LV_SelectableEdge
 GUI_LV_SetColumnsMsg
 GUI_LV_Show
 GUI_LV_StopFilter

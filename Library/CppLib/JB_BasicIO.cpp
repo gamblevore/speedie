@@ -19,15 +19,14 @@ extern "C" {
 // by a file class or by PrintFile?
 // a more generic system might be good.
 
-#if !__PRINTF__
+#if !__JB_PRINTF__
 	static int PrintFile = STDOUT_FILENO;
 #endif
 
 
 void JB_File_UseAsStdOut (JB_File* f) {
-#if __PRINTF__
-	// can't do it! its just for libjeebox... so... that doesnt redirect stdout.
-#else
+#if !__JB_PRINTF__
+	// libjeebox can't do this
 	if (f) {
 		int D = f->Descriptor;
 		if (D >= 0) {
@@ -43,7 +42,7 @@ void JB_File_UseAsStdOut (JB_File* f) {
 void JB_Str_PrintError (JB_String* s) {
 	int n = JB_Str_Length(s);
 	if (!n) return;
-#if __PRINTF__
+#if __JB_PRINTF__
 	fprintf(stderr, "%.*s", s->Length, s->Addr);
 #else
 	JB_Write_(STDERR_FILENO, s->Addr, n);
@@ -54,7 +53,7 @@ void JB_Str_PrintError (JB_String* s) {
 }
 
 void JB_PrintCString (const char* c) {
-#if __PRINTF__
+#if __JB_PRINTF__
 	printf("%s", c);
 #else
 	if (c) {
@@ -69,7 +68,7 @@ void JB_Str_PrintLine (JB_String* s) {
 	if (!s)
 		s = JB_Str__Empty();
 	int n = s->Length;
-#if __PRINTF__
+#if __JB_PRINTF__
 	printf("%.*s\n", n, s->Addr);
 #else
 	byte Buf[256];
@@ -111,7 +110,7 @@ void JB_Str_Print (JB_String* s) {
 	if (!s)
 		s = JB_Str__Empty();
 	int n = s->Length;
-#if __PRINTF__
+#if __JB_PRINTF__
 	printf("%.*s", n, s->Addr);
 #else
 	if (n) {

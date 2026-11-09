@@ -4,7 +4,7 @@
 
 * chained obj destructor bug in branch_Test.spd
 * break On || ShowMe = doaction_Duck fails
-* expansion not working quite right
+* expansion in cake not working quite right
 
 * Unused const (1) in setter Size
 	* vec>>4 bad asm

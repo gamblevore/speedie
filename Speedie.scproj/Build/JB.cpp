@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2394];
+extern JB_StringC* JB_LUB[2395];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -7383,7 +7383,6 @@ Message* JB_Tk__fXML_Comment(int Start, Message* Parent) {
 
 Message* JB_Tk__fXML_DTD(int Start, Message* Parent) {
 	JB_String* D = JB_Tk__GetData();
-	JB_DoAt(1);
 	int I = JB_Tk__NextStart();
 	while (true) {
 		uint C = JB_Str_ByteValue(D, I++);
@@ -10699,6 +10698,9 @@ bool SC_Ext__TransCompile(Array* Files, JB_String* Dest, JB_String* Type, JB_Fil
 bool SC_Ext__TransCompileWrap(Array* Cpps) {
 	bool Rz = false;
 	Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[1666], nil);
+	if (Rz) {
+		Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[2394], nil);
+	}
 	if (Rz) {
 		Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[2126], nil);
 	}
@@ -33636,7 +33638,7 @@ bool JB_Str_IsBinary(JB_String* Self, float F) {
 }
 
 bool SC_Str_isCLike(JB_String* Self) {
-	if ((JB_Str_Equals(Self, JB_LUB[1666], true)) or (JB_Str_Equals(Self, JB_LUB[2126], true))) {
+	if ((JB_Str_Equals(Self, JB_LUB[1666], true)) or ((JB_Str_Equals(Self, JB_LUB[2394], true)) or (JB_Str_Equals(Self, JB_LUB[2126], true)))) {
 		return true;
 	}
 	if (JB_Platform__OSX()) {
@@ -61451,4 +61453,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -5153240999738392472 3866930432266959523
+// -5153240999738392472 -2150891888948025921

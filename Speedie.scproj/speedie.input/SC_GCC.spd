@@ -121,7 +121,7 @@ function CanCompile ( |string| name, |bool| )
 
 
 function string.isCLike (|bool|)
-	if self ~= "cpp" or "s"
+	if self ~= "cpp" or "c" or "s"
 		return true
 	if platform.osx
 		return (self ~= "m" or "mm") // mm gets wierd errors that cpp doesnt?
@@ -322,6 +322,8 @@ function UseAndCompile (|[string]| Input, |String| Output, |bool|)
 
 function TransCompileWrap (|[file]| cpps, |bool|)
 	rz = .TransCompile( Cpps, " -c ", "cpp" )
+	if rz
+		rz = .TransCompile( Cpps, " -c ", "c" )	
 	if rz
 		rz = .TransCompile( Cpps, " -c ", "s" )
 	

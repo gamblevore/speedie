@@ -43,6 +43,9 @@ class File (stringshared)
 	destructor
 		cpp_wrapper JB_File_Destructor
 
+	setter Descriptor (|int|)
+		disabled "Life is hard enough without making it worse. Don't do that."
+	
 	function Mode (|FileMode|)
 		nil checker
 		cpp_wrapper JB_File_Mode
@@ -508,7 +511,6 @@ Creates an error, if the file is bigger than the 'Limit' param."
 				if f and !f.Mustexist
 					f = nil
 				return f
-
 
 		module std
 			constants

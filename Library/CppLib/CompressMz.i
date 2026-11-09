@@ -1,74 +1,4 @@
 
-#include "JB_Compress.h"
-#include "JB_MemUtils.h"
-#include "CompressionProbability.h"
-// Possible ideas:
-// * Can we speed up myscore?
-// * What about trying a putoffset, with a base-bits of 8? and 3 bits of log
-//   for data under 32K. So the min-offset is 11 bits, and max is 18-bits.
-// * What about... some kind of offset reduction? any way to rolz things? or no?
-// * What about... huffing the escaped bytes? perhaps using 256 different tables
-//	 One per byte. And doing it dynamically? And storing the actual byte-length
-//	 not the bit-length? Tricky but posisble. (and slow? IDK...)
-
-
-
-struct DateLocker {
-	atomic_int64	Value;
-	bool			NoLongerNeeded;
-	DateLocker  () {Value = 0; NoLongerNeeded=false;}
-	void unlock () {
-		Value &= ~1;
-	}
-	void lock () {
-		Date Now = JB_Date__Now()|1;
-		Date Expected;
-		do {
-			Expected = Value &~ 1;
-		} while (!Value.compare_exchange_weak(Expected, Now));
-	}
-	bool start_clear (int Duration) {
-		auto D = (Date)Value;
-		require(D and !(D&1));										// its been used but not in-use
-		require(NoLongerNeeded or JB_Date__Now() > D + Duration);	// enough time passed
-		return Value.compare_exchange_weak(D, -1);
-	}
-	void cleared () {
-		NoLongerNeeded = false;
-		Value = 0;
-	}
-};
-
-static PicoDate			JB_LastFlush;
-static DateLocker		Allocator;
-static u8*				Space;
-//static int				TotalEscaped;
-
-
-
-extern "C" int CompressionFree(int X) {
-	if (Allocator.start_clear(X)) {
-		JB_Free(Space);
-		Space = 0;
-		Allocator.cleared();
-	}
-	return 0;
-}
-
-extern "C" void JB_CompFreeNow() {
-	Allocator.NoLongerNeeded = true;
-}
-
-extern "C" int JB_BasicCareTaker(PicoDate D) {
-	if (D - JB_LastFlush >= 64*1024) { // one second.
-		JB_LastFlush = D;
-		fflush(stdout);
-	}
-
-	return CompressionFree(10*64*1024);	// 10s ago!
-}
-
-
 #define scint   static const int
 scint W_BITS     = 21; // Window size (17..23)
 scint HASH1_BITS = 21;
@@ -274,7 +204,7 @@ struct Compression {
 	}
 	
 	void EscapeSub (int LastOut, int p) {
-		probability_escape(Read, p - LastOut);
+//		probability_escape(Read, p - LastOut);
 		if (LastOut+1 == p) {
 			int x = LastOut + 1 + Read[LastOut];
 			if (x < W_SIZE)
@@ -316,7 +246,7 @@ struct Compression {
 	}
 
 	void PutOffset2 (uint p, uint offset) {
-		probability_add(offset, W_MINUS);
+//		probability_add(offset, W_MINUS);
 //		  2300928 // 8, 3, 4	     
 //		  2299300 // 9, 3, 3
 //		  2296448 // 8, 3, 3 // seems the most optimal.
@@ -495,7 +425,7 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 	int Req = (Size+20) + (Size>>6);
 	int Actual = ((int)(Fnd.CmpOut - Fnd.CmpOutStart)) << 2;
 	*Fnd.CmpOutStart = Actual;
-	probability_output(Actual);
+//	probability_output(Actual);
 	fs->Length += Actual - Req;
 	return Actual;
 }
@@ -503,9 +433,9 @@ int CompressStrong (FastString* fs, JB_String* self, int Level) {
 
 
 extern "C" int JB_Str_CompressChunk (FastString* fs, JB_String* self, int Level) {
-	Allocator.lock();
+	Allocator.Lock();
 	int rz = CompressStrong(fs, self, Level);
-	Allocator.unlock();
+	Allocator.Unlock();
 	return rz;
 }
 

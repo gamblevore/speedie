@@ -77,6 +77,11 @@
 		AC33F7BE2B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
 		AC33F7C12B4FA499009A1156 /* JB_Pico.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */; };
+		AC35A5DA309FB32200DF43CA /* JB_Deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = AC35A5D9309FB32200DF43CA /* JB_Deflate.c */; };
+		AC35A5DB309FB32200DF43CA /* JB_Deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = AC35A5D9309FB32200DF43CA /* JB_Deflate.c */; };
+		AC35A5DC309FB32200DF43CA /* JB_Deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = AC35A5D9309FB32200DF43CA /* JB_Deflate.c */; };
+		AC35A5DD309FB32200DF43CA /* JB_Deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = AC35A5D9309FB32200DF43CA /* JB_Deflate.c */; };
+		AC35A5DE309FD10600DF43CA /* JB_Deflate.c in Sources */ = {isa = PBXBuildFile; fileRef = AC35A5D9309FB32200DF43CA /* JB_Deflate.c */; };
 		AC52897A2961F3FB005EFB9D /* JB_Umbrella.hpp in Headers */ = {isa = PBXBuildFile; fileRef = AC5289792961F3FB005EFB9D /* JB_Umbrella.hpp */; };
 		AC528A5C2961F536005EFB9D /* JB_Globals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5A2961F536005EFB9D /* JB_Globals.cpp */; };
 		AC528A5D2961F536005EFB9D /* JB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = AC528A5B2961F536005EFB9D /* JB.cpp */; };
@@ -355,6 +360,7 @@
 		AC259FBF2660EF610026C303 /* image.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = image.input; path = ../Image.scproj/image.input; sourceTree = "<group>"; };
 		AC28D04B2638AAE700635A66 /* perry.input */ = {isa = PBXFileReference; lastKnownFileType = folder; path = perry.input; sourceTree = SOURCE_ROOT; };
 		AC33F7BD2B4FA499009A1156 /* JB_Pico.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = JB_Pico.cpp; path = ../Library/CppLib/JB_Pico.cpp; sourceTree = "<group>"; };
+		AC35A5D9309FB32200DF43CA /* JB_Deflate.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = JB_Deflate.c; path = ../Library/CppLib/JB_Deflate.c; sourceTree = "<group>"; };
 		AC3A6A8D296082E700CE1E91 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		AC4A650125011C1600EF6E9A /* gui.input */ = {isa = PBXFileReference; lastKnownFileType = folder; name = gui.input; path = ../GUI.scproj/gui.input; sourceTree = "<group>"; };
 		AC52889E2961ED2B005EFB9D /* CppLib */ = {isa = PBXFileReference; lastKnownFileType = folder; name = CppLib; path = ../Library/CppLib; sourceTree = SOURCE_ROOT; };
@@ -505,6 +511,7 @@
 				AC528E7D2961F946005EFB9D /* JB_Globals.cpp */,
 				AC528E7C2961F946005EFB9D /* JB.cpp */,
 				AC528EBD2961F9B2005EFB9D /* JB_Alloc.cpp */,
+				AC35A5D9309FB32200DF43CA /* JB_Deflate.c */,
 				AC528ECE2961F9B3005EFB9D /* JB_BasicIO.cpp */,
 				AC528ECD2961F9B3005EFB9D /* JB_Child.cpp */,
 				ACE989EB2EF043BF00526C32 /* JB_Dylib.cpp */,
@@ -938,6 +945,7 @@
 				AC13B2592EE1E77300BF1567 /* JB_Date.cpp in Sources */,
 				AC13B25A2EE1E77300BF1567 /* JB.cpp in Sources */,
 				AC13B25B2EE1E77300BF1567 /* JB_MSR.cpp in Sources */,
+				AC35A5DD309FB32200DF43CA /* JB_Deflate.c in Sources */,
 				AC13B25C2EE1E77300BF1567 /* JB_BasicIO.cpp in Sources */,
 				ACC38E772F0580BD00E6BE6C /* FF_ARM64.S in Sources */,
 				ACC38E782F0580C000E6BE6C /* FF_Intel.S in Sources */,
@@ -977,6 +985,7 @@
 				AC2218C62EE9A6DC004D73E0 /* FF_Intel.S in Sources */,
 				AC13B2AB2EE1E7BC00BF1567 /* JB_Globals.cpp in Sources */,
 				AC13B2852EE1E78E00BF1567 /* JB_Errors.cpp in Sources */,
+				AC35A5DE309FD10600DF43CA /* JB_Deflate.c in Sources */,
 				AC13B2862EE1E78E00BF1567 /* JB_Compress.cpp in Sources */,
 				AC90B9182F4F5D54006B4F52 /* JB_OSX.m in Sources */,
 				AC13B2872EE1E78E00BF1567 /* JB_File.cpp in Sources */,
@@ -1057,6 +1066,7 @@
 				AC2218C42EE9A6DC004D73E0 /* FF_Intel.S in Sources */,
 				AC66D1282ED1D54C00EDFB82 /* JB_Date.cpp in Sources */,
 				AC66D12A2ED1D54C00EDFB82 /* JB_MSR.cpp in Sources */,
+				AC35A5DC309FB32200DF43CA /* JB_Deflate.c in Sources */,
 				AC66D12B2ED1D54C00EDFB82 /* JB_BasicIO.cpp in Sources */,
 				AC66D12C2ED1D54C00EDFB82 /* JB_DirReaderUnix.cpp in Sources */,
 				AC66D12D2ED1D54C00EDFB82 /* JB_Pico.cpp in Sources */,
@@ -1098,6 +1108,7 @@
 				ACB2D25129BCCAB70070E60F /* JB_OSX.m in Sources */,
 				ACB2D25229BCCAB70070E60F /* JB_Tokeniser.cpp in Sources */,
 				ACB2D25329BCCAB70070E60F /* JB_Date.cpp in Sources */,
+				AC35A5DA309FB32200DF43CA /* JB_Deflate.c in Sources */,
 				ACB2D25429BCCAB70070E60F /* JB.cpp in Sources */,
 				ACB2D25529BCCAB70070E60F /* JB_MSR.cpp in Sources */,
 				ACB2D25629BCCAB70070E60F /* JB_BasicIO.cpp in Sources */,
@@ -1143,6 +1154,7 @@
 				AC528F042961F9B4005EFB9D /* JB_DirReaderUnix.cpp in Sources */,
 				AC33F7C02B4FA499009A1156 /* JB_Pico.cpp in Sources */,
 				AC528EDA2961F9B4005EFB9D /* JB_Math.cpp in Sources */,
+				AC35A5DB309FB32200DF43CA /* JB_Deflate.c in Sources */,
 				AC528F0C2961F9B4005EFB9D /* JB_Utils.cpp in Sources */,
 				AC528F0A2961F9B4005EFB9D /* JB_Errors.cpp in Sources */,
 				AC534D792C592A2900F0D6C5 /* JB_Temporal.cpp in Sources */,
