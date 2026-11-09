@@ -778,7 +778,6 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     if (!NewBlock)
         return 0;
 
-//	printf("%x\n", NewBlock);
 	NewBlock->DebugMark = ++DM;
     Sanity(NewBlock);
     JB_Class* Class = Mem->Class;
@@ -791,8 +790,6 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
 	}
     if (NewBlock->ObjSize != Size)
 		InitObjectsInBlock_( Mem, NewBlock, World, Size );
-
-	
 	
     NewBlock->PrevBlock = NewBlock;
     NewBlock->NextBlock = NewBlock;
@@ -802,15 +799,13 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     // surely when a block goes away, its layer does too? So then... which block is it, that had its layer
     // still "laying" around?
 
-//	if (strcmp(Mem->Class->Name, "Message") == 0)
-//		debugger;
     return LinkIn_(Mem, NewBlock);
 }
 
 
 
 
-// SuperBlocks
+// SuperBlocks // (going away!)
 // JB_MemoryLayer
 // AllocationBlocks
 // Objects
@@ -864,7 +859,7 @@ static void PointerCompressionBoom (byte* boom) {
 
 
 static byte* PointerCompressionAlloc () {
-// this can help me do pointer compression!!
+// this can help with pointer compression!!
 // each pointer is now the base-pointer.
 // we can remove the memory world too? nice.
 	byte* Got = JB_Mem__mmap(kUltraAlloc); // 32GB.

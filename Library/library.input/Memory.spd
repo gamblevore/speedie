@@ -224,6 +224,7 @@ class Memory
 										// more mysteries to solve!
 
 		libinternal	_memset	(|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
+		function	UltraAlloc (|int64| N = 1|uint64|<<31):				cpp_wrapper JB_Mem__mmap
 		function	Fill	(|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function	Fill	(|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function	Unmap	(|&nil| p, |int| n):						cpp_wrapper JB_munmap

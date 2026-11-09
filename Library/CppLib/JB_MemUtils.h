@@ -57,6 +57,7 @@ struct JB_Object;
 
 extern int OutOfMemoryHappenedAlready;
 bool JB_OutOfMemoryOccurred();
+byte* JB_Mem__mmap (uint64 Request);
 u64 JB_TotalMemoryCount();
 bool JB_TooLargeAlloc(int64 N, const char* S);
 void JB_OutOfMainMemory(int64 N);
