@@ -1164,7 +1164,6 @@ JB_Object_FastAs
 JB_Object_Isa
 JB_Object_MustBe
 JB_Object___Render__
-JB_OutOfMemoryOccurred
 JB_Pico_Get
 JB_Pico_Name
 JB_Pico_NameSet
@@ -1740,7 +1739,6 @@ JB_ivec4_SyntaxEquals
 JB_ivec4_Vec4
 JB_ivec4_Vert
 JB_ivec4_WidthSet
-JB_munmap
 JB_u64_Log2
 JB_u8p_Read
 JB_uint64_Now

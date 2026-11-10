@@ -21,6 +21,7 @@ JB__Tk__ErrorFlags
 GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
+JB__Rec__MemoryStillOK
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength

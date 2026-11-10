@@ -208,9 +208,6 @@ struct MemoryWorld
 		cpp_class JB_MemoryWorld
 
 	|&Byte|			Name
-	|Byte|			SuperSize
-	|Byte|			BlockSize
-	|Byte|			Alignment
 
 
 

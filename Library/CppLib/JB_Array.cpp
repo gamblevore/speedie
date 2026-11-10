@@ -50,13 +50,6 @@ void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
 
 
 
-
-
-void OutOfMem_ (Array*self, int Count=0) {
-    JB_OutOfUserMemory((self->_Capacity+Count)*sizeof(void*));
-}
-
-
 static bool ReAlloc_ (Array* self, int C) {
 	auto X = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
 	if (!X)
@@ -75,7 +68,7 @@ static bool GrowToLength_ (Array* self, int N, bool Extra) {
 	}
 	
 	if_rare (N > kArrayLengthMax)
-        return JB_TooLargeAlloc(N, "array allocation");
+        return JB_OutOfUserMemory(N);
 	if_rare (!ReAlloc_(self, N+((N*Extra)>>1)))
 		return false;
 

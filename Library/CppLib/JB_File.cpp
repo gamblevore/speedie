@@ -1462,12 +1462,6 @@ bool JB_File_IsLink (JB_String* self) {
 	return Stat_(self, &st, false) and S_ISLNK(st.st_mode);
 }
 
-
-void JB_munmap (void* mem, int64 n) {
-	if (mem)
-		ErrorHandle_(munmap(mem, n), nil, nil, "un-memmap");
-}
-
 /*
 just some wierd thing I found out about unix... the dir_type and stat modes don't match up.
 

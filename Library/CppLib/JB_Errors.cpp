@@ -13,7 +13,7 @@
 
 extern "C" {
 
-
+void JB_Str_Fail(JB_String* self);
 JB_Error* JB_Err_Constructor(JB_Error* self, Message* node, JB_String* desc, unsigned char level, JB_String* path);
 
 
@@ -31,7 +31,6 @@ void JB_ErrorHandle2C(const char* Desc, bool CanFreeDesc, const char* Path, bool
 	JB_Err_Fill(Err, FreeableStr_(Path, CanFreePath), FreeableStr_(Desc, CanFreeDesc)); 
 	JB_Rec_AppendErr(nil, Err);
 }
-
 
 
 
@@ -118,11 +117,6 @@ static JB_String* Path_(JB_String* self) {
     FastString* FS = JB_FS__FastNew(0);
     char* cwd = getcwd( 0, 0 );
     
-//    JB_String Fmt;
-//    Fmt.Addr = (u8*)"\x0CHello\x01\x0DMyName\x02\x09Is\x05\x0BCool";
-//    Fmt.Length = strlen((const char*)Fmt.Addr);
-//    JB_FS_AppendVArg(FS, &Fmt, cwd, '/', self);
-    
     JB_FS_AppendCString(FS, cwd);
     JB_FS_AppendByte(FS, '/');
     JB_FS_AppendString(FS, self);
@@ -154,30 +148,52 @@ int64_t JB_ErrorHandleC(const char* Desc, JB_String* path, bool CanFreeDesc) {
 
 
 
-void JB_Str_Fail(JB_String* self);
-void JB_OutOfUserMemory(int64 N) {
-	if (++OutOfMemoryHappenedAlready <= 10) 
-		JB_ReportMemoryError("Jeebox: Failed to allocate ", N, nil); 
-} 
+byte OutOfMemoryHappenedAlready;
+char MemoryErrorSpace[127];
 
-bool JB_ReportMemoryError(const char* A, int64 N, const char* operation) {
-    static uint8 ReportCount = 0;
-    require (ReportCount < 10);
-	FastString* FS = JB_FS__FastNew(0);
-	require (FS);
-	ReportCount++;
-	JB_FS_AppendCString(FS, A);
-	if (N) {
-		JB_FS_AppendIntegerAsText(FS, N, 0);
-		JB_FS_AppendCString(FS, " bytes of memory");
+static bool ReportMemoryError (bool MainFail, int64 N) {
+	if (OutOfMemoryHappenedAlready < 255)
+		if (OutOfMemoryHappenedAlready++ > 10)
+			return false;
+	
+	MainFail = false;
+	const char* A = MainFail ? "Failed to allocate main object memory":"Failed to allocate array/string";
+	int Count = snprintf(MemoryErrorSpace, sizeof(MemoryErrorSpace), "%s. Requested %lli ", A, N);
+	if (Count > 0)
+		A = MemoryErrorSpace;
+	errno = MainFail?ENOMEM:ERANGE;
+	perror(MemoryErrorSpace);
+	
+	JB_String* Str = JB_Str_CopyFromCString(MemoryErrorSpace);
+	if (!Str) {				// We really are in trouble, sigh.
+		Str = JB_StrC(MemoryErrorSpace);
+		if (!Str)			// Still?
+			exit(-1);		// Utter failiure
 	}
-	if (operation) {
-		JB_FS_AppendCString(FS, " during ");
-		JB_FS_AppendCString(FS, operation);
-	}
-	JB_Str_Fail(JB_FS_GetResult(FS));
+	
+	void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
+	JB_Rec__NewErrorSub(nil, Str, nil, 16<<MainFail);
+	
+	JB_Str_Fail(Str);
 	return false;
 }
+
+
+bool JB_OutOfUserMemory (int64 N) {
+	return ReportMemoryError(false, N);
+}
+
+
+void JB_OutOfMainMemory (int64 N) {
+// Used by the memory manager itself for blocks/objects
+	ReportMemoryError(true, N);
+}
+
+
+bool JB_OutOfMemoryOccurred () {
+    return OutOfMemoryHappenedAlready;
+}
+
 
 }
 

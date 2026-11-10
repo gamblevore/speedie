@@ -42,9 +42,12 @@ class ErrorReceiver
 	
 	
 	function OK (|bool|)
-		if self
-			Return !.errorcount
-		return !stderr.errorcount
+		opt norefcounts
+		if !self
+			self = stderr
+		if .errorcount
+			return false
+		return _MemoryStillOK
 	
 	
 	function HasProblems (|bool|)
@@ -186,8 +189,10 @@ class ErrorReceiver
 	
 	
 	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
+		if (level >= 16)
+			_MemoryStillOK = false
+			return true // we need to report out of memory errors, if possible.
 		require .LowerErrorsTo < ErrorSeverity.IgnoreAllErrors
-		require !ErrorReceiver.OutOfMemory
 		if level == ErrorSeverity.problem
 			return (.problemcount < .maxproblems)
 		if level >= ErrorSeverity.error // a warning
@@ -216,8 +221,7 @@ class ErrorReceiver
 
 
 	module
-		function OutOfMemory (|bool|)
-			cpp_Wrapper JB_OutOfMemoryOccurred
+		|bool| _MemoryStillOK = true
 			
 		
 	iterator
@@ -229,6 +233,7 @@ class ErrorReceiver
 			
 	constants
 		InternalError = "Internal Error"
+	
 
 
 

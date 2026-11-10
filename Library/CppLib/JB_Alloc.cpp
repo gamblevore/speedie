@@ -93,12 +93,6 @@ static bool MiniCompare (const char* s, const char* find) {
 }
 
 void JB_ClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Parent, JBObject_Behaviour* Table) {
-    if (!MemoryManager.Name) {
-        MemoryManager.Name           = (uint8*)"JB Standard Memory";
-        MemoryManager.SuperSize      = 20;
-        MemoryManager.SpareTrigger   = 0.75f;
-    }
-	
 	Cls.RefCount = 1024;
 	if (MiniCompare(Name, "JB_"))
 		Name += 3;
@@ -810,79 +804,56 @@ static FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
 // AllocationBlocks
 // Objects
 
-
-extern "C" int64 JB_ErrorHandleC (const char* Desc, bool CanFreeDesc);
-
-
-void JB_OutOfMainMemory (int64 N) {
-    if (!OutOfMemoryHappenedAlready) {
-        printf("Jeebox: Failed to allocate %lli bytes of main memory.\n", N);
-        OutOfMemoryHappenedAlready++;
-		JB_ErrorHandleC("Memory Manager failed to allocate Object", false);
-    }
-}
-
-
-bool JB_OutOfMemoryOccurred () {
-    return OutOfMemoryHappenedAlready;
-}
-
-
-byte* JB_Mem__mmap (uint64 Request) {
-// I could allocate 32-GB of memory for pointer-compression
-// test it on arrays, first? then dicts, etc. :]
-// This could make memory-management simpler!
-// no need to allocate one super-block at a time. I mean...
-// do we even NEED super-blocks anymore??? Probably not?
-// Some kind of "total-header info" is needed. Like... for the 
-// "first free block" basically. So we can allocate new blocks.
-
-// we can remove the memoryworld too! Just one super-system for all!
-// we can get the memoryworld from ANY object/block/whatever
-
-    byte* Addr = (byte*)mmap(0, Request, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-
-    if (Addr != MAP_FAILED)
-		return Addr;
+struct UltraMap {
+	int64 Allocated;
+	uint  Padding[(1<<13)-8];
 	
+};
+
+void JB_Date__Sleep (Date Durr);
+
+static UltraMap* ultra_alloc (uint64 Request) {
+// I could allocate 32-GB of memory for pointer-compression
+// remove supers + memoryworld
+
+	for (int i = 0; i < 40; i++) {		// try for 10s. I've seen it fail sometimes, strangely.
+		int Flags = MAP_PRIVATE | MAP_ANONYMOUS;
+		#ifdef MAP_HUGETLB
+			Flags |= MAP_HUGETLB;
+		#endif
+		auto Addr = (UltraMap*)mmap(0, Request, PROT_READ | PROT_WRITE, Flags, -1, 0);
+
+		if (Addr != MAP_FAILED)
+			return Addr;
+		JB_Date__Sleep(1<<14);			// 0.25s
+	}
 	JB_OutOfMainMemory(Request);
 	return 0; // oof;
 }
 
-
-
-static void PointerCompressionBoom (byte* boom) {
+void JB_Mem__FreeMap (UltraMap* boom) {
 	if (boom) {
-		munmap(boom, kUltraAlloc);
+		munmap(boom, boom->Allocated);
 	}
 }
 
 
-static byte* PointerCompressionAlloc () {
+static UltraMap* PointerCompressionAlloc () {
 // this can help with pointer compression!!
-// each pointer is now the base-pointer.
-// we can remove the memory world too? nice.
-	byte* Got = JB_Mem__mmap(kUltraAlloc); // 32GB.
+	auto Got = ultra_alloc(kUltraAlloc); // 32GB.
 	if (!((uint64)Got&(kUltraAlloc-1)))
 		return Got;
-	PointerCompressionBoom(Got);
-	Got = JB_Mem__mmap(kUltraAlloc<<1); // oof
-	if (!Got)
-		return 0;
-	Got = (byte*)((((uint64)Got) + kUltraAlloc)&~(kUltraAlloc-1));
+	JB_Mem__FreeMap(Got);
+	Got = ultra_alloc(kUltraAlloc<<1); // oof
+	if (Got)
+		Got = (UltraMap*)((((uint64)Got) + kUltraAlloc)&~(kUltraAlloc-1));
 	return Got;
 }
 
 
 static SuperBlock* Super_calloc (JB_MemoryWorld* World) {
-    int N = (1 << World->SuperSize);
+    int N = (1 << 20); // 1MB
     int Align = (1 << kBlockSize);
-//    for (int i = 0; i < 1024*1024; i++) {
-//		auto X = PointerCompressionAlloc();
-//		if (!X)
-//			debugger;
-////		PointerCompressionBoom(X);
-//    }
     while (N >= Align*4) {
 		SuperBlock* bla = (SuperBlock*)JB_AlignedAlloc(N, Align);
         if (bla) {
@@ -998,9 +969,9 @@ static AllocationBlock* ReturnSpare_ (JB_MemoryLayer* Mem) {
 }
 
 
-static u16 HiddenRef_ (float R, int Size) {
+static u16 HiddenRef_ (int Size) {
     int N = (1<<kBlockSize) - sizeof(AllocationBlock);
-    int N2 = N * R;
+    int N2 = (N * 3)/4;
     return N2 / Size;
 }
 
@@ -1011,7 +982,7 @@ static FreeObject* NewBlock ( AllocationBlock* CurrBlock ) {
     if (!IsDummy(CurrBlock)) {
         u16 Hidden = Mem->HiddenRefCount;       // trigger re-use of this block before it hits empty.
         if (!Hidden) {
-            Hidden = HiddenRef_(World->SpareTrigger, Mem->Class->Size);
+            Hidden = HiddenRef_(Mem->Class->Size);
             Mem->HiddenRefCount = Hidden;
         }
         CurrBlock->HiddenObjCount = Hidden;

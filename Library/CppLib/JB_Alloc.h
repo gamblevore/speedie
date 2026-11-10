@@ -179,13 +179,8 @@ struct JB_MemoryWorld {
     int                 CountRef;
     SuperBlock*         CurrSuper;
     SuperBlock*         SpareSuper;
-    uint8*              Name;
-
-    uint8               SuperSize;
     bool				Shutdown;
     int                 SupersMade;
-    
-    float               SpareTrigger; // number of objects free in a block after which the block becomes "spare"...
 };
 
 

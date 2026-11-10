@@ -44,9 +44,11 @@ Date JB_Date__Now () {
 static timespec DateToTimeSpec (Date Durr) {
     struct timespec ts;
     ts.tv_sec = Durr>>16;
-    ts.tv_nsec = (Durr & ((1<<16)-1)) * 15258.7890625;
+    Durr &= (1<<16)-1;
+    ts.tv_nsec = Durr * 15258.7890625;
     return ts;
 }
+
 
 void JB_Date__Sleep (Date Durr) {
     auto ts = DateToTimeSpec(Durr);

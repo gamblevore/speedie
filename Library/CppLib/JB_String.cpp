@@ -54,9 +54,9 @@ bool JB_BA_Realloc_ ( JB_String* self, int Length ) { // is a c-string
         return 0;
     }
 
-    if (Length > kStrLengthMax) {
-        return JB_TooLargeAlloc(Length, "strings");
-    }
+    if (Length > kStrLengthMax)
+		return JB_OutOfUserMemory(Length);
+    
     
     auto Result = JB_AllocateString( self->Addr, Length+1 );
     require (Result);

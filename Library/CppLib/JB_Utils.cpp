@@ -27,7 +27,6 @@ int JB_PointerSize() {
 }
 
 
-int OutOfMemoryHappenedAlready;
 static uint64  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
 static uint64  TotalStringBytes;
 
@@ -38,11 +37,6 @@ JB_String* JB_Str__Freeable(uint8* p, int n) {
     Str->Addr = (uint8*)p;
     Str->Length = n;
     return Str;
-}
-
-
-bool JB_TooLargeAlloc (int64 N, const char* S) {
-	return JB_ReportMemoryError("Jeebox: Oversized alloc requested: ", N, S); 
 }
 
 

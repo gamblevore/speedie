@@ -224,10 +224,8 @@ class Memory
 										// more mysteries to solve!
 
 		libinternal	_memset	(|&byte| p, |byte| B, |int| n):				cpp_wrapper memset
-		function	UltraAlloc (|int64| N = 1|uint64|<<31):				cpp_wrapper JB_Mem__mmap
 		function	Fill	(|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function	Fill	(|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
-		function	Unmap	(|&nil| p, |int| n):						cpp_wrapper JB_munmap
 		function	Realloc	(|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_Realloc
 		function	Zero	(|&nil| addr, |int| n):						cpp_wrapper memzero
 		function	Compare	(|&nil| dest, |&nil| src, |int| N, |int|):	cpp_wrapper memcmp
@@ -248,4 +246,10 @@ class Memory
 	
 		autogen Sort (|&nil| FP, |&object| First, |&object| Last)
 			cpp_wrapper SpdSort
-			
+
+/*	
+function	UltraAlloc (|int64| N = 1|uint64|<<31, |&byte|)
+			cpp_wrapper JB_Mem__mmap
+			description "Its just mmmap. Not even mmap. but mmmap. Like mmap, but a little better. OK so its wrapping mmap(). Turns out you can rely on the VM system to do crazy things for you. So why not allocate 2GB and just never use almost any of it. Even if you only use a tiny 16K of it. The system doesn't care, right? It works on 16KB page basis anyhow, right?"
+
+*/

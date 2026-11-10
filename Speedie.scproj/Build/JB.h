@@ -145,6 +145,8 @@ typedef byte TaskState;
 
 typedef int TerminalColor;
 
+typedef uint64 __junktest_7__;
+
 typedef int jbinLeaver;
 
 typedef vec4 mat2;
@@ -311,6 +313,8 @@ struct IntDownRange;
 
 struct IsaTester;
 
+struct Junk_ABC;
+
 struct LeakTester;
 
 struct LoopInfo;
@@ -342,6 +346,10 @@ struct Assembler;
 struct AutoItem_Behaviour;
 
 struct BranchPHITracker;
+
+struct CArrayTest_Behaviour;
+
+struct ContainerStruct2;
 
 struct CppRefs_Behaviour;
 
@@ -389,9 +397,13 @@ struct UnixProcess_Behaviour;
 
 struct Validator_Behaviour;
 
+struct __junktest_6___Behaviour;
+
 struct list_Behaviour;
 
 struct xC2xB5Form_Behaviour;
+
+struct ContainerStruct;
 
 struct FastStringCpp_Behaviour;
 
@@ -433,6 +445,8 @@ struct SCModule_Behaviour;
 
 struct AutoItem;
 
+struct CArrayTest;
+
 struct CppRefs;
 
 struct Cpp_Export;
@@ -462,6 +476,8 @@ struct SCParamArray;
 struct SyntaxObj;
 
 struct Validator;
+
+struct __junktest_6__;
 
 struct xC2xB5Form;
 
@@ -524,6 +540,8 @@ struct SCFunction;
 struct SCModule;
 
 typedef ASM* (*ASM_Encoder)(FatASM* Self, ASM* Curr, ASM* After);
+
+typedef int64 (*CakeVM_CakeChef)(CakeVM* Self, CakeStack* Stack, int ErrorCode, uint Break);
 
 typedef SCNode* (*FP_CollectFunc)(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
@@ -726,6 +744,10 @@ struct IsaTester {
 	bool InUse;
 };
 
+struct Junk_ABC {
+	int cc;
+};
+
 struct LeakTester {
 	int MemUsedStart;
 	JB_String* Name;
@@ -852,6 +874,13 @@ JBClass ( AutoItem , JB_Object ,
 	JB_String* Display;
 	bool Exact;
 	int Type;
+);
+
+struct CArrayTest_Behaviour: Object_Behaviour {
+};
+
+JBClass ( CArrayTest , JB_Object , 
+	int Items[20];
 );
 
 struct CppRefs_Behaviour: Object_Behaviour {
@@ -1657,6 +1686,8 @@ extern Message* SC__VM_Builder_skibidy;
 extern Message* SC__VM_Builder_TempDests;
 extern Message* SC__VM_Builder_Ugh;
 extern byte SC__VM_Builder_XType;
+extern int SC_ASMTrapper;
+extern ivec4 SC_Butter;
 extern Message* SC_CakeVirtualMacro;
 extern Message* SC_CakeVirtualReturn;
 extern Dictionary* SC_ClassOrModuleLinkage;
@@ -1676,6 +1707,7 @@ extern FastString* SC_fs_tmp_num;
 extern Dictionary* SC_FuncLinkageTable;
 extern Dictionary* SC_FuncPreReader;
 extern int SC_GenFlowCount;
+extern SCFunction* SC_IntMaxObj;
 #define kJB_kActualTypecasts ((int)-16545)
 #define kJB_kAddressOfMatch ((int)12582912)
 #define kJB_kCastedMatch ((int)25165824)
@@ -1710,6 +1742,7 @@ extern int SC_GenFlowCount;
 #define kJB_kVoidPtrMatch ((int)20971520)
 #define JB_Random JB__.Random
 #define JB_RandomShared JB__.RandomShared
+extern FatASM* SC_RefCountTrap;
 extern Dictionary* SC_RootCollectTable;
 extern Message* SC_SelfEqNilReturn;
 extern JB_Dylib SC_SelfLib;
@@ -1772,6 +1805,7 @@ extern JB_Dylib SC_SelfLib;
 #define kJB_SyxXPI ((uint)52)
 #define kJB_SyxXTxt ((uint)55)
 #define kJB_SyxYoda ((uint)44)
+extern CakeVM* SC_TestVM;
 extern SCDecl* SC_TrueBool;
 extern SCClass* SC_TypeArray;
 extern SCClass* SC_TypeBool;
@@ -2473,6 +2507,10 @@ extern Array* SC__NilReason_values;
 #define kJB__TerminalColor_Warn ((TerminalColor)19)
 #define kJB__TerminalColor_White ((TerminalColor)7)
 #define kJB__TerminalColor_Yellow ((TerminalColor)3)
+#define kSC__TM_BaseShrinkSpeed (0.0005f)
+#define kSC__TM_Halfmap ((__junktest_7__)6148914691236517205)
+#define kSC__TM_MOUSEBUTTONDOWN ((int)1025)
+#define kSC__TM_MOUSEMOTION ((int)1024)
 #define kSC__xC2xB5Param_Input ((uint)256)
 #define kSC__xC2xB5Param_Jump ((uint)32)
 #define kSC__xC2xB5Param_NonReg ((uint)96)
@@ -2508,6 +2546,7 @@ extern ArchonPurger SC__nil_T;
 #define kSC__FatRange_kEmptyKeep ((int)2)
 #define kSC__FatRange_kEmptyRemove ((int)1)
 extern IsaTester SC__IsaTester_T;
+extern Junk_ABC SC__Junk_ABC_D;
 #define kJB__TerminalDisplay_h ((int)35)
 #define kJB__TerminalDisplay_w ((int)80)
 extern FatASM* SC__Pac_BackupSpace;
@@ -2537,6 +2576,7 @@ extern uint64 SC__Cpp_SourceHash;
 extern bool SC__Cpp_WriteAPI;
 #define kJB__Wrap_kFree ((int)1)
 #define kJB__Wrap_kNothing ((int)0)
+#define JB__Rec__MemoryStillOK JB__.Rec__MemoryStillOK
 #define kJB__Rec_InternalError ((JB_StringC*)JB_LUB[898])
 #define kJB__fix_TypeDict ((int)3)
 #define kJB__fix_TypeObj ((int)1)
@@ -2612,6 +2652,7 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
+	bool Rec__MemoryStillOK;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
@@ -2619,9 +2660,8 @@ struct JB_Globals {
 	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Flow_LastCodePoint;
-	InputStream* Flow_FlowIn;
 	FastString* Flow_FlowOut;
-	JB_File* App__StdOut;
+	JB_File* App__stdin;
 	Dictionary* Constants_EscapeStr;
 	Dictionary* Constants_XML_EscapeStr;
 	Dictionary* Constants_JS_EscapeStr;
@@ -2630,16 +2670,17 @@ struct JB_Globals {
 	Dictionary* Constants_XML_UnEscapeStr;
 	Dictionary* Constants_EscapeChr;
 	Message* Tk__EndOfLineMarker;
-	JB_File* App__stdin;
+	InputStream* Flow_FlowIn;
 	Dictionary* TC_Types_Dict;
 	JB_String* App_Usage;
 	JB_File* Platform__Logger;
 	JB_ErrorReceiver* StdErr;
 	Dictionary* Syx_Types;
 	Message* App__Conf;
+	Message* App__Prefs;
 	SpdProcess* Proc__Parent;
 	Message* Err_BackupErrorSource;
-	Message* App__Prefs;
+	JB_File* App__StdOut;
 	Array* Macro_TmpPrms_;
 	Array* App__Args;
 	Dictionary* Tk__ErrorNames;
@@ -2652,12 +2693,12 @@ struct JB_Globals {
 	FP_SorterComparer ID__ByFreq;
 	FP_SorterComparer Str__Sorter;
 	FP_SorterComparer Msg__Sorter;
-	PicoComms* Proc__ForceParent;
 	RandomXOR* Random;
+	PicoComms* Proc__ForceParent;
 	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
-	CompressionStats MzSt_All;
 	MessagePosition Tk_Using;
+	CompressionStats MzSt_All;
 	uint64 Mem_MDummy_[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Syx_TypeList[64];
@@ -3327,6 +3368,14 @@ void SC_PackMaker__PackClasses(FastString* J, int LibOrPack);
 
 void SC_PackMaker__PackIDFuncs(Array* List);
 
+void SC_PackMaker__RunAFewTests();
+
+void SC_PackMaker__SyntaxAccessSetWithIntInt64(int V, int64 Value);
+
+void SC_PackMaker__SyntaxAccessSetWithIntObject(int V, JB_Object* Value);
+
+SCFunction* SC_PackMaker__TestFn(JB_String* S);
+
 bool SC_PackMaker__TryBakeOneFunc(FastString* J, FastString* Bmr, FastString* Dump, SCFunction* Fn);
 
 bool SC_PackMaker__UseMain(JB_String* Name, int Id);
@@ -3814,7 +3863,13 @@ int SC_StructStuff__Init_();
 
 
 // TextAssembler
+void SC_TextAssembler__Assemble(Message* Msg);
+
+bool SC_TextAssembler__GetLabel(FatASM* Jumper);
+
 int SC_TextAssembler__Init_();
+
+bool SC_TextAssembler__TextFunc(Message* Msg);
 
 
 
@@ -3985,6 +4040,14 @@ void SC_VM_Builder__VMLine(Message* Line, FastString* Vm);
 
 
 // main
+void SC___junktest_11__();
+
+void SC___junktest_1__();
+
+void SC___junktest_2__();
+
+bool SC___junktest_3__(IntRange Data);
+
 int JB_SP_AppInitSub_();
 
 int SC_ArrayInOrderCheck(int InOrder, Message* Msg);
@@ -4305,6 +4368,10 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 
 SCClass* SC_VecType(bool Isfloat, int Count);
 
+void* SC_voidtest(void* Abc);
+
+void* SC_voidtest2(void* Abc);
+
 
 
 // std
@@ -4334,6 +4401,8 @@ JB_String* JB_bool_Render0(bool Self);
 
 // byte
 bool JB_byte_Failed2(uint /*byte*/ Self);
+
+bool SC_byte_FatConst(uint /*byte*/ Self);
 
 bool JB_byte_In(uint /*byte*/ Self, uint /*byte*/ A, uint /*byte*/ B);
 
@@ -4390,6 +4459,8 @@ float JB_f_Pow(float Self, int N);
 
 float JB_f_SmoothStep(float Self, float Low, float High);
 
+bool JB_f_SyntaxAccess(float Self);
+
 float JB_f_Tan(float Self);
 
 float JB_f_Uncos(float Self);
@@ -4401,6 +4472,8 @@ float JB_f_UnTan(float Self, float Y);
 
 
 // int
+int SC_int___junktest_8__(int Self, int Inaaaadex, bool Create);
+
 int JB_int_AlignUp(int Self, int To);
 
 void SC_int_FuncFill(int Self, ASMReg* Regs, u16* Func_inputs);
@@ -4485,6 +4558,8 @@ int JB_ivec2_Width(ivec2 Self);
 
 
 // ivec4
+ivec4 SC_ivec4___junktest_4__Set(ivec4 Self, int Value);
+
 ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
 
 
@@ -4738,9 +4813,13 @@ ASM SC_ASM_Write_moveSet(ASM Self, uint Value);
 
 ASM SC_ASM_Write_OffsetSet(ASM Self, uint Value);
 
+SCFunction* SC_ASM__AccessStr(Message* M);
+
 int SC_ASM__Init_();
 
 void SC_ASM__TestASMText();
+
+void SC_ASM__TextASMTestSub(Message* Tests);
 
 
 
@@ -4773,6 +4852,8 @@ int SC_Reg_ByteShift(ASMReg Self);
 int64 SC_Reg_Const(ASMReg Self);
 
 void SC_Reg_ConstCheck(ASMReg Self);
+
+void SC_Reg_DebugPrint(ASMReg Self);
 
 int SC_Reg_EqulClip(ASMReg Self);
 
@@ -4841,6 +4922,10 @@ ASMReg SC_Reg_ReallySimplify(ASMReg Self);
 int SC_Reg_Reg(ASMReg Self);
 
 ASMReg SC_Reg_RegSet(ASMReg Self, int Value);
+
+byte SC_Reg_RegTypeLetter(ASMReg Self);
+
+JB_String* SC_Reg_Render(ASMReg Self, FastString* Fs_in);
 
 bool SC_Reg_Signed(ASMReg Self);
 
@@ -5022,6 +5107,8 @@ int JB_TC_ByteCount(uint /*DataTypeCode*/ Self);
 
 uint JB_TC_ByteShift(uint /*DataTypeCode*/ Self);
 
+void JB_TC_DebugPrint(uint /*DataTypeCode*/ Self);
+
 int SC_TC_FloatIntMerge(uint /*DataTypeCode*/ Self, int Old, Message* S);
 
 int JB_TC_Floatness(uint /*DataTypeCode*/ Self);
@@ -5191,6 +5278,8 @@ int SC_NilReason__Init_();
 // NilRecord
 int SC_NRD_DepthOfVars(NilRecord Self);
 
+void ndb5(NilRecord Self);
+
 NilState SC_NRD_SyntaxAccess(NilRecord Self, int Item);
 
 
@@ -5284,11 +5373,15 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name);
 
 JB_String* JB_Syx_Name(Syntax Self);
 
+bool JB_Syx_NoChildren(Syntax Self);
+
 SyntaxObj* JB_Syx_Obj(Syntax Self);
 
 Message* JB_Syx_OperatorPlus(Syntax Self, JB_String* M);
 
 Message* JB_Syx_PlusNum(Syntax Self, int64 M);
+
+bool JB_Syx_Translateable(Syntax Self);
 
 int JB_Syx__Init_();
 
@@ -5306,6 +5399,9 @@ JB_String* JB_TerminalColor_Colorise(TerminalColor Self, JB_String* S);
 
 JB_String* JB_TerminalColor_Render(TerminalColor Self, JB_String* Info, FastString* Fs_in);
 
+
+
+// __junktest_7__
 
 
 // jbinLeaver
@@ -5743,6 +5839,8 @@ void SC_nil__LaunchMothership();
 
 NilState SC_nil__List(Message* Msg, NilCheckMode Test);
 
+void ndb4();
+
 NilState SC_nil__NilFunction(Message* Msg, NilCheckMode Test);
 
 void SC_nil__NilParamPass(SCDecl* Recv, SCDecl* Sent, Message* Where, SCFunction* F, uint /*NilState*/ V);
@@ -5817,6 +5915,8 @@ Message* SC_ArgArrayCounter_Do(ArgArrayCounter* Self, JB_String* Name, Message* 
 
 
 // JB_CakeVM
+void JB_CakeVM_Load(CakeVM* Self, uint* ASM, int Length);
+
 
 
 // JB_ClassData
@@ -5887,6 +5987,10 @@ void JB_FastBuff_SyntaxExpect(FastBuff* Self, JB_String* S);
 
 
 // JB_FatASM
+void SC_FAT_AddLabelRequest(FatASM* Self, Message* P, int Pos);
+
+void SC_FAT_AddRegParam(FatASM* Self, Message* Src, int Write);
+
 ASMReg SC_FAT_ASMReg(FatASM* Self, int A);
 
 void SC_FAT_BakeBreak(FatASM* Self, uint SrcMap, uint Break);
@@ -5936,6 +6040,8 @@ uint64 SC_FAT_FuncPrms(FatASM* Self);
 int SC_FAT_GuessSize(FatASM* Self);
 
 ASM* SC_FAT_Halt_Encoder(FatASM* Self, ASM* Curr, ASM* After);
+
+uint SC_FAT_ID(FatASM* Self);
 
 void SC_FAT_Incr(FatASM* Self);
 
@@ -6112,6 +6218,21 @@ void SC_IsaTester__SyntaxAppend(Message* O);
 
 
 
+// JB_Junk_ABC
+void SC_Junk_ABC_ConstructorGHI(Junk_ABC* Self);
+
+int SC_Junk_ABC__Init_();
+
+void SC_Junk_ABC__New2(Junk_ABC* Rz);
+
+void SC_Junk_ABC__TestNew();
+
+void SC_Junk_ABC__TestNewNew(Junk_ABC* Rz);
+
+void SC_Junk_ABC__TestReturn(Junk_ABC* Rz);
+
+
+
 // JB_LeakTester
 void JB_Lk_Destructor(LeakTester* Self);
 
@@ -6184,6 +6305,10 @@ PicoComms* JB_Pico__New(JB_StringC* Name, int Noise);
 
 
 // JB_RandomXOR
+float JB_Rnd_Float(RandomXOR* Self);
+
+int64 JB_Rnd_RndInt(RandomXOR* Self);
+
 void JB_Rnd_SeedSet(RandomXOR* Self, uint64 Value);
 
 void JB_Rnd_TimeSeed(RandomXOR* Self);
@@ -6229,6 +6354,8 @@ void JB_TerminalDisplay_SyntaxAppend(TerminalDisplay* Self, JB_String* Text, ive
 ASMReg SC_Pac_AddConst(Assembler* Self, int Add, Message* Exp, ASMReg Base);
 
 void SC_Pac_AddFuncParams(Assembler* Self, SCFunction* Fn);
+
+void SC_Pac_AddLabel(Assembler* Self, Message* Ch);
 
 FatASM* SC_Pac_AddMissingReturn(Assembler* Self);
 
@@ -6500,7 +6627,11 @@ ASMReg SC_Pac_Less(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg 
 
 ASMReg SC_Pac_LessEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
+bool SC_Pac_LoadLabelJumps(Assembler* Self);
+
 ASMReg SC_Pac_LoadNumber(Assembler* Self, Message* Exp, int64 V, bool Special, ASMReg Dest);
+
+Message* SC_Pac_LoadTitle(Assembler* Self, Message* M);
 
 ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D);
 
@@ -6708,6 +6839,14 @@ ASMReg SC_Pac_TernaryOfLocals(Assembler* Self, Message* Cond, ASMReg Dest, Messa
 
 ASMReg SC_Pac_TernarySub(Assembler* Self, Message* Exp, ASMReg Dest);
 
+bool SC_Pac_TextConst(Assembler* Self, Message* List, Message* Orig);
+
+void SC_Pac_TextFuncSub(Assembler* Self, Message* M);
+
+void SC_Pac_TextOp(Assembler* Self, Message* M);
+
+bool SC_Pac_TextOpSub(Assembler* Self, Message* M);
+
 ASMReg SC_Pac_TheTrinity(Assembler* Self, Message* SrcPrms, Message* ASMPrms, ASMReg Dest, uint /*byte*/ OpCode);
 
 int SC_Pac_TotalIndex(Assembler* Self);
@@ -6752,7 +6891,11 @@ ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest, bool Force);
 
+void SC_Pac_xC2xB5Debug(Assembler* Self, Message* Exp, ASMReg Dest);
+
 ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A, int Add);
+
+ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5GetPrms(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -6780,6 +6923,12 @@ int SC_Pac__Init_();
 
 
 // JB_BranchPHITracker
+
+
+// JB_CArrayTest_Behaviour
+
+
+// JB_ContainerStruct2
 
 
 // JB_CppRefs_Behaviour
@@ -6857,10 +7006,16 @@ void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
 // JB_Validator_Behaviour
 
 
+// JB___junktest_6___Behaviour
+
+
 // JB_list_Behaviour
 
 
 // JB_µForm_Behaviour
+
+
+// JB_ContainerStruct
 
 
 // JB_FastStringCpp_Behaviour
@@ -7057,6 +7212,15 @@ void SC_AutoItem_Destructor(AutoItem* Self);
 bool SC_AutoItem_OKBy(AutoItem* Self, AutoItem* Prev);
 
 SortComparison SC_AutoItem__Sorter(AutoItem* Self, AutoItem* B);
+
+
+
+// JB_CArrayTest
+void SC_CArrayTest_A(CArrayTest* Self, int* A);
+
+void SC_CArrayTest_BB(CArrayTest* Self);
+
+void SC_CArrayTest_Destructor(CArrayTest* Self);
 
 
 
@@ -7368,6 +7532,8 @@ void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
 
 bool SC_Rec_TooMany(JB_ErrorReceiver* Self);
 
+int JB_Rec__Init_();
+
 void JB_Rec__NewCritical(Message* Node, JB_String* Desc, JB_String* Path);
 
 void JB_Rec__NewError(Message* Node, JB_String* Desc, JB_String* Path);
@@ -7514,6 +7680,8 @@ Instruction* SC_Instruction_Constructor(Instruction* Self, JB_String* FormName, 
 
 void SC_Instruction_Destructor(Instruction* Self);
 
+bool SC_Instruction_IsSetConst(Instruction* Self);
+
 JB_String* SC_Instruction_Render(Instruction* Self, FastString* Fs_in);
 
 void SC_Instruction__Add(JB_String* FormName, JB_String* Name, int Pos);
@@ -7545,9 +7713,13 @@ byte* JB_Mem_Ptr(MWrap* Self);
 
 bool JB_Mem_SetSize(MWrap* Self, int ItemCount);
 
+void JB_Mem_SizeSet(MWrap* Self, int Value);
+
 void JB_Mem_Zero(MWrap* Self);
 
 Array* SC_Mem__CollectLeaks_(JB_Object* Self);
+
+bool JB_Mem__Equals(void* Dest, void* Src, int N);
 
 int JB_Mem__Init_();
 
@@ -8064,6 +8236,11 @@ JB_String* JB_Fn_Render(SyntaxObj* Self, FastString* Fs_in);
 // JB_Validator
 
 
+// JB___junktest_6__
+DTWrap* SC___junktest_6____AbcVis();
+
+
+
 // JB_list
 void JB_Tree_AppendAfter(JB_List* Self, JB_List* Item, JB_List* After);
 
@@ -8085,6 +8262,8 @@ bool JB_Tree_IsLast(JB_List* Self);
 
 bool JB_Tree_IsOnlyChild(JB_List* Self);
 
+void jdb2(JB_List* Self);
+
 bool JB_Tree_OperatorIn(JB_List* Self, JB_List* P);
 
 JB_List* JB_Tree_Parent(JB_List* Self, int N);
@@ -8092,6 +8271,8 @@ JB_List* JB_Tree_Parent(JB_List* Self, int N);
 JB_List* JB_Tree_Pop(JB_List* Self);
 
 void JB_Tree_PrependAll(JB_List* Self, JB_List* Src);
+
+void jdbloc(JB_List* Self);
 
 void JB_Tree_Remove(JB_List* Self);
 
@@ -8274,6 +8455,8 @@ SCFunction* SC_Msg_AsFunc(Message* Self);
 void JB_Msg_Ask__(Message* Self, FastString* Fs);
 
 ASMReg SC_Msg_ASMAllowsTemp(Message* Self);
+
+uint64 SC_Msg_ASMConst(Message* Self);
 
 SCDecl* SC_Msg_ASMDecl(Message* Self);
 
@@ -8637,6 +8820,8 @@ FatASM* SC_Msg_FLNG(Message* Self, ASMReg R1, ASMReg R2);
 
 Float64 JB_Msg_Float(Message* Self);
 
+float JB_Msg_Float32(Message* Self);
+
 FatASM* SC_Msg_FLOG(Message* Self, ASMReg R1, ASMReg R2);
 
 FatASM* SC_Msg_FMAX(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int D);
@@ -8714,6 +8899,8 @@ void SC_Msg_GenWhileFlow(Message* Self);
 Message* SC_Msg_GetAddrButNicer(Message* Self);
 
 int SC_Msg_GetAddressOf(Message* Self, SCDecl* Type, bool WasCArray);
+
+Message* SC_Msg_GetASMFunc(Message* Self);
 
 Message* SC_Msg_GetDclName(Message* Self, bool IsConstructor);
 
@@ -8852,8 +9039,6 @@ FatASM* SC_Msg_JBAN(Message* Self, int Jmp, ASMReg R1, int Small);
 bool JB_Msg_jbinTest(Message* Self);
 
 FatASM* SC_Msg_JBOR(Message* Self, int Jmp, ASMReg R1, int Small);
-
-void jdb2(Message* Self);
 
 FatASM* SC_Msg_JMKE(Message* Self, int Jmp, ASMReg R1, int K);
 
@@ -9149,7 +9334,11 @@ bool SC_Msg_RefFallback(Message* Self);
 
 bool SC_Msg_RefTransparent(Message* Self);
 
+int SC_Msg_Reg(Message* Self);
+
 void SC_Msg_RegCheck(Message* Self, int Bad);
+
+int SC_Msg_RegOrNum(Message* Self);
 
 void JB_Msg_Rel__(Message* Self, FastString* Fs);
 
@@ -9558,6 +9747,8 @@ SCDecl* SC_Decl_AsLocal(SCDecl* Self);
 bool SC_Decl_ASMIsPack(SCDecl* Self);
 
 DataTypeCode SC_Decl_ASMRegType(SCDecl* Self);
+
+void SC_Decl_ASMSanity(SCDecl* Self);
 
 bool SC_Decl_AssignabilityCheck(SCDecl* Self, Message* Ln, Message* RN, SCDecl* Rc, bool WasHex);
 
@@ -10949,6 +11140,8 @@ bool SC_Func_SyntaxIs(SCFunction* Self, FunctionType K);
 
 void SC_Func_SyntaxIsSet(SCFunction* Self, FunctionType K, bool Value);
 
+ivec4* SC_Func_TestObesity(SCFunction* Self);
+
 void SC_Func_Transform(SCFunction* Self);
 
 void SC_Func_TranStrings(SCFunction* Self);
@@ -10972,6 +11165,8 @@ int SC_Func_VisibleArgs(SCFunction* Self);
 void SC_Func_WantAs(SCFunction* Self, uint /*NilState*/ NS);
 
 JB_String* SC_Func_WrappedName(SCFunction* Self);
+
+MWrap* SC_Func_xC2xB5Test(SCFunction* Self);
 
 Message* SC_Func__AlterPostCond(Message* PostCond, Message* IterPostCond, Message* NodeSrc);
 
@@ -11224,8 +11419,6 @@ inline bool JB_int64_OperatorInRange(int64 Self, int64 Length);
 
 inline bool JB_int_OperatorInRange(int Self, int Length);
 
-inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value);
-
 inline int SC_FatRange_Length(FatRange* Self);
 
 inline uint SC_Msg_SrcLoc(Message* Self);
@@ -11250,8 +11443,6 @@ inline JB_StringC* JB_Str_CastZero(JB_String* Self);
 
 inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F);
 
-inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value);
-
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After);
 
 inline bool SC_FatRange_Always(FatRange* Self);
@@ -11274,8 +11465,6 @@ inline bool SC_Reg_IsSmall(ASMReg Self);
 
 inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New);
 
-inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest);
-
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
@@ -11284,9 +11473,13 @@ inline bool SC_Reg_IsInt(ASMReg Self);
 
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
-inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed);
+inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value);
+
+inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value);
 
 inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
+
+inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed);
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src, FatASM* Start);
 
@@ -11363,10 +11556,6 @@ inline bool JB_int_OperatorInRange(int Self, int Length) {
 	return false;
 }
 
-inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value) {
-	Self->_Op = Value;
-}
-
 inline int SC_FatRange_Length(FatRange* Self) {
 	return Self->After - Self->Start;
 }
@@ -11428,10 +11617,6 @@ inline JB_String* JB_Tk__SyntaxAccess(int S, int E, Syntax F) {
 	return (P)(S, E, F, JB_Tk__GetData());
 }
 
-inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value) {
-	SC_FAT_opSet(Self, Value);
-}
-
 inline ASM* SC_FAT_xC2xB5BakeInto(FatASM* Self, ASM* Where, ASM* After) {
 	return (SC__ASM_Encoders[SC_FAT_Op(Self)])(Self, Where, After);
 }
@@ -11482,16 +11667,6 @@ inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState
 	return New;
 }
 
-inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest) {
-	//cpp_part;
-	Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Const, (!true));
-	uint Type = SC_Msg_ASMType(Exp);
-	Self->Actions[(++Self->ActionIndex)] = Type;
-	fn_asm Fn = SC_fn_asm_table[Type];
-	ASMReg Ss = (Fn)(Self, Exp, Dest);
-	return Ss;
-}
-
 inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 	if (SC_Reg_SyntaxIs(Self, kSC__Reg_CondRequest)) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_CondRequest, (!true));
@@ -11519,8 +11694,15 @@ inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 	return JB_int_RenderSize(Self, nil);
 }
 
-inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed) {
-	return SC_Pac_SetRegister(Self, Changed, nil, nil, nil);
+inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value) {
+	if ((SC_FAT_ID(Self) == -1) and SC_Str_trap(JB_LUB[0], nil)) {
+		debugger;
+	}
+	Self->_Op = Value;
+}
+
+inline void SC_FAT__opSet(FatASM* Self, uint /*byte*/ Value) {
+	SC_FAT_opSet(Self, Value);
 }
 
 inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
@@ -11531,6 +11713,10 @@ inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
 	}
 	JB_SafeDecr(F);
 	return F;
+}
+
+inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed) {
+	return SC_Pac_SetRegister(Self, Changed, nil, nil, nil);
 }
 
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src, FatASM* Start) {
@@ -11588,6 +11774,7 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
+	bool Rec__MemoryStillOK;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
@@ -11595,9 +11782,8 @@ struct JB_Globals {
 	uint Flow_FlowWhile;
 	int Flow__Enabled;
 	int Flow_LastCodePoint;
-	JB_Object* Flow_FlowIn;
 	JB_Object* Flow_FlowOut;
-	JB_Object* App__StdOut;
+	JB_Object* App__stdin;
 	JB_Object* Constants_EscapeStr;
 	JB_Object* Constants_XML_EscapeStr;
 	JB_Object* Constants_JS_EscapeStr;
@@ -11606,16 +11792,17 @@ struct JB_Globals {
 	JB_Object* Constants_XML_UnEscapeStr;
 	JB_Object* Constants_EscapeChr;
 	JB_Object* Tk__EndOfLineMarker;
-	JB_Object* App__stdin;
+	JB_Object* Flow_FlowIn;
 	JB_Object* TC_Types_Dict;
 	JB_Object* App_Usage;
 	JB_Object* Platform__Logger;
 	JB_Object* StdErr;
 	JB_Object* Syx_Types;
 	JB_Object* App__Conf;
+	JB_Object* App__Prefs;
 	JB_Object* Proc__Parent;
 	JB_Object* Err_BackupErrorSource;
-	JB_Object* App__Prefs;
+	JB_Object* App__StdOut;
 	JB_Object* Macro_TmpPrms_;
 	JB_Object* App__Args;
 	JB_Object* Tk__ErrorNames;
