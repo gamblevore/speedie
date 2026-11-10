@@ -59,7 +59,6 @@ struct AllocationBlock;
 struct JB_Object;
 struct DummyBlock;
 struct JB_MemoryWorld;
-struct SuperBlock;
 struct JBObject_Behaviour;
 
 
@@ -106,19 +105,6 @@ struct JB_RingList : JB_Object { // a list that does not own its items... unlike
 };
 
 
-struct SuperBlock {
-    uint                    ID;
-    uint                    BlocksActive;
-    SuperBlock*             Next;
-    SuperBlock*             Prev;
-    JB_MemoryWorld*         World;
-    AllocationBlock*        AvailableBlock;
-    AllocationBlock*        HeadBlock;
-    AllocationBlock*        SpaceBegin;
-    JB_FreeObject*          StartObj;
-    void*                   BlockEnd;
-} __attribute__ ((aligned (16)));
-
 
 struct AllocationBlock {
     u16                     ObjCount;
@@ -129,7 +115,7 @@ struct AllocationBlock {
     AllocationBlock*        PrevBlock;
     
     JB_MemoryLayer*         Owner;
-    SuperBlock*             Super;
+    void*             		Unused;
 
     JB_FreeObject*          FirstFree;
 
@@ -175,14 +161,6 @@ struct JB_Class : JB_Object { // JB_ClassData (is NOT a JB_Object. Would be nice
 };
 
 
-struct JB_MemoryWorld {
-    int                 CountRef;
-    SuperBlock*         CurrSuper;
-    SuperBlock*         SpareSuper;
-    int                 SupersMade;
-};
-
-
 struct JBObject_Behaviour {
 	const void* __destructor__;
 	const void* render;
@@ -201,21 +179,17 @@ struct JB_UltraMap {
 	uint  RefCount;
 };
 
-struct JB_MemoryWorld2 : JB_UltraMap {
-	int					DebugMark;
-	bool				DoTotalMemoryTest;
-	byte				MemFailKeeper;
-	JBObject_Behaviour	DummyFuncTable;
-	JB_Class*			AllClasses;
-	SuperBlock*			NextSuper;
-	JB_MemoryWorld		World;
-
-//    uint                    BlocksActive;
-//    AllocationBlock*        AvailableBlock;
-//    AllocationBlock*        SpaceBegin;
-//    JB_FreeObject*             StartObj;
-//    void*                   BlockEnd;
-};
+struct JB_MemoryWorld : JB_UltraMap {
+	int						DebugMark;
+	bool					DoTotalMemoryTest;
+	byte					MemFailKeeper;
+    uint					BlocksActive;
+    AllocationBlock*		AvailableBlock;
+    AllocationBlock*		HeadBlock;
+    AllocationBlock*		SpaceBegin;
+    JB_FreeObject*			StartObj;
+    void*					BlockEnd;
+} __attribute__ ((aligned (16)));
 
 
 
