@@ -68,7 +68,11 @@ static bool IsDummy( const AllocationBlock* Block ) {
 static fpDestructor GetDestructor_(AllocationBlock* B) {
 	return (fpDestructor)(B->Virtuals->__destructor__);
 }
-static inline AllocationBlock* EndBlock_(SuperBlock* Block) {return (AllocationBlock*)Block->BlockEnd;}
+static inline AllocationBlock* EndBlock_(SuperBlock* Block) {
+	if (auto H = (AllocationBlock*)Block->HeadBlock; H)
+		return H;
+	return (AllocationBlock*)Block->BlockEnd;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -207,6 +211,8 @@ JBObject_Behaviour BlockIsFreeTable = {(void*)BlockIsFreeMark, 0};
 		if (!B or IsDummy(B))
 			return;
 
+		if (!B->Virtuals)
+			failed("v");
 		AllocationBlock* N = B->NextBlock;
 		AllocationBlock* P = B->PrevBlock;
 		if (N) {
@@ -637,50 +643,11 @@ static JB_FreeObject* LinkIn_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock) {
 }
 
 
-static AllocationBlock* LinkInSuper_ (JB_MemoryWorld* World, SuperBlock* Super) {
-    if (Super->World!=World) {
-        Super->World = World;
-        Super->BlocksActive++;
-        World->CurrSuper = Super; // issue?
-        World->CountRef++;
-    }
-    AllocationBlock* First = Super->AvailableBlock;
-Sanity(First, false);
-Sanity(First->NextBlock, false);
-    Super->AvailableBlock = First->NextBlock;
-    First->NextBlock = 0;
-    return First;
-}
-
-
-
 static void SetupSuperSub_ (SuperBlock* Super, AllocationBlock* Curr) {
 	Curr->Super = Super;
 	Curr->Virtuals = &BlockIsFreeTable;
 	Curr->Owner = 0; // for clearing
 	Curr->NextBlock = 0;
-}
-
-
-static void SetupSuper_ (SuperBlock* Super, JB_MemoryWorld* W) {
-    AllocationBlock* Curr = Super->SpaceBegin;
-    AllocationBlock* End =  EndBlock_( Super );
-    const int Size = 1 << kBlockSize;
-
-    Super->AvailableBlock = Curr;
-    Super->HeadBlock = JB_Shift(Curr, Size);
-
-    while (Curr < End) {
-        AllocationBlock* Next = JB_Shift(Curr, Size);
-        Curr->Super = Super;
-        Curr->Virtuals = &BlockIsFreeTable;
-        Curr->Owner = 0; // for clearing
-        Curr->NextBlock = Next;
-        Curr = Next;
-    }
-    
-    Curr = JB_Shift(Curr, -Size);
-    Curr->NextBlock = 0;
 }
 
 
@@ -764,11 +731,6 @@ static JB_FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlo
     NewBlock->PrevBlock = NewBlock;
     NewBlock->NextBlock = NewBlock;
     
-    // can we link in... the new block here? so that the memory-layer keeps track of its allocated blocks?
-    // seems... possible?
-    // surely when a block goes away, its layer does too? So then... which block is it, that had its layer
-    // still "laying" around?
-
     return LinkIn_(Mem, NewBlock);
 }
 
@@ -845,32 +807,33 @@ static AllocationBlock* NewSuperBlock_ (JB_MemoryLayer* Mem, JB_MemoryWorld* Wor
     // we should move the superblock down
     // eventually we want to remove it anyhow.
 	auto Ultra = JB_Mem_WorldStart(World);
-	SuperBlock* NewSuper = Ultra->NextSuper;
-    NewSuper->ID = World->SupersMade++;
-	Ultra->NextSuper = JB_Shift(NewSuper,1<<20);
-	NewSuper->BlockEnd = Ultra->NextSuper;
+	SuperBlock* Super = Ultra->NextSuper;
+    Super->ID = World->SupersMade++;
+	Ultra->NextSuper = JB_Shift(Super, 1<<20);
+	Super->BlockEnd = Ultra->NextSuper;
 
-    const int BlockSize = 1 << kBlockSize;
-
-    JB_FreeObject* FirstWriteable = (JB_FreeObject*)JB_Shift(NewSuper, sizeof(SuperBlock));
+    JB_FreeObject* FirstWriteable = (JB_FreeObject*)JB_Shift(Super, sizeof(SuperBlock));
     
-    int Extra = sizeof(SuperBlock)&15;
-    if (Extra) {
-		int Alignment = 16;
-        FirstWriteable = (JB_FreeObject*)JB_Shift(FirstWriteable, Alignment - Extra);
-    }
-
-    NewSuper->StartObj = FirstWriteable;
-    NewSuper->SpaceBegin = ObjBlock_(NewSuper);
+    Super->StartObj = FirstWriteable;
+    AllocationBlock* Curr = ObjBlock_(Super);
+    Super->SpaceBegin = Curr;
+    Super->HeadBlock = JB_Shift(Curr, 1 << kBlockSize);
+    Super->AvailableBlock = 0;
+	SetupSuperSub_(Super, Curr);
 
 	if (World->CurrSuper) {
-		JB_Helper_PutBefore((JB_RingList*)(World->CurrSuper), (JB_RingList*)NewSuper);
+		JB_Helper_PutBefore((JB_RingList*)(World->CurrSuper), (JB_RingList*)Super);
     } else {
-		NewSuper->Prev = NewSuper;
-		NewSuper->Next = NewSuper;
+		Super->Prev = Super;
+		Super->Next = Super;
     }
-    SetupSuper_( NewSuper, World );
-    return LinkInSuper_(World, NewSuper);
+
+	Super->World = World;
+	Super->BlocksActive++;
+	World->CurrSuper = Super; // issue?
+	World->CountRef++;
+Sanity(Curr, false);
+    return Curr;
 }
 
 
@@ -883,6 +846,16 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
     
     do {
         AllocationBlock* Item = Sup->AvailableBlock;
+        if (!Item) {
+			Item = Sup->HeadBlock;
+			if (Item) {
+				SetupSuperSub_(Sup, Item);
+				auto H = JB_Shift(Item,1<<kBlockSize);
+				if (H >= Sup->BlockEnd)
+					H = 0;
+				Sup->HeadBlock = H;
+			}
+        }
         if (Item) {
             Sanity(Item, false);
             if (Sup == World->SpareSuper) {

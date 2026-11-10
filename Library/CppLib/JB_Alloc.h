@@ -117,7 +117,7 @@ struct SuperBlock {
     AllocationBlock*        SpaceBegin;
     JB_FreeObject*          StartObj;
     void*                   BlockEnd;
-};
+} __attribute__ ((aligned (16)));
 
 
 struct AllocationBlock {

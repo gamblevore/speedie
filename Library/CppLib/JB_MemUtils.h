@@ -42,10 +42,10 @@
     #define JB_FuncCallCount(count) static int _fnCallCount_ = 0; _fnCallCount_++;
     #define DEBUGONLY(x) x
 #else
-    #define debugger// would crash...
-    #define dbgexpect(test)
-    #define dbgexpect2(test)
-    #define JB_DoAt(count)
+    #define debugger ;// would crash...
+    #define dbgexpect(test) ;
+    #define dbgexpect2(test) ;
+    #define JB_DoAt(count) ;
     #define JB_FuncCallCount(count)
     #define DEBUGONLY(x)
 #endif
