@@ -52629,6 +52629,7 @@ bool SC_File_TestCakeVM(JB_File* Self, JB_File* CakeProj) {
 	uint Mode = kJB__PIDM_StdErrCapture;
 	Array* Args = (JB_Array_Constructor0(nil));
 	JB_Incr(Args);
+	JB_Array_Append(Args, JB_LUB[354]);
 	JB_Array_Append(Args, CakeProj);
 	ExitCode Status = JB_Str_Execute(Self, Args, nil, nil, Mode, 0);
 	JB_EarlyDecr(Args);
