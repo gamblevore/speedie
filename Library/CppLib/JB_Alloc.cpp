@@ -3,7 +3,7 @@
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
-// * Use JB_List for world/super/block!		 // makes code simpler!
+// * Use JB_List for block!					 // makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
 // * Simpler to have only one world?
@@ -615,7 +615,7 @@ static JB_FreeObject* LinkIn_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock) {
 }
 
 
-static void SetupSuperSub_ (JB_MemoryWorld* Super, AllocationBlock* Curr) {
+static void SetupWorldSub_ (JB_MemoryWorld* World, AllocationBlock* Curr) {
 	Curr->Virtuals = &BlockIsFreeTable;
 	Curr->Owner = 0; // for clearing
 	Curr->NextBlock = 0;
@@ -710,9 +710,6 @@ static JB_FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlo
 void JB_Date__Sleep (Date Durr);
 
 static JB_UltraMap* JB_UM_Alloc (uint64 Request) {
-// I could allocate 32-GB of memory for pointer-compression
-// remove supers + memoryworld
-
 	for (int i = 0; i < 40; i++) {		// try for 10s. I've seen it fail sometimes, strangely.
 		int Flags = MAP_PRIVATE | MAP_ANONYMOUS;
 		#ifdef MAP_HUGETLB
@@ -764,11 +761,10 @@ JB_MemoryWorld* JB_LibInit() {
 
 
 
-static AllocationBlock* NewSuperBlock_ (JB_MemoryLayer* Mem, JB_MemoryWorld* World) {
-    // we should move the superblock down
+static AllocationBlock* NewWorldBlock_ (JB_MemoryLayer* Mem, JB_MemoryWorld* World) {
+    // we should move the first block down. Did we do it already?
     // eventually we want to remove it anyhow.
 	auto Ultra = JB_Mem_WorldStart(World);
-//	Ultra->NextSuper = JB_Shift(Super, 1<<20);
 	World->BlockEnd = JB_Shift(Ultra, Ultra->Allocated);
 
     JB_FreeObject* FirstWriteable = (JB_FreeObject*)JB_Shift(World, sizeof(JB_MemoryWorld));
@@ -778,7 +774,7 @@ static AllocationBlock* NewSuperBlock_ (JB_MemoryLayer* Mem, JB_MemoryWorld* Wor
     World->SpaceBegin = Curr;
     World->HeadBlock = JB_Shift(Curr, 1 << kBlockSize);
     World->AvailableBlock = 0;
-	SetupSuperSub_(World, Curr);
+	SetupWorldSub_(World, Curr);
 
 	World->BlocksActive++;
 Sanity(Curr, false);
@@ -791,7 +787,7 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
 	if (!Item) {
 		Item = World->HeadBlock;
 		if (Item) {
-			SetupSuperSub_(World, Item);
+			SetupWorldSub_(World, Item);
 			auto H = JB_Shift(Item,1<<kBlockSize);
 			if (H >= World->BlockEnd)
 				H = 0;
@@ -871,7 +867,7 @@ static JB_FreeObject* NewBlock ( AllocationBlock* CurrBlock ) {
 
     AllocationBlock* Result = FindAllocBlock_( World );
     if (!Result)
-        Result = NewSuperBlock_( Mem, World );
+        Result = NewWorldBlock_( Mem, World );
     return BlockSetup_( Mem, Result, World );
 }
 
@@ -890,8 +886,8 @@ static JB_Class* ResetClass_ ( JB_Class* Cls ) {
 }
 
 
-static void SuperBlockFree_ (JB_MemoryWorld* Super) {
-    Super = Super;
+static void WorldBlockFree_ (JB_MemoryWorld* World) {
+    World = World;
 }
 
 
@@ -914,7 +910,7 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
 			FreeBlock->Owner = 0; // oof
 		
     } else {
-        // return block to superblock
+        // return block
 
         FreeBlock->PrevBlock = 0;
         FreeBlock->Virtuals = &BlockIsFreeTable;
@@ -928,7 +924,7 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
     
     int N = --(World->BlocksActive);
     if (!N) {
-        SuperBlockFree_(World);
+        WorldBlockFree_(World);
     }
 }
 
@@ -1048,9 +1044,9 @@ static void BlockFindLeakedObject_ (AllocationBlock* Block, JB_Object* Obj, Arra
 }
 
 
-static void SuperFindLeakedObject_ (JB_MemoryWorld* Super, JB_Object* Obj,  Array* R) {
-	AllocationBlock* Start = Super->SpaceBegin;
-	AllocationBlock* Finish = EndBlock_(Super);
+static void WorldFindLeakedObject_ (JB_MemoryWorld* World, JB_Object* Obj,  Array* R) {
+	AllocationBlock* Start = World->SpaceBegin;
+	AllocationBlock* Finish = EndBlock_(World);
 	do {
 		if (Start->Owner)
 			BlockFindLeakedObject_(Start, Obj, R);
@@ -1061,7 +1057,7 @@ static void SuperFindLeakedObject_ (JB_MemoryWorld* Super, JB_Object* Obj,  Arra
 
 void JB_FindLeakedObject (JB_Object* Obj, Array* R) {
     JB_MemoryWorld* World = JB_Mem_WorldStart(Obj);
-	SuperFindLeakedObject_(World, Obj, R);
+	WorldFindLeakedObject_(World, Obj, R);
 }
 
 
@@ -1088,7 +1084,7 @@ void JB_Mem_ClassLeakCounter () {
 	if (Mode == 0)
 		for (JB_Class* Cls = AllClasses; Cls; Cls = Cls->NextClass)
 			Cls->LeakCounter = 0;
-//&(World->OnlySuper);
+
 	AllocationBlock* Start = World->SpaceBegin;
 	AllocationBlock* Finish = EndBlock_(World);
 
