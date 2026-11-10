@@ -119,6 +119,7 @@ void JB_ClassInitReal (JB_Class& Cls, const char* Name, int Size, JB_Class* Pare
     Cls.Memory.CurrBlock = (AllocationBlock*)(&Cls.Memory.Dummy);
     Cls.Memory.IsActive = true;
     if (Size < sizeof(JB_FreeObject)) Size = sizeof(JB_FreeObject); 
+    Size += Size&4; // can't be 4 aligned. 8 min.
     Cls.Size = Size;
     
     if (Parent) {
@@ -136,7 +137,8 @@ MemStats JB_MemoryStats (JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
     
 //	u16 ActualMark = Mark &~ 0xf000;
 //	bool IsCheck   = Mark & 0xf000;
-	Result.Blocks += (World->BlocksActive);
+	Result.Blocks += (World->RefCount);
+	Result.Blocks--; // refcount starts at 1.
 	
 	if (CountObjs) {
 		AllocationBlock* Start = World->SpaceBegin;
@@ -776,7 +778,7 @@ static AllocationBlock* NewWorldBlock_ (JB_MemoryLayer* Mem, JB_MemoryWorld* Wor
     World->AvailableBlock = 0;
 	SetupWorldSub_(World, Curr);
 
-	World->BlocksActive++;
+	World->RefCount++;
 Sanity(Curr, false);
     return Curr;
 }
@@ -796,7 +798,7 @@ static AllocationBlock* FindAllocBlock_ (JB_MemoryWorld* World) {
 	}
 	if (Item) {
 		Sanity(Item, false);
-		World->BlocksActive++;
+		World->RefCount++;
 		World->AvailableBlock = Item->NextBlock;
 		Item->NextBlock = 0;
 	}
@@ -835,7 +837,7 @@ static AllocationBlock* ReturnSpare_ (JB_MemoryLayer* Mem) {
         }
         Mem->SpareBlock = 0;
         auto World = JB_Mem_WorldStart(NewBlock);
-        World->BlocksActive++;
+        World->RefCount++;
         return NewBlock;
     }
     return 0;
@@ -922,10 +924,7 @@ static void BlockFree_ ( AllocationBlock* FreeBlock ) {
 
     JB_Decr(Mem); // i hope this works...
     
-    int N = --(World->BlocksActive);
-    if (!N) {
-        WorldBlockFree_(World);
-    }
+	--(World->RefCount);
 }
 
 

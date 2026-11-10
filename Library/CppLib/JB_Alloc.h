@@ -183,7 +183,6 @@ struct JB_MemoryWorld : JB_UltraMap {
 	int						DebugMark;
 	bool					DoTotalMemoryTest;
 	byte					MemFailKeeper;
-    uint					BlocksActive;
     AllocationBlock*		AvailableBlock;
     AllocationBlock*		HeadBlock;
     AllocationBlock*		SpaceBegin;
