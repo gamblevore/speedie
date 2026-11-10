@@ -605,7 +605,6 @@ function MiniClampOpt (|message| exp,  |&FatAsm| compare,  |asmreg|)
 Struct FatRange
 	|&FatASM|		Start
 	|&FatASM|		After
-//	|uint16|		FirstBlock
 	|maybebool|		Constness
 
 	function Length (|int|)

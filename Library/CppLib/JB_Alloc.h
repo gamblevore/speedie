@@ -112,8 +112,9 @@ struct SuperBlock {
     SuperBlock*             Next;
     SuperBlock*             Prev;
     JB_MemoryWorld*         World;
-    AllocationBlock*        FirstBlock;
-    AllocationBlock*        StartBlock;
+    AllocationBlock*        AvailableBlock;
+    AllocationBlock*        HeadBlock;
+    AllocationBlock*        SpaceBegin;
     JB_FreeObject*          StartObj;
     void*                   BlockEnd;
 };
@@ -130,7 +131,7 @@ struct AllocationBlock {
     JB_MemoryLayer*         Owner;
     SuperBlock*             Super;
 
-    JB_FreeObject*             FirstFree;
+    JB_FreeObject*          FirstFree;
 
     JBObject_Behaviour*     Virtuals;		// speed things up a bit.
 };
@@ -210,8 +211,8 @@ struct JB_MemoryWorld2 : JB_UltraMap {
 	JB_MemoryWorld		World;
 
 //    uint                    BlocksActive;
-//    AllocationBlock*        FirstBlock;
-//    AllocationBlock*        StartBlock;
+//    AllocationBlock*        AvailableBlock;
+//    AllocationBlock*        SpaceBegin;
 //    JB_FreeObject*             StartObj;
 //    void*                   BlockEnd;
 };
