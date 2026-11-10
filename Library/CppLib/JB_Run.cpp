@@ -171,21 +171,18 @@ void JB_Str__LoadGlobals () {
 
 void JB_FinalEvents() {
 	AddError(JB_Rec_ShellPrintErrors(nil, nil),	"jb.stderr");
-	JB_LibShutdown();
+	JB_LibShutdown(true);
 	JB_RemoveHandlers(); // some wierd systems call signals after we exit??
 }
 
 
-
 Array*		JB_App__Args()					{ return Obj_Args; }
-void		JB_LibShutdown()				{ JB_MemFree(JB_MemStandardWorld()); }
-bool		JB_LibIsShutdown()				{ return JB_MemStandardWorld()->Shutdown; }
 bool		JB_LibIsThreaded()				{ return JB_Active & 4; }
 void		JB_App__CrashInstall();
 void		JB_CollectClassDepths ();
 int			JB_SP_AppInit();
 void		JB_App__GUIMode(bool GUI)		{ JB_NoExitOnCrash = GUI; }
-
+void*		JB_LibInit();
 
 JB_StringC*	JB_App__CallPath (const char* New) {
 	if (!New)
@@ -198,9 +195,10 @@ JB_StringC*	JB_App__CallPath (const char* New) {
 int JB_SP_Init (_cstring* Args, bool IsThread) {
 	static_assert((sizeof(ivec3) == 16 and sizeof(ivec4)==16 and sizeof(ivec2)==8) and sizeof(vec3) == 16 and sizeof(vec4)==16 and sizeof(vec2)==8 and sizeof(int) == 4  and  sizeof(int64) == 8, "sizeof type");
 
-	JB_ErrorNumber = 0;
 	JB_TaskData.Size = 128;
-	JB_CollectClassDepths();
+	
+	if (!JB_LibInit())
+		return ENOMEM;
 
 #if __APPLE__
 	pthread_setname_np(JB_ThreadName); // why?
@@ -208,8 +206,6 @@ int JB_SP_Init (_cstring* Args, bool IsThread) {
 	pthread_setname_np(pthread_self(), JB_ThreadName);
 #endif
 	
-    if (JB_MemStandardWorld()->CurrSuper)
-        return EADDRINUSE;
     if (!(EmptyString_ = emptystr()))
         return ENOMEM;
 	
@@ -250,7 +246,7 @@ int JB_SP_Run (_cstring* Args, int Mode)	{ // JB_SP_Main
 	if (JB_Active & 1)
 		return EALREADY;
 	JB_Active = 1 | (Mode&4);
-	if (JB_LibIsShutdown()) {
+	if (JB_LibShutdown(false)) {
 		AddError(EACCES, "jb.shutdown");
 	} else {
 		if (!Obj_Args and Args) {

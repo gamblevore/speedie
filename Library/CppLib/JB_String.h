@@ -142,7 +142,7 @@ inline MiniStr Mini2(const char* S) {
 
 
 // how to "unshare" this? If we are only keeping a small part of many files?
-// seems... we could try to re-link the parent memorylayer into the main memorylayer for String, and go through all the AllocationBlocks and set them to use the main memorylayer...
+// seems... we could try to re-link the parent memorylayer into the main memorylayer for String, and go through all the JB_AllocationBlocks and set them to use the main memorylayer...
 
 
 inline MiniStr ReadAddrs_( JB_String* self, int StartOff, int AfterOff ) {

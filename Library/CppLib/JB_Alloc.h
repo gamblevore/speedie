@@ -13,7 +13,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// LANGUAGE ADDITIONS
-#define JBShift(exp, amount)		((__typeof__(exp)) ((byte*)(exp)+(amount)))
+#define JB_Shift(exp, amount)		((__typeof__(exp)) ((byte*)(exp)+(amount)))
 
 #define likely(x)					__builtin_expect(!!(x),1)
 #define unlikely(x)					__builtin_expect(!!(x),0)
@@ -54,7 +54,7 @@ void JB_Flow__PrintStats();
 
 struct JB_MemoryLayer;
 struct JB_Class;
-struct FreeObject;
+struct JB_FreeObject;
 struct AllocationBlock;
 struct JB_Object;
 struct DummyBlock;
@@ -89,7 +89,7 @@ typedef void (*fpAllocator)(AllocationBlock* self);
 
 struct DummyBlock {
     JB_MemoryLayer*        		Owner;
-    FreeObject*             	FirstFree;
+    JB_FreeObject*             	FirstFree;
 };
 
 
@@ -114,7 +114,7 @@ struct SuperBlock {
     JB_MemoryWorld*         World;
     AllocationBlock*        FirstBlock;
     AllocationBlock*        StartBlock;
-    FreeObject*             StartObj;
+    JB_FreeObject*          StartObj;
     void*                   BlockEnd;
 };
 
@@ -130,7 +130,7 @@ struct AllocationBlock {
     JB_MemoryLayer*         Owner;
     SuperBlock*             Super;
 
-    FreeObject*             FirstFree;
+    JB_FreeObject*             FirstFree;
 
     JBObject_Behaviour*     Virtuals;		// speed things up a bit.
 };
@@ -150,7 +150,6 @@ struct JB_MemoryLayer : JB_Object  { // is actually a JB_Object... but a clang b
     AllocationBlock*    CurrBlock;
     JB_Class*           Class;
     AllocationBlock*    SpareBlock;
-    JB_MemoryWorld*     World;
     
     AllocationBlock     Dummy;
 }; 
@@ -179,7 +178,6 @@ struct JB_MemoryWorld {
     int                 CountRef;
     SuperBlock*         CurrSuper;
     SuperBlock*         SpareSuper;
-    bool				Shutdown;
     int                 SupersMade;
 };
 
@@ -195,6 +193,29 @@ struct JBSaver_Behaviour {
 	const void* SaveCollect;
 	const void* SaveWrite;
 };
+
+
+struct JB_UltraMap {
+	int64 Allocated;
+	uint  RefCount;
+};
+
+struct JB_MemoryWorld2 : JB_UltraMap {
+	int					DebugMark;
+	bool				DoTotalMemoryTest;
+	byte				MemFailKeeper;
+	JBObject_Behaviour	DummyFuncTable;
+	JB_Class*			AllClasses;
+	SuperBlock*			NextSuper;
+	JB_MemoryWorld		World;
+
+//    uint                    BlocksActive;
+//    AllocationBlock*        FirstBlock;
+//    AllocationBlock*        StartBlock;
+//    JB_FreeObject*             StartObj;
+//    void*                   BlockEnd;
+};
+
 
 
 
@@ -234,12 +255,11 @@ bool JB_DebugAllMemory(bool b);
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 __hot JB_Object* JB_AllocNew( AllocationBlock* CurrBlock );
-void JB_Delete( FreeObject* Obj );
+void JB_Delete( JB_FreeObject* Obj );
 fpDestructor JB_Destructor (JB_Object* Obj);
 void JB_Obj_Destructor (JB_Object* Obj);
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
 void JB_Mem_ClassLeakCounter ();
-void JB_MemFree(JB_MemoryWorld* World);
 JB_Class* JB_AllClasses();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +328,7 @@ inline void JB_Decr(JB_Object* self) {
 		self->RefCount = N;
 		JBObjRefTest(self);
         if (!N)
-            JB_Delete( (FreeObject*)self );
+            JB_Delete( (JB_FreeObject*)self );
     }
 }
 
@@ -341,7 +361,7 @@ inline JB_Object* JB_FreeIfDead(JB_Object* self) {
     if (self) {
 		JBObjRefTest(self);
         if (self->RefCount  <  1<<JB_RefCountShift)
-            JB_Delete( (FreeObject*)self );
+            JB_Delete( (JB_FreeObject*)self );
     }
     return self;
 }
@@ -373,7 +393,7 @@ inline void JB_SetRefCount(JB_Object* Obj, int C) {
 
 
 inline void* ClearFor_(void* Place, u32 Size) {
-    memset(JBShift(Place,4), 0, Size - 4); // refcount should be 0. Don't hide bug if refcount > 0!
+    memset(JB_Shift(Place,4), 0, Size - 4); // refcount should be 0. Don't hide bug if refcount > 0!
     return Place;
 }
 

@@ -43,7 +43,7 @@ JB_String* JB_CPath_ReadAll (const char* path, bool AllowMissingFile, int MaxFil
             int Size = (int)fread(JB_Str_Address(Result), 1, N, fp);
             if (ferror(fp)) {
                 jb_lib_file_err(path, "reading");
-                JB_Delete((FreeObject*)Result); Result = 0;
+                JB_Delete((JB_FreeObject*)Result); Result = 0;
             } else {
 				Result->Length = Size;
                 Result->Addr[Size] = 0; // make life easier for c-folks.

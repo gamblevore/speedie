@@ -97,7 +97,7 @@ void DictValueRemove_(JB_Object** Place) {
 										// i cant find the wrapper object anyhow
 										// or is this some kind of branch? i think its a branch?
 	JB_SetRefCount(B,0);
-    JB_Delete((FreeObject*)B);
+    JB_Delete((JB_FreeObject*)B);
 }
 
 

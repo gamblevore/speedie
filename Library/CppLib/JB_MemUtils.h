@@ -55,7 +55,6 @@ extern "C" {
 
 struct JB_Object;
 
-byte*	JB_Mem__mmap		(uint64 Request);
 u64		JB_TotalMemoryCount	();
 void	JB_OutOfMainMemory	(int64 N);
 bool	JB_OutOfUserMemory	(int64 N);
@@ -68,14 +67,6 @@ void	JB_Free				(const void* Arr);
 u64		JB_msize			(const void* Arr);
 u64		JB_MemUsedString	();
 u64		JB_MemUsedOther		();
-
-#if __linux__
-	#define JB_AlignedAlloc(R, A)	aligned_alloc(A, R) 
-	#define JB_AlignedFree(M)		free(M)
-#else 
-	#define JB_AlignedAlloc(R, A)	malloc_zone_memalign(malloc_default_zone(), A, R)
-	#define JB_AlignedFree(M)		malloc_zone_free(malloc_default_zone(), M);
-#endif
 
 
 inline int JB_Int_Log2 (int X) {

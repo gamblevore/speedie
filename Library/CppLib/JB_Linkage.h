@@ -42,7 +42,7 @@ JB_String* JB_App__LibClasses();
 
 
 // Startup
-void JB_LibShutdown();
+bool JB_LibShutdown (bool Shutdown);
 bool JB_LibIsThreaded();
 
 
