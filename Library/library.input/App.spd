@@ -278,7 +278,7 @@ libinternal LeakMarkMemory
 	cpp_wrapper JB_Mem_Mark
 
 libinternal LeakUnMarkMemory
-	cpp_wrapper JB_Mem_Unmark
+	cpp_wrapper JB_Mem__Unmark
 	
 
 

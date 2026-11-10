@@ -18,15 +18,6 @@ bool JB_IsDebug() {
 #endif
 }
 
-int JB_PointerSize() {
-#ifdef ENV64BIT
-    return 64;
-#else
-    return 32;
-#endif
-}
-
-
 static uint64  TotalOtherBytes; // malloc-zones could do this, or WE COULD OURSELVES
 static uint64  TotalStringBytes;
 

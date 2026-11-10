@@ -47,14 +47,14 @@ module Platform
 	inline Release (|bool|)
 		return !.Isdebug
 
-	function PointerBits (|int|)
-		cpp_wrapper JB_PointerSize
+	inline PointerBits (|int|)
+		return 8 // sorry :]
 
 	inline PointerBytes (|int|)
 		return .PointerBits >> 03
 
 	inline Is64Bit (|bool|)
-		return .PointerBits == 64
+		return true // haha
 
 	inline HALT_Crash
 		asm HALT(0) // creates sigkill
