@@ -560,7 +560,7 @@ function string.BatchSpds (|[file]|)
 
 function File.TestCakeVM (|file| CakeProj, |bool|)
 	|| mode = processmode.StdErrCapture
-	|| args = [CakeProj]
+	|| args = ["--nocolor", CakeProj]
 	|| Status = .Execute(args, nil, mode)
 	return stderr.ok
 
