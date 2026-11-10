@@ -526,8 +526,12 @@ module StringCorrector
 
 
 	function StringFile (|file|)
+		opt norefcounts
 		|| f = (Options.SingleFileInput!="")(compiler.GeneratedCppsFolder, Compiler.BaseProjectPath)!
-		return f[".strings.txt"]
+		if !options.targetdebug
+			return f[".strings.txt"]
+		  else
+			return f[".debugstrings.txt"]
 		
 		
 	function CorrectStringsSub

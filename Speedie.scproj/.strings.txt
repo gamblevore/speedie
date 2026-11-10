@@ -2392,3 +2392,4 @@
 "≈"
 "jcmpk"
 "c"
+".debugstrings.txt"
