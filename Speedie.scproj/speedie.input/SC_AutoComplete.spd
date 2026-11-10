@@ -1219,8 +1219,7 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 
 function ASM (|message| arg,  |SCFunction| fn, |bool|)
 	Assembler.Sh.ASMInit
-	Assembler.JSM.zero
-	Assembler.JSM.Length = 0
+	Assembler.Sh.ResetMemory
 	SourceMap.Clear
 
 	if Assembler.sh.FatterCompile(fn)

@@ -47,7 +47,7 @@ function @assembler.ASMDebug (|scfunction| fn, |faststring| fs_in, |int| Level=i
 	fn.Render(Fs)
 	fs <~ "\n"
 	
-	|| Base = assembler.sh.TotalStart + Start
+	|| Base = .TotalStart + Start
 	|| amount = fn.µFATLength ?? (Assembler.sh.curr - base)
 
 	for n in amount

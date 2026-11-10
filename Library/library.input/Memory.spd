@@ -247,6 +247,14 @@ class Memory
 		autogen Sort (|&nil| FP, |&object| First, |&object| Last)
 			cpp_wrapper SpdSort
 
+		autogen PermAlloc (|int64| Amount, |int64| AlignBits=0, |?&byte|)
+			description "This memory is never cleared or freeable. Comes from your program's internal mmap'd space. Speedie allocates 4GB (only used by objects) by default, so its a lot to play with. Strings/arrays are allocated outside of that space.
+			Aligns to at least 8K.
+			
+			AlignBits is used as the power of 2. For example: AlignBits 20 --> 1MB alignment.
+			"
+			cpp_wrapper JB_Mem__PermAlloc
+
 /*	
 function	UltraAlloc (|int64| N = 1|uint64|<<31, |&byte|)
 			cpp_wrapper JB_Mem__mmap

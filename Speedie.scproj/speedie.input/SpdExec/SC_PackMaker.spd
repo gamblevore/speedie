@@ -383,7 +383,7 @@ function SCFunction.CanPrepareInline (|bool|)
 
 function packmaker.FinalPrepare
 	opt norefcounts
-	Assembler.jsm.length = 0
+	Assembler.sh.ResetMemory
 
 	for c in Compiler.ClassList
 		if c.IsRole
@@ -398,7 +398,7 @@ function packmaker.FinalPrepare
 	for fn in .LibFuncs
 		if fn.CanPrepareInline
 			require Assembler.sh.FatterCompile(fn)
-			Assembler.jsm.length = 0
+			Assembler.sh.resetmemory
 
 
 

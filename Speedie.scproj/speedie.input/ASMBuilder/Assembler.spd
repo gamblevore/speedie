@@ -54,7 +54,6 @@ struct Assembler
 	|byte[256]|					Actions
 	|?&FatASM|					InlineEnd
 	|&FatASM|					FuncStart_
-	|&FatASM|					TotalStart
 	|&FatASM|					Curr_
 	|&FatASM|					End
 
@@ -65,13 +64,14 @@ struct Assembler
 		BreakPoint		= 2
 
 	module
+		|uint16[16K]|				BlockParents // this should be part of the FatASM. need to free a few bytes first.
+
 		|Assembler|					Sh
-		|memory of fatasm|			JSM = FatASM[0]!		// maybe better to just zalloc it... simpler?
-		|memory of fatasm|			HoistSpace = FatASM[0]!	// same
+		|!&FatASM|					TotalStart
+		|memory of fatasm|			HoistSpace = FatASM[0]!	// Replace with permalloc
 		|&FatASM|					BackupSpace
 		|uint16|					StringsOutOfRange
 		|faststring?|				DebugDecls
-		|uint16[16K]|				BlockParents // this should be part of the FatASM. need to free a few bytes first.
 		|uint|						SanityCount
 
 	
@@ -94,7 +94,7 @@ struct Assembler
 		return .curr_ - .FuncStart
 
 	function TotalIndex (|int|)
-		return .curr_ - .TotalStart
+		return .curr_ - TotalStart
 	
 	function FuncIndex (|int|)
 		return .curr_ - .FuncStart
@@ -597,6 +597,13 @@ struct Assembler
 	
 	function ASMInit 
 		opt norefcounts
+		|| T = totalstart
+		if !(T?)
+/			totalstart = t
+			T = memory.PermAlloc(256MB)|&fatasm|$
+			.curr_ = T
+			.end = ((T|&byte|)+256MB)|&fatasm|
+
 		require !asmtype.ReadASM[0] // set in ASMType.InitAccess
 		if options.TargetDebug
 			if Options.StripNames
@@ -633,6 +640,11 @@ struct Assembler
 		return self == asm.KNSR or asm.KNST or asm.KNST2 or asm.KNST3
 	
 	
+	function ResetMemory
+		debugger
+		.curr_ = totalstart
+
+
 	function InitAndStartFunc (|scfunction| fn)			// initfunc
 		opt norefcounts
 		
@@ -646,15 +658,10 @@ struct Assembler
 		self[0] = nil // CLEAR!
 		
 		HoistSpace.Length = 0
-		|| j = Assembler.jsm
-		.end = j.NeedSpare(64K, 64K)
-		.TotalStart = j.ptr
-		.curr_ = .TotalStart + j.Length
 		.FuncStart_ = .curr
 		
 		if !Backupspace
 			BackupSpace = memory.Zalloc((–sizeof FATASM) * 64K)|&fatasm| #expect
-		
 		
 		.inlinestate[0].TailInlineable = true
 		.Root_Fn = fn
@@ -681,9 +688,7 @@ struct Assembler
 			Count += start.GuessSize > 0
 			Start++
 		fn.µSmallerLength = Count
-			
-		jsm!.length = .curr - .TotalStart
-		
+	
 	
 	function MissingReturn
 		opt norefcounts

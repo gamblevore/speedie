@@ -207,7 +207,7 @@ struct Array;
 JB_MemoryWorld* JB_MemStandardWorld();
 void JB_Layer_Use( JB_MemoryLayer* self );
 void JB_Mem__Unmark( );
-void JB_Mem_Mark( );
+void JB_Mem__Mark( );
 byte* JB_Mem__PermAlloc (int64 Amount, int64 Align);
 JB_Class* JB_Obj_Class(JB_Object* Obj);
 int JB_RefCount(JB_Object* Obj);

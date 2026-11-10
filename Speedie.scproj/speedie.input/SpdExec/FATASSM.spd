@@ -180,7 +180,7 @@ struct FatASM
 	target debug
 		function ID (|uint|)
 			visible
-			return self - Assembler.sh.TotalStart
+			return self - Assembler.TotalStart
 
 	function uint16.fat (|&fatasm|)
 		return self|uint|.fat

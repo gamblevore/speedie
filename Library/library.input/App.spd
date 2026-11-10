@@ -275,7 +275,7 @@ libinternal FastString.MemoryReport (|cstring?| name, |string?| name2, |int64| A
 	
 
 libinternal LeakMarkMemory
-	cpp_wrapper JB_Mem_Mark
+	cpp_wrapper JB_Mem__Mark
 
 libinternal LeakUnMarkMemory
 	cpp_wrapper JB_Mem__Unmark
