@@ -340,7 +340,7 @@ module JB_API
 
 	|uint16| NilHappened_ = 0 // save 2 bytes XD
 	cpp_func JB_SP_Init (|&cstring| Args=nil, |bool| IsThread=false, |int|)
-	cpp_func JB_LibShutdown ()
+	cpp_func JB_LibShutdown (|bool| Shutdown=true, |bool|)
 
 
 	function Parse (|stringthatwasreadsafely?| s, |string| path="", |message|)

@@ -12,6 +12,7 @@
 #include "JB_Alloc.h"
 #include <setjmp.h>
 #include <sys/mman.h>
+#include <sys/time.h>
 
 
 #ifndef kUltraAlloc
@@ -709,8 +710,6 @@ static JB_FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlo
 
 
 
-void JB_Date__Sleep (Date Durr);
-
 static JB_UltraMap* JB_UM_Alloc (uint64 Request) {
 	for (int i = 0; i < 40; i++) {		// try for 10s. I've seen it fail sometimes, strangely.
 		int Flags = MAP_PRIVATE | MAP_ANONYMOUS;
@@ -723,7 +722,11 @@ static JB_UltraMap* JB_UM_Alloc (uint64 Request) {
 			Map->Allocated = Request;
 			return Map;
 		}
-		JB_Date__Sleep(1<<14);			// 0.25s
+
+		timespec ts = {0, 250000000};
+		while ((nanosleep(&ts, &ts) == -1 and errno == EINTR)) {
+			;
+		}	
 	}
 	JB_OutOfMainMemory(Request);
 	return 0; // oof;
@@ -885,11 +888,6 @@ static JB_Class* ResetClass_ ( JB_Class* Cls ) {
     Cls->NextClass = 0;
     Mem->SpareBlock = 0; // why not?
     return Result;
-}
-
-
-static void WorldBlockFree_ (JB_MemoryWorld* World) {
-    World = World;
 }
 
 
@@ -1123,7 +1121,6 @@ __hot JB_Object* JB_AllocNew ( AllocationBlock* CurrBlock ) {
     if_usual (Obj) {
         CurrBlock->ObjCount++;
         CurrBlock->FirstFree = Obj->Next;
-//        Obj->FakeRefCount = 0;
 		Sanity(CurrBlock);
         return Trap_(Obj);
     }
