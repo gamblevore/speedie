@@ -27,7 +27,7 @@
 extern "C" {
 
 jmp_buf 			JB_MemFailJump;
-JB_MemoryWorld*		CompressedManager;
+JB_MemoryWorld*		UltraManager;
 
 
 static JBObject_Behaviour DummyFuncTable = {};
@@ -157,14 +157,14 @@ MemStats JB_MemoryStats (JB_MemoryWorld* World, bool CountObjs, u16 Mark) {
 
 
 inline AllocationBlock* ObjBlock_ (void* Obj) {
-    IntPtr Addr = (IntPtr)Obj | ((1<<kBlockSize)-1);
+    int64 Addr = (int64)Obj | ((1<<kBlockSize)-1);
     Addr = Addr &~ (sizeof(AllocationBlock)-1);
     return (AllocationBlock*)Addr;
 }
 
 
 char* BlockStart_ (AllocationBlock* B) {
-	return (char*)(((IntPtr)B) &~ ((1<<kBlockSize)-1));
+	return (char*)(((int64)B) &~ ((1<<kBlockSize)-1));
 }
 
 
@@ -192,7 +192,7 @@ u64 JB_MemCount () {
 				failed("corrupt freeobj next chain");
 			}
 		}
-		if (((IntPtr)(Obj->Next)) & 3)
+		if (((int64)(Obj->Next)) & 3)
 			failed("corrupt freeobj next ptr");
 		return Obj->Next;
 	}
@@ -388,13 +388,13 @@ void JB_Layer_Use ( JB_MemoryLayer* Layer ) {
 }
 
 
-void JB_Mem_Unmark ( ) {
+void JB_Mem__Unmark ( ) {
 	JB_MemoryStats(JB_MemStandardWorld(), true, 1234|0xf000);
 	JB_MemoryStats(JB_MemStandardWorld(), true, 0);
 }
 
 
-void JB_Mem_Mark ( ) {
+void JB_Mem__Mark ( ) {
 	JB_MemoryStats(JB_MemStandardWorld(), true, 1234);
 }
 
@@ -461,17 +461,17 @@ JB_MemoryLayer* JB_Obj_Layer ( JB_Object* Obj ) {
         AllocationBlock* Block = ObjBlock_(Obj);
         return Block->Owner;
     }
-    return 0;
+    return nil;
 }
 
 
 uint JB_Obj_ID ( JB_Object* Obj ) {
 	if (Obj) {
 		auto World = JB_Mem_WorldStart(Obj);
-		IntPtr Offset = ((IntPtr)Obj) - ((IntPtr)(World));
+		int64 Offset = ((int64)Obj) - ((int64)(World));
 		return (uint)(Offset >> 3);// min objectsize = 8. So we can lose 3 bits
 	}
-	return 0;
+	return nil;
 }
 
 
@@ -507,7 +507,7 @@ Sanity(NewBlock);
 
 
 bool JB_DebugAllMemory (bool b)  {
-	bool* where = &(CompressedManager->DoTotalMemoryTest);
+	bool* where = &(UltraManager->DoTotalMemoryTest);
 	bool old = *where;
 	*where = b;
 	return old;
@@ -533,8 +533,8 @@ static int TestMemory (volatile byte* B, int N, int Mode) {
 			B[i] ^= Mode;		// restore
 	}
 	
-	CompressedManager->MemFailKeeper = C;			// stop optimiser
-	return 0;
+	UltraManager->MemFailKeeper = C;			// stop optimiser
+	return nil;
 }
 
 
@@ -630,7 +630,7 @@ static void InitObjectsInBlock_ (JB_MemoryLayer* Mem, AllocationBlock* NewBlock,
     auto oof = NewBlock->Owner;
     int BS = kBlockSize;
     int BlockBits = (1 << BS) - 1;
-    JB_FreeObject* Curr = (JB_FreeObject*)(((IntPtr)NewBlock) &~ BlockBits);
+    JB_FreeObject* Curr = (JB_FreeObject*)(((int64)NewBlock) &~ BlockBits);
     NewBlock->FirstFree = Curr; // for LinkIn_
 //	if (Mem->BoostMode) {
 //		return;
@@ -686,7 +686,7 @@ static JB_MemoryWorld* CollectClassDepths (JB_MemoryWorld* World) {
 
 static JB_FreeObject* BlockSetup_ ( JB_MemoryLayer* Mem, AllocationBlock* NewBlock, JB_MemoryWorld* World ) {
     if (!NewBlock)
-        return 0;
+        return nil;
 
 	NewBlock->DebugMark = ++(World->DebugMark);
     Sanity(NewBlock);
@@ -729,7 +729,7 @@ static JB_UltraMap* JB_UM_Alloc (uint64 Request) {
 		}	
 	}
 	JB_OutOfMainMemory(Request);
-	return 0; // oof;
+	return nil; // oof;
 }
 
 void JB_UM_Free (JB_UltraMap* self) {
@@ -751,14 +751,41 @@ static JB_MemoryWorld* PointerCompressionAlloc () {
 }
 
 
-JB_MemoryWorld* JB_LibInit() {
-	auto Mem = CompressedManager;
+byte* JB_Mem__PermAlloc (int64 Amount, int64 Align) {
+	JB_MemoryWorld* W = UltraManager;
+	auto H = W->HeadBlock;
+	if (!H)									// finished! oof
+		return nil;
+		
+	auto End = W->BlockEnd;
+	End = JB_Shift(End, -Amount);
+	if (Align < kBlockSize)
+		Align = kBlockSize;
+	Align = 1<<Align;
+	if (Align > Amount)
+		return nil;							// what are you doing even.
+	
+	int64 Extra = ((int64)End) & (Align-1);
+	End = JB_Shift(End, -Extra);
+	if (End < H)							// no space!
+		return 0;
+	
+	W->BlockEnd = End;
+	if (End <= H)							// will never be less, but could be equal
+		W->HeadBlock = 0;					// entirely used up!
+	
+	return (byte*)End;
+}
+
+
+JB_MemoryWorld* JB_LibInit () {
+	auto Mem = UltraManager;
 	if (Mem)
 		return Mem;
 	Mem = PointerCompressionAlloc();
 	if (Mem) {
 		Mem->RefCount = 1;
-		CompressedManager = Mem;
+		UltraManager = Mem;
 		return CollectClassDepths(Mem);
 	}
 	return Mem;
@@ -821,7 +848,7 @@ static AllocationBlock* ReturnSpareHidden_ (AllocationBlock* CurrBlock) {
         JB_Helper_Unlink((JB_RingList*)CurrBlock);
         return NextBlock;
     }
-    return 0;
+    return nil;
 }
 
 
@@ -843,7 +870,7 @@ static AllocationBlock* ReturnSpare_ (JB_MemoryLayer* Mem) {
         World->RefCount++;
         return NewBlock;
     }
-    return 0;
+    return nil;
 }
 
 
@@ -1075,7 +1102,7 @@ int64 JB_Class_MemoryUsed (JB_Class* Cls) {
 }
 
 
-void JB_Mem_ClassLeakCounter () {
+void JB_Mem__ClassLeakCounter () {
 	JB_MemoryWorld* World = JB_MemStandardWorld();
 	static int Mode;
 	if (Mode == 0)
@@ -1130,7 +1157,7 @@ __hot JB_Object* JB_AllocNew ( AllocationBlock* CurrBlock ) {
 
 
 JB_MemoryWorld* JB_MemStandardWorld () {
-    return CompressedManager;
+    return UltraManager;
 }
 
 JB_Class* JB_AllClasses () {
@@ -1138,7 +1165,7 @@ JB_Class* JB_AllClasses () {
 }
 
 bool JB_LibShutdown (bool Shutdown) {
-	auto Mem = CompressedManager;
+	auto Mem = UltraManager;
 	if (!Mem) return false; // not even started up yet
 	if (!Shutdown)
 		return !Mem->RefCount;

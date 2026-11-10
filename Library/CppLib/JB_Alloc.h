@@ -206,24 +206,21 @@ struct Array;
 
 JB_MemoryWorld* JB_MemStandardWorld();
 void JB_Layer_Use( JB_MemoryLayer* self );
-void JB_Mem_Unmark( );
+void JB_Mem__Unmark( );
 void JB_Mem_Mark( );
-bool JB_ObjIsOwned(JB_Object* Obj);
+byte* JB_Mem__PermAlloc (int64 Amount, int64 Align);
 JB_Class* JB_Obj_Class(JB_Object* Obj);
 int JB_RefCount(JB_Object* Obj);
 void** JB_Obj_ClassBehaviours(JB_Object* Obj);
-JB_Object* JB_ObjNext(JB_Object* Obj);
 JB_MemoryLayer* JB_Obj_Layer( JB_Object* Obj );
 uint JB_Obj_ID( JB_Object* Obj );
 JB_MemoryLayer* JB_Class_DefaultLayer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_Layer( JB_Class* Cls );
 JB_MemoryLayer* JB_Class_CurrLayer( JB_Class* Cls );
 int64 JB_Class_MemoryUsed( JB_Class* Cls );
-void JB_Class_Add( JB_Class* Cls, const char* s );
 JB_Class* JB_Class__First();
 JB_MemoryLayer* JB_Layer_Constructor( JB_MemoryLayer* self, JB_Class* Cls, JB_Object* Obj );
 void JB_Class_Init(JB_Class* Cls, JB_MemoryWorld* World, int Size);
-void JB_Class_SetIndex(JB_Class* cls, int i);
 bool JB_DebugAllMemory(bool b);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +230,7 @@ void JB_Delete( JB_FreeObject* Obj );
 fpDestructor JB_Destructor (JB_Object* Obj);
 void JB_Obj_Destructor (JB_Object* Obj);
 void JB_FindLeakedObject(JB_Object* Obj, Array* R);
-void JB_Mem_ClassLeakCounter ();
+void JB_Mem__ClassLeakCounter ();
 JB_Class* JB_AllClasses();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -248,8 +245,6 @@ int JB_LeakTrace(u16 Flag);
 typedef void (*fpListAllClasses)(JB_Class* M);
 u64 JB_MemCount();
 bool JB_IsDebug();
-int JB_PointerSize();
-void JB_MemList();
 u32 JB_ObjCount();
 
 
