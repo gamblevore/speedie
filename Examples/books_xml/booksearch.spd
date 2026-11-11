@@ -6,7 +6,6 @@ main (|file.existing| File)
 	|| jb = File.parse								#require
 	if file isa "xml"
 		jb.XMLToJeebox
-		printline jb
 		|| boxfile = File.SetExt("box")
 		if boxfile.writeall(jb.render) // write file to disk
 			"Converted XML to Jeebox: $boxfile"
@@ -31,3 +30,4 @@ function message.TestBook (|[string]| queries, |message|)
 			if row ~= q.ArgName
 				require Row.first.name contains q.ArgValue
 				rz = self
+

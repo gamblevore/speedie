@@ -459,7 +459,7 @@ function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |boo
 		return true
 	|| ptr = r._Ptr|&uint|$
 
-//copied cos of compressed pointers
+// Copied cos of compressed pointers
 	j.Enter(@arg)
 	|| i = 0
 	while (i < Length)

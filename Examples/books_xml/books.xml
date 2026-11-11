@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!--You know, that despite there being books about XML... Jeebox is better right? How ironic-->
 <catalog>
    <book id="bk101" code="xyz">
 	  <author>Gambardella, Matthew</author>
