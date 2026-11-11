@@ -25,23 +25,28 @@
 	#define kUltraShift 3
 #endif
 
-#define JB_Squash uint
+
 struct JB_Object;
+
+struct JB_Squash {
+	uint Value;
+	inline JB_Squash(uint64 V) { Value=V; }
+	inline JB_Squash(JB_Object* V) { Value=((uint64)V)>>kUltraShift; }
+	inline operator uint64() const { return Value; }
+	inline JB_Object* operator + (uint64 Base)  const { return (JB_Object*)(Base | (Value << kUltraShift)); }
+	inline JB_Object* operator + (JB_Object* V) const { return (JB_Object*)((((uint64)V)&~(kUltraAlloc-1)) | (Value << kUltraShift)); };
+};
+
 
 inline JB_Object* JB_UnSquash (uint64 Base, JB_Squash Q) {
 	return (JB_Object*)(Base | ((uint64)Q << kUltraShift));
 }
 inline JB_Object* JB_UnSquash (JB_Object* Self, JB_Squash Q) {
-	return JB_UnSquash(((uint64)Self)&~(kUltraAlloc-1), Q);
+	return JB_UnSquash((((uint64)Self)&~(kUltraAlloc-1)), Q);
 }
 inline uint64 JB_SquashBase (JB_Object* Self) {
 	return ((uint64)Self)&~(kUltraAlloc-1);
 }
-inline JB_Squash JB_Squeeze (JB_Object* Self) {
-	return ((uint64)Self)>>kUltraShift;
-}
-
-
 
 
 #ifdef JB_DEBUG_ON

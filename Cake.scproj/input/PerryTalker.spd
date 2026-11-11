@@ -440,11 +440,12 @@ function xvar.ExpandList (|jbin| j, |list| Obj, |message?| xp, |int| depth, |boo
 	|| i = 0
 	|| Curr = obj.first
 	|| OK = true
-	while (i++ < 10K)
+	while (i < 10K)
 		loop Curr
 		OK &= j.RenderListObject(Curr, i)
 		j.addint(i-1)
 		j.exit
+		i++
 		Curr++
 	j.exit
 	return OK
@@ -461,15 +462,16 @@ function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |boo
 //copied cos of compressed pointers
 	j.Enter(@arg)
 	|| i = 0
-	while (i++ < Length)
+	while (i < Length)
 		|uint64[1]| Where
 		Where[0] = r[i]|uint64|
 		|| OK = j.RenderListItem(Where, i)
-		j.addint(i-1)
+		j.addint(i)
 		if !OK
 			j.add(@thg, "bad")
 		
 		j.exit
+		i++
 	j.exit
 	return true // I still want to see bad vars
 

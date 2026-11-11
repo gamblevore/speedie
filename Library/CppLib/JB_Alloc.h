@@ -305,9 +305,9 @@ inline void JB_Decr(JB_Object* self) {
 
 
 inline void JB_SetSquash (JB_Object* Self, JB_Squash* Where, JB_Object* Value) {
-	auto V2 = JB_Squeeze(Value);
+	JB_Squash V2 = Value;
 	JB_Incr_(Value);
-	auto Old = JB_UnSquash(Self, *Where);
+	auto Old = *Where + Self;
 	*Where = V2;
 	JB_Decr(Old);
 }

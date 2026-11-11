@@ -1,9 +1,9 @@
 
-// Copyright, Theodore H. Smith 2019-2026
+// Copyright, Theodore H. Smith 2017
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 /*
-	Copyright (C) 2017-2026 Theodore H. Smith.
+	Copyright (C) 2017 Theodore H. Smith.
 */
 
 #include "JB_Umbrella.hpp"
@@ -109,7 +109,7 @@ static void ShrinkCapacity_ (Array* self, uint Length) {
 
 int JB_Array_Find (Array* Self, JB_Object* F) {
 	if (Self) {
-		auto F2 = JB_Squeeze(F);
+		JB_Squash F2 = F;
 		auto P = Self->_Ptr; 
 		int N = Self->_Length;
 		int i = 0; 
@@ -130,7 +130,7 @@ bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
 	auto P = self->_Ptr + n;
 	auto Pf = P + Count;
-	auto V2 = JB_Squeeze(Value);
+	JB_Squash V2 = Value;
 	while (P < Pf)
 		*P++ = V2;
 	return true;
@@ -142,7 +142,7 @@ bool JB_Array_Append ( Array* self, JB_Object* Value ) {
 		int n = self->_Length; 
 		if (GrowToLength_(self, n+1, true)) {
 			JB_Incr(Value);
-			self->_Ptr[n] = JB_Squeeze(Value);
+			self->_Ptr[n] = JB_Squash(Value);
 			return true;
 		}
 	}
@@ -165,7 +165,7 @@ bool JB_Array_Insert ( Array* Self, int Pos, JB_Object* Value ) {
 		Curr--;
 		Curr[1] = Curr[0];
 	}
-	First[0] = JB_Squeeze(Value);
+	First[0] = JB_Squash(Value);
 	
 	return true;
 }
