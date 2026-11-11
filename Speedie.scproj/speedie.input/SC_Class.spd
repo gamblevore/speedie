@@ -40,7 +40,7 @@ linkage
 |[SCClass]|					Children
 |SCDecl?|					Contained
 |scdecl?|					Signed								// int/uint
-|scdecl?|					_NotConst
+|scdecl?|					NotConst_
 |SCFunction?|				FuncProto
 |SCFunction?|				TheIsFunc
 |SCFunction?|				TheCompareFunc
@@ -59,7 +59,7 @@ linkage
 |DataTypeCode|				ASMTypeInfo
 |uint16|					TableID
 |uint16|					ClsSizeRaw
-|uint16|					ClsSize			// use scdecl.ByteSize to find the size of this in a var.
+|uint16|					ClsSize_			// use scdecl.ByteSize to find the size of this in a var.
 |uint16|					TaskObjectCount
 |byte|						Depth
 |byte|						Alignment
@@ -103,15 +103,22 @@ syntax is (|classinfo| cls, |bool|)
 
 
 syntax is (|classinfo| cls, assigns:|bool|)
-	if value
-		.flags |= cls
-	  else
-		.flags &= ~cls
+	|| f = .flags &~ cls
+	f |= cls*value
+	.flags = f
 	
 
 function NumericCount (|int|)
 	if self
 		return .TypeInfo.NumericCount
+
+
+function ClsSize (assigns:|int|)
+//	if (value < 8) and .BaseType.HasPtrs // oof?
+	.ClsSize_ = value
+
+function ClsSize (|int|)
+	return .ClsSize_
 
 
 render

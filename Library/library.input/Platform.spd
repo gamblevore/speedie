@@ -48,10 +48,10 @@ module Platform
 		return !.Isdebug
 
 	inline PointerBits (|int|)
-		return 8 // sorry :]
+		return 64 // sorry :]
 
 	inline PointerBytes (|int|)
-		return .PointerBits >> 03
+		return 8
 
 	inline Is64Bit (|bool|)
 		return true // haha

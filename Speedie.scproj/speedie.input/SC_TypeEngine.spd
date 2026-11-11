@@ -1623,13 +1623,13 @@ function SCClass.NotConst (|scdecl|)
 	opt norefcounts
 	require self
 	
-	|| d = ._NotConst
+	|| d = .NotConst_
 		return d
 	d = .typenormal
 	if (d is NumberConst)
 		D = D.copydecl		// erase IsConst, like collectdecls does...
 		(D Isnt NumberConst)
-	._NotConst = d			// a space of new eggs!!!
+	.NotConst_ = d			// a space of new eggs!!!
 	return D
 
 

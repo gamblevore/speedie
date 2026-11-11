@@ -16,8 +16,8 @@ datatype SCNodeType (byte)
 	syntax is (|SCNodetype| d, |bool|)
 		return self == d
 	
-	function HasPtrs (|bool|)
-		return self >= ProtoType
+	function HasPtrs (|bool|)		// probably should removed this. its used in one place
+		return self >= ProtoType	// it just means that "Structs should be considered real in most cases"
 	function HasASMPtrs (|bool|)
 		return self >= Struct
 
