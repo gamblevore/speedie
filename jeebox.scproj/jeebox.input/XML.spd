@@ -10,7 +10,7 @@ function parser.XMLAttribs (|message| XML,  |int| start,  |int|)
 	|| AllAtts = parser.new(xml, @list, Start)
 	|| s = parser.data
 	while
-		|| i = s.outwhite(.nextstart) #loop
+		|| i = s.outwhite(.nextstart)		#loop
 		|| c = s[i]
 		if (c == '>') or (c=='/' and s[i+1]=='>')
 			return i
@@ -226,8 +226,9 @@ function message.XMLToJeebox (|bool|)
 libinternal message.XMLToJeeboxSub
 	opt norefcounts
 	|| fn = .type
-	if fn == @xpi
-		.remove
+	if fn == @xpi or @xcom	// what to do with comments? they don't exist in jeebox!
+		.remove				// comments are REAL comments. Not part of the tree!
+							// turn them into @sheb? I kinda use that as comment, i guess.
 		return
 	
 	require fn == @xml
