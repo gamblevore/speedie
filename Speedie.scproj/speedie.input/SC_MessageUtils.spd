@@ -312,7 +312,7 @@ function scfunction.DeclAfter (|message| after, |scdecl| Orig, |scdecl| D, |mess
 	|| src = orig.source!
 	using src
 
-	// carrays can't be set normally. We could just memzero it?
+	// carrays can't be set normally. We could just JB_memzero it?
 	|| Prop = orig.DeclToDot(.self)
 	if d.IsCArray
 		rz = @dot.msg("zero")

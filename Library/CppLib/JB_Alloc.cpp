@@ -1,24 +1,32 @@
 
-// Copyright, Theodore H. Smith 2019.
+// Copyright, Theodore H. Smith 2019 - 2026
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 // todo
 // * Use JB_List for block!					 // makes code simpler!
 // * Can just do block = JB_RT_Next2(block); // goes up and down if hits end
 // 												easy way to list all blocks in the world!
-// * Simpler to have only one world?
+
+
+/*
+This system needs more work. Some kind of block tree-system.
+Layer 1: One block is 8K. 64-bits = 512K mapped
+Layer 2: 64-bits over L1 = 32MB mapped
+Layer 3: 64-bits over L2 = 2GB mapped
+Layer 4: 64-bits over L3 = 128GB mapped.
+
+Pointer compression can only get us up to 32GB. So we only need 16-bits at the last stage.
+Is there any way to boost this? Perhaps use a list of 16 numbers?
+I think we are unlikely to go over 2GB. So L3 is the most we need.
+
+This also removes the prev/next pointers, at 16-bytes per block! Quite nice.
+*/
 
 
 #include "JB_Alloc.h"
 #include <setjmp.h>
 #include <sys/mman.h>
 #include <sys/time.h>
-
-
-#ifndef kUltraAlloc
-	//#define kUltraAlloc (1ull<<35) // 32GB
-	#define kUltraAlloc (1ull<<31) // 2GB
-#endif
 
 #define kBlockSize          13  // 8K!
 
@@ -777,6 +785,7 @@ static byte* PermAllocSub (int64 Amount, int64 Align) {
 	return (byte*)End;
 }
 
+
 byte* JB_Mem__PermAlloc (int64 Amount, int64 Align) {
 	if (auto rz = PermAllocSub(Amount, Align); rz)
 		return rz;
@@ -1018,29 +1027,29 @@ __boiling fpDestructor JB_Destructor (JB_Object* Obj) {
 __boiling void JB_Delete ( JB_FreeObject* Obj ) {
 	AllocationBlock* Block = ObjBlock_(Obj);
 
-	#if DEBUG
+#if DEBUG
 	int N = Block->ObjSize - 12;
-	#endif
+#endif
 
 	Sanity(Block);
 	fpDestructor Destructor = GetDestructor_(Block);
 
-	#if __VM__
+#if __VM__
 	if (((uint64)Destructor) >> 63) {			// VM based destructor
 		auto V = JB_GlobalVM;
 		((JB_FreeObject**)((V->ProposedStack)+2))[0] = Obj;
 		JB_ASM_CallBack(V, (u32*)Destructor);
 	} else
-	#endif
+#endif
 	{(Destructor)((JB_Object*)Obj);}
 	
 	
-	#if DEBUG
+#if DEBUG
 	if (N > 0) {
 		byte* Bob = 12 + ((byte*)Obj);
 		memset(Bob, 0xfe, N);
 	}
-	#endif
+#endif
 }
 
 

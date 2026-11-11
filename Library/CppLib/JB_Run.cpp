@@ -66,7 +66,7 @@ JBClassPlace(Dictionary,		JB_Object,	"Dictionary",JB_Dict_Destructor, JB_Dict_Re
 JBClassPlace(Array,				JB_Object,	"Array",	JB_Array_Destructor, JB_Array_Render );
 
 JBClassPlace( FastString,		JB_Object,	"FastString", JB_FS_Destructor,		JB_FS_Render );
-JBClassPlace( JB_List,			JB_Object,	"List",		JB_Ring_Destructor,		JB_List_Render );
+JBClassPlace( JB_List,			JB_Object,	"List",		JB_List_Destructor,		JB_List_Render );
 JBClassPlace( TokHan,			JB_Object,	"TokenHandler",	0,					0 );
 
 

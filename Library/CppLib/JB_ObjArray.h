@@ -12,12 +12,12 @@ extern "C" {
 
 JBClass( Array, JB_Object,
 	int					_Marker;
-	JB_Object**			_Ptr;
+	JB_Squash*			_Ptr;
 	int					_Capacity;
 	int					_Length;
 );
 
-void SpdSort (void* fp, JB_Object** low, JB_Object** high);
+void SpdSort (void* fp, JB_Squash* low, JB_Squash* high, uint64 Data);
 
 typedef int (*ArraySorterComparerInt)(JB_Object* a, JB_Object* b);
 

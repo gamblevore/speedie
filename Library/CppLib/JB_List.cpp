@@ -18,7 +18,7 @@
 
 extern "C" {
 
-static void RingLeave_( JB_List* rt );
+static void Leave_( JB_List* rt );
 
 
 inline bool RingIsRoot_( JB_List* rt ) {
@@ -99,7 +99,7 @@ static void Sanity_(JB_List* Curr) {
 
 
 static JB_List* LastSanity = 0;
-void JB_Ring_TotalSanity(JB_List* Root) {
+void JB_List_TotalSanity(JB_List* Root) {
     if (!Root) {
         Root = LastSanity;
         if (!Root) {
@@ -109,24 +109,24 @@ void JB_Ring_TotalSanity(JB_List* Root) {
         LastSanity = Root;
     }
     
-    JB_List* After = JB_Ring_FlatAfter(Root);
+    JB_List* After = JB_List_FlatAfter(Root);
     JB_List* Curr = Root;
     while (Curr != After) {
         AmContainedSanity_(Curr);
-        Curr = JB_Ring_FlatNext0(Curr);
+        Curr = JB_List_FlatNext0(Curr);
     }
 }
 
 
 
-inline void RingClearLocation_( JB_List* Curr ) {
+inline void ClearLocation_( JB_List* Curr ) {
     Curr->Next = 0;
     Curr->Parent = 0;
     Curr->Prev = 0;
 }
 
 
-bool JB_Ring_IsAncestor( JB_List* child, JB_List* ance ) {
+bool JB_List_IsAncestor( JB_List* child, JB_List* ance ) {
 	JB_List* p = child->Parent;
 	while ( p ) {
 		if ( p == ance ) {
@@ -141,7 +141,7 @@ bool JB_Ring_IsAncestor( JB_List* child, JB_List* ance ) {
 
 static bool DB_RingIsAncestor_( JB_List* child, JB_List* ance ) {
 #if DEBUG || AS_LIBRARY // important!
-	return JB_Ring_IsAncestor(child, ance);
+	return JB_List_IsAncestor(child, ance);
 #endif
 
 	return false;   
@@ -157,7 +157,7 @@ inline bool PrepareMove_( JB_List* place, JB_List* mover ) {
             ; // fail
         } else {
             if ( mover->Parent ) {
-                RingLeave_( mover );
+                Leave_( mover );
             } else {
                 JB_Incr( mover );
             }
@@ -170,11 +170,11 @@ inline bool PrepareMove_( JB_List* place, JB_List* mover ) {
 }
 
 
-bool JB_Ring_HasChildren( JB_List* self ) {
+bool JB_List_HasChildren( JB_List* self ) {
     return self and self->Child;
 }
 
-int JB_Ring_Count( JB_List* self ) {
+int JB_List_Count( JB_List* self ) {
 	JB_List* c = self->Child;
 	
     int N = 0;
@@ -186,7 +186,7 @@ int JB_Ring_Count( JB_List* self ) {
 	return N;
 }
 
-bool JB_Ring_HasChildCount( JB_List* self, int HasCount ) {
+bool JB_List_HasChildCount( JB_List* self, int HasCount ) {
 	JB_List* c = self->Child;
 	
 	while ( HasCount-- >= 1 ) {
@@ -199,7 +199,7 @@ bool JB_Ring_HasChildCount( JB_List* self, int HasCount ) {
 	return ( !c );
 }
 
-JB_List* JB_Ring_Last( JB_List* self ) {
+JB_List* JB_List_Last( JB_List* self ) {
 	if (self) {
 		JB_List* c = self->Child;
 		if ( c ) {
@@ -209,14 +209,14 @@ JB_List* JB_Ring_Last( JB_List* self ) {
 	return 0;
 }
 
-JB_List* JB_Ring_NextSib( JB_List* self ) {
+JB_List* JB_List_NextSib( JB_List* self ) {
 	if (self) {
 		return self->Next;
 	}
 	return 0;
 }
 
-JB_List* JB_Ring_PrevSib( JB_List* self ) {
+JB_List* JB_List_PrevSib( JB_List* self ) {
 	if (self) {
 		JB_List* Prev = self->Prev;
 		if (Prev and Prev->Next) { // the last one has no next!
@@ -228,19 +228,19 @@ JB_List* JB_Ring_PrevSib( JB_List* self ) {
 }
 
 
-JB_List* JB_Ring_First( JB_List* self ) {
+JB_List* JB_List_First( JB_List* self ) {
 	if (self)
 		return self->Child;
 	return 0;
 }
 
-JB_List* JB_Ring_Parent( JB_List* self ) {
+JB_List* JB_List_Parent( JB_List* self ) {
 	if (self)
 		return self->Parent;
 	return 0;
 }
 
-JB_List* JB_Ring_Root( JB_List* self ) {
+JB_List* JB_List_Root( JB_List* self ) {
 	JB_List* rz = self;
 	while ( self ) {
 		rz = self;
@@ -250,7 +250,7 @@ JB_List* JB_Ring_Root( JB_List* self ) {
 }
 
 
-bool JB_Ring_IsRoot( JB_List* self ) {
+bool JB_List_IsRoot( JB_List* self ) {
 	if (self) {
 		return ( !self->Parent );
 	}
@@ -258,7 +258,7 @@ bool JB_Ring_IsRoot( JB_List* self ) {
 }
 
 
-static void RingLeave_( JB_List* rt ) {
+static void Leave_( JB_List* rt ) {
     Sanity(rt);
 	dbgexpect( rt );
 	dbgexpect( !RingIsRoot_( rt ) ); // 
@@ -358,14 +358,14 @@ DepthNode FlatNext( JB_List* self, bool AllowDown ) {
 }
 
 // very cool
-JB_List* JB_Ring_FlatNext0( JB_List* self ) {
+JB_List* JB_List_FlatNext0( JB_List* self ) {
 	if (self)
 		return FlatNext( self, true ).Node;
 	return 0;
 }
 
 
-JB_List* JB_Ring_FlatNextDepth( JB_List* self, int* Depth, bool Down ) {
+JB_List* JB_List_FlatNextDepth( JB_List* self, int* Depth, bool Down ) {
 	auto D = FlatNext( self, Down );
 	if (Depth)
 		*Depth += D.Depth;
@@ -373,32 +373,32 @@ JB_List* JB_Ring_FlatNextDepth( JB_List* self, int* Depth, bool Down ) {
 }
 
 
-JB_List* JB_Ring_FlatAfter( JB_List* self ) {
+JB_List* JB_List_FlatAfter( JB_List* self ) {
 	if (self)
 		return FlatNext( self, false ).Node;
 	return 0;
 }
 
 
-void JB_Ring_ParentSet( JB_List* self, JB_List* NewParent ) {
+void JB_List_ParentSet( JB_List* self, JB_List* NewParent ) {
 	if (NewParent) {
-		JB_Ring_LastSet( NewParent, self );
+		JB_List_LastSet( NewParent, self );
 	} else if (self and self->Parent) {
-		RingLeave_( self );
-		RingClearLocation_( self );
+		Leave_( self );
+		ClearLocation_( self );
 		JB_Decr(self);
 	}
 }
 
 
-void JB_Ring_NextSibSet( JB_List* self, JB_List* Mover ) {
+void JB_List_NextSibSet( JB_List* self, JB_List* Mover ) {
 	if ( self->Parent and PrepareMove_( self, Mover ) ) {
 		InsertAfter_( self, Mover );
 	}
 }
 
 
-bool JB_Ring_PrevSibSet( JB_List* self, JB_List* Mover ) {
+bool JB_List_PrevSibSet( JB_List* self, JB_List* Mover ) {
 	if ( self->Parent and PrepareMove_( self, Mover ) ) {
 		InsertBefore_( self, Mover );
 		return true;
@@ -407,7 +407,7 @@ bool JB_Ring_PrevSibSet( JB_List* self, JB_List* Mover ) {
 }
 
 
-bool JB_Ring_LastSet( JB_List* self, JB_List* New ) {
+bool JB_List_LastSet( JB_List* self, JB_List* New ) {
 	if ( !self or !PrepareMove_( self, New ) ) {
         return false;
     }
@@ -434,19 +434,19 @@ bool JB_Ring_LastSet( JB_List* self, JB_List* New ) {
 
 
 
-bool JB_Ring_FirstSet( JB_List* self, JB_List* Mover ) {
+bool JB_List_FirstSet( JB_List* self, JB_List* Mover ) {
 	if ( Mover and self ) {
-        JB_List* First = JB_Ring_First( self );
+        JB_List* First = JB_List_First( self );
         if ( !First )
-            return JB_Ring_LastSet( self, Mover );
+            return JB_List_LastSet( self, Mover );
 		  else if (First != Mover) 
-			return JB_Ring_PrevSibSet( First, Mover );
+			return JB_List_PrevSibSet( First, Mover );
     }
     return false;
 }
 
 
-JB_List* JB_Ring_Constructor0( JB_List* self ) {
+JB_List* JB_List_Constructor0( JB_List* self ) {
 	JB_New2(JB_List);
     self->Position = 0;
     self->Obj = 0;
@@ -458,7 +458,7 @@ JB_List* JB_Ring_Constructor0( JB_List* self ) {
 }
     
     
-JB_List* JB_Ring_Constructor( JB_List* self, JB_List* Parent ) {
+JB_List* JB_List_Constructor( JB_List* self, JB_List* Parent ) {
 	JB_New2(JB_List);
     self->Position = 0;
     self->Obj = 0;
@@ -491,19 +491,25 @@ JB_List* JB_Ring_Constructor( JB_List* self, JB_List* Parent ) {
     
 
 
-void JB_Ring_Destructor( JB_List* self ) {
+void JB_List_Destructor( JB_List* self ) {
 	JB_List* Curr = self->Child;
 	// some kind of flattened destroyer sounds good?
 	// less oofing around with stuff.
+	// Actually no. Even better would be to save my time
+	// write a tree-destroyer into the memory-manager itself.
+	// we can use 64-bits to store the parent (54-bits), plus the position in the parent (10bits)
+	// store it in the object directly, overwriting it.
+	// that way, the entire object system becomes a tree!
+	// each class will need to have a 64-bit "object pattern".
 	while (Curr) {
 		JB_List* Next = Curr->Next;
-		RingClearLocation_( Curr );
+		ClearLocation_( Curr );
 		JB_Decr( Curr );
 		Curr = Next;
 	};
     if (self->Parent) {
-		RingLeave_( self );
-		RingClearLocation_( self );
+		Leave_( self );
+		ClearLocation_( self );
 		JB_SafeDecr( self );
 	}
 	JB_SetRef(self->Obj, 0);

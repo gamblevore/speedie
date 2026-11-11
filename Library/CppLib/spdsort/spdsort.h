@@ -19,7 +19,7 @@
 #ifndef __spdsort_type__
 	#define __spdsort_type__ int
 #endif
-extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* high);
+extern "C" void SpdSort(void* func, __spdsort_type__* low, __spdsort_type__* high, uint64 Data);
 
 
 #ifndef __SPD_SORT__
@@ -28,7 +28,7 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 
 #ifndef __spdsort_func__
 	#define __spdsort_func__ SpdDemoSort
-	inline int SpdDemoSort (void* dat__, __spdsort_type__ a, __spdsort_type__ b) {
+	inline int SpdDemoSort (void* func, __spdsort_type__ a, __spdsort_type__ b, uint64 Data) {
 		return b-a;
 	}
 #endif
@@ -40,22 +40,22 @@ extern "C" void SpdSort(void* dat__, __spdsort_type__* low, __spdsort_type__* hi
 #ifndef __spd_variant__
 	#define __spd_variant__(a) a
 #endif
-#ifndef __spd_dat__
-	#define __spd_dat__ void*
+#ifndef __spdsort_proto__
+	#define __spdsort_proto__ void*
 #endif
 
 
-static __spdsort_type__* __spd_variant__(SortABit) (__spd_dat__ dat__, __spdsort_type__* low, __spdsort_type__* high) {
+static __spdsort_type__* __spd_variant__(SortABit) (__spdsort_proto__ func, __spdsort_type__* low, __spdsort_type__* high, uint64 Data) {
 // Future upgrade for pathological data: Swap a random element for the high element
 // We'd need to only do that if our stack depth gets too high.
     auto pivot = *high;
-    while (__spdsort_func__(dat__, pivot, *low++) <= 0)
+    while (__spdsort_func__(func, pivot, *low++, Data) <= 0)
 		if (low >= high)
 			return 0;
 
 	auto i = low - 2;
     while (low < high) {
-        if (__spdsort_func__(dat__, pivot, *low) <= 0) {
+        if (__spdsort_func__(func, pivot, *low, Data) <= 0) {
 			i++;
             __spdsort_swap__(*i, *low);
 		}
@@ -72,22 +72,22 @@ static void __spd_variant__(QuickReverse) (__spdsort_type__* low, __spdsort_type
 }
 
 
-extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* low, __spdsort_type__* high) {
+extern "C" void __spd_variant__(SpdSort) (__spdsort_proto__ func, __spdsort_type__* low, __spdsort_type__* high, uint64 Data) {
 	if (high == low+1) {									// Reduce comparisons...
-		if (__spdsort_func__(dat__, *low, *high) <= 0)	
+		if (__spdsort_func__(func, *low, *high, Data) <= 0)	
 			__spdsort_swap__(*high, *low);
 		return;
 	}
-    auto p = __spd_variant__(SortABit)(dat__, low, high);
+    auto p = __spd_variant__(SortABit)(func, low, high, Data);
     if (!p) {
 		p = low;
-		while (__spdsort_func__(dat__, p[1], p[0]) <= 0)
+		while (__spdsort_func__(func, p[1], p[0], Data) <= 0)
 			if (++p >= high)
 				return;										// Avoid disasterous worst-case (sorted data).
 		p = high;
     } else {
 		if (p == low) {										// Avoid pointless compares for 2 element reversals.
-			while (__spdsort_func__(dat__, p[0], p[1]) <= 0)
+			while (__spdsort_func__(func, p[0], p[1], Data) <= 0)
 				if (++p >= high)							// Avoid reverse-sort. Also disasterous.
 					return __spd_variant__(QuickReverse)(low, high);
 			p = low;
@@ -96,10 +96,10 @@ extern "C" void __spd_variant__(SpdSort) (__spd_dat__ dat__, __spdsort_type__* l
 	}
 	
     if (low < p - 1) {
-		__spd_variant__(SpdSort)(dat__, low, p - 1);
+		__spd_variant__(SpdSort)(func, low, p - 1, Data);
 	}
 	if (p + 1 < high) {
-		__spd_variant__(SpdSort)(dat__, p + 1, high);
+		__spd_variant__(SpdSort)(func, p + 1, high, Data);
 	}
 }
 

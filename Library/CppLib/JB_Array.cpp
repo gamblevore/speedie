@@ -1,32 +1,36 @@
 
-// Copyright, Theodore H. Smith 2019.
+// Copyright, Theodore H. Smith 2019-2026
 // Released under jeebox-licence http://jeebox.org/licence.txt
 
 /*
-	Copyright (C) 2017 Theodore H. Smith.
+	Copyright (C) 2017-2026 Theodore H. Smith.
 */
 
 #include "JB_Umbrella.hpp"
-#define __spdsort_type__ JB_Object*
-#define __spdsort_func__(fp,b,c)  (((ArraySorterComparerInt)fp)(b, c))
+
+
+
+#define __spdsort_type__ JB_Squash
+#define __spdsort_func__(fp,b,c,d)  ({									\
+	((ArraySorterComparerInt)fp)(JB_UnSquash(d,b), JB_UnSquash(d,c));	\
+})
 #include "spdsort/spdsort.h"
 
 #define kArrayLengthMax (2147483644)
-#define PtrSize (sizeof(void*))
 
 #if __VM__
 #undef __SPD_SORT__
 #undef __spd_variant__
 #undef __spdsort_func__
 #define __spd_variant__(fn) (fn##VM) 
-#define __spdsort_func__(fp,b,c)  ({					\
+#define __spdsort_func__(fp,b,c,d)  ({					\
 														\
 	auto V = JB_GlobalVM;								\
-	((JB_Object**)((V->ProposedStack)+2))[0] = b;		\
-	((JB_Object**)((V->ProposedStack)+3))[0] = c;		\
+	((JB_Object**)((V->ProposedStack)+2))[0] = JB_UnSquash(d,b);		\
+	((JB_Object**)((V->ProposedStack)+3))[0] = JB_UnSquash(d,c);		\
 	JB_ASM_CallBack(V, (u32*)fp)[0][0];					\
 })
-// This COULD be optimised but I don't want to ruin my life optimising everything.
+// VMSort COULD be optimised but I don't want to ruin my life optimising everything.
 // You need to err on one side or the other... and I tend to err on the optimising side
 // so... I might as well err the other way, for once.
 
@@ -35,27 +39,30 @@
 
 
 extern "C" {
-void JB_Array_Sort (Array* self, ArraySorterComparerInt fp) {
-	int N = JB_Array_Length(self);
+void JB_Array_Sort (Array* Self, ArraySorterComparerInt fp) {
+	int N = JB_Array_Length(Self);
 	require0 (N >= 2);
-
+	
+	auto Base = JB_SquashBase(Self);
+	auto Start = Self->_Ptr;
+	auto After = Start+N-1; 
 	#if __VM__
 	if (((IntPtr)fp)>>63)		// speedie func!
-		return SpdSortVM((void*)fp, self->_Ptr, self->_Ptr+N-1);
+		return SpdSortVM((void*)fp, Start, After, Base);
 	#endif
 	
-	SpdSort((void*)fp, self->_Ptr, self->_Ptr+N-1);
+	SpdSort((void*)fp, Start, After, Base);
 }
 
 
 
 
 static bool ReAlloc_ (Array* self, int C) {
-	auto X = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
+	auto X = (JB_Squash*)JB_Realloc(self->_Ptr, C*sizeof(JB_Squash));
 	if (!X)
 		return false;
 	self->_Ptr = X;
-	self->_Capacity = (int)(JB_msize(X)/sizeof(void*));
+	self->_Capacity = (int)(JB_msize(X)/sizeof(JB_Squash));
 	return true;
 }
 
@@ -96,25 +103,24 @@ static void ShrinkCapacity_ (Array* self, uint Length) {
 		return;
 	C = std::max((int)Length, 8);
 	self->_Capacity = C;
-	self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, C*sizeof(void*));
+	self->_Ptr = (JB_Squash*)JB_Realloc(self->_Ptr, C*sizeof(JB_Squash));
 }
 
 
 int JB_Array_Find (Array* Self, JB_Object* F) {
 	if (Self) {
+		auto F2 = JB_Squeeze(F);
 		auto P = Self->_Ptr; 
 		int N = Self->_Length;
 		int i = 0; 
 		while (i < N) {
-			if (P[i] == F)
+			if (P[i] == F2)
 				return i;
 			i++;
 		}
 	}
 	return -1;
 }
-
-
 
 
 bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
@@ -124,18 +130,19 @@ bool JB_Array_AppendCount( Array* self, JB_Object* Value, int Count ) {
 	JB_SetRefCount(Value, JB_RefCount(Value) + Count);
 	auto P = self->_Ptr + n;
 	auto Pf = P + Count;
+	auto V2 = JB_Squeeze(Value);
 	while (P < Pf)
-		*P++ = Value;
+		*P++ = V2;
 	return true;
 }
 
 
-
-bool JB_Array_Append( Array* self, JB_Object* Value ) {
+bool JB_Array_Append ( Array* self, JB_Object* Value ) {
 	if (Value) {
 		int n = self->_Length; 
 		if (GrowToLength_(self, n+1, true)) {
-			JB_SetRef(self->_Ptr[n], Value);
+			JB_Incr(Value);
+			self->_Ptr[n] = JB_Squeeze(Value);
 			return true;
 		}
 	}
@@ -143,33 +150,35 @@ bool JB_Array_Append( Array* self, JB_Object* Value ) {
 }
 
 
-
-bool JB_Array_Insert( Array* self, int Pos, JB_Object* Value ) {
-	int n = self->_Length;
-	if ( (uint)Pos > n  or  !JB_Array_Append(self, Value) )
+bool JB_Array_Insert ( Array* Self, int Pos, JB_Object* Value ) {
+	int n = Self->_Length;
+	if ( (uint)Pos > n  or  !JB_Array_Append(Self, Value) )
 		return false;
 	if (Pos == n)
 		return true; // already done.
 	
-	auto P = self->_Ptr;
+	auto P = Self->_Ptr;
 	
-	JB_Object** Curr = P+n;
-	JB_Object** First = P+Pos;
+	JB_Squash* Curr = P+n;
+	JB_Squash* First = P+Pos;
 	while (Curr > First) {
 		Curr--;
 		Curr[1] = Curr[0];
 	}
-	First[0] = Value;
+	First[0] = JB_Squeeze(Value);
 	
 	return true;
 }
 
 
-static void ArrayDecrDownTo_(Array* self, int64 NewLength) {
-	JB_Object** Curr = self->_Ptr + self->_Length-1;
-	JB_Object** First = self->_Ptr + NewLength;
-	while ( Curr >= First ) // backwards is safer.
-		JB_Decr( *Curr-- );
+static void ArrayDecrDownTo_ (Array* Self, int64 NewLength) {
+	int N = Self->_Length - 1;
+	JB_Squash* Curr = Self->_Ptr + N;
+	JB_Squash* First = Self->_Ptr + NewLength;
+	auto Base = JB_SquashBase(Self);
+	while ( Curr >= First ) { // backwards is safer.
+		JB_Decr( JB_UnSquash(Base, *Curr--) );
+	}
 }
 
 
@@ -177,7 +186,7 @@ void JB_Array_Shrink (Array* self) {
 	int L = self->_Length;
 	if (L < self->_Capacity) {
 		self->_Capacity = L;
-		self->_Ptr = (JB_Object**)JB_Realloc(self->_Ptr, L*sizeof(void*));
+		self->_Ptr = (JB_Squash*)JB_Realloc(self->_Ptr, L*sizeof(JB_Squash));
 	}
 }
 
@@ -260,10 +269,10 @@ int JB_Array_Length( Array* self ) {
 }
 
 
-Array* JB_Array_Copy(Array* self) {
-    require(self);
+Array* JB_Array_Copy (Array* Self) {
+    require(Self);
 	Array* Result = JB_Array_Constructor0(nil);
-	int n = self->_Length;
+	int n = Self->_Length;
 	if (!n)
 		return Result;
 	if (!GrowToLength_(Result, n, false)) {
@@ -273,11 +282,13 @@ Array* JB_Array_Copy(Array* self) {
 
     auto Dest = Result->_Ptr;
     auto After = Dest + n;
-    auto Src = self->_Ptr;
+    auto Src = Self->_Ptr;
+    auto Base = JB_SquashBase(Self);
 	while (Dest < After) {
 		auto O = *Src++;
 		*Dest++ = O;
-		JB_Incr(O);
+		auto O2 = JB_UnSquash(Base, O);
+		JB_Incr(O2);
 	}
     return Result;
 }
@@ -308,20 +319,20 @@ int JB_Array_Wipe (Array* self) {
 }
 
 
-void JB_Array_ValueSet( Array* self, int Pos, JB_Object* Value ) {
-	if ((u32)Pos < (u32)(self->_Length)) {
-		JB_SetRef( self->_Ptr[Pos], Value );
+void JB_Array_ValueSet ( Array* Self, int Pos, JB_Object* Value ) {
+	if ((u32)Pos < (u32)(Self->_Length)) {
+		JB_SetSquash(Self, Self->_Ptr+Pos, Value);
 	}
 }
 
 
-JB_Object* JB_Array_Pop(Array* self) {
-	if (self) {
-		int n = self->_Length - 1;
+JB_Object* JB_Array_Pop (Array* Self) {
+	if (Self) {
+		int n = Self->_Length - 1;
 		if (n >= 0) {
-			JB_Object* rz = self->_Ptr[n];
-			ShrinkCapacity_(self, n);
-			return rz;
+			JB_Squash rz = Self->_Ptr[n];
+			ShrinkCapacity_(Self, n);
+			return JB_UnSquash(Self, rz);
 		}
 	}
 	return nil;
@@ -330,7 +341,7 @@ JB_Object* JB_Array_Pop(Array* self) {
 
 JB_Object* JB_Array_Value( Array* self, int Pos ) {
     if (self and (u32)Pos < self->_Length) {
-        return self->_Ptr[ Pos ];
+        return JB_UnSquash(self, self->_Ptr[ Pos ]);
     }
     return 0;
 }
@@ -340,14 +351,9 @@ JB_Object* JB_Array_Last( Array* self, int Pos ) {
 		int N = self->_Length;
 		Pos = N - (Pos+1);
 		if ((uint)Pos < (uint)N)
-			return self->_Ptr[ Pos ];
+			return JB_UnSquash(self, self->_Ptr[ Pos ]);
     }
     return 0;
-}
-
-    
-void JB_FillInts(int* Start, int N, int Value) {
-	std::fill(Start, Start+N, Value);
 }
 
 
@@ -355,7 +361,7 @@ void JB_FillInts(int* Start, int N, int Value) {
 void JB_Array_Shuffle( Array* self ) {
 	int n = JB_Array_Length(self);
 	require0(n);
-	JB_Object** Array = self->_Ptr;
+	JB_Squash* Array = self->_Ptr;
 	uint64 Hash = JB_Date__Now();
 	self->_Marker = 0;
 

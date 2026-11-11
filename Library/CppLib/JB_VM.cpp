@@ -293,7 +293,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 		return 0;
 	}
 	
-	memzero(V, AllocSize);
+	JB_memzero(V, AllocSize);
 	auto HighBit = 1ull << 63ull;
 	V = (CakeVM*)(((int64)V)&~HighBit);
 	if (Flags&kJB_VM_AskDebug)

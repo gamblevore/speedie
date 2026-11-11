@@ -285,7 +285,9 @@ inline JB_Object* JB_Incr_(JB_Object* self) {
 		JB_TotalSanity(JB_TotalSanity_Force);
 	#endif
         self->RefCount += 1<<JB_RefCountShift;
+    #if DEBUG
 		JBObjRefTest(self);
+	#endif
     }
     return self;
 }
@@ -299,6 +301,15 @@ inline void JB_Decr(JB_Object* self) {
         if (!N)
             JB_Delete( (JB_FreeObject*)self );
     }
+}
+
+
+inline void JB_SetSquash (JB_Object* Self, JB_Squash* Where, JB_Object* Value) {
+	auto V2 = JB_Squeeze(Value);
+	JB_Incr_(Value);
+	auto Old = JB_UnSquash(Self, *Where);
+	*Where = V2;
+	JB_Decr(Old);
 }
 
 

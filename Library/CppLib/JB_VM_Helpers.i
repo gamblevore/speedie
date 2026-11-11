@@ -641,7 +641,7 @@ VMOpt void AllocStack (CakeVM& vm, CakeRegister* r, ASM Op) {
 	int Amount = Alloc_Amounti << 4;
 	auto B = vm.AllocBase;
 	if (Amount > 0)
-		memzero(B, Amount);
+		JB_memzero(B, Amount);
 	int n = n1;
 	if (n)
 		r[n].Int = (uint64)(B);

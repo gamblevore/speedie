@@ -608,7 +608,7 @@ function jbin.RenderListObject (|object| Item, |int| i, |bool|)
 	return .RenderListItem((&Temp[0])|&uint64|, i)
 
 
-function jbin.RenderListItem (|&uint64| Items_, |int| i, |bool|)
+function jbin.RenderListItem (|&uint64| Items_,  |int| i, |bool|)
 	opt norefcounts
 	if i >= 10K
 		.AddStr("...")

@@ -227,7 +227,7 @@ class Memory
 		function	Fill	(|&byte| p, |int| n, |byte| B):				._memset(p, b, n)
 		function	Fill	(|&int| p, |int| n, |int| Pattern):			cpp_wrapper JB_FillInts
 		function	Realloc	(|?&nil| b, |int| n, |?&byte|):				cpp_wrapper JB_Realloc
-		function	Zero	(|&nil| addr, |int| n):						cpp_wrapper memzero
+		function	Zero	(|&nil| addr, |int| n):						cpp_wrapper JB_memzero
 		function	Compare	(|&nil| dest, |&nil| src, |int| N, |int|):	cpp_wrapper memcmp
 		inline		Equals	(|&nil| dest, |&nil| src, |int| N, |bool|):	return .compare(dest, src, n) == 0
 		function	Free	(|?&nil| b)
@@ -244,11 +244,11 @@ class Memory
 
 		libinternal _Free (|?&nil| b):									cpp_wrapper free
 	
-		autogen Sort (|&nil| FP, |&object| First, |&object| Last)
-			cpp_wrapper SpdSort
+		autogen Sort (|&nil| base, |uint64| Count, |uint64| width, |&nil| Comparer)
+			cpp_wrapper JB_qsort
 
 		autogen PermAlloc (|int64| Amount, |int64| AlignBits=0, |?&byte|)
-			description "This memory is never cleared or freeable. Comes from your program's internal mmap'd space. Speedie allocates 4GB (only used by objects) by default, so its a lot to play with. Strings/arrays are allocated outside of that space.
+			description "Returns non-freeable memory from your programs internal mmap'd space. Speedie allocates 4GB (only used by objects) by default, so its a lot to play with. Strings/arrays are allocated outside of that space.
 			Aligns to at least 8K.
 			
 			AlignBits is used as the power of 2. For example: AlignBits 20 --> 1MB alignment.

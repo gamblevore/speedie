@@ -122,7 +122,7 @@ function scdecl.AccessToMemCpy (|message| exp, |message| side, |scdecl| type, |s
 			nxt = nxt.wrapwith(@brel, "&")
 	
 	if side.obj == typenil
-		name.name = "memzero"
+		name.name = "JB_memzero"
 		nxt.remove
 	  else
 		prms <~ nxt

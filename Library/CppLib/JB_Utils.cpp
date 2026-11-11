@@ -38,7 +38,7 @@ static uint8* AllocateSub (int N, const void* Arr, uint64* Where) {
 		if (Result) {
 			int64 Gain = JB_msize(Result) - Old;
 			if (Gain > 0)
-				memzero(Result+Old, Gain);
+				JB_memzero(Result+Old, Gain);
 			*Where += Gain;
 			return Result;
 		}
@@ -112,6 +112,11 @@ void JB_MemSwap (const void* A, const void* B, int Bytes) {
 		*(byte*)A = bb; A = (void*)((byte*)A + 1); // sameee...
 		*(byte*)B = aa; B = (void*)((byte*)B + 1); // same
 	}
+}
+
+    
+void JB_FillInts(int* Start, int N, int Value) {
+	std::fill(Start, Start+N, Value);
 }
 
 

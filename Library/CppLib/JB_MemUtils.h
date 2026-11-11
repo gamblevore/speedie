@@ -13,6 +13,37 @@
 #endif
 
 
+#ifndef kUltraAlloc
+	//#define kUltraAlloc (1ull<<35) // 32GB
+	#define kUltraAlloc (1ull<<31) // 2GB
+#endif
+
+
+#if kUltraAlloc <= 1ull<<32 // fits in 4GB, no need to do pointer shifting.
+	#define kUltraShift 0	// one less instruction!
+#else
+	#define kUltraShift 3
+#endif
+
+#define JB_Squash uint
+struct JB_Object;
+
+inline JB_Object* JB_UnSquash (uint64 Base, JB_Squash Q) {
+	return (JB_Object*)(Base | ((uint64)Q << kUltraShift));
+}
+inline JB_Object* JB_UnSquash (JB_Object* Self, JB_Squash Q) {
+	return JB_UnSquash(((uint64)Self)&~(kUltraAlloc-1), Q);
+}
+inline uint64 JB_SquashBase (JB_Object* Self) {
+	return ((uint64)Self)&~(kUltraAlloc-1);
+}
+inline JB_Squash JB_Squeeze (JB_Object* Self) {
+	return ((uint64)Self)>>kUltraShift;
+}
+
+
+
+
 #ifdef JB_DEBUG_ON
     #define JBSanity( a ) // nothing for now
     #define JB_DEBUG(x) x
@@ -90,9 +121,14 @@ inline int JB_u64_Log2 (u64 X) {
 }
 
 
-#define MemZero(Where) (memzero(Where, sizeof(Where)))
-inline void memzero (void* Where, int64 N) {
+inline void JB_memzero (void* Where, int64 N) {
     memset(Where, 0, N);
+}
+
+typedef int (*_qsort_garbage_)(const void* Space, const void* Result);
+
+inline void JB_qsort (void* Data, uint64 Count, uint64 Width, void* Func) {
+	qsort(Data, Count, Width, (_qsort_garbage_)Func);
 }
 
 inline int JB_Int_CountBits (int X) {

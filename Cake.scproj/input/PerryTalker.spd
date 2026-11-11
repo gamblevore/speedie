@@ -401,7 +401,7 @@ function xtype.ExpandSub (|jbin| j, |!&byte| Obj, |message| xp, |int| Depth)
 		v.DescribeJBin(j, Obj+v.position, xp, depth)
 
 
-function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items, |message?| xp, |int| depth, |int| Count, |bool|)
+function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items, |message?| xp, |int| depth, |int| Count,   |bool|)
 	opt norefcounts
 	j.Enter(@arg)
 	|| i = 0
@@ -453,11 +453,25 @@ function xvar.ExpandList (|jbin| j, |list| Obj, |message?| xp, |int| depth, |boo
 function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |bool|)
 	opt norefcounts
 	require R.mustbe(array)
-	|| length = r._Length
+	|| length = r._Length min 10K
 	if !length
 		return true
-	|| ptr = r._Ptr
-		return .ExpandObjectMemory(j, ptr|&uint64|, xp, depth, length)
+	|| ptr = r._Ptr|&uint|$
+
+//copied cos of compressed pointers
+	j.Enter(@arg)
+	|| i = 0
+	while (i++ < Length)
+		|uint64[1]| Where
+		Where[0] = r[i]|uint64|
+		|| OK = j.RenderListItem(Where, i)
+		j.addint(i-1)
+		if !OK
+			j.add(@thg, "bad")
+		
+		j.exit
+	j.exit
+	return true // I still want to see bad vars
 
 
 function xvar.ExpandGoodContainer (|jbin| j, |&byte| Obj, |xtype| Type, |message?| xp, |int| Depth, |bool|)
