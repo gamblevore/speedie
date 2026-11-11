@@ -2,8 +2,8 @@
 
 							/// Get perry ASMing ///
 
-* chained obj destructor bug in branch_Test.spd
-* break On || ShowMe = doaction_Duck fails
+* chained obj destructor bug in branch_test.spd
+* break On || ShowMe = doaction_Duck flips out /usr/local/speedie/Examples/speedie_syntax.spd
 * expansion in cake not working quite right
 
 * Unused const (1) in setter Size
@@ -17,23 +17,24 @@
 
 * Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
 
-* need to select top on enter stack
-* funcs sometimes close when opening another?
-* "open all double-right" is not cool for the debugger
-* new created vars get a "glitter" like the textview
-	* altered also, but a different color
-
+* Need to select top on enter stack
+* Funcs sometimes close when opening another?
+* New created vars get a "glitter" like the textview
+	* Altered also, but a different color
 
 
 								// ASM later
+
 * ASM errors while editing, shouldn't spam interface... just ignore I guess.
 * asmview-syncing when stepping would be nice
 * Step through destructor without it fretting
-* display libglobs
-
+* Display libglobs
 
 
 				// Someone paying for productive work wants these done after //
+				
+* GameExamples/tetris.spd does not load in cmd-d. why not assume like... speedie?
+	* running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
 * too aggressive with error keeping
 * Undo still thinks its changed when its not, and we undid ALL changes!
 * CalledFrom datatypes/properties too
@@ -42,8 +43,8 @@
 * Perhaps case-sensitivity bitching is... unnecessary. Or could be optional.
 * 1s*604800 not asm displaying properly (value is ok though)
 
-...
 
+...
 
 * New reg system. All prms use the same system
 	* nil-checker checks for trashers. AND for things that alter the decl. (a = b() + a)
