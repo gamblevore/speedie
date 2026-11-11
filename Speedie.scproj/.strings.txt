@@ -1947,7 +1947,7 @@
 "memcpy"
 "memory"
 "memorycopy"
-"memzero"
+"JB_memzero"
 "min"
 "minilib"
 "mins"

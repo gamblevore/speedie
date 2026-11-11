@@ -337,7 +337,7 @@ struct VirtualJBString;
 
 struct Array_Behaviour;
 
-struct Assembler;
+struct AssemblerWipe;
 
 struct AutoItem_Behaviour;
 
@@ -392,6 +392,8 @@ struct Validator_Behaviour;
 struct list_Behaviour;
 
 struct xC2xB5Form_Behaviour;
+
+struct Assembler;
 
 struct FastStringCpp_Behaviour;
 
@@ -782,7 +784,7 @@ struct VirtualJBString {
 	byte* Addr;
 };
 
-struct Assembler {
+struct AssemblerWipe {
 	RegFile Regs;
 	u16 BasicBlock;
 	u16 BasicParent;
@@ -809,9 +811,6 @@ struct Assembler {
 	byte Actions[256];
 	FatASM* InlineEnd;
 	FatASM* FuncStart_;
-	FatASM* TotalStart;
-	FatASM* Curr_;
-	FatASM* End;
 };
 
 struct BranchPHITracker {
@@ -832,6 +831,12 @@ struct SavedRegisters {
 	bool ExpectOneMore;
 	DeclAlterable Decls[32];
 	RegFile Regs;
+};
+
+struct Assembler: AssemblerWipe {
+	FatASM* Curr_;
+	FatASM* End;
+	FatASM* TotalStart;
 };
 
 struct Object_Behaviour {
@@ -1230,7 +1235,7 @@ JBClass ( SCClass , SCBetterNode ,
 	DataTypeCode ASMTypeInfo;
 	u16 TableID;
 	u16 ClsSizeRaw;
-	u16 ClsSize;
+	u16 ClsSize_;
 	u16 TaskObjectCount;
 	ClassInfo Flags;
 	SCDecl* DataObject;
@@ -1251,7 +1256,7 @@ JBClass ( SCClass , SCBetterNode ,
 	Array* Children;
 	SCDecl* Contained;
 	SCDecl* Signed;
-	SCDecl* _NotConst;
+	SCDecl* NotConst_;
 	SCClass* Super;
 	Message* Defawlt;
 	Message* False;
@@ -2515,8 +2520,6 @@ extern u16 SC__Pac_BlockParents[16384];
 #define kSC__Pac_Breakable ((int)1)
 #define kSC__Pac_BreakPoint ((int)2)
 extern FastString* SC__Pac_DebugDecls;
-extern MWrap* SC__Pac_HoistSpace;
-extern MWrap* SC__Pac_JSM;
 #define kSC__Pac_kContinue ((int)254)
 #define kSC__Pac_kExit ((int)255)
 extern uint SC__Pac_SanityCount;
@@ -6227,6 +6230,96 @@ void JB_TerminalDisplay_SyntaxAppend(TerminalDisplay* Self, JB_String* Text, ive
 // JB_Array_Behaviour
 
 
+// JB_AssemblerWipe
+
+
+// JB_AutoItem_Behaviour
+
+
+// JB_BranchPHITracker
+
+
+// JB_CppRefs_Behaviour
+
+
+// JB_Cpp_Export_Behaviour
+
+
+// JB_DataObject_Behaviour
+
+
+// JB_DictionaryReader_Behaviour
+
+
+// JB_Dictionary_Behaviour
+
+
+// JB_ErrorReceiver_Behaviour
+
+
+// JB_FastString_Behaviour
+
+
+// JB_FixedDict_Behaviour
+
+
+// JB_InputStream_Behaviour
+
+
+// JB_Instruction_Behaviour
+
+
+// JB_MemoryLayer_Behaviour
+
+
+// JB_Memory_Behaviour
+
+
+// JB_SCImport_Behaviour
+
+
+// JB_SCNodeRenamer_Behaviour
+
+
+// JB_SCObject_Behaviour
+
+
+// JB_SCOperator_Behaviour
+
+
+// JB_SCParamArray_Behaviour
+
+
+// JB_SavedRegisters
+void SC_SavedRegisters_Collect(SavedRegisters* Self, Array* Args, Assembler* Sh);
+
+void SC_SavedRegisters_Restore(SavedRegisters* Self, Array* Args);
+
+void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
+
+
+
+// JB_String_Behaviour
+
+
+// JB_SyntaxObj_Behaviour
+
+
+// JB_TokenHandler_Behaviour
+
+
+// JB_UnixProcess_Behaviour
+
+
+// JB_Validator_Behaviour
+
+
+// JB_list_Behaviour
+
+
+// JB_µForm_Behaviour
+
+
 // JB_Assembler
 ASMReg SC_Pac_AddConst(Assembler* Self, int Add, Message* Exp, ASMReg Base);
 
@@ -6422,8 +6515,6 @@ ASMReg SC_Pac_FloatMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASM
 
 ASMReg SC_Pac_FloatPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
-int SC_Pac_FnLength(Assembler* Self);
-
 bool SC_Pac_FoundReg(Assembler* Self, Message* All, int R);
 
 int SC_Pac_FuncIndex(Assembler* Self);
@@ -6440,7 +6531,7 @@ ASMReg SC_Pac_GrabAddr(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* D, AS
 
 void SC_Pac_GrabbedRegisters(Assembler* Self, Message* AllPrms, FatASM* Start, FatASM* Fn);
 
-void SC_Pac_Guard(Assembler* Self);
+FatASM* SC_Pac_Guard(Assembler* Self);
 
 ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest);
 
@@ -6658,6 +6749,8 @@ FatASM* SC_Pac_Register(Assembler* Self, int I);
 
 FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SortableLocation Map);
 
+void SC_Pac_ResetMemory(Assembler* Self);
+
 void SC_Pac_RevertFAT(Assembler* Self, bool Check, int TrapCount);
 
 void SC_Pac_Rewind(Assembler* Self, FatASM* Start, FatASM* After);
@@ -6776,93 +6869,6 @@ void SC_Pac__DumpRegs(FastString* Fs);
 
 int SC_Pac__Init_();
 
-
-
-// JB_AutoItem_Behaviour
-
-
-// JB_BranchPHITracker
-
-
-// JB_CppRefs_Behaviour
-
-
-// JB_Cpp_Export_Behaviour
-
-
-// JB_DataObject_Behaviour
-
-
-// JB_DictionaryReader_Behaviour
-
-
-// JB_Dictionary_Behaviour
-
-
-// JB_ErrorReceiver_Behaviour
-
-
-// JB_FastString_Behaviour
-
-
-// JB_FixedDict_Behaviour
-
-
-// JB_InputStream_Behaviour
-
-
-// JB_Instruction_Behaviour
-
-
-// JB_MemoryLayer_Behaviour
-
-
-// JB_Memory_Behaviour
-
-
-// JB_SCImport_Behaviour
-
-
-// JB_SCNodeRenamer_Behaviour
-
-
-// JB_SCObject_Behaviour
-
-
-// JB_SCOperator_Behaviour
-
-
-// JB_SCParamArray_Behaviour
-
-
-// JB_SavedRegisters
-void SC_SavedRegisters_Collect(SavedRegisters* Self, Array* Args, Assembler* Sh);
-
-void SC_SavedRegisters_Restore(SavedRegisters* Self, Array* Args);
-
-void SC_SavedRegisters_Rewind(SavedRegisters* Self, Assembler* Sh);
-
-
-
-// JB_String_Behaviour
-
-
-// JB_SyntaxObj_Behaviour
-
-
-// JB_TokenHandler_Behaviour
-
-
-// JB_UnixProcess_Behaviour
-
-
-// JB_Validator_Behaviour
-
-
-// JB_list_Behaviour
-
-
-// JB_µForm_Behaviour
 
 
 // JB_FastStringCpp_Behaviour
@@ -7533,23 +7539,9 @@ Instruction* SC_Instruction__SyntaxAccessWithInt(int Pos);
 
 
 // JB_Memory
-int JB_Mem_ByteCapacity(MWrap* Self);
-
 MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
 
-int JB_Mem_CopyFrom(MWrap* Self, void* Src, int Length);
-
 void JB_Mem_Destructor(MWrap* Self);
-
-void JB_Mem_LengthSet(MWrap* Self, int Value);
-
-byte* JB_Mem_NeedSpare(MWrap* Self, int ReqItems, int Extra);
-
-byte* JB_Mem_Ptr(MWrap* Self);
-
-bool JB_Mem_SetSize(MWrap* Self, int ItemCount);
-
-void JB_Mem_Zero(MWrap* Self);
 
 Array* SC_Mem__CollectLeaks_(JB_Object* Self);
 
@@ -10438,6 +10430,10 @@ void SC_Class_CheckItersAndVirtuals(SCClass* Self);
 void SC_Class_CheckUnusedClass(SCClass* Self, Message* Feedback);
 
 void SC_Class_ClassCollect(SCClass* Self);
+
+void SC_Class_ClsSizeSet(SCClass* Self, int Value);
+
+int SC_Class_ClsSize(SCClass* Self);
 
 void SC_Class_CollectBehaviours(SCClass* Self, FastString* J, SCBehaviour* B);
 
