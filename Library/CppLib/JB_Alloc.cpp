@@ -751,7 +751,7 @@ static JB_MemoryWorld* PointerCompressionAlloc () {
 }
 
 
-byte* JB_Mem__PermAlloc (int64 Amount, int64 Align) {
+static byte* PermAllocSub (int64 Amount, int64 Align) {
 	JB_MemoryWorld* W = UltraManager;
 	auto H = W->HeadBlock;
 	if (!H)									// finished! oof
@@ -775,6 +775,12 @@ byte* JB_Mem__PermAlloc (int64 Amount, int64 Align) {
 		W->HeadBlock = 0;					// entirely used up!
 	
 	return (byte*)End;
+}
+
+byte* JB_Mem__PermAlloc (int64 Amount, int64 Align) {
+	if (auto rz = PermAllocSub(Amount, Align); rz)
+		return rz;
+	return (byte*)JB_OutOfUserMemory(Amount);
 }
 
 

@@ -2,7 +2,7 @@
 
 extend SCFunction
 	function FatFirst (|&fatasm|)
-		return Assembler.TotalStart + .µstart
+		return Assembler.sh.TotalStart + .µstart
 	
 	
 	function ASMBake (|!&ASM| Where,  |!&asm| After,  |?&uint| Positions,  |!&asm|)

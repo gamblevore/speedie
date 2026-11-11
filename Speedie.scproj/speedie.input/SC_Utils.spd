@@ -51,7 +51,7 @@ function Message.ListAll (|[Message]|)
 
 
 helper @memory.CollectLeaks_ (|object| self, |[]|)
-	JB_FindLeakedObject(self, rz)
+	leaktester.findleak(self, rz)
 
 
 function @memory.PrintLeaks (|object| self)

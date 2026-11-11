@@ -156,7 +156,7 @@ datatype ASMReg (uint64)
 		|| f = .fatindex.fat
 			return f
 		error "anorexic register"
-		return Assembler.TotalStart
+		return Assembler.sh.TotalStart
 	
 	operator isa (|datatypecode| M, |bool|)
 		return .µtype == M

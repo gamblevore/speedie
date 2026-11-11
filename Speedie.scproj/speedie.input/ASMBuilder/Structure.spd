@@ -368,6 +368,8 @@ extend assembler
 
 		target debug
 			if .Register(reg) != alterer						// huh?
+				debugger
+				.Register(reg)
 		
 		(NopDest isnt AllowNopDest)
 		return NopDest
