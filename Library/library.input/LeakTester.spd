@@ -26,10 +26,17 @@ struct LeakTester
 			rz.Name = name
 			app.LeakMarkMemory
 
+		function FindLeak (|object| Obj, |array| dest)
+			cpp_wrapper JB_FindLeakedObject
+		
+		function Count
+			cpp_wrapper JB_Mem__ClassLeakCounter
+
+
 	
 libinternal object.FindReferences
 	|| r = []
-	JB_FindLeakedObject(self, r)
+	leaktester.FindLeak(self, r)
 	printline r
 	debugger
 
@@ -43,5 +50,3 @@ libinternal object.RefCountMark (|int|)
 	return S[] & 1
 
 
-cpp_func JB_FindLeakedObject		(|object| Obj,	|array| dest)
-cpp_func JB_Mem__ClassLeakCounter	()

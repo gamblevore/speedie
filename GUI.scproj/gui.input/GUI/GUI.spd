@@ -1080,7 +1080,7 @@ module GUI
 				.FullScreen = -1
 				return true
 			if (key is l) and keys.shift
-				JB_Mem_ClassLeakCounter()
+				LeakTester.Count
 			if (key is squote)
 				return w.DoListViewNext(true)
 			if (key is semicolon)
