@@ -3,7 +3,9 @@
 module beep
 	syntax expect (|string?| s=nil)
 		inlined
-		app.beep(s)
+		app.beep
+		if (s!=nil)
+			Notifications <~ s
 	visible false
 	|date| _OK
 

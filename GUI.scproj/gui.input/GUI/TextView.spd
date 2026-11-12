@@ -1137,25 +1137,34 @@ class TextView (GUIControl)
 			.LineAttention(1.0s, gui.framestart, D)
 
 
-	task LineAttention (taskgui, |TextViewLine| D)
+	task LineAttention (taskgui, |object| D)
 		constructor
 			libinternal
 			is Animation
 		
 		run
+			opt norefcounts
 			libinternal
-			require .d in .upon.WrappedLines
+			|| y = 0.0
+			|| d = .d
+			|| color = (1.0, 1.0, 2.0, 1.0)
 			|| LH = .upon.lineheight|float|
-			|| Y = .upon.Y(.d)|float| + LH*0.75
+			if d isa textviewline
+				require d in .upon.WrappedLines
+				Y = .upon.Y(d)|float| + LH*0.75
+				|| err = d.LineError
+					color = (err.Textcolor-0.1)*2.0
+//			  elseif d isa message
+//				require d in .upon.WrappedLines
+//				Y = .upon.Y(d)|float| + LH*0.75
+				
+				
 			|| H = .upon.lastrect.x1x2.vec2
 			|| HM = (H.x+H.x2)/2.0
 			|| WH = 1.0/h.width
 			|| S = .StartTime
 			|| ago = s.ago.float
 			|| mush = S|int|
-			|| color = (1.0, 1.0, 2.0, 1.0)
-			|| err = .d.LineError
-				color = (err.Textcolor-0.1)*2.0
 			
 			while h.x < h.x2
 				|| Rect = (h.x, Y, h.x, Y) ± -5.0
@@ -1369,10 +1378,10 @@ class TextView (GUIControl)
 		.Selection = (0, .text.length)
 			
 
-	libinternal init
+	libinternal Init
 		.gnormal.edge  = (0.5, 0.5, 0.5, 1.0).px
 		.gnormal.Bg    = (0, 0, 0, 0.5).px
-		.clear("")
+		.clearText
 	
 	
 	libinternal SelMsgValid (|ivec2| sel, |bool|)
@@ -1681,7 +1690,7 @@ class TextView (GUIControl)
 	autogen TextViewSet (|object| value)
 		opt norefcounts
 		isnt modified
-		if .Clear(value)
+		if .ClearText(value)
 			|| u = ._viewing
 				u.cleardoc
 				u.text = .text
@@ -2022,7 +2031,7 @@ class TextView (GUIControl)
 		disabled
 	
 	
-	libinternal Clear (|object| NewText, |bool|)
+	libinternal ClearText (|object| NewText=nil, |bool|)
 		rz = super.textset(NewText)
 		require rz or !.WrappedLines.hasany
 
@@ -2157,7 +2166,7 @@ class TextView (GUIControl)
 		d.TextFlags = 0
 		d.LineNumber = 0
 		d.vline = 0
-		d._Text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
+		d.text = "(--Trimmed: ${._LogTrimmed.strsize}--)\n"
 		return .NextVline(d, 0)
 
 
@@ -2303,7 +2312,7 @@ class TextView (GUIControl)
 		|| T = u.typingplace		// same
 			
 		if !u.Load(false)
-			.clear("")
+			.clearText
 			return false
 
 		.document = u

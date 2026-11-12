@@ -586,7 +586,8 @@ class GUIControl (list)
 	autogen TextSet (assigns:|object| text, |bool|)
 		cpp_part TextSetter
 		opt norefcounts
-
+		if text == nil
+			text = ""
 		if text isa string
 			if (text == .text)
 				return false

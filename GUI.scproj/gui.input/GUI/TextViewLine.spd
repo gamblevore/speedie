@@ -21,45 +21,54 @@ datatype TextLineFlags (uint16)
 		
 
 
-class TextViewLine (list)
+class TextViewLine (message)
+// Now that this is a message, we can put effects on it like listviewrow!
 	linkage
 		cpp_part Line
 	contains TextViewLine
 
-	|string|				_Text		// should be removed. And the getter go through the parent!
-	|message?|				Message
 	|Error?|				LineError
 	|float|					UserInfo
 	|int|					vline
 	|int|					LineNumber
-	|TextLineFlags|			TextFlags
 	|int|					CompilePos	// Position at compile time
 
 	constructor (|int| p = 0)
-		inlined
+		super.constructor(nil, @back)
 		.position = p
 		.CompilePos = -1
 	
+	function Message (|message|)
+		return .obj as Message
+	
+	function TextFlags (|textlineflags|)
+		return .tag
+	
+	function TextFlags (assigns:|textlineflags|)
+		.tag = value
+	
+	inline Message (assigns:|message|)
+		.obj = value
+	
+	function Name (|string|)
+		disabled "Use .text"
+	setter Name (|string|)
+		disabled "Use .text"
+		
 	inline Text (|string|)
-		// its quite a large effort to remove ._text property
-		// splitting has to be done differently, I need to store the length directly also.
-		// drawing differently... everything differently.
-		// I'd need to disable logtrimming and... never create line shortening
-		// opt norefcounts is the biggest problem, as we'd be creating temporaries
-		// temps are unavoidable in some places, like .render, so I'd need to delete .render
-		
-		// A lot of things rely on ._text to get the length, so that needs storing.
-		
-		// i'll do it some other day (never). it only makes things faster and take less memory
-		
-		// I feel like i'm letting myself down... but im not right?
-		// Right now, we have the simpler design. We are already faster and take less memory.
-		// why not reserve some spare powers?
-		
-		return ._text
+		// i was planning on removing .Name and feeding off our info instead
+		// using our position and the next one's position.
+		// but now its based on message... not so sure?
+		// a crazy amount of work and only for super-giant files.
+		// Speedie needs more focus. Not "just do everything".
+		return super.Name
+
+	inline Text (assigns:|string|)
+		super.Name = value
 	
 	inline Length (|int|)
-		return ._text.Length
+		opt norefcounts
+		return .text.Length
 	
 	render
 		opt norefcounts
@@ -152,7 +161,7 @@ class TextViewLine (list)
 
 		require !parsedok
 
-		|| r = ._text.Parse
+		|| r = .Text.Parse
 			is ColoriseUsingPosition
 			r.TVAddPos(.position)
 			.ColoriseSub(r)
@@ -247,7 +256,7 @@ class TextViewLine (list)
 			|| par = curr.parent						// special coloring
 			if par and par.contains(ToFind, true)
 				|| pt = par.type
-				if (pt == @type)  
+				if (pt == @type)
 					if (par.After > ToFind)
 						return par
 				
@@ -313,15 +322,15 @@ class TextViewLine (list)
 		.Position = p
 
 		if .vline > 1000K
-			._Text = txt[p, int.max]
+			.text = txt[p, int.max]
 			(self is EndsNormally) = txt.Last.IsTextLine
 
 		  elseif p >= txt.length									// edge case.
 			isnt EndsNormally
-			._Text = ""
+			.text = ""
 		  else
 			|| i = txt.WrapSub(MaxWidth, IsInline, p)
-			._Text = txt[p, i]
+			.text = txt[p, i]
 			(self is EndsNormally) = txt[i-1].IsTextLine
 			if (i < txt.length) or (self is endsnormally)
 				return i
@@ -365,8 +374,6 @@ libinternal textview.DrawErrorBackground (|image| Where, |int| y, |TextViewLine|
 	if e == .myerror
 		v.a *= 0.75
 
-//	if d.CompileContains(.sel1)
-//		.myerror = e
 	if e is parse
 		|| Alpa = (e.when.guiago.float - 1.0) * lm
 		if (Alpa <= lm)

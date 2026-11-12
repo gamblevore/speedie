@@ -427,7 +427,7 @@ extend TextView
 		self|guicontrol|.text = text // does nothing if already done
 
 		if !text
-			.Clear(text)		
+			.ClearText(text)		
 		  elseif reason isnt Initialset
 			|| ty = d.typingplace
 			.TrySelect(ty, true, nil)

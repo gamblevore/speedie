@@ -366,10 +366,15 @@ class Button (GUIControl)
 
 			
 	function SearchMenu (|listviewrow| row=nil, |bool|)
-		|| sub = .OpenMenu(row)
-			sub.IsSearchMenu = true
-			// SlideMenuOpen(self, gui.FrameStart, 0.5s)
-			return sub.TypedString("")
+		opt norefcounts
+		|| sub = .SubMenu$
+		sub.IsSearchMenu = true
+		sub.NeedFilter.cleartext
+		sub.TypedString("")
+		expect (sub.ListSource.HasAny) (beep)					// Nothing to search.
+		.OpenMenu(row)
+		// SlideMenuOpen(self, gui.FrameStart, 0.5s)
+		return true
 
 
 	function MenuIsOpen (|bool|)
@@ -377,7 +382,7 @@ class Button (GUIControl)
 		return  .SubControl isa menu  and  .subcontrol is visible
 
 
-	function ListSource (|ListViewRow|)
+	inline ListSource (|ListViewRow|)
 		opt norefcounts
 		|| m = .SubMenu
 			return m.ListSource
