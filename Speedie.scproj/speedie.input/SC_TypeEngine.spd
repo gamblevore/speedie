@@ -1345,7 +1345,10 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |int|)
 	opt norefcounts
 	ifn exp in @arg
-		return LC.CanCompare(RC, (self Is EqualOrNot)|bool|)
+		|| Result = LC.CanCompare(RC, (self Is EqualOrNot)|bool|)
+			return Result
+		if self is caseaware // this is bad.
+			return 1
 
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |int| DoCompare, |scdecl|)
@@ -1546,7 +1549,7 @@ function TypeOfRel (ExprResolver)
 	if Custom == CustomOps.needed
 		if (comp isnt CompOrSet)
 			return CustomFuncOp( exp, comp, name_space, RN )
-		if RC != TypeNil
+		if (comp is caseaware) or (RC != TypeNil)
 			|| compare = comp.CanOpCompare(lc, rc, exp)
 				return DoOpCompare(exp, lc, rc, comp, name_space, compare-1)
 	  elseif (comp is Bit)

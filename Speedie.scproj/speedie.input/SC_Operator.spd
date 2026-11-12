@@ -472,6 +472,12 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 				return CustomOps.OnlyLeftIsVector
 			  else
 				return CustomOps.OnlyRightIsVector
+
+		// what about pointers?
+		// this code can't be right but it did not take pointers into account ever?
+		// do we want custom ops on struct pointers? Not for basic math, right? like x-y, right?
+		if lc.pointercount and rc.pointercount
+			return 0
 		return CustomOps.Needed				// num + obj
 	
 	
@@ -502,7 +508,7 @@ function UseCustomOperators (|SCDecl| LC, |SCDecl| RC, |SCOperator| Comp, |messa
 
 	if (!SCNode.ConstantsLoadingOverride and LC.Type is TreatAsBaseType)
 		return CustomOps.Needed ||| extra
-	if (LN > 1) and (comp is CompOrSet)									// can't compare vectors directly in C++
+	if (LN > 1) and (comp is Compare)									// can't compare vectors directly in C++
 		return CustomOps.Needed ||| extra
 
 	if !extra
