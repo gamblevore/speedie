@@ -712,9 +712,9 @@ function FindNilChecker
 function OverrideSyntax
 	require stderr.OK
 	.FindNilChecker
-	.TheCompareFunc = .FindSpecialFunc( "SyntaxCompare", true )
-	(self is HasEqualsFunc) = .FindSpecialFunc( "SyntaxEquals", true ) != nil
-	(.TheIsFunc) = .FindSpecialFunc( "SyntaxIs", true )
+	.TheCompareFunc = .FindSpecialFunc( "syntaxcompare", true )
+	(self is HasEqualsFunc) = .FindSpecialFunc( "syntaxequals", true ) != nil
+	(.TheIsFunc) = .FindSpecialFunc( "syntaxis", true )
 
 
 function HasObjectProperties (|bool|)

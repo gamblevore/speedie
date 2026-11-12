@@ -1306,7 +1306,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 	while rn.hasany
 		opch <~ rn.first
-	rn  <~ (@thg, LookupType.name) 
+	rn  <~ (@thg, LookupType.name)
 	rn  <~ opch
 	exp.msg(@prm) <~ rn
 	
@@ -1324,7 +1324,7 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 			  else
 				exp = negate
 		  else
-			if ! negate 
+			if ! negate
 				|| NOT = @brel + "!"
 				side.next = not
 				not <~ side
@@ -1342,13 +1342,12 @@ function message.NiceIsFlagSyntax (|message| opch,  |message| RN,  |SCNode| name
 
 
 
-function scoperator.CanOpCompare (|scdecl| lc,  |scdecl| rc,  |message| exp,  |int|)
+function scoperator.CanOpCompare (|scdecl| LC,  |scdecl| RC,  |message| Exp,  |int|)
 	opt norefcounts
 	ifn exp in @arg
 		|| Result = LC.CanCompare(RC, (self Is EqualOrNot)|bool|)
 			return Result
-		if self is caseaware // this is bad.
-			return 1
+		return self is caseaware										// this is bad.
 
 
 function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| comp,  |SCNode| name_space, |int| DoCompare, |scdecl|)
@@ -1364,14 +1363,14 @@ function DoOpCompare (|message| exp,  |scdecl| lc,  |scdecl| rc,  |scoperator| c
 	
 	if !DoCompare
 		exp.Last.Remove
-		dot.name = "SyntaxEquals"
+		dot.name = "syntaxequals"
 		if (comp.CompOp == "!=")
 			exp.become( @BRel, "!" )
 			exp <~ dot
 		  else
 			exp.become(@bra)				// don't break the AST...
 	  else
-		dot.name = "SyntaxCompare"
+		dot.name = "syntaxcompare"
 		|| opmsg = exp.last!
 		opmsg.name = comp.compOp
 		opmsg.obj = nil						// sigh
