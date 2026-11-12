@@ -1035,8 +1035,6 @@ ive been~running #since morning
 				output = output.parent!
 		
 		output <~ curr
-		if chin & 3				// ifElseStyle
-			return curr
 		return output
 
 

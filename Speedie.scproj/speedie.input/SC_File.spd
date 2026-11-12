@@ -110,16 +110,16 @@ class SCFile (file)
 			
 			|| oldimp = scimport.CurrIsManuallyImported
 			scimport.CurrIsManuallyImported = .proj.depth
-			parser.Using.Tag = .FileNum << 5	// kinda useless, we sort the things later.
-												// so remove?
+			parser.Using.Tag = 0 // created later, after sort
+
 			if !orig
-				rz = .fData.ParseClean			// should parseclean not set tags?
+				rz = .fData.ParseClean
 			  else
 				rz = .fdata.parse
 			scimport.CurrIsManuallyImported = oldimp
 			.DetectInsecureWords
 			
-			parser.using.tag = 0				// remove too
+			parser.using.tag = 0
 			parser._DotInsertallow = false
 			StdErr.source = ""
 		(Message).restore

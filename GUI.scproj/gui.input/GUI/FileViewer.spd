@@ -313,11 +313,14 @@ class FileViewer (ListView)
 				rz = 1 // sigh
 
 	
-	function FindAPath (|string| path,  |filerow| within=nil, |bool| Copy=false, |filerow|)
-		return .FindPaths(path, within, copy)[0]
+	function FindAPath (|string| path,  |filerow--| within=nil, |bool| Copy=false, |filerow|)
+		if !within
+			within = .ListSource as filerow
+		if within
+			return .FindPaths(path, within, copy)[0]
 
 
-	function FindPaths (|string| path,  |listviewrow| within=nil, |bool| Copy=false, |[filerow]|)
+	function FindPaths (|string| path,  |listviewrow!| within, |bool| Copy=false, |[filerow]|)
 		require path
 		|| NameOnly = path[0, "./"]
 			path = path[2...]
@@ -527,7 +530,7 @@ class FileViewer (ListView)
 			if f.MustExist
 				|| x = .extra
 				if !x
-					x = filerow("", "(Extra)", ".")
+					x = filerow(string.error, "(Extra)", ".")
 					.extra = x
 					self <~ x
 				

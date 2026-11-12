@@ -54,6 +54,7 @@ function FuncSrc (|Message|)
 
 
 function CollectSub (|Message| c, |SCNode|)
+	opt norefcounts
 	|| T = ClsCollectTable
 	if self == compiler.program  or  self isa scmodule
 		T = RootCollectTable
@@ -135,7 +136,6 @@ function FindModuleParent (|SCNodeFindMode| Mode, |SCnode|)
 
 function FindModule (|String| name, |Message| where=nil, |SCNodeFindMode| Mode=0, |SCModule|)
 	opt norefcounts
-
 	|| Upon = self
 	while upon
 		if name ~= upon.name
