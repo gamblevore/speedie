@@ -503,7 +503,7 @@ function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| x
 	
 	j.Enter(@arg)
 	// this isn't quite working right.
-/	xp = .IsExpanded(xp)
+	xp = .IsExpanded(xp)
 	rz = true
 	if xp
 		if !type.IsObject or (.weird isnt pointer)
