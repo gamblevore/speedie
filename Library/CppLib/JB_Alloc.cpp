@@ -747,7 +747,7 @@ void JB_UM_Free (JB_UltraMap* self) {
 }
 
 
-static JB_MemoryWorld* PointerCompressionAlloc () {
+static JB_MemoryWorld* MMapAlloc () {
 	auto Got = (JB_MemoryWorld*)JB_UM_Alloc(kUltraAlloc);
 	if (!((uint64)Got&(kUltraAlloc-1)))
 		return Got;
@@ -797,7 +797,9 @@ JB_MemoryWorld* JB_LibInit () {
 	auto Mem = UltraManager;
 	if (Mem)
 		return Mem;
-	Mem = PointerCompressionAlloc();
+	void MMapTest();
+	MMapTest();
+	Mem = MMapAlloc();
 	if (Mem) {
 		Mem->RefCount = 1;
 		UltraManager = Mem;

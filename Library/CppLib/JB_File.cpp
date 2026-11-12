@@ -275,6 +275,45 @@ bool RetryMakePath (JB_String* s) {
 }
 
 
+// this could be useful for Pico. :] It can make it into a ringbuffer, for faster read/writes
+// however, its also slower to allocate. Look at all the work needed to create one!
+// rather than just mallocing.
+bool MMapTestSub (int fd, const char* name) {
+// this name needs randomisation
+/*
+	shm_unlink(name);
+	int Size = 1024*1024;
+	if (ftruncate(fd, Size) < 0)
+		return 0;
+		
+    byte* Buff = (byte*)mmap(NULL, 2 * Size, PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    if (Buff == MAP_FAILED)
+		return 0;
+
+    mmap(Buff, 			Size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0);
+    mmap(Buff + Size,	Size, PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FIXED, fd, 0);
+    
+    for (int i = 0; i < 100; i++) {
+		Buff[i+Size] = 'A' + i;
+    }
+*/
+    return true;
+}
+
+
+void MMapTest () {
+/*
+	const char* name = "picotest";
+	int fd = shm_open(name, O_RDWR|O_CREAT|O_EXCL);
+	if (fd < 0) return;
+	if (MMapTestSub(fd, name)) {
+		close(fd);
+	}
+*/
+}
+
+
+
 int StrOpen_ (JB_String* Path, int Flags, bool AllowMissing, u8* Buff=nil) {
 	if (!JB_Str_Length(Path)) {
 		errno = ENOENT;
@@ -1036,28 +1075,13 @@ void JB_File_Destructor (JB_File* self) {
 	JB_Str_Destructor(self);
 }
 
-
-void JB_File_StopSHM (JB_File* self) {
-	#ifndef AS_LIBRARY
-	if (self->_FileFlags & 1) { // 1 == server!
-//		printf("unlinking %s\n", self->Addr);
-		shm_unlink((const char*)(self->Addr));
-		self->_FileFlags &= ~1;
-	}
-	#endif
-}
-
-void JB_File_CloseSub ( JB_File* self ) {
+void JB_File_Close ( JB_File* self ) {
 	int R = self->Descriptor;
 	self->Descriptor  = -1;
 	self->_OpenMode = 0;
+	self->_FileFlags = 0;
     if (R >= 0)
 		ErrorHandle_(close( R ), self, nil, "closing");
-}
-
-void JB_File_Close ( JB_File* self ) {
-	JB_File_StopSHM(self);
-	JB_File_CloseSub(self);
 }
 
 int JB_File_Mode ( JB_String* self ) {
