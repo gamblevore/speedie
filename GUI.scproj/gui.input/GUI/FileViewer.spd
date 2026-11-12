@@ -520,20 +520,21 @@ class FileViewer (ListView)
 			.editme.ShowAndSelect(Pos, true)
 
 
-	function AddExtra (|string| path, |filerow|)
-		require path[0] == '/' or '~'
-		|| f = path.file
-		require f.MustExist
-		|| x = .extra
-		if !x
-			x = filerow("", "(Extra)", ".")
-			.extra = x
-			self <~ x
-		
-		|| C = 3000
-		rz = .AddRootSub(path.file, false, C) 
-		x <~ rz
-		.Select(rz)
+	function AddExtra (|string| Path, |filerow|)
+		|| p0 = path[]
+		if p0 == '/' or '~'
+			|| f = path.file
+			if f.MustExist
+				|| x = .extra
+				if !x
+					x = filerow("", "(Extra)", ".")
+					.extra = x
+					self <~ x
+				
+				|| C = 3000
+				rz = .AddRootSub(path.file, false, C) 
+				x <~ rz
+				.Select(rz)
 
 
 	function FindSearchWithin (|filerow|)

@@ -217,27 +217,28 @@ class FileRow (ListViewRow)
 			d.SimpleUpdateFromDisk // :]
 			return d.text
 		
-		|| f = .readfrom.file
 		|| Data = ""
-		if f.isdir or !f.Exists
-			//
-		  elseif Binary
-			Data = f.ReadAll
-		  else
-			// how do we know a file is binary? just... by checking it... really.
-			|| x = f.open(file.readmode)
-				|| fsize = f.size
-				|| ToRead = 4K
-				if fsize <= 32K
-					ToRead = fsize
-				Data = f.Read(ToRead)
-				|| badness = Data.UTF8Badness
-				if badness.y > 0
-					ifn  badness.x >= 4093  and  fsize > 4096 // heuristic, in case we cut a char in half.
-						data = ""
-						fsize = ToRead
-				if fsize != ToRead
-					Data = f.readall
+		|| path = .ReadFrom
+			|| f = path.file
+			if f.isdir or !f.Exists
+				//
+			  elseif Binary
+				Data = f.ReadAll
+			  else
+				// how do we know a file is binary? just... by checking it... really.
+				|| x = f.open(file.readmode)
+					|| fsize = f.size
+					|| ToRead = 4K
+					if fsize <= 32K
+						ToRead = fsize
+					Data = f.Read(ToRead)
+					|| badness = Data.UTF8Badness
+					if badness.y > 0
+						ifn  badness.x >= 4093  and  fsize > 4096 // heuristic, in case we cut a char in half.
+							data = ""
+							fsize = ToRead
+					if fsize != ToRead
+						Data = f.readall
 				
 		return Data
 

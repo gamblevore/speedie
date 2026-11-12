@@ -2,25 +2,24 @@
 
 							/// Get perry ASMing ///
 
-* chained obj destructor bug in branch_test.spd
 * break On || ShowMe = doaction_Duck flips out /usr/local/speedie/Examples/speedie_syntax.spd
 * expansion in cake not working quite right
+* chained obj destructor bug in branch_test.spd
 
 * Unused const (1) in setter Size
 	* vec>>4 bad asm
 	* OverSizedCmm not using psub
 * asmreg.zero fails to const
 
-* Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
 * We want single run flow-log system. Runs both, compares output
 	* Get speedie flowlogged the same way!
-
-* Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
 
 * Need to select top on enter stack
 * Funcs sometimes close when opening another?
 * New created vars get a "glitter" like the textview
 	* Altered also, but a different color
+
+* Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
 
 
 								// ASM later
@@ -32,9 +31,9 @@
 
 
 				// Someone paying for productive work wants these done after //
-				
-* GameExamples/tetris.spd does not load in cmd-d. why not assume like... speedie?
-	* running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
+
+* running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
+* Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
 * too aggressive with error keeping
 * Undo still thinks its changed when its not, and we undid ALL changes!
 * CalledFrom datatypes/properties too
