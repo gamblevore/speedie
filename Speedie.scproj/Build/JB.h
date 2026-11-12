@@ -7704,7 +7704,7 @@ bool SC_SCObject__StatelessFn(SCFunction* Self, Message* Msg);
 
 
 // JB_SCOperator
-int SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp);
+int SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* LC, SCDecl* RC, Message* Exp);
 
 SCOperator* SC_Opp_Constructor(SCOperator* Self, JB_String* Name, fn_OpASM ASM, OpMode Mode);
 

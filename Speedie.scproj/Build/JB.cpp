@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2396];
+extern JB_StringC* JB_LUB[2393];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -9604,7 +9604,7 @@ JB_File* SC_Crkt__StringFile() {
 		return JB_File_SyntaxAccess(F, JB_LUB[412]);
 	}
 	 else {
-		return JB_File_SyntaxAccess(F, JB_LUB[2395]);
+		return JB_File_SyntaxAccess(F, JB_LUB[1284]);
 	}
 }
 
@@ -10697,7 +10697,7 @@ bool SC_Ext__TransCompileWrap(Array* Cpps) {
 	bool Rz = false;
 	Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[1666], nil);
 	if (Rz) {
-		Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[2394], nil);
+		Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[1283], nil);
 	}
 	if (Rz) {
 		Rz = SC_Ext__TransCompile(Cpps, JB_LUB[172], JB_LUB[2126], nil);
@@ -12223,7 +12223,7 @@ SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, S
 	(JB_List_FirstSet(Exp, Dot));
 	if (!DoCompare) {
 		JB_Tree_Remove(((Message*)JB_List_Last(Exp)));
-		JB_SetRef(Dot->Name, JB_LUB[1283]);
+		JB_SetRef(Dot->Name, JB_LUB[2198]);
 		if ((JB_Str_Equals(Comp->CompOp, JB_LUB[244], false))) {
 			JB_Msg_BecomeStr(Exp, kJB_SyxBRel, JB_LUB[243]);
 			JB_Tree_SyntaxAppend(Exp, Dot);
@@ -12233,7 +12233,7 @@ SCDecl* SC_DoOpCompare(Message* Exp, SCDecl* Lc, SCDecl* Rc, SCOperator* Comp, S
 		}
 	}
 	 else {
-		JB_SetRef(Dot->Name, JB_LUB[1281]);
+		JB_SetRef(Dot->Name, JB_LUB[2197]);
 		Message* Opmsg = ((Message*)JB_List_Last(Exp));
 		JB_SetRef(Opmsg->Name, Comp->CompOp);
 		JB_SetRef(Opmsg->Obj, nil);
@@ -14629,7 +14629,7 @@ SCObject* SC_TypeOfRel(Message* Exp, SCNode* Name_space, Message* Side) {
 			JB_SafeDecr(_tmPf5);
 			return _tmPf5;
 		}
-		if (RC != SC_TypeNil) {
+		if ((SC_Opp_SyntaxIs(Comp, kSC__OpMode_CaseAware)) or (RC != SC_TypeNil)) {
 			int Compare = SC_Opp_CanOpCompare(Comp, LC, RC, Exp);
 			if (Compare) {
 				JB_EarlyDecr(Side);
@@ -15191,6 +15191,9 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 				return kSC__CustomOps_OnlyRightIsVector;
 			}
 		}
+		if (LC->PointerCount and RC->PointerCount) {
+			return 0;
+		}
 		return kSC__CustomOps_Needed;
 	}
 	int Extra = 0;
@@ -15237,7 +15240,7 @@ int SC_UseCustomOperators(SCDecl* LC, SCDecl* RC, SCOperator* Comp, Message* Msg
 	if ((!SC__Base_ConstantsLoadingOverride) and SC_Class_SyntaxIs(LC->Type, kSC__ClassInfo_TreatAsBaseType)) {
 		return kSC__CustomOps_Needed | Extra;
 	}
-	if ((LN > 1) and (SC_Opp_SyntaxIs(Comp, kSC__OpMode_CompOrSet))) {
+	if ((LN > 1) and (SC_Opp_SyntaxIs(Comp, kSC__OpMode_Compare))) {
 		return kSC__CustomOps_Needed | Extra;
 	}
 	if (!Extra) {
@@ -31034,10 +31037,10 @@ void SC_Instruction__InstructionInit() {
 	SC_Instruction__Add(JB_LUB[1894], JB_LUB[972], 73);
 	SC_Instruction__Add(JB_LUB[1896], JB_LUB[971], 74);
 	SC_Instruction__Add(JB_LUB[1896], JB_LUB[974], 75);
-	SC_Instruction__Add(JB_LUB[2393], JB_LUB[969], 76);
-	SC_Instruction__Add(JB_LUB[2393], JB_LUB[968], 77);
-	SC_Instruction__Add(JB_LUB[2393], JB_LUB[967], 78);
-	SC_Instruction__Add(JB_LUB[2393], JB_LUB[970], 79);
+	SC_Instruction__Add(JB_LUB[1281], JB_LUB[969], 76);
+	SC_Instruction__Add(JB_LUB[1281], JB_LUB[968], 77);
+	SC_Instruction__Add(JB_LUB[1281], JB_LUB[967], 78);
+	SC_Instruction__Add(JB_LUB[1281], JB_LUB[970], 79);
 	SC_Instruction__Add(JB_LUB[1608], JB_LUB[919], 80);
 	SC_Instruction__Add(JB_LUB[1608], JB_LUB[915], 81);
 	SC_Instruction__Add(JB_LUB[1932], JB_LUB[988], 82);
@@ -32456,9 +32459,13 @@ bool SC_SCObject__StatelessFn(SCFunction* Self, Message* Msg) {
 }
 
 
-int SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* Lc, SCDecl* Rc, Message* Exp) {
+int SC_Opp_CanOpCompare(SCOperator* Self, SCDecl* LC, SCDecl* RC, Message* Exp) {
 	if (!JB_Msg_OperatorIn(Exp, kJB_SyxArg)) {
-		return SC_Decl_CanCompare(Lc, Rc, ((bool)(SC_Opp_SyntaxIs(Self, kSC__OpMode_EqualOrNot))));
+		int Result = SC_Decl_CanCompare(LC, RC, ((bool)(SC_Opp_SyntaxIs(Self, kSC__OpMode_EqualOrNot))));
+		if (Result) {
+			return Result;
+		}
+		return SC_Opp_SyntaxIs(Self, kSC__OpMode_CaseAware);
 	}
 	return 0;
 }
@@ -33580,7 +33587,7 @@ bool JB_Str_IsBinary(JB_String* Self, float F) {
 }
 
 bool SC_Str_isCLike(JB_String* Self) {
-	if ((JB_Str_Equals(Self, JB_LUB[1666], true)) or ((JB_Str_Equals(Self, JB_LUB[2394], true)) or (JB_Str_Equals(Self, JB_LUB[2126], true)))) {
+	if ((JB_Str_Equals(Self, JB_LUB[1666], true)) or ((JB_Str_Equals(Self, JB_LUB[1283], true)) or (JB_Str_Equals(Self, JB_LUB[2126], true)))) {
 		return true;
 	}
 	if (JB_Platform__OSX()) {
@@ -53798,9 +53805,9 @@ void SC_Class_OverrideSyntax(SCClass* Self) {
 		return;
 	}
 	SC_Class_FindNilChecker(Self);
-	JB_SetRef(Self->TheCompareFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[1281], true));
-	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasEqualsFunc, JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[1283], true)) != nil)));
-	JB_SetRef(Self->TheIsFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[1284], true));
+	JB_SetRef(Self->TheCompareFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[2197], true));
+	((SC_Class_SyntaxIsSet(Self, kSC__ClassInfo_HasEqualsFunc, JB_FreeIfDead(SC_Class_FindSpecialFunc(Self, JB_LUB[2198], true)) != nil)));
+	JB_SetRef(Self->TheIsFunc, SC_Class_FindSpecialFunc(Self, JB_LUB[2199], true));
 }
 
 int SC_Class_PassableCount(SCClass* Self) {
@@ -61401,4 +61408,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 8337744888486677542 7221401107309682891
+// -522638895843392542 -1492264401510773541
