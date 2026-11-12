@@ -20,14 +20,6 @@ Design:
 #include <unistd.h>
 
 
-#if __linux__
-	#define JB_AlignedAlloc(R, A)	aligned_alloc(A, R) 
-#else 
-	#define JB_AlignedAlloc(R, A)	malloc_zone_memalign(malloc_default_zone(), A, R)
-#endif
-
-
-
 extern "C" {
 byte			CakeCrashCode;
 CakeVM*			JB_GlobalVM;
@@ -285,15 +277,13 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	if (Flags&kJB_VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
 	
-	// this can use the JB_Lib main memory! Just bump up the supers a little! nice
 	Flags |= PROT_READ | PROT_WRITE;
-	auto V = (CakeVM*)JB_AlignedAlloc(AllocSize, Page);
+	auto V = (CakeVM*)JB_Mem__PermAlloc(AllocSize, Page);
 	if (!V) {
 		JB_ErrorHandleFileC(nil, errno, "Allocating CakeVM");
 		return 0;
 	}
 	
-	JB_memzero(V, AllocSize);
 	auto HighBit = 1ull << 63ull;
 	V = (CakeVM*)(((int64)V)&~HighBit);
 	if (Flags&kJB_VM_AskDebug)
