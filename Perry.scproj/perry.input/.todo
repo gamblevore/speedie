@@ -12,7 +12,6 @@
 * We want single run flow-log system. Runs both, compares output
 	* Get speedie flowlogged the same way!
 
-* Need to select top on enter stack
 * Funcs sometimes close when opening another?
 * New created vars get a "glitter" like the textview
 	* Altered also, but a different color
