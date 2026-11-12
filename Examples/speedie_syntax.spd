@@ -22,6 +22,7 @@ main
 	|| z = list[0]
 
 /	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
+	(Objs)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
 	app.TestSyntax
 
