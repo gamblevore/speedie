@@ -649,23 +649,19 @@ class PerryIDE (Window)
 		return true
 
 
-	function ShowQuickStuff (|bool| FuncMenu, |bool|)
-		if FuncMenu
-			if (.FunctionMenu.MenuIsOpen)
-				FuncMenu = false
-		  else
-			if (.filelist.QuickOpen is visible)
-				FuncMenu = true
-		if FuncMenu
-			.FileList.quickopen isnt visible
-			return .FunctionMenu.SearchMenu
-			
-		  else
-			|| sub = .FunctionMenu.SubMenu
-				sub.CloseMenu
-			if .FileList.ShowQuickOpen
-				return true
-			return .FunctionMenu.SearchMenu
+	function ShowQuickFuncs (|bool|)
+		opt norefcounts
+		|| m = .FunctionMenu
+		|| sub = m.SubMenu
+			sub.CloseMenu
+			return m.SearchMenu
+		return true
+	
+	
+	function ShowQuickFiles (|bool|)
+		opt norefcounts
+		|| f = .FileList
+		return F.ShowQuickOpen
 			
 	
 	function GotoIncludedFile (|string| path, |bool|)

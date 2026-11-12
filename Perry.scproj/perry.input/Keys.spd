@@ -111,10 +111,10 @@ extend PerryIDE
 				OpenHistory(.goprev)
 				return .goprev.searchmenu
 			  else
-				return .ShowQuickStuff(true)
+				return .ShowQuickFuncs
 		
 		if key is d
-			return .ShowQuickStuff(false)
+			return .ShowQuickFiles
 		
 		if  key is s  and  .editme is visible
 			.SaveEditing(documentaction.saving)

@@ -460,7 +460,7 @@ extend ListViewRow
 			if p.isroot
 				j.AddHint(.index)
 			  else
-				|| f = .first #require
+				|| f = .first					#require
 				j.AddStr(f.debugname)
 		return true
 	
