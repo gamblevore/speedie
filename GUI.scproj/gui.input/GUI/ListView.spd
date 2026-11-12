@@ -963,7 +963,9 @@ class ListView (GUIControl) {
 		|| Deeper = WantExpand.abs > 1
 		
 		if  !Expand  and  (sel isnt expanded)			// Collapsing already collapsed row
-			sel = .listparent(sel)$						// Collapse its parent instead
+			sel = .listparent(sel)						// Collapse its parent instead
+			if !sel
+				return true								// don't pass keystroke up
 			if sel isnt Selected
 				.Select(sel)
 			Deeper = true
