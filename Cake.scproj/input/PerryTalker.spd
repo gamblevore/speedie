@@ -518,9 +518,8 @@ function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 	j.Enter(@tmp, .name)
 	
 	|| Src = .SrcMap
-	|| AtRoot = !xp.parent.parent
-	j.AddStr(src.file * AtRoot)
-	j.Addhint(src.Position * AtRoot)
+	j.AddStr(src.file)
+	j.Addhint(src.Position)
 	
 	|| vars = debugger.VariablePrinter!
 	|| OK = true
