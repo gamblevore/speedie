@@ -35,7 +35,7 @@ function PressingTabs (guiaction)
 		p <~ ("Copy " + ide.projname,	MenuCopyProject, obj)
 		p <~ ("Show In Desktop",		MenuShowProject, obj)
 		if ide.RunningProd.Status.IsRunning
-			p <~ ("Kill",				MenuKillProject, obj)
+			p <~ ("Quit",				MenuKillProject, obj)
 		p <~ ("", nil)
 		p <~ ("Close",					MenuCloseProject, obj)
 			
