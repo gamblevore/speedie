@@ -972,19 +972,14 @@ class ListView (GUIControl) {
 			if (!Expand and sel contains .scrollstart)
 				.show(sel)
 
-//		if !Deeper and !expand and (.AllExpandState(sel) == 3)
-//			|| r = .ListChild(sel)
-//			while r										// Some expanded some not? Make it consistant.
-//				.ExpandRowSub(r, false)
-//				r = r.next								// Its flat at this point
-//
-			// too annoying to get working
-//		  elseif
 		if !.CanExpand(sel)								// Tried to expand something we shouldn't
 			.ExpandRowSub(sel, false)					// In case it was accidentally expanded somehow.
 			
 		  else
-			Deeper |= (Expand == (sel is expanded))
+			if expand
+				deeper |= sel is expanded
+			  else
+				deeper = true
 			Deeper &= .AllowMultiExpand
 			|| Curr = sel
 			while Curr

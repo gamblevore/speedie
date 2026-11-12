@@ -979,7 +979,7 @@ JB_File* JB_File_Constructor ( JB_File* self, JB_String* Path ) {
 	if (!JB_Str_Length(Path)) {
 		auto Err = JB_Str__Error();
 		if (Path == Err) {
-			; // allow. They intended this file, as a place-holder, to stop nil-errors. 
+			Path = JB_Str__Empty(); // allow. They intended this file, as a place-holder, to stop nil-errors. 
 		} else {
 			Path = Err;
 			static byte EmptyFilePaths = 0;

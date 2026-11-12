@@ -552,7 +552,7 @@ function InstallCompiler
 
 function string.BatchSpds (|[file]|)
 	opt norefcounts
-	|| batch = compiler.BaseProjectPath[self]
+	|| batch = compiler.BaseProjectPath![self]
 	for c in batch.ListFiles
 		if c.visible and c isa "spd"
 			rz <~ c

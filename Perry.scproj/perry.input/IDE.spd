@@ -810,7 +810,7 @@ So anything not 0 means "its OK"`
 	
 	
 	function EditFile (|FileRow| r, |int|) // loadfile, fileload, fileedit, openfile, fileopen
-		require r and r.FilePath and !.DuringLoad
+		require r and r.FilePath|string|.length and !.DuringLoad
 		// the drawing thing needs a document too!
 		// why not the same?
 		// we could make editfield have an internal draw editor...

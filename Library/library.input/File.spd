@@ -190,8 +190,10 @@ class File (stringshared)
 
 
 	function Child (|string| name, |File!|)
-//		real self put back later
-		check (name) (Self, "No name specified for sub-file of directory: " + self)
+		opt norefcounts
+		real self
+//		if !name
+//			return self
 		return File( self|string|.child(name) )
 	
 	function ChildExisting (|string| name, |File|)
@@ -315,19 +317,16 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		
 	function DirectoryContains (|string| path, |bool|)
 		return path.PathFix starts .PathDir
-	
+			
 	operator IsNewerThan (|File| F, |bool|)
 		cpp_Part NewerThanFile
-		return self isnewerthan f.modified
+		inlined
+		return .modified > f.modified
 	
 	operator IsNewerThan (|date| F, |bool|)
 		inlined
 		return (.Modified > F)
 	
-	operator IsOlderThan (|File| F, |bool|)
-		inlined
-		return (.Modified < F.Modified)
-
 	function string.Out (|bool| Clear=true, |Faststring|)
 		disabled "Use .outputstream"
 	function string.In (|string| Header="", |int| ChunkSize=4MB, |InputStream|)

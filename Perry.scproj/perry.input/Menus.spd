@@ -1,17 +1,17 @@
 
 
 function Button.FillMenuPath (|string| L, |listviewrow| tab=nil)
-	|| p = .SubMenu		#require
-	|| orig = l
-	p.listsource.clear
-	p <~ menuitem("Copy " + l.name, MenuCopyFile, self)
-	p.AddSep
+	|| menu = .SubMenu		#require
+	menu.listsource.clear
+	menu <~ menuitem("Copy " + l.name, MenuCopyFile, self)
+	menu.AddSep
+	|| Count = 0
 	while l
-		|| S = filerow.FileIcon(l, "").render + " " + l.NameOrRoot
-		|| dirfile = ".nothing" * (l != orig)
-		|| row = filerow(l, s, dirfile)
+		|| S = filerow.FileIcon(l, Count > 0, "").render + " " + l.NameOrRoot
+		Count++
+		|| row = filerow(l, s)
 		(row isnt editable)
-		p <~ row
+		menu <~ row
 		if l.IsVolume
 			exit
 		l = l.parent

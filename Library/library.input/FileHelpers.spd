@@ -161,8 +161,11 @@ extend String
 	function Parent (|string|)
 		description "Gets the file path's parent'"
 		// this won't handle a bad path like "////" sigh.
+		opt norefcounts
 		if self != "/"
-			return .BeforeLastByte('/')
+			|| p = .BeforeLastByte('/')
+				return p
+			return "/"
 
 	function PathFix (|StringZeroTerminated|)
 		cpp_wrapper JB_File_PathFix

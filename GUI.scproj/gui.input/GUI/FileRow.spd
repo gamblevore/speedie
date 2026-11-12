@@ -6,8 +6,8 @@ class FileRow (ListViewRow)
 	linkage
 		cpp_part FR
 	
-	|string|				FilePath	// why not make .FilePath an actual file? we often want to do file stuff on it?
-	|Document?|				_Document	// files don't consume any resources unless opened... only tiny object memory.
+	|File|					FilePath
+	|Document?|				_Document
 	|date|					DateOfFileAtRead
 	|string|				DirFile
 	|int|					LastSize
@@ -22,6 +22,28 @@ class FileRow (ListViewRow)
 	contains FileRow
 	
 	
+	module
+		function New (|string| Path, |FileRow|)
+			opt norefcounts
+			return FileRow(path, path.name, "")
+	
+	constructor (|string| path, |string| name, |string--| DirFile="")
+		.type		= @file
+		.rangelength = 0 // for the sorter
+		.name		= name
+		
+		|| F = path.file
+		.FilePath	= F
+		|| IsDir = F.IsDir
+		if !IsDir
+			DirFile = ""
+			.LastFileCount = 1
+			if path
+				.LastSize = f.size
+		.asdir		= IsDir
+		.dirfile	= DirFile
+	
+
 	constructor (|FileRow| R, |string?--| OverRideName = nil)
 		cpp_Part ConstructorCopy
 		.type		= r.type
@@ -36,21 +58,6 @@ class FileRow (ListViewRow)
 		.lastfilecount = r.lastfilecount
 		.DoesntExist = r.DoesntExist
 		.InMainProj = r.InMainProj
-	
-	
-	constructor (|string| path, |string| name, |string| DirFile="")
-		.type		= @file
-		.rangelength = 0 // for the sorter
-
-		.FilePath	= (DirFile!="")(path.PathDir, path)
-		.dirfile	= DirFile
-
-		.asdir		= dirfile
-		.name		= name
-		if path and !.asdir
-			.lastsize = path.File.Size
-		.lastfilecount = (!.asdir)|int|
-	
 
 	render
 		opt norefcounts
@@ -64,11 +71,12 @@ class FileRow (ListViewRow)
 		if ex contains self
 			fv.Removerow(self)
 			return
-		|| l = .FilePath$
-		require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
-		if l.file.MoveToTrash
-			fv.removerow(self)
-		fv.checksize
+		|| l = .FilePath
+		if l|string|
+			require keys.shift or "Delete file: ${l.name}?\n\nAt ${l.parent}".confirm
+			if l.MoveToTrash
+				fv.removerow(self)
+			fv.checksize
 	
 	
 	libinternal MoveTo (|string| v, |bool|) // rename
@@ -76,13 +84,13 @@ class FileRow (ListViewRow)
 			beep v + " is not a valid filename!"
 			return false
 		
-		|| l = .FilePath.file
+		|| l = .FilePath
 		|| f = l.sibling(v)
 		if .FilePath != f
 			if (.filepath ~!= f) and f.Exists
 				beep v + " already exists!"
 			  elseif l.moveto(f)
-				.FilePath = f.path
+				.FilePath = f
 				.name = f.name
 				.parent.filesort
 				|| d = ._Document
@@ -100,13 +108,9 @@ class FileRow (ListViewRow)
 	
 	
 	function ReadFrom (|string|)
-		return .FilePath + .dirfile
+		return .FilePath.child(.dirfile)
 
 
-	libinternal IsAlsoDir (|file| f, |bool|)
-		return f.isdir == .asdir
-	
-	
 	libinternal MatchField (|string| Name, |string| Match, |bool|)
 //		opt norefcounts
 		|| d = .FileData.parse
@@ -116,8 +120,8 @@ class FileRow (ListViewRow)
 	
 	function TryReload (|fileviewer|fv)
 		require .asdir
-		|| l = .FilePath
-			|| f = l.file
+		|| f = .FilePath
+		if f|string|
 			|| d = f.modified
 			if d > .DateOfFileAtRead
 				.DateOfFileAtRead = d
@@ -136,7 +140,7 @@ class FileRow (ListViewRow)
 		|| r = filerow(f.path, f.name)
 		self <~ r
 		if f.isdir
-			r.FilePath = r.FilePath.pathdir
+//			r.FilePath = r.FilePath.file
 			r.dirfile = folfile
 
 		if f.IsntAnOSXBundle and !f.issymlink
@@ -165,7 +169,7 @@ class FileRow (ListViewRow)
 			|| ch = dir[name]!
 			ifn (name[0] == '.') or (excl[name.ext])
 				|| f = found[name]
-				if f and f.IsAlsoDir(ch)
+				if f and (f.asdir == ch.isdir)
 					found[name] = nil
 					f.DoesntExist = false
 				  else
@@ -190,7 +194,7 @@ class FileRow (ListViewRow)
 	function ReadName (|string|)
 		|| n = .FilePath.name
 		if .dirfile
-			return n.pathdir + .dirfile
+			return n.child(.dirfile)
 		return n
 
 
@@ -394,7 +398,7 @@ function ListView.ListFiles (|string| InPath, |string| types, |bool| save, |int|
 			|| ext = n.ext
 			if isdirlike
 				p = p.PathDir
-			|| icon = filerow.FileIcon(p, types).Render
+			|| icon = filerow.FileIcon(p, isdirlike, types).Render
 			n = icon + " " + n
 			|| r = filerow(p, n, ".nothing" * isdirlike)
 			self <~ r

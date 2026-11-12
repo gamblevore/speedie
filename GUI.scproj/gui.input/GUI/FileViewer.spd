@@ -7,7 +7,7 @@ class FileViewer (ListView)
 	|dictionary?|					NoFind
 	|TextView|						QuickOpen
 	|ListView|						ListOpen
-	|textView|						EditMe
+	|TextView|						EditMe
 	|filerow?|						Extra
 	|filerow?|						SearchWithin
 	|[string]|						SizeCheckers
@@ -15,7 +15,6 @@ class FileViewer (ListView)
 
 	constructor (|window| p, |GUIListEvent| select, |GUIListEvent| return, |TextView| EditMe)
 		super.constructor(p, select, return)
-//		.MultiSelection		= true
 		.editme				= editme
 		.OnReturn			= ReturnFileList|GUIListEvent|		// c++ work around
 		.OnRightClick		= RightClickFileList|GUIListEvent|
@@ -23,7 +22,7 @@ class FileViewer (ListView)
 		.Listopen			= ListView(nil,		nil,		ClickedOpenList)
 		.ondrawrow			= InsideFileViewRowDraw
 		.Oneditcell			= FileRowRenamer
-		.listsource			= filerow("", "root")
+		.listsource			= filerow(string.error, "root")
 		.ColumnFinder		= FileRowCell
 		.gnormal.textcolor	= 0xFF6FB6D7
 		
@@ -323,14 +322,13 @@ class FileViewer (ListView)
 		|| NameOnly = path[0, "./"]
 			path = path[2...]
 
-		within ?= .listsource
 		for f.flat in within
 			if f isa filerow
 				|| it = f.match(path, NameOnly)
 					f.rangelength = it
 					if Copy
 						f = FileRow(f)
-						if f.FilePath.file.IsDir
+						if f.FilePath.IsDir
 							f.name = f.name.PathDir
 					rz <~ f
 		
@@ -425,8 +423,18 @@ class FileViewer (ListView)
 			return nil
 		
 		|| before = path.Before(":")
-		ifn path[0, "/"] or path[0, "~/"]
-			|| r = .FindPaths(before, nil, true)
+		|| p0 = path[0]
+		if (p0 != '/' and '~')
+			|| r = .FindPaths(before, .listsource, true)
+			if r != nil
+				|string--| spd = file.SpeedieDir(before)
+				if spd.FileExists
+					r <~ FileRow(spd)
+			// want to list the children of any folders found.
+//				for f in r
+//					if f.AsDir
+//						.OpenQuickRelistItems(f.FilePath.file, "", r)// (|file| path, |string| filter, |[filerow]| items)
+					
 			.ListOpen.QuickOpenFill(r)
 			return nil
 		
@@ -452,7 +460,7 @@ class FileViewer (ListView)
 		.clear
 		for p in items
 			|| m = message(@str, p.name)
-			|| dir = p.FilePath.file.isdir
+			|| dir = p.FilePath.isdir
 			m.name = (dir)("\10 ", "\11 ") + m.name
 			
 			if HasSel and p isnt UnSelectable
@@ -467,9 +475,8 @@ class FileViewer (ListView)
 		.size = the~same by 0~before back d2
 
 
-	libinternal OpenQuickRelistDir (|file| path, |string| filter)
+	libinternal OpenQuickRelistItems (|file| path, |string| filter, |[filerow]| items)
 		|| invis = filter starts "."
-		|[filerow]| items
 		for ch in path
 			if invis or ch.visible
 				|| s = path[ch]!
@@ -479,6 +486,11 @@ class FileViewer (ListView)
 				if filter and !(ch.name starts filter)
 					(ffr is Disabled)
 				items <~ ffr
+	
+	
+	libinternal OpenQuickRelistDir (|file| path, |string| filter)
+		|[filerow]| items
+		.OpenQuickRelistItems(path, filter, items)
 		items.sort(FileRowScoreSorter)
 		.listopen.QuickOpenFill(items)
 	
@@ -603,7 +615,7 @@ class FileViewer (ListView)
 			require r and v
 
 			|| loc = r.FilePath
-			if loc.file.isdir
+			if loc.isdir
 				V.OpenQuickRelist(loc, true)
 				return true
 			
@@ -648,13 +660,13 @@ libinternal string.PlatformVisible (|bool| AtRoot, |bool|)
 libinternal FileRow.Modifier (|byte|)
 	if .DoesntExist
 		return '?'
-	return FileIcon(.FilePath, "", self is expanded, !.asdir)
+	return FileIcon(.FilePath, .asdir, "", self is expanded)
 
 
-function @filerow.FileIcon (|string| self, |string| types, |bool| Expanded = false, |bool| NotDir = false, |CodePoint|)
+function @filerow.FileIcon (|string| self, |bool| Dir,  |string| types, |bool| Expanded = false, |CodePoint|)
 	|| n = .name
 	|| ext = n.ext
-	if (.last == '/') and !notdir
+	if Dir
 		if types and types.TypeContains(ext + "/")
 			rz = '\19'
 		  elseif expanded
@@ -712,7 +724,7 @@ libinternal FileViewerCreateFile (GuiMenuEvent)
 	if !row.asdir
 		row = row.parent!
 	|| l = row.FilePath
-	|| f = l.file.UniqueChild("untitled")
+	|| f = l.UniqueChild("untitled")
 	if f and f.CreateEmpty and self isa FileViewer
 		|| created = filerow(f.path, f.name)
 		row <~ created

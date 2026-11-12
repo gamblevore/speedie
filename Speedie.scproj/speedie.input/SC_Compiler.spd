@@ -41,7 +41,7 @@
 |SCDecl|	FalseBool
 
 
-function Compiler.SpeedieDir (|string?| s=nil, |file|)
+function Compiler.SpeedieDir (|string?| s=nil, |file!|)
 	return file.Speediedir(s).file
 	
 
@@ -52,7 +52,8 @@ linkage
 |SCNode|					VisibleFuncs = SCNode("visible")
 |SCNode|					Interpreter = SCNode("cake_interpreter")
 |File|						BaseProjectPath  // projectfolder, projfol
-|file|						Library
+|file|						Library = compiler.Speediedir("Library")!
+
 |string|					OriginalInputPath
 |File|						_BuildFolder
 |String?|					_SpeedieProj = nil
