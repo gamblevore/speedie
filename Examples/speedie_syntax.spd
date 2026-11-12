@@ -7,17 +7,19 @@ targets: flow
 
 main
 	|| list = &Syntax.TypeList[0]
-	// viewing list in debugger is buggered
 	for i in 63
-		|| item = list[]
-		list++
-		(item)
+		|| item = list[i]
+			|| v = item.Name
+			if v[0] == 's'
+				printline v
+	List = &Syntax.TypeList[0]
 	
-/	ObjRenderTest()
+	ObjRenderTest()
 	|object[10]| Objs
 	|&object| ObjPtr = &Objs[0]
 	for i in 10
 		Objs[i] = "abc" + i
+	|| z = list[0]
 
 /	ByteCountTest(DataTypeCode.byte, DataTypeCode.float)
 	ByteCountTest(DataTypeCode.uint16, DataTypeCode.f64)
