@@ -2,8 +2,6 @@
 
 							/// Get perry ASMing ///
 
-* break On || ShowMe = doaction_Duck flips out /usr/local/speedie/Examples/speedie_syntax.spd
-* expansion in cake not working quite right
 * chained obj destructor bug in branch_test.spd
 
 * Unused const (1) in setter Size

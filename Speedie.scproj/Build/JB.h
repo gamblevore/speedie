@@ -10250,8 +10250,6 @@ bool JB_File_Opened(JB_File* Self);
 
 bool JB_File_NewerThanFile(JB_File* Self, JB_File* F);
 
-bool JB_File_OperatorIsNewerThan(JB_File* Self, Date F);
-
 JB_File* JB_File_Parent(JB_File* Self);
 
 Message* JB_File_Parse(JB_File* Self, int Lim, bool AllowMissing, Syntax Owner);
