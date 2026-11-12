@@ -35,7 +35,6 @@ Speedie.scproj/Speedie.xcodeproj/xcshareddata/xcschemes/Update.xcscheme
 *.xcscheme
 examples/prototest.spd
 examples/prototest
-*.strings.txt
 examples/encoding_test(ignore).spd
 Library/CppLib/spdsort/spdsort.xcodeproj/*
 
@@ -49,11 +48,10 @@ Examples/books_xml/books.box
 *.zpd
 /Bangle
 Utils/CompilerTest
-Speedie.scproj/.strings.txt
 *.cake
 /Documentation/CppComparison/*
 Terminal/Cake
 GameExamples/tetris.spd.pref
 Examples/hello_world.spd
 Examples/branch_test.spd
-Speedie.scproj/.debugstrings.txt
+*.txt
