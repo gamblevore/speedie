@@ -41,10 +41,10 @@ class TextViewLine (message)
 	function Message (|message|)
 		return .obj as Message
 	
-	function TextFlags (|textlineflags|)
+	inline TextFlags (|textlineflags|)
 		return .tag
 	
-	function TextFlags (assigns:|textlineflags|)
+	inline TextFlags (assigns:|textlineflags|)
 		.tag = value
 	
 	inline Message (assigns:|message|)

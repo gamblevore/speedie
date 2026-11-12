@@ -8,7 +8,6 @@ class TextView (GUIControl)
 
 	|bool|						GroupSaveAll		// needs a better name... not sure what.
 	|bool|						IsALogTextView		// Is this textview used for displaying a Log.
-	|byte|						LineHeight
 	|int8|						YAdjust
 	|MoveCode|					Alignment			// centered, left, right
 
@@ -1135,49 +1134,6 @@ class TextView (GUIControl)
 		opt NoRefCounts
 		|| w = .window
 			.LineAttention(1.0s, gui.framestart, D)
-
-
-	task LineAttention (taskgui, |object| D)
-		constructor
-			libinternal
-			is Animation
-		
-		run
-			opt norefcounts
-			libinternal
-			|| y = 0.0
-			|| d = .d
-			|| color = (1.0, 1.0, 2.0, 1.0)
-			|| LH = .upon.lineheight|float|
-			if d isa textviewline
-				require d in .upon.WrappedLines
-				Y = .upon.Y(d)|float| + LH*0.75
-				|| err = d.LineError
-					color = (err.Textcolor-0.1)*2.0
-//			  elseif d isa message
-//				require d in .upon.WrappedLines
-//				Y = .upon.Y(d)|float| + LH*0.75
-				
-				
-			|| H = .upon.lastrect.x1x2.vec2
-			|| HM = (H.x+H.x2)/2.0
-			|| WH = 1.0/h.width
-			|| S = .StartTime
-			|| ago = s.ago.float
-			|| mush = S|int|
-			
-			while h.x < h.x2
-				|| Rect = (h.x, Y, h.x, Y) ± -5.0
-				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 2.5
-				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
-				vib += s.ago.float
-				|| middleness = 0.5-((h.x-hm).length)*WH
-				rect = rect.up(vib*LH*0.15 + LH*-0.3 + ago*0.3)
-				|| str = (1.0-ago*0.7th)*0.5 max -0.01
-				color.a = str*middleness*2.5
-				GUI.Screen.DrawSoftCircle( Rect, color )
-				h.x += 10.0 - (mush.hash&1)|float|*2.3
-				mush++
 
 
 	libinternal message.LastAfter (|int| IgnoreAfter, |ind|)

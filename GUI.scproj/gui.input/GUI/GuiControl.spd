@@ -628,6 +628,60 @@ class GUIControl (list)
 				progress = 1.0 - progress			
 			.upon.SizeFraction() = progress
 
+	
+	inline LineHeight (|int|)
+		return .GNormal.LineHeight
+	
+	
+	setter LineHeight (|int|)
+		inlined
+		.GNormal.LineHeight = value
+	
+	
+	task LineAttention (taskgui, |listviewrow| D)
+		constructor
+			libinternal
+			is Animation
+		
+		run
+			opt norefcounts
+			libinternal
+			|| y = 0.0
+			|| d = .d
+			|| color = (1.0, 1.0, 2.0, 1.0)
+			|| upon = .upon
+			if d isa textviewline and upon isa textview
+				require d in upon.WrappedLines
+				Y = upon.Y(d)|float|
+				|| err = d.LineError
+					color = (err.Textcolor-0.1)*2.0
+			  elseif upon isa listview
+				require upon.listsource contains d
+				Y = upon.RowBounds(d).y|float|
+			
+			|| LH = upon.lineheight|float|
+			y+=LH*0.75
+				
+				
+			|| H = .upon.lastrect.x1x2.vec2
+			|| HM = (H.x+H.x2)/2.0
+			|| WH = 1.0/h.width
+			|| S = .StartTime
+			|| ago = s.ago.float
+			|| mush = S|int|
+			
+			while h.x < h.x2
+				|| Rect = (h.x, Y, h.x, Y) ± -5.0
+				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 2.5
+				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
+				vib += s.ago.float
+				|| middleness = 0.5-((h.x-hm).length)*WH
+				rect = rect.up(vib*LH*0.15 + LH*-0.3 + ago*0.3)
+				|| str = (1.0-ago*0.7th)*0.5 max -0.01
+				color.a = str*middleness*2.5
+				GUI.Screen.DrawSoftCircle( Rect, color )
+				h.x += 10.0 - (mush.hash&1)|float|*2.3
+				mush++
 
 	libinternal AddTask (|TaskGUI| t)
 		opt norefcounts

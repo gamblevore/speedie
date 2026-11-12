@@ -308,15 +308,15 @@ extend PerryIDE
 			isnt DrawsFocus
 			.Columns = ListViewRow("", listviewstate.aligncenter)
 			.IsMainEditor	= true
-			.RowHeight		= .rowheight + 3
 			.Hierarchical	= true
 			.tooltip		= self.SearchArea.Tooltip			
 			.KeepOneSelected = true
 			.OnKeyDown		= DeleteableListKeys
 			.ID				= "FoundList"
-			.size 			= the~width  by  the~bottom to 2~under
+			.size			= the~width  by  the~bottom to 2~under
 			.AlwaysSendChangeEvent = true
 			.gnormal		= self.FileList.GNormal.copy
+			.LineHeight		= .LineHeight + 3
 			.GNormal.Solid = LeftBG
 			.gRowSel.solid  = ((0.8, 1.0, 0.8, 0.65))
 			.GNormal.Separator = 0
@@ -371,11 +371,12 @@ extend PerryIDE
 			isnt DrawsFocus
 			
 			
+			.gnormal		= self.FileList.GNormal.copy
 			.OnKeyDown		= PerryStackKeyDown
 			.ColumnFinder	= &Perry.VariableFinder
 			.OnExpandRow	= &listview.PerryCollectExpansion
 			.Hierarchical	= ListViewHierarchy.Last
-			.RowHeight		= .rowheight + 3
+			.LineHeight		= .LineHeight + 3
 			.IsMainEditor	= true
 			.MultiSelection	= true
 			.AllowMultiExpand = false
@@ -385,7 +386,6 @@ extend PerryIDE
 			.ID				= "Stack"
 			.xindentperdepth = font.Width
 			.size			= the~width by 0~up to 1~under
-			.gnormal		= self.FileList.GNormal.copy
 			.GNormal.Solid	= vec4(0.13, 0.135, 0.120, 0.975)
 			.gRowSel.solid	= vec4(0.11, 0.335, 0.12, 0.675)
 			.GNormal.Separator	= 0
@@ -711,7 +711,7 @@ extend PerryIDE
 			.AlwaysSendChangeEvent = true
 			.copypaste		|= copypasteflags.copytext
 			.gnormal.edge	= .gnormal.bg
-			.rowheight		= .rowheight * 2
+			.LineHeight		= .LineHeight * 2
 
 
 	function AddViewButton (|Button| BTN, |string| Oof, |guicontrol| tag)

@@ -59,7 +59,7 @@ role AppMenu (Window)
 			|| c = AppMenu.Choices$
 			c.setfocus
 			|| n = c.listsource.Count
-			|| mh = n * c.rowheight + 4
+			|| mh = n * c.Lineheight + 4
 			m.size = 160~wide by (mh)~high
 			m.ClickOutsideCloses = true
 			c.size = the~area

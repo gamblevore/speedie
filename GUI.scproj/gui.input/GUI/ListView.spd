@@ -2,7 +2,6 @@
 class ListView (GUIControl) {
 	linkage
 		cpp_part LV
-	|int|							RowHeight
 	|bool|							MultiLineDraw
 
 	|int|							ScrollShift
@@ -48,7 +47,7 @@ class ListView (GUIControl) {
 
 	constructor (|guicontrol| Parent,  |GUIListEvent| Select,  |GUIListEvent| Return)
 		super.constructor(Parent)
-		.RowHeight		= 13
+		.LineHeight		= 13
 		.takesfocus		= takesfocusflag.On
 		.AllowMultiExpand = true
 		.onreturn		= return
@@ -111,7 +110,7 @@ class ListView (GUIControl) {
 
 	function DesiredHeight (|int|)
 		opt norefcounts
-		rz = 2 + ((.ListSource.Count max 2) * .RowHeight)
+		rz = 2 + ((.ListSource.Count max 2) * .LineHeight)
 		|| t = .typingfilter
 			rz += t.height - 1
 
@@ -493,14 +492,14 @@ class ListView (GUIControl) {
 
 
 	function VisibleRows (|int|)
-		|| r = .RowHeight
+		|| r = .LineHeight
 		|| h = .actualrect.height
 		h += .scrollshift + (r - 1)
 		return h / r
 	
 
 	inline FullyVisibleRows (|int|)
-		return .height / .RowHeight
+		return .height / .LineHeight
 
 
 	libinternal VisibleRowsGap (|int|)
@@ -797,7 +796,7 @@ class ListView (GUIControl) {
 				.ClearDragcutely
 				return MouseDragging.handled
 
-			|| p2 = (0, .rowheight / 2)
+			|| p2 = (0, .Lineheight / 2)
 			|| i  = .FindClicked((P - P2).y)
 			|ListViewrow--| DesiredDest
 			
@@ -1234,7 +1233,7 @@ class ListView (GUIControl) {
 		if c and c isnt hidden
 			|| r = 19
 			|int| i = c.indent
-				r = (.RowHeight max i)
+				r = (.LineHeight|int| max i)
 			rz.y2 -= r
 	
 
@@ -1255,7 +1254,7 @@ class ListView (GUIControl) {
 		|| r = .ActualRect
 		
 		for sc.visible in self
-			r.y = r.y2 - .RowHeight
+			r.y = r.y2 - .LineHeight
 			if  r.vert contains search
 				return sc
 			r.y2 = r.y
@@ -1272,7 +1271,7 @@ class ListView (GUIControl) {
 		|| r = .lastrect
 
 		for row.visible in self
-			r.y = r.y2 - .rowheight
+			r.y = r.y2 - .LineHeight
 			if row == search
 				return r.y2
 			r.y2 = r.y
@@ -1309,19 +1308,24 @@ class ListView (GUIControl) {
 				ind = .CalculateSkip(sk, prev, n)
 			sk.indent = ind
 			prev = sk
+		
+	
+	libinternal RowBounds (|ListViewrow| find, |ivec4|)
+		return .rowbounds(.scrollstart, find, .lineheight)
 	
 	
 	libinternal RowBounds (|ListViewrow| curr, |ListViewrow| find, |int| Add, |bool| AllowBottom=true, |ivec4|)
+		cpp_part RowBoundsSub
 		opt norefcounts
 		require find
 
 		|| s	= .ActualRect
 		|| low	= s.y1
-		|| top	= s.y2 + .scrollshift - .rowheight
+		|| top	= s.y2 + .scrollshift - .LineHeight
 		if find == .ListSource
 			find = nil
 		while curr != find
-			top -= .rowheight
+			top -= .LineHeight
 			ifn (curr) and (top >= low)
 				if AllowBottom
 					exit
@@ -1344,10 +1348,10 @@ class ListView (GUIControl) {
 	libinternal CellBounds (|ListViewCell| cell,  |ivec4|)
 		opt norefcounts
 		|| sc = cell.row!
-		|| B = .RowBounds(.scrollstart, sc, .rowheight)			#require
+		|| B = .RowBounds(sc)								#require
 		B.horz = .ColumnBounds(cell.column, B, sc)
 		B.x += .IndentDepth(sc)
-		return (B down .lastbottom) left .lastleft 
+		return (B down .lastbottom) left .lastleft
 
 
 	libinternal DrawRowBorders (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R, |int| NRows,  |ivec4|)
@@ -1368,7 +1372,7 @@ class ListView (GUIControl) {
 				r.DrawDividerH(z2, where, i)
 			r.DrawDividerV(z2, where)
 
-		z2 = z2 down .rowheight
+		z2 = z2 down .LineHeight
 		return z2
 		
 		
@@ -1376,7 +1380,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| z2 = rect
 		z2.y2 += .scrollshift
-		z2.y  = z2.y2 - .rowheight
+		z2.y  = z2.y2 - .LineHeight
 		
 		if .gnormal.Separator.a
 			|| c = .Columns
@@ -1387,11 +1391,11 @@ class ListView (GUIControl) {
 
 		z2 = rect
 		z2.y2 += .scrollshift
-		z2.y = z2.y2 - .rowheight
+		z2.y = z2.y2 - .LineHeight
 		for r.visible in self
 			if r is Selected
 				Where.mark(z2, 2 + .hasfocus)
-			z2 = z2 down .rowheight
+			z2 = z2 down .LineHeight
 
 
 	libinternal DrawBackGround (|image| Where,  |ivec4| Rect, |imagepixel|)
@@ -1431,7 +1435,7 @@ class ListView (GUIControl) {
 
 
 	libinternal RealignScrollshift (|int| shl, |int|)
-		if shl >= (.rowheight/2)
+		if shl >= (.LineHeight/2)
 			return shl + 1
 		return shl-1
 
@@ -1444,7 +1448,7 @@ class ListView (GUIControl) {
 		|| real = ._ScrollRealigner
 			real--
 			if real < 32
-				shl = .realignscrollshift(shl).clamp(0, .rowheight)
+				shl = .realignscrollshift(shl).clamp(0, .LineHeight)
 				.scrollshift = shl
 				if !shl
 					real = 0
@@ -1482,11 +1486,11 @@ class ListView (GUIControl) {
 		
 		while (rem < 0)
 			.ScrollByRows -1
-			rem += .rowheight
+			rem += .LineHeight
 			
-		while (rem >= .rowheight)
+		while (rem >= .LineHeight)
 			.ScrollByRows(1)
-			rem -= .rowheight
+			rem -= .LineHeight
 		
 		.scrollshift = rem
 		return !rem
@@ -1534,7 +1538,7 @@ class ListView (GUIControl) {
 			|| NCols = .ColumnCount
 
 			for r.visible in self
-				rect.y = rect.y2 - .RowHeight
+				rect.y = rect.y2 - .LineHeight
 				r.ListRowDraw(Where, rect, self, .IndentDepth(R), NCols)
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart
@@ -1557,11 +1561,11 @@ class ListView (GUIControl) {
 		}
 		
 		|| cmm = .cmm
-			.RowBorderDraw(.scrollstart, cmm.EditingRow, .RowHeight, where, ¥.focusborder)
+			.RowBorderDraw(.scrollstart, cmm.EditingRow, .LineHeight, where, ¥.focusborder)
 
 		|| re = .RowBounds(.scrollstart, ._DraggingRowTo, 1, true)
 			if ._draggingrowto.prev
-				re = re up .rowheight
+				re = re up .LineHeight
 			|| below = (.LastBottom + 1) - re.y
 			if below > 0
 				re = re up below			

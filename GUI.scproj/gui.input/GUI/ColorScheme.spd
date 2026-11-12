@@ -42,7 +42,7 @@ class ColorScheme
 		// could just be a 4-byte const and... write it.
 		// would be nice to have imagepixel/vec4 conversion optimised...
 		.ActiveTextLine			<~ ((0.2, 0.5, 0.2, 0.3))
-		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4)) 
+		.scroll.bg				<~ ((0.5, 0.0, 0.7, 0.4))
 		.scroll.edge			<~ ((0.75, 0.25, 0.9, 0.5))
 		.TextSelection.bg		<~ ((1.0, 0.25, 0.75, 0.5))
 //		.TextCopy.bg			<~ ((0.6, 0.6, 0.1, 0.2))
@@ -63,9 +63,10 @@ class ColorScheme
 		
 		.systemstyle.PixelShader = image.CurlieQueDrawer		
 		.BGCorners[0]		= (0.7, 1.0, 0.2, 1.0)
-		.BGCorners[1]		= .BGCorners[0] 
+		.BGCorners[1]		= .BGCorners[0]
 		.BGCorners[2]		= (0.6, 1.0, 0.1, 1.0)
 		.BGCorners[3]		= .BGCorners[2]
+		.Menus.LineHeight	= 13
 		.menus.edge			= (1.0, 0, 1.0, 1.0).px
 		.menus.bg			= (0.0, 0.0, 0.0, 1.0).px
 		.menus.Separator			= nil
@@ -119,7 +120,7 @@ class ColorScheme
 				|| vs = v.vec2*scale
 				|| CX1	= vs.x.mix(C0,	c1)
 				|| Cx2	= vs.x.mix(C2,	c3)
-				|| C	= vs.y.mix(cx2, cx1) 
+				|| C	= vs.y.mix(cx2, cx1)
 				P <~ C 
 
 

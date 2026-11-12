@@ -20,7 +20,7 @@ libinternal ListView.SLH (|vec3|)
 			Found = Total
 		++Total
 	|| L = (1 + Total - .visiblerows) max 0
-	return (Found,  L,  .rowheight).vec3
+	return (Found,  L,  .LineHeight).vec3
 
  
 libinternal textview.SLH (|vec3|)

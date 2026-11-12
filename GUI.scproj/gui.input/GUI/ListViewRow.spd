@@ -182,7 +182,7 @@ role ListViewRow (message)
 			if parent.CanExpand(self)
 				|| exp = (self isnt expanded)("\02", "\03")
 				|| VCol = vec4(1, 0.5)
-				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.rowheight)
+				font.small!.DrawTextWrap(exp, Where, R - (2,-1), VCol, parent.LineHeight)
 			r.x += font.width + 2
 		
 		if CanDraw
@@ -191,7 +191,7 @@ role ListViewRow (message)
 			if self is Disabled
 				str *= 0.375
 			TextCol.alpha *= str
-			font.small!.DrawTextWrap(CellText, Where, R, Textcol, parent.rowheight)
+			font.small!.DrawTextWrap(CellText, Where, R, Textcol, parent.LineHeight)
 	
 
 	libinternal listview.CanExpand (|listviewrow| Row, |bool|)
