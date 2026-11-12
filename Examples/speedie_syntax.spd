@@ -10,8 +10,8 @@ main
 	for i in 63
 		|| item = list[i]
 			|| v = item.Name
-			if v[0] == 's'
-				printline v
+			if v[0] == 'x'
+				"$v -> ${item.fullname}"
 	List = &Syntax.TypeList[0]
 	
 	ObjRenderTest()

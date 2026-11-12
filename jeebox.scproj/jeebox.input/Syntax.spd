@@ -5,14 +5,15 @@
 
 
 prototype fpMsgRender (|Message| self, |FastString| fs)
-	libinternal // shouldn't be changed, ever. jeebox should render as jeebox.
+	libinternal						// shouldn't be changed, ever. jeebox should render as jeebox.
+
 prototype fpMsgExport (|Message| self, |FastString| fs)
 		
 
 datatype Syntax (Byte)
 	default nil
 	linkage
-		cpp_Part Syx
+		cpp_part Syx
 		numeric false // disallow implicit (syntax <--> int) conversion
 
 	inline Translateable (|bool|)
@@ -23,7 +24,7 @@ datatype Syntax (Byte)
 		if self >= @sstr and self <= @str
 			return true
 
-// relies on me having cleverly ordered all my syntax :> to group them up.
+// Relies on me having cleverly ordered all my syntax :> to group them up.
 	inline NoChildren (|bool|)
 		return self >= @Cnj	and self <= @Bin
 
@@ -48,25 +49,28 @@ datatype Syntax (Byte)
 		opt norefcounts
 		inlined
 		cpp_Part PlusNum
-		return .msg(m.render)
+		return .Msg(m.render)
 		
 	function Name (|string|)
 		Opt NoRefCounts
-		if self
-			|| o = .obj
-				return o.name
-		return "child"
-	
+		|| o = .obj
+			rz = o.name
+		
 	function FullName (|string|)
 		Opt NoRefCounts
 		if self
 			|| o = .obj
 				return o.FullName
+		
+		// "child" is for error reporting. Like:
+		// x[@name,"fred"] --> "expected name 'fred'" 
+		// x[@nil, "fred"] --> "expected child 'fred'"
+		// we needed to replace name with something. Perhaps smarter error code would be better.
 		return "child"
+	
 	
 	inline Obj (|syntaxobj|)
 		return Syntax.TypeList[self|byte|&63]
-	
 	
 	inline Msg ( |string?| name=nil, |Message| )
 		return Message( nil, self, name )
@@ -93,16 +97,9 @@ datatype Syntax (Byte)
 			cpp_part AccessName
 			|| obj = .Types.valuelower(name)		#expect (where, "Unknown syntax: " + name)
 			return obj.id
-			
-//		syntax access (|int| i, |message| where=nil, |SyntaxObj|)
-//			embedded // never needed?
-//			visible
-//			if i|uint| < –count .TypeList
-//				|| obj = .TypeList[i]		#expect (where, "Unknown syntax: " + i)
-//				return obj
-		
+
 		function Join (|faststring| fs_in=nil, |string| Sep=", ", |string|)
-			embedded // rarely needed
+			embedded						// rarely needed
 			opt norefcounts
 			|| fs = FastString(fs_in)
 			|| i = 0
@@ -112,18 +109,17 @@ datatype Syntax (Byte)
 						fs <~ sep
 					fs <~ syx.name
 			return fs.GetResult(fs_in)
-				
-			
-			
-		libinternal StdNew (|fpMsgRender| Render, |string| Name, |String| LongName, |int| ID, |Syntax|)
+		
+		
+		libinternal StdNew (|fpMsgRender| Render, |string| Name, |String| FullName, |int| ID, |Syntax|)
 			opt norefcounts
 			expect (ID < –count .TypeList) ("Value out of range: " + id)
 			|| result = Syntaxobj.new(Render, name, ID)
 			.types[name] = result
 			.TypeList[ID] = result
-			if (LongName)
-				.types[LongName] = result
-				result.FullName = LongName
+			if (FullName)
+				.types[FullName] = result
+				result.FullName = FullName
 			  else
 				result.FullName = Name
 			return ID|syntax|
