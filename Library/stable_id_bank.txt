@@ -947,7 +947,6 @@ JB_File_MoveNext
 JB_File_MoveTo
 JB_File_MoveToTrash
 JB_File_MustExist
-JB_File_NewerThanFile
 JB_File_Offset
 JB_File_OffsetSet
 JB_File_Open

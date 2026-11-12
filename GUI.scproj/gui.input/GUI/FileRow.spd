@@ -23,7 +23,7 @@ class FileRow (ListViewRow)
 	
 	
 	module
-		function New (|string| Path, |FileRow|)
+		inline New (|string| Path, |FileRow|)
 			opt norefcounts
 			return FileRow(path, path.name, "")
 	
