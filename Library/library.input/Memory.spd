@@ -6,12 +6,8 @@
 
 
 
-// We use FastString naming convention:
-	// Size means:      The buffer capacity, both used and unused.
-		// (Capacity is in terms of items, not bytes!)
-	// Length means:    Length of data that is written to, so far.
-	// FreeSize means:  Size - Length
-// Additionally, we have a ItemSize.
+	// Size:			The buffer capacity in terms of items, not bytes.
+	// ItemSize:		The bytesize of the datatype (or struct) stored.
 
 
 class Memory
@@ -20,11 +16,10 @@ class Memory
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|int|				Size
-	|&byte|				_Ptr
-	|int|				Length			// removing this might be better. its not really good at being a generalised appender
-	|uint|				ItemSize		// for that, we want two pointers to work with. Or 3 really.
-	|byte|				_Allocator
+	|uint|				Size
+	|&byte|				Addr
+	|uint|				ItemSize
+	|byte|				Allocator
 	contains byte
 	
 
@@ -32,42 +27,33 @@ class Memory
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
 		.size = itemcount
-		._Allocator = Allocator
-		.length = 0
-		._ptr = ptr
+		.Allocator = Allocator
+		.Addr = ptr
 	
 	
 	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
 		embedded
 		.ItemSize = ItemSize
 		.size = itemcount
-		if ._Allocator == dataobject.kfree
-			Memory.free(._ptr)
-		._Allocator = 0
-		._ptr = P|&byte|
+		if .Allocator == dataobject.kfree
+			Memory.free(.Addr)
+		.Allocator = 0
+		.Addr = P|&byte|
 	
 	
-	inline Ptr (|&...|)
-		return ._ptr|&...|
+	setter Addr (|&...|)
+		disabled
 		
-	function Next (|&...|)
-		return (._ptr + .Bytelength)|&...|
+	function Addr (|&...|)
+		return .Addr
 		
-	setter Length (|int|)
-		if Value > .size
-			value = .size
-		  elseif Value < 0
-			value = 0
-		.length = Value
-	
 	operator plus (|int| n, |&...|)
-		return (._ptr + .itemsize*n)|&...|
-	
+		return (.Addr + .itemsize*n)|&...|
 	
 	function CopyFrom (|&nil| Src, |int| Length, |int|)
 		cpp_part CopyFromPtr
 		|| cap = .ByteCapacity min Length
-			memory.Copy(.ptr, Src, cap)
+			memory.Copy(.Addr, Src, cap)
 		return cap
 
 	inline CopyFrom (|string| Src, |int|)
@@ -76,7 +62,7 @@ class Memory
 	
 	function CopyFrom (|memory| other, |int|)
 		embedded
-		return .CopyFrom(other.ptr, other.bytecapacity)
+		return .CopyFrom(other.Addr, other.bytecapacity)
 		
 	function Count (|int|)
 		disabled "Use .size"
@@ -88,36 +74,26 @@ class Memory
 	function SetSize (|int| ItemCount, |bool|)
 		if ItemCount == .size
 			return true
-		require ._Allocator == DataObject.kfree
+		require .Allocator == DataObject.kfree
 		|| S = .itemsize|int|
 		|| old = S * .size
 		|| New = S * ItemCount
-		|| Mem = Memory.realloc(._ptr, New)
-			._ptr = mem
+		|| Mem = Memory.realloc(.Addr, New)
+			.Addr = mem
 			.size = ItemCount
-			if ItemCount < .length
-				.length = ItemCount
 			if New > Old
 				memory.Zero(mem+old, New-Old)
 			return true
 		error (self, "Can't allocate bytes: " + new)
 
-	inline HasSpare (|bool|)
-		return .Length < .size
 	
 	inline ByteCapacity (|int|)
 		return .ItemSize|int|*.size|int|
-	
-	inline ByteLength (|int|)
-		return .ItemSize|int|*.Length|int|
-	
-	function Clear
-		disabled "Do you mean .Free or .Zero?"
-	
+
 	
 	function Zero
 		embedded
-		zero(._ptr, .length * .itemsize)
+		zero(.Addr, .bytecapacity)
 	
 
 	function DebugPrint
@@ -126,13 +102,13 @@ class Memory
 	
 	
 	inline String (|string|)
-		return string.Copy(._ptr, .ByteLength)
+		return string.Copy(.Addr, .ByteCapacity)
 	
 	
 	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
 		opt norefcounts
 		embedded
-		|| p = ._ptr
+		|| p = .Addr
 		|| p2 = p + .ByteCapacity
 		|| i = 0
 		|| com = 0
@@ -151,14 +127,14 @@ class Memory
 
 	
 	destructor
-		if (._Allocator == DataObject.kfree)
-			Memory.free(._ptr)
+		if (.Allocator == DataObject.kfree)
+			Memory.free(.Addr)
 		
 
 	iterator
-		|| FFFirst = .ptr
+		|| FFFirst = .Addr
 		|| Curr = FFFirst
-		|| After = curr + .length
+		|| After = curr + .size
 		while (Curr < after)
 			yield Curr[0] (curr - FFFirst)
 			++Curr

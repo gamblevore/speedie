@@ -154,10 +154,9 @@ struct RandomXOR
 
 	function Temporal (|Memory| mem)
 		description "seems not temporal... needs upgrade."
-		|| P = mem.ptr
+		|| P = mem.Addr
 		if p?
 			.temporal(P, P + mem.ByteCapacity)
-			mem.Length = mem.size
 
 	macro SyntaxCall
 		description "Returns a bool. To get a float, use [] instead of ()"

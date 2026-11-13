@@ -37,10 +37,11 @@ struct TemporalGenerator
 
 
 class SteveMachine
-	|int| 					Reps
+	|int|					Reps
 	|bool|					Feedback
 	|&TemporalGenerator|	Create
 	|byte[]|				_ByteSamples
+	|int|					Count
 	
 	constructor (|int| reps, |&TemporalGenerator| T, |byte[]| buff)
 		.reps = reps, .create = t, ._ByteSamples = buff, .Feedback = true
@@ -53,7 +54,7 @@ class SteveMachine
 		require self
 		|| p = ._ByteSamples.ptr
 		|| a = p + ._ByteSamples.Size
-		._ByteSamples.Length = 0 // So that .samples.next works properly.
+		.Count = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
 		
 		
@@ -105,7 +106,7 @@ class SteveMachine
 		// So EightIsntGreat just return 8-bits because its natural. The name reminds us
 		// that its better to combine into more bits, then take 8 directly.
 		
-		if !._ByteSamples.HasSpare
+		if .Count >= ._ByteSamples.size
 			.Refresh
 							// OK so... this isn't possible to fully replicate just yet
 							// the original temporal engine did A LOT MORE. Including...
@@ -114,7 +115,7 @@ class SteveMachine
 							// xoring multiple runs, and von-neuman and other cleanups.
 							// or just initialising a large data-set to use for seeding
 							// but... the chaotic generator is quite good. lets just use that for now :D
-		return ._ByteSamples.Next
+		return ._ByteSamples[.Count++]
 		
 
 	function DivineCount (|int| BitCount=12, |int|)

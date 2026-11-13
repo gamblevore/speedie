@@ -29,8 +29,7 @@ function Arrow (|int| Length, |int| Height, |byte| A, |byte| B, |string|)
 		for y in extra
 			arrow[mid + (y+1)*Stride] = b
 			arrow[mid - (y+1)*Stride] = b
-		
-	arrow.Length = arrow.Size
+	
 	return Arrow.String
 
 

@@ -15,7 +15,6 @@ class Image (memory)
 		cpp_Part ConstructorPointer
 		super.constructor(s.area, 4, P)
 		.name = name
-		.length = self|memory|.size
 		.AreaInfo = s
 	
 
@@ -46,7 +45,7 @@ class Image (memory)
 	function CopyImage (|string| name="", |Image|)
 		rz = .ImageOfSameSize(name)
 		if rz
-			memory.Copy(rz.ptr, .ptr, rz.ByteCapacity)
+			memory.Copy(rz.Addr, .Addr, rz.ByteCapacity)
 	
 	
 	target __IMPORT_GUI__
@@ -65,7 +64,7 @@ class Image (memory)
 
 	operator contains (|&imagepixel| P, |bool|)
 		cpp_part ContainsPixel
-		|| Start = ._ptr
+		|| Start = .addr
 		|| After = Start+.ByteCapacity
 		return P >= Start|&imagepixel|  and P < After|&imagepixel| 
 		
@@ -137,10 +136,9 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		require !._Allocator  or .SetSize(N)
+		require !.Allocator  or .SetSize(N)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
 
-		.length = n
 		.AreaInfo = value
 		return true
 			
@@ -168,7 +166,7 @@ class Image (memory)
 	
 	function Pixels (|&imagepixel|)
 		inlined
-		return .ptr|&imagepixel|
+		return .addr|&imagepixel|
 	
 	
 	function @Vec4.Colorise (|byte| D, |float| a=1.0,  |vec4|)
@@ -376,8 +374,8 @@ class Image (memory)
 				return s.loadqoi(self) #expect (self, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
-			|| l = .ByteLength
-			|| qoi = imagehelper.WriteQOI(.ptr, .Width, .Height, l)
+			|| l = .ByteCapacity
+			|| qoi = imagehelper.WriteQOI(.Addr, .Width, .Height, l)
 				return string.FromPtr(qoi, l)
 
 
@@ -449,7 +447,7 @@ class Image (memory)
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
-			memory.fill(.ptr|&int|, .length, Color)
+			memory.fill(.Addr|&int|, super.size, Color)
 		  else
 			for sigh in range
 				sigh[0] = Color
@@ -498,14 +496,14 @@ class Image (memory)
 			.DrawOutlineOnly(rect, outline, bg, AllowEdge)
 	
 	
-	function Invert 
-		|| p = ._Ptr
-		|| End = p + (.bytecapacity-3) 
+	function Invert
+		|| p = .addr
+		|| End = p + (.bytecapacity-3)
 		while p < End
-			p[0] = 255-p[0] 
-			p[1] = 255-p[1] 
-			p[2] = 255-p[2] 
-			p[3] = 255-p[3] 
+			p[0] = 255-p[0]
+			p[1] = 255-p[1]
+			p[2] = 255-p[2]
+			p[3] = 255-p[3]
 			p+=4
 	
 
