@@ -749,7 +749,7 @@ function assembler.RootGen (|scfunction| fn)
 
 
 function Assembler.Rework (|SCFunction| fn)
-//	HoistSpace.NeedSpare(.FnLength)
+//	HoistSpace.Reserve(.FnLength)
 //	HoistSpace.CopyFrom(.FuncStart, .FnLength)
 
 	.InitAndStartFunc(fn)

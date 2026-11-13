@@ -22,27 +22,28 @@ class Memory
 	
 	|int|				Size
 	|&byte|				_Ptr
-	|int|				Length
-	|uint|				ItemSize
-	|byte|				DeathAction
+	|int|				Length			// removing this might be better. its not really good at being a generalised appender
+	|uint|				ItemSize		// for that, we want two pointers to work with. Or 3 really.
+	|byte|				_Allocator
 	contains byte
 	
 
-	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| DeathAction=DataObject.kfree)
+	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| Allocator=DataObject.kfree)
 		cpp_part ConstructorPtr
 		.ItemSize = ItemSize
 		.size = itemcount
-		.deathaction = deathaction
+		._Allocator = Allocator
 		.length = 0
 		._ptr = ptr
 	
 	
 	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
+		embedded
 		.ItemSize = ItemSize
 		.size = itemcount
-		if .deathaction == dataobject.kfree
+		if ._Allocator == dataobject.kfree
 			Memory.free(._ptr)
-		.deathaction = 0
+		._Allocator = 0
 		._ptr = P|&byte|
 	
 	
@@ -62,54 +63,32 @@ class Memory
 	operator plus (|int| n, |&...|)
 		return (._ptr + .itemsize*n)|&...|
 	
-	function CopyFrom (|string| Src, |int|)
-		cpp_Part CopyFromString
-		|| cap = .ByteCapacity min src.Length
-			memory.Copy(.ptr, src.Addr, cap)
-			return cap		
 	
 	function CopyFrom (|&nil| Src, |int| Length, |int|)
+		cpp_part CopyFromPtr
 		|| cap = .ByteCapacity min Length
 			memory.Copy(.ptr, Src, cap)
-			return cap		
+		return cap
+
+	inline CopyFrom (|string| Src, |int|)
+		cpp_part CopyFromString
+		return .CopyFrom(src.addr, src.length)
 	
-	function CopyTo (|memory| other, |bool|)
-		|| A1 = .ByteCapacity
-		|| A2 = other.ByteCapacity
-		|| A3 = A1 min A2
-			memory.copy(other.ptr, .ptr, A3)
-		return A3 == A1
+	function CopyFrom (|memory| other, |int|)
+		embedded
+		return .CopyFrom(other.ptr, other.bytecapacity)
 		
-		
-	function AppendPlace (|&...|)
-		|| L = .length
-		if (L >= .size)
-			// try grow
-			|| NewSize = .itemsize*L*2
-			|| P2 = Memory.realloc(._ptr, NewSize)
-			if (!P2) // fail
-				return (&Memory.MDummy_)|&...|
-			|| OldSize = .ByteCapacity
-			Memory.zero((p2 + OldSize), NewSize - OldSize) 
-			._ptr = p2
-	
-		.length = l + 1
-		return (._ptr + (.itemsize*L))|&...|
-	
-	
-	function Temporal
-		random.temporal(self)
-	
 	function Count (|int|)
 		disabled "Use .size"
 		
 	setter Size (|int|)
+		inlined
 		.SetSize(value)
 	
-	libinternal SetSize (|int| ItemCount, |bool|)
+	function SetSize (|int| ItemCount, |bool|)
 		if ItemCount == .size
 			return true
-		require .DeathAction == DataObject.kfree
+		require ._Allocator == DataObject.kfree
 		|| S = .itemsize|int|
 		|| old = S * .size
 		|| New = S * ItemCount
@@ -122,12 +101,6 @@ class Memory
 				memory.Zero(mem+old, New-Old)
 			return true
 		error (self, "Can't allocate bytes: " + new)
-
-	function NeedSpare (|int| ReqItems, |int| Extra = 0,  |&...|)
-		|| Q = .length + reqitems
-		if .size < Q
-			require .SetSize(Q+Extra)
-		return (.ptr + .size*.itemsize)|&...|
 
 	inline HasSpare (|bool|)
 		return .Length < .size
@@ -143,10 +116,12 @@ class Memory
 	
 	
 	function Zero
+		embedded
 		zero(._ptr, .length * .itemsize)
 	
 
 	function DebugPrint
+		embedded
 		printline .dump
 	
 	
@@ -156,6 +131,7 @@ class Memory
 	
 	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
 		opt norefcounts
+		embedded
 		|| p = ._ptr
 		|| p2 = p + .ByteCapacity
 		|| i = 0
@@ -175,16 +151,9 @@ class Memory
 
 	
 	destructor
-		if (.deathaction == DataObject.kfree)
+		if (._Allocator == DataObject.kfree)
 			Memory.free(._ptr)
 		
-
-	iterator safe
-		|| i = 0
-		while (i < .length)
-			yield self[i] (i)
-			++i
-
 
 	iterator
 		|| FFFirst = .ptr
@@ -198,27 +167,22 @@ class Memory
 	macro SyntaxAccess
 		(_0.ptr|&...|)[_1]
 	
-	macro SyntaxAppend
-		(_0.appendplace |&...|)[0] = _1
-
-	syntax cast (|&...|)
-		inlined
-		return .ptr
 
 	module
-		|uint64[2]| MDummy_
+		|uint64[2]| _MDummy
 		function Object (|int| Count, |int| ItemSize, |Memory|)
-			visible 
-			description "Returns a memory of object size requested. Creates an error() if fails."
+			visible
+			description "Returns a memory of object size requested. Creates an error if fails."
 			|| p = .zalloc(Count * ItemSize)
 				return .new(Count, ItemSize, p)
 
-		function Random  (|int| n, |memory|)
+		function Random (|int| n, |memory|)
+			opt norefcounts
 			rz = byte[n]
 			if rz
 				random.temporal(rz)
 		
-		inline		Zalloc	(|int| count, |?&byte|)
+		inline Zalloc (|int| count, |?&byte|)
 			inlined
 			return .realloc(nil, count) // why is this not inlined in the cpp??
 										// more mysteries to solve!

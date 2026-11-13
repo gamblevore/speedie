@@ -137,7 +137,7 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		require !.deathaction  or .SetSize(N)
+		require !._Allocator  or .SetSize(N)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
 
 		.length = n
@@ -435,7 +435,7 @@ class Image (memory)
 				Write += step
 
 		if dest == self
-			into.CopyTo(self)
+			.CopyFrom(into)
 					
 		
 	function DrawRect (|ivec4| Rect, |imagepixel| Color)

@@ -17,7 +17,7 @@ class ProgressBar (GUIControl)
 		if gui.FrameStart >= .NextUpdate
 			.NextUpdate = gui.FrameStart + 1s/16
 			GUI.touch
-			RandomBank.Temporal
+			random.temporal(RandomBank)
 		return RandomBank
 	
 	
