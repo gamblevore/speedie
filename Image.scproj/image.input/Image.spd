@@ -11,13 +11,15 @@ class Image (memory)
 	|image?|		Temp
 	contains byte
 
-	constructor (|ivec2| S, |&byte| P, |string| name="")
-		cpp_Part ConstructorPointer
+	constructor (|ivec2| S, |?&byte| P, |string?| name)
+		opt norefcounts
 		super.constructor(s.area, 4, P)
+		if !name
+			name = ""
 		.name = name
 		.AreaInfo = s
 	
-
+	
 	destructor
 		if .name
 			"Destroying: $.name"
@@ -353,15 +355,14 @@ class Image (memory)
 	
 	
 	module
-		function New (|ivec2| wh, |string| name="", |image?|)
+		function New (|ivec2| wh, |string?| name=nil, |image?|)
 			cpp_part NewWithSize
-			|| alloc = memory.zalloc(wh.area*4 max 4)
+			|| alloc = memory.zalloc(wh.area*4)
 				return image(wh, alloc, name)
 		
-		function New (|string| name="", |image!|)
+		inline New (|string?| name=nil, |image!|)
 			cpp_part NewWithName
-			|| alloc = memory.ZAlloc(4)!
-			return image((0,0), alloc, name)
+			return image((0,0), nil, name)
 
 		function string.LoadQOI (|string| name="", |image|)
 			|int[2]| xy

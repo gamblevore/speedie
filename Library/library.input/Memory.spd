@@ -4,8 +4,6 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-
-
 	// Size:			The buffer capacity in terms of items, not bytes.
 	// ItemSize:		The bytesize of the datatype (or struct) stored.
 
@@ -23,30 +21,33 @@ class Memory
 	contains byte
 	
 
-	constructor (|int| ItemCount, |int| ItemSize, |&byte| ptr, |byte| Allocator=DataObject.kfree)
+	constructor (|int| ItemCount, |int| ItemSize, |?&byte| ptr, |byte| Allocator=DataObject.kfree)
 		cpp_part ConstructorPtr
+		if !ptr
+			ptr = (&_MDummy)|&byte|
+			ItemCount = 0
+			Allocator = 0 // ooof
+		
 		.ItemSize = ItemSize
 		.size = itemcount
 		.Allocator = Allocator
 		.Addr = ptr
 	
 	
-	function UseExternalPointer (|&nil| P, |int| ItemCount, |int| ItemSize)
+	function UseExternalPointer (|&nil| P, |int| ItemCount)
 		embedded
-		.ItemSize = ItemSize
 		.size = itemcount
 		if .Allocator == dataobject.kfree
-			Memory.free(.Addr)
-		.Allocator = 0
+			Memory.free(.addr)
 		.Addr = P|&byte|
-	
+		.Allocator = 0
 	
 	setter Addr (|&...|)
 		disabled
 		
 	function Addr (|&...|)
 		return .Addr
-		
+	
 	operator plus (|int| n, |&...|)
 		return (.Addr + .itemsize*n)|&...|
 	
@@ -141,7 +142,7 @@ class Memory
 
 	
 	macro SyntaxAccess
-		(_0.ptr|&...|)[_1]
+		(_0.Addr|&...|)[_1]
 	
 
 	module
@@ -195,9 +196,4 @@ class Memory
 			"
 			cpp_wrapper JB_Mem__PermAlloc
 
-/*	
-function	UltraAlloc (|int64| N = 1|uint64|<<31, |&byte|)
-			cpp_wrapper JB_Mem__mmap
-			description "Its just mmmap. Not even mmap. but mmmap. Like mmap, but a little better. OK so its wrapping mmap(). Turns out you can rely on the VM system to do crazy things for you. So why not allocate 2GB and just never use almost any of it. Even if you only use a tiny 16K of it. The system doesn't care, right? It works on 16KB page basis anyhow, right?"
 
-*/

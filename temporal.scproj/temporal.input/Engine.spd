@@ -41,7 +41,7 @@ class SteveMachine
 	|bool|					Feedback
 	|&TemporalGenerator|	Create
 	|byte[]|				_ByteSamples
-	|int|					Count
+	|uint|					Count
 	
 	constructor (|int| reps, |&TemporalGenerator| T, |byte[]| buff)
 		.reps = reps, .create = t, ._ByteSamples = buff, .Feedback = true
@@ -52,7 +52,7 @@ class SteveMachine
 	
 	function Refresh
 		require self
-		|| p = ._ByteSamples.ptr
+		|| p = ._ByteSamples.addr
 		|| a = p + ._ByteSamples.Size
 		.Count = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
@@ -60,7 +60,7 @@ class SteveMachine
 		
 	libinternal Hash_
 		|uint64| H
-		|| p = ._ByteSamples.ptr
+		|| p = ._ByteSamples.addr
 		|| n = ._ByteSamples.Size
 		for i in n
 			H = (H xor p[i]).Hash

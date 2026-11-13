@@ -956,14 +956,14 @@ module GUI
 
 	libinternal StartFrame (|&SDL_Texture| T)
 		opt norefcounts
-		|| stride = 0
+		|| Stride = 0
 		|&nil| SDLBuff
 		t.lockThatZerosEventhoughItShouldnt(nil, sdlbuff, stride)
-		// could use SDL_UpdateTexture instead? use my own buffer! then
+		// Could use SDL_UpdateTexture instead? use my own buffer! then
 		// we don't need to lock/unlock, which uses 2x memory and DOESN'T
 		// let me get access to the old buffer! might be faster too.
 		if SDLBuff?
-			.screen.UseExternalPointer(SDLBuff, .Screen.size.area, 4)
+			.screen.UseExternalPointer(SDLBuff, .Screen.size.area)
 		
 	
 	libinternal EndFrame (|&SDL_Texture| T)

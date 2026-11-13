@@ -9,6 +9,7 @@
 	* OverSizedCmm not using psub
 
 * asmreg.zero fails to const
+  VBLD: r3, r0, r0, r0, r0 // why not just pass r0?
 
 * Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
 	* We want single run flow-log system. Runs both, compares output
