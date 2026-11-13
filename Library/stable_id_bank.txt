@@ -40,7 +40,6 @@ GUI_Btn_Constructor
 GUI_Btn_Destructor
 GUI_Btn_Draw
 GUI_Btn_ItemAt
-GUI_Btn_ListSource
 GUI_Btn_MenuIsOpen
 GUI_Btn_MouseDown
 GUI_Btn_MouseMove
@@ -305,8 +304,10 @@ GUI_LV_SyntaxAppend
 GUI_LV_TypedString
 GUI_LV_Use
 GUI_LV_VisibleRows
+GUI_Line_Constructor
 GUI_Line_DebugDraw
 GUI_Line_Destructor
+GUI_Line_Message
 GUI_Line_OperatorContains
 GUI_Line_Range
 GUI_Line_Render
