@@ -35,12 +35,13 @@ DrawStyle has the ability to alter the Edge and background colors 'Safely', then
 	
 	linkage
 		cpp_part Sty
+		sort_properties false
 	default DrawStyle.new
 	|ImagePixel|				BG
 	|ImagePixel|				Edge
 	|ImagePixel|				Separator
-	|ImagePixel|				TextColor
 	|ImageDrawStyleEvent?|		PixelShader
+	|ImagePixel|				TextColor
 	|ImagePixel|				_BackupBG
 	|ImagePixel|				_BackupEdge
 	
@@ -61,9 +62,14 @@ DrawStyle has the ability to alter the Edge and background colors 'Safely', then
 		.bg = c.bg
 		.edge = c.edge
 		.Separator = c.Separator
+		.PixelShader = c.PixelShader
 		.textcolor = c.textcolor
+		._Backupbg = c._Backupbg
+		._BackupEdge = c._BackupEdge
 		.CornerSize = c.CornerSize
 		.CornersCut = c.CornersCut
+		.EdgeWidth = c.EdgeWidth
+		.LineHeight = c.LineHeight
 	
 		
 	render

@@ -47,7 +47,6 @@ class ListView (GUIControl) {
 
 	constructor (|guicontrol| Parent,  |GUIListEvent| Select,  |GUIListEvent| Return)
 		super.constructor(Parent)
-		.LineHeight		= 13
 		.takesfocus		= takesfocusflag.On
 		.AllowMultiExpand = true
 		.onreturn		= return
@@ -58,15 +57,16 @@ class ListView (GUIControl) {
 		.listsource		= ListViewrow()
 		.gRowSel		= .gnormal.copy
 		.RightClickSelects = true
-		.XIndentPerDepth = font.Width*2
-		.init
+		.InitStyle
 
 
-	libinternal Init
+	libinternal InitStyle
 		.gRowSel.Bg			<~ ((0.5, 0.5, 0.5, 0.65))
 		.gnormal.solid		=  ((0,   0,   0,   0.65))
 		.gnormal.Separator	<~ ((0.5, 0.5, 0.5, 0.65))
 		.GNormal.TextColor = -1 // oof
+		.LineHeight		= 13
+		.XIndentPerDepth = font.Width*2
 
 
 	libinternal TryRenameCellTo (|listviewcell!| cell, |string| value)
@@ -205,7 +205,7 @@ class ListView (GUIControl) {
 		opt norefcounts
 		|| li = .listsource
 		|| H = ._Hierarchical
-			return li.hierend(li, H)
+			return .hierend(li)
 		return li.Last
 	
 	
@@ -764,7 +764,7 @@ class ListView (GUIControl) {
 		|| T = .ColumnStart(0)
 		|| R = .findClicked(P.y)
 		if r and r != .columns
-			T += .IndentDepth(R)
+			T += .DrawNestDepth(R)
 			|| T2 = T + font.width + 6
 			|| x = p.x
 			if (x >= T and x <= t2)			// and ((r is selected) or keys.option or keys.gui)
@@ -979,9 +979,9 @@ class ListView (GUIControl) {
 		  else
 			if expand
 				deeper |= sel is expanded
+				Deeper &= .AllowMultiExpand
 			  else
 				deeper = true
-			Deeper &= .AllowMultiExpand
 			|| Curr = sel
 			while Curr
 				.ExpandRowSub(curr, expand)
@@ -1288,27 +1288,17 @@ class ListView (GUIControl) {
 			where.DrawRectStyled(r, g)
 	
 	
-	libinternal CalculateSkip (|listviewrow| curr, |ListViewRow| prev, |int| n, |int|)
+	libinternal CalculateRowSkip (|listviewrow| curr, |int| ColumnCount, |uint|)
 		opt norefcounts
-		require prev
-		for i in 1 to n
+		|| prev = curr.prev
+		require prev and !.Hierarchical
+
+		for i in 1 to ColumnCount
 			|| t = .TableCell(curr, i)
 			|| p = .TableCell(prev, i)
 			if (t ~= p)
 				rz |= 1<<i
-	
-	
-	libinternal CalculateSkips
-		opt norefcounts
-		|| n = .ColumnCount
-		|ListViewRow| prev
-		for sk.visible in self
-			|| ind = 0
-			if !.Hierarchical
-				ind = .CalculateSkip(sk, prev, n)
-			sk.indent = ind
-			prev = sk
-		
+
 	
 	libinternal RowBounds (|ListViewrow| find, |ivec4|)
 		return .rowbounds(.scrollstart, find, .lineheight)
@@ -1350,7 +1340,7 @@ class ListView (GUIControl) {
 		|| sc = cell.row!
 		|| B = .RowBounds(sc)								#require
 		B.horz = .ColumnBounds(cell.column, B, sc)
-		B.x += .IndentDepth(sc)
+		B.x += .DrawNestDepth(sc)
 		return (B down .lastbottom) left .lastleft
 
 
@@ -1366,11 +1356,13 @@ class ListView (GUIControl) {
 	libinternal DrawOneRowBorders (|image| Where, |ivec4| Rect, |ivec4| z2, |listviewRow| R,  |ivec4|)
 		opt norefcounts
 		|| n = .ColumnsToDraw
+		
+		|| Skips = ~.CalculateRowSkip(R, n)
 		for i in n
 			z2.horz = .ColumnBounds(i, rect, r)
 			if r.next
-				r.DrawDividerH(z2, where, i)
-			r.DrawDividerV(z2, where)
+				r.DrawLineAcross(z2, where, i, skips)
+			r.DrawLineUpwards(z2, where)
 
 		z2 = z2 down .LineHeight
 		return z2
@@ -1526,7 +1518,6 @@ class ListView (GUIControl) {
 		
 		|| clip = where.ControlClip
 		|| rect = .ActualRect
-		.CalculateSkips
 
 		{
 			|| bg = .DrawBackground(where, rect)		// Cellborders too
@@ -1539,7 +1530,7 @@ class ListView (GUIControl) {
 
 			for r.visible in self
 				rect.y = rect.y2 - .LineHeight
-				r.ListRowDraw(Where, rect, self, .IndentDepth(R), NCols)
+				r.ListRowDraw(Where, rect, self, .DrawNestDepth(R), NCols)
 				rect.y2 = rect.y
 				if (r == end) and .liststart == .scrollstart
 					._CanSeeAllLines = (rect.y >= .lastrect.y)
@@ -1581,7 +1572,7 @@ class ListView (GUIControl) {
 			.DrawScroll(.slh, where)
 
 	
-	libinternal IndentDepth (|listviewRow| Row, |int|)
+	libinternal DrawNestDepth (|listviewRow| Row, |int|)
 		// maybe better to just return an indent... 
 		opt norefcounts
 		if .Hierarchical

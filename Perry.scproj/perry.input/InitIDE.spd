@@ -376,7 +376,7 @@ extend PerryIDE
 			.ColumnFinder	= &Perry.VariableFinder
 			.OnExpandRow	= &listview.PerryCollectExpansion
 			.Hierarchical	= ListViewHierarchy.Last
-			.LineHeight		= .LineHeight + 3
+			.LineHeight		= 16
 			.IsMainEditor	= true
 			.MultiSelection	= true
 			.AllowMultiExpand = false

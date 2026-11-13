@@ -638,7 +638,7 @@ class FileViewer (ListView)
 			opt norefcounts
 			if self isa filerow
 				|| z	= parent.lastrect
-				|| v	= (6 + parent.IndentDepth(self), texty)
+				|| v	= (6 + parent.DrawNestDepth(self), texty)
 				|| D	= ._Document
 				|| mod	= (D!=nil)(D.ismodified, nil)
 				|| ddd	= (mod)(Colors.black(0.5), Colors.clear)

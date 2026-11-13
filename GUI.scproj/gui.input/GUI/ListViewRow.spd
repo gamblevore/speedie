@@ -35,16 +35,11 @@ role ListViewRow (message)
 			gui.touch
 
 
-	libinternal NotDeclutteredCell (|int| i, |bool|)
-		if !self
-			return true
-		return !((.Indent)&(1<<i))
-		
-
-
-	libinternal HierEnd (|listviewrow| root, |listviewhierarchy| H, ||)
+	libinternal ListView.HierEnd (|listviewrow| row, |listviewrow|)
 		opt norefcounts
-		rz = self
+		rz = row
+		|| root = .ListSource
+		|| h = ._Hierarchical
 		while (rz is expanded) or (rz == root)
 			|| try = rz.last
 			if (h is last) and (rz!=root)
@@ -54,23 +49,24 @@ role ListViewRow (message)
 			
 
 
-	libinternal HierPrev (|listviewrow| root, |listviewhierarchy| H, ||)
+	libinternal ListView.HierPrev (|listviewrow| Row, |listviewrow|)
 		opt norefcounts
-		|| p = .Prev
-			return p.hierend(root, H)
-		if h is last
-			self = .parent
-			if self == root
+		|| root = .ListSource
+		|| p = row.Prev
+			return .hierend(p)
+		if ._hierarchical is last
+			row = row.parent
+			if row == root
 				return nil
-		p = .parent
+		p = row.parent
 		if p == root
 			p = nil
 		return p
 
 
-	libinternal listview.HierNext (|listviewrow| Row, |listviewrow| Root, |listviewrow|)
-		opt norefcounts		// listviewhierarchy isnt so easy to get working...
-		if (row is expanded) or (row == root)
+	libinternal listview.HierNext (|listviewrow| Row, |listviewrow|)
+		opt norefcounts		// ListViewHierarchy isnt so easy to get working...
+		if (row is expanded) or (row == .listsource)
 			if ._hierarchical is Last
 				row = row.last
 			return row.flatnext
@@ -95,29 +91,30 @@ role ListViewRow (message)
 		where.DrawRect(Rect, A) 
 	
 	
-	libinternal DrawDividerH (|ivec4| z2, |image| Where, |int| i)
+	libinternal DrawLineAcross (|ivec4| z2, |image| Where, |int| i, |uint| Skips)
 		opt NoRefCounts
 		require (self isnt disabled) and (.prev isnt disabled)
-		|| Vis	= .NotDeclutteredCell(i)
+		|| Vis	= (1<<i)&Skips
 			Where.MarkLineH(z2.x1y2, z2.width, 1)
 
 
-	libinternal DrawDividerV (|ivec4| z2, |image| Where)
-		Where.MarkLineV(z2.x1y2, 		z2.height, 1)
+	libinternal DrawLineUpwards (|ivec4| z2, |image| Where)
+		Where.MarkLineV(z2.x1y2,		z2.height, 1)
 		Where.MarkLineV(z2.x2y2+(1,0),	z2.height, 1)
 
 	
-	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| p, |int| indent_depth, |int| N)
+	libinternal ListRowDraw (|image| Where, |ivec4| Rect, |ListView| Owner, |int| indent_depth, |int| N)
 		opt NoRefCounts
-		|| w	= p.window	
+		|| w	= Owner.window	
 		|| z2	= rect
 		|| str = 1.0
 
+		|| Skips = ~Owner.CalculateRowSkip(self, N)
 		for i in n
-			rect.horz	= p.ColumnBounds(i, z2, self)
+			rect.horz	= Owner.ColumnBounds(i, z2, self)
 			rect.x		+= indent_depth
-			where.ControlClip = rect.clip(p.lastrect)
-			.DrawRowColumn(rect, where,  p, i, str)
+			where.ControlClip = rect.clip(Owner.lastrect)
+			.DrawCellInsides(rect, where,  Owner, i, str, (1<<i)&Skips != 0)
 		
 		where.controlclip = z2
 		
@@ -157,10 +154,9 @@ role ListViewRow (message)
 		return parent.TableCell(self, column)
 	
 	
-	libinternal DrawRowColumn (|ivec4| rect, |image| Where, |ListView| Parent, |int| Column, |float| str)
+	libinternal DrawCellInsides (|ivec4| rect, |image| Where, |ListView| Parent, |int| Column, |float| str, |bool| CanDraw)
 		opt NoRefCounts
 
-		|| CanDraw = .NotDeclutteredCell(column)
 		require CanDraw or parent.OnDrawRow
 		
 		|| CellText = .CellOrRow(parent, column)
@@ -199,17 +195,9 @@ role ListViewRow (message)
 		if row.last == @arg
 			return true // Right? even if its empty.
 						// Cos we need some way to ask a server/process for open a folder
-		if .listchild(row)
+		if .ListChild(row)
 			return true // also
 	
-	
-	libinternal listview.AllExpandState (|listviewrow| Row, |int|)
-		opt norefcounts
-		|| r = .ListChild(Row)
-		while r
-			rz |= 1 + (r is expanded)
-			r = .hiernext(r, row)
-
 	
 	module
 		function NewSeparator (|int| Pos = 0, |listviewrow|)
@@ -305,8 +293,7 @@ extend ListView
 				return l.prev
 
 		Within ?= .ListSource
-		if Forward
-			return .hiernext(l, Within)
-		  else
-			return l.hierprev(Within, H)
+		|| Found = (Forward)(.hiernext(l), .hierprev(l))		
+		if Within contains Found
+			return Found
 

@@ -490,9 +490,9 @@ function ListViewRow.AddSpacers
 	while curr
 		if (curr isnt Disabled) and (curr.prev isnt Disabled)
 			curr.prev = ListViewRow(listviewstate.disabled)
-		curr = curr.Next
-
-
+		curr = curr.Next			
+	
+	
 function perryide.UpdateStack (|message| stack, |int| Mode)
 	opt norefcounts
 	
@@ -508,7 +508,6 @@ function perryide.UpdateStack (|message| stack, |int| Mode)
 
 	StackSrc.ReStitchAndFixup(arg, 0)
 	StackSrc.AddSpacers
-	StackSrc.name = "vars"
 	
 	|| CurrFunc = .stack.SelectableEdge
 	if !CurrFunc
@@ -517,7 +516,8 @@ function perryide.UpdateStack (|message| stack, |int| Mode)
 	if currfunc and Mode != kStackUpdate
 		if Mode == kBreak
 			.stack.SelectFirst
-			(CurrFunc is expanded)
+			.NiceExpands(Currfunc)
+			
 		
 		|| m = .DebugMode
 		(m is paused)
@@ -546,7 +546,20 @@ function jbin.ExpandDebug (|listviewrow| list, |int| Depth)
 				.ExpandDebug(arg, depth+1)
 				.exit
 	.exit
-		
+
+
+
+function PerryIDE.NiceExpands (|listviewrow| row)
+	opt norefcounts
+	if row isnt Expanded
+		.stack.ExpandRow(row)
+		row.Indent = 255 // mark as auto-collapse
+	while
+		row++
+		require row
+		if row.Indent == 255
+			.stack.ExpandRow(row, -1)
+
 
 function listview.PerryCollectExpansion (GUIListExpandEvent)
 	// This would expand ALL vars of the same function... even if recursive.
@@ -554,6 +567,9 @@ function listview.PerryCollectExpansion (GUIListExpandEvent)
 //	main: "/usr/local/speedie/Examples/hello_world.spd" \150 \4
 
 	opt norefcounts
+	if row
+		row.Indent = 0
+		
 	|| funcs = .ListSource
 	|| j = VarPrinter|jbin|.Start(@tmp, "expansion")
 	j.Enter(@arg)

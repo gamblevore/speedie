@@ -443,7 +443,7 @@ function xvar.ExpandList (|jbin| j, |list| Obj, |message?| xp, |int| depth, |boo
 	while (i < 10K)
 		loop Curr
 		OK &= j.RenderListObject(Curr, i)
-		j.addint(i-1)
+		j.addint(i)
 		j.exit
 		i++
 		Curr++
