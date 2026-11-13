@@ -952,7 +952,7 @@ struct Memory_Behaviour: Object_Behaviour {
 JBClass ( MWrap , JB_Object , 
 	uint ItemSize;
 	byte* _Ptr;
-	byte DeathAction;
+	byte _Allocator;
 	int Length;
 	int Size;
 );
@@ -2549,7 +2549,7 @@ extern bool SC__Cpp_WriteAPI;
 #define kSC__Instruction_kTypeConst ((int)2)
 extern Dictionary* SC__Instruction_OpDict;
 extern Instruction* SC__Instruction_TypeList[256];
-#define JB__Mem_MDummy_ JB__.Mem_MDummy_
+#define JB__Mem__MDummy JB__.Mem__MDummy
 extern Array* SC__Imp_AllFiles;
 extern SCImport* SC__Imp_Curr;
 extern byte SC__Imp_CurrIsManuallyImported;
@@ -2663,7 +2663,7 @@ struct JB_Globals {
 	RandomXOR zalgo_R;
 	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
-	uint64 Mem_MDummy_[2];
+	uint64 Mem__MDummy[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Syx_TypeList[64];
 };
@@ -7539,7 +7539,7 @@ Instruction* SC_Instruction__SyntaxAccessWithInt(int Pos);
 
 
 // JB_Memory
-MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction);
+MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ Allocator);
 
 void JB_Mem_Destructor(MWrap* Self);
 

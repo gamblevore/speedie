@@ -31208,21 +31208,21 @@ Instruction* SC_Instruction__SyntaxAccessWithInt(int Pos) {
 }
 
 
-MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ DeathAction) {
+MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ Allocator) {
 	if (Self == nil) {
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
 	//cpp_part;
 	Self->ItemSize = ItemSize;
 	Self->Size = ItemCount;
-	Self->DeathAction = DeathAction;
+	Self->_Allocator = Allocator;
 	Self->Length = 0;
 	Self->_Ptr = Ptr;
 	return Self;
 }
 
 void JB_Mem_Destructor(MWrap* Self) {
-	if (Self->DeathAction == kJB__Wrap_kFree) {
+	if (Self->_Allocator == kJB__Wrap_kFree) {
 		JB_Free(Self->_Ptr);
 	}
 	JB_Obj_Destructor(Self);
@@ -61384,4 +61384,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 19434380427204534 -3305639385004484334
+// 6890027315495526438 -3305639385004484334

@@ -123,7 +123,7 @@ GUI__cwin__asker
 GUI__Open__Asker
 JB__TC_Types_Dict
 GUI__RayInfo_Miss
-JB__Mem_MDummy_
+JB__Mem__MDummy
 JB_RandomShared
 JB__zalgo_R
 JB__Tk_Using

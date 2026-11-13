@@ -7,15 +7,11 @@
 * Unused const (1) in setter Size
 	* vec>>4 bad asm
 	* OverSizedCmm not using psub
+
 * asmreg.zero fails to const
 
-* We want single run flow-log system. Runs both, compares output
-	* Get speedie flowlogged the same way!
-
-* New created vars get a "glitter" like the textview
-	* Altered also, but a different color
-
 * Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
+	* We want single run flow-log system. Runs both, compares output
 
 
 								// ASM later
