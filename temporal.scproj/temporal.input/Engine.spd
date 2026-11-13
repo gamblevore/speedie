@@ -53,7 +53,7 @@ class SteveMachine
 	function Refresh
 		require self
 		|| p = ._ByteSamples.addr
-		|| a = p + ._ByteSamples.Size
+		|| a = p + ._ByteSamples.Count
 		.Count = 0 // So that .samples.next works properly.
 		(.Create.Steve)(p, a, 0, .reps)
 		
@@ -61,7 +61,7 @@ class SteveMachine
 	libinternal Hash_
 		|uint64| H
 		|| p = ._ByteSamples.addr
-		|| n = ._ByteSamples.Size
+		|| n = ._ByteSamples.Count
 		for i in n
 			H = (H xor p[i]).Hash
 		
@@ -106,7 +106,7 @@ class SteveMachine
 		// So EightIsntGreat just return 8-bits because its natural. The name reminds us
 		// that its better to combine into more bits, then take 8 directly.
 		
-		if .Count >= ._ByteSamples.size
+		if .Count >= ._ByteSamples.Count
 			.Refresh
 							// OK so... this isn't possible to fully replicate just yet
 							// the original temporal engine did A LOT MORE. Including...

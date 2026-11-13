@@ -156,7 +156,7 @@ struct RandomXOR
 		description "seems not temporal... needs upgrade."
 		|| P = mem.Addr
 		if p?
-			.temporal(P, P + mem.ByteCapacity)
+			.temporal(P, P + mem.ByteLength)
 
 	macro SyntaxCall
 		description "Returns a bool. To get a float, use [] instead of ()"

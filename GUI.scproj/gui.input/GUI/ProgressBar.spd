@@ -24,7 +24,7 @@ class ProgressBar (GUIControl)
 	libinternal ColorIndef (|image| image, |Memory| data, |float| Strength=1)
 		require strength > 0
 		|| in = data.addr
-		|| after = data.Addr + data.size
+		|| after = data.Addr + data.Count
 		|| w = ((strength)~gray).PreMul
 		|premultipliedcolor| c
 		|| clip = image.ControlClip

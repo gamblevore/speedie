@@ -4,9 +4,8 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-	// Size:			The buffer capacity in terms of items, not bytes.
-	// ItemSize:		The bytesize of the datatype (or struct) stored.
-
+	// Size:			The number of items this memory allocation can store.
+	// ItemSize:		The bytesize of each item.
 
 class Memory
 	linkage
@@ -14,8 +13,9 @@ class Memory
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|uint|				Size
+	|uint|				ByteLength	// can be shared with string now.
 	|&byte|				Addr
+	|uint|				Count	// I prefer Count than length because length sounds like a string. But the the items here have a real count. Like the length of a rope is it's length. But the COUNT of items is different than its length. 10 elephants has a longer length than 10 snails.
 	|uint|				ItemSize
 	|byte|				Allocator
 	contains byte
@@ -29,14 +29,16 @@ class Memory
 			Allocator = 0 // ooof
 		
 		.ItemSize = ItemSize
-		.size = itemcount
+		.Count = itemcount
+		.ByteLength = ItemCount * ItemSize
 		.Allocator = Allocator
 		.Addr = ptr
 	
 	
 	function UseExternalPointer (|&nil| P, |int| ItemCount)
 		embedded
-		.size = itemcount
+		.Count = itemcount
+		.ByteLength = ItemCount * .ItemSize
 		if .Allocator == dataobject.kfree
 			Memory.free(.addr)
 		.Addr = P|&byte|
@@ -48,12 +50,12 @@ class Memory
 	inline Addr (|&...|)
 		return .Addr
 	
-	operator plus (|int| n, |&...|)
-		return (.Addr + .itemsize*n)|&...|
+	setter Allocator (|int|)
+		disabled
 	
 	function CopyFrom (|&nil| Src, |int| Length, |int|)
 		cpp_part CopyFromPtr
-		|| cap = .ByteCapacity min Length
+		|| cap = .ByteLength min Length
 			memory.Copy(.Addr, Src, cap)
 		return cap
 
@@ -63,38 +65,38 @@ class Memory
 	
 	function CopyFrom (|memory| other, |int|)
 		embedded
-		return .CopyFrom(other.Addr, other.bytecapacity)
+		return .CopyFrom(other.Addr, other.ByteLength)
 		
-	function Count (|int|)
-		disabled "Use .size"
-		
-	setter Size (|int|)
+	setter Count (|int|)
 		inlined
-		.SetSize(value)
+		.ReSize(value)
 	
-	function SetSize (|int| ItemCount, |bool|)
-		if ItemCount == .size
+	function Size (|uint|)
+		disabled "Use .count"
+	
+	function Resize (|int| ItemCount, |bool|)
+		if ItemCount == .Count
 			return true
 		require .Allocator == DataObject.kfree
 		|| S = .itemsize|int|
-		|| old = S * .size
+		|| old = S * .Count
 		|| New = S * ItemCount
 		|| Mem = Memory.realloc(.Addr, New)
 			.Addr = mem
-			.size = ItemCount
+			.Count = ItemCount
 			if New > Old
 				memory.Zero(mem+old, New-Old)
 			return true
 		error (self, "Can't allocate bytes: " + new)
 
 	
-	inline ByteCapacity (|int|)
-		return .ItemSize|int|*.size|int|
+	inline RealSize (|int|)
+		disabled "Use .length"
 
 	
 	function Zero
 		embedded
-		zero(.Addr, .bytecapacity)
+		zero(.Addr, .ByteLength)
 	
 
 	function DebugPrint
@@ -103,14 +105,14 @@ class Memory
 	
 	
 	inline String (|string|)
-		return string.Copy(.Addr, .ByteCapacity)
+		return string.Copy(.Addr, .ByteLength)
 	
 	
 	render Dump (|int| BytesOnRow=16, |int| TabsAfterBytes=4)
 		opt norefcounts
 		embedded
 		|| p = .Addr
-		|| p2 = p + .ByteCapacity
+		|| p2 = p + .ByteLength
 		|| i = 0
 		|| com = 0
 		fs <~ "dumping memory:\n"
@@ -135,7 +137,7 @@ class Memory
 	iterator
 		|| FFFirst = .Addr
 		|| Curr = FFFirst
-		|| After = curr + .size
+		|| After = curr + .Count
 		while (Curr < after)
 			yield Curr[0] (curr - FFFirst)
 			++Curr
@@ -154,6 +156,7 @@ class Memory
 				return .new(Count, ItemSize, p)
 
 		function Random (|int| n, |memory|)
+			embedded
 			opt norefcounts
 			rz = byte[n]
 			if rz

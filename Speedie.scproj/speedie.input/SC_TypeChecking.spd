@@ -294,14 +294,17 @@ function Compiler.GetTypeVoid (|scdecl!|)
 	syntax cast (|bool|)
 		disabled "Can't cast void to a bool."
 }` ~ Parse
-
+	
 	compiler.program.CollectOne(msg)
-	|| vc = Compiler["_void"]
+
+	|| vc = Compiler["_void"]			#expect app
+//	vc.name = "nil"
 	TypeVoid_ = vc
-	
-	if !vc
-		app.Quit("_void failiure", -1)
-	
 	rz = vc.TypeNormal
+	rz.name = "nil"
 	typevoid = rz
-	TypeVoidPtr = rz.GetAddress
+
+	|| ptr = rz.GetAddress
+	TypeVoidPtr = ptr
+	ptr.Name = "nil"
+

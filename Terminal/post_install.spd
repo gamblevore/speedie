@@ -15,6 +15,7 @@ main
 	.LetsGo
 	.cwd = cwd
 	if IsTesting
+		app.say "Success!"
 		return 0
 	
 	if StdErr.ok

@@ -83,7 +83,7 @@ class GraphicsEditor (GuiControl)
 	
 	
 	function image.RawData (|string|)
-		return string.FromPtr(.Addr, .ByteCapacity)
+		return string.FromPtr(.Addr, .ByteLength)
 	
 					
 	function jbin.AddImage	(|image| img, |string| name)

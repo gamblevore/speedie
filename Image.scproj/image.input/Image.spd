@@ -47,7 +47,7 @@ class Image (memory)
 	function CopyImage (|string| name="", |Image|)
 		rz = .ImageOfSameSize(name)
 		if rz
-			memory.Copy(rz.Addr, .Addr, rz.ByteCapacity)
+			memory.Copy(rz.Addr, .Addr, rz.ByteLength)
 	
 	
 	target __IMPORT_GUI__
@@ -67,7 +67,7 @@ class Image (memory)
 	operator contains (|&imagepixel| P, |bool|)
 		cpp_part ContainsPixel
 		|| Start = .addr
-		|| After = Start+.ByteCapacity
+		|| After = Start+.ByteLength
 		return P >= Start|&imagepixel|  and P < After|&imagepixel| 
 		
 	
@@ -138,7 +138,7 @@ class Image (memory)
 	
 	function ResizeTo (|ivec2| value, |bool|)
 		|| N = value.area
-		require !.Allocator  or .SetSize(N)
+		require !.Allocator  or .Resize(N)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
 
 		.AreaInfo = value
@@ -375,7 +375,7 @@ class Image (memory)
 				return s.loadqoi(self) #expect (self, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
-			|| l = .ByteCapacity
+			|int| l = .ByteLength
 			|| qoi = imagehelper.WriteQOI(.Addr, .Width, .Height, l)
 				return string.FromPtr(qoi, l)
 
@@ -384,7 +384,7 @@ class Image (memory)
 	
 	function LoadEmpty (|int| W, |int| H, |bool|)
 		if (.size.x != W or .size.y != h)
-			.setsize(w * h)
+			require .Resize(w * h)
 			.AreaInfo = (w,h)
 		return .Pixels
 	
@@ -448,7 +448,7 @@ class Image (memory)
 				sigh.Overlay(C)
 				i++
 		  elseif Rect == .rect
-			memory.fill(.Addr|&int|, super.size, Color)
+			memory.fill(.Addr|&int|, super.Count, Color)
 		  else
 			for sigh in range
 				sigh[0] = Color
@@ -499,7 +499,7 @@ class Image (memory)
 	
 	function Invert
 		|| p = .addr
-		|| End = p + (.bytecapacity-3)
+		|| End = p + (.ByteLength-3)
 		while p < End
 			p[0] = 255-p[0]
 			p[1] = 255-p[1]
