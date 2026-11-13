@@ -1130,12 +1130,6 @@ class TextView (GUIControl)
 		return nil
 
 
-	function DoExplode (|textviewline| D)
-		opt NoRefCounts
-		|| w = .window
-			.LineAttention(1.0s, gui.framestart, D)
-
-
 	libinternal message.LastAfter (|int| IgnoreAfter, |ind|)
 		opt norefcounts
 		nil self

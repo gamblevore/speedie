@@ -637,8 +637,19 @@ class GUIControl (list)
 		inlined
 		.GNormal.LineHeight = value
 	
+
+	function DoExplode (|date| Duration=0, |message| ExplodingLine, |vec4| Color = nil)
+		opt NoRefCounts
+		require .window
+		
+		if !color
+			color = (1.0, 1.0, 2.0, 1.0)
+		if !Duration
+			Duration = 1s
+		.ExplodeLine(Duration, gui.framestart, ExplodingLine, Color)
+
 	
-	task LineAttention (taskgui, |listviewrow| D)
+	task ExplodeLine (taskgui, |listviewrow| ExplodingLine, |vec4| Color)
 		constructor
 			libinternal
 			is Animation
@@ -647,8 +658,8 @@ class GUIControl (list)
 			opt norefcounts
 			libinternal
 			|| y = 0.0
-			|| d = .d
-			|| color = (1.0, 1.0, 2.0, 1.0)
+			|| d = .ExplodingLine
+			|| color = .color
 			|| upon = .upon
 			if d isa textviewline and upon isa textview
 				require d in upon.WrappedLines
@@ -658,10 +669,10 @@ class GUIControl (list)
 			  elseif upon isa listview
 				require upon.listsource contains d
 				Y = upon.RowBounds(d).y|float|
+				y += 3
 			
 			|| LH = upon.lineheight|float|
-			y+=LH*0.75
-				
+			y += LH*0.75
 				
 			|| H = .upon.lastrect.x1x2.vec2
 			|| HM = (H.x+H.x2)/2.0
@@ -675,13 +686,14 @@ class GUIControl (list)
 				|| vib = (s+(h.x*32191.23)|int|).ago.cycle(1s) - 2.5
 				vib += (s+(h.x*3191.23)|int|).ago.cycle(0.27s)
 				vib += s.ago.float
-				|| middleness = 0.5-((h.x-hm).length)*WH
+				|| Middleness = 0.5-((h.x-hm).length)*WH
 				rect = rect.up(vib*LH*0.15 + LH*-0.3 + ago*0.3)
 				|| str = (1.0-ago*0.7th)*0.5 max -0.01
 				color.a = str*middleness*2.5
 				GUI.Screen.DrawSoftCircle( Rect, color )
 				h.x += 10.0 - (mush.hash&1)|float|*2.3
 				mush++
+
 
 	libinternal AddTask (|TaskGUI| t)
 		opt norefcounts
@@ -693,7 +705,7 @@ class GUIControl (list)
 // (which sucks anyhow). I guess we can worry about this when we make functional
 // programming or nested subtasks.
 
-	task TaskGUI ( |...!| Upon,  |duration| duration,  |date| StartTime = gui.framestart )
+	task TaskGUI ( |...!| Upon,  |duration| Duration,  |date| StartTime = gui.framestart )
 		|float| PrevProgress
 		contains –parentclass			// super cool feature
 		constructor						// upon,  StartTime,  duration are automatically set

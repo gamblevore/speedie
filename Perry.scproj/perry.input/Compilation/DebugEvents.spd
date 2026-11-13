@@ -305,7 +305,7 @@ function ClickedStack (GUIListEvent)
 	return true
 
 
-function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,  |ListViewRow|)
+function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,   |ListViewRow|)
 	opt norefcounts
 	|| Path = ""
 	while
@@ -322,7 +322,7 @@ function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,  |ListViewRo
 		|| e = .editme
 		e._ActiveLine = file_path
 		|| Line = e.show(Where, textviewjumpmode.CompilePos)
-		if (Mode == PerryUpdateStack) or (.LastStack != row)
+		if (.LastStack != row)
 			e.DoExplode(Line)
 	
 		.LastStack = row	

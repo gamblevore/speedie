@@ -235,30 +235,42 @@ function listviewrow.BadVar
 	Notifications <~ "Something wrong with var: " + .name
 
 
-function listviewrow.CopyNames (|listviewrow| Row)
+function ListView.CopyNames (|listviewrow| Old, |listviewrow| Row)
 	opt norefcounts
-	if self isnt error and row is error
+	if old isnt error and row is error
 		row.badvar
 	
-	(self is error) = (row is Error)
-	.name = row.name
-	self = .first
+	(old is error) = (row is Error)
+	.GlitterName(old,  row)
+	old = old.first
 	row = row.first
-	while self and row
-		.name = row.name
-		self++
+	while old and row
+		.GlitterName(old, row)
+		old++
 		row++
-	if self
-		.RemoveAfter
-		.Remove
+	if old
+		old.RemoveAfter
+		old.Remove
+		
 
-
-function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
+function ListView.GlitterName (|ListViewRow| Old, |listviewrow| R)
 	opt norefcounts
-	.CopyNames(Inputrow)
+	|| n = R.name
+	require n != old.name
+	old.name = n
+	if old in @arg
+		|| VeryYellow = (3.5, 1.5, 0.5, 0.0)
+		.DoExplode(2s, Old, VeryYellow)
+		.Position++
+
+
+
+function ListView.CopyDebugData (|listviewrow| Old, |message| InputRow, |int| Depth)
+	opt norefcounts
+	.CopyNames(old, Inputrow)
 	|| InputArg = InputRow.last
 	if InputArg == @arg
-		.givearg|listviewrow|.ReStitchAndFixup(InputArg, Depth)
+		.ReStitchAndFixup(old.givearg|listviewrow|, InputArg, Depth)
 		
 	// AAAA
 	// BBBB (O)
@@ -267,9 +279,9 @@ function listviewrow.CopyDebugData (|message| InputRow, |int| Depth)
 	// AAAA (N)
 	// CCCC
 
-function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
+function listview.ReStitchAndFixup (|ListViewRow| Old, |listviewrow| NewList, |int| Depth)
 	opt norefcounts
-	|| O = .last
+	|| O = old.last
 	
 	while (|| N = NewList.Last)
 		|listviewrow| Same
@@ -285,14 +297,14 @@ function listviewrow.ReStitchAndFixup (|listviewrow| NewList, |int| Depth)
 				o = same
 			
 		if Same
-			same.CopyDebugData(n, Depth+1)
+			.CopyDebugData(same, n, Depth+1)
 			n.remove
 			o--
 		  else
 			if o
 				o.next = n
 			  else
-				.first = n
+				old.first = n
 			if n is error
 				n.badvar
 
@@ -493,11 +505,11 @@ function ListViewRow.AddSpacers
 		curr = curr.Next			
 	
 	
-function perryide.UpdateStack (|message| stack, |int| Mode)
+function perryide.UpdateStack (|message| Stack, |int| Mode)
 	opt norefcounts
 	
 	|| arg = stack.last$
-	.appinfo.obj = stack.first			// Nice info about RAM/Pico :]
+	.AppInfo.obj = stack.first			// Nice info about RAM/Pico :]
 	|| StackSrc = .stack.listsource
 
 	for m in Arg
@@ -506,18 +518,18 @@ function perryide.UpdateStack (|message| stack, |int| Mode)
 			for s in l
 				s|ListViewRow|.ImproveVar(0, .DebugHideUnderscore)
 
-	StackSrc.ReStitchAndFixup(arg, 0)
+	.stack.Position = 0 // glittercount
+	.stack.ReStitchAndFixup(StackSrc, arg, 0)
 	StackSrc.AddSpacers
 	
 	|| CurrFunc = .stack.SelectableEdge
 	if !CurrFunc
 /		beep "no CurrFunc?"// how???
 
-	if currfunc and Mode != kStackUpdate
+	if CurrFunc and Mode != kStackUpdate
 		if Mode == kBreak
 			.stack.SelectFirst
 			.NiceExpands(Currfunc)
-			
 		
 		|| m = .DebugMode
 		(m is paused)
@@ -529,7 +541,7 @@ function perryide.UpdateStack (|message| stack, |int| Mode)
 		|| l = .editme._ActiveLine
 			l.Flags = (mode == kCrash)|int|
 
-		.UpdateCodePointer(CurrFunc, PerryUpdateStack)
+		.UpdateCodePointer(CurrFunc, mode)
 
 	.SetAppInfo
 
@@ -540,8 +552,8 @@ function jbin.ExpandDebug (|listviewrow| list, |int| Depth)
 	.enter
 	for var in list
 		|| arg = var.last
-		if (arg == @arg) and (var is expanded) and (depth < 24) // in case a bug mass expands somehow
-			|| name = var.obj as string							// we don't want some recursive object to destroy the stack
+		if (arg == @arg) and (var is expanded) and (depth < 24) // In case a bug mass expands somehow
+			|| name = var.obj as string							// We don't want some recursive object to destroy the stack
 				.enter(@tmp, name)
 				.ExpandDebug(arg, depth+1)
 				.exit
