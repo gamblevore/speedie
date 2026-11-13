@@ -18300,13 +18300,12 @@ Message* JB_Syx_Msg(Syntax Self, JB_String* Name) {
 }
 
 JB_String* JB_Syx_Name(Syntax Self) {
-	if (Self) {
-		SyntaxObj* O = JB_Syx_Obj(Self);
-		if (O) {
-			return O->Name;
-		}
+	JB_String* Rz = JB_LUB[0];
+	SyntaxObj* O = JB_Syx_Obj(Self);
+	if (O) {
+		Rz = O->Name;
 	}
-	return JB_LUB[1634];
+	return Rz;
 }
 
 SyntaxObj* JB_Syx_Obj(Syntax Self) {
@@ -18330,7 +18329,7 @@ int JB_Syx__Init_() {
 	return 0;
 }
 
-Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* LongName, int ID) {
+Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* FullName, int ID) {
 	if (ID >= (64)) {
 		JB_Str_Fail(JB_Str_OperatorPlusWithInt64(JB_LUB[1445], ID));
 		return nil;
@@ -18338,9 +18337,9 @@ Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* LongNam
 	SyntaxObj* Result = JB_Fn_Constructor(nil, ((FP_fpMsgRender)(Render)), Name, ID);
 	(JB_Dict_ValueSet(JB__Syx_Types, Name, Result));
 	JB_SetRef(JB__Syx_TypeList[ID], Result);
-	if (((JB_String*)JB_Str_Exists(LongName))) {
-		(JB_Dict_ValueSet(JB__Syx_Types, LongName, Result));
-		JB_SetRef(Result->FullName, LongName);
+	if (((JB_String*)JB_Str_Exists(FullName))) {
+		(JB_Dict_ValueSet(JB__Syx_Types, FullName, Result));
+		JB_SetRef(Result->FullName, FullName);
 	}
 	 else {
 		JB_SetRef(Result->FullName, Name);
@@ -61385,4 +61384,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -8405244340654214663 -3305639385004484334
+// 19434380427204534 -3305639385004484334

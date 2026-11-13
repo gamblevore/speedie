@@ -5297,7 +5297,7 @@ Message* JB_Syx_PlusNum(Syntax Self, int64 M);
 
 int JB_Syx__Init_();
 
-Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* LongName, int ID);
+Syntax JB_Syx__StdNew(FP_fpMsgRender Render, JB_String* Name, JB_String* FullName, int ID);
 
 Syntax JB_Syx__AccessName(JB_String* Name, Message* Where);
 
