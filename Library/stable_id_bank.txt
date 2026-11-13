@@ -168,7 +168,7 @@ GUI_Img_Clear
 GUI_Img_Clip
 GUI_Img_ClipVec
 GUI_Img_ClippedRectDrawer
-GUI_Img_ConstructorPointer
+GUI_Img_Constructor
 GUI_Img_ContainsPixel
 GUI_Img_ControlClipSet4
 GUI_Img_CopyImage
@@ -211,7 +211,6 @@ GUI_Img_Tile2
 GUI_Img_WindowSet
 GUI_Img_WriteQOI
 GUI_Img__CurlieQue
-GUI_Img__NewWithName
 GUI_Img__NewWithSize
 GUI_Img_blur
 GUI_Img_resetarea
@@ -1058,8 +1057,6 @@ JB_MemUsedString
 JB_Mem_ConstructorPtr
 JB_Mem_CopyFromPtr
 JB_Mem_Destructor
-JB_Mem_LengthSet
-JB_Mem_Next
 JB_Mem_OperatorPlus
 JB_Mem_SetSize
 JB_Mem__ClassLeakCounter

@@ -45,7 +45,7 @@ class Memory
 	setter Addr (|&...|)
 		disabled
 		
-	function Addr (|&...|)
+	inline Addr (|&...|)
 		return .Addr
 	
 	operator plus (|int| n, |&...|)
