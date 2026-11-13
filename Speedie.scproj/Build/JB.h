@@ -951,10 +951,10 @@ struct Memory_Behaviour: Object_Behaviour {
 
 JBClass ( MWrap , JB_Object , 
 	uint ItemSize;
-	byte* _Ptr;
-	byte _Allocator;
-	int Length;
-	int Size;
+	byte* Addr;
+	byte Allocator;
+	uint Count;
+	uint ByteLength;
 );
 
 struct MemoryLayer_Behaviour: Object_Behaviour {
@@ -2702,6 +2702,8 @@ Message* JB_App__Prefs();
 ExitCode JB_App__Say(JB_String* S, bool Print);
 
 JB_String* JB_App__ArgValue(JB_String* Name);
+
+void JB_App__SyntaxExpect(JB_String* S);
 
 bool JB_App__Yes(JB_String* Name);
 

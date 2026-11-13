@@ -1057,13 +1057,11 @@ JB_MemUsedString
 JB_Mem_ConstructorPtr
 JB_Mem_CopyFromPtr
 JB_Mem_Destructor
-JB_Mem_OperatorPlus
-JB_Mem_SetSize
+JB_Mem_Resize
 JB_Mem__ClassLeakCounter
 JB_Mem__Fill
 JB_Mem__Object
 JB_Mem__PermAlloc
-JB_Mem__Random
 JB_MoveCode_Field
 JB_MoveCode_Flip
 JB_MsgPos_Destructor

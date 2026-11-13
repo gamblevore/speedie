@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2392];
+extern JB_StringC* JB_LUB[2391];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -209,6 +209,10 @@ JB_String* JB_App__ArgValue(JB_String* Name) {
 	}
 	;
 	return Rz;
+}
+
+void JB_App__SyntaxExpect(JB_String* S) {
+	JB_App__Quit(S, -1);
 }
 
 bool JB_App__Yes(JB_String* Name) {
@@ -1074,14 +1078,17 @@ SCDecl* SC_Comp__GetTypeVoid() {
 	Message* Msg = JB_Str_ParseJbin(((JB_LUB[32])), 1073741824);
 	SC_Base_CollectOne(SC__Comp_Program, Msg, false);
 	SCClass* Vc = SC_Comp__FindClassName(JB_LUB[1535], 0);
-	JB_SetRef(SC_TypeVoid_, Vc);
 	if (!Vc) {
-		JB_App__Quit(JB_LUB[1536], -1);
+		JB_App__SyntaxExpect(nil);
 		return nil;
 	}
+	JB_SetRef(SC_TypeVoid_, Vc);
 	Rz = Vc->TypeNormal;
+	(SC_Decl_NameSet(Rz, JB_LUB[1978]));
 	JB_SetRef(SC_TypeVoid, Rz);
-	JB_SetRef(SC_TypeVoidPtr, SC_Decl_GetAddress(Rz, kSC__DeclMode_Always));
+	SCDecl* Ptr = SC_Decl_GetAddress(Rz, kSC__DeclMode_Always);
+	JB_SetRef(SC_TypeVoidPtr, Ptr);
+	(SC_Decl_NameSet(Ptr, JB_LUB[1978]));
 	return Rz;
 }
 
@@ -7502,7 +7509,7 @@ void JB_Tk__Init() {
 	JB_Tk__TokenzFn(JB_LUB[2375], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fYoda)));
 	JB_Tk__TokenzFn(JB_LUB[2387], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fQuoteLang)));
 	JB_Tk__TokenzFn(JB_LUB[2386], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fQuestion)));
-	JB_Tk__TokenzFn(JB_LUB[2391], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fAsk)));
+	JB_Tk__TokenzFn(JB_LUB[1536], kJB__Tk_kThingSyx, ((FP_ParseHandler)(JB_Tk__fAsk)));
 	JB_Tk__TokenzFn(JB_LUB[486], kJB__Tk_kTemporalSyx, ((FP_ParseHandler)(JB_Tk__fXML)));
 	JB_Tk__TokenzFn(JB_LUB[497], kJB__Tk_kTemporalSyx, ((FP_ParseHandler)(JB_Tk__fXML_PI)));
 	JB_Tk__TokenzFn(JB_LUB[488], kJB__Tk_kTemporalSyx, ((FP_ParseHandler)(JB_Tk__fXML_Comment)));
@@ -31213,17 +31220,22 @@ MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr
 		Self = ((MWrap*)JB_NewClass(&MWrapData));
 	}
 	//cpp_part;
+	if (!Ptr) {
+		Ptr = ((byte*)((uint64*)(&JB__Mem__MDummy)));
+		ItemCount = 0;
+		Allocator = 0;
+	}
 	Self->ItemSize = ItemSize;
-	Self->Size = ItemCount;
-	Self->_Allocator = Allocator;
-	Self->Length = 0;
-	Self->_Ptr = Ptr;
+	Self->Count = ItemCount;
+	Self->ByteLength = (ItemCount * ItemSize);
+	Self->Allocator = Allocator;
+	Self->Addr = Ptr;
 	return Self;
 }
 
 void JB_Mem_Destructor(MWrap* Self) {
-	if (Self->_Allocator == kJB__Wrap_kFree) {
-		JB_Free(Self->_Ptr);
+	if (Self->Allocator == kJB__Wrap_kFree) {
+		JB_Free(Self->Addr);
 	}
 	JB_Obj_Destructor(Self);
 }
@@ -35931,7 +35943,7 @@ SCFunction* SC_Msg_AsFunc(Message* Self) {
 }
 
 void JB_Msg_Ask__(Message* Self, FastString* Fs) {
-	JB_Msg_BinnRender(Self, Fs, JB_LUB[2391]);
+	JB_Msg_BinnRender(Self, Fs, JB_LUB[1536]);
 }
 
 ASMReg SC_Msg_ASMAllowsTemp(Message* Self) {
@@ -61384,4 +61396,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 6890027315495526438 -3305639385004484334
+// -6860088118677721514 4807076475491978564
