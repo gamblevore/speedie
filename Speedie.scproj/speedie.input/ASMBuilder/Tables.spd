@@ -235,6 +235,7 @@ function TypeCast (fn_asm)
 		return .exists(exp, dest, from)
 
 	dest.µType = NewType
+
 	if from is Const
 		return ConstConvert(self, exp, dest, from, oldtype, newtype)
 
@@ -249,10 +250,9 @@ function TypeCast (fn_asm)
 	
 	if (OV|||NV) > 1
 		if NewType.IsFloat == oldtype.isfloat
-			if (ov == 3 and nv == 4) or (nv == 3 and ov == 4)
+			if (ov*nv == 12) or (dest iz from) // 12 = 4*3
+				from.µtype = newtype
 				return from
-			if dest iz from
-				return dest
 			return exp.VMOV(dest, from) * dest
 		return exp.QCNV(dest, from, OldType.isfloat|int|) * dest
 		

@@ -1,9 +1,14 @@
 
 
 
-function message.ExpandBits (|asmreg| Src, |Datatypecode| Type,  |asmreg|)
+function message.ExpandBits (|asmreg| Src, |asmreg| Other,  |asmreg|)
 	|| sh = Assembler.sh
 	|| closer = sh.OpenVars
+
+	|| ToAdd = (1 << Other.reg) ||| (1 << src.reg)
+	sh.vtemps_ |= ToAdd &~ sh.vdecls_				// math ops should not womp their inputs even if closed.
+
+	|| type = other.µType
 	|| Where = sh.TempMe(self, Type|asmreg|)
 	|| dest = sh.BFLG_Sub(self, where, Src, 32, 32, Src.Signed)
 	return sh.CloseVars(Closer, dest)
@@ -28,7 +33,7 @@ function message.AddInt (|ASMReg| dest, |ASMReg| L, |ASMReg| R, |int| Sh, |&fata
 			return .SUBM(dest, L, R, sh)
 
 		if !l.IsBitCorrect
-			l = .ExpandBits(L, r.µtype)
+			l = .ExpandBits(L, r)
 			if subtract
 				problem (self, "Subtraction upon smaller type, by a bigger one.")
 	

@@ -248,6 +248,9 @@ extend assembler
 		// If something jumped to a point, and then we nop the jump-dest, it goes wrong.
 		// It happens during returnopt. But could it happen elsewhere? who knows.
 		// Might as well play safe.
+		
+		// Can't step back even outside of branches, because DoMathSub wants to check the
+		// instructions in case they womped the inputs
 			|| C = .Last
 			if fat == C
 				.curr_ = C							// Do it before both kinds of nop...

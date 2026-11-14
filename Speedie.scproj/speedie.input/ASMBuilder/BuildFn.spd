@@ -18,7 +18,7 @@ extend_module ASM
 				|| ff = fn.µTest
 				testvm.Registers(true)
 				testvm.SetDebug(cakevm.kBreakStated)
-				testvm.load(ff.ptr, ff.length)
+				testvm.load(ff.addr|&uint|, ff.bytelength)
 				object.totalsanity
 				testvm.Run(0)
 				object.totalsanity
