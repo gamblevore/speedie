@@ -33,10 +33,10 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 	|| OV = .OpenVars
 
 	target debug
-		|| TrapInline = ++asmtrapper
-		if trapinline == -1
+		|| TryInlineTrap = ++asmtrapper
+		if TryInlineTrap == -1
 	  else
-		|| TrapInline = 0
+		|| TryInlineTrap = 0
 	|| st = .StartInlineState(prms, dest, fn)
 		
 	.backupfat(.curr)
@@ -47,7 +47,7 @@ function assembler.TryInline (|message| Prms, |asmreg| Dest, |SCFunction| Fn, |i
 			|| des = fn.cls!.DestructorFunc
 				.ASMReach(des)
 
-	.RevertFAT(r==nil, TrapInline)
+	.RevertFAT(r==nil, TryInlineTrap)
 	.CloseInline(st)
 
 	if !.InlineDepth
@@ -392,13 +392,14 @@ function PerhapsPhi (|message| Exp, |ASMReg| New, |ASMReg| Old, |ASMReg|)
 
 function InlineReturnToJump (|message| exp, |Fatasm| S, |asmreg| r, |asmreg| dest, |ASMReg|)
 	|| value = s.inputfat(0)				#expect
-	|| value_info = value.info
+	|| ReturnType = value.info
+	returntype.µtype = s.info
 	if .state.TailInlineable
-		(value_info is AlreadyReturned)
-		return value_info
+		(ReturnType is AlreadyReturned)
+		return ReturnType
 		
 	if dest.reg
-		r = .PerhapsPhi(exp, value_info, r)
+		ReturnType = .PerhapsPhi(exp, ReturnType, r)
 
 	value.safedecr						// Will get incremented later.
 	|| Old = s.info
@@ -406,7 +407,7 @@ function InlineReturnToJump (|message| exp, |Fatasm| S, |asmreg| r, |asmreg| des
 	s.info = old
 	s.setOp = asm.jump
 	s.JumpFix(.curr)
-	return r
+	return ReturnType
 
 	
 function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg|)
