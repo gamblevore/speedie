@@ -489,7 +489,7 @@ class GUIControl (list)
 	libinternal DrawFocusRect (|image| where, |ivec4| R, |float| Strength)
 		opt norefcounts
 		require strength > 0
-		|| oldclip = where._ControlClip			// maybe outside
+		|| oldclip = where.ControlClip			// maybe outside
 		where.ControlClip() = (0, 0, 31K, 31K)
 		|| g = .FocusBorderStyle
 		|| g2 = .GNormal

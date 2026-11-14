@@ -4,9 +4,9 @@ class Image (memory)
 	linkage
 		cpp_part Img
 		opt min 3
-	|ivec2|			Area
+	|ivec2|			Size
 	|ivec2|			WindowBase
-	|ivec4|			_ControlClip
+	|ivec4|			ControlClip
 	|string|		Name
 	|image?|		Temp
 	contains byte
@@ -32,10 +32,6 @@ class Image (memory)
 		inlined
 		.ResizeTo(value)
 	
-	function Size (|ivec2|)
-		inlined
-		return .area
-	
 	function NeedTemp (|image|)
 		opt norefcounts
 		return .Temp init image(.size)
@@ -45,9 +41,10 @@ class Image (memory)
 		return image(.size, name)
 	
 	function CopyImage (|string| name="", |Image|)
+		opt norefcounts
 		rz = .ImageOfSameSize(name)
 		if rz
-			memory.Copy(rz.Addr, .Addr, rz.ByteLength)
+			rz.CopyFrom(self)
 	
 	
 	target __IMPORT_GUI__
@@ -57,12 +54,12 @@ class Image (memory)
 			.ControlClip = s.Soothe
 
 
-	function ControlClip (assigns:|ivec4| R)
+	setter ControlClip (assigns:|ivec4| R)
 		cpp_part ControlClipSet4
 		|| sigh = (0, 0, .size)
 		|| b = .WindowBase.xyxy
 		r = (r + b).clip(sigh)
-		._ControlClip = r - b
+		.ControlClip = r - b
 
 	operator contains (|&imagepixel| P, |bool|)
 		cpp_part ContainsPixel
@@ -71,16 +68,11 @@ class Image (memory)
 		return P >= Start|&imagepixel|  and P < After|&imagepixel| 
 		
 	
-	function ControlClip (|ivec4|)
-		inlined
-		return ._ControlClip
-		
-	
 	target __IMPORT_GUI__
 		function Tile (|ivec2| t, |imagetiler|)
 			cpp_Part Tile2
 			rz.tile = t
-			rz.bounds = ._Controlclip
+			rz.bounds = .ControlClip
 	
 	function Rect (|ivec4|)
 		inlined
@@ -98,27 +90,19 @@ class Image (memory)
 	
 	
 	inline AreaInfo (assigns:|ivec2| wh)
-		.area = wh
+		.size = wh
 		.ResetBoundsToSize
 
 
 	function ResetBoundsToSize
 		cpp_Part resetarea
 		.WindowBase = (0, 0)
-		.noclip
+		.ControlClip = (0, 0, .size)
 	
-	libinternal NoClip
-		._ControlClip = (0, 0, .size)
 	
 	function Horz (assigns:|ivec2|r)
-		._controlclip.x = r.x
-		._controlclip.x2 = r.x2
-	
-//	function Horz (|intrange|)
-//		return ._Controlclip.x1x2
-//	
-//	function Vert (|intrange|)
-//		return ._Controlclip.y1y2
+		.ControlClip.x = r.x
+		.ControlClip.x2 = r.x2
 	
 		
 	function Clip (|ivec4| R, |ivec4|)
@@ -134,15 +118,13 @@ class Image (memory)
 
 	syntax cast (|ivec4|)
 		inlined
-		return ._controlclip
+		return .ControlClip
 	
 	function ResizeTo (|ivec2| value, |bool|)
-		|| N = value.area
-		require !.Allocator  or .Resize(N)
+		if !.Allocator  or .Resize(value.area)
 		// !.deathaction means our memory is externally managed, so we assume its already been resized.
-
-		.AreaInfo = value
-		return true
+			.AreaInfo = value
+			return true
 			
 	
 	function DrawGradientV (|ivec4| r, |vec4| B, |vec4| T)
@@ -189,7 +171,7 @@ class Image (memory)
 			rz += (closeness*c0*0.25)
 
 	
-	operator contains (|ivec2| P, |bool|)
+	operator contains (|ivec2| P, |bool|) // breaks ASM
 		return (p+.windowbase) inrange .size
 		
 
@@ -344,9 +326,9 @@ class Image (memory)
 
 	
 	iterator
-		|| curr = ._controlclip.x1y1
-		|| xstart = ._controlclip.x
-		|| end = ._controlclip.x2y2
+		|| curr = .controlclip.x1y1
+		|| xstart = .controlclip.x
+		|| end = .controlclip.x2y2
 		while (curr.y < end.y)
 			while (curr.x < end.x)
 				yield (self[curr]) (curr)
@@ -372,7 +354,7 @@ class Image (memory)
 
 		function file.LoadQOI (|image|)
 			|| s = .readall
-				return s.loadqoi(self) #expect (self, "Failed to read image.")
+				return s.loadqoi(self)				#expect (self, "Failed to read image.")
 
 		function image.WriteQOI (|string|)
 			|int| l = .ByteLength
@@ -390,7 +372,7 @@ class Image (memory)
 	
 	
 	inline CurrSize (|ivec2|)
-		return ._controlclip.size
+		return .ControlClip.size
 	
 				
 	function DrawEdge (|ivec4| R, |DrawStyle| G, |MoveCode| Edges)

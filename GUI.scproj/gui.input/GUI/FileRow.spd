@@ -193,8 +193,9 @@ class FileRow (ListViewRow)
 
 	function ReadName (|string|)
 		|| n = .FilePath.name
-		if .dirfile
-			return n.child(.dirfile)
+		|string--| d = .DirFile
+		if d
+			n = n.child(d)
 		return n
 
 
