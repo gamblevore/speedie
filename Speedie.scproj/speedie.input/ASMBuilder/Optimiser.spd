@@ -2,12 +2,15 @@
 
 function asm.VecIntMathPart (|asm|)
 	if self >= asm.add and self <= asm.mul		// div is a lil tricky. can do mod, and inputs in different order
-		return self + (asm.padd - asm.add)
+		// .psub, .pmul, .padd
+		self += asm.padd - asm.add
+//		if self == asm.psub
+		return self
 
 
 function asmreg.OptWithin (|&fatasm|)
 	|| Get = .within(asm.vget)
-	if get and !get.prms[2]
+	if get and !get.regonly(2)
 		return get
 
 
@@ -30,6 +33,7 @@ function message.OptVecMathTwo (|asmreg| Dest, |asmreg| A, |asmreg| B, |&fatasm|
 	Assembler.sh.AskNopTemp(fatb)
 	return fat
 
+
 function message.OptIntVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shift, |ASM| Op,  |&fatasm|)
 	if !Shift
 		|| fat = .OptVecMathTwo(dest, L, R)
@@ -41,7 +45,7 @@ function message.OptIntVecMath (|asmreg| Dest, |ASMReg| L, |ASMReg| R, |int| Shi
 	return fat
 
 
-function fatasm.IsPartyAble (|bool|)
+function fatasm.CanAccessVecPartsDirectly (|bool|)
 	|| op = ._op
 	if (op >= asm.PADD and op <= asm.PDIV) or (op >= asm.UADD and op <= asm.UDIV)
 		return true
@@ -63,19 +67,21 @@ function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |A
 	// Doesn't yet handle:   x[0] = a - b
 	if  !vara  and  (dest is temp)
 		|| party = dest.fat
-			if party.IsPartyAble and .redest(party, base)
+			if party.CanAccessVecPartsDirectly and .redest(party, base)
 				party.prms[3] |= k
 				return base
 		
 			|| op = party.op|asm|
 			|| vop = op.VecIntMathPart
-				if (party.prms[3] == 0) and .ReDest(party, base)							// no shift or 3rd part in mul
+				if (party.prms[3] == 0) and .ReDest(party, base)		// no shift or 3rd part in mul
+					if 0: exp.psub, exp.pmul
 					party._op = vop
 					party.Prms[3] |= k
 					return base
 			
 			if 0: exp.psub
-			if (op isa asm.VGET) and (party.prms[2] == 0)		// vset+vget...
+			if (op isa asm.VGET) and (party.prms[2] == 0)				// vset+vget...
+				if base.isfloat											// what?
 				k |= party.prms[3]<<2
 				|| v2 = exp.padd(base, party.asmreg(1), asmreg(), K)
 				.Nop(party)

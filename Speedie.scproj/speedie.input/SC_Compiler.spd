@@ -381,13 +381,7 @@ function ImportProj
 			
 
 function ConfBool (|string| name, |bool| Default=true, |bool|)
-	return .ConfMsg[name].Yes(Default)
-
-
-function PrepareAST 
-	opt norefcounts
-	for rz in .ImportedList
-		rz.PrepareAll
+	return .ConfMsg[name].Yes(Default)	
 
 
 function ImportAll
@@ -400,8 +394,7 @@ function ImportAll
 
 	.ImportLibs
 	.ImportProj
-	SCImport.Neaten
-	.PrepareAST
+	scimport.PrepareAST
 
 	require .Stage( "Import" )
 	.Timer( "Import" )

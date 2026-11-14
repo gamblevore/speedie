@@ -181,7 +181,7 @@ extend assembler
 		require R is Const
 
 		|| RF = R.fat
-//		if rf and .IsWithin(RF)					// The .iswithin is already used by CanConstLocalThg
+//		if rf and .IsWithin(RF)					// The .iswithin is already used by CanConstRegisterThg
 			|| k = RF.const
 			if k.fits(bits, signed)
 				.NopTempConst(R)
@@ -195,11 +195,11 @@ extend assembler
 	
 	
 	function NopTempConst (|asmreg| R)
-		require r.reg
+		require r.reg and r isnt blocknop
 		target debug: if r isnt Const		// hah
-
-		if  R is temp  and  r isnt blocknop	// don't think we can do better. not easily. 
-			.AskNop(r.NeedFAT)				// for example .iscurr(f) gets params used by future stuff
+		
+		if  R is temp  or  r isnt fromregister
+			.AskNop(r.NeedFAT)
 	
 	
 	function Nop (|FATASM| ToNop)
@@ -319,22 +319,21 @@ extend assembler
 		return true
 	
 	
-	function ClearRegister (|int| Changed,  |asmreg|)
+	function ClearRegister (|int| Changed)
 		opt inline
-		return .SetRegister(changed, nil, nil, nil)
+		.SetRegister(asmreg(changed), nil, nil)
 	
 	
-	function SetRegister (|int| Reg, |asmreg| NopDest, |?&FATASM| Alterer, |int| Field,  |asmreg|)
+	function SetRegister (|asmreg| Input, |?&FATASM| Alterer, |int| Field, |bool| AllowNopDest=false,  |asmreg|)
+		|| Reg = input.reg
 		|| oldi = .regs.Setters[Reg]
 		if (Reg == 0) and oldi
 			debugger
-			return NopDest
+			return Input
 				
 		|uint| P = .regs.Phi &~ (1<<Reg)
 		
-//		|| xxx = ++asmtrapper
-//		if xxx == 458150
-		if (oldi > 1) and (NopDest is AllowNopDest)
+		if (oldi > 1) and AllowNopDest
 			target debug: if !alterer							// Can't happen,  .Dest sets this.
 			|| old = .fat(oldi)
 			if .CanNop(old, Reg)
@@ -374,8 +373,7 @@ extend assembler
 				debugger
 				.Register(reg)
 		
-		(NopDest isnt AllowNopDest)
-		return NopDest
+		return Input
 	
 	
 	function RegIsConst (|asmreg| R, |int64| K, |bool|)

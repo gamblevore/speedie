@@ -246,9 +246,7 @@ struct FatASM
 		if !changed
 			return info
 		
-		if info
-			(info is AllowNopDest)
-		return sh.SetRegister(changed, info, self, a)
+		return sh.SetRegister(info, self, a, true)
 	
 
 	function assembler.FindOutput (|&fatasm| fat, |int| reg, |int| a, |&fatasm|)
@@ -275,7 +273,7 @@ struct FatASM
 			while (prev isa asm.noop) and (prev isnt param)
 				prev = .FindOutput(prev, reg) #loop
 			
-		.SetRegister(reg, nil, prev, -1)
+		.SetRegister(asmreg(reg), prev, -1)
 
 	
 	function assembler.ReDest (|fatasm| f, |asmreg| dest, |asmreg|)

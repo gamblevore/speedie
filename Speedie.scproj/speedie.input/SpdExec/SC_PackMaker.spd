@@ -396,7 +396,7 @@ function packmaker.FinalPrepare
 	// These lib funcs are not actually going into the pack.
 	// We just want to see the size of the libfunc, if it were inlined.
 	for fn in .LibFuncs
-		if fn.CanPrepareInline
+		if fn.CanPrepareInline // ".trap
 			require Assembler.sh.FatterCompile(fn)
 			Assembler.sh.resetmemory
 

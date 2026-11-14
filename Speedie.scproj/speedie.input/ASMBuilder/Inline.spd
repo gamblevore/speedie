@@ -127,7 +127,7 @@ struct InlineInfo
 		require (msg.type == @thg)
 		|| passed = msg.ASMDecl
 		require passed is local
-		|| v = sh.LocalThg(passed)
+		|| v = sh.RegisterThg(passed)
 		|| vr = 1<<v.reg
 		.CantNop |= 1<<i
 		if param is Reference

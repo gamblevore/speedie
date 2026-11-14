@@ -150,7 +150,7 @@ struct Assembler (AssemblerWipe)
 		  else
 			fake.refcount = 1000
 		|| dest = fake.constfill(asmreg.fatparam, 0)
-		.SetRegister(0, dest, fake, 0)
+		.SetRegister(dest, fake, 0)
 	
 	
 	function AddFuncParams (|SCFunction| fn)

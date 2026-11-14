@@ -569,9 +569,9 @@ function ThgSub (|assembler| self, |message| exp, |AsmReg| Dest, |asmreg|)
 			return ThgReference(self, exp, dest, d)
 			
 		if dest isnt AddrForceRequest
-			return .LocalThg(d)
+			return .RegisterThg(d)
 			
-		|| T = .LocalThg(d)
+		|| T = .RegisterThg(d)
 		if d.IsBareStruct or d.iscarray					// it already has the address 
 			return T.haveaddr
 		return .GrabAddr(exp, dest, d, T)
@@ -650,10 +650,23 @@ function BoolNot (fn_asm)							// !a
 	if src is AlreadyNegated
 		src.negatefail(dest)
 		return src.negafix(dest.negate)
+	
+	// OK... exists has a problem. If it takes 1, and we are negated.
+	// So its like:  x = !1
+	// we can return reg 0
+	// so... we actually want to nop the input of 1
+	// but we only nop temps
+	// but here, with boolnot, we already placed 1 into x, then do x = !x
+	// so its not ACTUALLY a temp, anymore.
+	// how to know that it is "kinda temp really?"
+	// theres a lot of things that create param inputs then call exists or other things on them
+	// Can I fix all of them?
+	// the only thing I can see, is that I could make a "FromRegister" flag.
+	// would that even work? Would it be preserved properly?
+	
+	
 	return .Exists(exp, dest, src).negafix(dest.negate)
 	
-//	if dest isnt negate and dest isnt condrequest // should be OK, it was passed unnegated
-//		return src
 
 
 function IncrSlowOnAddr (|assembler| self, |message| f, |ASMReg| Dest, |int| Mode, |ASMReg| Addr, |int64| Amount, |scdecl| glob,  |ASMReg|)	
@@ -842,7 +855,7 @@ function ExistingVar (|message| m, |asmreg|)
 	|| d = m.ASMDecl
 	if fn == @thg
 		require d is local and d isnt Reference
-		return .LocalThg(d)
+		return .RegisterThg(d)
 
 	return .MegaNumFinder(d.ExportPosition, d.SpecialReg, d.µtype)
 
@@ -877,7 +890,7 @@ helper VectorUpgrade (|asmreg| Src, |message| exp, |asmreg|)
 	return exp.VSWZ(T, src, Mode) * T
 
 
-function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
+function CanConstRegisterThg (|scdecl| D, |&fatasm| f, |bool|)
 	if .IsCurrBranch(f)
 		// K = 1
 		// X += K				// Can const
@@ -905,13 +918,13 @@ function CanConstLocalThg (|scdecl| D, |&fatasm| f, |bool|)
 	return f isnt FromInline		// not sure why inline makes a difference... remove this?
 	
 
-function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
+function RegisterThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	opt norefcounts
 	|| T = .WholeType(d)
 	
 	(t is param) = d is param
 	|| f = t.fat
-	if f and .CanConstLocalThg(d, f)
+	if f and .CanConstRegisterThg(d, f)
 		(T is Const) = (f is Const)	
 	
 	|| rr = T.reg
@@ -920,7 +933,8 @@ function LocalThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 			t = t.Tempness(ret)
 	  else
 		(T is const)
-		
+
+	(t is FromRegister)
 	return T
 }
 

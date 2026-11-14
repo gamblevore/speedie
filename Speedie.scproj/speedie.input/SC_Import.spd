@@ -61,12 +61,6 @@ class SCImport
 		SCImport.Importpath( name, P, .Depth + 1, false )
 		scimport.CurrIsManuallyImported--
 	
-	
-	function PrepareAll
-		opt norefcounts
-		for f in .files
-			f.AST
-
 
 	function ReloadImports (|scfile| index)
 		opt norefcounts
@@ -230,6 +224,21 @@ class SCImport
 		|bool|				NeatenDone
 		
 			
+		function PrepareAST
+			opt norefcounts
+			.NeatenDone = true
+		
+			.AllFiles.sort				// or else file-dates can mess things up.
+			|| TooMany = .allfiles[2K]
+				if options.modecake		// only 11 bits free in SourceLocation type.
+					problem (TooMany, "Too many files included, debugging will misreport some file-positions")
+		
+			for (f in .allfiles) (i)
+				f.filenum = i
+				|| s = f.ast
+					.LateConfAdd(s, i<<5)
+		
+		
 		function CurrFileNum (|int|)
 			if .NeatenDone
 				return .AllFiles.Length
@@ -246,22 +255,6 @@ class SCImport
 			opt norefcounts
 			for ch.flat in self
 				ch.tag = Tag
-		
-		
-		function Neaten 
-			opt norefcounts
-			.NeatenDone = true
-
-			.AllFiles.sort			// or else file-dates can mess things up.
-			|| TooMany = .allfiles[2K]
-				if options.modecake		// only 11 bits free in SourceLocation type.
-					problem (TooMany, "Too many files included, debugging will misreport some file-positions")
-
-			for (f in .allfiles) (i)
-				f.filenum = i
-				|| s = f.liveast
-					.LateConfAdd(s, i<<5)
-			
 									
 				
 		function DoImport (CollectFunc)

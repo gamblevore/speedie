@@ -124,11 +124,12 @@ extend Assembler
 		target !debug: return
 		|| After = .Curr - 1
 		while Curr < After
-			|| O = curr.output.reg 
-				if O == l.reg or r.reg
-					Curr.debugprint
-					debugger
-					// womped!
+			if !curr.CanAccessVecPartsDirectly // give it a pass. loosen the tests!
+				|| O = curr.output.reg 
+					if O == l.reg or r.reg
+						Curr.debugprint
+						debugger
+						// womped!
 			Curr++
 		
 	
@@ -221,10 +222,11 @@ extend Assembler
 		(self is alreadynegated) = (dest is negate)
 		return self
 	
+	
 	function Equals (fn_opasm)
 		|| rr = r.reg,  || ll = l.reg
 		if !rr  and  ll
-			swap (l) (r) // put reg 0 into the left... more convenient.
+			swap (l) (r)							// put reg 0 into the left... more convenient.
 		(Dest  as=  l & r & asmreg.Const)
 		
 		if rr == ll
@@ -236,17 +238,16 @@ extend Assembler
 		  else
 			rz = .CompareFloat(dest, l, r, exp, 2)						
 			
-		rz = rz.boolanswerok		// all of these handle negate!
-//		(rz is already negated)		// in case of double negation but the original wants to check that it is negated
-									// I'd need to add a "really tell us that we want negation" flag otherwise.
-//		maybe try double-negation some other way.							
-//		do we mean: !!x    or do we mean:  if (!x or b)
+		rz = rz.boolanswerok						// all of these handle negate!
+		if (R is const) and !(rz iz R)				// im hoping
+			.NopTempConst(R)
+
 
 	function JumpIntK (|asmreg| dest, |asmreg| L, |asmreg| R, |message| exp, |uint| Mode, |asmreg|)
 		require  l is Const  or  r is Const
 		|| swapped = l is Const
-			swap (l) (r)					// 10 > x   -->  x <  10  -->  x <= 9
-			mode ^= 1						// 10 <= x  -->  x >= 10  -->  x >  9
+			swap (l) (r)							// 10 > x   -->  x <  10  -->  x <= 9
+			mode ^= 1								// 10 <= x  -->  x >= 10  -->  x >  9
 		|| f = r.fat$
 
 		|| k = f.const - swapped
@@ -255,7 +256,7 @@ extend Assembler
 		k = k|uint64|.trim(9)
 		|| J = exp.JMKM(0, l, k)
 		if 0: exp.JMKL
-		j._op += (mode&1)						// .JMPL
+		j._op += (mode&1)							// .JMPL
 		return J * dest
 	
 	
@@ -582,6 +583,7 @@ extend Assembler
 			if !dest.isvec
 				|| Fat = exp.OptVecMathTwo(dest, L, R)
 					fat._op = asm.uadd + (l is Subtract)
+					if 0: exp.usub
 					return fat*dest
 
 		if 0: exp.VADD
