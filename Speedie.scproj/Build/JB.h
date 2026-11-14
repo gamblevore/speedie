@@ -951,7 +951,7 @@ struct Memory_Behaviour: Object_Behaviour {
 
 JBClass ( MWrap , JB_Object , 
 	uint ItemSize;
-	byte* Addr;
+	byte* _Addr;
 	byte Allocator;
 	uint Count;
 	uint ByteLength;
@@ -2028,7 +2028,6 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_AddrNeed ((ASMReg)7696581394432)
 #define kSC__Reg_AddrNoFiddle ((ASMReg)4398046511104)
 #define kSC__Reg_AddrRequest ((ASMReg)1099511627776)
-#define kSC__Reg_AllowNopDest ((ASMReg)4294967296)
 #define kSC__Reg_AlreadyNegated ((ASMReg)131072)
 #define kSC__Reg_AlreadyReturned ((ASMReg)549755813888)
 #define kSC__Reg_Alternate ((ASMReg)1048576)
@@ -2049,6 +2048,7 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_FatParam ((ASMReg)34360262656)
 #define kSC__Reg_FlagsToRemove ((ASMReg)68719738880)
 #define kSC__Reg_FromInline ((ASMReg)67108864)
+#define kSC__Reg_FromRegister ((ASMReg)4294967296)
 #define kSC__Reg_GlobalMemory ((ASMReg)17179869184)
 #define kSC__Reg_InlineFlagsToKeep ((ASMReg)277027488768)
 #define kSC__Reg_Negate ((ASMReg)65536)
@@ -2845,8 +2845,6 @@ void SC_Comp__MiniTests();
 void SC_Comp__NewConst(SCDecl* D);
 
 void SC_Comp__PostInitCodeCall();
-
-void SC_Comp__PrepareAST();
 
 void SC_Comp__PrintCompileErrors();
 
@@ -4873,9 +4871,9 @@ ASMReg SC_Reg_xC2xB5TypeSetWithTC(ASMReg Self, uint /*DataTypeCode*/ Value);
 
 ASMReg SC_Reg_xC2xB5TypeSetWithReg(ASMReg Self, ASMReg Value);
 
-ASMReg SC_Reg__New();
+ASMReg SC_Reg__NewWithIntUint16(int Reg, uint /*u16*/ Index);
 
-ASMReg SC_Reg__NewPhi(int Reg, uint /*u16*/ Index);
+ASMReg SC_Reg__NewWith0();
 
 
 
@@ -5902,6 +5900,8 @@ void SC_FAT_BakeLabelRequest(FatASM* Self, ASM* Start, ASM* After, int Reg);
 
 int SC_FAT_BaseOp(FatASM* Self);
 
+bool SC_FAT_CanAccessVecPartsDirectly(FatASM* Self);
+
 int SC_FAT_CanTrashRegisters(FatASM* Self);
 
 void SC_FAT_CheckHasOutput(FatASM* Self);
@@ -5959,8 +5959,6 @@ bool SC_FAT_IsFinisherWith0(FatASM* Self);
 bool SC_FAT_IsFunc(FatASM* Self);
 
 int SC_FAT_IsJump(FatASM* Self);
-
-bool SC_FAT_IsPartyAble(FatASM* Self);
 
 bool SC_FAT_IsRead(FatASM* Self);
 
@@ -6395,7 +6393,7 @@ bool SC_Pac_CanAddK(Assembler* Self, ASMReg R, int64 T);
 
 int SC_Pac_CanBAND_BFLG(Assembler* Self, ASMReg R);
 
-bool SC_Pac_CanConstLocalThg(Assembler* Self, SCDecl* D, FatASM* F);
+bool SC_Pac_CanConstRegisterThg(Assembler* Self, SCDecl* D, FatASM* F);
 
 u16 SC_Pac_CanDelay(Assembler* Self, FatASM* Fat);
 
@@ -6597,8 +6595,6 @@ ASMReg SC_Pac_LessEq(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMRe
 
 ASMReg SC_Pac_LoadNumber(Assembler* Self, Message* Exp, int64 V, bool Special, ASMReg Dest);
 
-ASMReg SC_Pac_LocalThg(Assembler* Self, SCDecl* D);
-
 void SC_Pac_LoopFill(Assembler* Self, FatASM* C, FatASM* S, FatASM* A);
 
 ASMReg SC_Pac_MainBrancher(Assembler* Self, Message* Exp, ASMReg Dest);
@@ -6749,6 +6745,8 @@ bool SC_Pac_RegIsConst(Assembler* Self, ASMReg R, int64 K);
 
 FatASM* SC_Pac_Register(Assembler* Self, int I);
 
+ASMReg SC_Pac_RegisterThg(Assembler* Self, SCDecl* D);
+
 FatASM* SC_Pac_RequestOp(Assembler* Self, ASM Op, Message* Exp, SortableLocation Map);
 
 void SC_Pac_ResetMemory(Assembler* Self);
@@ -6773,7 +6771,7 @@ ASMReg SC_Pac_SetConst(Assembler* Self, Message* Exp, int64 Value, ASMReg Ml, AS
 
 ASMReg SC_Pac_SetInlineDest(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn);
 
-ASMReg SC_Pac_SetRegister(Assembler* Self, int Reg, ASMReg NopDest, FatASM* Alterer, int Field);
+ASMReg SC_Pac_SetRegister(Assembler* Self, ASMReg Input, FatASM* Alterer, int Field, bool AllowNopDest);
 
 ASMReg SC_Pac_SHL(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -7541,6 +7539,8 @@ Instruction* SC_Instruction__SyntaxAccessWithInt(int Pos);
 
 
 // JB_Memory
+byte* JB_Mem_Addr(MWrap* Self);
+
 MWrap* JB_Mem_ConstructorPtr(MWrap* Self, int ItemCount, int ItemSize, byte* Ptr, uint /*byte*/ Allocator);
 
 void JB_Mem_Destructor(MWrap* Self);
@@ -7583,8 +7583,6 @@ void SC_Imp_LoadBanned(SCImport* Self, Message* List);
 
 void SC_Imp_LoadConf(SCImport* Self, SCFile* Scf);
 
-void SC_Imp_PrepareAll(SCImport* Self);
-
 void SC_Imp_ReloadImports(SCImport* Self, SCFile* Index);
 
 JB_String* SC_Imp_Render(SCImport* Self, FastString* Fs_in);
@@ -7609,9 +7607,9 @@ bool SC_Imp__IsInputName(JB_String* Name);
 
 void SC_Imp__LateConfAdd(Message* S, int T);
 
-void SC_Imp__Neaten();
-
 void SC_Imp__NoProj();
+
+void SC_Imp__PrepareAST();
 
 
 
@@ -8533,7 +8531,7 @@ FatASM* SC_Msg_EQUL(Message* Self, ASMReg R1, ASMReg R2, ASMReg R3, int Cmp);
 
 void JB_Msg_ERel__(Message* Self, FastString* Fs);
 
-ASMReg SC_Msg_ExpandBits(Message* Self, ASMReg Src, uint /*DataTypeCode*/ Type);
+ASMReg SC_Msg_ExpandBits(Message* Self, ASMReg Src, ASMReg Other);
 
 Message* SC_Msg_ExpandToBool(Message* Self, SCNode* Name_space);
 
@@ -11284,7 +11282,7 @@ inline bool SC_Reg_IsInt(ASMReg Self);
 
 inline JB_String* JB_SSSSS_ARGH(SizeInt Self);
 
-inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed);
+inline void SC_Pac_ClearRegister(Assembler* Self, int Changed);
 
 inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation);
 
@@ -11519,8 +11517,8 @@ inline JB_String* JB_SSSSS_ARGH(SizeInt Self) {
 	return JB_int_RenderSize(Self, nil);
 }
 
-inline ASMReg SC_Pac_ClearRegister(Assembler* Self, int Changed) {
-	return SC_Pac_SetRegister(Self, Changed, nil, nil, nil);
+inline void SC_Pac_ClearRegister(Assembler* Self, int Changed) {
+	SC_Pac_SetRegister(Self, SC_Reg__NewWithIntUint16(Changed, 0), nil, nil, false);
 }
 
 inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
@@ -11561,7 +11559,7 @@ inline Message* JB_Macro_Run(Message* Self, Array* Prms) {
 }
 
 inline ASMReg SC_Pac_Exists(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L) {
-	return SC_Reg_NegaFix(SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__New()), Dest);
+	return SC_Reg_NegaFix(SC_Pac_Equals(Self, Exp, SC_Reg_Negate(Dest, true), L, SC_Reg__NewWith0()), Dest);
 }
 
 inline FatASM* SC_Pac_Read(Assembler* Self, ASMReg Dest, Message* Exp, ASMReg Ptr, ASMReg VarAdd, SCDecl* ReadDecl, int Index) {
