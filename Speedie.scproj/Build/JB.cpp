@@ -24443,13 +24443,14 @@ ASMReg SC_Pac_InlineReturnToJump(Assembler* Self, Message* Exp, FatASM* S, ASMRe
 		JB_Object_Fail(nil);
 		return nil;
 	}
-	ASMReg Value_info = Value->Info;
+	ASMReg ReturnType = Value->Info;
+	ReturnType = SC_Reg_xC2xB5TypeSetWithReg(ReturnType, S->Info);
 	if (SC_Pac_State(Self)->TailInlineable) {
-		Value_info = SC_Reg_SyntaxIsSet(Value_info, kSC__Reg_AlreadyReturned, true);
-		return Value_info;
+		ReturnType = SC_Reg_SyntaxIsSet(ReturnType, kSC__Reg_AlreadyReturned, true);
+		return ReturnType;
 	}
 	if (SC_Reg_Reg(Dest)) {
-		R = SC_Pac_PerhapsPhi(Self, Exp, Value_info, R);
+		ReturnType = SC_Pac_PerhapsPhi(Self, Exp, ReturnType, R);
 	}
 	SC_FAT_SafeDecr(Value);
 	ASMReg Old = S->Info;
@@ -24457,7 +24458,7 @@ ASMReg SC_Pac_InlineReturnToJump(Assembler* Self, Message* Exp, FatASM* S, ASMRe
 	S->Info = Old;
 	(SC_FAT_SetOpSet(S, kSC__ASM_JUMP));
 	SC_FAT_JumpFix(S, SC_Pac_Curr(Self));
-	return R;
+	return ReturnType;
 }
 
 ASMReg SC_Pac_IntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R) {
@@ -25275,6 +25276,8 @@ uint64 SC_Pac_OpenVars(Assembler* Self) {
 
 ASMReg SC_Pac_OptFMul(Assembler* Self, ASMReg Dest, ASMReg Mul, ASMReg Add) {
 	FatASM* FatMul = SC_Reg_FAT(Mul);
+	if (Self->RequestTrap) {
+	}
 	if (!SC_Pac_IsCurrBlockWithFATASM(Self, FatMul, kSC__ASM_FMUL)) {
 		return nil;
 	}
@@ -25296,7 +25299,7 @@ ASMReg SC_Pac_OptFMul(Assembler* Self, ASMReg Dest, ASMReg Mul, ASMReg Add) {
 		FatMul = FatAdd;
 	}
 	(SC_FAT_RegInputSet(FatMul, 3, Add));
-	Dest = SC_Reg_RegSet(Dest, SC_FAT_RegOnly(FatMul, 0));
+	Dest = SC_Reg_FatRegSet(Dest, SC_FAT_ASMReg(FatMul, 0));
 	return SC_FAT_AsReg(FatMul, Dest);
 }
 
@@ -26363,7 +26366,7 @@ bool SC_Pac_TryBangOpt(Assembler* Self, ASMReg X, ASMReg KK) {
 
 ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction* Fn, int AllowedGain) {
 	uint64 OV = SC_Pac_OpenVars(Self);
-	int TrapInline = 0;
+	int TryInlineTrap = 0;
 	InlineState* St = SC_Pac_StartInlineState(Self, Prms, Dest, Fn);
 	SC_Pac_BackupFAT(Self, SC_Pac_Curr(Self));
 	FatRange LL = ((FatRange){});
@@ -26377,7 +26380,7 @@ ASMReg SC_Pac_TryInline(Assembler* Self, Message* Prms, ASMReg Dest, SCFunction*
 			}
 		}
 	}
-	SC_Pac_RevertFAT(Self, R == nil, TrapInline);
+	SC_Pac_RevertFAT(Self, R == nil, TryInlineTrap);
 	SC_Pac_CloseInline(Self, St);
 	if (!Self->InlineDepth) {
 		if (R) {
@@ -61379,4 +61382,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -628053930009413428 4807076475491978564
+// 2893241847459819697 4807076475491978564

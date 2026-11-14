@@ -801,6 +801,7 @@ struct AssemblerWipe {
 	byte DelayedNopCount;
 	byte ActionIndex;
 	bool NeedsRework;
+	bool RequestTrap;
 	uint RegDebugInfo;
 	uint VDecls_;
 	uint VTemps_;
