@@ -45,7 +45,7 @@ function Assembler.RequestOp (|asm| op, |message?| exp, |SortableLocation| map=n
 
 		p.BasicBlock = .BasicBlock
 		target debug
-			if (p.id == -1) and "".trap // 
+			if .RequestTrap or ((p.id == -1) and "".trap) // 
 			
 		return p
 

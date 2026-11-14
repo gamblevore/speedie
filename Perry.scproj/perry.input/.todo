@@ -6,7 +6,8 @@
 
 * Unused const (1) in setter Size
 	* vec>>4 bad asm
-	* OverSizedCmm not using psub
+	* image.mark fails
+	* image.syntax access fails to empty struct AND compile
 
 * asmreg.zero fails to const
   VBLD: r3, r0, r0, r0, r0 // why not just pass r0?
@@ -25,7 +26,7 @@
 
 				// Someone paying for productive work wants these done after //
 
-* running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
+* Running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
 * Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
 * too aggressive with error keeping
 * Undo still thinks its changed when its not, and we undid ALL changes!

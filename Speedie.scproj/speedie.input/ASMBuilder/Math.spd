@@ -108,12 +108,15 @@ extend Assembler
 		first = exp.second
 		first ?= exp.first! // for "-x"
 		target debug
-			|| Math2Trap = ++ASMTrapper, if Math2Trap == -1
 			|| Start = .curr
+			|| Math2Trap = ++ASMTrapper
+			if Math2Trap == -1
+				//.RequestTrap = true
 
 		|| ActualMath = (fn)(self, first, dest, ml, mr)
 		
 		target debug
+			.TempCheck(ActualMath)
 			if ActualMath.IsVec != ml.IsVec			// Argh?
 			.NoWomping(Start, ml, mr)
 		
@@ -602,6 +605,7 @@ extend Assembler
 	
 	function OptFMul (|asmreg| Dest, |asmreg| Mul, |asmreg| Add, |asmreg|)
 		|| FatMul = mul.FAT!
+		
 		require .IsCurrBlock(fatmul, asm.fmul)
 		require (fatmul is temp) or (dest iz fatmul.info)
 		require !fatmul.regonly(3)
@@ -624,7 +628,7 @@ extend Assembler
 		
 		
 		fatmul.reginput(3) = add
-		dest.reg = fatmul.regonly(0)
+		dest.fatreg = fatmul.asmreg(0)
 		return fatmul * dest
 	
 	

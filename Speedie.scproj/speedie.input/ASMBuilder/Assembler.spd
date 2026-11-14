@@ -42,6 +42,7 @@ struct AssemblerWipe
 	|byte|						DelayedNopCount
 	|byte|						ActionIndex
 	|bool|						NeedsRework				// hoisting
+	|bool|						RequestTrap
 	|uint|						RegDebugInfo
 	|uint|						VDecls_
 	|uint|						VTemps_
@@ -546,12 +547,13 @@ struct Assembler (AssemblerWipe)
 			.TempCheck(dest)
 			|| µTrap = ++ASMTrapper
 			|| CurrFat = .curr
-			if µtrap == -1 or .ActionIndex > 30 // ugh
 
 		|| Type = exp.ASMType
 		.Actions[++.ActionIndex] = Type
-		
 		|| fn = fn_asm_table[Type]!
+
+		target debug
+			if µtrap == -1 or .ActionIndex > 30
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
