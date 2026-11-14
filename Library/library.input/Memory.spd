@@ -15,7 +15,7 @@ class Memory
 		pragma noearlyfree
 	
 	|uint|				ByteLength	// Can be shared with string now.
-	|&byte|				Addr
+	|&byte|				_Addr		// to force types correctly via the addr() wrapper
 	|uint|				Count		// I prefer Count than length because length sounds like a string. But the the items here have a real count. Like the length of a rope is it's length. But the COUNT of items is different than its length. 10 elephants has a longer length than 10 snails.
 	|uint|				ItemSize
 	|byte|				Allocator
@@ -33,7 +33,7 @@ class Memory
 		.Count = itemcount
 		.ByteLength = ItemCount * ItemSize
 		.Allocator = Allocator
-		.Addr = ptr
+		._Addr = ptr
 	
 	
 	autogen UseExternalPointer (|&nil| P, |int| ItemCount)
@@ -42,24 +42,24 @@ class Memory
 		.ByteLength = ItemCount * .ItemSize
 		if .Allocator == dataobject.kfree
 			Memory.free(.addr)
-		.Addr = P|&byte|
+		._Addr = P|&byte|
 		.Allocator = 0
 	
 	setter Addr (|&...|)
 		disabled
 		
 	inline Addr (|&...|)
-		return .Addr
+		return ._Addr
 	
 	setter Allocator (|int|)
 		disabled
 	
 	function CopyFrom (|&nil| Src, |int| Length, |int|)
 		cpp_part CopyFromPtr
-		|| cap = .ByteLength min Length
-		if cap > 0
-			memory.Copy(.Addr, Src, cap)
-		return cap
+		Length = .ByteLength min Length
+		if Length > 0
+			memory.Copy(.Addr, Src, length)
+		return Length
 
 	inline CopyFrom (|string| Src, |int|)
 		cpp_part CopyFromString
@@ -84,8 +84,9 @@ class Memory
 		|| old = S * .Count
 		|| New = S * ItemCount
 		|| Mem = Memory.realloc(.Addr, New)
-			.Addr = mem
+			._Addr = mem
 			.Count = ItemCount
+			.ByteLength = ItemCount * S
 			if New > Old
 				memory.Zero(mem+old, New-Old)
 			return true

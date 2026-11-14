@@ -37,7 +37,7 @@ datatype DataTypeCode (uint16)
 		Vec4	= 3 + 32 + 0  + 128 + 8
 		Int		= 0 + 32 + 0  + 0	+ 8
 		UInt	= 0 + 32 + 64 + 0	+ 8
-		bool	= 256
+		bool	= 256 //+ 64 // surely this needs to be unsigned?
 		Pointer = 512
 		u32	 = uint
 
