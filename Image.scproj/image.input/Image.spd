@@ -223,13 +223,14 @@ class Image (memory)
 	
 		
 	inline ClearMarks (|ivec4| R)
-		.mark(r, 0)
+		.AlphaMark(r, 0)
 	
 	
-	function Mark (|ivec4| R,  |byte| Mark=1)
+	function AlphaMark (|ivec4| R, |byte| Mark=1)
 		|| range = self[r]
 		for px in range
 			px.a = mark
+
 
 	function MarkLineH  (|ivec2| P, |int| Width, |int| Mark)
 		|| R = .clip(P.xyxy + (0,0,width+1,0))

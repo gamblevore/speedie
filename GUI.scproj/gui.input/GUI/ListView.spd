@@ -1386,7 +1386,7 @@ class ListView (GUIControl) {
 		z2.y = z2.y2 - .LineHeight
 		for r.visible in self
 			if r is Selected
-				Where.mark(z2, 2 + .hasfocus)
+				Where.AlphaMark(z2, 2 + .hasfocus)
 			z2 = z2 down .LineHeight
 
 
