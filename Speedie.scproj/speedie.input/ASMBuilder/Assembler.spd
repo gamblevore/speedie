@@ -134,7 +134,8 @@ struct Assembler (AssemblerWipe)
 		  else
 			fake.refcount = 1000
 			
-		|| Reg	= a.µtype|asmreg|.reg(i) as ASMReg.FatParam		
+		|| Reg	= asmreg(i) as ASMReg.FatParam
+		reg = reg.µtype(a.µtype)
 		fake.Dest(0, reg, self)
 		if fake isnt param // huh?
 	

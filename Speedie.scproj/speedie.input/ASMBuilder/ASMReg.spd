@@ -272,32 +272,25 @@ datatype ASMReg (uint64)
 		(self as= R|asmreg|)
 		return self
 
-	
-	function SlimReg (assigns:|asmreg|, |asmreg|)
-		.reg = value.reg
-		self = .Tempness(value)
-		return self
-
-	
+		
 	function FatReg (assigns:|asmreg|, |asmreg|)
 		// we could do all of this in two bit-operations...
 		// just clear, then copy
-		.reg = value.reg
-		self = .Tempness(value)
+		.SlimReg = value
 		.fatindex = value.fatindex
 		return self
 
+
+	function SlimReg (assigns:|asmreg| Other,   |asmreg|)
+		self &=~ TempFlags
+		(self as= other&tempflags)
+		.reg = other.reg
+		return self
+		
 	
 	operator mul (|bool| b, |asmreg|)
 		return (b)(self, nil)
-		
-		
-	function Tempness (|asmreg| Other, |asmreg|)
-		self &=~ TempFlags
-		(self as= other&tempflags)
-		return self
-		
-
+	
 	syntax cast (|int|)
 		disabled
 		
@@ -357,7 +350,8 @@ datatype ASMReg (uint64)
 				"low reg $R marked"
 		debugger
 	
-			
+	
+	// we want to make sure .reg(int) is only set in this file! Then rename it so it cant be use elsewhere
 	module
 		function New (|int| reg, |uint16| Index=0, |asmreg|)
 			rz.reg = reg

@@ -132,8 +132,7 @@ function Assembler.ClearAllStructs (|message!| exp,  |bool|)
 function Assembler.ClearStruct (|message?| exp,  |fatasm| fat,  |int| v,  |bool|)
 	opt norefcounts
 	if  exp  and  fat isa asm.allo						/// DEALLOCATE STRUCTS ///
-		|asmreg| vreg
-		vreg.reg = v
+		|| vreg = asmreg(v)
 		ASMType.AllocBearStruct(-1, exp.FlatLast, vreg, fat.RegOnly(1)<<4)
 		.ClearRegister(v)
 	return true

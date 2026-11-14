@@ -930,7 +930,7 @@ function RegisterThg (|scdecl| d, |asmreg|)				// asmlocal, localasm
 	|| rr = T.reg
 		|| Ret = .State.Return
 		if rr == ret.reg
-			t = t.Tempness(ret)
+			t.SlimReg = ret
 	  else
 		(T is const)
 

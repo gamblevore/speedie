@@ -210,8 +210,6 @@ function MarkInlinedFunction (|message| fnc)
 
 function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatrange| LL, |asmreg|)
 	opt norefcounts
-	target debug
-		if fn == "JB_Msg_SyntaxEquals"
 	LL.Start = .curr
 	
 	|SavedRegisters| svregs

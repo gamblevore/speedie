@@ -93,11 +93,8 @@ function FunctionDestination (|message| exp,  |asmreg| dest,  |scfunction| fn,  
 			v = SafeDest
 		  elseif !fn.hascversion
 			v = v max safedest
-			
-		dest = dest.Tempness(ret)
-
-		// this could trash a valid reg!!!
-		// x = inl(y) --> return y + func() // func trashes! 
+		
+		dest.SlimReg = ret
 
 	  else
 		|| vd = .VDecls
