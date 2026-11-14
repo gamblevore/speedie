@@ -4,7 +4,8 @@
 	Jeebox internals. By Theodore H. Smith...
 */
 
-	// Size:			The number of items this memory allocation can store.
+	// ByteLength:		The actual length in bytes allocated.
+	// Count:			The number of items this memory allocation can store.
 	// ItemSize:		The bytesize of each item.
 
 class Memory
@@ -13,9 +14,9 @@ class Memory
 		cpp_class MWrap
 		pragma noearlyfree
 	
-	|uint|				ByteLength	// can be shared with string now.
+	|uint|				ByteLength	// Can be shared with string now.
 	|&byte|				Addr
-	|uint|				Count	// I prefer Count than length because length sounds like a string. But the the items here have a real count. Like the length of a rope is it's length. But the COUNT of items is different than its length. 10 elephants has a longer length than 10 snails.
+	|uint|				Count		// I prefer Count than length because length sounds like a string. But the the items here have a real count. Like the length of a rope is it's length. But the COUNT of items is different than its length. 10 elephants has a longer length than 10 snails.
 	|uint|				ItemSize
 	|byte|				Allocator
 	contains byte
@@ -35,7 +36,7 @@ class Memory
 		.Addr = ptr
 	
 	
-	function UseExternalPointer (|&nil| P, |int| ItemCount)
+	autogen UseExternalPointer (|&nil| P, |int| ItemCount)
 		embedded
 		.Count = itemcount
 		.ByteLength = ItemCount * .ItemSize
@@ -56,6 +57,7 @@ class Memory
 	function CopyFrom (|&nil| Src, |int| Length, |int|)
 		cpp_part CopyFromPtr
 		|| cap = .ByteLength min Length
+		if cap > 0
 			memory.Copy(.Addr, Src, cap)
 		return cap
 
@@ -63,7 +65,7 @@ class Memory
 		cpp_part CopyFromString
 		return .CopyFrom(src.addr, src.length)
 	
-	function CopyFrom (|memory| other, |int|)
+	inline CopyFrom (|memory| other, |int|)
 		embedded
 		return .CopyFrom(other.Addr, other.ByteLength)
 		
@@ -88,10 +90,6 @@ class Memory
 				memory.Zero(mem+old, New-Old)
 			return true
 		error (self, "Can't allocate bytes: " + new)
-
-	
-	inline RealSize (|int|)
-		disabled "Use .length"
 
 	
 	function Zero
@@ -179,7 +177,7 @@ class Memory
 			description "same as free() but also decreases the reported used-memory count."
 				
 		function	Copy	(|&nil| dest, |&nil| src, |int| N):			cpp_wrapper memcpy
-		function	Swap	(|&nil| A, |&nil| B, |int| N):				cpp_wrapper JB_MemSwap // later
+		function	Swap	(|&nil| A, |&nil| B, |int| N):				cpp_wrapper JB_MemSwap
 
 		autogen		Test		(|!&nil| p, |int| n, |int| Mode=0, |ErrorInt|): cpp_wrapper JB_TestMemory
 		inline		Readable	(|!&nil| p, |int| n, |ErrorInt|):		return .Test(p|&nil|, n)
