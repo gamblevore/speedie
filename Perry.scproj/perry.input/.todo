@@ -5,8 +5,6 @@
 * chained obj destructor bug in branch_test.spd
 
 * Unused const (1) in setter Size
-	* vec>>4 bad asm
-
 * asmreg.zero fails to const
   VBLD: r3, r0, r0, r0, r0 // why not just pass r0?
 
