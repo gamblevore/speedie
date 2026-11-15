@@ -163,6 +163,7 @@ GUI_ImageBlurrer_Create
 GUI_ImageReader_Destructor
 GUI_ImageTiler_Constructor
 GUI_Img_ActiveEdges
+GUI_Img_AlphaMark
 GUI_Img_AtXY
 GUI_Img_Clear
 GUI_Img_Clip
@@ -195,7 +196,6 @@ GUI_Img_HorzSet
 GUI_Img_Interp
 GUI_Img_Invert
 GUI_Img_LoadEmpty
-GUI_Img_Mark
 GUI_Img_MarkLineH
 GUI_Img_MarkLineV
 GUI_Img_NeedTemp
