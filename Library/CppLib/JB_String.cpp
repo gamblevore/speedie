@@ -790,11 +790,10 @@ inline int OffsetCompare_( MiniStr S, MiniStr F ) {
 		}
 	}
 	
-	if ( S.Length > F.Length ) {
+	if ( S.Length > F.Length )
 		return 1; // should work?
-	} else if ( S.Length < F.Length ) {
+	if ( S.Length < F.Length )
 		return -1;
-	}
 	return 0;
 }
 
@@ -971,9 +970,9 @@ int JB_Str_ByteValue(JB_String* self, int offset) {
 
 
 
-#define kParseEnd_Dot 1
-#define kParseEnd_E 2
-#define kParseEnd_Both 3
+#define kParseEnd_Dot	1
+#define kParseEnd_E		2
+#define kParseEnd_Both	3
 
 void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos, bool Overflow);
 void ParseNumErr_( JB_String* self, uint8* BadPos, Message* Where, bool OverFlow ) {
@@ -1094,6 +1093,9 @@ double JB_Str_TextDouble (JB_String* self, Message* Where, bool Suffixes) {
 
 // Could combine Self/Where, and use ISA.
 // requires the message HAS the same name, or else bad errors.
+// we'd need to get the name of the message. And how? we don't have it's struct here.
+// we'd need to re-write ParseNumErr_ in Speedie entirely.
+
 static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u8* After, int Failed ) {
 	bool Overflow = false;
 	if (S < After) {
@@ -1817,7 +1819,7 @@ static int SafeRenderTests (JB_Object* self, FastString* fs, int Maximum) {
 	if (RenderRecover)
 		return -4;
 	
-	// now what? we need to "lock" the faststring.
+	// we need to "lock" the faststring.
 	
 	if (!JB_FS_NeedSpare(fs, Maximum))
 		return -1;
