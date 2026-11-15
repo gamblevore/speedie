@@ -815,6 +815,7 @@ So anything not 0 means "its OK"`
 		// or a fileviewer or a gamepreview player
 		// better to have a generalised "fileviewer"
 		|| g = (r isa "voi" or "png" or "qoi")
+		|| IsNewlyOpened = !r._Document
 		if .IsGraphics != g
 			.IsGraphics = g
 			.DuringLoad++
@@ -822,17 +823,16 @@ So anything not 0 means "its OK"`
 			.DuringLoad--
 		
 		.AddToJumpHistory
-		|| ok = (g)(.EditDraw(r), .EditText(r))
+		|| OK = (g)(.EditDraw(r), .EditText(r))
 		if ok != 1
 			.RecentFiles.pop
 			return ok
 
-		|| IsNewlyOpened = !r._Document
 		.LoadCurrFileName
 		.DuringLoad++
 		.filelist.select(r)
 		
-		if !g
+		if !G
 			.LoadErrors(IsNewlyOpened, false)
 			if .editme.JeeboxMode isnt expect
 				.ProductSep.Collapsed = true

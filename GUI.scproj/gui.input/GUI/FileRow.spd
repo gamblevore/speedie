@@ -63,7 +63,9 @@ class FileRow (ListViewRow)
 		opt norefcounts
 		fs <~ "file: "
 		fs <~ .FilePath
-		fs <~ .dirfile	
+		if .DirFile
+			fs <~ "/"
+			fs <~ .dirfile	
 
 	
 	function AskDelete (|fileviewer| fv)
@@ -189,14 +191,6 @@ class FileRow (ListViewRow)
 				if !.AddFileSub(f, excl, folfile, count)
 					exit
 		.filesort
-
-
-	function ReadName (|string|)
-		|| n = .FilePath.name
-		|string--| d = .DirFile
-		if d
-			n = n.child(d)
-		return n
 
 
 	inline IsModified (|bool|)
@@ -343,17 +337,13 @@ class FileRow (ListViewRow)
 			if (b == ext) != (a == ext)
 				return (a==ext)+1
 
-		
-	
-
-libinternal string.FindExistingPath (|string|)
-	while (self > 1) and !.fileexists
-		self = self.parent
-	return self
 
 
 libinternal ListView.ListFilesUp (|string| InPath, |string| types, |bool| Save, |int| max = 2K, |string|)
-	|| path = InPath.TrimSlashes.FindExistingPath
+	|| path = InPath.TrimSlashes
+	while (path > 1) and !path.fileexists
+		path = path.parent
+	
 	require .listfiles(path, types, save, max) and inpath // also calls clear
 	|filerow| r
 	|| pp = path.parent

@@ -4,12 +4,10 @@
 // openfile,  filedialog,  folderdialog,  askfile,  openfolder
 
 function app.AskOpen (|string| types, |string| base="", |string| question="", |string| accept="Open", |string| Restore="", |string|)
-	require GUI.StartedProperly
 	return OpenSaveRequest(types, base, accept, false, question, restore)
 
 
 function app.AskSave (|string| SingleType, |string| base="", |string| question="", |string| accept="Save", |string| Restore="",   |string|)
-	require GUI.StartedProperly
 	if SingleType contains ','
 		error "Can't save with multiple extensions"
 		return string.error
@@ -17,6 +15,9 @@ function app.AskSave (|string| SingleType, |string| base="", |string| question="
 	
 
 function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bool| Save,  |string| question,  |string| RestoreDir="",  |string|)
+	// rename this function. Its the same as AskOpen!
+	
+	require GUI.StartedProperly
 	|| w = OpenSaveDialog._asker init OpenSaveDialog()
 	
 	with w
@@ -48,8 +49,6 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 	if last
 		f.select(filerow.FindFileName(f, last.name))
 	
-//	if save and w.name.text contains '.'
-//		w.name.Selection = (0, 8) // only works on the second time we run this func? annoying.
 	f.setfocus
 	
 	rz = (w)() as string
@@ -69,9 +68,9 @@ class OpenSaveDialog (Window)
 	|textview|					Name
 	|textview|					Question
 	|ListView|					Files
-	|Button|				Cancel
-	|Button|				Accept
-	|Button|				Reveal
+	|Button|					Cancel
+	|Button|					Accept
+	|Button|					Reveal
 	|string|					Types
 	|string|					LastGoodPath
 	|string|					Keyboard
@@ -287,7 +286,7 @@ libinternal file.IsntAnOSXBundle (|bool|)
 	return (n != "XCBuildData") and (ext != "app" and "framework" and "bundle" and "xcodeproj" and "build" and "dSYM" and "scproj") // mostly osx
 
 
-function window.CancelReturn
+inline window.CancelReturn
 	.ReturnValue = self
 
 

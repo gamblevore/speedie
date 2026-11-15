@@ -164,8 +164,9 @@ module Perry
 		if !old
 			old = .projects.msg(@tmp, path)
 			old.msg(@str, path.TrimCodeExt)
+			// what if I just... don't create these?
 			old["edit"] = ""
-			old["pos"] = ""
+			old["pos"] = 0
 		
 		i.ProjectTab = old
 		i.SetTab2Name(old)

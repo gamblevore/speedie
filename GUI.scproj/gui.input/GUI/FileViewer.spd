@@ -230,6 +230,15 @@ class FileViewer (ListView)
 		return true
 
 
+	libinternal filerow.DisplayName (|faststring| fs)
+		|| n = .FilePath.name
+		fs <~ n
+		|string--| d = .DirFile
+		if d
+			fs <~ "/"
+			fs <~ d
+
+
 	function AskSaveAll (|bool|)
 		|[filerow]| m
 		for r.fast in self
@@ -250,8 +259,9 @@ class FileViewer (ListView)
 			fs <~ " files in project "
 			fs <~ .liststart!.name
 		  else
-			fs <~ first.readname
-		if gui.quitreason
+			first.DisplayName(fs)
+		
+		if gui.QuitReason
 			fs <~ ", before quitting"
 		fs <~ "?"
 		
@@ -259,7 +269,7 @@ class FileViewer (ListView)
 			fs <~ "\n"
 			for m0 in m
 				fs <~ "\n"
-				fs <~ m0.readname
+				m0.DisplayName(fs)
 		
 		|| answer = fs|&nil||string|.AskSaveOrCancel
 		fs = nil
@@ -275,13 +285,11 @@ class FileViewer (ListView)
 
 	syntax access (|string| path, |filerow|)
 		cpp_part AccessPath
-		require path
-
-		if path.file.IsDir
-			path = path.PathDir // standardise
-		for f.fast in self
-			if path ~= f.FilePath or f.ReadFrom
-				return f
+		|| P = path.TrimSlashes					// standardise
+			for f.fast in self
+				if P ~= f.FilePath or f.ReadFrom
+					rz = f
+					exit
 
 
 	libinternal string.name (|bool| YeahReally, |string|)
