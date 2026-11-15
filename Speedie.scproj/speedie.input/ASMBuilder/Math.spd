@@ -624,7 +624,6 @@ extend Assembler
 			|fatasm| swap = fatmul[0]
 			fatmul[0] = fatadd[0]
 			fatadd[0] = swap
-			// OK... its swapped. now what?
 			add.fatindex = mul.fatindex
 			fatmul = fatadd
 		
