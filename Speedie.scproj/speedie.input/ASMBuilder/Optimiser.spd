@@ -51,12 +51,12 @@ function fatasm.CanAccessVecPartsDirectly (|bool|)
 		return true
 
 
-function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| base,  |AsmReg| vara,  |asmreg|)
-	if dest is AddrRequest									// We need the address of this.
+function assembler.VecAccess (|message| exp,  |AsmReg| Dest,  |asmreg| Base,  |AsmReg| Vara, |DataTypeCode| VType,  |asmreg|)
+	if dest is AddrRequest
 		if base isnt containsaddr
-			return base // by not returning containsaddr, we told them to figure it out some other way.
+			return base										// tells them to figure it out some other way.
 		
-		return .IncrPointerByVar(dest, base, vara, exp, true)
+		return .IncrPointerByVar(dest, base, vara, exp, VType)
 
 	if base is ContainsAddr
 		if dest is ContainsAddr								// really what?

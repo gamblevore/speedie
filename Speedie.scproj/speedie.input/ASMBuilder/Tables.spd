@@ -457,21 +457,21 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
 	
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
-		(mode is AddrNoFiddle)								// inlineoffsetopt can't get at buried glob
-															// So we simplify
-	|| base = .µGetPrms(f, Mode)							// x = a.b[0]
+		(mode is AddrNoFiddle)									// InlineOffsetOpt can't get at buried glob
+																// So we simplify
+	|| base = .µGetPrms(f, Mode)								// x = a.b[0]
 	|| RegToAdd = .µGetASM(Index)
 
 	|| TyA = d.ASMRegType
 	if tya.VecCount > 1
-		return .VecAccess(exp, dest, base, RegToAdd)
+		return .VecAccess(exp, dest, base, RegToAdd, tya)
 
 	target debug: if !d.PointerCount and !d.IsCarray
 	
 	if d.CanCopyNormally
 		if dest isnt AddrRequest
 			dest.µType = exp.ASMDecl.µtype
-			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)		// readorwrite can convert vara to a const
+			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)// Readorwrite can convert vara to a const
 	  elseif dest is set
 		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!)
 		

@@ -220,10 +220,14 @@ datatype ASMReg (uint64)
 	function Signed (|bool|)
 		return self|DataTypeCode|.issigned
 		
-	function BitLoss (|int|)
+	function VBitLoss (|int|)
 		if .isbool
 			return 63
-		return 64 - .bitcount
+		|| S = self|DataTypeCode|
+		|| V = S & (~3|DataTypeCode|)
+		if V == S								// A vector
+			return 64 - V.BitCount
+		return 32 - V.bitcount					// Clear vector bits. ivec4-->int
 	
 	function IsBool (|bool|)
 		opt inline

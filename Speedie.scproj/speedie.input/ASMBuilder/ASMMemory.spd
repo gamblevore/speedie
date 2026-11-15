@@ -10,10 +10,11 @@ function AddConst (|int| Add, |message| exp, |ASMReg| Base, |ASMReg|)
 	return .AddToReg(exp, dest, base, Add)
 
 
-function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message| exp, |bool| Vector=false, |asmreg|)
+function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message| exp, |DataTypeCode| Vector=0, |asmreg|)
 	base = base.HaveAddr
 	if !vara.reg
 		return base
+	
 	dest = dest.HaveAddr
 	dest.µType = DataTypeCode._voidptr
 	if !dest.reg
@@ -21,16 +22,11 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 		dest.TryDestReg = Base
 		dest = .TempMe(exp, dest)
 	
-	if Vector	// we want to access its components.
-				// OK, so theres more things to deal with.
-				// we are returning the address of a component. but we need to TELL them that.
-				// its not the address of the original vector that we are returning.
-				// the problem is that ++Struct.Vec[1] now wants to add 1 to a pointer-sized address.
-				// maybe we can just return "containsaddr" but mark it as an int/float
-				// then update all the callers.
-/		return .intplussub(exp, dest, base, vara, 4)	
-	
-	return .Plus(exp, dest, base, vara)
+	if !Vector
+		return .Plus(exp, dest, base, vara)
+
+	dest = .IntPlusSub(exp, dest, base, vara, 4)
+	return dest.µType(vector & ~3)
 
 
 function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |asmreg|)
@@ -39,6 +35,7 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 
 	|| Amount = D.SizeOfQuery max 1
 	// what about structs like 53 bytes long? What is their alignment?
+	// should I use ClsSizeRaw instead?
 	
 	if index
 		dest = .AddConst(index*amount, exp, dest)
