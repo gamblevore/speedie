@@ -2051,7 +2051,6 @@ extern Dictionary* SC__ASM_Types_Dict;
 #define kSC__Reg_FromInline ((ASMReg)67108864)
 #define kSC__Reg_FromRegister ((ASMReg)4294967296)
 #define kSC__Reg_GlobalMemory ((ASMReg)17179869184)
-#define kSC__Reg_InlineFlagsToKeep ((ASMReg)277027488768)
 #define kSC__Reg_Negate ((ASMReg)65536)
 #define kSC__Reg_NewlyDeclared ((ASMReg)2097152)
 #define kSC__Reg_NoScale ((ASMReg)33554432)
@@ -4818,11 +4817,7 @@ ASMReg SC_Reg_Negate(ASMReg Self, bool Neg);
 
 bool SC_Reg_NegateFail(ASMReg Self, ASMReg Dest);
 
-ASMReg SC_Reg_OperatorAs(ASMReg Self, ASMReg A);
-
 ASMReg SC_Reg_OperatorAsnt(ASMReg Self, ASMReg A);
-
-ASMReg SC_Reg_OperatorBitand(ASMReg Self, ASMReg A);
 
 bool SC_Reg_OperatorIsa(ASMReg Self, uint /*DataTypeCode*/ M);
 
@@ -11259,6 +11254,12 @@ inline bool SC_FatRange_Never(FatRange* Self);
 
 inline bool SC_Pac_DepthOK(Assembler* Self, SCFunction* Fn);
 
+inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest);
+
+inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
+
+inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
+
 inline bool SC_Reg_FourBytes(ASMReg Self);
 
 inline bool SC_Reg_IsBig(ASMReg Self);
@@ -11270,12 +11271,6 @@ inline bool SC_Reg_IsFloat(ASMReg Self);
 inline bool SC_Reg_IsSmall(ASMReg Self);
 
 inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New);
-
-inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest);
-
-inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self);
-
-inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self);
 
 inline bool SC_Reg_IsInt(ASMReg Self);
 
@@ -11453,32 +11448,6 @@ inline bool SC_Pac_DepthOK(Assembler* Self, SCFunction* Fn) {
 	return Self->InlineDepth < (Self->InlineDepthLimit + ExpectInline);
 }
 
-inline bool SC_Reg_FourBytes(ASMReg Self) {
-	return JB_TC_ByteShift(((DataTypeCode)Self)) == 2;
-}
-
-inline bool SC_Reg_IsBig(ASMReg Self) {
-	return JB_TC_ByteShift(((DataTypeCode)Self)) == 3;
-}
-
-inline bool SC_Reg_IsBool(ASMReg Self) {
-	return JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Self), kJB__TC_bool);
-}
-
-inline bool SC_Reg_IsFloat(ASMReg Self) {
-	return JB_TC_IsFloat(((DataTypeCode)Self));
-}
-
-inline bool SC_Reg_IsSmall(ASMReg Self) {
-	return (JB_TC_ByteShift(((DataTypeCode)Self)) < 3);
-}
-
-inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New) {
-	NilRecorder* P = ((NilRecorder*)(Self->Neel));
-	(SC_NRC_SyntaxCallSet((P), D->NilReg, New));
-	return New;
-}
-
 inline ASMReg SC_Pac_GetASM(Assembler* Self, Message* Exp, ASMReg Dest) {
 	//cpp_part;
 	Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_Const, (!true));
@@ -11504,6 +11473,32 @@ inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Negate, (!true));
 	}
 	return Self;
+}
+
+inline bool SC_Reg_FourBytes(ASMReg Self) {
+	return JB_TC_ByteShift(((DataTypeCode)Self)) == 2;
+}
+
+inline bool SC_Reg_IsBig(ASMReg Self) {
+	return JB_TC_ByteShift(((DataTypeCode)Self)) == 3;
+}
+
+inline bool SC_Reg_IsBool(ASMReg Self) {
+	return JB_TC_SyntaxIs(SC_Reg_xC2xB5Type(Self), kJB__TC_bool);
+}
+
+inline bool SC_Reg_IsFloat(ASMReg Self) {
+	return JB_TC_IsFloat(((DataTypeCode)Self));
+}
+
+inline bool SC_Reg_IsSmall(ASMReg Self) {
+	return (JB_TC_ByteShift(((DataTypeCode)Self)) < 3);
+}
+
+inline NilState SC_nil_SetNilness(ArchonPurger* Self, SCDecl* D, uint /*NilState*/ New) {
+	NilRecorder* P = ((NilRecorder*)(Self->Neel));
+	(SC_NRC_SyntaxCallSet((P), D->NilReg, New));
+	return New;
 }
 
 inline bool SC_Reg_IsInt(ASMReg Self) {
