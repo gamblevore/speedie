@@ -528,7 +528,7 @@ POS 5
 /**/ BRSH  (Shift)
 		u1 = ((u2 << Shift_Shu) >> Shift_Shu) >> u3
 /**/ BLSH  (Shift) 
-		u1 = ((u2 << u3) << Shift_Shu) >> Shift_Shu
+		u1 = ((u2 << Shift_Shu) >> Shift_Shu) << u3
 
 
 
@@ -836,21 +836,21 @@ POS 5
 //		else
 //			uv1 |= ((uv2 << BFLD_upu) >> BFLD_downu)	
 /**/ QRSS  (Shift)
-		iv1 = (iv2 >> Shift_Shu) >> iv3
+		iv1 = ((iv2 << Shift_Shu) >> Shift_Shu) >> iv3
 /**/ QRSH  (Shift)
-		uv1 = (uv2 >> Shift_Shu) >> uv3
-/**/ QLSH  (Shift) 
-		uv1 = (uv2 << uv3) << Shift_Shu
+		uv1 = ((uv2 << Shift_Shu) >> Shift_Shu) >> uv3
+/**/ QLSH  (Shift)
+		uv1 = ((uv2 << Shift_Shu) >> Shift_Shu) << uv3
 
 
 
 #!						 (((((Vector BitOps)))))
 /**/ QAND  (Shift)
-		uv1 = uv2  &  (uv3 ||| Shift_Shu)
+		uv1 = uv2  &  ((uv3 << Shift_Shu) >>Shift_Shu)
 /**/ QXOR  (Shift)
-		uv1 = uv2  ^  (uv3 ||| Shift_Shu)
+		uv1 = uv2  ^  ((uv3 << Shift_Shu) >>Shift_Shu)
 /**/ QORR  (Shift)
-		uv1 = uv2 ||| (uv3 ||| Shift_Shu)
+		uv1 = uv2 ||| ((uv3 << Shift_Shu) >>Shift_Shu)
 /**/ QNOT  (BoolNot)
 		uv1 = (~uv2) & (uv3|||BoolNot_Ki)
 /**/ QCNV (Convert)
