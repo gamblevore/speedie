@@ -4,9 +4,9 @@
 
 * chained obj destructor bug in branch_test.spd
 
-* Unused const (1) in setter Size
-* asmreg.zero fails to const
-  VBLD: r3, r0, r0, r0, r0 // why not just pass r0?
+* asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
+	* strange const rendering. Do the params not reflect the actual Const value?
+	* name SC_Reg__NewWithIntUint16 displays wrong
 
 * Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
 	* We want single run flow-log system. Runs both, compares output
