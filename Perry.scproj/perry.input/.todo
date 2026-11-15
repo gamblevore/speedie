@@ -6,8 +6,6 @@
 
 * Unused const (1) in setter Size
 	* vec>>4 bad asm
-	* image.mark fails
-	* image.syntax access fails to empty struct AND compile
 
 * asmreg.zero fails to const
   VBLD: r3, r0, r0, r0, r0 // why not just pass r0?
