@@ -952,7 +952,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		@Rel.ExportAddr  = C_RenderRel
 		
 		@Num.ExportAddr  = C_RenderNum
-		@unit.ExportAddr = C_RenderUnt
 		@Bra.ExportAddr  = C_RenderBra
 		@ARel.ExportAddr = C_RenderArel
 
@@ -1215,18 +1214,6 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 		  else			
 			D.Default!.Export( T )
 		t <~ ")"
-			
-
-
-	function C_RenderUnt (fpMsgExportCpp)
-		expect (self == "x")
-		|| num = .first!
-		|| s = num.name.ReplaceAll( "_", "" )
-
-		fs <~ "0x"
-		if (s.length mod 2) and (s[]).isletter
-			fs <~ '0'
-		fs <~ s
 
 
 	function C_RenderBak (fpMsgExportCpp)

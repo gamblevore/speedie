@@ -8,7 +8,6 @@ datatype ASMReg (uint64)
 	default 0|AsmReg|
 	linkage
 		cpp_part Reg
-		numeric false
 	
 	Flags
 		|asmreg|
@@ -237,22 +236,16 @@ datatype ASMReg (uint64)
 	function µType (|DataTypeCode|)
 		opt inline
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
-	
+		
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		return .µType(value|asmreg|)
-	
-	function µType (assigns:|asmreg|, |asmreg|)
 		|| Mask = DataTypeCode.PossibleBits|uint64| // first 10 bits
-		return ((self|uint64| & ~Mask) ||| (value|uint64|&Mask))|asmreg|
+		return (self & ~Mask) ||| (value&Mask)
 	
 	syntax is (|AsmReg| R, |bool|)
 		return self & R
 	
 	syntax is (|AsmReg| R, assigns:|bool|, |AsmReg|)
-		self = self asnt r
-		if (value)
-			self = self as r
-		return self
+		return (self &~ r) ||| (R * Value)
 		
 	function datatypecode.zero (|asmreg|)
 		|| K = asmreg.Const
@@ -363,8 +356,7 @@ datatype ASMReg (uint64)
 			rz.fatindex = index
 
 		function New (|asmreg|)
-			(rz is const)
-			(rz is param)
-			(rz as= datatypecode.uint64|asmreg|)
-			rz.FatIndex = 1			
+			|| Zero = ASMReg.const ||| asmreg.param ||| datatypecode.uint64
+			zero.FatIndex = 1
+			return zero
 

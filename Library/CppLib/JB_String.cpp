@@ -976,14 +976,13 @@ int JB_Str_ByteValue(JB_String* self, int offset) {
 #define kParseEnd_Both 3
 
 void JB_Err__CantParseNum(Message* Where, JB_String* self, int Pos, bool Overflow);
-void ParseNumErr_( JB_String* self, uint8* BadPos, Message*& Where, bool OverFlow ) {
+void ParseNumErr_( JB_String* self, uint8* BadPos, Message* Where, bool OverFlow ) {
     int CharPos = (int)(BadPos - self->Addr - 1);
     JB_Err__CantParseNum(Where, self, CharPos, OverFlow);
-    Where = nil;
 }
 
 
-static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd, bool IsFrac, Message*& Where, int Endable) {
+static double ParseDouble_ (JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd, bool IsFrac, Message* Where, int Endable) {
 	double Value = 0;
 	uint8* Read = *ReadPlaceOut;
 	double Mul0 = 10;
@@ -1002,6 +1001,7 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
                     ; //
                 } else {
                     ParseNumErr_( Str, Read, Where, false );
+                    Read = 0;
                 }
                 break;
             }
@@ -1013,6 +1013,7 @@ static double ParseDouble_(JB_String* Str, uint8** ReadPlaceOut, uint8* ReadEnd,
             } else {
 				if (Value > Max) {
 					ParseNumErr_( Str, Read, Where, true );
+					Read = 0;
 					break;
 				}
                 Value = Value*Mul + num;
@@ -1076,10 +1077,10 @@ double JB_Str_TextDouble (JB_String* self, Message* Where, bool Suffixes) {
 
 	double Value = ParseDouble_( self, &ReadPlace, ReadEnd, false, Where, kParseEnd_Both );
 
-	if (ReadPlace[-1] == '.') {
+	if (ReadPlace and ReadPlace[-1] == '.') {
 		Value += ParseDouble_( self, &ReadPlace, ReadEnd, true, Where, kParseEnd_E );
 	}
-	if (ReadPlace[-1] == 'e') {
+	if (ReadPlace and ReadPlace[-1] == 'e') {
 		bool ExpMinus = (ReadPlace[0] == '-');
 		if (ExpMinus) ReadPlace++;
 		double Exp = ParseDouble_( self, &ReadPlace, ReadEnd, false, Where, 0 );
@@ -1092,8 +1093,10 @@ double JB_Str_TextDouble (JB_String* self, Message* Where, bool Suffixes) {
 
 
 // Could combine Self/Where, and use ISA.
-// requires the message HAS the same name, or rlse bad errors.
+// requires the message HAS the same name, or else bad errors.
 static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u8* After, int Failed ) {
+	bool Overflow = false;
+	if (S < After) {
 	bool IsMinus = (*S == '-');
 	S += IsMinus;
 	
@@ -1108,7 +1111,6 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u
 			S+=2;
 		}
 	}
-
 	int Mul = 10;
 	if (Mode == 1) {
 		Mul = 2;
@@ -1118,9 +1120,12 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u
 		
 
 	uint64 Value = 0;
-	bool Overflow = false;
-
-	while ( S < After ) {
+	if (S < After) while ( true ) {
+		if (S >= After) {
+			if (IsMinus)
+				Value = -Value;
+			return Value;
+		}
 		uint c = *S++;
 		if (c == '_')
 			continue;
@@ -1128,23 +1133,21 @@ static int64 ParseNumbers__( JB_String* self, int Mode, Message* Where, u8* S, u
 			c -= 32; // a --> A
 		if (c >= '0' and c <= '9') {
 			c = c - '0';
-			if (Mode == 1 and c > 1) goto BadPos;
+			if (Mode == 1 and c > 1) break;
 		} else if ( Mode == 2 and c >= 'A' and c <= 'F' ) {
 			c = c + (10 - 'A');
 		} else {
-			goto BadPos;
+			break;
 		}
 		if (__builtin_mul_overflow(Value, Mul, &Value) or __builtin_add_overflow(Value, c, &Value)) {
 			Overflow = true;
-			BadPos:;
-			ParseNumErr_(self, S, Where, Overflow);
-			return Failed;
+			break;
 		}
 	}
+	}
 
-	if (IsMinus)
-		Value = -Value;
-	return Value;
+	ParseNumErr_(self, S, Where, Overflow);
+	return Failed;
 }
 
 

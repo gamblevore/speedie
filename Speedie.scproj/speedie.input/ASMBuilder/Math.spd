@@ -4,7 +4,6 @@ prototype fn_OpASM			(|assembler| self, |message| exp, |asmreg| dest, |asmreg| L
 prototype fn_ASMConstifier	(|asmreg| L, |asmreg| R, |int64|)
 
 
-
 extend asmreg
 	function BoolNegateAnswer (|asmreg|)
 		opt inline
@@ -123,7 +122,7 @@ extend Assembler
 
 	
 	function NoWomping (|&fatasm| Curr, |asmreg| L, |asmreg| R)
-		target !debug: return
+		return // this test is too aggressive.
 		|| After = .Curr - 1
 		while Curr < After
 			if !curr.CanAccessVecPartsDirectly // give it a pass. loosen the tests!
@@ -1041,21 +1040,20 @@ extend Assembler
 
 
 	function BitShifter (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
-		target debug: if up and down //  One is always zero.
 		if up == 0 and down == 0
 			return src.µtype(Dest)
+		target debug: if up and down //  One is always zero.
 
 		|| SrcBits = src.unvec.BitCount
 		|| MaxBits = 64 >> src.IsVec
 		|| Extra = MaxBits - SrcBits
 		if up
-			if up >= MaxBits
-				problem (exp, "Shifted up too far")
-			up = Extra
-			down = Extra - up
+			if Extra > up
+				down = Extra - up
+				up = Extra
 		  else
-			if (down >= SrcBits)
-				problem (exp, "Shifted down too far")
+			if down >= SrcBits // error?
+				problem (Exp, "Shifted down too far")
 			up += Extra
 			down += Extra
 		return .BFLG(Exp, dest, src, up, down, src.signed)
@@ -1065,11 +1063,13 @@ extend Assembler
 		if !up and !down and dest iz src // oof
 			return dest
 		
+		if up >= 64
+			problem (exp, "Shifted up too far")
+		if down >= 64 // error?
+			problem (Exp, "Shifted down too far")
+
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return dest.zero
-
-		if down >= 64 // error?
-/			down = 63
 		
 		|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign|int|)
 			return Merge
