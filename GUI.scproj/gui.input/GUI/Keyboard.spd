@@ -119,7 +119,9 @@ dataType Keys (int)
 			return self is MacBacktick or backtick or APPLICATION or slash
 
 	function IsModifier (|bool|)
-		return (self is lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
+		if self >= scan
+			if (self == lgui or rgui or lctrl or rctrl or lalt or ralt or lshift or rshift)
+				return true
 
 	function IsCancel (|bool|)
 		return (self is cancel_key or escape)

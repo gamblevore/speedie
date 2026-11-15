@@ -2,7 +2,7 @@
 
 module Colors
 	function Rainbow (|float| H, |float| S, |float| B, |float| A=1.0,  |vec4|)
-		description "Rainbow color wheel. More orange than color.Wheel" 
+		description "Rainbow color wheel. More orange than color.Wheel"
 		h = h.Fract
 		h = h * 7.0
 		|| i = h|int|
