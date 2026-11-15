@@ -174,14 +174,13 @@ extend assembler
 			.NopTempConst(A)					// In case of swapped order
 	
 	
-	function Const (|asmreg| R, |int| bits, |bool| signed, |ind|)
+	function Const (|asmreg| R, |int| Bits, |bool| Signed, |ind|)
 		if r.reg == 0
 			return 0							// Sigh. I DIE.
 		
 		require R is Const
 
 		|| RF = R.fat
-//		if rf and .IsWithin(RF)					// The .iswithin is already used by CanConstRegisterThg
 			|| k = RF.const
 			if k.fits(bits, signed)
 				.NopTempConst(R)

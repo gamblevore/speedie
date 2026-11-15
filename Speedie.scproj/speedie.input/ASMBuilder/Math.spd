@@ -90,8 +90,7 @@ extend Assembler
 			.AskNopTemp(ml)
 			.AskNopTemp(mr)
 			return dest									// Returning from inline, into func that discards result.
-	
-		
+			
 		if (!first.IsLast) and (ml.IsVec != mr.IsVec)
 			if ml.IsVec
 				mr = .VectorUpgrade(mr, exp)
@@ -433,7 +432,7 @@ extend Assembler
 			if Pow2 <= 1
 				return .Quick1Or1Sub(dest, l, Pow2, exp)
 			if 0: exp.QFLG
-			return .BFLG_Sub(Exp, dest, L,  Pow2-1, 0, false) // y = x * 4  -->  y = x << 2
+			return .BFLG(Exp, dest, L,  Pow2-1, 0, false) // y = x * 4  -->  y = x << 2
 			
 		|| five = .IntPowerOfTwo(r, 1) // 5 or 9 or 17 or 33, etc
 			if 0: exp.QADD, exp.QSUB
@@ -576,7 +575,7 @@ extend Assembler
 		if src.issmall and cmp.IsBig
 			cmp.reg = 0
 			|| dest = .TempMe(exp, cmp)
-			return .BFLG_Sub(exp, dest, src, 32, 32, false)
+			return .BFLG(exp, dest, src, 32, 32, false)
 		return src
 		
 
@@ -760,7 +759,7 @@ extend Assembler
 				exp.DivByZero
 			return .Quick1Or1Sub(dest, l, ptoi, exp)
 		if !l.Signed
-			return .BFLG_Sub(exp, dest, l, 0, ptoi-1, false)							// u / 2 --> u >> 1
+			return .BFLG(exp, dest, l, 0, ptoi-1, false)							// u / 2 --> u >> 1
 		return exp.DIV2(dest, l, l.VBitLoss, ptoi-1) * Dest		// nice
 
 
@@ -919,7 +918,7 @@ extend Assembler
 		if (r.reg) and (!dest.IsVec)
 			if (opp == asm.BAND)
 				|| B = .CanBAND_BFLG(R)
-					return .BFLG_Sub(exp, dest, L, B, B, false)
+					return .BFLG(exp, dest, L, B, B, false)
 			
 			if (opp + 4 == asm.bank) and (r is const)
 				|uint64| K = r.const
@@ -955,26 +954,23 @@ extend Assembler
 			|| fn = (signed)(ConstifyBitSHS, ConstifyBitSHR)
 			return .MakeConstFromTwo(exp, dest, l, r, fn)
 
-//		|| K2 = .BFLG2(exp, dest, l, 0, R)
-//			return K2
+		|| K = .Vconst(L, R)
+			return .BitShifter(exp, dest, l, 0, K)
 
-		|| K = .const(R, 6, false)
-			return .BFLG(exp, dest, l, 0, k)
-		
 		|| fat = exp.BRSH(dest, L, R, l.VBitLoss)
-		fat.Vectorise(dest, asm.QRSS)
+		dest = fat.Vectorise(dest, asm.QRSS)
 		if l.Signed
 			if 0: exp.brss, exp.QRSS, exp.QRSH
 			fat._op--
-		return fat * dest	
+		return dest
 
 
 	function SHL  (fn_opasm)
 		if dest is Const
 			return .MakeConstFromTwo(exp, dest, l, r, ConstifyBitSHL)
 
-		|| K = .const(R, 6, false)
-			return .BFLG(exp, dest, l, K, 0)
+		|| K = .vconst(L, R)
+			return .BitShifter(exp, dest, l, K, 0)
 		
 		if 0: exp.QLSH
 		return exp.BLSH(dest, L, R, l.VBitLoss).Vectorise(Dest, asm.QLSH)
@@ -1029,38 +1025,51 @@ extend Assembler
 				|| D = C >> Down
 				if D == Target
 					return up			
-		
+	
 
-	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
-		if !up and !down
+	function VConst (|ASMReg| Upon, |asmreg| Shift, |ind|)
+		if !upon.IsVec
+			return .const(shift, 6, false)
+		|| fat = shift.fat
+		if  (fat isa asm.VSWZ) and fat.prms[2] == 2340			// Vec = (k,k,k,k)
+			|| R1 = fat.InputFat(1)
+			if r1 isa asm.KNST
+				|| K = .const(r1.info, 6, false)
+					.asknop(fat) // no idea if this is overcomplex or not
+					.asknop(r1)  // perhaps asknop and asknoptemp should be merged?
+					return K	 // especially as we have now 'FromRegister'
+
+
+	function BitShifter (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |asmreg|)
+		target debug: if up and down //  One is always zero.
+		if up == 0 and down == 0
 			return src.µtype(Dest)
 
-		|| SrcBits = src.BitCount
-		if srcbits == 1							// bool
-			if down > up
-				problem (exp, "Bool shifted into nothing")
-			if down == up
-				return src.µtype(Dest)
-			srcbits = (up+1) min 64
-			
-		if (up > srcbits) or (down > SrcBits)
-			problem (exp, "Shift too far")
-			
-		|| Extra = 64 - SrcBits
-		up += Extra
-		down += Extra
-		return .BFLG_Sub(Exp, dest, src, up, down, src.signed)
+		|| SrcBits = src.unvec.BitCount
+		|| MaxBits = 64 >> src.IsVec
+		|| Extra = MaxBits - SrcBits
+		if up
+			if up >= MaxBits
+				problem (exp, "Shifted up too far")
+			up = Extra
+			down = Extra - up
+		  else
+			if (down >= SrcBits)
+				problem (exp, "Shifted down too far")
+			up += Extra
+			down += Extra
+		return .BFLG(Exp, dest, src, up, down, src.signed)
 
 
-	function BFLG_Sub (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
+	function BFLG (|message| exp, |asmreg| dest, |asmreg| Src, |int| up, |int| down, |bool| Sign, |asmreg|)
 		if !up and !down and dest iz src // oof
 			return dest
 		
 		if  src.iszero  or  (up >= 64)  or  (!src.signed and down >= 64)
 			return dest.zero
 
-		if down >= 64
-			down = 63
+		if down >= 64 // error?
+/			down = 63
 		
 		|| Merge = .MergeBFLG(exp, dest, src, up, down, Sign|int|)
 			return Merge

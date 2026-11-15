@@ -172,7 +172,7 @@ function ExpandBits2 (|assembler| self, |message| exp, |asmreg| dest, |scdecl| t
 		|| BC = dest.BitCount
 		if Needed.IsInt and (Needed.VecCount == 1) and (Needed.BitCount > BC)
 			|| Wipe = 64 - BC
-			return .BFLG_Sub(exp, dest, dest, Wipe, Wipe, needed.issigned)
+			return .BFLG(exp, dest, dest, Wipe, Wipe, needed.issigned)
 	return dest
 	
 	
@@ -261,7 +261,7 @@ function TypeCast (fn_asm)
 
 	// what if it came frmo a memory-read
 	|| sh2 = 64 - (NewType.BitCount min OldType.BitCount)
-	return .BFLG_Sub(exp, dest, from, sh2, sh2, dest.signed)
+	return .BFLG(exp, dest, from, sh2, sh2, dest.signed)
 
 
 

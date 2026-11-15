@@ -10,7 +10,7 @@ function message.ExpandBits (|asmreg| Src, |asmreg| Other,  |asmreg|)
 
 	|| type = other.µType
 	|| Where = sh.TempMe(self, Type|asmreg|)
-	|| dest = sh.BFLG_Sub(self, where, Src, 32, 32, Src.Signed)
+	|| dest = sh.BFLG(self, where, Src, 32, 32, Src.Signed)
 	return sh.CloseVars(Closer, dest)
 
 
