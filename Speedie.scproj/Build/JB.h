@@ -4413,8 +4413,6 @@ void SC_int_FuncFill(int Self, ASMReg* Regs, u16* Func_inputs);
 
 bool SC_int_IsNormalMatch(int Self);
 
-bool JB_int_IsPow2(int Self);
-
 bool SC_int_IsSimpleOrPointerCast(int Self);
 
 int JB_int_LowestBit(int Self);
@@ -4499,6 +4497,8 @@ ivec4 JB_ivec4_Shrink(ivec4 Self, int I);
 bool SC_uint_EqulInputsAreBothBool(uint Self);
 
 FatASM* SC_uint_FAT(uint Self);
+
+bool JB_uint_IsPow2(uint Self);
 
 int JB_uint_Log2(uint Self);
 
@@ -4766,8 +4766,6 @@ ASMReg SC_Reg_BasicVec(ASMReg Self);
 
 int SC_Reg_BitCount(ASMReg Self);
 
-int SC_Reg_BitLoss(ASMReg Self);
-
 ASMReg SC_Reg_BoolAnswerMaybeBugged(ASMReg Self);
 
 ASMReg SC_Reg_BoolAnswerOK(ASMReg Self);
@@ -4852,7 +4850,7 @@ bool SC_Reg_Signed(ASMReg Self);
 
 ASMReg SC_Reg_Simplify(ASMReg Self);
 
-ASMReg SC_Reg_SlimRegSet(ASMReg Self, ASMReg Value);
+ASMReg SC_Reg_SlimRegSet(ASMReg Self, ASMReg Other);
 
 bool SC_Reg_SomePointer(ASMReg Self);
 
@@ -4860,9 +4858,11 @@ bool SC_Reg_SyntaxIs(ASMReg Self, ASMReg R);
 
 ASMReg SC_Reg_SyntaxIsSet(ASMReg Self, ASMReg R, bool Value);
 
-ASMReg SC_Reg_Tempness(ASMReg Self, ASMReg Other);
-
 ASMReg SC_Reg_TryDestRegSet(ASMReg Self, ASMReg Dest);
+
+ASMReg SC_Reg_UnVec(ASMReg Self);
+
+int SC_Reg_VBitLoss(ASMReg Self);
 
 FatASM* SC_Reg_Within(ASMReg Self, ASM Op);
 
@@ -6358,9 +6358,7 @@ ASMReg SC_Pac_Assign(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, Fat
 
 void SC_Pac_BackupFAT(Assembler* Self, FatASM* Curr);
 
-ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down);
-
-ASMReg SC_Pac_BFLG_Sub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down, bool Sign);
+ASMReg SC_Pac_BFLG(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down, bool Sign);
 
 ASMReg SC_Pac_BitAnd(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -6371,6 +6369,8 @@ ASMReg SC_Pac_BitMaker(Assembler* Self, ASMReg Dest, ASMReg L, ASMReg R, Message
 ASMReg SC_Pac_BitNot(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_BitOr(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
+
+ASMReg SC_Pac_BitShifter(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int Up, int Down);
 
 ASMReg SC_Pac_BitXor(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
@@ -6538,7 +6538,7 @@ ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_InbuiltTernary(Assembler* Self, ASMReg Dest, ASMReg A, ASMReg B, Message* Cond);
 
-ASMReg SC_Pac_IncrPointerByVar(Assembler* Self, ASMReg Dest, ASMReg Base, ASMReg Vara, Message* Exp);
+ASMReg SC_Pac_IncrPointerByVar(Assembler* Self, ASMReg Dest, ASMReg Base, ASMReg Vara, Message* Exp, uint /*DataTypeCode*/ Vector);
 
 ASMReg SC_Pac_IncrPost(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Src, int64 Value);
 
@@ -6563,6 +6563,8 @@ ASMReg SC_Pac_InlineReturnToJump(Assembler* Self, Message* Exp, FatASM* S, ASMRe
 ASMReg SC_Pac_IntMul(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
 
 ASMReg SC_Pac_IntPlus(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R);
+
+ASMReg SC_Pac_IntPlusSub(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg L, ASMReg R, uint Lmul);
 
 ParsedInt SC_Pac_IntPowerOfTwo(Assembler* Self, ASMReg R, int Sub);
 
@@ -6822,11 +6824,13 @@ bool SC_Pac_Unchanged(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
 ASMReg SC_Pac_UniqueLocation(Assembler* Self, Message* A, ASMReg Dest, Message* B);
 
+Ind SC_Pac_VConst(Assembler* Self, ASMReg Upon, ASMReg Shift);
+
 uint SC_Pac_vdecls(Assembler* Self);
 
 void SC_Pac_vdeclsSet(Assembler* Self, uint Value);
 
-ASMReg SC_Pac_VecAccess(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Base, ASMReg Vara);
+ASMReg SC_Pac_VecAccess(Assembler* Self, Message* Exp, ASMReg Dest, ASMReg Base, ASMReg Vara, uint /*DataTypeCode*/ VType);
 
 ASMReg SC_Pac_VecSwizzle(Assembler* Self, Message* Exp, ASMReg Dest);
 
