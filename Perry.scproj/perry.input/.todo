@@ -5,7 +5,7 @@
 * chained obj destructor bug in branch_test.spd
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
-	* strange const rendering. Do the params not reflect the actual Const value?
+	* Strange const rendering. Do the params not reflect the actual Const value?
 	* name SC_Reg__NewWithIntUint16 displays wrong
 
 * Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
