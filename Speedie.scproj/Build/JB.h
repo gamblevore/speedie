@@ -4828,8 +4828,6 @@ bool SC_Reg_OperatorIsa(ASMReg Self, uint /*DataTypeCode*/ M);
 
 bool SC_Reg_OperatorIz(ASMReg Self, ASMReg M);
 
-ASMReg SC_Reg_OperatorMul(ASMReg Self, bool B);
-
 ASMReg SC_Reg_OperatorxE2x80xA2(ASMReg Self, ASMReg Dest);
 
 FatASM* SC_Reg_OptWithin(ASMReg Self);
@@ -4868,9 +4866,7 @@ FatASM* SC_Reg_Within(ASMReg Self, ASM Op);
 
 ASMReg SC_Reg_Zero(ASMReg Self);
 
-ASMReg SC_Reg_xC2xB5TypeSetWithTC(ASMReg Self, uint /*DataTypeCode*/ Value);
-
-ASMReg SC_Reg_xC2xB5TypeSetWithReg(ASMReg Self, ASMReg Value);
+ASMReg SC_Reg_xC2xB5TypeSet(ASMReg Self, uint /*DataTypeCode*/ Value);
 
 ASMReg SC_Reg__NewWithIntUint16(int Reg, uint /*u16*/ Index);
 
@@ -7222,8 +7218,6 @@ void SC_Cpp__C_RenderThg(Message* Self, FastStringCpp* Fs);
 void SC_Cpp__C_RenderTmp(Message* Self, FastStringCpp* Fs);
 
 void SC_Cpp__C_RenderTyp(Message* Self, FastStringCpp* Fs);
-
-void SC_Cpp__C_RenderUnt(Message* Self, FastStringCpp* Fs);
 
 JB_String* SC_Cpp__CDotType(Message* Msg, FastStringCpp* Fs, SCDecl* Type, bool DoIt);
 
@@ -11504,7 +11498,7 @@ inline ASMReg SC_Reg_BoolCondAnswer(ASMReg Self) {
 }
 
 inline ASMReg SC_Reg_BoolNegateAnswer(ASMReg Self) {
-	Self = SC_Reg_xC2xB5TypeSetWithTC(Self, kJB__TC_bool);
+	Self = SC_Reg_xC2xB5TypeSet(Self, kJB__TC_bool);
 	if (SC_Reg_SyntaxIs(Self, kSC__Reg_Negate)) {
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_AlreadyNegated, true);
 		Self = SC_Reg_SyntaxIsSet(Self, kSC__Reg_Negate, (!true));
@@ -11539,19 +11533,19 @@ inline JB_File* JB_Str_FileThatExists(JB_String* Self, JB_String* Operation) {
 inline ASMReg SC_Pac_ImproveAssign(Assembler* Self, ASMReg Dest, ASMReg Src, FatASM* Start) {
 	FatASM* F = SC_Reg_FAT(Src);
 	if (!(F and (Start and (F >= Start)))) {
-		return nil;
+		return 0;
 	}
 	if (SC_FAT_IsFunc(F)) {
-		return nil;
+		return 0;
 	}
 	if (!SC_Reg_SyntaxIs(Src, kSC__Reg_Temp)) {
 		if (!SC_Pac_IsCurrBranch(Self, F)) {
-			return nil;
+			return 0;
 		}
 		uint Vdecls = SC_InlineState_ParentAllocated(SC_Pac_State(Self));
 		int Find = 1 << SC_Reg_Reg(Src);
 		if ((Vdecls & Find)) {
-			return nil;
+			return 0;
 		}
 	}
 	return SC_Pac_ReDest(Self, F, Dest);
