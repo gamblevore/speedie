@@ -212,7 +212,7 @@ function TypeCast (fn_asm)
 	|| f = exp.first!
 	|| NewDecl = exp.ASMDecl
 	if newdecl.IsBareStruct
-		return asmreg() as asmreg.discard
+		return asmreg() ||| asmreg.discard
 	
 	dest.µtype = newdecl.µtype
 	|| From = .µGetASM(F, dest)
@@ -310,7 +310,7 @@ function SetRel (fn_asm)						// function relset (
 	|| Src = .µGetPrms(exp, dest)
 	(Src is Set)
 	// if I change this to incr the op, then IncrPost and IncrPre should too.
-	return .µ(F, Src) as asmreg.discard
+	return .µ(F, Src) ||| asmreg.discard
 
 
 
@@ -454,7 +454,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 	|| d = f.ASMDecl
 	
 	|| Index = exp.Second.first!
-	|| mode = ASMReg.AddrRequest as Index.ASMAllowsTemp
+	|| mode = ASMReg.AddrRequest ||| Index.ASMAllowsTemp
 	
 	ifn (dest isnt AddrRequest) and !d.IsCarray and d.CanCopyNormally
 		(mode is AddrNoFiddle)									// InlineOffsetOpt can't get at buried glob

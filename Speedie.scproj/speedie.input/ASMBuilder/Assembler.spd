@@ -134,7 +134,7 @@ struct Assembler (AssemblerWipe)
 		  else
 			fake.refcount = 1000
 			
-		|| Reg	= asmreg(i) as ASMReg.FatParam
+		|| Reg	= asmreg(i) ||| ASMReg.FatParam
 		reg = reg.µtype(a.µtype)
 		fake.Dest(0, reg, self)
 		if fake isnt param // huh?
@@ -251,7 +251,7 @@ struct Assembler (AssemblerWipe)
 		rz = .DeclareMe(where, rz)
 		Type.WholeType = rz
 		type.DepthOfLoop = .LoopDepth
-		(rz as= extra)
+		rz |= extra
 		
 		target debug: Type.ASMSanity
 

@@ -194,7 +194,7 @@ function SetInlineDest (|message| prms, |asmreg| dest, |scfunction| fn, |asmreg|
 			require .TempCheck(dest)
 			dest2 = .FunctionDestination(prms, dest, fn)			// better to put this in the right place...
 	
-	dest2 = dest2.simplify // as (dest & asmreg.InlineFlagsToKeep) // put in later
+	dest2 = dest2.simplify // ||| (dest & asmreg.TempFlags + asmreg.Set + asmreg.NewlyDeclared) // put in later
 	dest2.µtype = fn.ASMReturn.ASMRegType
 	if !dest2.reg
 		(dest2 is discard)
@@ -261,7 +261,7 @@ function @ASMType.InlinedReturn (|assembler| self, |message| exp, |asmreg| dest,
 
 	target debug
 		|| in_ret_trap = ++asmtrapper, if in_ret_trap == -1
-	(dest as= extras)
+	dest |= extras
 	|| f = exp.first
 		if !dest.reg
 			dest = .µ(f, asmreg.discard)
@@ -270,7 +270,7 @@ function @ASMType.InlinedReturn (|assembler| self, |message| exp, |asmreg| dest,
 		  else
 			dest = .µinto(f, dest)
 	
-	(dest as= extras)							// it can get lost... sadly.	
+	dest |= extras							// it can get lost... sadly.	
 	if .state.TailInlineable
 		.ClearAllStructs(exp)
 		dest = ReturnOpt(self, dest)
@@ -424,7 +424,7 @@ function InlineFinish (|message| exp, |FatRange| R, |SavedRegisters| sv, |ASMReg
 			(s is FromInline)					// Whyy???? this blocks consts, but why?
 	
 	rz &= ~ASMReg.Exit
-	(rz as= dest&asmreg.exit)
+	(rz |= dest&asmreg.exit)
 	rz = rz.ExpectSameType(dest)
 	if !rz.reg
 		(rz is const)							// Make compiler happy

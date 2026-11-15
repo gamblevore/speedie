@@ -4,7 +4,7 @@ function Assembler.RefCountSet (|message| exp, |message| prms, |&FatASM|)
 	opt	NoRefCounts
 	|| DestMsg = prms.first!
 	|| SrcMsg = prms.second!
-	|| A = .µGetPrms(DestMsg, ASMReg.AddrRequest as SrcMsg.ASMAllowsTemp)
+	|| A = .µGetPrms(DestMsg, ASMReg.AddrRequest ||| SrcMsg.ASMAllowsTemp)
 	|| B = .µ(SrcMsg, ASMReg.AddrRequest)
 	if A iz B
 		return nil // wat?
@@ -143,7 +143,7 @@ function assembler.RefCountFinish (|&fatasm| fat, |asmreg|)
 					saved = output
 				assembler.sh.Trash(saved)
 			fat.incr
-			return fat.info as asmreg()
+			return fat.info ||| asmreg()
 		return fat.info
 
 

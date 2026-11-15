@@ -228,7 +228,7 @@ extend Assembler
 		|| rr = r.reg,  || ll = l.reg
 		if !rr  and  ll
 			swap (l) (r)							// put reg 0 into the left... more convenient.
-		(Dest  as=  l & r & asmreg.Const)
+		(Dest  |=  l & r & asmreg.Const)
 		
 		if rr == ll
 			|| One = (dest isnt negate)|int|

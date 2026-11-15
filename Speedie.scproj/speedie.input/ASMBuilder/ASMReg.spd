@@ -41,7 +41,6 @@ datatype ASMReg (uint64)
 		AddrNeed		= [AddrRequest, AddrForceRequest, AddrNoFiddle]
 		Exit			= [ExitFunction, ExitAtAll]
 		TempFlags		= OKAsTemp	||| Temp
-		InlineFlagsToKeep = TempFlags  |||  Set  |||  NewlyDeclared
 		FatParam		= Param ||| veryspecial
 		FlagsToRemove	= Const		||| Discard
 		// don't go above 47
@@ -83,7 +82,7 @@ datatype ASMReg (uint64)
 			return f.f32|float64|
 
 	function Simplify (|asmreg|)
-		return .ReallySimplify as (self & tempflags) // okastemp
+		return .ReallySimplify ||| (self & tempflags) // OKAsTemp
 
 	function ReallySimplify (|asmreg|)
 		return self|uint16||asmreg|
@@ -131,7 +130,7 @@ datatype ASMReg (uint64)
 		return  (self is Const) and (.const == 0)
 	
 	function Negate (|bool| Neg=true, |asmreg|)
-		return (self|uint64| xor (neg << 16)|uint64|)|asmreg|
+		return self xor (neg << 16)
 	
 	function BitCount (|int|)
 		return .µtype.bitcount
@@ -146,7 +145,7 @@ datatype ASMReg (uint64)
 		return self|uint64| >> 48
 	
 	function FatIndex (assigns:|uint|, |asmreg|)
-		return (((self|uint64| << 16) >> 16) ||| (value|uint64| << 48))|asmreg|
+		return (((self << 16) >> 16) ||| (value|asmreg| << 48))
 
 	function FAT (|?&fatasm|)
 		return .FatIndex.fat
@@ -220,7 +219,7 @@ datatype ASMReg (uint64)
 		return self|DataTypeCode|.issigned
 	
 	function UnVec (|asmreg|)
-		return (self|uint64| & (~3)|uint64|)|asmreg|
+		return self & (~3)|uint64|
 	
 	function VBitLoss (|int|)
 		if .isbool
@@ -238,7 +237,7 @@ datatype ASMReg (uint64)
 		return self|DataTypeCode| & DataTypeCode.PossibleBits
 		
 	function µType (assigns:|DataTypeCode|, |asmreg|)
-		|| Mask = DataTypeCode.PossibleBits|uint64| // first 10 bits
+		|| Mask = DataTypeCode.PossibleBits|asmreg| // first 10 bits
 		return (self & ~Mask) ||| (value&Mask)
 	
 	syntax is (|AsmReg| R, |bool|)
@@ -257,7 +256,7 @@ datatype ASMReg (uint64)
 	function HaveAddr (|asmreg|)
 		rz = self asnt AddrRequest
 		rz = self asnt AddrForceRequest
-		rz = rz as ContainsAddr
+		rz |= ContainsAddr
 	
 	
 	function Reg (|int|)
@@ -265,9 +264,9 @@ datatype ASMReg (uint64)
 	
 		
 	function Reg (assigns:|int|, |AsmReg|)
-		|| R = (value&31) << 11
-		self &= ~(31 << 11)|asmreg|
-		(self as= R|asmreg|)
+		|| R = (value&31)|asmreg| << 11
+		self &= ~(31|asmreg| << 11)
+		self |= R
 		return self
 
 		
@@ -281,25 +280,15 @@ datatype ASMReg (uint64)
 
 	function SlimReg (assigns:|asmreg| Other,   |asmreg|)
 		self &=~ TempFlags
-		(self as= other&tempflags)
+		self |= other&tempflags
 		.reg = other.reg
 		return self
-		
-	
-	operator mul (|bool| b, |asmreg|)
-		return (b)(self, nil)
 	
 	syntax cast (|int|)
 		disabled
 		
-	operator bitand (|asmreg| A, |asmreg|)
-		return (self|int64| & A|int64|)|asmreg|
-	
-	operator as (|asmreg| A, |asmreg|)
-		return (self|int64| ||| A|int64|)|asmreg|
-
 	operator asnt (|asmreg| A, |asmreg|)
-		return (self|int64| &~ A|int64|)|asmreg|
+		return self &~ A
 
 	operator • (|asmreg| dest, |asmreg|)
 		if .reg == dest.reg
