@@ -14,6 +14,7 @@
 
 								// ASM later
 
+* Startup folder not loading at startup
 * ASM errors while editing, shouldn't spam interface... just ignore I guess.
 * asmview-syncing when stepping would be nice
 * Step through destructor without it fretting
