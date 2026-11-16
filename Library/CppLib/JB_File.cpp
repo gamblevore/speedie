@@ -154,10 +154,10 @@ static bool HasFD (JB_File* f) {
 }
 
 int64 ErrorHandle_ (int64 MaybeErr, JB_String* self, JB_String* other, const char* Operation) {
-    if (MaybeErr >= 0) {
+    if (MaybeErr >= 0)
         return MaybeErr;
-    }
-    JB_ErrorHandleFile(self, other, errno, nil, Operation);
+    
+    JB_ErrorHandleFile(self, other, 0, nil, Operation);
     return MaybeErr;
 }
 
@@ -266,7 +266,7 @@ int JB_File_RelaxPath (JB_File* self, bool NeedsMode) {
 
 
 int JB_Str_MakeEntirePath (JB_String* self, bool Last);
-bool RetryMakePath (JB_String* s) {
+static bool RetryMakePath (JB_String* s) {
 	int Err = errno;
 	if (Err != ENOENT)
 		return false;
@@ -314,13 +314,10 @@ void MMapTest () {
 
 
 
-int StrOpen_ (JB_String* Path, int Flags, bool AllowMissing, u8* Buff=nil) {
-	if (!JB_Str_Length(Path)) {
-		errno = ENOENT;
-	} else {
-		char* CPath = (char*)JB_FastFileString( Path, Buff );
-		
-		Flags |= O_Win32Sucks |  O_CLOEXEC; // mostly we dont want this... just for shm
+static int StrOpen_ (JB_String* Path, int Flags, bool AllowMissing, u8* Buff=nil) {
+	char* CPath = (char*)JB_FastFileString( Path, Buff );
+	if (CPath) {
+		Flags |= O_Win32Sucks |  O_CLOEXEC;		// mostly we dont want this... just for shm
 		int FD = open( CPath,  Flags,  kDefaultMode );
 		if (FD < 0  and  Flags&O_CREAT  and  RetryMakePath(Path))
 			FD = open( CPath,  Flags,  kDefaultMode );
@@ -332,10 +329,10 @@ int StrOpen_ (JB_String* Path, int Flags, bool AllowMissing, u8* Buff=nil) {
 			return FD;
 		}
 		if ((errno == ENOENT) and AllowMissing)
-			return -2;// ignore it...
+			return -2;							// ignore it...
 	}
     
-	JB_ErrorHandleFile(Path, nil, errno, nil, "opening");
+	JB_ErrorHandleFile(Path, nil, 0, nil, "opening");
     return -1;
 }
 
@@ -353,8 +350,7 @@ static bool Stat2_ ( JB_String* ErrName,  struct _stat* st,  bool normal,  const
 }
 
 
-bool Stat_ ( JB_String* self, struct _stat* st, bool normal=true ) {
-    if (!self) return false;
+static bool Stat_ ( JB_String* self, struct _stat* st, bool normal=true ) {
     uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (!tmp)
@@ -365,7 +361,7 @@ bool Stat_ ( JB_String* self, struct _stat* st, bool normal=true ) {
 
 
 JB_String* JB_Str_Preview (JB_String* P, int N);
-JB_StringC* PathTooLong (JB_String* P) {
+static JB_StringC* PathTooLong (JB_String* P) {
 	JB_ErrorHandleFile(JB_Str_Preview(P, 150), nil, ENAMETOOLONG, nil, "fixing-path");
 	return (JB_StringC*)JB_Str__Error(); // hmmm
 }
@@ -373,14 +369,16 @@ JB_StringC* PathTooLong (JB_String* P) {
 
 
 uint8* JB_FastFileString (JB_String* Path, uint8* Tmp=nil) { // just use posix funcs? fuck windows 16-bit chars.
-    u32 N = JB_Str_Length( Path );
-    if ( ! N )
-        return (uint8*)"";
+    int N = JB_Str_Length( Path );
+    if ( N <= 0 ) {
+		JB_ErrorHandleFile(JB_Str_Preview(Path, 150), nil, ENOENT, nil, "fixing-path");
+        return 0;
+	}
 
 	if (!Tmp) // For the JB_File* only functions.
 		return Path->Addr;
 
-    if (N >= PATH_MAX) {
+    if (N >= PATH_MAX) { // JB_File* already checked for PATH_MAX, ~, etc...
 		PathTooLong(Path);
         return nil;
 	}
@@ -398,18 +396,7 @@ uint8* JB_FastFileString (JB_String* Path, uint8* Tmp=nil) { // just use posix f
 		N--;
 	}
 	/*else if (Src[0] != '/') { // relative paths are understood by syscalls anyhow.
-		const char* CWD = getcwd( (char*)Write, PATH_MAX/2 );
-		if (!CWD) {
-			JB_ErrorHandleFile(Path, nil, errno, nil, "calling-getcwd");
-			return 0;
-		}
-			
-		int N2 = (int)strlen(CWD);
-		Write += N2; 
-		if (*Write!='/') {
-			*Write++ = '/';
-			*Write = 0;
-		}
+		...
 	}*/
 	// what about /../? lets do that later
 	// perhaps the pathfix feature could be moved to here and we don't need faststring anymore.
@@ -425,7 +412,7 @@ uint8* JB_FastFileString (JB_String* Path, uint8* Tmp=nil) { // just use posix f
 }
 
 
-int File_GoToStart ( JB_File* f, bool AllowMissing ) {
+static int File_GoToStart ( JB_File* f, bool AllowMissing ) {
 	int FD = f->Descriptor;
 	if (FD >= 0) {
 		int err = JB_File_OffsetSet(f, 0);
@@ -436,20 +423,20 @@ int File_GoToStart ( JB_File* f, bool AllowMissing ) {
 }
 
 
-bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
-	#if DEBUG
+static bool DebugFile (JB_File* F, const char* S) { // in case something is fucked up
+#if DEBUG
 	JB_String D = {};
 	D.Addr = (u8*)S;
 	D.Length = (int)strlen(S);
 	bool JB_Str_ContainsString(JB_String* Self, JB_String* S);
 	return JB_Str_ContainsString(F, &D);
-	#else
+#else
 	return false;
-	#endif
+#endif
 }
 
 
-int JB_File__CheckLeaks (int From, int To, bool Print) {
+static int CheckFDLeaks (int From, int To, bool Print) {
 	int Count = 0;
 	while (From <= To) {
 	#ifdef F_GETPATH
@@ -512,9 +499,8 @@ int JB_Write_ (int fd, uint8* buffer, int N) {
 }
 
 
-int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Total, const char* Path) {
-
-// <=-1 : -errno
+static int UnixReadButBetter (int fd, unsigned char* Out, int Request, int64& Total, const char* Path) {
+// <0   : -errno
 // 0 	: Early EOF. (This is OK if you read an oversized amount to be safe).
 // 1	: Successful read, got all
 
@@ -536,7 +522,7 @@ int ReadIfItWasDoneProperly (int fd, unsigned char* Out, int Request, int64& Tot
 				continue;										// 5) Files need a full read.
 			 													// 6) File failed too many times, give up.
 		}
-		return -JB_ErrorHandleFileC(Path, Error, "reading");	// 7) return error
+		return JB_ErrorHandleFileC(Path, Error, "reading");		// 7) return error
     } while (true);
 }
 
@@ -584,8 +570,6 @@ static bool CrashLogSub (const char* c) {
 			fprintf(stderr, "Log At: %s\n", JB_CrashLogFileName);
 	}
 	
-	
-
 	if (CrashLogFile <= 0) return false;
     JB_Write_( CrashLogFile, (u8*)c, (int)strlen(c) );
     return true;
@@ -618,14 +602,14 @@ int JB_FS_AppendFile (FastString* self, JB_File* F, uint64 L, bool LeaveOpen) {
 		uint Req = (uint)std::min(L, (uint64)(64*1024));
 		uint8* Buffer = JB_FS_WriteAlloc_(self, Req);
 		int64 N = 0;
-		Error = ReadIfItWasDoneProperly(fd, Buffer, Req, N, (const char*)F->Addr);
+		Error = UnixReadButBetter(fd, Buffer, Req, N, (const char*)F->Addr);
 		JB_FS_AdjustLength_(self, 64 * 1024, (int)N);
 		if ((int64)L>0)
 			L -= N;
 		if (Error < 0 or L==0) break;
 	}
 	if (!Error and (int64)L > 0)
-		Error = -JB_ErrorHandleFile(F, nil, EIO, nil, "reading"); // File smaller than expected
+		Error = JB_ErrorHandleFile(F, nil, EIO, nil, "reading"); // File smaller than expected
 	if (!LeaveOpen)
 		JB_File_Close(F);
 	return Error;
@@ -675,7 +659,7 @@ inline bool WorthTestingCase () {
 static void CaseFail_ (JB_String* Orig, const char* Actual, bool Owned) {
 	CaseComparisonsAllowed -= 64;
 	JB_String* Ugh = Owned ? JB_Str__Freeable0(Actual) : JB_Str_CopyFromCString(Actual);
-	JB_ErrorHandleFile(Orig, Ugh, -1, "case-differs", "finding path", 3, "found");
+	JB_ErrorHandleFile(Orig, Ugh, EINVAL, "case-differs", "finding path", 3, "found");
 }
 
 static void TrimSlash (MiniStr& A) {
@@ -736,7 +720,7 @@ JB_String* JB_Str_ResolvePath ( JB_String* self, bool AllowMissing ) {
 		if (AllowMissing)
 			return UserPath;
 	} else {
-		JB_ErrorHandleFile(self, nil, errno, nil, "resolving path");
+		JB_ErrorHandleFile(self, nil, 0, nil, "resolving path");
 	}
 	
 	if (UserPath != self)			// because userpath is not returned below.
@@ -802,7 +786,7 @@ JB_String* JB_File_Read ( JB_File* self, int Length, bool AllowMissing ) {
 		Result = JB_Str_New( Length );
 		if (Result) {
 			int64 Total = 0;
-			int Error = ReadIfItWasDoneProperly( FD, Result->Addr, Length, Total, (const char*)(self->Addr) );
+			int Error = UnixReadButBetter( FD, Result->Addr, Length, Total, (const char*)(self->Addr) );
 			if (Error < 0) {
 				JB_FreeIfDead(Result);
 				Result = JB_Str__Error();
@@ -915,7 +899,8 @@ JB_String* JB_File__Home () {
 }
 
 	
-void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
+static void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
+// doesn't handle /../ yet.
 	int i = 0;
 	int LastSlash = 0;
 	while (i <= n) {
@@ -933,32 +918,31 @@ void RemovePathGarbage_ (FastString* FS, byte* PS, int n) {
 }
 
 
-// Something like this could be nice?
-static bool PathIsClean (JB_String* P) {
-	// Doesn't handle    /../
-	int N = JB_Str_Length(P);
-	if (N<=0 or N >= PATH_MAX) return false;
-	
-	byte* PS = P->Addr;
-	if (PS[N-1] == '\n')
-		return false;
-	
-	int B = PS[0];
-    if (B != '/')
-		return false;
+static int PathIsClean (byte* PS, int N) {
+	int B = PS[N-1];
+	if (B == '\n' or B == '\r')
+		return 0;
+	B = PS[0];
+	if (B == '\n' or B == '\r')
+		return 0;
 	
 	int A = -1;
 	for (int i = 1; i < N; i++) {
 		int C = PS[i];
-		if (C == '/' and C == B) // oof
-			return false;
-		if (C == '/' and B == '.' and A == '/')
-			return false;
+		if (C == '/' and C == B)				/*			//				*/
+			return 0;
+		if (C == '/' and B == '.') {
+			if (A == '/')
+				return 0;
+			if (A == '.')
+				if (i == 2 or PS[i-3] == '/')	/*			../  	/../	*/
+					return 0;
+		}
 		A = B;
 		B = C;
 	}
 	
-	return true;
+	return 1 + (PS[0] == '/');
 }
 
 
@@ -1050,11 +1034,19 @@ JB_String* JB_File_Render (JB_File* self, FastString* fs_in) {
 	return self;
 }
 
-void JB_File_ListStart (JB_File* File, JB_DirReader* Reader) {
+int JB_File_ListStart (JB_File* File, JB_DirReader* Reader) {
     Reader->File = JB_Incr(File);
     Reader->Item = 0;									// in case already set?
-    auto P = (const char*)JB_FastFileString(File, nil); 
-    Reader->Dir = opendir( P );
+    auto P = (const char*)JB_FastFileString(File, nil);
+    if (!P)
+		return errno;
+
+	auto X = opendir( P );
+	Reader->Dir = X;
+	if (!X) {					// listing a missing folder is usually expected to just list nothing.
+		return errno;
+	}
+	return 0;
 }
 
 void JB_File_ListEnd (JB_DirReader* self) {
@@ -1085,6 +1077,8 @@ void JB_File_Close ( JB_File* self ) {
 }
 
 int JB_File_Mode ( JB_String* self ) {
+	if (!self)
+		return 0;
 	struct _stat st;
     require (Stat_(self, &st));
 	return st.st_mode&(7+(7<<3)+(7<<6));
@@ -1092,7 +1086,9 @@ int JB_File_Mode ( JB_String* self ) {
 
 static int FileModeSet ( JB_String* self, int Mode, u8* Buff ) {
 	auto C = (const char*)JB_FastFileString(self, Buff);
-	int Err = chmod(C, Mode);
+	int Err = !C;
+	if (!Err)
+		Err = chmod(C, Mode);
 	return (int)ErrorHandle_(Err, self, nil, "setting permissions");
 }
 
@@ -1133,6 +1129,8 @@ bool JB_File_HardLinkTo ( JB_File* self, JB_String* Link ) {
 	auto C	= ((const char*)JB_FastFileString(self));
 	uint8 PCreate[PATH_MAX];
 	auto LinkPath = (const char*)JB_FastFileString(Link, PCreate);
+	if (!LinkPath)
+		return false;
     int Err	= link(C, LinkPath);
     if (Err and RetryMakePath(Link))
 		Err = link(C, LinkPath);
@@ -1146,6 +1144,8 @@ JB_String* JB_File_LinkToGet ( JB_File* self ) {
 	char _Found[PATH_MAX];
 	u8* Found = (u8*)(&_Found[0]);
 	auto C = (const char*)JB_FastFileString(self, Found);
+	if (!C)
+		return JB_Str__Error();
 	int bytes = (int)readlink((const char *)C, _Found, sizeof(_Found));
 	return JB_Str_CopyFromPtr(Found, bytes);
 }
@@ -1184,16 +1184,19 @@ int JB_File_SizeSet ( JB_File* self, IntPtr N ) {
 }
 
 
-s64 JB_File_Size ( JB_File* self ) {
-	struct _stat st;
-	if (Stat_(self, &st))
-		if (!S_ISDIR(st.st_mode))
+s64 JB_File_Size ( JB_File* Self ) {
+	if (Self) {
+		struct _stat st;
+		if (Stat_(Self, &st) and !S_ISDIR(st.st_mode))
 			return st.st_size;
+	}
 	return 0;
 }
 
 
 Date JB_File_Accessed ( JB_File* self ) {
+	if (!self)
+		return 0;
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1205,6 +1208,8 @@ Date JB_File_Accessed ( JB_File* self ) {
 
 
 Date JB_File_Modified ( JB_File* self ) {
+	if (!self)
+		return 0;
     struct _stat st = {};
     require (Stat_(self, &st))
 	#if __linux__
@@ -1241,31 +1246,39 @@ bool JB_Str_IsOK(JB_String* Self) {
 	return (Self != nil) and (Self != JB_Str__Error());
 }
 
-bool JB_File_Exists ( JB_String* self ) {
-	// should use JB_File_PathFix() for... consistancy? or else a path ending with "\n"
-	// fails even though it WOULD work if turned into a file!
-	// it uses a faststring, and here we just use a buff. which is even faster.
-	
-	uint8 Tmp[PATH_MAX];
+bool JB_File_Exists (JB_String* self) {
+ 	uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (!tmp)
 		return false;
+	// On MacOSX access seems to handle paths like: /tmp/../tmp///.//./// --> /tmp
+	// I'm not sure this is true on all platforms, though.
+	// thats why the PathIsClean tests is below.
 	int err = access(tmp, 0);
 	if (!err)
 		return true;
 
-// could use PathIsClean...
-//	auto Path2 = JB_File_PathFix(self); // now what?
-//	err = access((const char*)(Path2->Addr), 0);
-	
 	if (errno != ENOENT) {
 		ErrorHandle_(err, self, nil, "testing the existance of");
 		return false;
 	}
+
+	if (!PathIsClean((u8*)tmp, self->Length)) {		// unclean path does not exist
+		auto Path2 = JB_File_PathFix(self);			// clean up
+		if (Path2 != self) {						// check it actually cleaned
+			tmp = (const char*)JB_FastFileString(Path2, Tmp);
+			int err = access(tmp, 0);
+			JB_FreeIfDead(Path2);
+			if (!err) { // we can't report this as correct. Transparent actions are bad.
+						// what if the path is sent outside of speedie?
+				JB_ErrorHandleFile(self, nil, ENOENT, "unclean path (Call .pathfix or .file)", "testing the existance of");
+				return false;
+			}
+		}
+	}
 	
 	struct stat st = {};
 	if (Stat2_(self, &st, false, tmp) and S_ISLNK(st.st_mode)) {
-		errno = EMLINK; // no broken link errno!
 		JB_ErrorHandleFile(self, nil, EMLINK, "broken link", "testing the existance of");
 	}
 	return false;
@@ -1345,7 +1358,7 @@ int JB_File_Copy (JB_File* self, JB_String* To, bool AttrOnly) {
 		u8 Block[ChunkSize];
 		while (Status > 0) {
 			int64 Total = 0;
-			Status = ReadIfItWasDoneProperly(Input, Block, ChunkSize, Total, (const char*)self->Addr);
+			Status = UnixReadButBetter(Input, Block, ChunkSize, Total, (const char*)self->Addr);
 			if (WriteRawSub_(To, Block, (int)Total, Output) <= 0)
 				break;
 		}
@@ -1362,7 +1375,7 @@ int JB_File_Copy (JB_File* self, JB_String* To, bool AttrOnly) {
 JB_String* JB_File__CWD ( ) {
 	char* path = getcwd( 0, 0 );
 	if (!path) {
-		JB_ErrorHandleFile(nil, nil, errno, strerror(errno),  "calling-getcwd");
+		JB_ErrorHandleFile(nil, nil, 0, nil,  "calling-getcwd");
 		return JB_Str__Error(); // sigh. it's possible, and can crash your app.
 	}
 	IntPtr N = strlen( path );

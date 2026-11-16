@@ -37,7 +37,7 @@ int JB_FS_AppendURL (FastString* self, JB_StringC* URL, uint64 Timeout, JB_Strin
 		curl_global_init(CURL_GLOBAL_DEFAULT);
 		curl = curl_easy_init();
 		if (!curl) {
-			return JB_ErrorHandleFileC(url, -1, "init curl");
+			return JB_ErrorHandleFileC(url, EINVAL, "init curl");
 		}
 
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, CurlToJB);

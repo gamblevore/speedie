@@ -130,12 +130,14 @@ void JB_App__SetThreadName(JB_String* self) {
 	require0(JB_Str_Length(self));
 	u8 CName[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, CName);
-	CName[16] = 0; // in case its too long.
-#if __APPLE__
-	pthread_setname_np(tmp); // why?
-#else
-	pthread_setname_np(pthread_self(), tmp);
-#endif
+	if (tmp) {
+		CName[16] = 0; // in case its too long.
+	#if __APPLE__
+		pthread_setname_np(tmp); // why?
+	#else
+		pthread_setname_np(pthread_self(), tmp);
+	#endif
+	}
 }
 
 
@@ -157,7 +159,6 @@ const char** JB_Proc__CreateArgs(JB_String* self, Array* R) {
 
 	if (Strs >= ARG_MAX-1) {
 		JB_ErrorHandleFile(self, nil, E2BIG, "Arguments too long", "Creating shell-arguments");
-		errno = E2BIG;
 		return 0;
 	}
 
@@ -217,7 +218,7 @@ int JB_Sh_StartProcess (ShellStream* S) {
 	byte Result = 0;
 	if (ChildID < 0) {
 		Result = errno;
-		JB_ErrorHandleFile(S->Path, nil, Result, nil, "run");
+		JB_ErrorHandleFile(S->Path, nil, 0, nil, "run");
 	}
 
 	free(argv);
@@ -243,8 +244,11 @@ JB_String* JB_Sh_ReadStdOut (ShellStream* self) {
 int JB_Str_System(JB_String* self) { // needz escape params manually...
     uint8 Buffer[PATH_MAX];
     uint8* Result = JB_FastFileString(self, Buffer);
-    int ugh = system((const char*)Result);
-    return WEXITSTATUS(ugh);
+    if (Result) {
+		int ugh = system((const char*)Result);
+		return WEXITSTATUS(ugh);
+    }
+    return errno;
 }
 
 
@@ -345,7 +349,7 @@ bool JB_App__TurnInto(JB_String* self, Array* R) {
 	auto argv = JB_Proc__CreateArgs(JB_Str_ZeroTerm(self), R);
 	execvp(argv[0], (char* const*)argv); // may exit here. :)
 	free(argv);
-	JB_ErrorHandleFile(self, nil, errno, nil, "running");
+	JB_ErrorHandleFile(self, nil, 0, nil, "running");
 	return false;	
 }
 

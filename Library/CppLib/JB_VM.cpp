@@ -280,7 +280,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	Flags |= PROT_READ | PROT_WRITE;
 	auto V = (CakeVM*)JB_Mem__PermAlloc(AllocSize, Page);
 	if (!V) {
-		JB_ErrorHandleFileC(nil, errno, "Allocating CakeVM");
+		JB_ErrorHandleFileC(nil, 0, "Allocating CakeVM");
 		return 0;
 	}
 	

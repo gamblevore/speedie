@@ -38,7 +38,7 @@ void JB_ErrorHandle2C(const char* Desc, bool CanFreeDesc, const char* Path, bool
 // or a char*. Seems like a good idea?
 // perhaps not... if its a file, we could block the destructor.
 int JB_ErrorHandleFileC (const char* Path, int err, const char* Operation) {
-	return JB_ErrorHandleFile(JB_Str_CopyFromCString(Path), nil, err, nil, Operation);
+	return JB_ErrorHandleFile (JB_Str_CopyFromCString(Path), nil, err, nil, Operation);
 }
 
 JB_String* JB_App__StackTrace(int Skip, FastString* Fs_in) {
@@ -125,14 +125,20 @@ static JB_String* Path_(JB_String* self) {
 }
 
 
-int JB_ErrorHandleFile(JB_String* self, JB_String* other, int errnum, const char* DefaultErr, const char* op, int Severity, const char* verb) {
-	if (!errnum)
-		return 0;
+int JB_ErrorHandleFile (JB_String* self, JB_String* other, int errnum, const char* DefaultErr, const char* op, int Severity, const char* verb) {
+	if (!errnum) {
+		errnum = errno;
+		if (!DefaultErr)
+			DefaultErr = strerror(errnum);
+	}
+	
 	JB_String* Desc = Desc_(self, other, errnum, DefaultErr, op, verb);
 	JB_String* Path = Path_(self);
 	auto Err = JB_Err_Constructor(nil, 0, Desc, Severity, Path);
 	JB_Rec_AppendErr(nil, Err);
 
+	if (errnum > 0)
+		errnum = -errnum; // negative numbers usually mean to fail.
     return errnum;
 }
 

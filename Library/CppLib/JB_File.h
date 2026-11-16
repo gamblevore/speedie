@@ -34,7 +34,7 @@ JB_String* JB_File_CurrChild (JB_DirReader* self, int SlashOnDir);
 long JB_File_Test( );
 JB_String* JB_File_Render(JB_File* self, FastString* fs);
 bool JB_File_MoveNext(JB_DirReader* self);
-void JB_File_ListStart (JB_File* File, JB_DirReader* Reader);
+int JB_File_ListStart (JB_File* File, JB_DirReader* Reader);
 void JB_File_ListEnd( JB_DirReader* self );
 //bool JB_File_ListActive( JB_File* self );
 
