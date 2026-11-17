@@ -214,7 +214,6 @@ function @scfunction.InType (|scnodetype| ty, |bool|)
 
 function TryAdd (|Message?| ErrPlace, |SCObject| IncObj, |String| name)
 	opt norefcounts
-	real self
 	expect ((name.length-1)|uint| < 64) ( ErrPlace, "Name should be 1-64 bytes long." )
 	
 	if self isa scclass
@@ -1000,7 +999,6 @@ function LoadVisibility (|Message| p, |bool|)
 
 module {
 	|bool|			CurrVisibility = true
-	|bool|			ConstantsLoadingOverride
 
 	function LoadCppPart (CollectFunc)
 		opt norefcounts

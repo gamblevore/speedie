@@ -13,17 +13,17 @@ linkage
 |SCClass?|					Cls
 |Message?|					InitVarsArg // remove this and use .globals?
 |Message?|					InitCodeArg
-|[scdecl]?|					Globals
+|[scdecl]?|					ModGlobals
+|[scdecl]?|					Consts
 |string|					CppPart
 |CppRefs|					DefaultRefs
 |message?|					InitAfter
 |bool|						IsImport
 |bool|						Inited
-|bool|						IsRequiredInterface // perhaps remove this. or at least test BEFORE doing a c++ compile!
 
 
 constructor
-	.globals = nil
+	.ModGlobals = nil
 	.defaultrefs = cpprefs.new
 	|| c = compiler.modulelist
 	if (c? != nil)
@@ -74,25 +74,15 @@ function SCDecl.PrefixedName (|faststring| fs, |SCModule| M)
 
 function GlobalsFix
 	// Goes through our properties/constants and renames them!
-	|| fs = faststring()
-	for decl.vars in self
-		if Decl
-			decl.PrefixedName(fs, self)
-
-
-
-iterator Vars
-	|| d = .access.navigate
-	while d.MoveNext
-		yield d.ValueDecl
-
-
-function DictionaryReader.ValueDecl (|scdecl|)
 	opt norefcounts
-	|| t = .value
-	if t isa SCDecl
-		if !t.IsLookupOnly
-			return t
+	|| fs = faststring.shared
+	
+	for decl in .ModGlobals
+		decl.PrefixedName(fs, self)
+	for decl in .consts
+		decl.PrefixedName(fs, self)
+			
+
 
 
 function NewModuleFunc (|Message| src, |SCFunction|)
@@ -158,6 +148,7 @@ function GetTheNewer (|SCObject|)
 
 
 module
+	|bool|			ConstantsLoadingOverride
 	|int|			ModuleDepth
 	|scmodule--|	Curr
 

@@ -212,7 +212,7 @@ function Message.CollectAGlobalDecl (|SCModule| Mod, |bool|)
 		if d and d.StatedReal
 			dcl.NilDeclared = nilstate.real			// in case of something like |object| x = real()
 	
-	(mod.Globals init []) <~ dcl
+	(mod.ModGlobals init []) <~ dcl
 	return dcl.AddToGlobs							// return false for error.
 
 

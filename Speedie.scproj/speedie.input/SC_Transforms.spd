@@ -751,7 +751,7 @@ function Tran_Syx (|Message| msg, |Message|)
 			Params.Name = "fpMsgRender"
 			Compiler.program.CollectOne( dotnew, true )
 	
-		compiler.actualsyxes <~ compiler.program.AddNumericConst(syxname, .syxid, msg)
+		compiler.actualsyxes <~ compiler.program.AddSyxConst(syxname, .syxid, msg)
 
 	Params.Name = "fpMsgRender"
 	
@@ -1012,12 +1012,11 @@ function message.LoopExitter (|int| ASMType, |SCBlockage| ExitCode)
 	.LastInBlock(ExitCode)
 
 
-function scnode.AddNumericConst (|string| name, |int64| value, |message| where, |scdecl|)
+function scmodule.AddSyxConst (|string| name, |int64| value, |message| where, |scdecl|)
 	opt norefcounts
 	|| SyxConst = SCDecl(TypeSyntax!)
-	Compiler.NewConst(SyxConst)
 	NewDeclNumConst( SyxConst, value, name )
-	.TryAdd( where, SyxConst, SyxConst.Name )
+	.NewConst(where, SyxConst)
 	return syxconst
 
 

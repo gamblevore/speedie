@@ -541,26 +541,29 @@ function message.CommandIsOK (|bool|)
 	return true
 
 
+//function Message.DeclName (|Message|)
+//	opt norefcounts
+//	|| name = .Last
+//	if name == @Rel
+//		Return name.first
+//	return name
+
 
 function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |string| reason, |message|)
 	opt norefcounts
 	|| spd_func = where.OwningFunc
-	if spd_func or (where == @decl) or where.Ancestor(@decl) or (where == @thg and where in @bra)
+	if spd_func or (where == @thg and where in @bra)
 		return .BuildNormalCommand(cmd,  where,  spd_func, name,  reason)
-	
-//	if (where == @thg) and Where.IsDeclName
-//		return .BuildDeclCommand(cmd,  where,  name,  reason)
 	
 	if (where == @tmp) and cmd[0, "autocomplete"]
 		return .BuildTmp(reason, where, name)
-
-		
-
-
-//function PerryIDE.BuildDeclCommand (|string| cmd,  |message| where,  |string| name,  |string| reason,  |message|)
-//	ignore
-//		global "@spd/Perry.scproj/perry.input/IDE.spd" 15814 17
-//	debugger  // do some shit
+	
+	if cmd ~= "callfrom"
+		|| Decl = where.Ancestor(@decl)
+		if Where == @decl
+			decl = where
+		if decl
+			return .BuildNormalCommand("decl", decl,  nil, "",  reason)
 
 
 function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message| spd_func,  |string| name,  |string| reason,  |message|)

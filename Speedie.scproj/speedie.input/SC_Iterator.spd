@@ -182,14 +182,7 @@ function scclass.CheckBehaviours (|bool|)
 	while (b)
 		for (M in b.interfaces)
 			|| s = m.name.InterfaceToBehaviour
-			|scfunction--| fn = .BestBehaviourFor(s)
-				|scclass--| BaseClass = .InterfaceForBehaviour(fn)
-					ifn (M.IsRequiredInterface and !.Behaviour![s])
-						fn = nil
-			  else
-				.MissingBehaviour(s)
-			
-			if fn
+			if !.BestBehaviourFor(s)
 				.MissingBehaviour(s)
 		b = b.upwards
 	

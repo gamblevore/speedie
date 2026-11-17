@@ -13,6 +13,10 @@ function dictionary.Expect (|message| m, ||)
 	return v
 
 
+function object.OperatorIn (|[]?| Where, |bool|)
+	return where != nil and Where.Find(Self) >= 0
+
+
 
 //  //  //  //  //   //  // .Obj Conversion //  //  //  //  //  //  //  //  //
 

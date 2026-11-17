@@ -4,7 +4,7 @@
 */
 
 
-function SCNode.CollectOneConstants (|Message| ch)
+function SCModule.CollectOneConstant (|Message| ch)
 	constantsloadingoverride = true
 	.project.use
 	using ch
@@ -147,14 +147,16 @@ function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64
 
 
 
-function SCNode.CollectConstantsSub (|Message| ch)
+function SCModule.CollectConstantsSub (|Message| ch)
 	opt norefcounts
 	|| FuncName = ch.first									#require
 	|| arg = ch[-1]
 	|| vs = funcname
 
+	|[message]|	NameList = nil
 	if funcname == @thg
 		vs = funcname.next
+		NameList = []
 	  else
 		funcname = nil
 
@@ -165,7 +167,6 @@ function SCNode.CollectConstantsSub (|Message| ch)
 	|uint64| LastFlag = 0
 	
 	|[SCDecl]|	FixLater
-	|[message]|	NameList
 	|SCDecl--|	CurrType
 
 	for line1 in arg
@@ -239,17 +240,24 @@ function SCNode.CollectConstantsSub (|Message| ch)
 			newitem.source = thg
 
 		if newitem
-			compiler.newconst(NewItem)
-			NameList <~ NewItem.source!
-			.TryAdd( line, NewItem, NewItem.Name )
+			if namelist!=nil
+				NameList <~ NewItem.source!
+			.newconst(line, NewItem)
 	
 	for (D in FixLater)
 		.Tran_Const( D, self )
 
-	if (FuncName)
+	if namelist
 		.CreateNameDict( FuncName, NameList )
 		scfunction.currfunc = nil
 
+
+function scmodule.NewConst (|message| line, |scdecl| Const)
+	opt norefcounts
+	compiler.newconst(Const)
+	|| c = .Consts init []
+	c <~ const
+	.TryAdd( line, Const, Const.Name )
 
 
 function SCNode.Tran_Const (|SCDecl| D, |SCNode| base)
@@ -349,8 +357,8 @@ function compiler.CollectConstants
 	opt norefcounts
 	scfunction.currfunc = nil
 	for ch in .constantslist
-		|| b = ch.obj as SCNode
-			b.CollectOneConstants(ch)
+		|| Mod = ch.obj as SCModule
+			Mod.CollectOneConstant(ch)
 
 
 function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
@@ -359,7 +367,7 @@ function datatypecode.NumericCountBoolsToo (|scdecl| D, |int|)
 		return .VecCount
 	if self & bool
 		return 1
-	if scnode.ConstantsLoadingOverride and (d is const)
+	if scmodule.ConstantsLoadingOverride and (d is const)
 		return .VecCount
 		
 

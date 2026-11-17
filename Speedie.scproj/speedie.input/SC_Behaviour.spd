@@ -346,12 +346,9 @@ function $InterName (,$InterName)
 					return .MakeVirtualCaller(Mod, cls, errplace)
 		
 		
-		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|) {
+		function NewVirtualSub (|Message| node, |SCClass| cls, |Message| ErrPlace, |scmodule|)
 //			opt norefcounts
 			|| Thg = node.first!
-			|| required = (thg isarel "++")
-				thg = thg.replacewith(thg.first!)
-
 			expect (thg==@thg)				(node, "Interface has no name.")
 			|| s = Thg.name
 			expect (!s.UnderScoreAtAnyEnd)	(thg, "Interfaces can’t start or end with underscore.")
@@ -359,21 +356,16 @@ function $InterName (,$InterName)
 			Thg.name = s.moat
 			
 			|| Mod = SCFunction.NewPrototypeSub(node, cls, ErrPlace, s)		#require
-			Mod.IsRequiredInterface = required
 			cls.AddBehaviourOrInterface( Mod )
 			|| mcls = mod.cls
 				mcls.Behaviourness = kBehaviourProto
-				if required
-					mcls.Behaviourness = kBehaviourProtoRequired
 			Return Mod
-		}
 	}
 
 	
 	constants
 		kBehaviourTable = 1
 		kBehaviourProto = 2
-		kBehaviourProtoRequired = 6
 	
 	
 	iterator

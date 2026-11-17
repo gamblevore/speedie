@@ -413,12 +413,15 @@ function ReportMemory (|Message| cmd, |message|)
 	
 
 function DoCmd (|Message| cmd, |message|)
+	opt norefcounts
 	require cmd == @tmp
 	
 	if !.InitedOK:							return cmd.SendPerryErrors
+
+	if cmd ~= "decl":						return .DeclUsers(cmd)
 	if cmd ~= "check" or "unused":			return .Check(cmd)
 	if cmd ~= "mem":						return .ReportMemory(cmd)
-	if cmd == 1 or cmd.last == @name:		return .autoJump(cmd)
+	if cmd <= 4:							return .autoJump(cmd)
 
 	|| req = cmd[@str].name
 	|| my_file = compiler.files.valuelower(req)
@@ -561,15 +564,38 @@ function SCFunction.Disambiguate (|message| src, |scfunction|)
 	return self // better than nothing?
 
 
+function FindSourceInCmd (|message| cmd, |message|)
+	opt norefcounts
+	|| req = cmd[@str].name
+	|| my_file = compiler.files.valuelower(req)$
+	|| f = cmd[@num, 1].int|int|
+	|| ast = my_file.ast
+		|| n = cmd[@num, 2].int(0,1,128)|int|
+			return ast.findpos(F,N)
+
+
+function DeclUsers (|message| cmd, |message|)
+	opt norefcounts
+/	|| Decl = FindSourceInCmd(cmd)
+	require decl == @decl
+	debugger
+	// now we have a decl. now what?
+	// well... find who called it? lets check for that info
+	
+			
+			
+			
 function AutoJump (|message| cmd, |message|)
 	opt norefcounts
-	|| c = cmd.last
+	|| c = cmd.last$
+	|| cmdname = cmd.name
+
 	if c == @name
-		if cmd starts "autocomplete"
-			return .AutoComplete(c.first, c.name, cmd.name)
-		return .DefineOrCall(c, cmd.name)
+		if cmdname starts "autocomplete"
+			return .AutoComplete(c.first, c.name, cmdname)
+		return .DefineOrCall(c, cmdname)
 			
-	if cmd starts "autocomplete"
+	if cmdname starts "autocomplete"
 		return .RootTmpComplete(cmd)
 	
 	if c ~= "import"
@@ -597,7 +623,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 		return .CppASM(cmd, fn)
 	
 	if cmd starts  "define" or "display" or "callfrom"
-		if !thg and cmd == "callfrom" // "calledfrom"
+		if !thg and cmd == "callfrom"
 			thg = fn.source
 		if  thg == @thg  and  fn.source!.isbehaviour  and  thg in fn.source
 			return .define_behaviour(fn, cmd.name)

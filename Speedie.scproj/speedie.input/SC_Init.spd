@@ -31,7 +31,7 @@ module SC_Init
 				Return true
 
 
-	function SCModule.AvoidMain (|message| c, |bool|)	
+	function SCModule.IsNotLib (|message| c, |bool|)	
 		opt norefcounts
 		
 		require (self == compiler.program)
@@ -52,8 +52,10 @@ module SC_Init
 
 
 	function SCModule.MoveToInitFunc (|Message| c)
-		description "Put globally found decls+funcs, into a function that can be called at init-time. Each module will have an init-func... and it will be called if it has any code. We just store the stuff right now, but later, we create them via .CreateInitFunc"
+		description "Put globally found decls+functioncalls, into a function that can be called at init-time. Each module will have an init-func... and it will be called if it has any code. We just store the stuff right now, but later, we create them via .CreateInitFunc"
 		opt norefcounts
+		// could we not move a copy into there?
+		// and then link the original to the copy? IDK?
 		
 		if (c == @sheb or @url)
 			c.remove
@@ -61,7 +63,7 @@ module SC_Init
 		expect c.AllowedMoveToInit (c)
 
 		|message| dest
-		if .AvoidMain(c)
+		if .IsNotLib(c)
 			if c != @decl
 				dest = compiler.AppInitCode!
 			  else
@@ -70,9 +72,10 @@ module SC_Init
 			require !c.SettingToNil
 			dest = .InitVarsArg init .BuildInitArg
 			dest = dest.first!
+			// c = c.copy // make autocomplete easier. do later!
 		  else
 			dest = .InitCodeArg init .BuildInitArg
-		dest <~ c			
+		dest <~ c
 
 
 function Message.AllowedMoveToInit (|bool|)

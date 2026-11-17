@@ -415,7 +415,7 @@ class SCDecl (SCObject) {
 
 
 	function IsReallyNumeric (|bool|)
-		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
+		if scmodule.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
 			if .IsNormal
 				return .type.ASMTypeInfo.NumericCount
 
@@ -426,7 +426,7 @@ class SCDecl (SCObject) {
 		if (.Type.NumericCount == 1)
 			return true
 		
-		if scnode.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
+		if scmodule.ConstantsLoadingOverride or (.type.IsCurrentlyBeingUsed)
 			if .type.ASMTypeInfo.VecCount == 1
 				return true
 
