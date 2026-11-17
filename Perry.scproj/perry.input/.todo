@@ -3,11 +3,13 @@
 							/// Get perry ASMing ///
 
 * chained obj destructor bug in branch_test.spd
+* go through initvarsarg and remove them bit by bit!
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
 	* 1s*604800 not asm displaying properly (value is ok though)
 	* name SC_Reg__NewWithIntUint16 displays wrong
+	* The SourceLocations render badly if we change the text in ASMView.
 
 * Get Speedie ASMing in: (Mac ARM, Winx86 via linux, linux x86)
 	* We want single run flow-log system. Runs both, compares output
@@ -24,7 +26,6 @@
 				// Someone paying for productive work wants these done after //
 
 * CalledFrom datatypes/properties too
-* The SourceLocations render badly if we change the text in ASMView.
 * Running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
 * Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
 * too aggressive with error keeping
