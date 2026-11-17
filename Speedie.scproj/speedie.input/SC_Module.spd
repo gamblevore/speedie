@@ -11,7 +11,7 @@ linkage
 
 |int|						ModuleNum
 |SCClass?|					Cls
-|Message?|					InitVarsArg // remove this and use .globals?
+|Message?|					InitVarsArg // remove this and use .ModGlobals?
 |Message?|					InitCodeArg
 |[scdecl]?|					ModGlobals
 |[scdecl]?|					Consts
