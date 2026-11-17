@@ -1247,6 +1247,12 @@ bool JB_Str_IsOK(JB_String* Self) {
 }
 
 bool JB_File_Exists (JB_String* self) {
+	if (!self)
+		return false; // speedie goes mad otherwise.
+					  // what do you expect if checking a nil-string?
+					  // an error? you just passed nil. What else could it be.
+					  // if nil is always an error, then we should not be able to accept nil.
+					  // blalbalba.
  	uint8 Tmp[PATH_MAX];
 	auto tmp = (const char*)JB_FastFileString(self, Tmp);
 	if (!tmp)

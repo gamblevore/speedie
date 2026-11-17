@@ -182,7 +182,9 @@ class String
 
 	function Preview (|int| N = 100, |string|)
 		visible class~file // file uses this
-		if (.Length <= N)
+		if self == nil
+			return ""
+		if .Length <= N
 			return self
 		return self[0, N].UnicodeSync + "..."
 	
