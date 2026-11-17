@@ -34,11 +34,12 @@ class FileRow (ListViewRow)
 		
 		|| F = path.file
 		.FilePath	= F
-		|| IsDir = F.IsDir
-		if !IsDir
-			DirFile = ""
-			.LastFileCount = 1
-			if path
+		|| IsDir = false
+		if path
+			IsDir = F.IsDir
+			if !IsDir
+				DirFile = ""
+				.LastFileCount = 1
 				.LastSize = f.size
 		.asdir		= IsDir
 		.dirfile	= DirFile
