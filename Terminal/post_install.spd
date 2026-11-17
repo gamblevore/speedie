@@ -7,7 +7,7 @@
 ||			Spd			= file.SpeedieDir
 ||			SpdTerm		= spd["Terminal/Speedie"]
 ||			User		= app.BaseUser
-|bool|		IsTesting	= app["test"]
+|string|	IsTesting	= app["test"]
 
 main
 	|| cwd = .cwd
