@@ -164,6 +164,10 @@ class Array
 	function Find (|| f, |ind|)
 		nil checker
 		cpp_wrapper JB_Array_Find
+		
+	operator Contains (|| f, |bool|)
+		inlined
+		return .find(F) >= 0
 
 	syntax Compare (|int| n, |int|)
 		nil self
