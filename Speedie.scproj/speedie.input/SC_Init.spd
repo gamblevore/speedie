@@ -196,43 +196,39 @@ function message.HasActualCode (|bool|)
 	for curr.flat in self
 		if (curr == @Decl or @sheb)
 			continue_with curr.FlatAfter
-		  elseif (curr != @arg) 
+		  elseif (curr != @arg)
 			return true // found something!
 
 
 
-function SCModule.InitRootDecl (|Message| DeclMsg, |bool|) {
+function SCModule.InitRootDecl (|Message| DeclMsg, |bool|)
 	opt norefcounts
 	require (declmsg.type == @Decl)
-	|| name = declmsg.GetDclName$	///	require name.expect(@thg)
+	|| name = declmsg.GetDclName$
 	
-	|| decl = .LookUpVarRootDecl( name.name, name )
-	if decl isa SCDecl
-		if decl.isbarestruct
-			return true
-		using (name)
+	|| decl = .LookUpVarRootDecl( name.name, name )$
+	if decl.isbarestruct
+		return true
 
-		|| P = name.parent
-		|| PRel = (P == @Rel)
-		|| NewDefault =  (PRel)(P.last, nil)
-		
-		if !NewDefault
+	|| NewDefault = (name in @Rel)(name.parent.last, nil)
+	if !NewDefault and !Decl.IsNormal
+		return true
+	
+	using (name)
+	if !NewDefault
 // this code seems wrong... these decls always have a default! So why create a default?
-			if !Decl.IsNormal
-				return true
-			NewDefault = Decl.CreateDefault(name)
-			if (NewDefault and decl.contains)
-				NewDefault = decl.WriteTypeCast(NewDefault)
-				NewDefault.Obj = nil // just keep doing what it used to do
-		
-		if newdefault
-			if !newdefault.IsNilOrZero
-				|| fn = @sdot
-				if self == compiler.program
-					fn = @thg
-				DeclMsg.Prev = NeweqRel( fn + name.name, NewDefault )
-		Return true
-}
+		NewDefault = Decl.CreateDefault(name)
+		if (NewDefault and decl.contains)
+			NewDefault = decl.WriteTypeCast(NewDefault)
+			NewDefault.Obj = nil // just keep doing what it used to do
+	
+	if NewDefault and !NewDefault.IsNilOrZero
+		|| fn = @sdot
+		if self == compiler.program
+			fn = @thg
+		DeclMsg.Prev = NeweqRel( fn + name.name, NewDefault )
+	Return true
+
 
 
 function message.IsNilOrZero (|bool|)
@@ -244,7 +240,7 @@ function message.IsNilOrZero (|bool|)
 			return true
 		if n == "nil" or "false" // what?
 	if f == @num
-		return .iszero
+		return .IsZero
 	if f == @arg
 		return !.hasany
 		

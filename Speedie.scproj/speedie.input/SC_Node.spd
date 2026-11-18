@@ -677,9 +677,10 @@ function LookUpVar (|String| name, |Message| exp, |message?| side, |SCObject?|)
 	return .LookUpSub( name, exp, self, nil, side, kPurposeVar )
 
 
-function LookUpVarRootDecl (|String| name, |Message| exp, |SCObject|)
+function LookUpVarRootDecl (|String| name, |Message| exp, |SCdecl|)
 // misdesigned... but so is initrootdecl :(
-	return .LookUpSub( name, exp, self, nil, nil, kPurposeVarDecl ) 
+	opt norefcounts
+	return .LookUpSub( name, exp, self, nil, nil, kPurposeVarDecl ) as SCDecl
 
 
 function LookUpVarDecl (|String| name, |SCDecl|)
