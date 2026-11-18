@@ -576,15 +576,20 @@ function FindSourceInCmd (|message| cmd, |message|)
 
 function DeclUsers (|message| cmd, |message|)
 	opt norefcounts
-/	|| Decl = FindSourceInCmd(cmd)
-	require decl == @decl
-	debugger
-	// now we have a decl. now what?
-	// well... find who called it? lets check for that info
-	
-			
-			
-			
+	|| Orig = FindSourceInCmd(cmd)
+	cmd.clear
+	require Orig == @decl
+	|| msg = Orig.Obj as Message
+		Orig = msg
+	|| Decl = orig.AsDecl
+		|| arg = cmd.GiveArg
+		|| define = .Define(Orig, "define", decl)
+			define <~ decl.RenderTypeAndName()
+			arg <~ define
+		.CallFromSub(arg, decl.LinkFrom, nil)
+	return cmd
+
+
 function AutoJump (|message| cmd, |message|)
 	opt norefcounts
 	|| c = cmd.last$
@@ -1144,14 +1149,14 @@ function CallFromDefine (|message| msg, |scfunction| fn, |object| found, |messag
 function CallFrom (|message| msg, |object| found=nil, |message|)
 	opt norefcounts
 	
-/	|| fn = msg.AutoMsgFuncFn
+	|| fn = msg.AutoMsgFuncFn
 		rz = .CallFromDefine(msg, fn, found)
-		.CallFromSub(rz.first!, fn)
+		.CallFromSub(rz.first!, fn.linkfrom, fn)
 
 
-function CallFromSub (|message| arg, |scfunction| fn)
+function CallFromSub (|message| arg, |[scfunction]| List,  |scfunction| fn)
 	opt norefcounts
-	for call_point in fn.linkfrom
+	for call_point in list
 		|| s = call_point.source
 			|| item = arg.msg(@tmp, "line")
 			|| pos = -1
@@ -1159,7 +1164,7 @@ function CallFromSub (|message| arg, |scfunction| fn)
 			item <~ (@sstr, f)
 			item <~ call_point.CallFromName
 			item <~ pos
-			if call_point == .OrigFn
+			if fn and call_point == .OrigFn
 				item.name = "curr"
 			
 
@@ -1175,11 +1180,12 @@ function message.AutoFoundFunc (|scfunction| f, |bool|)
 helper Message.FuncPos (|scfunction| fn, |$int| pos,  |string|)				
 	opt norefcounts
 	rz = .originalfilepath
-	for ss.flat in self
-		if ss.autofoundfunc(fn)
-			rz ?= ss.originalfilepath
-			self = ss
-			exit
+	if fn
+		for ss.flat in self
+			if ss.autofoundfunc(fn)
+				rz ?= ss.originalfilepath
+				self = ss
+				exit
 	if rz
 		pos = .Position // oh well
 
