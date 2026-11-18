@@ -4,6 +4,7 @@
 
 * chained obj destructor bug in branch_test.spd
 * go through initvarsarg and remove them bit by bit!
+* string operator mul does not change if you change !bvv
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
@@ -18,7 +19,6 @@
 								// ASM later
 
 * ASM errors while editing. Shouldn't spam interface... just ignore I guess.
-* asmview-syncing when stepping would be nice
 * Step through destructor without it fretting
 * Display libglobs
 

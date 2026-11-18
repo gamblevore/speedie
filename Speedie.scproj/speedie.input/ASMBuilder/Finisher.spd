@@ -116,6 +116,9 @@ function assembler.TryTail (|fatasm| FNC)
 	fnc.incr
 	(Fnc is exit)
 	
+	ret.prms[0] = nil // stop decr
+	.nop(ret)
+	
 	if 0: nil|message|!.TAIL
 
 

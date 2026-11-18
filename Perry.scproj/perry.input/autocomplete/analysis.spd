@@ -69,7 +69,7 @@ function PerryIDE.ImproveFuncList (|message| result)
 				s.prev = d
 			|| n = s.first!.name
 			if p != @name
-				n = "." + n 
+				n = "." + n
 			s.name = n
 			p0 = p
 
