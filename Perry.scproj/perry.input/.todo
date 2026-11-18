@@ -3,7 +3,6 @@
 							/// Get perry ASMing ///
 
 * chained obj destructor bug in branch_test.spd
-* go through initvarsarg and remove them bit by bit!
 * string operator mul does not change if you change !
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...

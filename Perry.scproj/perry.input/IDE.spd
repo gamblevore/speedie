@@ -720,8 +720,8 @@ class PerryIDE (Window)
 
 	function OpenDoc (|string| Path, |object|)
 		require self
-		|| p   = path
-		|| f   = p.file
+		|| p = path
+		|| f = p.file
 		if f.isdir
 			p = p.pathdir
 		|| ide = self

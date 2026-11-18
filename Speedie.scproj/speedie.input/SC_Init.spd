@@ -68,7 +68,7 @@ module SC_Init
 			dest = .InitVarsArg init .BuildInitArg
 			dest = dest.first!
 			|| old = c
-			c = c.copy // dont send the original, cos we need it for autocomplete
+			c = c.copy					// dont send the original, cos we need it for autocomplete
 			old.obj = c
 		  else
 			dest = .InitCodeArg init .BuildInitArg
