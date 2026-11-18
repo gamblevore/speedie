@@ -92,10 +92,6 @@ function Compiler.RenderErrors (|errorreceiver| stderr, |errorseverity| MinSev, 
 	return msg
 
 
-//function Message.FileLocation (|string|)
-//	opt norefcounts
-//	return .file$.path
-
 
 function Error.Improve					// sc_improve 
 	opt norefcounts

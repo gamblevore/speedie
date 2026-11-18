@@ -543,6 +543,7 @@ function perryide.UpdateStack (|message| Stack, |int| Mode)
 
 		.UpdateCodePointer(CurrFunc, mode)
 
+	.TryReselectASM
 	.SetAppInfo
 
 

@@ -74,9 +74,17 @@ function PerryIDE.ImproveFuncList (|message| result)
 			p0 = p
 
 
-function perryide.CurrSelFunc (|message|)
+function PerryIDE.DetectASMSelectedFunc (|message|)
 	opt norefcounts
-	|| msg = .EditMe.MessageAtSel
+	|| msg = .CurrSelFunc(.editme.IsActivelyDebugging)
+		return msg
+	
+	return .CurrSelFunc
+
+
+function perryide.CurrSelFunc (|int| Where=-1, |message|)
+	opt norefcounts
+	|| msg = .EditMe.MessageAt(where)
 		return msg.OwningFunc
 
 

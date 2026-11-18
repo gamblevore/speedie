@@ -392,11 +392,11 @@ class TextView (GUIControl)
 	inline Selection (|intrange|)
 		return ._typingplace.resolve
 		
-	libinternal SelStart (|int|)
+	autogen SelStart (|int|)
 		inlined
 		return ._typingplace.resolve.x
 	
-	libinternal SelAfter (|int|)
+	autogen SelAfter (|int|)
 		inlined
 		return ._typingplace.resolve.x2
 
@@ -1146,17 +1146,11 @@ class TextView (GUIControl)
 			return la.clamp(.position, a)
 		return a
 	
-	
-	function MessageAtSel (|message|)
-		return .MessageWithin(.SelStart, false, true)
-
 		
-	inline MessageAt (|int| pos, |bool| named=false, |message|)
-		return .MessageWithin(pos, named, false)
-	
-	
-	function MessageWithin (|int| pos, |bool| named, |Bool| Within, |message|)
+	function MessageAt (|int| Pos=-1, |bool| named=false, |Bool| Within=false, |message|)
 		opt NoRefCounts
+		if pos < 0
+			pos = .selstart
 		|| d   = .FindTextLine(pos)
 		require d isnt fakemsg
 		|| msg = d.message						#require
@@ -1170,7 +1164,7 @@ class TextView (GUIControl)
 		
 		|| found = msg.FindTightest(pos, named)
 		if named and !found
-			found = msg.FindTightest(pos, false) 
+			found = msg.FindTightest(pos, false)
 		if found in @rel
 			|| p = found.parent
 			if found == p.second

@@ -499,20 +499,31 @@ function perryide.TryReselectASM (|bool|)
 	require !.DuringASMEvent and (.ASMVis)
 	.DuringASMEvent = true
 	.UpdateASM
-	.ReselectASM
+	.ActivateASM
 	.DuringASMEvent = false
 
 
-function PerryIde.ReselectASM
+function PerryIde.ActivateASM
 	opt norefcounts
+	|| e = .editme
+	|| file = e.FilePath
+	|| i = e.IsActivelyDebugging
+	if i < 0
+		i = e.SelectedLine.Position
+	
 	|| AV = .ASMView
-	|| Sel = AV.FirstSelected
-	if sel and AV.InView(sel)
-		|| i = .editme.SelectedLine.Position
-		for s in AV.ListSource
-			if !(s.name contains "JUMP: ") and (s.first.int >= i)
-				AV.Select(s)
-				exit
+	|| OK = true
+	for s in AV.ListSource
+		|| This = false
+		if OK and (s.obj as string) ~= file
+			if (s.first.int >= i)
+				This = true
+				OK = false
+		(s is active) = this
+		if !s.name
+			OK = true
+	av.Touch
+				
 	
 	
 function perryide.HideASM
@@ -523,7 +534,7 @@ function perryide.HideASM
 
 function perryide.UpdateASM (|bool|)
 	opt norefcounts
-	|| fn = .CurrSelFunc
+	|| fn = .DetectASMSelectedFunc
 	if fn != .CurrASMFunc
 		.CurrASMFunc = fn
 		return fn and .MaybeSendMessage("asm", fn)
@@ -538,7 +549,7 @@ function perryide.GotASM (|message| asm)
 	.DuringASMEvent = true
 	.ClearOldASMErrors
 	.GotASMSub(asm)
-	.ReselectASM
+	.ActivateASM
 	.DuringASMEvent = false
 	
 
@@ -576,7 +587,6 @@ function perryide.GotASMError (|message| Error_List)
 				v.clear
 				v.AddFail "ASM unavailable for " + .path.name
 				v.addfail "File not in " + .projname
-				continue
 
 // asm errors are good for me debugging Speedie, but not general-use even for me.
 // so how to turn it on/off? some pref switch?

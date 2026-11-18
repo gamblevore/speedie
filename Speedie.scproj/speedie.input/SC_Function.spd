@@ -135,18 +135,18 @@ function ParentName (|string|)
 render RenderParams (|bool| ForErrors=true)
 	opt norefcounts
 	fs <~ '('
-	|| sep = ""
-	for a in .args
+	|| gotany = 0
+	for (a in .args) (i)
 		if (a.source)
-			fs <~ sep
-			sep = ", "
+			if Gotany++
+				fs <~ ", "
 			if a.Source contains "..."
 				a.RenderTypeAndName(1, fs)			
 			  else
 				fs <~ a.source
 	
 	if !ForErrors and .ReturnType
-		fs <~ sep
+		fs <~ ", "
 		.returntype.render(fs)
 	fs <~ ')'
 

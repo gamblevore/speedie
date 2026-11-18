@@ -444,6 +444,13 @@ function textviewline.DebugDraw (|image| Where, |int| y)
 	where.DrawText(s, (where.ControlClip.x2-40, y))
 
 
+function textview.IsActivelyDebugging (|ind|)
+	opt norefcounts
+	|| a = ._Activeline
+		if a ~= .FilePath
+			return a.Position
+
+
 libinternal TextView.DrawOneLine (|image| Where,  |TextViewLine| D,  |int| Y,  |int| UseCol)
 	opt norefcounts
 	opt min 3
@@ -453,7 +460,7 @@ libinternal TextView.DrawOneLine (|image| Where,  |TextViewLine| D,  |int| Y,  |
 		.DrawErrorBackground(where, y + GoUp, d)
 	
 	|| m = ._ActiveLine
-	if (m and m ~= .filepath)
+	if m ~= .filepath
 		if d.CompileContains(m.Position)
 			|| bg = ¥.ActiveTextLine
 			if m.flags&1

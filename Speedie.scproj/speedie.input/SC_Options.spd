@@ -82,7 +82,7 @@ module Feedback
 		require !Options.SelfReplacement
 		
 		|| p = compiler.BaseProjectPath$
-		|| spd = compiler.SpeedieProj
+		|string| spd = compiler.SpeedieProj
 		if p ~= spd
 			Options.SelfReplacement = 1 // isselfaltering, isselfmodifying, alteringself, modifyingself
 			Options.AllowMassInlines = true

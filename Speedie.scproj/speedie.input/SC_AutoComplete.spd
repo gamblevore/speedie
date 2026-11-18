@@ -1226,7 +1226,10 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 	rz = @tmp.msg(msg.name)
 	rz.msg(@thg, fn.name)
 	|| rzarg = rz.msg(@arg)
-	if !.ASM(rzarg, fn)
+	if .ASM(rzarg, fn)
+		rzarg.msg(@tmp, "")						// separator
+		fn.CppView(rzarg)
+	  else
 		rz = nil
 		.ASMFail(fn, rz)
 
@@ -1256,7 +1259,7 @@ function ASM (|message| arg,  |SCFunction| fn, |bool|)
 function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |bool| RenderBlocks=false,  |bool|)
 	opt norefcounts
 	|| bb = 0
-	|file| curr_file
+	|scfile| curr_file
 	|| Count = 0
 	|| Size = 0
 	
@@ -1277,46 +1280,83 @@ function FeedBackViewASMSub (|message| out,  |SCFunction| fn, |faststring| fs, |
 				out <~ bb
 			fs <~ (' ', 2)
 			fat.RenderFat(fs, 8)
-			|| tmp = out.msg(@tmp, fs)
 			
-			|| map = fat.source
-			tmp <~ map.position
-			|| mapfile = map.file
-			if mapfile != curr_file and nil
-				curr_file = mapfile
-				|| file = @tmp + "file"
-				file <~ mapfile
-				tmp.prev = file
+			curr_file = out.SmartFeedback(fs, fat.source, curr_file)
 		fat++
 	
 	|| title = out.first
 		title <~ count
 		title <~ size * 4
 	
-	.CppView(out, fn)
 	return true
 
 
-
-function scfunction.RenderSheBless (|string|)
-	|message--| src = .source$
-	|message--| a = src.Last
-		|| b = src.copy
-		|| f = src.first
-			f.name = .ExportName
-		for s.fastflat in b
-			if s.type == @sheb
-				s.remove
-		rz = src.Render
+function message.SmartFeedback (|faststring| name, |sortablelocation| map, |scfile?| curr_file, |scfile|)
+	opt norefcounts
+	|| tmp = .msg(@tmp, name.getresult)
+	tmp <~ map.position
+	|| mapfile = map.file
+	if mapfile != curr_file and nil
+		curr_file = mapfile
+		|| file = @tmp + "file"
+		file <~ mapfile
+		tmp.prev = file
+	return curr_file
+	
 
 	
-function CppView (|message| out, |scfunction| fn)
-	out.msg(@tmp, "")						// separator
-//	out.msg(@tmp, "// " + fn.exportname)	// none exists! D:
-	for s.lines in fn.Rendershebless
-		if !s
-			s = " "
-		out.msg(@tmp, s)					// C-view
+function scfunction.CppView (|message| arg)
+	opt norefcounts
+	|| src = .source$
+	|| f = src.first$
+	
+	|| fs = FastString.shared
+	fs <~ "function "
+	if .ExportName
+		fs <~ .exportname
+	  else
+		fs <~ .name
+	fs <~ " "
+	.RenderParams(false, fs)
+	|| file = src.AutoCppOut(fs, arg, nil)
+	
+	src.Last!.RenderCppSub(fs, arg, file, 0)
+
+
+function message.AutoCppOut (|faststring| name, |message| out, |scfile?| file, |scfile|)
+	return out.SmartFeedback(name, .SrcLoc, file)
+
+
+function message.RenderCppSub (|faststring| fs, |message| out, |scfile?| file, |int| Indent,  |scfile?|)
+	opt norefcounts
+
+	if self == @arg
+		indent++
+		for c.fast in self
+			file = c.RenderCppSub(fs, out, file, indent)
+		return file
+
+	fs.Indent = indent
+	fs.AppendIndent
+	if self != @tmp
+		.Render(fs)
+		return .AutoCppOut(fs, out, file)
+
+	fs <~ .name
+	|message| arg
+	for c.fast in self
+		if c != @arg
+			fs <~ " "
+			c.Render(fs)
+		  else
+			arg = c
+	
+	file = .AutoCppOut(fs, out, file)
+	if !arg
+		return file
+	return arg.RenderCppSub(fs, out, file, indent)
+
+		
 
 		
 function DefineOrCall (|message| msg,  |string| purpose,  |object| found=nil,  |message|)
