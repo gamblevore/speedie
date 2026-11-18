@@ -284,16 +284,16 @@ class String
 	
 	operator mul (|bool| b, |string|)
 		cpp_part MulBool
-		opt norefcounts
+		opt norefcounts // could merge this with below. uwu
 		inlined
 		nil self
-		if !b or !self
+		if !b or (self==nil)
 			self = ""
 		return self
 	
 	operator Mul (|int| n, |string|)
 		if n <= 1
-			return .operatormul(n==1)
+			return .OperatorMul(n==1)
 		|| fs = faststring()
 		fs.Size = n*.length
 		fs <~ (self, n)
@@ -501,19 +501,7 @@ class String
 
 
 	libinternal MoveCodePoint (|ind| BytePos, |int| CodePoints, |ind|)
-		|| n	= .length
-		
-//		if BytePos >= N // can't be bothered to make a general API.
-//			if Codepoints >= 0
-//				return BytePos
-//			if BytePos > N
-//				return -1
-//		if BytePos <= 0
-//			if (Codepoints <= 0) or (BytePos < 0)
-//				return 0
-//			if BytePos < 0
-//				return -1
-			
+		|| n	= .length			
 		|| s0	= .addr
 		|| s	= s0 + BytePos
 		if Codepoints >= 0
