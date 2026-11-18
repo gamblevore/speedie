@@ -47,6 +47,15 @@ function compiler.PrintCompileTime (|date| durr)
 
 
 
+function compiler.PrintTodo
+	opt norefcounts
+	|| list = Compiler.TodoList
+		printline "Todo:"
+		for t in list
+			print "\t\t* "
+			printline t.name
+
+
 function compiler.PrintCompileErrors
 	if Options.Warnings
 		require stderr.HasAnything
@@ -95,15 +104,15 @@ function compiler.CompileTime
 
 
 function compiler.VariousSelfTests
-	|| WantCompress = false
 	target cpp
+		|| WantCompress = false
 		Jeebox.test // bug if put into compiler.run!. Wierd!
 		if (options.perryoutput < 2) and !options.scripting and !app.Parent
-			WantCompress = options.PrintLibraries
-	if WantCompress
-		if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
-			"Compression: OK" // stabilise strings by putting outside of target
-	mzlab.FreeNow
+			WantCompress = options.noisy
+		if WantCompress
+			if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
+				"Compression: OK" // stabilise strings by putting outside of target
+		mzlab.FreeNow
 
 
 

@@ -694,11 +694,6 @@ function ImportFile (|SCFile| file)
 	opt norefcounts
 	|| AST = file.AST								#require
 	expect (!AST.IsCake) (file, file.name + " is compiled executable that uses the 'cake' vm, and can be run directly.")
-		
-	
-	todo `visibility needs to make a bit more sense than this...
-	 we should remove the "visible" statement from within class scope... only allowed in the linkage.
-	 within modules... it should only apply to global vars`
 	
 	file.Use
 	compiler.project = file.proj

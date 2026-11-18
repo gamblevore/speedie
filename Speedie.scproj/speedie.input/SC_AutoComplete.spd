@@ -69,7 +69,7 @@ function EnterAutoComplete (|bool|)
 	if !app.IsMainThread
 		"(AsLib)"
 		realm.timeout = 0					// No need timeout
-	if options.PrintLibraries
+	if options.Noisy
 		"(Noisy)"
 		perry.pico.config.noise = -1
 

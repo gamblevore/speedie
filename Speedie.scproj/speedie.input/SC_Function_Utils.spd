@@ -45,8 +45,9 @@ dispatch FuncPreReader (fnPreReader)
 
 	+'todo'
 		opt norefcounts
-		msg[@nil].expectlast
-		compiler.TodoList <~ msg
+		|| str = msg[@nil]
+		if str.expectlast and str.expectstring
+			compiler.TodoList <~ str
 	
 	+'libinternal'
 		.MakeLibInternal(msg)

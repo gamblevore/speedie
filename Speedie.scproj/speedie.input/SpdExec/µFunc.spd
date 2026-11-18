@@ -82,7 +82,7 @@ function fatasm.BakeLabelRequest (|!&asm| Start, |!&asm| After, |int| reg)
 	
 function packmaker.BakeAllFuncs (|jbin| j, |faststring| bmr, |bool|)
 	|faststring--| dump
-	if !Compiler.InPerry and options.LogASM
+	if !Compiler.InPerry and options.Noisy
 		dump = assembler.ASMDump.OutputStream
 		
 	|| i = 0

@@ -19,8 +19,7 @@ module Options
 	||		Compile					= true
 	||		TargetDebug				= false
 	||		PrintMemoryUsage		= false
-	||		LogASM					= false
-	||		PrintLibraries			= false
+	||		Noisy					= false
 	||		GenFlowLogCode			= false
 	||		KeepAllErrors			= false
 	||		Scripting				= false
@@ -286,9 +285,7 @@ module Feedback
 			Explain(Purpose, "Prints more stuff")$
 			|| b = value.yes
 			Options.PrintCompileString = b
-			options.PrintLibraries = b
-			options.LogASM = b
-//			options.noisy = b
+			options.Noisy = b
 		
 		+'alive'
 			Explain(purpose)$

@@ -246,9 +246,14 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
 	range.Start = .curr
-	|| mode = asmreg.CondRequest.Negate(neg)
-
-	rz = .µ(cond, mode)
+	|| mode = asmreg.CondRequest
+	if neg
+		rz = ASMType.boolnot(self, cond, mode)
+		(mode is negate) // for isnt condanswer below
+	  else
+		rz = .µ(cond, mode)
+	
+	if (cond contains "b") and ("MulBool2".trap or "MulBool".trap)
 	if rz isnt CondAnswer
 		rz = .Exists(cond, mode, rz)
 
@@ -271,19 +276,16 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 	if dest isnt CondRequest								// 😢 😿 😢 😿 😢 😿 😢 😿 SADNESS!!
 		return .BoolAndOrSmartValue(A, B, dest, opp)
 
-	rz = dest
-	if rz is negate
+	if dest is negate
 		(opp xor= OpMode.AndOr)								//  !(a and b)  -->  !a or !b
 
 	if OPP is OR
-		rz = .BranchOr(A, B, rz)
-		rz.NegateFail(dest)
+		return .BranchOr(A, B, dest)
 	  else
-		rz = .BranchAnd(A, B, rz)
-		rz.NegateFail(dest)
+		return .BranchAnd(A, B, dest)
 
 
-function asmreg.NegateFail (|asmreg| dest, |bool|)
+function asmreg.NegateTest (|asmreg| dest)
 	target debug
 		if (self is AlreadyNegated) != (dest is negate)
 			assembler.ASMDebug
@@ -294,7 +296,6 @@ function asmreg.NegateFail (|asmreg| dest, |bool|)
 			dest.debugprint
 			.debugprint
 			debugger 
-			return true
 	
 	// the output is not consistant
 	// is it meant to always be already negated, or not?

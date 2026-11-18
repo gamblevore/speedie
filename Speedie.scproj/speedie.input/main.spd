@@ -24,9 +24,11 @@ function Compiler.EnterCompile (|bool|)
 	interact.EnterAutoComplete()
 
 
+
 function Compiler.PrintResults
 	|| OK = stderr.ok // incase errors happen AFTER success!
 	.PrintCompileErrors
+	.PrintTodo
 	if app.parent != nil
 		"Exiting Speedie ${app.id}"
 

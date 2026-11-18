@@ -230,7 +230,7 @@ extend Assembler
 			swap (l) (r)							// put reg 0 into the left... more convenient.
 		(Dest  |=  l & r & asmreg.Const)
 		
-		if rr == ll
+		if (rr == ll)  // and (dest isnt condrequest) // try this soon as I find this. Couldnt test this immediately!
 			|| One = (dest isnt negate)|int|
 			rz = .NumToReg(exp, dest, One, DataTypeCode.bool)
 		

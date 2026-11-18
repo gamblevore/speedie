@@ -554,7 +554,7 @@ struct Assembler (AssemblerWipe)
 		|| fn = fn_asm_table[Type]!
 
 		target debug
-			if µtrap == -1 or .ActionIndex > 30
+			if µtrap == 6059 or .ActionIndex > 30
 		|| ss = (fn)(self, exp, dest)
 
 		target debug
@@ -563,8 +563,6 @@ struct Assembler (AssemblerWipe)
 
 			if !.TempCheck(ss)
 				.µdebug(exp, dest)
-			if dest isnt negate and ss is alreadynegated
-				ss.negatefail(dest)
 			if ss isa asm.noop // what about params
 				.µdebug(exp, dest)
 			if .EntireInlineFailed

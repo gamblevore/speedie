@@ -639,35 +639,17 @@ function AddressOf (fn_asm)
 
 
 function BoolNot (fn_asm)							// !a
-	dest = dest.negate
-	|| src = .µGetASM(exp, dest)
-	if src is condanswer
-		src.negatefail(dest)
-		return src.negafix(dest.negate)
-		
-	if dest isnt Negate
-		if src is AlreadyNegated // what?
-		return src.negafix(dest.negate)
-	
-	if src is AlreadyNegated
-		src.negatefail(dest)
-		return src.negafix(dest.negate)
-	
-	// OK... exists has a problem. If it takes 1, and we are negated.
-	// So its like:  x = !1
-	// we can return reg 0
-	// so... we actually want to nop the input of 1
-	// but we only nop temps
-	// but here, with boolnot, we already placed 1 into x, then do x = !x
-	// so its not ACTUALLY a temp, anymore.
-	// how to know that it is "kinda temp really?"
-	// theres a lot of things that create param inputs then call exists or other things on them
-	// Can I fix all of them?
-	// the only thing I can see, is that I could make a "FromRegister" flag.
-	// would that even work? Would it be preserved properly?
-	
-	
-	return .Exists(exp, dest, src).negafix(dest.negate)
+	|| DN = dest.negate
+	|| src = .µGetASM(exp, DN)
+
+	if src is condanswer or alreadynegated
+		src.NegateTest(DN)
+		return src.negafix(dest)
+
+	if src.isbool and dest is Negate				// unnecessary? (try delete. working on sthg else right now)
+		return src.negafix(dest)					// I think so. Exists returns a bool, via .loadnumber
+
+	return .Exists(exp, DN, src).negafix(dest)
 	
 
 
