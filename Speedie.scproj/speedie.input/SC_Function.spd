@@ -135,9 +135,10 @@ function ParentName (|string|)
 render RenderParams (|bool| ForErrors=true)
 	opt norefcounts
 	fs <~ '('
-	|| gotany = 0
-	for (a in .args) (i)
-		if (a.source)
+
+	|| GotAny = 0
+	for a in .args
+		if a.source
 			if Gotany++
 				fs <~ ", "
 			if a.Source contains "..."
@@ -146,7 +147,8 @@ render RenderParams (|bool| ForErrors=true)
 				fs <~ a.source
 	
 	if !ForErrors and .ReturnType
-		fs <~ ", "
+		if GotAny
+			fs <~ ", "
 		.returntype.render(fs)
 	fs <~ ')'
 
@@ -154,12 +156,12 @@ render RenderParams (|bool| ForErrors=true)
 render RenderTitle (|bool| ForErrors=true)
 	opt norefcounts
 	fs <~ .Name
-	if .args or (!forerrors and .ReturnType)
+	if .args or (!ForErrors and .ReturnType)
 		fs <~ " "
 		.RenderParams(ForErrors, fs)
 
 
-render Describe 
+render Describe
 	opt norefcounts
 	fs <~ "function "
 	fs <~ .Name

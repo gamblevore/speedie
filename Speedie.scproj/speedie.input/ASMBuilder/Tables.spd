@@ -643,7 +643,7 @@ function BoolNot (fn_asm)							// !a
 	|| src = .µGetASM(exp, DN)
 
 	if src is condanswer or alreadynegated
-		src.NegateTest(DN)
+//		src.NegateTest(DN)
 		return src.negafix(dest)
 
 	if src.isbool and dest is Negate				// unnecessary? (try delete. working on sthg else right now)

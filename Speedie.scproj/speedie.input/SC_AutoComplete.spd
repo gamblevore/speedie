@@ -625,7 +625,7 @@ function MainAct (|Message| cmd, |scfile| my_file, |message|)
 	
 	|| thg = fn.source!.FindPos(f, n)
 	if cmd starts "asm"
-		return .CppASM(cmd, fn)
+		return .DisplayCppAndASM(cmd, fn)
 	
 	if cmd starts  "define" or "display" or "callfrom"
 		if !thg and cmd == "callfrom"
@@ -806,18 +806,20 @@ function SCObject.Display (|bool| exact, |string|)
 		if .IsAllocOrNew or (self is disabled)
 			return ""
 		return (Exact)(.RenderTitle(false), .name)
+	
 	if self isa SCDecl
 		return .AutoCompleteName
-	if self isa sciterator
+		
+	if self isa SCIterator
 		return ""
 	return .name
 
 
 function SCObject.NextDisplay (|bool| exact, |SCObject|)
 	if exact
-		if self isa scfunction
+		if self isa SCFunction
 			return .nextfunc
-		if self isa scdecl
+		if self isa SCDecl
 			return .hiderfunc
 			
 	
@@ -1219,7 +1221,7 @@ function ASMFail (|scfunction| fn, |message?| ret,  |message|)
 
 
 
-function CppASM (|message| msg,  |scfunction| fn,  |message|)
+function DisplayCppAndASM (|message| msg,  |scfunction| fn,  |message|)
 	opt norefcounts
 	// Not safe to continue (At least in ASM) if theres an error
 	|| err = fn.savederror
@@ -1239,17 +1241,6 @@ function CppASM (|message| msg,  |scfunction| fn,  |message|)
 		rz = nil
 		.ASMFail(fn, rz)
 
-	
-	
-//function Nothing (|message| out,  |SCFunction| fn)
-//	if fn.IsMacro
-//		out <~ "This is a macro, and has no real code"
-//	  elseif fn Is Wrapper
-//		out <~ "This is a cpp_wrapper function"
-//	  elseif fn is disabled
-//		out <~ "This function is disabled"
-//	  else
-//		out <~ "Could not compile this function."
 
 
 function ASM (|message| arg,  |SCFunction| fn, |bool|)
@@ -1333,17 +1324,29 @@ function message.AutoCppOut (|faststring| name, |message| out, |scfile?| file, |
 	return out.SmartFeedback(name, .SrcLoc, file)
 
 
+function faststring.AppendIndent (|int| i, |byte| s=0)
+	.Indent = i
+	.AppendIndent
+	if s
+		self <~ s
+
 function message.RenderCppSub (|faststring| fs, |message| out, |scfile?| file, |int| Indent,  |scfile?|)
 	opt norefcounts
 
 	if self == @arg
+		if self in @arg
+			fs.AppendIndent(indent, '{')
+			file = .AutoCppOut(fs, out, file)
 		indent++
 		for c.fast in self
 			file = c.RenderCppSub(fs, out, file, indent)
+		indent--
+		if self in @arg
+			fs.AppendIndent(indent, '}')
+			file = .AutoCppOut(fs, out, file)
 		return file
 
-	fs.Indent = indent
-	fs.AppendIndent
+	fs.AppendIndent(indent)
 	if self != @tmp
 		.Render(fs)
 		return .AutoCppOut(fs, out, file)

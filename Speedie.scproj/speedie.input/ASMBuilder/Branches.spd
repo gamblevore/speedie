@@ -253,7 +253,6 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 		rz = .µ(cond, mode)
 		(mode is negate) // for isnt condanswer below
 	
-	if (cond contains "b") and ("MulBool2".trap or "MulBool".trap)
 	if rz isnt CondAnswer
 		rz = .Exists(cond, mode, rz)
 
