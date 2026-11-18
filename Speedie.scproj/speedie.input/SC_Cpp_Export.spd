@@ -791,7 +791,7 @@ extern "C" JB_StringC** JB_Str__FindGlobals(const char** src, uint64* Hash) {
 
 
 	function APIHeader (|File|)
-		|| arg = compiler.api_place.last(@arg)
+		|| arg = compiler.api_place.arg
 		|| ForLib = arg.find(@tmp, "libraryname")[@str]
 			|| FolName = arg.find(@tmp, "exportplace")[@str]
 				|| Fol = Compiler.BaseProjectPath![ FolName.name ]

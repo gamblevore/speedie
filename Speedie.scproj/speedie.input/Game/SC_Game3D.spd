@@ -107,7 +107,7 @@ extend Message {
 		
 
 //	function TranModel (|Message|)
-//		|| Arg = .last(@arg)								#require
+//		|| Arg = .arg								#require
 //		|| Shader = Arg.ParseShaderSub						#require // should be empty by now.
 //		.Name = "struct"
 //		return Shader

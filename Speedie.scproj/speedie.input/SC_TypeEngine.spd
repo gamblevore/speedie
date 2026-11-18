@@ -873,7 +873,7 @@ function MoveFutureStaticsIn (|Message| msg)
 	|| Next = msg$.next
 	for ch.forward in Next
 		if ch istmp "module"
-			ch.last(@arg).AppendAllInto( msg.givearg )
+			ch.arg.AppendAllInto( msg.givearg )
 
 
 

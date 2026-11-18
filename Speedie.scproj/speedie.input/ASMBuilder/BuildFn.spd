@@ -8,7 +8,7 @@ extend_module ASM
 	function TextASMTestSub (|message| tests)
 		opt norefcounts
 		Assembler.sh.ASMInit
-		|| list = tests.last(@arg)
+		|| list = tests.arg
 		|| TestName = tests[@thg]
 		require list and testname
 

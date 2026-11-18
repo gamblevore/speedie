@@ -47,7 +47,7 @@ function message.DylibFuncs (|message|)
 function @scclass.NewDylib (CollectFunc)
 	opt norefcounts
 	|| libname = node[@thg]$
-	|| arg = node.Last(@arg)$
+	|| arg = node.arg$
 	require arg.Find(@tmp, "cpp_func", true)
 	using node
 	|| bra = @bra.msg

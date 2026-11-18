@@ -129,7 +129,8 @@ function Second (fn_asm)
 
 function Sheb (fn_asm)
 	opt NoRefCounts
-	exp.noop
+	if !exp.hasany
+		exp.noop
 	return nil
 
 
@@ -422,7 +423,8 @@ function ArgumentSub (|assembler| self=assembler.sh, |message| exp, |asmreg| Mas
 		if ch.type == @decl
 			rz = decl(self, ch, nil)
 		  else
-			rz = .µ(ch, asmreg.discard)
+			|| Curr = .µ(ch, asmreg.discard)
+				rz = curr
 		ch++
 		loop ch and rz isnt exit
 	

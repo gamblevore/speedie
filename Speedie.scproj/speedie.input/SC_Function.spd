@@ -833,7 +833,7 @@ function IsSimpleCast (|Message|)
 	opt norefcounts
 	expect .Source
 	
-	|| found = .Source.last(@arg).first
+	|| found = .Source.arg.first
 	require found and found.IsLast and (found IsTmp "return")
 
 	found = found.first

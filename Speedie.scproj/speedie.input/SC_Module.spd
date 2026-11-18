@@ -92,7 +92,7 @@ function NewModuleFunc (|Message| src, |SCFunction|)
 
 
 function BaseDecls 
-	CollectDeclsGlobals( .source, self ) // right?
+	.CollectDeclsGlobals( .source ) // right?
 
 
 function AddModuleToFunc (|SCNode| space)

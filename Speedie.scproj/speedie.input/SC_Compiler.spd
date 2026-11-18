@@ -528,8 +528,7 @@ function ImportAll
 	require .Stage( "Collecting Globals" )
 	for m in .ModuleList
 		m.InitDecls
-	for F in SCImport.AllFiles
-		F.CollectGlobals Compiler.Program	
+	compiler.program.CollectDeclsGlobals( Compiler.AppInitGlobals )
 
 	SCImport.noproj
 	(Message).Restore

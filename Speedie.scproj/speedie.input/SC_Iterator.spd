@@ -28,7 +28,7 @@ class SCIterator (SCObject)
 		.Name = x
 		
 		|| M = StdErr.mark
-		|| src = msg.last(@arg)									#check msg
+		|| src = msg.arg									#check msg
 		.source = src
 		
 		

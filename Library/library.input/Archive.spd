@@ -21,7 +21,7 @@ role FileArchive (message)
 		|| argfn = @arg
 		|| arc = (self == argfn)(.first, self)
 		require .expect(@tmp, "archive")
-		for p in arc.last(@arg)
+		for p in arc.arg
 			require p.expect(@tmp)
 			|| arg = p[@arg]
 			|| OK = (p.name.istext and arg["data"] and !(p.name contains "/../" or "/./"))

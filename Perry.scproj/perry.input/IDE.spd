@@ -613,7 +613,7 @@ class PerryIDE (Window)
 		rz |= .UpdateMemOne(2, app.OtherMemory)
 
 
-	function CheckModified 
+	function CheckModified
 		|| doc = .editme.Document
 			doc.CheckModified
 		

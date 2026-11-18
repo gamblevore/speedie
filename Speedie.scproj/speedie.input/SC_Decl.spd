@@ -344,7 +344,7 @@ class SCDecl (SCObject) {
 		rz <~ .WriteType(minimal)
 	
 
-	render RenderTypeAndName (|int| minimal)
+	render RenderTypeAndName (|int| minimal=1)
 		.WriteDeclTypeAndName("", minimal).Render(fs)
 	
 	

@@ -178,7 +178,8 @@ function CollectProperties
 	scmodule.curr = .modul
 	for item in .SourceArg
 		if item == @decl
-			.CollectProp(item)
+			ifn item.obj isa message
+				.CollectProp(item)
 			
 	if .IsTask
 		.TaskProperties
@@ -1243,7 +1244,7 @@ module
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
 		|| name = c[@thg]
-			|| arg  = c.last(@arg)
+			|| arg  = c.arg
 			|| M = Compiler.findmodulemsg(name)
 			if m and arg
 				|SCNode| B = M

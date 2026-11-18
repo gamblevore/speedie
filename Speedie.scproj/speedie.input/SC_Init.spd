@@ -3,14 +3,12 @@
 module SC_Init
 	function SCModule.BuildInitArg (|message!|)
 		opt norefcounts
-		|| arg
 		|| s = .source
 			using s
-				arg = .BuildInitArgSub
-
-		if !arg
-			arg = .BuildInitArgSub
-		return arg
+				s = .BuildInitArgSub
+		  else
+			s = .BuildInitArgSub
+		return s
 	
 	
 	function SCModule.BuildInitArgSub (|message!|)
@@ -41,14 +39,11 @@ module SC_Init
 
 
 	function SCModule.InitDecls
-		description "Collects global decls from this module." 
-		opt norefcounts
-		|| a = .InitVarsArg.First
-		// would be nicer to use .globals
-		if a.HasAny
-			CollectDeclsGlobals( a, self )
-		if self == compiler.program
-			CollectDeclsGlobals( compiler.AppInitGlobals, self )
+		description "Collects global decls from this module."
+		opt NoRefCounts
+		|| Arg = .InitVarsArg.First							// Would be nicer to use .globals
+		if Arg.HasAny
+			.CollectDeclsGlobals( Arg )
 
 
 	function SCModule.MoveToInitFunc (|Message| c)
@@ -72,7 +67,9 @@ module SC_Init
 			require !c.SettingToNil
 			dest = .InitVarsArg init .BuildInitArg
 			dest = dest.first!
-			// c = c.copy // make autocomplete easier. do later!
+			|| old = c
+			c = c.copy // dont send the original, cos we need it for autocomplete
+			old.obj = c
 		  else
 			dest = .InitCodeArg init .BuildInitArg
 		dest <~ c
@@ -166,19 +163,19 @@ function SCModule.CallOurInitsByTheBiggerInitFunc
 	opt norefcounts
 	|| p = Compiler.program
 	if p == self
-		.InitDeclFixer(compiler.appinitglobals)		
+		.InitDeclFixer(compiler.AppInitGlobals)		
 	if .IsLibrary
 		.CallOurInits(p.InitVarsArg!, p.InitCodeArg!)
 	  else
-		.CallOurInits(compiler.appinitglobals, compiler.appinitcode)
+		.CallOurInits(compiler.AppInitGlobals, compiler.AppInitCode)
 	
 
 
 function SCModule.InitDeclFixer (|message| list)
 	opt norefcounts
-	for msg in list
+	for msg.fast in list
 		if .InitRootDecl( msg )
-			msg.Remove
+			msg.type = @sheb 
 
 
 function SCModule.CallOurInits (|message| DestVars, |message| DestCode)

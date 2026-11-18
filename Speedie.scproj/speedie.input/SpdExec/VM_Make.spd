@@ -264,7 +264,7 @@ function VM_CleanupList (|message| list, |[message]| out)
 		  elseif ch ~= "POS"
 			|| f = ch.first
 			if f == @num
-				|| arg = ch.last(@arg)
+				|| arg = ch.arg
 				|| item = arg.first
 					.VM_MakeInstructionSub(item, out, f.int(0, 1, 255))
 			ch.Remove

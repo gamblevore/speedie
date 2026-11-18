@@ -382,7 +382,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.DisplayFB(msg)
 		  elseif msg starts "log"
 			0 //
-		  elseif msg starts "callfrom"
+		  elseif msg starts "callfrom" or "decl"
 			.CallFromFB(msg)
 		  elseif msg starts "asm"
 			.GotASM(msg)

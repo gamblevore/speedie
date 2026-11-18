@@ -24,7 +24,7 @@ class µForm
 		.index = ++µform.count
 		check (.Index < 255) (tmp, "Too many forms")
 
-		|| Arg = tmp.last(@arg)
+		|| Arg = tmp.arg
 		for line.fast in Arg
 			.LoadParam(line.FirstName, line)
 		if .params[0] is jump // jumps use reg0

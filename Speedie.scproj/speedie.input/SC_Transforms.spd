@@ -715,7 +715,7 @@ function Tran_Syx (|Message| msg, |Message|)
 	opt norefcounts
 	msg.name= "libinternal"
 	|| name	= msg[@thg]
-	|| arg = msg.last(@arg)
+	|| arg = msg.arg
 	require name and arg
 	expect ( name.Length <= 4 )  ( msg, "Name too long (max=4)" )
 	|| Params	= msg.find(@bra)[@thg]

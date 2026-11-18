@@ -17,7 +17,7 @@ module SC_API
 	function NewAPI (|message| api, |string| part, |SCNode| parent, |string| proj)
 		proj += "_"
 		|| name = api[@thg]					#require
-		|| arg = api.last(@arg)				#require
+		|| arg = api.arg					#require
 		|| cpp = arg.find(@tmp, "cpp_name")
 		
 		using (arg)
@@ -69,7 +69,7 @@ module SC_API
 		
 		|| name		= node[@thg]						#require
 		|| partname = name.Next(@bra)[@thg]				#require
-		|| arg		= node.last(@arg)					#require
+		|| arg		= node.arg							#require
 		|| cls		= compiler[name]					#require
 
 		partname.parent.remove
