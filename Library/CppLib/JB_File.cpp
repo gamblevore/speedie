@@ -969,6 +969,9 @@ JB_StringC* JB_File_PathFix (JB_String* P) {
 		N--;
 	}
 	
+	if (N <= 0)
+		return (JB_StringC*)JB_Str__Empty();
+	
     if (PS[0] == '~') {
 		JB_FS_AppendString(FS, JB_File__Home());
 		PS++; N--;

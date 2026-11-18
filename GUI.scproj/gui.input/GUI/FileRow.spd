@@ -89,7 +89,7 @@ class FileRow (ListViewRow)
 		
 		|| l = .FilePath
 		|| f = l.sibling(v)
-		if .FilePath != f
+		if .FilePath|string| != f|string|
 			if (.filepath ~!= f) and f.Exists
 				beep v + " already exists!"
 			  elseif l.moveto(f)

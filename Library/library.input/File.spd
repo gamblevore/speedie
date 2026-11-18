@@ -87,10 +87,15 @@ class File (stringshared)
 		return .addr|cstring|
 
 	syntax cast (|bool|)
-		description "Necessary because while files are strings, we don't want to compare against an empty string."
+		description "Necessary because while files are strings, we don't want to use string.syntaxcast"
 		inlined
 		return self|bool|
 
+	syntax equals (|file?| f, |bool|)
+		inlined	// same as syntaxcast
+		cpp_part EqualsFile
+		return self|object| == f|object|
+			
 	syntax equals (|string?| s, |bool| aware=false, |bool|)
 		inlined
 		return super.SyntaxEquals(s, aware)

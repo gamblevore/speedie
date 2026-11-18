@@ -118,16 +118,7 @@ datatype cstring
 		
 	function StrCmp (|cstring| other, |int|)
 		cpp_wrapper strcmp
-	
-	function FileName (|cstring|)
-		|| c = self|&byte|
-		|| b = c
 		
-		while c[]
-			if c++[] == '/'
-				b = c
-		return b|cstring|
-	
 	syntax cast (|&byte|)
 		inlined
 		return self|&byte|
