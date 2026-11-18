@@ -113,7 +113,6 @@ GUI_FR_DirSize
 GUI_FR_Document
 GUI_FR_FileData
 GUI_FR_ReadFrom
-GUI_FR_ReadName
 GUI_FR_Render
 GUI_FR_SyntaxAppend
 GUI_FR_TryReload
@@ -483,6 +482,7 @@ GUI_Text_GotFocus
 GUI_Text_Insert
 GUI_Text_InsertAutoComplete
 GUI_Text_InsertText
+GUI_Text_IsActivelyDebugging
 GUI_Text_IsModified
 GUI_Text_JeeboxMode
 GUI_Text_JeeboxModeSet
@@ -492,8 +492,7 @@ GUI_Text_Log
 GUI_Text_LostFocus
 GUI_Text_MakeInline
 GUI_Text_MaxVisibleLines
-GUI_Text_MessageAtSel
-GUI_Text_MessageWithin
+GUI_Text_MessageAt
 GUI_Text_MouseDown
 GUI_Text_MouseMove
 GUI_Text_Parse
@@ -543,7 +542,6 @@ GUI_Win_BlockXSet
 GUI_Win_BlockYSet
 GUI_Win_CalculateSize
 GUI_Win_CancelClose
-GUI_Win_CancelReturn
 GUI_Win_CloseWindow
 GUI_Win_Confirm
 GUI_Win_Constructor
@@ -1570,7 +1568,6 @@ JB_config_ConfFirst
 JB_config_Save
 JB_config__Create
 JB_cstring_Copy
-JB_cstring_FileName
 JB_cstring_OperatorPlus
 JB_cstring_Render
 JB_dbl_AsInt
