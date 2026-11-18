@@ -554,7 +554,7 @@ struct Assembler (AssemblerWipe)
 		|| fn = fn_asm_table[Type]!
 
 		target debug
-			if µtrap == 6059 or .ActionIndex > 30
+			if µtrap == -1 or .ActionIndex > 30
 		|| ss = (fn)(self, exp, dest)
 
 		target debug

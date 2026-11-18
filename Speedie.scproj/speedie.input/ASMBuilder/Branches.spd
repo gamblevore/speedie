@@ -249,9 +249,9 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	|| mode = asmreg.CondRequest
 	if neg
 		rz = ASMType.boolnot(self, cond, mode)
-		(mode is negate) // for isnt condanswer below
 	  else
 		rz = .µ(cond, mode)
+		(mode is negate) // for isnt condanswer below
 	
 	if (cond contains "b") and ("MulBool2".trap or "MulBool".trap)
 	if rz isnt CondAnswer
