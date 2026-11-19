@@ -1027,27 +1027,31 @@ struct PicoComms : PicoConfig {
 	void check_exit_code () {
 		if (PIDStatus >= 0)
 			return;
-		if (!ChildID)
+		if (!ChildID) {
 			if (!(PartClosed == 15 and ExecFlags&PicoExecForked))
 				return;
-		
-		int ExitCode = 0;
-		if (!ChildID) {
 			if (getppid() <= 1) {	// parent died.
-				PIDStatus = 0;		// unknown why. So lets say it ended nicely.
+			#ifdef EOWNERDEAD
+				PIDStatus = EOWNERDEAD;
+			#else
+				PIDStatus = EIO;	// unknown reason
+			#endif
 				SocketStatus = EPIPE;
 				AskClose("Terminated");
 			}
 
-		} else if (waitpid(ChildID, &ExitCode, WNOHANG) <= 0)
-			(0); // 0 == still alive,  -1 == unknown
-		  else {
-			if (WIFSIGNALED(ExitCode))
-				PIDStatus = WTERMSIG(ExitCode)|128;
-			  else if (WIFEXITED(ExitCode))
-				PIDStatus = WEXITSTATUS(ExitCode);
-			if (SocketStatus == 0 and PIDStatus > 0)
-				SocketStatus = EPIPE;
+		} else {
+			int ExitCode = 0;
+			if (waitpid(ChildID, &ExitCode, WNOHANG) <= 0) {
+				(0); // 0 == still alive,  -1 == unknown
+			} else {
+				if (WIFSIGNALED(ExitCode))
+					PIDStatus = WTERMSIG(ExitCode)|128;
+				  else if (WIFEXITED(ExitCode))
+					PIDStatus = WEXITSTATUS(ExitCode);
+				if (SocketStatus == 0 and PIDStatus > 0)
+					SocketStatus = EPIPE;
+			}
 		}
 		if (CanSayDebug())
 			Say("Process", StatusName(PIDStatus), ChildID);
