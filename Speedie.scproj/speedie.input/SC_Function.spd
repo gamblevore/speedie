@@ -278,8 +278,7 @@ function SubFuncParamsLoad (|message| P)
 	if space and !.cls
 		|| L = .parent
 		if L isa SCModule
-			if l.IsProperModule
-				L.AddModuleToFunc( space )
+			L.AddModuleToFunc( space )
 
 	if .FuncInfo
 		|| r = .ReturnType

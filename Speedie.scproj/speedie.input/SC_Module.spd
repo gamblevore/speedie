@@ -45,14 +45,6 @@ function SuperMod (|scmodule|)
 			return s.modul
 
 
-function IsProperModule (|bool|)
-// not "main" or any other auto-generated module that doesn't properly have a "module name {" thing going on...
-	require .parent
-	if (.parent == compiler.program) and (.source == nil)
-		return false
-	return true
-
-
 function Use
 	super.Use
 	scmodule.curr = self
