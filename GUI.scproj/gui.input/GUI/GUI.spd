@@ -1459,9 +1459,7 @@ datatype GUIActivity (byte)
 		return self
 
 
+
 inline Duration.syntaxcall (|float|)
 	return gui.loop(self)
-
-// CVDisplayLink could be used to make vsyncing possible? Its a lot of per-platform work though.
-// Linux/Win have their own alternatives.
 
