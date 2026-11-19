@@ -247,7 +247,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
 	range.Start = .curr
 	|| mode = asmreg.CondRequest.negate(neg)
-	if "BraTest".trap
+	target debug: if "BraTest".trap
 //	if neg
 //		rz = ASMType.boolnot(self, cond, mode)
 //	  else

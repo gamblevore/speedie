@@ -157,6 +157,7 @@ extend Assembler
 		
 
 	function EqualsInt (|message| exp, |asmreg| dest, |asmreg| L, |asmreg| R, |asmreg|)
+		target debug: if "bratest".trap
 		|| negate = dest is negate
 		|| Res = dest.BoolAnswerOK						// Hmmm... so what should it be?
 		if  L is Const  and  R is Const
