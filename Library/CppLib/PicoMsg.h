@@ -114,7 +114,7 @@ struct PicoConfig {
 	PicoTrousers		GrabLock;
 	PicoTrousers		InUse;
 	int					Socket;
-	int					PID;
+	int					ChildID;
 	PicoBuff*			Reading;
 	PicoBuff*			Sending;
 	PicoBuff*			StdErr;
@@ -465,13 +465,13 @@ struct PicoComms : PicoConfig {
 		  or (!MiniPipe(Err, NoStdErr, STDERR_FILENO)  and  GiveUp(Out) < 0))
 			return -errno;
 
-		PID = 0;
+		ChildID = 0;
 		PIDStatus = -2;
-		int ChildID = NoMsgs?fork():StartFork(Name, true);
-		if (ChildID < 0)
+		int child = NoMsgs?fork():StartFork(Name, true);
+		if (child < 0)
 			return -errno;
 		
-		IsParent = ChildID;
+		IsParent = child;
 		if (!IsParent) {
 			ExecFlags |= PicoExecForked;
 			if (NoStdOut == 1) 
@@ -501,16 +501,16 @@ struct PicoComms : PicoConfig {
 				PartClosed &=~ 8;
 		}
 		
-		PID = ChildID;
+		ChildID = child;
 		mark_started();
-		return PID;
+		return ChildID;
 	}
 
 	bool StartThread (PicoThreadFn fn, uint Mode, const char** Args, int Noise) {
 		if (!alloc_msg_buffs()) return false;
 
-		int ChildID = pico_list.Reserve();
-		if (!ChildID) return false;
+		int child = pico_list.Reserve();
+		if (!child) return false;
 		
 		PicoComms* C = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Thread", ChildID);
 		Socket = -1;  C->Socket = -1;
@@ -576,9 +576,9 @@ struct PicoComms : PicoConfig {
 				return StoreSock(S);
 		} 
 		
-		PID = childid;
+		ChildID = childid;
 		add_msg_buffs(S);
-		return PID; 
+		return ChildID; 
 	}
 	/// **End of  Initialisation**
 	
@@ -728,7 +728,7 @@ struct PicoComms : PicoConfig {
 		int T = PIDStatus;
 		if (S) {
 			S->Status = T;
-			S->PID = PID;
+			S->PID = ChildID;
 			S->StatusName = StatusName(T);
 			if (ExecFlags&PicoExecForked)
 				S->PID = getppid();
@@ -1027,18 +1027,19 @@ struct PicoComms : PicoConfig {
 	void check_exit_code () {
 		if (PIDStatus >= 0)
 			return;
-		if (!PID)
+		if (!ChildID)
 			if (!(PartClosed == 15 and ExecFlags&PicoExecForked))
 				return;
 		
 		int ExitCode = 0;
-		if (!PID) {
+		if (!ChildID) {
 			if (getppid() <= 1) {	// parent died.
 				PIDStatus = 0;		// unknown why. So lets say it ended nicely.
 				SocketStatus = EPIPE;
+				AskClose("Terminated");
 			}
 
-		} else if (waitpid(PID, &ExitCode, WNOHANG) <= 0)
+		} else if (waitpid(ChildID, &ExitCode, WNOHANG) <= 0)
 			(0); // 0 == still alive,  -1 == unknown
 		  else {
 			if (WIFSIGNALED(ExitCode))
@@ -1049,13 +1050,13 @@ struct PicoComms : PicoConfig {
 				SocketStatus = EPIPE;
 		}
 		if (CanSayDebug())
-			Say("Process", StatusName(PIDStatus), -PID);
+			Say("Process", StatusName(PIDStatus), ChildID);
 	}
 	
 	void kill_me () {
-		if (PID  and  PIDStatus == -1) {
+		if (ChildID  and  PIDStatus == -1) {
 			ExecFlags &= ~PicoExecWantDead;
-			kill(PID, SIGKILL);
+			kill(ChildID, SIGKILL);
 		}
 	}
 	
