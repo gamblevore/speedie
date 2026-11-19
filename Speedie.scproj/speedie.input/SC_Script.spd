@@ -17,11 +17,10 @@ function compiler.UsingScript (|file| f, |file|)
 	app._rawargs.remove(0)
 
 
-function compiler.ScriptRecompile (|file| f, |file|script_build, |bool|)
+function compiler.ScriptRecompile (|file| f, |file| script_build, |bool|)
 	if !script_build.exists
 		return true
-	if (script_build.modified < f.modified)
-		return true
+	return script_build.modified < f.modified
 
 
 function compiler.CanTryModes (|file|)
