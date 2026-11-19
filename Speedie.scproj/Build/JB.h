@@ -1516,8 +1516,7 @@ extern bool SC__Options_MakeExec;
 extern bool SC__Options_Compile;
 extern bool SC__Options_TargetDebug;
 extern bool SC__Options_PrintMemoryUsage;
-extern bool SC__Options_LogASM;
-extern bool SC__Options_PrintLibraries;
+extern bool SC__Options_Noisy;
 extern bool SC__Options_GenFlowLogCode;
 extern bool SC__Options_KeepAllErrors;
 extern bool SC__Options_Scripting;
@@ -2843,6 +2842,8 @@ void SC_Comp__PrintErrors(uint /*ErrorSeverity*/ MinSev);
 
 void SC_Comp__PrintResults();
 
+void SC_Comp__PrintTodo();
+
 JB_File* SC_Comp__ProductFile();
 
 JB_String* SC_Comp__ProductPath();
@@ -3090,7 +3091,7 @@ Message* SC_AC__CallFrom(Message* Msg, JB_Object* Found);
 
 Message* SC_AC__CallFromDefine(Message* Msg, SCFunction* Fn, JB_Object* Found);
 
-void SC_AC__CallFromSub(Message* Arg, SCFunction* Fn);
+void SC_AC__CallFromSub(Message* Arg, Array* List, SCFunction* Fn);
 
 bool SC_AC__CanUseName(SCNode* L);
 
@@ -3099,10 +3100,6 @@ Message* SC_AC__Check(Message* Cmd);
 Message* SC_AC__CmdCleanUp(Message* Arg);
 
 bool SC_AC__CmdWrap(Message* Arg);
-
-Message* SC_AC__CppASM(Message* Msg, SCFunction* Fn);
-
-void SC_AC__CppView(Message* Out, SCFunction* Fn);
 
 Message* SC_AC__DeclUsers(Message* Cmd);
 
@@ -3115,6 +3112,8 @@ Message* SC_AC__Define_Something(SCFile* Myfile, int F, Message* Thg, JB_String*
 Message* SC_AC__DefineOrCall(Message* Msg, JB_String* Purpose, JB_Object* Found);
 
 Message* SC_AC__Diissplay(Message* Msg, Message* S, JB_String* Purpose);
+
+Message* SC_AC__DisplayCppAndASM(Message* Msg, SCFunction* Fn);
 
 Message* SC_AC__DoCmd(Message* Cmd);
 
@@ -4017,8 +4016,6 @@ bool SC_ClassOrModuleLinkage_wrapper(SCFunction* Fn, Message* Node, SCNode* Name
 
 SCNode* SC_ClsCollectTable_description(Message* Node, SCNode* Name_space, Message* ErrPlace);
 
-void SC_CollectDeclsGlobals(Message* Arg, SCModule* Mod);
-
 void SC_CollectManyDeclsFromBody(Message* Arg, SCNode* Scarg);
 
 bool JB_CompareError(Message* Expected, Message* Found);
@@ -4807,8 +4804,6 @@ FatASM* SC_Reg_NeedFAT(ASMReg Self);
 ASMReg SC_Reg_NegaFix(ASMReg Self, ASMReg Dest);
 
 ASMReg SC_Reg_Negate(ASMReg Self, bool Neg);
-
-bool SC_Reg_NegateFail(ASMReg Self, ASMReg Dest);
 
 ASMReg SC_Reg_OperatorAsnt(ASMReg Self, ASMReg A);
 
@@ -7388,6 +7383,8 @@ void JB_FS_AppendHexStr(FastString* Self, JB_String* Data);
 
 void JB_FS_AppendHInt(FastString* Self, int64 N);
 
+void SC_FS_AppendIndent(FastString* Self, int I, uint /*byte*/ S);
+
 void SC_FS_AppendLibGlob(FastString* Self, SCDecl* D);
 
 void JB_FS_AppendQuotedEscape(FastString* Self, JB_String* S, uint /*byte*/ Quote);
@@ -7903,6 +7900,8 @@ JB_String* JB_Str_MulBool(JB_String* Self, bool B);
 
 JB_String* JB_Str_OperatorMul(JB_String* Self, int N);
 
+JB_String* JB_Str_MulBool2(JB_String* Self, bool B);
+
 JB_String* JB_Str_OperatorPlusWithCstring(JB_String* Self, _cstring C);
 
 JB_String* JB_Str_OperatorPlusWithInt64(JB_String* Self, int64 I);
@@ -8271,6 +8270,8 @@ void SC_Msg_AssignsFix(Message* Self, SCFunction* F);
 int SC_Msg_Autocomplete_State(Message* Self);
 
 JB_String* SC_Msg_AutoCompleteDecl(Message* Self);
+
+SCFile* SC_Msg_AutoCppOut(Message* Self, FastString* Name, Message* Out, SCFile* File);
 
 bool SC_Msg_AutoFoundFunc(Message* Self, SCFunction* F);
 
@@ -9144,6 +9145,8 @@ void JB_Msg_render_jbin_sub(Message* Self, FastString* Js);
 
 JB_String* JB_Msg_RenderAST(Message* Self, bool RenderRoot, FastString* Fs_in);
 
+SCFile* SC_Msg_RenderCppSub(Message* Self, FastString* Fs, Message* Out, SCFile* File, int Indent);
+
 JB_String* JB_Msg_RenderJbin(Message* Self, JB_String* Shell_path, FastString* Fs_in);
 
 void JB_Msg_RenderPrm(Message* Self, FastString* Fs, uint /*byte*/ B1, uint /*byte*/ B2);
@@ -9207,6 +9210,8 @@ bool JB_Msg_ShallowEquals(Message* Self, Message* B, bool Aware);
 void JB_Msg_Sheb__(Message* Self, FastString* Fs);
 
 void SC_Msg_SlidePositions(Message* Self, int Add);
+
+SCFile* SC_Msg_SmartFeedback(Message* Self, FastString* Name, SortableLocation Map, SCFile* Curr_file);
 
 void SC_Msg_SortImprove(Message* Self, SCNode* Name_space);
 
@@ -10044,7 +10049,7 @@ SCObject* SC_Base_LookUpVar(SCNode* Self, JB_String* Name, Message* Exp, Message
 
 SCDecl* SC_Base_LookUpVarDecl(SCNode* Self, JB_String* Name);
 
-SCObject* SC_Base_LookUpVarRootDecl(SCNode* Self, JB_String* Name, Message* Exp);
+SCDecl* SC_Base_LookUpVarRootDecl(SCNode* Self, JB_String* Name, Message* Exp);
 
 void SC_Base_MakeLibInternal(SCNode* Self, Message* Node);
 
@@ -10242,6 +10247,8 @@ bool JB_File_SmartDataSet(JB_File* Self, JB_String* Nieu);
 FileSizeInt JB_File_SyntaxAccessSet(JB_File* Self, JB_String* Data);
 
 JB_File* JB_File_SyntaxAccess(JB_File* Self, JB_String* Name);
+
+bool JB_File_EqualsFile(JB_File* Self, JB_File* F);
 
 bool JB_File_SyntaxEquals(JB_File* Self, JB_String* S, bool Aware);
 
@@ -10641,8 +10648,6 @@ Message* SC_File_AST(SCFile* Self);
 
 Message* SC_File_ASTSub(SCFile* Self, bool Orig);
 
-void SC_File_CollectGlobals(SCFile* Self, SCModule* P);
-
 SCFile* SC_File_Constructor(SCFile* Self, JB_File* F, SCImport* P);
 
 void SC_File_Destructor(SCFile* Self);
@@ -10749,6 +10754,8 @@ void SC_Func_ConstructParentProperties(SCFunction* Self);
 void SC_Func_CopyParams(SCFunction* Self, Message* List);
 
 Message* SC_Func_CountCallsToParentAlloc(SCFunction* Self, Message* Root);
+
+void SC_Func_CppView(SCFunction* Self, Message* Arg);
 
 int SC_Func_CreateTypeCast(SCFunction* Self, SCDecl* MyType, Message* Exp, int Loss);
 
@@ -10899,8 +10906,6 @@ void SC_Func_RefFunc(SCFunction* Self, Message* Prm, Message* After);
 JB_String* SC_Func_Render(SCFunction* Self, FastString* Fs_in);
 
 JB_String* SC_Func_RenderParams(SCFunction* Self, bool ForErrors, FastString* Fs_in);
-
-JB_String* SC_Func_RenderSheBless(SCFunction* Self);
 
 JB_String* SC_Func_RenderTitle(SCFunction* Self, bool ForErrors, FastString* Fs_in);
 
@@ -11129,6 +11134,8 @@ void SC_Mod_CallOurInitsByTheBiggerInitFunc(SCModule* Self);
 
 void SC_Mod_CollectConstantsSub(SCModule* Self, Message* Ch);
 
+void SC_Mod_CollectDeclsGlobals(SCModule* Self, Message* Arg);
+
 void SC_Mod_CollectOneConstant(SCModule* Self, Message* Ch);
 
 SCModule* SC_Mod_Constructor(SCModule* Self);
@@ -11152,8 +11159,6 @@ void SC_Mod_InitDecls(SCModule* Self);
 bool SC_Mod_InitRootDecl(SCModule* Self, Message* DeclMsg);
 
 bool SC_Mod_IsNotLib(SCModule* Self, Message* C);
-
-bool SC_Mod_IsProperModule(SCModule* Self);
 
 void SC_Mod_LoadModule(SCModule* Self, Message* Node);
 

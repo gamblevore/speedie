@@ -2,8 +2,8 @@
 
 							/// Get perry ASMing ///
 
-* chained obj destructor bug in branch_test.spd
-* string operator mul does not change if you change !
+* Chained obj destructor bug in branch_test.spd
+* BoolNot bugs
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
@@ -17,6 +17,7 @@
 
 								// ASM later
 
+* entering a constructor that does not exist (auto-generated) should stay at the same line of code.
 * ASM errors while editing. Shouldn't spam interface... just ignore I guess.
 * Step through destructor without it fretting
 * Display libglobs
@@ -26,7 +27,7 @@
 
 * Running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
 * Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
-* too aggressive with error keeping
+* Too aggressive with error keeping
 * Undo still thinks its changed when its not, and we undid ALL changes!
 * Tabbing to create function params does not work if its at the last line
 * Perhaps case-sensitivity bitching is... unnecessary. Or could be optional.
