@@ -290,7 +290,7 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	
 	range.after = .curr
 
-	// allow easier checking of the jump instruction, especially if its 1 long, in: function WhileSub
+// Allow easier checking of the jump instruction, especially if its 1 long, in function WhileSub
 	while BranchStart isa asm.noop
 		BranchStart++
 	range.start = BranchStart
