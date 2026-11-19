@@ -19,16 +19,6 @@ function regfile.ActualPhi (|uint16| From, |uint|)
 
 
 function assembler.PhiStart (|BranchPhiTracker|)
-	// we should make a virtual block to go into...
-	// for each branch, even! how?
-
-// something like this? // and then something similar in PhiMiddle and PhiMerge
-//	.NextBasicBlock
-//	.EnterBranch
-//	.NextBasicBlock
-
-// for now... just rely on the fact that our regfile has been cleared of the other branch
-
 	rz.Start = .regs
 	|| i = .index(.curr)
 	rz.StartIndex = i
@@ -76,14 +66,14 @@ function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest,
 		.PhiMergeSub(exp, T.Start,	.regs,		B, liftup)
 	
 	|| C = &.regs.Setters[0]
-	|| M = &(t.middle.Setters[0])	// M is needed to merge branches, undoing the earlier restoration. 
-	|| S = &(t.start.setters[0])	// S is needed, because of trashers
+	|| M = &(t.middle.Setters[0])			// M is needed to merge branches, undoing the earlier restoration. 
+	|| S = &(t.start.setters[0])			// S is needed, because of trashers
 
 	// || y = 123
-	// if x: return .func(y) // trashes y
+	// if x: return .func(y)				// Trashes y
 	// we need y untrashed now!
 	
-	for i in 32
+	for i in 32								// untrash vars
 		C[i] = (C[i]|uint| max M[i]) max S[i]
 	return dest
 
@@ -92,7 +82,7 @@ function assembler.PhiEnd (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=ni
 	return .PhiMerge(exp, t, dest, 1)
 
 
-function assembler.PhiMergeNormal  (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
+function assembler.PhiEndNormal  (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
 	return .PhiMerge(exp, t, dest, 0)
 
 

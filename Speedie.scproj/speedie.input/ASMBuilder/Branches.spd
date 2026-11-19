@@ -105,57 +105,67 @@ function WhileSub (|message| exp,   |asmreg|)
 	opt norefcounts
 
 	|| InitialJump = exp.JUMP										// test goes after loop
-	|| phi = .PhiStart
+	|BranchPhiTracker| BranchPhis = .PhiStart
+	|BranchPhiTracker| PhI2
+//	PhI2 = BranchPhis
+	memory.Copy(&phi2, &BranchPhis, –sizeof BranchPhis) // fix this!!!
+	
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
 	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo	
-	
-	// this can't be in the same branch as the argument. or else we get const issues
-	// so theres another way to do it.
-	// we run the test twice. this way, at each point, we know for sure what has happened.
-	// the second one can only have happened after the argument.
-	// depends on how big the branch is.
-	// so we'd need to test it.
-	// and then, otherwise, we simply do the test at the start
-	// then jump back, at the end.
-	// i feel like jumping back, we actually don't take into account vars that are used. (in the arg)
-	// I think the best way, is to fix the merging
-
-	// so what needs merging, even?
-	
-	// well... we need to merge here... So that merges with the middle and the outside.
-	// but thats wierd? i guess? IDK?
-	
-	
+	.PhiEnd(exp, BranchPhis)
 	.Branch(exp.first!, loop_test, true)
+		
 	require !.EntireInlineFailed
-
+	target debug: if "bratest".trap
 	|| Known = loop_test.Constness.negate							// loops are weird :]
 	if Known.knownfalse
-		if (loop_test.length)
+		if loop_test.length
 			error (exp.first!, "Bad loop. Always false but actually does stuff.")
 		.nop(InitialJump)
-		.PhiEnd(exp, phi)
-		return ASMReg()
-
-	if Known.knowntrue
-		.Nop(InitialJump)	
-		exp.JUMP.JumpTo(initialjump+1, self)
-		loop_test.after++
+		returns = ASMReg()
 	  else
-		InitialJump.JumpTo(loop_test.start, self)
-		loop_test.JumpTo(InitialJump+1, 0)
-		if loop_Test.length == 1									// loop opt!
-			InitialJump.CopyJump(loop_test.Start)
-			InitialJump.JumpTo(loop_test.After, self)
-			InitialJump.JumpNegate
-		returns = nil
-
-	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
-	.PhiEnd(exp, phi)
+		if Known.knowntrue
+			.Nop(InitialJump)	
+			exp.JUMP.JumpTo(initialjump+1, self)
+			loop_test.after++
+		  else
+			InitialJump.JumpTo(loop_test.start, self)
+			loop_test.JumpTo(InitialJump+1, 0)
+			if loop_Test.length == 1									// loop opt!
+				InitialJump.CopyJump(loop_test.Start)
+				InitialJump.JumpTo(loop_test.After, self)
+				InitialJump.JumpNegate
+			returns = nil
 	
-	if exp.second.scarg(nil)!.HasEscape
-		.ExpectOneMore = true
+		.LoopFill(InitialJump+1 /*enter*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
+		
+		if exp.second.scarg(nil)!.HasEscape
+			.ExpectOneMore = true
+	
+	.phiend(Exp, phi2)
+
+/*
+	We need double-merging
+	
+	|| x = .x
+	while x++ != z
+		y++
+	
+	the branch alters x. So we write the jump-to-end, then create the arg
+	the arg may or not have come from a previous arg, but thats not the point really.
+	the point is that it can alter vars. So by the time we get to: x++ != z, we need a phi for x.
+	
+	So we create the phis for x, at .PhiEnd(exp, BranchPhis). Now the branch has all its phis properly
+	knowing its real inputs. From inside and outside.
+	
+	But thats not the only issue.
+	We might not have run the arg. So everything on the outside needs it merged too.
+	OK so the first PhiEnd will merge it.
+
+	Why not just reuse BranchPhis? iDK? did it get altered somewhere? if not then I guess yeah... reuse
+*/
+
 	return returns
 
 
@@ -262,7 +272,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
-	range.Start = .curr
+	|| s = .curr
 	|| mode = asmreg.CondRequest.negate(neg)
 	target debug: if "BraTest".trap
 //	if neg
@@ -279,6 +289,11 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 		.NopBranch(range.start)
 	
 	range.after = .curr
+
+	// allow easier checking of the jump instruction, especially if its 1 long, in: function WhileSub
+	while s isa asm.noop
+		s++
+	range.start = s
 
 
 
@@ -485,7 +500,7 @@ function BranchAnd (|message| A, |message| B, |asmreg| dest, |asmreg|)
 		if AndTest.Never // a and 0
 			return Second
 
-		.PhiMergeNormal(A.parent!, phi)
+		.PhiEndNormal(A.parent!, phi)
 		return first
 
 	// 1 and 1
@@ -535,7 +550,7 @@ function BranchOr (|message| A, |message| B, |asmreg| dest, |asmreg|)
 
 	// a or 0
 	// a or b
-	.PhiMergeNormal(A.parent!, phi)
+	.PhiEndNormal(A.parent!, phi)
 	return first
 
 
@@ -624,8 +639,12 @@ Struct FatRange
 	|maybebool|		Constness
 
 	function Length (|int|)
-		opt inline
-		return .after - .Start
+		|| c = .start
+		|| a = .After
+//		return a - c
+		while a > c
+			rz += c.GuessSize
+			c++
 	
 	function Always (|bool|)
 		opt inline

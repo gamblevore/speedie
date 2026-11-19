@@ -4,10 +4,6 @@ function PerryIDE.ACTUAL_COMPILE
 	expect !.compilr (beep)  // wah?
 	require .FileList.SaveAll(documentaction.saving, .CurrFileRow)
 
-	// So should I save this here? Or in saveall?
-	// lets try here. Why not... in the TextView itself?
-	// it would need to know whether to save or not...
-
 	|| args = ["--nocolor"]
 	if .projname ~= "Speedie.scproj"
 		args <~ "--perry"
@@ -25,17 +21,14 @@ function PerryIDE.ACTUAL_COMPILE
 		args <~ "--force"
 	args <~ .project
 
+	app.Script = nil
 	.compilr = UnixProcess.spawn(speedie, args, processmode.captureall)
 	if .compilr
 		.GUIIsCompiling(args)
 
 
-//function Perryide.ShowOutput
-//	opt norefcounts
-//	.ShowText(.ProductOut, "", false)
-//	|| itm = .CompileTab(3)
-//		(itm is hidden)
-//	.ProductErrors.text = ""
+function app.Script (assigns:|stringzeroterminated?| where)
+	.Env("OrigScriptPath") = where
 
 
 function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug also. but whatever
@@ -51,6 +44,7 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 		return
 	
 	args.insert(0, f)
+
 	target perryexec and xcode
 		|| cake = (Cake_Main).Spawn(CakeExec, args)
 	  else
@@ -60,16 +54,11 @@ function PerryIDE.ACTUAL_DEBUG (|file| f, |[string]| args) // can run non-debug 
 	.RunCompileSub(cake)	
 
 
-
 function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 	|| DebugArgs = .DebugArgs							#require
 	|| ArgMsg = DebugArgs["args"]
 		ArgMsg = ArgMsg.Copy
 		.Ask(argmsg)
-	
-	// args, env, or what? pico? a separate file?
-	// pico could set an original path... i guess	
-	// args just seem the easiest, but not so fun to remove from the args list.
 
 	|[string]| args	
 	if  ArgMsg.DebugArgNames(args)
@@ -79,10 +68,10 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 		
 		|| old = app.cwd
 		.DebugPath(debugargs)
-		.DebugEnvs(debugargs["env"])		
-		app.Env("OrigScriptPath") = .Project
+		.DebugEnvs(debugargs["env"])
+		app.script = .Project
 		.ACTUAL_DEBUG(f, args)
-		app.Env("OrigScriptPath") = nil
+		app.script = nil
 		app.cwd = old
 	
 	if !StdErr.ok
