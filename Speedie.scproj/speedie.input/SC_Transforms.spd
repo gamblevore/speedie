@@ -462,7 +462,7 @@ function Tran_Result (|SCFunction| f, |message|)
 	require type isnt returnedstruct
 	
 	|| Src  = f.SourceArg
-	require  type  and  src  and  !(Src.Last IsTmp "return")
+	require  type  and  !(Src.Last IsTmp "return")
 
 	|| p = src.FlatLast
 	using p
@@ -1069,7 +1069,7 @@ function scfunction.Transform ()
 	.SavedError = nil
 	|| StillOK = StdErr.Mark
 
-	|| arg = .SourceArg							#require
+	|| arg = .SourceArg
 	|| Space = arg.SCArg( self )				#require
 	
 	if .HasProto and Options.GenFlowLogCode

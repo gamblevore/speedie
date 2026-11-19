@@ -224,7 +224,7 @@ function TryInlineSub (|Message| prms, |SCFunction| fn, |int| AllowedGain, |fatr
 	.InlineParams(prms, info, fn)					// Params need to be done anyhow... so don't count them.
 	
 	|| RealStart = .curr
-	asmtype.ArgumentSub(self, fn.SourceArg!)
+	asmtype.ArgumentSub(self, fn.sourcearg)
 	info.NopParams(fn.args.length, .state.return, self)
 	svregs.Restore(fn.args)
 	

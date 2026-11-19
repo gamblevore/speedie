@@ -589,7 +589,7 @@ function SafeDecrMsg (|Message| msg, |Message|)
 function RC_DeclArg (|scdecl| AR, |scfunction| fn)
 	opt norefcounts
 	|| src = ar.source
-	|| arg = fn.sourcearg!
+	|| arg = fn.sourcearg
 	if !src
 		src = arg
 	using src
@@ -700,7 +700,7 @@ function RC_HandleDisappearingSub (|Message| msg, |int| Basis)
 
 function SCFunction.CallSuperMem (|SCFunction| fn)
 	opt norefcounts
-	|| root = .sourcearg $
+	|| root = .sourcearg
 	|| fnargs = fn.args
 	expect ((fnargs == 1) or .cls.istask) (root, "Unable to auto-call super-class constructor.")
 	
@@ -728,7 +728,7 @@ function SCFunction.CallSuperMem (|SCFunction| fn)
 	
 function SCFunction.FillInDestructor // filldestructor
 	opt norefcounts
-	|| s = .SourceArg$
+	|| s = .SourceArg
 	|| c = .Cls$
 	|| first = s.FindDestructor
 	using s
@@ -743,8 +743,7 @@ function SCFunction.FillInDestructor // filldestructor
 
 function SCFunction.FindCallParents (|message|)
 	opt norefcounts
-	|| s = .SourceArg
-		rz = .CountCallsToParentAlloc( s )
+	return .CountCallsToParentAlloc( .SourceArg )
 
 
 function SCFunction.CallParents 
@@ -791,7 +790,7 @@ function SCFunction.BuildConstructorDestructor
 	// we need to log stuff here... if in perry?
 	|| TheCall = .FindCallParents
 	|| IsConstructor = self is Constructor
-	|| root = .SourceArg$
+	|| root = .SourceArg
 	.CheckConstructorAndDestructor( root, IsConstructor )
 	if IsConstructor
 		thecall ?= root.MakeAfter

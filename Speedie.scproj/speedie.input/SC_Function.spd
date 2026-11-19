@@ -1009,8 +1009,8 @@ function ParamlessConstructor (|SCFunction|)
 
 function TranStrings
 	|| S = .SourceArg
-		if self Isnt cpp
-			SCFunction.Tran_Strings( S.parent!, self )
+	if self Isnt cpp
+		SCFunction.Tran_Strings( S.parent!, self )
 
 
 function message.IsParentConCall (|scfunction|)
@@ -1883,6 +1883,7 @@ function message.NormaliseFunc (|scclass| AddSelf = nil, |message|)
 	rz = prm.next
 	if rz
 		rz.expect(@arg)
+		rz.ExpectLast // oof
 	  else
 		rz = .msg(@arg)
 	

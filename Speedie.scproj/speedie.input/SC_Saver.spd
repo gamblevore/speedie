@@ -119,7 +119,7 @@ module SC_Saver {
 		|| Using = .source!.syntaxusing
 		|| SrcStr = fs.getresult
 		|| Msg = SrcStr.parse
-		|| dest = .sourcearg!
+		|| dest = .sourcearg
 		for (line in Msg)
 			dest <~ line
 	}

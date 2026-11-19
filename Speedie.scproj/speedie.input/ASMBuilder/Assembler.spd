@@ -719,7 +719,7 @@ struct Assembler (AssemblerWipe)
 
 	function Guard (|&fatasm|)
 		opt norefcounts
-		|| ret = .Root_Fn.SourceArg!
+		|| ret = .Root_Fn.sourcearg
 		|| l = ret.last
 			ret = l
 		if ret.position < 0
@@ -750,7 +750,7 @@ target debug
 
 function assembler.RootGen (|scfunction| fn)
 	opt norefcounts
-	asmtype.ArgumentSub(self, fn.SourceArg!, nil)
+	asmtype.ArgumentSub(self, fn.sourcearg, nil)
 
 
 function Assembler.Rework (|SCFunction| fn)

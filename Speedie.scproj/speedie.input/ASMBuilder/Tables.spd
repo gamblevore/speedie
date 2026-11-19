@@ -639,6 +639,8 @@ function AddressOf (fn_asm)
 
 
 function BoolNot (fn_asm)							// !a
+// this is so confusing.
+// maybe we should just compare against zero?
 	|| DN = dest.negate
 	|| src = .µGetASM(exp, DN)
 

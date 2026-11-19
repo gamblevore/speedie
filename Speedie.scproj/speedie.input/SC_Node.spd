@@ -738,16 +738,12 @@ function SourceArg (|Message|)
 
 function SCFunction.SourceArg (|message|)
 	opt norefcounts
-	|| arg = .Source.last
-	if arg == @arg
-		return arg
-
-//function SCFunction.SourceArg (assigns:|message|)
-//	opt norefcounts
-//	|| arg = .Source.last
-//	if arg != value
-//		if arg == @arg
-//			arg.ReplaceWith(value)
+	|| s = .source
+	if !s // should never happen
+		s = @tmp + errorreceiver.internalerror
+		.Source = s
+		error (self)
+	return s.GiveArg // should always have an arg
 
 
 function SCFunction.ParamUniquer (|string| s, |string|)

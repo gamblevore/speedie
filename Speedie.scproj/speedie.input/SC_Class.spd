@@ -703,7 +703,7 @@ function FindNilChecker
 		  elseif ret.IsNormalBool
 			|| OK = (f isnt disabled)
 				f.args.first!.nildeclared = nilstate.Optional
-			|| Mode = f.sourcearg!.nilcheckmode(ok)
+			|| Mode = f.sourcearg.nilcheckmode(ok)
 			f.IsNilChecker = Mode
 			is HasNilChecker
 			.TheBoolFunc = f

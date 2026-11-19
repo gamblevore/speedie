@@ -246,12 +246,12 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
 	range.Start = .curr
-	|| mode = asmreg.CondRequest
-	if neg
-		rz = ASMType.boolnot(self, cond, mode)
-	  else
-		rz = .µ(cond, mode)
-		(mode is negate) // for isnt condanswer below
+	|| mode = asmreg.CondRequest.negate(neg)
+	if "BraTest".trap
+//	if neg
+//		rz = ASMType.boolnot(self, cond, mode)
+//	  else
+	rz = .µ(cond, mode)
 	
 	if rz isnt CondAnswer
 		rz = .Exists(cond, mode, rz)

@@ -79,11 +79,13 @@ class SCBehaviour (SCNode)
 	
 	
 	function SCClass.CreateBehaviour
+		opt norefcounts
 		require .isobject and !.isrole
+
+		|| B = .behaviour init SCBehaviour.new(self)
+		|| errs = .SourceArg #expect
+		B.CreateFuncTable( errs )
 		
-		.Behaviour ?= SCBehaviour.new(self)
-		.Behaviour!.CreateFuncTable( .sourcearg! )
-	
 	
 	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)
 		opt norefcounts

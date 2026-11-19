@@ -147,7 +147,7 @@ function CppFunc (|FastStringCpp| fs, |SCFunction| F) // function func (
 	|| FuncHeader = .FuncHeader(f)$
 	.FuncStart(fs, f, FuncHeader)
 	
-	f.Sourcearg!.Export( fs )
+	f.sourcearg.Export( fs )
 	.OptEnd(fs, f.minopt)
 	fs <~ "\n\n"
 

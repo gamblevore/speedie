@@ -376,7 +376,7 @@ function SCFunction.CanPrepareInline (|bool|)
 	require self isnt AnyNoInline
 	
 	|| Allowed = 14 + (self is OptInline)<<4
-	|| Count = .SourceArg!.InlineCount(Allowed)
+	|| Count = .sourcearg.InlineCount(Allowed)
 	if Count <= Allowed
 		return true
 
