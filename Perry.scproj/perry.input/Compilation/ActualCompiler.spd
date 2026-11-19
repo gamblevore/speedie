@@ -82,6 +82,7 @@ function PerryIDE.RUN_COMPILE_WRAP (|file| product)
 		.DebugEnvs(debugargs["env"])		
 		app.Env("OrigScriptPath") = .Project
 		.ACTUAL_DEBUG(f, args)
+		app.Env("OrigScriptPath") = nil
 		app.cwd = old
 	
 	if !StdErr.ok
