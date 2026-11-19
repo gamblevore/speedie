@@ -21886,6 +21886,12 @@ void SC_FatRange_JumpTo(FatRange* Self, FatASM* Curr, int Allowed) {
 	};
 }
 
+int SC_FatRange_Length(FatRange* Self) {
+	FatASM* C = Self->Start;
+	FatASM* A = Self->After;
+	return A - C;
+}
+
 
 
 bool SC_HairyMan_AddOrShrink(HairyMan* Self, FastString* J, SCFunction* F) {
@@ -23124,7 +23130,7 @@ ASMReg SC_Pac_BoolMul(Assembler* Self, ASMReg Dest, ASMReg Bule, ASMReg V, Messa
 
 ASMReg SC_Pac_Branch(Assembler* Self, Message* Cond, FatRange* Range, bool Neg) {
 	ASMReg Rz = ((ASMReg)0);
-	Range->Start = SC_Pac_Curr(Self);
+	FatASM* BranchStart = SC_Pac_Curr(Self);
 	ASMReg Mode = SC_Reg_Negate(kSC__Reg_CondRequest, Neg);
 	Rz = SC_Pac_xC2xB5(Self, Cond, Mode);
 	if (!SC_Reg_SyntaxIs(Rz, kSC__Reg_CondAnswer)) {
@@ -23136,6 +23142,10 @@ ASMReg SC_Pac_Branch(Assembler* Self, Message* Cond, FatRange* Range, bool Neg) 
 		SC_Pac_NopBranch(Self, Range->Start);
 	}
 	Range->After = SC_Pac_Curr(Self);
+	while (SC_FAT_OperatorIsa(BranchStart, kSC__ASM_NOOP)) {
+		(++BranchStart);
+	};
+	Range->Start = BranchStart;
 	return Rz;
 }
 
@@ -23154,7 +23164,7 @@ ASMReg SC_Pac_BranchAnd(Assembler* Self, Message* A, Message* B, ASMReg Dest) {
 		if (SC_FatRange_Never((&AndTest))) {
 			return Second;
 		}
-		SC_Pac_PhiMergeNormal(Self, ((Message*)JB_List_Parent(A)), (&Phi), nil);
+		SC_Pac_PhiEndNormal(Self, ((Message*)JB_List_Parent(A)), (&Phi), nil);
 		return First;
 	}
 	return Second;
@@ -23187,7 +23197,7 @@ ASMReg SC_Pac_BranchOr(Assembler* Self, Message* A, Message* B, ASMReg Dest) {
 	if (JB_MaybeBool_KnownFalse(KF)) {
 		return Second;
 	}
-	SC_Pac_PhiMergeNormal(Self, ((Message*)JB_List_Parent(A)), (&Phi), nil);
+	SC_Pac_PhiEndNormal(Self, ((Message*)JB_List_Parent(A)), (&Phi), nil);
 	return First;
 }
 
@@ -24469,7 +24479,7 @@ ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest) {
 		}
 		Self->ExpectOneMore = true;
 		SC_FatRange_JumpTo((&B), SC_Pac_Curr(Self), kSC__FatRange_kEmptyRemove);
-		SC_Pac_PhiMergeDeeper(Self, Exp, (&Phi), nil);
+		SC_Pac_PhiEnd(Self, Exp, (&Phi), nil);
 		return SC_Reg__NewWith0();
 	}
 	SC_Pac_PhiMiddle(Self, (&Phi));
@@ -24479,7 +24489,7 @@ ASMReg SC_Pac_IfSub(Assembler* Self, Message* Exp, ASMReg Dest) {
 	if (AfterFirst) {
 		SC_FAT_JumpToSet(AfterFirst, SC_Pac_Curr(Self), Self);
 	}
-	SC_Pac_PhiMergeDeeper(Self, Exp, (&Phi), nil);
+	SC_Pac_PhiEnd(Self, Exp, (&Phi), nil);
 	return Rz;
 }
 
@@ -25613,6 +25623,14 @@ ASMReg SC_Pac_PerhapsPhi(Assembler* Self, Message* Exp, ASMReg New, ASMReg Old) 
 	return New;
 }
 
+ASMReg SC_Pac_PhiEnd(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest) {
+	return SC_Pac_PhiMerge(Self, Exp, T, Dest, 1);
+}
+
+ASMReg SC_Pac_PhiEndNormal(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest) {
+	return SC_Pac_PhiMerge(Self, Exp, T, Dest, 0);
+}
+
 void SC_Pac_PhiFix(Assembler* Self, FatASM* Start) {
 	FatASM* Phi = SC_Pac_Curr(Self);
 	while ((--Phi) >= Start) {
@@ -25661,14 +25679,6 @@ ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMRe
 	}
 	;
 	return Dest;
-}
-
-ASMReg SC_Pac_PhiMergeDeeper(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest) {
-	return SC_Pac_PhiMerge(Self, Exp, T, Dest, 1);
-}
-
-ASMReg SC_Pac_PhiMergeNormal(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest) {
-	return SC_Pac_PhiMerge(Self, Exp, T, Dest, 0);
 }
 
 void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both, uint Liftup) {
@@ -25965,7 +25975,7 @@ ASMReg SC_Pac_RealTernary(Assembler* Self, Message* Exp, ASMReg Dest, Message* A
 	FatASM* FatPhi = SC_Msg_PHI(Exp, Dest, mA, mB);
 	FatPhi->Prms[3] = 1;
 	Dest = SC_FAT_AsReg(FatPhi, Dest);
-	return SC_Pac_PhiMergeDeeper(Self, Exp, (&Phi), Dest);
+	return SC_Pac_PhiEnd(Self, Exp, (&Phi), Dest);
 }
 
 ASMReg SC_Pac_ReDest(Assembler* Self, FatASM* F, ASMReg Dest) {
@@ -26913,11 +26923,14 @@ ASMReg SC_Pac_While(Assembler* Self, Message* Exp, ASMReg Dest) {
 
 ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
 	FatASM* InitialJump = SC_Msg_JUMP(Exp, nil);
-	BranchPHITracker Phi = ((BranchPHITracker){});
-	SC_Pac_PhiStart(Self, (&Phi));
+	BranchPHITracker BranchPhis = ((BranchPHITracker){});
+	SC_Pac_PhiStart(Self, (&BranchPhis));
+	BranchPHITracker PhI2 = ((BranchPHITracker){});
+	memcpy((&PhI2), (&BranchPhis), (148));
 	ASMReg Returns = SC_ASMType__ArgumentSub(Self, ((Message*)JB_Tree_Second(Exp)), kSC__Reg_Exit);
 	FatRange Loop_test = ((FatRange){});
 	Self->BreakRequest = (Self->BreakRequest | (kSC__Pac_Breakable | InitialJump->BreakInfo));
+	SC_Pac_PhiEnd(Self, Exp, (&BranchPhis), nil);
 	SC_Pac_Branch(Self, ((Message*)JB_List_First(Exp)), (&Loop_test), true);
 	if (Self->EntireInlineFailed) {
 		return 0;
@@ -26930,29 +26943,30 @@ ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
 			}
 		}
 		SC_Pac_Nop(Self, InitialJump);
-		return SC_Reg__NewWith0();
-	}
-	SC_Pac_PhiMiddle(Self, (&Phi));
-	if (JB_MaybeBool_KnownTrue(Known)) {
-		SC_Pac_Nop(Self, InitialJump);
-		SC_FAT_JumpToSet(SC_Msg_JUMP(Exp, nil), InitialJump + 1, Self);
-		(++Loop_test.After);
+		Returns = SC_Reg__NewWith0();
 	}
 	 else {
-		SC_FAT_JumpToSet(InitialJump, Loop_test.Start, Self);
-		SC_FatRange_JumpTo((&Loop_test), InitialJump + 1, 0);
-		if (SC_FatRange_Length((&Loop_test)) == 1) {
-			SC_FAT_CopyJump(InitialJump, Loop_test.Start);
-			SC_FAT_JumpToSet(InitialJump, Loop_test.After, Self);
-			SC_FAT_JumpNegateWith0(InitialJump);
+		if (JB_MaybeBool_KnownTrue(Known)) {
+			SC_Pac_Nop(Self, InitialJump);
+			SC_FAT_JumpToSet(SC_Msg_JUMP(Exp, nil), InitialJump + 1, Self);
+			(++Loop_test.After);
 		}
-		Returns = nil;
+		 else {
+			SC_FAT_JumpToSet(InitialJump, Loop_test.Start, Self);
+			SC_FatRange_JumpTo((&Loop_test), InitialJump + 1, 0);
+			if (SC_FatRange_Length((&Loop_test)) == 1) {
+				SC_FAT_CopyJump(InitialJump, Loop_test.Start);
+				SC_FAT_JumpToSet(InitialJump, Loop_test.After, Self);
+				SC_FAT_JumpNegateWith0(InitialJump);
+			}
+			Returns = nil;
+		}
+		SC_Pac_LoopFill(Self, InitialJump + 1, Loop_test.Start, Loop_test.After);
+		if (SC_Msg_SCArg(((Message*)JB_Tree_Second(Exp)), nil, nil)->HasEscape) {
+			Self->ExpectOneMore = true;
+		}
 	}
-	SC_Pac_LoopFill(Self, InitialJump + 1, Loop_test.Start, Loop_test.After);
-	SC_Pac_PhiMergeDeeper(Self, Exp, (&Phi), nil);
-	if (SC_Msg_SCArg(((Message*)JB_Tree_Second(Exp)), nil, nil)->HasEscape) {
-		Self->ExpectOneMore = true;
-	}
+	SC_Pac_PhiEnd(Self, Exp, (&PhI2), nil);
 	return Returns;
 }
 
@@ -61774,4 +61788,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -7826312289938213269 4074544292908304061
+// 7745629059735706836 4074544292908304061

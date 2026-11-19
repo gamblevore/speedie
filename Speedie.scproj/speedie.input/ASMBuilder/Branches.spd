@@ -272,7 +272,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 
 
 function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmreg|)
-	|| s = .curr
+	|| BranchStart = .curr
 	|| mode = asmreg.CondRequest.negate(neg)
 	target debug: if "BraTest".trap
 //	if neg
@@ -291,9 +291,9 @@ function Branch (|message| Cond,  |fatrange| Range,  |bool| Neg = false,  |asmre
 	range.after = .curr
 
 	// allow easier checking of the jump instruction, especially if its 1 long, in: function WhileSub
-	while s isa asm.noop
-		s++
-	range.start = s
+	while BranchStart isa asm.noop
+		BranchStart++
+	range.start = BranchStart
 
 
 
@@ -641,10 +641,10 @@ Struct FatRange
 	function Length (|int|)
 		|| c = .start
 		|| a = .After
-//		return a - c
-		while a > c
-			rz += c.GuessSize
-			c++
+		return a - c // already fixed by BranchStart++
+//		while a > c
+//			rz += c.GuessSize
+//			c++
 	
 	function Always (|bool|)
 		opt inline

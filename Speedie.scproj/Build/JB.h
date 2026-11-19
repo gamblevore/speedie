@@ -6055,6 +6055,8 @@ bool SC_FAT__VerifyNumbers();
 // JB_FatRange
 void SC_FatRange_JumpTo(FatRange* Self, FatASM* Curr, int Allowed);
 
+int SC_FatRange_Length(FatRange* Self);
+
 
 
 // JB_FloatRange
@@ -6661,13 +6663,13 @@ void SC_Pac_ParentSanity(Assembler* Self);
 
 ASMReg SC_Pac_PerhapsPhi(Assembler* Self, Message* Exp, ASMReg New, ASMReg Old);
 
+ASMReg SC_Pac_PhiEnd(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+
+ASMReg SC_Pac_PhiEndNormal(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
+
 void SC_Pac_PhiFix(Assembler* Self, FatASM* Start);
 
 ASMReg SC_Pac_PhiMerge(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest, int Liftup);
-
-ASMReg SC_Pac_PhiMergeDeeper(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
-
-ASMReg SC_Pac_PhiMergeNormal(Assembler* Self, Message* Exp, BranchPHITracker* T, ASMReg Dest);
 
 void SC_Pac_PhiMergeSub(Assembler* Self, Message* Exp, RegFile* A, RegFile* B, uint Both, uint Liftup);
 
@@ -11218,8 +11220,6 @@ inline bool JB_int_OperatorInRange(int Self, int Length);
 
 inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value);
 
-inline int SC_FatRange_Length(FatRange* Self);
-
 inline uint SC_Msg_SrcLoc(Message* Self);
 
 inline bool SC_PA_SyntaxCast(SCParamArray* Self);
@@ -11357,10 +11357,6 @@ inline bool JB_int_OperatorInRange(int Self, int Length) {
 
 inline void SC_FAT_opSet(FatASM* Self, uint /*byte*/ Value) {
 	Self->_Op = Value;
-}
-
-inline int SC_FatRange_Length(FatRange* Self) {
-	return Self->After - Self->Start;
 }
 
 inline uint SC_Msg_SrcLoc(Message* Self) {
