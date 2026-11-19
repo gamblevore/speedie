@@ -42,7 +42,7 @@ function IfSub (fn_asm) // function If (fn_asm)
 			return Clamped
 		.ExpectOneMore = true
 		b.JumpTo(.curr, fatrange.kEmptyRemove)
-		.PhiMergeDeeper(exp, Phi)
+		.PhiEnd(exp, Phi)
 		return asmreg()
 	
 	.PhiMiddle(Phi)
@@ -51,7 +51,7 @@ function IfSub (fn_asm) // function If (fn_asm)
 	rz = .ElseSub(other) & Arg1Return						// if x {return} else {return}
 	if afterfirst
 		AfterFirst.JumpTo(.curr, self)
-	.PhiMergeDeeper(exp, Phi)
+	.PhiEnd(exp, Phi)
 
 
 
@@ -104,12 +104,28 @@ function While (fn_asm)
 function WhileSub (|message| exp,   |asmreg|)
 	opt norefcounts
 
-	
 	|| InitialJump = exp.JUMP										// test goes after loop
 	|| phi = .PhiStart
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test
 	.BreakRequest |= assembler.breakable ||| InitialJump.BreakInfo	
+	
+	// this can't be in the same branch as the argument. or else we get const issues
+	// so theres another way to do it.
+	// we run the test twice. this way, at each point, we know for sure what has happened.
+	// the second one can only have happened after the argument.
+	// depends on how big the branch is.
+	// so we'd need to test it.
+	// and then, otherwise, we simply do the test at the start
+	// then jump back, at the end.
+	// i feel like jumping back, we actually don't take into account vars that are used. (in the arg)
+	// I think the best way, is to fix the merging
+
+	// so what needs merging, even?
+	
+	// well... we need to merge here... So that merges with the middle and the outside.
+	// but thats wierd? i guess? IDK?
+	
 	
 	.Branch(exp.first!, loop_test, true)
 	require !.EntireInlineFailed
@@ -119,9 +135,9 @@ function WhileSub (|message| exp,   |asmreg|)
 		if (loop_test.length)
 			error (exp.first!, "Bad loop. Always false but actually does stuff.")
 		.nop(InitialJump)
+		.PhiEnd(exp, phi)
 		return ASMReg()
 
-	.PhiMiddle(phi)
 	if Known.knowntrue
 		.Nop(InitialJump)	
 		exp.JUMP.JumpTo(initialjump+1, self)
@@ -136,7 +152,8 @@ function WhileSub (|message| exp,   |asmreg|)
 		returns = nil
 
 	.LoopFill(InitialJump+1 /*loop_start*/,  loop_test.start /*continue*/,  loop_test.After /*exit*/)
-	.PhiMergeDeeper(exp, phi)
+	.PhiEnd(exp, phi)
+	
 	if exp.second.scarg(nil)!.HasEscape
 		.ExpectOneMore = true
 	return returns
@@ -222,7 +239,7 @@ function RealTernary (|message| exp, |asmreg| dest, |message| A, |message| B, |f
 	|| FatPhi = exp.phi(dest, ma, mb)
 	FatPhi.prms[3] = 1 // liftup in phifix
 	dest = FatPhi * dest
-	return .PhiMergeDeeper(exp, Phi, dest)
+	return .PhiEnd(exp, Phi, dest)
 
 
 function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, |asmreg|)

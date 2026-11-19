@@ -56,9 +56,6 @@ function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest,
 	|| XM = T.Middle.ActualPhi(T.StartIndex)
 	|| XC = .regs.ActualPhi(T.MiddleIndex)
 	
-//	if (XS&~A)
-//	if (XM&~A)
-//	if (XC&~A)
 	XS &= A // kinda makes sense?
 	XM &= A // not sure
 	XC &= A // i might be too strict or too loose. Or just messing this up!
@@ -91,7 +88,7 @@ function assembler.PhiMerge (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest,
 	return dest
 
 
-function assembler.PhiMergeDeeper (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
+function assembler.PhiEnd (|message| Exp, |BranchPhiTracker| T, |asmreg| Dest=nil, |asmreg|)
 	return .PhiMerge(exp, t, dest, 1)
 
 
