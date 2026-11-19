@@ -280,8 +280,7 @@ helper ASMBoolMaker (|message| exp,  |ASMReg| Dest,  |opmode| Opp,  |ASMReg|)
 
 	if OPP is OR
 		return .BranchOr(A, B, dest)
-	  else
-		return .BranchAnd(A, B, dest)
+	return .BranchAnd(A, B, dest)
 
 
 function asmreg.NegateTest (|asmreg| dest)
