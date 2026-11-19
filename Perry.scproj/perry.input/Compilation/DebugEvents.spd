@@ -537,7 +537,7 @@ function perryide.UpdateASM (|bool|)
 	|| fn = .DetectASMSelectedFunc
 	if fn != .CurrASMFunc
 		.CurrASMFunc = fn
-		return fn and .MaybeSendMessage("asm", fn)
+		return fn and .MaybeSendMessage("ASM", fn)
 	
 
 function ListView.AddFail (|string| s)

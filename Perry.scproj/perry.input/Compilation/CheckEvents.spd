@@ -12,7 +12,7 @@ extend PerryIDE
 			.ModifiedForCompile = false
 			if .ProjectIsCode and !.UsingSpdLib
 				.Feedback = nil
-				.ASMHelper = nil
+				.ASMProcess = nil
 
 		|| unused = @tmp + "check"
 		unused <~ p * .EditorIsCode
@@ -168,7 +168,7 @@ extend PerryIDE
 
 		.DebugMode &= ~CompileMode.Compiling
 
-		|| Bad = .CheckCrashed(c,  "compiler")
+		|| Bad = .CheckCrashed(c)
 		|| Errors = c.readstderr
 		.compilr = nil
 		if Errors

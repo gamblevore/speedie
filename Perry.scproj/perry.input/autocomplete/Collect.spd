@@ -64,9 +64,9 @@ function PerryIDE.SendFeedback (|message| msg, |spdprocess|)
 	opt norefcounts
 	require .IsFront // save memory on startup :]
 	
-	if msg ~= "asm"
-		|| fb = .FeedbackInit(.ASMHelper)
-			.ASMHelper = fb
+	if msg ~= "ASM"
+		|| fb = .FeedbackInit(.ASMProcess, true)
+			.ASMProcess = fb
 			return fb
 	
 	  else
@@ -86,7 +86,7 @@ function PerryIDE.SendFeedbackMsg (|message| msg, |date|)
 	return d
 
 
-function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler, initfeedback
+function PerryIDE.FeedbackInit (|SpdProcess| C, |bool| CanDebug=false,  |SpdProcess|)   // InitCompiler, initfeedback
 	if c
 		if !c.libraryprocess and C.TimedOut(5s)
 			c.kill(32)		// epipe
@@ -104,7 +104,7 @@ function PerryIDE.FeedbackInit (|SpdProcess| C, |SpdProcess|)   // InitCompiler,
 	
 	SpdLibAlreadyInUse = SpdLibAlreadyInUse
 	target debug and !perryexec and xcode
-		if !SpdLibAlreadyInUse
+		if CanDebug and !SpdLibAlreadyInUse
 			SpdLibAlreadyInUse = true
 			if !.UsingSpdLib
 				.UsingSpdLib = true

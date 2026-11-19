@@ -1,0 +1,244 @@
+
+extend PerryIDE
+	function CheckModified
+		opt norefcounts
+		|| doc = .editme.Document
+			doc.CheckModified
+
+	function EditPath2 (|string| s, |bool|)
+		opt norefcounts		// using the other seems to cause issues
+		if s
+			return .editfile(.FileList[s] ?? .FileList.AddExtra(s))
+
+
+	function EditPath (|string| path, |bool| ChangeFocus=true, |bool|)
+		require path.FileExists
+		if ChangeFocus
+			.Editme.SetFocus
+		return .GotoIncludedFile(path) or .FileList.AddExtra(path)
+	
+		
+	function OpenDoc (|string| Path, |object|)
+		require self
+		|| p = path
+		|| f = p.file
+		if f.isdir
+			p = p.pathdir
+		|| ide = self
+		if .GotoIncludedFile(p)
+			//
+		  elseif f.NeedsOwnWindow
+			ide = perry.IdeAddProj(p)					// add as project
+		  else
+			.filelist.addextra(p)						// add root
+		StartupWindow.hide
+		ide.ShowIDE
+		return ide
+
+		
+	function LoadErrors (|bool| jump, |bool| actual_compile)
+		opt norefcounts
+		|| txt = .EditMe
+		|| doc = txt.document
+		|| path = (doc!=nil)(doc.FilePath, "")
+		|| lst = .errorlist
+		.filelist.ClearErrors
+		
+		|error| JumpTo
+		|| src = lst.ListSource
+		
+		|| Parse_err = txt.MyError
+		if Parse_err is parse
+			src <~ parse_err
+
+		|| ActualErrors = 0
+		|| sel = txt.Selectedline
+		if src.HasAny and src mustbe error
+			for err in src
+				if err.severity >= ErrorSeverity.Error
+					ActualErrors++
+				if err.path ~= path
+					if txt.AddErrorToLine(err) == sel
+						txt.TryShowLineError(sel)
+					if jump and (!jumpto or err == lst.FirstSelected)
+						jumpto = err
+				if actual_compile
+					.CommsLogList <~ err.copy
+				.filelist.ErrorAt(err)
+				
+		if jumpto
+			txt.showandselect(jumpto.position)
+		  elseif jump and actual_compile
+			if .DuringMsgFB
+				.DuringMsgFB = false
+				lst.select(src.first)
+		(self is broken) = ActualErrors > 0
+		.RelistStartupErrors
+		.CommsLogList.listsource.trim(144)
+
+
+	function EditRow (|listviewrow| r, |int|)
+		description `
+-1 means "its OK, its already loaded"
+1 means "its OK, we managed to load it"
+So anything not 0 means "its OK"`
+
+		if r isa FileRow
+			rz = .EditFile(r)
+
+	function LoadCurrFileName
+		|string--| p = .path
+		|| s = p.name
+		if s[] == '.'
+			s = p.parent.name + "/" + s
+		.CurrFileName.text = s
+	
+	
+	function EditFile (|FileRow| r, |int|) // loadfile, fileload, fileedit, openfile, fileopen
+		require r and r.FilePath|string|.length and !.DuringLoad
+		// the drawing thing needs a document too!
+		// why not the same?
+		// we could make editfield have an internal draw editor...
+		// but at that point we might as well make a general viewer...
+		// why not a 3D SDF viewer and audioplayer too.
+		// or a fileviewer or a gamepreview player
+		// better to have a generalised "fileviewer"
+		|| g = (r isa "voi" or "png" or "qoi")
+		|| IsNewlyOpened = !r._Document
+		if .IsGraphics != g
+			.IsGraphics = g
+			.DuringLoad++
+			.ViewAsCurr
+			.DuringLoad--
+		
+		.AddToJumpHistory
+		|| OK = (g)(.EditDraw(r), .EditText(r))
+		if ok != 1
+			.RecentFiles.pop
+			return ok
+
+		.LoadCurrFileName
+		.DuringLoad++
+		.filelist.select(r)
+		
+		if !G
+			.LoadErrors(IsNewlyOpened, false)
+			if .editme.JeeboxMode isnt expect
+				.ProductSep.Collapsed = true
+		
+		.PopupHide
+		if  !g  and  .IsEditingSource
+			.Recheck(self)
+			.TryReselectASM
+		  else
+			.HideASM
+		.DuringLoad--
+		
+		return 1
+			
+
+	function EditDraw (|FileRow| r, |int|)
+		require .drawme.LoadFile(r.FilePath, r)
+		.HideASM
+		return 1
+		
+	
+	function EditText (|FileRow| r, |int|) // edittextfile, loadfile, fileload, fileedit, openfile, fileopen
+		|textview--| E = .editme
+		|document--| doc = r.document
+		if e.Document == doc
+			return -1
+				
+		if doc.FilePath.PathIsCode
+			doc.JeeboxMode |= documentjeeboxmode.Expect
+		
+		|| Loaded = E.LoadDocument(doc, true)					#require
+
+		|| dm = .DebugMode
+		if (dm is debug) and !.ReloadBreaks // apparantly its not debug after all? how did that happen
+			(dm isnt debug)
+			.DebugMode = dm
+
+		|| m = .FunctionMenu.SubControl as menu
+			m.StopFilter
+		doc.CompareTreesOnSave = doc.JeeboxMode is Jeebox
+		.ListAllFuncs
+		.CheckScrollErrors(0, gui.framestart + 0.25s)		
+		|| it = .ProjectTab
+			if !.DuringLoad
+				it["edit"] = r.FilePath
+			it["pos"] = doc.Position
+			perry.save
+
+		return 1
+
+
+	function LoadStartupErrors
+		while (|| err = stderr.pop)
+			notifications <~ err
+			if err.IsBad
+				.StartupErrors <~ error(err)
+
+
+	function SaveDrawing
+		.DrawMe.Save
+
+
+	function SaveEditing (|DocumentAction| Purpose) // savetext, savefile, filesave
+		opt norefcounts
+		if .DrawMe is visible
+			return .SaveDrawing
+
+		.ParseErrorDetect
+				
+		|| e = .editme
+		if purpose is errorchecking
+			require e.IsModified
+		// otherwise resave anyhow.
+		|| Curr = .CurrFileRow
+
+		if (!keys.shift and .ProjectIsCode)
+			.filelist.saveall(Purpose, curr)
+		  elseif e.IsModified
+			require e.Save
+		  else
+			return
+		
+		.UpdateActiveFile
+		if curr
+			curr.lastsize = e.Length
+			if curr.FilePath.pathiscode
+				.HandleAltered
+		(self is modified) = e.ismodified
+
+
+	function UpdateActiveFile
+		|| d = .editme.Document
+			|| l = d.FilePath.Resolve(true)
+			if l ~= app.prefs.path
+				.UpdatePrefs
+			  else
+				|| p = .PerryFile
+				if l ~= p
+					.UpdatePerry(p)
+	
+	
+	function UpdatePerry (|file| ProjConf)
+		.startuperrors.clear
+		error.BackupErrorSource = @tmp+projconf
+		if projconf.exists
+			|| conf = projconf.parse
+				|| root = .root
+				root.RemoveAfter
+				.LoadConfSub(conf)
+		.LoadStartupErrors
+		error.BackupErrorSource = nil
+	
+
+	function HandleAltered
+		// well it depends on if we modified shared files?
+		for i in perry.OpenProj
+			i.ModifiedForCompile = true
+		.recheck
+
+	

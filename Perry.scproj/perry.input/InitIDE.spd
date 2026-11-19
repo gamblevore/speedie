@@ -214,7 +214,7 @@ extend PerryIDE
 		with .autocomplete
 			.OnRightClick	= PerrySuperAutoComplete
 			.onselected		= PerryAutocompleteSelected
-			.ID				= "AutoComplete"
+			.ID				= "Autocomplete"
 			.takesfocus		= takesfocusflag.CanFocus
 			|| dark			= self.filelist.GNormal.bg.color
 			.GNormal.bg		= 0.05.mix(  dark, vec4(0.5, 1.0, 0.0, 1.0)).px	// mostly dark
@@ -587,7 +587,7 @@ extend PerryIDE
 
 		with .ASMButton
 			.gnormal = self.RecentAndSplash.gnormal
-			.id = "asm"
+			.id = "ASM"
 			.tooltip = "ASM-Viewer (Inbuilt GodBolt)"
 			.size = 6~left back 23  by  the~same
 			.text = "\1d"
@@ -687,7 +687,7 @@ extend PerryIDE
 		if c
 			if c == .Feedback
 				where = .logcomms
-			  elseif c == .ASMHelper
+			  elseif c == .ASMProcess
 				where = .LogASM
 			  elseif c == .Compilr
 				/0 // wierd?
