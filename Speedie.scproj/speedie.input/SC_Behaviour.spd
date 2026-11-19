@@ -83,8 +83,7 @@ class SCBehaviour (SCNode)
 		require .isobject and !.isrole
 
 		|| B = .behaviour init SCBehaviour.new(self)
-		|| errs = .SourceArg #expect
-		B.CreateFuncTable( errs )
+		B.CreateFuncTable( .SourceArg )
 		
 	
 	function SCClass.BestBehaviourFor (|string| name, |SCFunction|)

@@ -733,7 +733,10 @@ function SourceArg (|Message|)
 	|| p = .Source
 		if p == @Arg
 			Return p
-		return p.find( @Arg )
+		p = p.find( @Arg )
+	if !p
+		app.crash
+	return p
 
 
 function SCFunction.SourceArg (|message|)

@@ -81,8 +81,6 @@ function GlobalsFix
 		decl.PrefixedName(fs, self)
 	for decl in .consts
 		decl.PrefixedName(fs, self)
-			
-
 
 
 function NewModuleFunc (|Message| src, |SCFunction|)
@@ -164,9 +162,6 @@ module
 		|| M = .modul
 		m.Project = SCImport.curr
 		
-//		|| x = array.byte
-//		if p != compiler.program
-//			"route: ${self.name} --> ${p.name} --> ${p.parent.name}"
 		m.parent = p
 		m.Cls = self
 		m.name = .Name
@@ -184,6 +179,8 @@ module
 		m.parent = name_space.ProjectFix
 		if node
 			m.LoadModule( node )
+		  else
+			m.Source = @arg.msg
 		Return m
 
 
@@ -191,6 +188,7 @@ module
 		// for storing arbitrary stuff in.
 		rz = SCModule.new
 		rz.name = s
+		rz.source = @arg.msg
 		Compiler.program.TryAdd( nil, rz, s )
 
 }
