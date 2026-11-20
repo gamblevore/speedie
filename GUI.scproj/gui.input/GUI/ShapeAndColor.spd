@@ -271,7 +271,7 @@ module VShapes
 		return Colors.Rainbow(hit.x+r, 1, 0.5)
 	
 
-prototype ColorFunction (|vobject| self, |raytracer| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
+prototype ColorFunction (|vobject| self, |raytracer| Ray, |vec3| P, |rayinfo| Hit=vec4(), |vec4|)
 prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
 	description "
 x: dist

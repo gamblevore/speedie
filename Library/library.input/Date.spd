@@ -16,7 +16,7 @@ Unix time does not have leap-seconds, so one day is always 86400 seconds."
 		Highest	=  0x7FFFffffFFFFffff_
 		
 	function Seconds (|float|)
-		disabled "Use .float64 for fractional seconds, or .WholeSeconds for integer seconds"
+		disabled "Use .float for fractional seconds, or .WholeSeconds for integer seconds"
 	
 	function Float (|Float64|)
 		return self|Float64| / (64.0*1024.0)|float64|

@@ -523,7 +523,7 @@ datatype float
 
 	function Unsin (|float|)
 		trin (12, NIS)
-		return math.unsinebad(self) * math.iTau
+		return math.unsinbad(self) * math.iTau
 
 	function Uncos (|float|)
 		trin (13, SOC)

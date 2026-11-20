@@ -29,7 +29,7 @@ module GUI
 
 	|date|						BlurBackgroundStart
 	|float|						Scale
-	|bool|						MouseMoveInited
+	|bool|						_MouseMoveInited
 	|bool|						StartedProperly
 	|bool|						BlockTextInput
 	|date|						ForeGroundTime
@@ -1253,10 +1253,10 @@ module GUI
 		|ivec2| move
 		if ev
 			move = (ev.xrel, ev.yrel)
-			.MouseMoveInited = true
+			._MouseMoveInited = true
 		if !move
 			move = xy - OldXY		#require
-			if !.MouseMoveInited
+			if !._MouseMoveInited
 				return GUIActivity.Activity				// or else we never get there
 
 		|| MB = .MouseButtons

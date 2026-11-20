@@ -290,6 +290,16 @@ class String
 		if !b or (self==nil)
 			self = ""
 		return self
+
+	operator mul2 (|bool| b, |string|)
+		cpp_part MulBool2
+		visible
+		opt norefcounts // could merge this with below. uwu
+		inlined
+		nil self
+		if b or (self==nil)
+			self = ""
+		return self
 	
 	operator Mul (|int| n, |string|)
 		if n <= 1

@@ -614,8 +614,8 @@ datatype vec2
 
 	function OperatorCMul (|vec2| v, |vec2|)
 		description "Complex number multiply" 
-	    rz.x = (.x * v.x) - (.y * v.y)
-	    rz.y = (.y * v.x) + (.x * v.y)
+		rz.x = (.x * v.x) - (.y * v.y)
+		rz.y = (.y * v.x) + (.x * v.y)
 	
 	function Normal (|vec2|)
 		return self / .Length
