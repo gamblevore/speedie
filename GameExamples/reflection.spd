@@ -213,7 +213,7 @@ class Breakout (Window)
 	
 	function BallDraw (|image| where, |[vobject]| List)
 		for b in list
-			|| bx = b.Box2d.screenfloat ± -4.0
+			|| bx = b.Box2d.vobjectscreen ± -4.0
 			|| sh = bx.Width*4th
 			where.DrawSoftCircle(bx, b.Color, 2.0)
 			|| v = b.Velocity.Normal.xyxy

@@ -1,6 +1,21 @@
 
 
 datatype RayInfo (vec4)
+	description "
+x: dist
+y: thickness
+z: reserved
+w: material-info
+
+If y == 0, then an SDF-engine is used to call this again until its good enough.
+"
+	inline Distance (|float|)
+		return .x
+	inline IsAnalytical (|bool|)
+		return .y != 0.0
+	inline Thickness (|float|)
+		return .y	// only analyticals can know this. SDFs cant without testing.
+	
 	default vec4(float.max, 0, 0, 0)
 	module
 		|| Miss = vec4(float.max, 0, 0, 0)
@@ -10,14 +25,14 @@ datatype RayInfo (vec4)
 		if r.x==float.max or .x == float.max
 			return self
 		
-		if r.x > .x // hit s first, so just use s.
-			return self // might need to adjust the thickness, but do that later.
+		if r.x > .x						// hit s first, so just use s.
+			return self					// might need to adjust the thickness, but do that later.
 		
 		|| r2 = r.x + r.y
 		|| s2 =  .x +  .y
 		
 		if r2 >= s2
-			return Miss		// cut right through
+			return Miss					// cut right through
 	
 		.x = r2 max .x					// nice!
 		.w = .w max r.w					// material fixs
@@ -52,26 +67,26 @@ datatype RayInfo (vec4)
 
 module VShapes
 // https://www.youtube.com/watch?v=aNR4n0i2ZlM // a heart shape?
-
-	function OpSmooth (|float| a, |float| b, |float| k=0.125, |float|)
+	linkage
 		embedded
+		
+		
+	function OpSmooth (|float| a, |float| b, |float| k=0.125, |float|)
 		k *= 4.0
 		|| h = ( k-(a-b).length max 0.0 ) / k
 		return (a min b) - h*h*k*0.25
 	
 
 	function OpRepLim (|vec3| p, |float| spacing, |vec3| lima, |vec3| limb, |vec3|)
-		embedded
 		return p - spacing*((p / spacing).round.clamp(lima, limb)) // from inigo. Doesnt quite work yet?
 	
 	// this is just not my thing lol.
 	// i dont konw how to do it.
 	function Heart (DistanceFunction)
-		embedded
 		p.w *= 0.5
 		p.y += gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
-			return PlasticBall(self, ray, p, hit)
+			return PlasticBall(self, Tracer, p, hit)
 		
 		
 		|| r = .Radius.x * p.w
@@ -94,80 +109,73 @@ module VShapes
 		
 		
 	function Sphere (DistanceFunction)
-		embedded
 		opt min 3
 		if Hit
-			return NormalColor(self, ray, p, Hit)
+			return NormalColor(self, Tracer, p, Hit)
 		|| L = .Pos - P
 		|| r = .Radius.x * p.w
-		if ray
-			|| t = L • Ray._CamDir
-			if t > 0
-				|| h = (r*r) + (t*t) - (L • L)
-				if h >= 0
-					h = h.Sqrt
-					return (t-h, h*2, 0, 0)
-			return rayinfo.miss
-		return vec4(L.Length-r, 0, 0, 0) // for SDF operations
+		if !Tracer
+			return vec4(L.Length-r, 0, 0, 0) // for SDF operations
+		|| t = L • Tracer._CamDir
+		if t > 0
+			|| h = (r*r) + (t*t) - (L • L)
+			if h >= 0
+				h = h.Sqrt
+				return (t-h, h*2, 0, 0)
+		return rayinfo.miss
 
 
 	function Debug (DistanceFunction)
-		embedded
 		p.w *= 0.5
 		if Hit
-			return NormalColor(self, ray, p, Hit)
+			return NormalColor(self, Tracer, p, Hit)
 		if Keys.k[]
-			return Box(self, ray, p)
+			return Box(self, Tracer, p)
 		if Keys.l[]
 			p.w *= 1.1
-			return Sphere(self, ray, p)
+			return Sphere(self, Tracer, p)
 
 		// Seems CPU-side SDFs are impossible to do fast.
 		// At least using SDF-like techniques
 		// We need to stay purely analytical right now.
 		// Until we can upload speedie code to a GPU.
 		
-		rz = Box(self, ray, p)
+		rz = Box(self, Tracer, p)
 		
 		p.w *= 1.2
-		rz = rz subtract Sphere(self, ray, p)
+		rz = rz subtract Sphere(self, Tracer, p)
 
 
 	function PhotoMetricR0 (|float| n2, |float| n1, |float|)
-		embedded
 		return ((n1-n2)/(n1+n2)).pow2
 	
 	function PhotoMetricR0 (|float| n2, |float|)
-		embedded
 		cpp_Part PhotoMetricAir
 		return ((1.0-n2)/(1.0+n2)).pow2
 	
 	
 	function PhotoMetric (|float| R0, |float| dot, |float|)
-		embedded
 		|| s = 1.0 - dot // improved schlick equation...
 						 // no idea how to use it.
 		return r0 + (s - R0) * s.pow4
 	
 	
 	function PlasticBall (DistanceFunction)
-		embedded
-		if !Hit or !ray
-			return Sphere(self, ray, p)
-		return plasticColor(self, ray, p, hit)
+		if !Hit or !Tracer // why am i testing both?
+			return Sphere(self, Tracer, p)
+		return plasticColor(self, Tracer, p, hit)
 		
 
 	function PlasticColor (ColorFunction)
-		embedded
 		|| Flux = 4.0
 		|| Normal = (P - .Pos).Normal
 
 		|| Kd = 0.072
 		|| Ks = 0.04
-		|| dir = ray._camdir
+		|| dir = Tracer._camdir
 		
 							// Diffuse
-		|| LightDir = ray.MainLight
+		|| LightDir = Tracer.MainLight
 		|| Light = kd * Flux * ((Normal • lightDir).pow2 + 1.3)
 
 		if 1				// Phong
@@ -179,7 +187,7 @@ module VShapes
 			light += ks*PhotoMetric(r0, Normal • -lightDir) // doesnt look right
 
 		  else				// Blinn-phong
-			|| NdotH = (normal • -ray._halfway).clamp // can't get this to work... sadly.
+			|| NdotH = (normal • -Tracer._halfway).clamp // can't get this to work... sadly.
 			|| SpecularIntensity = NdotH.pow8
 			light += ks * Flux * SpecularIntensity*10
 		
@@ -204,10 +212,10 @@ module VShapes
 		p.w *= 0.5
 		p.y+=gui.Cycle(5s, (.id.hash&255)*2s)*0.5
 		if hit
-			return CloudColor(self, ray, p, hit)
+			return CloudColor(self, Tracer, p, hit)
 			
 		|| r = .Radius.x * p.w
-		return Sphere(self, ray, p + (0,0,r)) add Sphere(self, ray, p - (0,r,0)) add Sphere(self, ray, p + (r,0,0))
+		return Sphere(self, Tracer, p + (0,0,r)) add Sphere(self, Tracer, p - (0,r,0)) add Sphere(self, Tracer, p + (r,0,0))
 	
 
 
@@ -215,11 +223,11 @@ module VShapes
 		embedded
 		opt min 3
 		if hit
-			return NormalColor(self, ray, p, hit)
+			return NormalColor(self, Tracer, p, hit)
 		|| orig = P - .Pos
 		|| r = .Radius * p.w
-		if ray
-			|| idir = ray._iDir
+		if Tracer
+			|| idir = Tracer._iDir
 			
 			|| p0 = (orig - r) * idir
 			|| p1 = (orig + r) * idir
@@ -246,8 +254,8 @@ module VShapes
 	function FudgeBlock (DistanceFunction)
 		embedded
 		if !Hit
-			return box(self, ray, P, hit)
-		return IceFudgeColor(self, ray, P, hit)
+			return Box(self, Tracer, P, hit)
+		return IceFudgeColor(self, Tracer, P, hit)
 	
 		
 	function IceFudgeColor (ColorFunction)
@@ -271,16 +279,8 @@ module VShapes
 		return Colors.Rainbow(hit.x+r, 1, 0.5)
 	
 
-prototype ColorFunction (|vobject| self, |raytracer| Ray, |vec3| P, |rayinfo| Hit=vec4(), |vec4|)
-prototype DistanceFunction (|vobject| self, |raytracer?| Ray, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
-	description "
-x: dist
-y: thickness
-z: reserved
-w: material-info
-
-If y == 0, then an SDF-engine is used to call this again until its good enough.
-"
+prototype ColorFunction (|vobject| self, |raytracer| Tracer, |vec3| P, |rayinfo| Hit, |vec4|)
+prototype DistanceFunction (|vobject| self, |raytracer?| Tracer, |vec3| P, |rayinfo| Hit=vec4(), |rayinfo|)
 	function New (|vec3| Pos, |vec3| Radius, |vec4| color=vec4(1),   |vobject|)
 		inlined
 		return VObject(pos, radius, self, color)

@@ -127,6 +127,7 @@ class RayTracer
 	libinternal AntiAlias (|vec2| XY, |RayTraceCell| cell, |&imagepixel| pxl)
 		opt min 3; opt norefcounts
 		|| C = pxl.color
+		
 		for i in 4
 			|| sh = ((i&1, i>>1).Vec2 - 0.5) * 0.70711
 			.Prepare(xy + sh)
@@ -187,7 +188,7 @@ class RayTracer
 		._RayHit = rayinfo.miss
 		while sp
 			if sp != ignore
-				|| Hit = .FindSub(sp)
+				|| Hit = .SDF_Detect(sp)
 				if  hit.x < Best  and  hit.z <= 1024th
 					rz = sp
 					._Rayhit = hit
@@ -195,7 +196,7 @@ class RayTracer
 			sp = sp._CellNext
 	
 	
-	libinternal FindSub (|vobject| sp, |vec4|)
+	libinternal SDF_Detect (|vobject| sp, |rayinfo|)
 		opt min 3
 		|| P = .Camera, p.w = 1.0
 		|| hit = (sp.Shape)(sp, self, P)
@@ -207,7 +208,7 @@ class RayTracer
 		for .RayAccuracy
 			P = .Camera + ._camdir*d,  P.w = 1.0	// Scaling factor
 			Hit = (sp.Shape)(sp, self, P)
-			d += (hit.x + 4096th)
+			d += (hit.x + 4096th)					// surely this should be max?
 			if  hit.y  or  hit.x <= 1024th
 				hit.z = hit.x
 				hit.x = d
@@ -300,7 +301,7 @@ class RayTracer
 				
 				.Quadditch(.rootnode, s)
 
-	 
+	
 	function RayTrace (|image| where)
 		opt min 3
 		.ViewMat

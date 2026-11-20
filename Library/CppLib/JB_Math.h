@@ -44,7 +44,7 @@ extern "C" {
     }
     
     inline float JB_f__nan () {
-		const int x = ((1<<11)-1)<<21;
+		const int x = 0xffe00000; // top 11 bits
 		return reinterpret_cast<const float&>(x);
     }
 

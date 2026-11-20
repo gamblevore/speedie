@@ -201,11 +201,6 @@ struct RetroFloat
 		.remain = rem
 		return A|int|
 
-	
-function float.Steps (|FloatRange|)
-	rz.from = -1
-	rz.to = 1
-	rz.Step = 2.0 / self
 
 
 struct IntDownRange   /// :3
@@ -219,22 +214,33 @@ struct IntDownRange   /// :3
 			--_c
 
 
+
 struct FloatRange	/// :3
 	|Float| From
 	|Float| To
 	|float| Step
-	
-	autogen float.LoopOK (|float| Final, |float| Step, |bool|)
-		opt inline
-		if Step >= 0.0
-			return self <= final
-		return self >= final
 		
 	iterator
 		|| _c = .from
 		while (_c.LoopOK(.To, .step))
 			yield _c (_c)
 			_c += .Step
+
+
+
+autogen float.LoopOK (|float| Final, |float| Step, |bool|)
+	opt inline
+	if Step >= 0.0
+		return self <= final
+	return self >= final
+
+
+
+function float.Steps (|FloatRange|)
+	rz.from = -1
+	rz.to = 1
+	rz.Step = 2.0 / self
+
 
 
 datatype uint
@@ -295,7 +301,6 @@ datatype uint
 			curr = curr &~ Lowest
 	
 	
-	
 	iterator flags
 		|| curr = self
 		while curr
@@ -317,12 +322,10 @@ datatype uint16
 		min = 0
 
 
-
-
 datatype int16
 	default 0
 	
-	linkage 
+	linkage
 		cpp_class s16
 
 	constants
@@ -333,17 +336,18 @@ datatype int16
 
 
 datatype float
-	linkage 
+	linkage
 		cpp_part f
 	default 0.0
-		
+	
+	
 	module
 		function Max (|float|)
-			cpp_wrapper JB_f__max
+			cpp_wrapper JB_f__max		// 0x7F7F_FFFF
 		inline Min (|float|)
-			return -.max
+			return -.max				// 0xFF7F_FFFF
 		function Nan (|float|)
-			cpp_wrapper JB_f__nan
+			cpp_wrapper JB_f__nan		// 0xFFE0_0000
 	
 	
 	Render RenderDuration (|bool| ms = false)
