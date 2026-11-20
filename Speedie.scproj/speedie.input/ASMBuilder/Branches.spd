@@ -264,7 +264,7 @@ function InbuiltTernary (|asmreg| dest, |asmreg| A, |asmreg| B, |message| cond, 
 		return cond.TERN(dest, C, A, B, C.issmall|int|) * dest
 
 	|| T = B
-	if (C.Const)
+	if C.Const
 		T = A
 	.NopTempConst(C)
 	return t
