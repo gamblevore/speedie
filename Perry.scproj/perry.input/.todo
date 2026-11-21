@@ -2,13 +2,12 @@
 
 							/// Get perry ASMing ///
 
+* PhI2 = BranchPhis copies the reg... not the struct?
+* fatasm.SyntaxExpect does not report errors nicely!
+
+* BoolNot bugs
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
-* fatasm.SyntaxExpect does not report errors nicely!
-* BoolNot bugs
-* asm cmd-6 at start of line or after comments fails!
-* PhI2 = BranchPhis copies the reg... not the struct?
-* JB_FS_AppendDoubleAsText can't render float_max at 3.4 x 10^38?
 * |float| ana,   || x = ((&ana)|&uint|) // fails in cake, x is nil!
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...

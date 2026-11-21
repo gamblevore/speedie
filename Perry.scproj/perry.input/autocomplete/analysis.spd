@@ -84,7 +84,7 @@ function PerryIDE.DetectASMSelectedFunc (|message|)
 
 function perryide.CurrSelFunc (|int| Where=-1, |message|)
 	opt norefcounts
-	|| msg = .EditMe.MessageAt(where)
+	|| msg = .EditMe.MessageAt(where, false, true)
 		return msg.OwningFunc
 
 
