@@ -67,8 +67,8 @@ struct JBObject_Behaviour;
 #define JB_NewClass(Cls)        (JB_Object*)(JB_AllocNew((Cls)->DefaultBlock))
 #define JB_New(name)            (name*)(JB_AllocNew((name ## Data).DefaultBlock))
 #define JB_New2(T)				{if (!self) self = JB_New(T);}
-#define JB_NewEmpty(name)       (name*)(ClearFor_(JB_New(name), sizeof(name)))
-#define JB_Zero(name)           (ClearFor_((void*)(name), sizeof(__typeof__(*name))))
+#define JB_NewEmpty(name)       (name*)(JB_ClearFor(JB_New(name), sizeof(name)))
+#define JB_Zero(name)           (JB_ClearFor((void*)(name), sizeof(__typeof__(*name))))
 #define JBStructData(a)         extern JB_Class a ## Data;
 #define JBClass(a, b, c)        struct a : b {c}; JBStructData(a);
 #define JB_AsClass(Name)        (&(Name ## Data))
@@ -372,7 +372,7 @@ inline void JB_SetRefCount(JB_Object* Obj, int C) {
 }
 
 
-inline void* ClearFor_(void* Place, u32 Size) {
+inline void* JB_ClearFor(void* Place, u32 Size) {
     memset(JB_Shift(Place,4), 0, Size - 4); // refcount should be 0. Don't hide bug if refcount > 0!
     return Place;
 }
