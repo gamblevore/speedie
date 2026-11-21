@@ -473,6 +473,11 @@ struct Assembler (AssemblerWipe)
 		return .µGetPrms(exp, exp.next.ASMAllowsTemp)
 
 
+	function µCopy (|message| exp, |AsmReg| Dest, |scdecl| D,  |asmreg|)
+		|| v = .µ(exp)
+/		return .CopyMemory(0, Exp, v, dest, nil, D)
+
+
 	function µInto (|message| exp, |AsmReg| Dest, |asmreg|)
 		|| Closer = .OpenVars
 		|| start = .curr

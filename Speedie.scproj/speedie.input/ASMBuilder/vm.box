@@ -229,8 +229,8 @@ forms
 		Value	17
 	
 	MemoryCopy
-		r1		r		// dest
-		r2		r		// src
+		r1		r		// src
+		r2		r		// dest
 		Length	14
 		
 	AddB
@@ -703,9 +703,8 @@ POS 5
 /**/ CNTD  (CNTC)
 		IncrementAddr(r, Op, 0)
 
-// rename to WRCP // write copy
 /**/ WCPY  (MemoryCopy) // can zero memory, if we pass r0 as src.
-		MemCopyRDWR(r, Op)
+		MemCopyRDWR(r, Op) // src, dst, len
 
 
 

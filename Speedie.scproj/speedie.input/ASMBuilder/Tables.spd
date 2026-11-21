@@ -290,27 +290,27 @@ function ConstConvert  (|assembler| self, |message| exp, |ASMReg| dest, |ASMReg|
 	return .NumToReg(exp, dest, K, new)
 
 
-
 function SetRel (fn_asm)						// function relset (
 	opt	norefcounts								//     x[func()] = y++
 	|| F = exp.first!.ASMUnbra
+
+	exp = exp.last!
 	|| X = .ExistingVar(F)
 		|| D = F.ASMDecl
-		if d.IsBareStruct or d.IsCArray
-			(x is Set)
-		return .µInto(exp.last!, X)				// could suffer from consts. we need to clear consts if its altered in a loop
+		ifn d.IsBareStruct or d.IsCArray
+			return .µInto(exp, X)				// could suffer from consts. we need to clear consts if its altered in a loop
+		return .µCopy(exp, X, D)
 
 	// Probably x.y = z,  or x[y] = z
 
 	dest = f.ASMAllowsTemp
-	exp = exp.last!
 	target debug
 		|| SetRelTrap = ++asmtrapper
 		if SetRelTrap == -1
 
 	|| Src = .µGetPrms(exp, dest)
 	(Src is Set)
-	// if I change this to incr the op, then IncrPost and IncrPre should too.
+	// if I change this to incr the ASM, then IncrPost and IncrPre should too.
 	return .µ(F, Src) ||| asmreg.discard
 
 
@@ -475,7 +475,7 @@ function Access (fn_asm)										// a[b], struct.mem[b]
 			dest.µType = exp.ASMDecl.µtype
 			return .ReadOrWrite(Dest, exp, base, RegToAdd, d, 0)// Readorwrite can convert vara to a const
 	  elseif dest is set
-		return .CopyMemory(0, Exp, dest, base, RegToAdd, D.internal!)
+		return .CopyMemory(0, Exp, base, dest, RegToAdd, D.internal!)
 		
 	return .IncrPointerByVar(dest, base, RegToAdd, exp)
 	
@@ -607,9 +607,9 @@ function DoGlobal (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |
 	if (dest is AddrRequest) or d.isbarestruct or d.iscarray
 		if dest is set
 			|| CopyTo = .GlobAddr(d, exp, nil)
-			return .CopyMemory(0, Exp, CopyTo, dest, nil, D)
+			return .CopyMemory(0, Exp, dest, CopyTo, nil, D)
 		
-		|| addr = .GlobAddr(d, exp, dest) 
+		|| addr = .GlobAddr(d, exp, dest)
 			addr.µtype = d.µtype
 			addr = addr.HaveAddr
 		return addr

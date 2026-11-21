@@ -2,7 +2,6 @@
 
 							/// Get perry ASMing ///
 
-* PhI2 = BranchPhis copies the reg... not the struct?
 * fatasm.SyntaxExpect does not report errors nicely!
 
 * BoolNot bugs
@@ -24,6 +23,7 @@
 
 * entering a constructor that does not exist (auto-generated) should stay at the same line of code.
 * ASM errors while editing. Shouldn't spam interface... just ignore I guess.
+	* |retrofloat| B /    // slash // ASMVIew spams errors
 * Step through destructor without it fretting
 * Display libglobs
 

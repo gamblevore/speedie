@@ -107,8 +107,7 @@ function WhileSub (|message| exp,   |asmreg|)
 	|| InitialJump = exp.JUMP										// test goes after loop
 	|BranchPhiTracker| BranchPhis = .PhiStart
 	|BranchPhiTracker| PhI2
-//	PhI2 = BranchPhis
-	memory.Copy(&phi2, &BranchPhis, –sizeof BranchPhis) // fix this!!!
+	PhI2 = BranchPhis
 	
 	|| Returns = ASMType.ArgumentSub(self, exp.second!)
 	|FatRange| loop_test

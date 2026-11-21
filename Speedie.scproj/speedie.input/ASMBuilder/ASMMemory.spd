@@ -30,6 +30,7 @@ function IncrPointerByVar (|asmreg| dest, |asmreg| base, |asmreg| vara, |message
 
 
 function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |asmreg| vara, |scdecl| D, |asmreg|)
+	expect (D) (exp, errorreceiver.internalerror)
 	if vara.reg
 		dest = .IncrPointerByVar(nil, dest, vara, exp)
 
@@ -41,7 +42,7 @@ function CopyMemory (|int| Index, |message| Exp, |asmreg| Src, |asmreg| Dest, |a
 		dest = .AddConst(index*amount, exp, dest)
 	
 	check (Amount <= 1<<14) (exp, "Object too large memory-copy requested. Copy this manually.")
-	return exp.WCPY(Src, dest, Amount & 14~bits) * src		// VM treats 0 as the biggest num
+	return exp.WCPY(Src, dest, Amount & 14~bits) * dest		// VM treats 0 as the biggest num
 
 
 function GObjOpt (|ASMReg| Dest, |message| Exp, |asmreg| Base, |int| Index, |scdecl?| Decl, |&fatasm|)
