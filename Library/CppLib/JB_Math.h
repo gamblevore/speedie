@@ -43,6 +43,10 @@ extern "C" {
         return __FLT_MAX__;
     }
     
+    inline double JB_dbl__max () {
+		return __DBL_MAX__;
+    }
+    
     float JB_f__nan ();
 
 	inline bool JB_dbl_IsNan (double x)	{

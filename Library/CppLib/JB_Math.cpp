@@ -87,17 +87,24 @@ extern "C" {
 #define Min(a, b) (((a) < (b)) ? (a) : (b))
 #define Max(a, b) (((a) > (b)) ? (a) : (b))
 
-	double JB_Pow10(double rz, int x) {
+//double f6 (uint32_t x) {
+//	static const double A[] = { 1e+0, 1e+1, 1e+2, 1e+3, 1e+4, 1e+5, 1e+6, 1e+7, 1e+8, 1e+9, 1e+10, 1e+11, 1e+12, 1e+13, 1e+14, 1e+15, 1e+16, 1e+17, 1e+18, 1e+19, 1e+20, 1e+21, 1e+22, 1e+23, 1e+24, 1e+25, 1e+26, 1e+27, 1e+28, 1e+29, 1e+30, 1e+31 };
+//	static const double B[] = { 1e+0, 1e+32, 1e+64, 1e+96, 1e+128, 1e+160, 1e+192, 1e+224, 1e+256, 1e+288 };
+//	return rz * A[x & 0x1F] * B[x >> 5];
+//  // doesn't work onnegative numbers
+//}
+
+	double JB_Pow10 (double rz, int x) {
 	// isn't there a std math func to do this?
-		if (x > 350) x = 350;
-		if (x < -350) x = -350;
 		if (x < 0) {
+			if_rare (x < -308) return 0;
 			for_(-x)
 				rz *= 0.1;
-		} else {
-			for_(x)
-				rz *= 10.0;
+			return rz;
 		}
+		if_rare (x > 308) return  __DBL_MAX__;
+		for_(x)
+			rz *= 10.0;
 		return rz;
 	}
     

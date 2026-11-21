@@ -365,7 +365,7 @@ void JB_FS_AppendReplaceB(FastString* self, JB_String* Data, int From, int To) {
 }
 
 
-// "2 000 000 000" is 10 int!
+// "2 000 000 000" is 10 digits!
 
 static uint8* WriteIntToBuffer (uint8* wp, uint64 LeftOver) {
     do {
@@ -376,12 +376,6 @@ static uint8* WriteIntToBuffer (uint8* wp, uint64 LeftOver) {
     } while (LeftOver);
     return wp;
 }
-
-
-int JB_int_Render(int self, byte* Addr, int N) {
-	return snprintf((char*)Addr, N, "%i", self);
-}
-
 
 
 void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
@@ -413,15 +407,10 @@ void JB_FS_AppendIntegerAsText(FastString* self, int64 Value, int RoundTo) {
 
 
 void JB_FS_AppendDurr(FastString* self, Date D) {
-	auto Amount = ((double)D) / ((double)0x10000);
-	if (floor(Amount)!=Amount)
-		JB_FS_AppendDoubleAsText(self, Amount, 3, false);
+	if (D&0xFFFF) // fractional part
+		JB_FS_AppendDoubleAsText(self, ((double)D) / ((double)0x10000), 3, false);
 	  else
-		JB_FS_AppendIntegerAsText(self, Amount, 1);
-}
-
-void JB_FS_AppendDoubleAsText0(FastString* self, double D) {
-    JB_FS_AppendDoubleAsText(self, D, 9, true);
+		JB_FS_AppendIntegerAsText(self, D>>16, 1);
 }
 
 bool HasDot (uint8* self, int Used) {
@@ -432,47 +421,50 @@ bool HasDot (uint8* self, int Used) {
 	return false;
 }
 
-static bool DoubleIsNormal (double D) {
-	return  D <= DBL_MAX  &&  D >= -DBL_MAX;
-}
-
-
-// ActualExp is passed as a boolean. However, we re-use this var for an integer value!
-// 1 Reg saved!
 void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp) {
-	if (!D or !DoubleIsNormal(D))
+	if (D != D) {			// NaN. Write -0 to signify nan.
+		return JB_FS_AppendCString(self, "-00.00");
+	}
+	if (!D)
 		return JB_FS_AppendCString(self, "0.0");
 
-	if (dp < 1) dp = 1;
-    dp = Min(dp, 16);
+	if (dp < 1) {			// makes AppendDouble easier to call
+		dp = 9;
+		ActualExp = true;
+	} else {
+		dp = Min(dp, 16);
+	}
     
-    if (D < 0)
+    if (D < 0) {
 		JB_FS_AppendByte(self, '-');
+		D = fabs(D);
+	}    
 
-    D = fabs(D) + JB_Pow10(0.5001, -dp); // round off last digit!
-	// Why 0.5001? Well... we need at least 1dp. (Add at least 0.05)
-	// However, 0.05 is NOT STORABLE as a float. Either more, or less.
-	// I guess I could add more 0s, but sometimes floating point errors
-	// often end up with numbers like 0.499994, when really you wanted
-	// 0.5. After multiplying by 0.00000000000000001, this could happen.
-	// Someone better at float-math could help me :)
-
-    if (ActualExp) {
-		auto e = log10(D);
-		if (fabs(e) > 7) {
-			ActualExp = (int)floor(e);
+	auto e = log10(D);
+    if (ActualExp or e > 16.0) { // JB_FS_AppendIntegerAsText cant write above (1<<64)-1
+		if (e > 7 or ActualExp > 1) {
+			ActualExp = (int)e;
 			D = JB_Pow10(D, -ActualExp);
 		} else {
 			ActualExp = 0;
 		}
-	}
-    
+    }
+
+	D += JB_Pow10(0.5001, -dp);
+
 	auto F = floor(D);
 	JB_FS_AppendIntegerAsText(self, F, 1);
 
 	auto Write = JB_FS_WriteAlloc_(self, 64);  self->Length -= 64;
 	auto Start = Write;
 	*Write++ = '.';
+
+	// I tried snprintf. It sucks.
+	// the issue, is that it trails with .000000 all over the place
+	// and, it adds a + to the exponent. very tricky to remove quickly.
+	// Its almost certainly slower.
+	// this is as good as it gets. really.
+
 
 	auto Frac = D - F;
 	while (Frac and dp-- > 0) {
