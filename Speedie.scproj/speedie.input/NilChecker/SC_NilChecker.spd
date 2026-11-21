@@ -803,19 +803,20 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 	ifn where isthing raw
 		fs <~ ' '
 		fs <~ raw
-	fs <~ ':'
 	fs <~ ' '
+	fs <~ "'"
 	where.OrigRender(fs)
-	|| str = fs.GetResult
-	error (where, str)
+	fs <~ "'"
 
 	if To
-		fs <~ str
-		fs <~ " to "
-		if where.isfirst and to.cls
-			fs <~ to.Name
-		  else
-			to.rendertitle(fs)
+		fs <~ ", passed to: "
+		fs <~ to.Name
+		fs <~ "()"
+		to.ErrorIsHere
+
+	error (where, fs)
+
+	if To
 		to.ErrorIsHere
 }
 
