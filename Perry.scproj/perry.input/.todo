@@ -2,8 +2,6 @@
 
 							/// Get perry ASMing ///
 
-* fatasm.SyntaxExpect does not report errors nicely!
-
 * BoolNot bugs
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
@@ -36,6 +34,7 @@
 * Undo still thinks its changed when its not, and we undid ALL changes!
 * Tabbing to create function params does not work if its at the last line
 * Perhaps case-sensitivity bitching is... unnecessary. Or could be optional.
+* fatasm.SyntaxExpect does not report errors nicely!
 
 
 ...

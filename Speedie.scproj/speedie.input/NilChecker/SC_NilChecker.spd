@@ -806,16 +806,17 @@ function FailedReal (|scfunction| To, |message| where, |nilreason| reason, |nils
 	fs <~ ':'
 	fs <~ ' '
 	where.OrigRender(fs)
+	|| str = fs.GetResult
+	error (where, str)
+
 	if To
+		fs <~ str
 		fs <~ " to "
 		if where.isfirst and to.cls
 			fs <~ to.Name
 		  else
 			to.rendertitle(fs)
 		to.ErrorIsHere
-//		problem (to.source, kUsingStr)
-	error (where, fs)
-	
 }
 
 

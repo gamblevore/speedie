@@ -1236,6 +1236,7 @@ function TypeOfExprNeeded ( |message| exp, |SCNode| name_space, |SCDecl| )
 	|| result = TypeOfExpr(Exp, name_space)
 	if result.Found
 		return result
+	
 	if (oldcount == stderr.errorcount)
 		error (exp, "This expression doesn't return anything.")
 		|| it = exp.unbra.msgfunc
