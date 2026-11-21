@@ -43,24 +43,23 @@ extern "C" {
         return __FLT_MAX__;
     }
     
-    inline float JB_f__nan () {
-		const int x = 0xffe00000; // top 11 bits
-		return reinterpret_cast<const float&>(x);
-    }
+    float JB_f__nan ();
 
-// these 4 functions are getting errors about compile options
-// not sure how to fix it and keep floating-point opts... I'll look into that later.
 	inline bool JB_dbl_IsNan (double x)	{
-		return std::isnan(x);
+		uint64 u = *((uint64*)(&x));
+		return (u << 1) > (0x7ff0000000000000u << 1);
 	}
 	inline bool JB_dbl_IsInf (double x)	{
-		return std::isinf(x);
+		uint64 u = *((uint64*)(&x));
+		return (u << 1) == (0x7ff0000000000000u << 1);
 	}
 	inline bool JB_f_IsNan (float x) {
-		return std::isnan(x);
+		uint u = *((uint*)(&x));
+		return (u << 1) > (0xff800000u << 1);
 	}
 	inline bool JB_f_IsInf (float x) {
-		return std::isinf(x);
+		uint u = *((uint*)(&x));
+		return (u << 1) == (0xff800000u << 1);
 	}
 
 

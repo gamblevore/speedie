@@ -8,8 +8,14 @@
 #include <math.h>
 
 extern "C" {
+	uint Nan = 0x7FC00000u;			// defeat the anti-nan optimisations
     float JB_f_Clamp (float d, float min, float max) {
 		return std_clamp(d, min, max);
+    }
+    
+    float JB_f__nan () {
+		float f = *((float*)(&Nan));
+		return f;
     }
 
 	ivec4 JB_ivec4_ClampVec (ivec4 Self, ivec4 A, ivec4 B) {
