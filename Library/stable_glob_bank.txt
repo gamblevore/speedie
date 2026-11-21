@@ -1,4 +1,5 @@
 // beta-file. Unstable.
+GUI__App__MouseMoveInited
 GUI__App__QuitReason
 GUI__App_AControlWasResized
 GUI__App_BlockTextInput
@@ -7,7 +8,6 @@ GUI__App_ControlResizedSafely
 GUI__App_DrawState
 GUI__App_DuringAction
 GUI__App_FlashSelector
-GUI__App_MouseMoveInited
 GUI__App_NeedMouseMove
 GUI__App_ResizedCounter
 GUI__App_SingleFrameDepth

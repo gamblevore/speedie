@@ -530,8 +530,6 @@ GUI_VObject_AdjustPos
 GUI_VObject_Box2D
 GUI_VObject_ConstructorShape
 GUI_VObject_Destructor
-GUI_VObject_OverlapsBlock
-GUI_VObject_OverlapsRect
 GUI_VObject_SizeSet
 GUI_VObject_SyntaxIsSet
 GUI_VObject_Towards
@@ -664,7 +662,7 @@ GUI_ivec4_TextCorner
 GUI_vec4_BoxVsPlane
 GUI_vec4_PreMul
 GUI_vec4_Screen
-GUI_vec4_ScreenFloat
+GUI_vec4_VObjectScreen
 GUI_vec4__Colorise
 JB_API__Errors
 JB_API__Init
@@ -834,8 +832,8 @@ JB_F64_Exponent
 JB_FS_AppendBuff
 JB_FS_AppendByte
 JB_FS_AppendCString
+JB_FS_AppendDouble0
 JB_FS_AppendDoubleAsText
-JB_FS_AppendDoubleAsText0
 JB_FS_AppendDurr
 JB_FS_AppendEscape
 JB_FS_AppendHInt
@@ -1575,7 +1573,7 @@ JB_dbl_Clamp
 JB_dbl_IsInf
 JB_dbl_IsNan
 JB_dbl_Render
-JB_dbl_RenderFloat
+JB_dbl__max
 JB_dylib_Close
 JB_dylib_DyLibInit
 JB_dylib_Error
@@ -1655,7 +1653,6 @@ JB_int_OperatorInRange
 JB_int_OperatorMax
 JB_int_OperatorMin
 JB_int_OperatorPow
-JB_int_Render
 JB_int_RenderFS
 JB_int_RenderZeros
 JB_int_Shrink
