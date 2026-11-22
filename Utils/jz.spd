@@ -49,7 +49,7 @@ main
 
 
 datatype Type (int)
-	flags
+	flag_constants
 		ReadOK, Compressed, PreComp, Plain, XML, Json, actions=[Box, Jbin, Report], StdOut, SelfReplace
 	
 	syntax is (|Type| test, |bool|)
