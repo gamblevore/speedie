@@ -250,6 +250,7 @@ function ShowCompileCutely (|bool| Always=false)
 
 
 function OutText (|textview|)
+	opt norefcounts
 	|| row = .BottomCompileTabs.Selected
 		return row.obj as TextView
 
