@@ -161,10 +161,7 @@ function PerryIDE.MakeNothingRunning (|string| reason="?", |bool|)
 function PressingDebug (GUIAction)
 	opt norefcounts
 	|| db = .ide.RunArgsText
-	if db.HasAnyFocus
-		db.ClearFocus
-	  else
-		db.setfocus
+	db.setfocus(db.HasAnyFocus)
 	return true
 
 
@@ -305,7 +302,7 @@ function ClickedStack (GUIListEvent)
 	return true
 
 
-function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode,   |ListViewRow|)
+function perryide.UpdateCodePointer (|listviewrow| row, |int| Mode, |ListViewRow|)
 	opt norefcounts
 	|| Path = ""
 	while
