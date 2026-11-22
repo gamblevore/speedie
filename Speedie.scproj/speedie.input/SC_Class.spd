@@ -1227,8 +1227,9 @@ module
 		if (PreferClass and MCls)
 			B = MCls
 		name.type = @thg
-
-		|| imp = c.obj as scimport
+		
+		|| imp = c.obj
+		if imp isa SCImport
 			imp.use
 		  else
 			B.project.use
@@ -1243,6 +1244,7 @@ module
 	
 
 	function ProcessExtendOld (|Message| c, |bool| PreferClass)
+		opt norefcounts
 		|| name = c[@thg]
 			|| arg  = c.arg
 			|| M = Compiler.findmodulemsg(name)
@@ -1251,8 +1253,10 @@ module
 				|| cls = m.cls
 				if (PreferClass and cls)
 					B = cls
+
 		
-				|| imp = c.obj as scimport
+				|| imp = c.obj
+				if imp isa scimport
 					imp.use
 				  else
 					B.project.use
