@@ -641,6 +641,7 @@ function ASMViewKeys (guikeyevent)
 
 
 function SelectedASM (guilistevent)
+	opt norefcounts
 	require row
 	|| i = .ide
 	require !i.DuringASMEvent
