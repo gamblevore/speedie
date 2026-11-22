@@ -8407,6 +8407,8 @@ Message* SC_Msg_CollectDclName(Message* Self);
 
 SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode, SCClass* Cls, SCFunction* FuncPrmz);
 
+Message* SC_Msg_CollectDeclDefault(Message* Self, SCFunction* FuncPrmz, Message* Name);
+
 void SC_Msg_CollectFromBody(Message* Self, SCNode* Name_space);
 
 JB_String* SC_Msg_CollectFuncTableName(Message* Self);

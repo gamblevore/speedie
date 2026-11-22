@@ -12,7 +12,6 @@ datatype CompileMode (int)
 		Finished
 		Crashed
 		DebugSet = Debug // easier to search for. now I know which places set it.
-
 		
 	syntax is (|CompileMode| M, |bool|)
 		return (self&M) == M
