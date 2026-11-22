@@ -2,8 +2,6 @@
 
 							/// Get perry ASMing ///
 
-* |float| ana,   || x = ((&ana)|&uint|) // fails in cake, x is nil!
-
 * BoolNot bugs
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
