@@ -24,6 +24,7 @@ role config (message)
 		flowlog.enable
 	
 	inline Path (|file|)
+		opt norefcounts
 		return .obj as file
 	
 	function ConfFirst (||)
