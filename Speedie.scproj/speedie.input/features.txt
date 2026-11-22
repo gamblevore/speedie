@@ -1,8 +1,8 @@
-      % % % % Do things just because its fun to do. % % % %
+
+					  % % % % Do things just because its fun to do. % % % %
 
  
 		 				FEATURES TO DO
-
 
 * Reference Count improver
 	* Remove opt norefcounts... very bad source of bugs
@@ -12,109 +12,94 @@
 	* Unified destructor? Subclass by "wrap", all objects go before refcount. Or 64-bit position marker?
 	* It can get bogged down... needing to handle all sorts of wierd issues
 
-
-* Static vars?
-
-* ability to create functions that own copies of vars from owning space.
-	* fn = % func (value, expr) // or fn = ∆ func val exp
-
-* auto-create float/int funcs for vecs? (on demand or explicit?)
-
-* vec/array param split?
-	* obj.func(P) --> obj.func(p.x, p.y, p.z)
-* Allow constants for array sizes!
+* Allow constants for carray sizes!
 
 *		expect (obj isa SCDecl) // ideally the test below should be unnecessary
 		if (obj isa SCDecl) { use obj as a decl... }
 
-................................................................................
 
 
 
-							Actually already good:
-
-* Disable implicit bools object params? (but we wanna keep 1, 2, 3, etc? makes no sense. just allow all or none.)
-
-* int outputs ALWAYS 64bit-correct  (allows compare/add 64/32 bit without typecasts)	
-
-* obj.property().func --> obj.property.func... the () is superfluous, ignored.
-
-* "a:b" I need to change language?
-
-* syntactic comments... actually good! I know the code is a mess... bug that probably means it should be redesigned. It does exactly what it should do! There isn't a simpler way to do it. Just maybe a clearer way.
-
-* lack of #exit... it was buggy and the syntax SUCKED
-    "(item) #exit" all over. urgh.
-
-* 
-    class bla {
-        module {
-            |int| i
-            function bla {i++}
-            // disallow i++, use .i++ ?
-        }
-        // sure, except... what about accessing "i" from within the class?
-        function bla2 {
-            i++
-            // now it is inconsistant! unless we have MORE syntax like mod.i++
-            // it's fine as it is.
-            // maybe not?
-        }
-    }
-    
-    
-
-* units!!!! @num containing @unit was DUMB!!!! @UNIT should be the top!!!
+* Dynamic property adding on objects.
+	+++ Useful for tasks. Now task can be a normal object! Not wierd anymore. We can add whatever properties to it we want, and its size is well-known.
+	
+	+++ Useful for vobjects, which will have just ANY property. May end up with 1000s of classes, no fun to try to do OOP in game-dev. There is tons of overlap. Fatstructs become the only real solution, but not ideal.
+	
+	+++ The lang should transparently know if a class has a real version of this property, or a dynamic one. If a property is ALWAYS added, say in the constructor, it might as well be a real property, right. Either way, I should be able to write: MyObj.Prop = Something
+	
+		........	........	........	........	........	........	........	........	........
 
 
-* "return{bla}" should be allowed? (its to differentiate return() from return ())
+	* IDs: The ID could allow separating each property into its own table. However, this ID doesn't scale so well. Because if an ID has only 1 property, and we have 1000 possible properties, each time the ID goes up, 999 tables get empty-spaces.
+
+		* Sparse-array? A Sorted array? But then what if a property gets added later? We need to re-sort. No good.
+Hash-tables... could work? I mean... it might be perfect. Assuming we don't care about the order if the objects for when we want to list over the entire table. Like for games with their stuff.
+			* We could force addition to act per-object once. No overlapping adds. (That would be annoying.)
+
+		* FixedDict map ID to a position, PER table. But again, more overhead.
+
+	
+	* Direct object. That sounds nice! All the properties in one place. We can do this:
+	
+		struct DynPropertyList
+			|uint16|			PropertyCount
+			|uint16|			DataLength
+			|DynPropertyMap[]|	Map
+		
+		struct DynPropertyMap
+			|uint16| Offset // offset from the struct start. Starts at the end, and crawls backwards until all space is used.
+			|uint16| Key
+
+		
+	Or this:
+		
+		struct DynPropertyList
+			|DynPropertyItem[]| Items
+		
+		struct DynPropertyItem			// simple enough.
+			|uint16|  		Key
+			|uint8|   		Length		// Length of the property
+			|uint8[]|		Data
+		
+		So why one over the other? I doubt we'll have MANY properties, but it would be nice to have them sorted. This way, if there ARE many properties... we can use a sorted array search operation on the .Map property.
+		
+		Also... our DynProperties can take 4-bytes using compression :]
+		
+		So... lets assume only a few properties, like 3. Well... might as well use the second. Probably faster?
+		
 		
 
-* tmp vars... do them local per func...
-	(seems actually quite hard... because they aren't just created in one spot. It's called from at least 3 widely separated points in the code. So I can’t just keep a global counter because the global counter needs resetting... Also means I need to "Start tmp vars" and then "stop tmp vars" PER FUNCTION in 3 points in the code... before actually doing anything... so now I have...
-		fn.StartTmpVars
-		DoRefs(fn)
-		fn.StopTmpVars
-		
-		which i s ugly.
-		
-		it would be better to design it properly, so it always takes a namespace? But that means redesigning a lot of my code...
-		* Why not each func just has a "tempvar" counter?
-	)
+class GUIControl
+	dynamic
+		|GUIKeyEvent|			OnKeyDown
+		|GUIPasteEvent|			OnPaste
+		|GUICopyEvent|			OnCopy
+
+
+
+class Whatever (GUIControl)
+	|GUIKeyEvent|			OnKeyDown
+	// well... now we know where it is! Any code working on a "whatever" can directly access OnkeyDown
+	// otherwise, if it doesn't, it can look into the itemlist to figure out where it is, (on the object somehow)
 	
-	Right now... the tempifier is messing up a lot of var names... seems WORSE after trying to fix this!
-
-
-* Lack of struct.new    (add "owned/borrowed/shared/virtual" objects instead!)
-
-* Constructors/new are already good! Because constructors inline in C anyhow...
-
-*	msg[0] was finding a func in message[(default params)] instead of list[(exact match)]
-	I think this actually is good behaviour... I should just create an error about "Shadowing"... rather than make my compiler awkward.
+	* Now... what next? We need some way to say the offset is actually "within the object itself" but thats not a problem. Objects have 4K max-size, or something like that. So just use high-bit means "within object" otherwise within the dyn-props.
+	* Now any code working on GUIControl, can check for the existance of certain properties. Nice.
+	* The compiler can do errors, for example:    if –exists MyWhatever.OnkeyDown // (error: always exists!)
+	* Now we can get properties. I guess we'll need a default value, or something, IDK. Not an issue.	
+		* If the object has a health, it can get its health subtracted, that kinda thing. Nice.
 	
-* a = b:c
-	BAD... Breaks my parser. In so many ways.
-
-* CNJ efficiency by putting it elsewhere...
-	BAD: Old design was better
-
-* a = b #require
-	ITS FINE! The only issue is this:
-	a = b + (c + D#require)
-
-	nested requires/expects are the issue.
+	* It seems we'll need a dynproperty list per object always. A shared default one sounds nice. Each class can have a default, which is NOT modifyable! :] Perhaps we hacked it so its "out of space" always.
 	
-* compiler needs to have some way for a datatype func to say "Actually, we need THE ADDRESS OF SELF"
-	* useful for saving...
-		function LoadProperties (blablabla) {
-			pragma AddressOfSelf // implied for structs
-		}
-		* Can mean I can get rid of value = loader.int or whatever it was...
-			.Value.LoadProperties(loader)
-			* what about our huge number of datatypes? fail?
-				* Yeah, basically...
-	* wait till need this anyhow for OTHER REASONS than saving.
+	* I think the only fast way of doing this, is storing the DynProps at the start of the object. This forces us to... really it should have a baseclass, so we can do:   "if X Isa DynamicObj", or else how will we know, if its testable?
+	
+	* We would otherwise need to hash the objectID or something. Store it in a dictionary. Now the destructor needs to remove it from a dictionary. NOT COOL.
+	
+	* OR... we coudl add it to ALL objects. Not cool! string even?
+	* Why not try it on the list class already?
+		* We can compress .obj so no one will notice
+		* Add helpful defines like decomp(Self->Child)
 
-* @base... MAKES THINGS WORSE! what about -10? or -0x10?
-	where does the "-" go? now we need to do string append just to get the -10 with an "x" base!
-	And what about parsing? -10 or 0x10.parseint... works just fine. until we split it all off!
+
+
+
+
