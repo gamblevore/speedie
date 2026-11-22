@@ -280,6 +280,11 @@ function Message.CollectDecl (|SCNode| P, |SCNode| Recv, |declmode| Mode, |sccla
 	
 	expect (FuncPrmz or Name)  (self, "No name found.")
 	|| Default = DeclsDefault( name )
+	if Name == @rel
+		|message--| op = name.second
+		if op.Expect(@opp, "=")
+			expect !op.islast (name, "Missing right hand side")
+	
 	|| Sdcl = ExtractDecl( Type, P, mode )
 		check ((sdcl isnt reference) or (mode is FuncParam)) (Type, "Only params can be references")
 	  elseif !default  and  (P isa SCArg)
