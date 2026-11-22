@@ -320,10 +320,10 @@ class FastString {
 		cpp_part AppendDouble0
 		.appenddouble(D, 0, false) // defaults to 9
 	
-	function AppendDouble (|Float64| D, |int| dp=1, |bool| PreferExp=false)
+	function AppendDouble (|Float64| D, |int| dp, |bool| PreferExp=false)
 		cpp_wrapper JB_FS_AppendDoubleAsText
 	
-	function AppendFloat (|float| D, |int| dp=1, |bool| PreferExp=false)
+	function AppendFloat (|float| D, |int| dp, |bool| PreferExp=false)
 		inlined
 		.AppendDouble(D|Float64|, dp, PreferExp)
 	
