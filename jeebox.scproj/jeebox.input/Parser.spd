@@ -1352,7 +1352,7 @@ module Parser
 	.using.Position = -1
 
 
-	flags
+	flag_constants
 		kAdjectiveOp
 		kColon
 		kColonArg
@@ -1430,7 +1430,7 @@ datatype MessageFlags (uint16)
 		inlined
 		return self & v
 
-	flags
+	flag_constants
 		|MessageFlags|
 		// These are not set during parse, but after.
 		Inserted			= 0x0800				// Jeebox sets this on messages created via "syntax using"".

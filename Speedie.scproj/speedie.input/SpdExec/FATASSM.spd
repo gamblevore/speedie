@@ -779,7 +779,7 @@ target debug
 
 datatype FatNopMode	(byte)
 	default 0
-	flags
+	flag_constants
 		Hard = 0
 		KeepInputs
 		Rewind

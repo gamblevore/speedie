@@ -142,7 +142,7 @@ datatype MouseButton (uint)
 		inlined
 		return self & x
 
-	flags
+	flag_constants
 		Left		
 		Middle
 		Right

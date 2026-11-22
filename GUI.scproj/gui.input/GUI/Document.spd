@@ -305,7 +305,7 @@ class Document (list)
 
 
 datatype DocumentJeeboxMode (byte)
-	flags
+	flag_constants
 		NotJeebox = 0
 		Prefer
 		Expect

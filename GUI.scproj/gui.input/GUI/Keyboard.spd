@@ -32,7 +32,7 @@ datatype KeyModifier (int)
 	//     if aware: return x<<5==self<<5
 	// whatever...
 	
-	flags
+	flag_constants
 		Shift
 		Option
 		Control

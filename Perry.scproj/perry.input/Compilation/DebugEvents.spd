@@ -1,7 +1,7 @@
 
 
 datatype CompileMode (int)
-	flags
+	flag_constants
 		|CompileMode|
 		Compiling	// 1
 		Debug		// 2

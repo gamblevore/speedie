@@ -50,7 +50,7 @@ struct CompressionStats
 	|byte| Purpose
 	|bool| Live
 	linkage:cpp_part MzSt	
-	flags
+	flag_constants
 		Compression
 		Decompression
 

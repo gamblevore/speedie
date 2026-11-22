@@ -1,7 +1,7 @@
 
 
 module Options
-	flags: kCpp, kCake
+	flag_constants: kCpp, kCake
 	
 	||		BannedClasses			= nil|dictionary|
 	||		exe_path				= ""		// if not exist, use output_path

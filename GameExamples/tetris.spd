@@ -17,7 +17,7 @@ main
 
 
 datatype Tetronimo (uint64)
-	flags
+	flag_constants
 		|Tetronimo|
 		(1<<8)
 		Ghost

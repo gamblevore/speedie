@@ -7,7 +7,7 @@
 
 
 datatype OpMode (int)
-	flags
+	flag_constants
 		|OpMode|
 		CompOrSet  = [Compare, Assigns]
 		MathLike = [Bit, Math]

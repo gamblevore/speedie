@@ -1434,7 +1434,7 @@ module GUI
 
 
 datatype GUIActivity (byte)
-	flags
+	flag_constants
 		|GUIActivity|
 		Nothing = 0
 		Activity

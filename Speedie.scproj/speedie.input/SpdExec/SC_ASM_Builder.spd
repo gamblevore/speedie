@@ -20,7 +20,7 @@ datatype µParam (uint16)
 	syntax is (|µparam| p, |bool|)
 		return (self & p)
 	
-	flags
+	flag_constants
 		|µparam|
 		(32)		// Starting point
 		NonReg = [Jump, Number]

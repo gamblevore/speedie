@@ -1,7 +1,7 @@
 
 
 datatype TextLineFlags (uint16)
-	flags
+	flag_constants
 		// coloring
 		Colored
 		ColoriseUsingPosition

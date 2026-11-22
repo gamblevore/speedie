@@ -4,7 +4,7 @@ datatype CopyPasteFlags (uint16)
 	// how to totally inline this class?
 	linkage
 		cpp_part CPF
-	Flags
+	flag_constants
 		|CopyPasteFlags|
 		// Important to have copyfile and pastefile being separate.
 		// We might want to copy a file but not being able to paste a file
@@ -27,7 +27,7 @@ datatype CopyPasteFlags (uint16)
 datatype TakesFocusFlag (byte)
 	linkage
 		cpp_part TFF
-	flags
+	flag_constants
 		CanFocus
 		CanTabInto
 		None = 0
@@ -49,7 +49,7 @@ datatype TakesFocusFlag (byte)
 datatype GuiControlFlags (uint)
 	linkage
 		cpp_part GCF
-	flags
+	flag_constants
 		|GuiControlFlags|
 		Visible
 		Enabled

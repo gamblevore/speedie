@@ -9,7 +9,7 @@ struct DynamicLibrary
 	|?&nil|		_handle
 	
 	
-	flags
+	flag_constants
 		Lazy
 		Now
 		Local

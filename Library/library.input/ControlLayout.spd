@@ -172,7 +172,7 @@ datatype ControlPoint (int)
 
 
 datatype ControlClipMode (byte)
-	Flags
+	flag_constants
 		SlideBackInParent
 		SlideBackInWindow
 		Debug

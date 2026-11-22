@@ -29,7 +29,7 @@ struct NilRecorder
 
 datatype NilCheckMode (int)
 	linkage: cpp_part khalai
-	flags
+	flag_constants
 		|NilCheckMode|
 		Nothing = 0
 		Negative

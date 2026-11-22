@@ -27,7 +27,7 @@ class File (stringshared)
 		ReadWriteMode	= 0x002			/* open for reading and writing */
 
 
-	flags
+	flag_constants
 		AllowInvisible
 		AllowSymLinks
 		WantFileObjects

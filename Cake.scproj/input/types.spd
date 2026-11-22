@@ -95,7 +95,7 @@ class XType
 
 
 datatype Wierdness (uint)
-	flags
+	flag_Constants
 		Pointer
 		Reference
 	syntax is (|Wierdness| N, |bool|)

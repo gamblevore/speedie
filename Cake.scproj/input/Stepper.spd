@@ -2,7 +2,7 @@
 
 datatype StepAction (uint)
 	default 0
-	flags
+	flag_constants
 		|StepAction|
 		DoNothing = 0
 		SendVars

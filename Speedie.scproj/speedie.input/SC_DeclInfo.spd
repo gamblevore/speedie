@@ -40,7 +40,7 @@ constants
 
 
 datatype SCDeclInfo (uint)
-	flags
+	flag_constants
 		// could look for other exclusive flags
 		// consts can't be borrowed.
 		

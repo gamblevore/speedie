@@ -929,7 +929,7 @@ datatype bool
 
 
 datatype MoveCode (byte)
-	Flags
+	flag_constants
 		|movecode|
 		Right
 		Left

@@ -202,7 +202,7 @@ function scfunction.Unfinished (|bool|)
 
 
 datatype SCBlockage (int)
-	flags
+	flag_constants
 		Bits		= 0b111
 	
 		Continue	= 0b001

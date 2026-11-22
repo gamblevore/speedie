@@ -9,7 +9,7 @@ datatype ASMReg (uint64)
 	linkage
 		cpp_part Reg
 	
-	flags
+	flag_constants
 		|asmreg|
 		Temp = 1024			// Sigh.
 		(1<<16)				// Starting point

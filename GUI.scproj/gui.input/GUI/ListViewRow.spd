@@ -210,7 +210,7 @@ role ListViewRow (message)
 
 
 datatype ListViewState (uint16)
-	flags
+	flag_constants
 		|ListViewState|
 		AlignLeft	= 0
 		Align		= [AlignCenter, AlignRight]
@@ -239,7 +239,7 @@ datatype ListViewState (uint16)
 datatype ListViewSelectMode (uint)
 	linkage
 		numeric false
-	flags
+	flag_constants
 		|ListViewSelectMode|
 		InitialSelection
 		NoShow

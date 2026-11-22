@@ -6,7 +6,7 @@
 
 
 datatype ClassInfo (int)
-	Flags
+	flag_constants
 		|ClassInfo|
 		ContainsParentClass
 		IgnoreContainedSelf

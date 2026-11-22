@@ -46,7 +46,7 @@ class Task (list)
 
 
 datatype TaskState (byte)
-	flags
+	flag_constants
 		|TaskState|
 		Started
 		Paused
