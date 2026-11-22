@@ -111,7 +111,7 @@ function compiler.VariousSelfTests
 			WantCompress = options.noisy
 		if WantCompress
 			if (Cpp_Export.FindGlobalsCpp*12).CompressTest_(false)
-				"Compression: OK" // stabilise strings by putting outside of target
+				"Success"
 		mzlab.FreeNow
 
 
