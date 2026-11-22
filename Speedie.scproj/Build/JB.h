@@ -6833,6 +6833,8 @@ ASMReg SC_Pac_xC2xB5(Assembler* Self, Message* Exp, ASMReg Dest);
 
 ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest, bool Force);
 
+ASMReg SC_Pac_xC2xB5Copy(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* D);
+
 ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A, int Add);
 
 ASMReg SC_Pac_xC2xB5GetPrms(Assembler* Self, Message* Exp, ASMReg Dest);
@@ -7379,7 +7381,7 @@ void SC_FS_AppendCppAll(FastString* Self, JB_String* S);
 
 void JB_FS_AppendEscape(FastString* Self, JB_String* S);
 
-void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp);
+void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool PreferExp);
 
 void JB_FS_AppendHexStr(FastString* Self, JB_String* Data);
 
@@ -7430,6 +7432,8 @@ void JB_FS_AppendUint(FastString* Self, uint Data);
 void JB_FS_AppendUint16(FastString* Self, uint /*u16*/ Data);
 
 void JB_FS_AppendInt32(FastString* Self, int Data);
+
+void JB_FS_AppendDouble0(FastString* Self, Float64 D);
 
 void JB_FS_AppendBool(FastString* Self, bool B);
 

@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2383];
+extern JB_StringC* JB_LUB[2385];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2687,7 +2687,7 @@ void SC_Comp__VariousSelfTests() {
 		JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
 		JB_Incr(_tmPf0);
 		if (SC_Str_CompressTest_((_tmPf0), false, 3)) {
-			JB_PrintLine(JB_LUB[2382]);
+			JB_PrintLine(JB_LUB[2384]);
 		}
 		JB_Decr(_tmPf0);
 	}
@@ -16924,7 +16924,7 @@ ASMReg SC_ASMType__Access(Assembler* Self, Message* Exp, ASMReg Dest) {
 		}
 	}
 	 else if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
-		return SC_Pac_CopyMemory(Self, 0, Exp, Dest, Base, RegToAdd, D->Internal);
+		return SC_Pac_CopyMemory(Self, 0, Exp, Base, Dest, RegToAdd, D->Internal);
 	}
 	return SC_Pac_IncrPointerByVar(Self, Dest, Base, RegToAdd, Exp, 0);
 }
@@ -16936,6 +16936,7 @@ ASMReg SC_ASMType__AddressOf(Assembler* Self, Message* Exp, ASMReg Dest) {
 	}
 	Dest = SC_Reg_SyntaxIsSet(Dest, kSC__Reg_AddrNeed, true);
 	Rz = SC_Pac_GetASM(Self, Exp, Dest);
+	Rz = SC_Reg_xC2xB5TypeSet(Rz, kJB__TC__voidptr);
 	Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_ContainsAddr, (!true));
 	Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_AddrRequest, (!true));
 	Rz = SC_Reg_SyntaxIsSet(Rz, kSC__Reg_AddrForceRequest, (!true));
@@ -17214,10 +17215,12 @@ ASMReg SC_ASMType__DoGlobal(Assembler* Self, ASMReg Dest, Message* Exp, SCDecl* 
 	if ((SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) or (SC_Decl_IsBareStruct(D) or SC_Decl_IsCArray(D))) {
 		if (SC_Reg_SyntaxIs(Dest, kSC__Reg_Set)) {
 			ASMReg CopyTo = SC_Pac_GlobAddr(Self, D, Exp, nil);
-			return SC_Pac_CopyMemory(Self, 0, Exp, CopyTo, Dest, nil, D);
+			return SC_Pac_CopyMemory(Self, 0, Exp, Dest, CopyTo, nil, D);
 		}
 		ASMReg Addr = SC_Pac_GlobAddr(Self, D, Exp, Dest);
 		if (Addr) {
+			if (!SC_Reg_SyntaxIs(Dest, kSC__Reg_AddrRequest)) {
+			}
 			Addr = SC_Reg_xC2xB5TypeSet(Addr, SC_Decl_xC2xB5Type(D));
 			Addr = SC_Reg_HaveAddr(Addr);
 		}
@@ -17535,16 +17538,16 @@ ASMReg SC_ASMType__Second(Assembler* Self, Message* Exp, ASMReg Dest) {
 
 ASMReg SC_ASMType__SetRel(Assembler* Self, Message* Exp, ASMReg Dest) {
 	Message* F = SC_Msg_ASMUnbra(((Message*)JB_List_First(Exp)));
+	Exp = ((Message*)JB_List_Last(Exp));
 	ASMReg X = SC_Pac_ExistingVar(Self, F);
 	if (X) {
 		SCDecl* D = SC_Msg_ASMDecl(F);
-		if (SC_Decl_IsBareStruct(D) or SC_Decl_IsCArray(D)) {
-			X = SC_Reg_SyntaxIsSet(X, kSC__Reg_Set, true);
+		if (!(SC_Decl_IsBareStruct(D) or SC_Decl_IsCArray(D))) {
+			return SC_Pac_xC2xB5Into(Self, Exp, X);
 		}
-		return SC_Pac_xC2xB5Into(Self, ((Message*)JB_List_Last(Exp)), X);
+		return SC_Pac_xC2xB5Copy(Self, Exp, X, D);
 	}
 	Dest = SC_Msg_ASMAllowsTemp(F);
-	Exp = ((Message*)JB_List_Last(Exp));
 	ASMReg Src = SC_Pac_xC2xB5GetPrms(Self, Exp, Dest);
 	Src = SC_Reg_SyntaxIsSet(Src, kSC__Reg_Set, true);
 	return SC_Pac_xC2xB5(Self, F, Src) | kSC__Reg_Discard;
@@ -17674,12 +17677,12 @@ ASMReg SC_ASMType__TypeCast(Assembler* Self, Message* Exp, ASMReg Dest) {
 	if (SC_Decl_IsBareStruct(NewDecl)) {
 		return SC_Reg__NewWith0() | kSC__Reg_Discard;
 	}
-	Dest = SC_Reg_xC2xB5TypeSet(Dest, SC_Decl_xC2xB5Type(NewDecl));
+	uint NewType = SC_Decl_ASMRegType(NewDecl);
+	Dest = SC_Reg_xC2xB5TypeSet(Dest, NewType);
 	ASMReg From = SC_Pac_GetASM(Self, F, Dest);
-	if (SC_Reg_xC2xB5Type(From) == SC_Reg_xC2xB5Type(Dest)) {
+	if (SC_Reg_xC2xB5Type(From) == NewType) {
 		return From;
 	}
-	uint NewType = SC_Decl_ASMRegType(NewDecl);
 	if (!SC_Reg_Reg(From)) {
 		From = SC_Reg_xC2xB5TypeSet(From, NewType);
 		return From;
@@ -20000,17 +20003,14 @@ NilState SC_nil__FailedReal(SCFunction* To, Message* Where, uint /*NilReason*/ R
 		JB_FS_AppendString(Fs, Raw);
 	}
 	JB_Decr(Raw);
-	JB_FS_AppendByte2(Fs, ':');
 	JB_FS_AppendByte2(Fs, ' ');
+	JB_FS_AppendByte(Fs, '\'');
 	JB_FreeIfDead(SC_Msg_OrigRender(Where, Fs));
+	JB_FS_AppendByte(Fs, '\'');
 	if (To) {
-		JB_FS_AppendString(Fs, JB_LUB[230]);
-		if (JB_Tree_IsFirst(Where) and To->Cls) {
-			JB_FS_AppendString(Fs, To->Name);
-		}
-		 else {
-			JB_FreeIfDead(SC_Func_RenderTitle(To, true, Fs));
-		}
+		JB_FS_AppendString(Fs, JB_LUB[2382]);
+		JB_FS_AppendString(Fs, To->Name);
+		JB_FS_AppendString(Fs, JB_LUB[2383]);
 		SC_Func_ErrorIsHere(To);
 	}
 	if (true) {
@@ -20019,7 +20019,10 @@ NilState SC_nil__FailedReal(SCFunction* To, Message* Where, uint /*NilReason*/ R
 		JB_Msg_Fail(Where, _tmPf1);
 		JB_Decr(_tmPf1);
 	}
-	JB_EarlyDecr(Fs);
+	JB_Decr(Fs);
+	if (To) {
+		SC_Func_ErrorIsHere(To);
+	}
 	return 0;
 }
 
@@ -23575,6 +23578,10 @@ ASMReg SC_Pac_Continue(Assembler* Self, Message* Exp, ASMReg Dest) {
 }
 
 ASMReg SC_Pac_CopyMemory(Assembler* Self, int Index, Message* Exp, ASMReg Src, ASMReg Dest, ASMReg Vara, SCDecl* D) {
+	if ((!D)) {
+		JB_Msg_Fail(Exp, kJB__Rec_InternalError);
+		return 0;
+	}
 	if (SC_Reg_Reg(Vara)) {
 		Dest = SC_Pac_IncrPointerByVar(Self, nil, Dest, Vara, Exp, 0);
 	}
@@ -23585,7 +23592,7 @@ ASMReg SC_Pac_CopyMemory(Assembler* Self, int Index, Message* Exp, ASMReg Src, A
 	if (Amount > (1 << 14)) {
 		JB_Msg_Fail(Exp, JB_LUB[1115]);
 	}
-	return SC_FAT_AsReg(SC_Msg_WCPY(Exp, Src, Dest, Amount & ((1 << 14) - 1)), Src);
+	return SC_FAT_AsReg(SC_Msg_WCPY(Exp, Src, Dest, Amount & ((1 << 14) - 1)), Dest);
 }
 
 FatASM* SC_Pac_Curr(Assembler* Self) {
@@ -26926,7 +26933,7 @@ ASMReg SC_Pac_WhileSub(Assembler* Self, Message* Exp) {
 	BranchPHITracker BranchPhis = ((BranchPHITracker){});
 	SC_Pac_PhiStart(Self, (&BranchPhis));
 	BranchPHITracker PhI2 = ((BranchPHITracker){});
-	memcpy((&PhI2), (&BranchPhis), (148));
+	PhI2 = BranchPhis;
 	ASMReg Returns = SC_ASMType__ArgumentSub(Self, ((Message*)JB_Tree_Second(Exp)), kSC__Reg_Exit);
 	FatRange Loop_test = ((FatRange){});
 	Self->BreakRequest = (Self->BreakRequest | (kSC__Pac_Breakable | InitialJump->BreakInfo));
@@ -26993,6 +27000,12 @@ ASMReg SC_Pac_xC2xB5BoolInto(Assembler* Self, Message* Exp, ASMReg Dest, bool Fo
 		return SC_Pac_Exists(Self, Exp, Dest, Value);
 	}
 	return SC_Pac_Assign(Self, Exp, Dest, Value, Start);
+}
+
+ASMReg SC_Pac_xC2xB5Copy(Assembler* Self, Message* Exp, ASMReg Dest, SCDecl* D) {
+	ASMReg V = SC_Pac_xC2xB5(Self, Exp, SC_Reg__NewWith0());
+	JB_DoAt(1);
+	return SC_Pac_CopyMemory(Self, 0, Exp, V, Dest, nil, D);
 }
 
 ASMReg SC_Pac_xC2xB5FuncPrms(Assembler* Self, Message* Exp, SCDecl* A, int Add) {
@@ -30021,7 +30034,7 @@ JB_String* JB_Wrap_Render(DTWrap* Self, FastString* Fs_in) {
 	//visible;
 	uint K = Self->Kind;
 	if (JB_TC_IsFloat(K)) {
-		JB_FS_AppendDoubleAsText0(Fs, JB_int64_AsFloat(Self->PrivValue));
+		JB_FS_AppendDouble0(Fs, JB_int64_AsFloat(Self->PrivValue));
 	}
 	 else {
 		int64 V = Self->PrivValue;
@@ -30576,8 +30589,8 @@ void JB_FS_AppendEscape(FastString* Self, JB_String* S) {
 	JB_FS_AppendMultiReplace(Self, S, JB__Constants_EscapeStr, JB_StdErr);
 }
 
-void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool CanExp) {
-	JB_FS_AppendDoubleAsText(Self, ((Float64)D), Dp, CanExp);
+void JB_FS_AppendFloat(FastString* Self, float D, int Dp, bool PreferExp) {
+	JB_FS_AppendDoubleAsText(Self, ((Float64)D), Dp, PreferExp);
 }
 
 void JB_FS_AppendHexStr(FastString* Self, JB_String* Data) {
@@ -30787,6 +30800,11 @@ void JB_FS_AppendUint16(FastString* Self, uint /*u16*/ Data) {
 void JB_FS_AppendInt32(FastString* Self, int Data) {
 	//cpp_part;
 	JB_FS_AppendIntegerAsText(Self, Data, 1);
+}
+
+void JB_FS_AppendDouble0(FastString* Self, Float64 D) {
+	//cpp_part;
+	JB_FS_AppendDoubleAsText(Self, D, 0, false);
 }
 
 void JB_FS_AppendBool(FastString* Self, bool B) {
@@ -37480,6 +37498,16 @@ SCDecl* SC_Msg_CollectDecl(Message* Self, SCNode* P, SCNode* Recv, DeclMode Mode
 	}
 	Message* Default = SC_DeclsDefault(Name);
 	JB_Incr(Default);
+	if (JB_Msg_EqualsSyx(Name, kJB_SyxRel)) {
+		Message* Op = ((Message*)JB_Tree_Second(Name));
+		if (JB_Msg_Expect(Op, kJB_SyxOpp, JB_LUB[500])) {
+			if (JB_Tree_IsLast(Op)) {
+				JB_Msg_Fail(Name, JB_LUB[1029]);
+				JB_EarlyDecr(Default);
+				return nil;
+			}
+		}
+	}
 	SCDecl* Sdcl = SC_ExtractDecl(Type, P, Mode, 0);
 	JB_Incr(Sdcl);
 	if (Sdcl) {
@@ -61788,4 +61816,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// 7745629059735706836 4074544292908304061
+// -8530330662779822150 5653306278456249751
