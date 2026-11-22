@@ -145,8 +145,6 @@ function SCNode.CalculateConstSub (|message!| value, |$datatypecode| Ty, |uint64
 
 
 
-
-
 function SCModule.CollectConstantsSub (|Message| ch)
 	opt norefcounts
 	|| FuncName = ch.first									#require
@@ -162,7 +160,10 @@ function SCModule.CollectConstantsSub (|Message| ch)
 
 	expect (arg == vs) and (arg == @arg or arg == @list) (vs)
 	
-	|uint64| NextNum = 0 + (ch == "flags")
+	|| IsFlags = ch.name[].lowercase == 'f'
+//	if ch~="flags"
+//		problem (ch)
+	|uint64| NextNum = 0 + IsFlags
 	|uint64| StartNum = NextNum
 	|uint64| LastFlag = 0
 	
@@ -195,7 +196,7 @@ function SCModule.CollectConstantsSub (|Message| ch)
 			NewItem = SCDecl(typeint!)
 			|| NewNum = NewDeclNumConst( NewItem, NextNum, line.name, true )
 			newitem.source = line
-			if (ch == "flags")
+			if (IsFlags)
 				LastFlag++
 				NextNum <<= 1
 			  else

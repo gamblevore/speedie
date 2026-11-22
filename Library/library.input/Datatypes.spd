@@ -970,12 +970,6 @@ datatype MoveCode (byte)
 			self |= m
 		return self
 
-	function Field (|int|)
-		if self & Vertical
-			rz = 1
-		if self & Positive
-			rz |= 2
-	
 	function Flip (|bool| same=false, |movecode|)
 		if !same
 			|| m = 0b01010101

@@ -151,7 +151,7 @@ dispatch ClassOrModuleLinkage (TranFunc)
 			name_space.TypeInfo = 0
 			if type == "false" or "symbol"
 				(name_space is symbol)
-			  elseif type == "flags"
+			  elseif type == "flags" or "flag_constants"
 				(name_space is flags)
 			  else
 				error type

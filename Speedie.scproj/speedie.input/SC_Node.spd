@@ -1067,6 +1067,7 @@ dispatch RootCollectTable (CollectFunc)
 	+'cpp_part'				(SCNode.LoadCppPart)
 	+'constants'			(SCModule.ConstantCollector)
 	+'flags'				(SCModule.ConstantCollector)
+	+'flag_constants'		(SCModule.ConstantCollector)
 	
 
 
@@ -1117,11 +1118,12 @@ dispatch ClsCollectTable (CollectFunc)
 	+'module'				(DontRemove)
 	+'constants'			(SCModule.ConstantCollector)
 	+'flags'				(SCModule.ConstantCollector)
+	+'flag_constants'		(SCModule.ConstantCollector)
 
 
 
 datatype SCObjInfo (uint16)
-	Flags
+	flags
 		ExplicitExport
 		Visible
 		AllowLinkedLists
