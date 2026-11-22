@@ -72,7 +72,8 @@ function @confirmationdialog.Ask (|string| Q,  |string| Title,  |[string]| Answe
 			|| bw = b.textwidth+8 max 40
 			|| a = answers[i]
 			a ?= ""
-			b.vistext = a
+			b.textset(a)
+			b.visible = a
 			|| l = (i > 0)(3, 7)
 			b.size    = (l)~after for bW  by 5~up  for 17
 		.SetResponse(response)

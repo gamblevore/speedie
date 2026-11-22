@@ -24,7 +24,8 @@ function OpenSaveRequest (|string| types,  |string| base,  |string| Accept,  |bo
 		.types				= types
 		.accept.text		= accept
 		(.name is visible)	= save
-		.question.vistext = question
+		.question.textset(question)
+		.question.visible = question
 	
 	|| bigger = question and save
 	|| wsize = (bigger)(350 by 300, 350 by 275)

@@ -228,7 +228,7 @@ class GUIControl (list)
 	function Touch (|int| Amount = 1)
 		opt norefcounts
 		if (Amount < 0) and gui.IsBackground
-			return 
+			return
 		Amount = amount.abs
 		if gui.TouchCount < amount
 			gui.TouchCount = amount
@@ -272,17 +272,18 @@ class GUIControl (list)
 			GUI.resized(self)
 	
 	
-	function Transition (|int| Value, |int| Field, |movecode| Matching, |int|)
+	libinternal movecode.Field (|int|)
+		if self & Vertical
+			rz = 1
+		if self & Positive
+			rz |= 2
+	
+	libinternal Transition (|int| Value, |int| Field, |movecode| Matching, |int|)
 		if matching.field == field
 			value *= ._TransitionFraction
 			return value >> 12
 		return value
-	
-
-	function VisText (assigns:|string| S)
-		.TextSet(s)
-		(self is visible) = s > 0
-	
+		
 	
 	setter Visible (|bool|)
 		inlined
@@ -309,7 +310,7 @@ class GUIControl (list)
 		return true
 
 		
-	function ContainsMouse (|bool|)
+	libinternal ContainsMouse (|bool|)
 		opt norefcounts
 		|| w = .window
 		if w and w.IsFront
@@ -356,6 +357,7 @@ class GUIControl (list)
 	
 		
 	function PasteFromClipboard (|Object| Data, |copypasteflags| Type = CopyPasteFlags.PasteText, |bool|)
+		opt norefcounts
 		|| w = .window
 		if w and (data isa string)
 			rz = .PasteSub(Data, type, w)
@@ -364,9 +366,8 @@ class GUIControl (list)
 	
 	
 	libinternal PasteEvent (|GUIPasteEvent|)
-		if self isa textview and self isnt editable
-			return nil
-		return .OnPaste
+		if self is editable or self isa textview
+			return .OnPaste
 
 	
 	libinternal DragList (|array|)
@@ -405,7 +406,7 @@ class GUIControl (list)
 		
 	syntax equals (|string| s, |bool|)
 		if self
-			return .id.syntaxequals(s, true) // why would we want to tell "EditMe" apart from "editme"?
+			return .id.SyntaxEquals(s, true) // why would we want to tell "EditMe" apart from "editme"?
 
 	syntax equals (|string| s, |bool| Aware, |bool|)
 		disabled "Just use == which is always case-aware"
@@ -501,14 +502,17 @@ class GUIControl (list)
 			where.DrawEdge(R, g, ~.FindAttachedEdge)
 		where.controlclip = oldclip
 
+
 	inline Edge (|int| x, |controlpoint|)
 		return ._Size[x&3]|controlpoint|
 	
+
 	setter Edge (|int| i, |controlpoint|)
 		inlined
 		if .edge(i) != value
 			._Size[i] = value
 			GUI.resized(self)
+
 	
 	libinternal FindAttachedEdge (|MoveCode|) // .EdgeAllow
 		opt norefcounts
@@ -555,17 +559,18 @@ class GUIControl (list)
 		w._FlashSelf = 0
 	
 			
-	function SetFocus
+	function SetFocus (|bool| Clear=false)
 		opt norefcounts
-		.window$.setfocus(self)
+		nil self
+		|| w = .window
+		if w and (!clear or .hasfocus)
+			if clear
+				self = nil
+			w.setfocus(self)
 
-
-	function ClearFocus
-		opt norefcounts
-		if .HasFocus
-			.window!.SetFocus(nil)
-
-
+	inline ClearFocus
+		.SetFocus(true)
+	
 	libinternal MouseIsDown (|bool|)
 		opt norefcounts
 		|| w = .window
