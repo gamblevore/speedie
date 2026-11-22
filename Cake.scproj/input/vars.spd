@@ -517,7 +517,7 @@ class XVar (list)
 			if (f is Prototype) or w.Carray or .isobject
 				return true
 			addr = ptr|&ivec4|
-			fs <~ ": "
+			fs <~ " // "
 
 		require fs.TestMem(addr, bc)
 				
@@ -564,32 +564,50 @@ class XVar (list)
 		  else
 			if v <= 1
 				if BC <= 4
-					fs <~ (addr|&float|)[]
+					fs.CakeFloat(addr|&float|[])
 				  else
-					fs <~ (addr|&f64|)[]
-			  elseif v == 2
-				fs <~ (addr|&vec2|)[]
-			  elseif v == 3
-				fs <~ (addr|&vec3|)[]
-			  elseif v == 4
-				(addr|&vec4|)[].SmallerVec4Render(fs)
+					fs.CakeFloat(addr|&f64|[])
+			  else
+				fs.SmallerVecRender(addr|&float|, v)
 
 		return true
 	
-	
-function vec4.SmallerVec4Render (|Faststring| fs)
-	if self == vec4()
-		fs <~ "vec4()"					// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell
+
+function faststring.CakeFloat (|Float| F)
+	.CakeFloat(f|float64|, 7)
+
+
+function faststring.CakeFloat (|Float64| F, |int| dp=16)
+	if f.IsNan
+		self <~ "NaN" // could output the nanbits later.
+	  elseif f.IsInf
+		if f < 0
+			self <~ "-"
+		self <~ "inf"
 	  else
-		fs <~ "("
-		for i in 4
-			|| v = self[i]
-				fs <~ v
+		.AppendDouble(F, dp)
+
+
+
+function faststring.SmallerVecRender (|&float| Addr, |int| n)
+	|| Real = false
+	for i in n
+		if addr[i]
+			Real = true
+	if !real
+		self <~ "vec"
+		self <~ n
+
+	self <~ "("
+	if Real		// fs <~ "0.0,0.0,0.0,0.0" // noisy as hell	
+		for i in n
+			if i
+				self <~ ", "
+			|| v = addr[i]
+				.cakefloat(v)
 			  else
-				fs <~ "0"
-			if i < 3
-				fs <~ ", "
-		fs <~ ")"
+				self <~ "0"
+	self <~ ")"
 
 
 function faststring.EscapeByte (|byte| value)
