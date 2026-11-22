@@ -65,6 +65,11 @@ extern "C" {
 		uint u = *((uint*)(&x));
 		return (u << 1) == (0xff800000u << 1);
 	}
+	inline bool JB_f_IsNanOrInf (float x) {
+		uint u = *((uint*)(&x));
+		return (u << 1) >= (0xff800000u << 1);
+	}
+
 
 
 #if __PLATFORM_CURR__ != __PLATFORM_OSX__
