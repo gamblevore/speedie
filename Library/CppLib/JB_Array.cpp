@@ -231,7 +231,7 @@ JB_String* JB_Array_Render (Array* self, FastString* fs_in) {
 }
 
 
-void JB_Array_Reverse( Array* self ) {
+void JB_Array_Reverse ( Array* self ) {
     int n = (int)(self->_Length)/2;
     auto F = self->_Ptr;
     for_(n)
