@@ -574,9 +574,7 @@ GUI_cncl_Destructor
 GUI_cncl_SyntaxCall
 GUI_ctrl_AppForeGroundChange
 GUI_ctrl_BlockSize
-GUI_ctrl_ClearFocus
 GUI_ctrl_Constructor
-GUI_ctrl_ContainsMouse
 GUI_ctrl_ControlAt
 GUI_ctrl_Copy
 GUI_ctrl_CopyToClipboard
@@ -622,10 +620,8 @@ GUI_ctrl_TaskGUI_interface_SyntaxCall
 GUI_ctrl_TextSetter
 GUI_ctrl_Touch
 GUI_ctrl_TouchScrollBar
-GUI_ctrl_Transition
 GUI_ctrl_TypedString
 GUI_ctrl_Undo
-GUI_ctrl_VisTextSet
 GUI_ctrl_WidthSet
 GUI_ctrl_Window
 GUI_ctrl___AppForeGroundChange__
@@ -1058,7 +1054,6 @@ JB_Mem__ClassLeakCounter
 JB_Mem__Fill
 JB_Mem__Object
 JB_Mem__PermAlloc
-JB_MoveCode_Field
 JB_MoveCode_Flip
 JB_MsgPos_Destructor
 JB_Msg_Ancestor
