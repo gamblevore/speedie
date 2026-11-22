@@ -39,6 +39,7 @@ class TextViewLine (message)
 		.CompilePos = -1
 	
 	function Message (|message|)
+		opt norefcounts
 		return .obj as Message
 	
 	inline TextFlags (|textlineflags|)

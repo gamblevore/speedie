@@ -28,6 +28,7 @@ role ListViewCell (message)
 		
 	function Row (|ListViewrow!|)
 		inlined
+		opt norefcounts
 		return (.obj as Message)|listviewrow|!
 	
 	syntax cast (|string|)

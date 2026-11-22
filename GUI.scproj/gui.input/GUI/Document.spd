@@ -412,6 +412,7 @@ extend TextView
 	libinternal Undo_ (|document| D, |documentreverser| m)
 		// abcdef<123>gh		//	"123"	(6,6)	""
 		// abcdef123gh
+		opt norefcounts
 		|| t = m.obj as string
 		if t != nil
 			|| x = m.Point.x
