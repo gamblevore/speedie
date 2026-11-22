@@ -16,7 +16,7 @@ function string.RenderSpeed (|object| fs_in=nil, |int64| BytesIn, |duration| Dur
 		if BytesIn
 			fs <~ " ("
 			|| ratio = ((Bytesout div Bytesin)|float|*100.0)
-			fs.appendfloat(ratio)
+			fs.appendfloat(ratio, 1)
 			fs <~ "%)"
 
 	if bytesin or bytesout
