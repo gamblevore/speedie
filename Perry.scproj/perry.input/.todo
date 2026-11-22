@@ -2,10 +2,11 @@
 
 							/// Get perry ASMing ///
 
+* |float| ana,   || x = ((&ana)|&uint|) // fails in cake, x is nil!
+
 * BoolNot bugs
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
-* |float| ana,   || x = ((&ana)|&uint|) // fails in cake, x is nil!
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
@@ -20,8 +21,6 @@
 								// ASM later
 
 * entering a constructor that does not exist (auto-generated) should stay at the same line of code.
-* ASM errors while editing. Shouldn't spam interface... just ignore I guess.
-	* |retrofloat| B /    // slash // ASMVIew spams errors
 * Step through destructor without it fretting
 * Display libglobs
 

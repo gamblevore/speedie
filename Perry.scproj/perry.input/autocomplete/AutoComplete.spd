@@ -340,11 +340,7 @@ function PerryIDE.PopupHide
 
 
 // SpeedieDidReceiveMsg, receivedmsg, maybedidgetmsg, gotmsg, msgreceived, receivefb, fbreceived
-function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
-	debug_require c
-	if (c == .compilr) and !c.CommsOpen
-/		isnt active		// the compiler doesn't send messages? its just a unixprocess?
-
+function PerryIDE.SpeedieMsgReceive (|SpdProcess| c)
 	|| msg = C.Get					#require
 	|message| date
 	if msg == @arg and "Perry"
@@ -360,38 +356,41 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c, |bool|)
 			.editme.insertautocomplete
 		if msg.first ~= "ASM"
 			.GotASMError(msg.second)
-		return false
+		return
 	
 	.DuringMsgFB = true
 	|| reason = ""
 	if msg ~= "result"
 		reason = msg.firstname
-		msg = msg.second$ // in case of garbled result?
+		msg = msg.second // in case of garbled result?
 		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
 			msg.name = "" // returns
 	
 	.LogOneComm(msg, "\1b ", c)
 	|| f = msg.first
-		if msg ~= "autocomplete"
-			.AutoCompleteFB(f, AutoCompleteMode.default, reason)
-		  elseif msg ~= "autocomplete_edit"
-			.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
-		  elseif msg ~= "autocomplete_sel"
-			.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
-		  elseif msg starts "display"
-			.DisplayFB(msg)
-		  elseif msg starts "log"
-			0 //
-		  elseif msg starts "callfrom" or "decl"
-			.CallFromFB(msg)
-		  elseif msg starts "ASM"
+	if !f or !msg
+		0
+	  elseif (c == .asmprocess)
+		if msg starts "ASM"
 			.GotASM(msg)
-		  elseif msg starts "check"
-			.CheckFB(msg, true)
-		  elseif msg starts "unused"
-			.CheckFB(msg, false)
-		  elseif msg starts "define"
-			.DefineFB(msg)
+	  elseif msg ~= "autocomplete"
+		.AutoCompleteFB(f, AutoCompleteMode.default, reason)
+	  elseif msg ~= "autocomplete_edit"
+		.AutoCompleteFB(f, AutoCompleteMode.edit, reason)
+	  elseif msg ~= "autocomplete_sel"
+		.AutoCompleteFB(f, AutoCompleteMode.sel, reason )
+	  elseif msg starts "display"
+		.DisplayFB(msg)
+	  elseif msg starts "log"
+		0 //
+	  elseif msg starts "callfrom" or "decl"
+		.CallFromFB(msg)
+	  elseif msg starts "check"
+		.CheckFB(msg, true)
+	  elseif msg starts "unused"
+		.CheckFB(msg, false)
+	  elseif msg starts "define"
+		.DefineFB(msg)
 	.DuringMsgFB = false
 
 
