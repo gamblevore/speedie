@@ -422,9 +422,9 @@ bool HasDot (uint8* self, int Used) {
 }
 
 void JB_FS_AppendDoubleAsText (FastString* self, double D, int dp, int ActualExp) {
-	if (D != D) {			// NaN. Write -0 to signify nan.
+	if (JB_f_IsNanOrInf(D))				// NaN. Write -0 to signify nan.
 		return JB_FS_AppendCString(self, "-00.00");
-	}
+	
 	if (!D)
 		return JB_FS_AppendCString(self, "0.0");
 
