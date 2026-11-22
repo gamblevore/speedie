@@ -215,12 +215,12 @@ function TypeCast (fn_asm)
 	if newdecl.IsBareStruct
 		return asmreg() ||| asmreg.discard
 	
-	dest.µtype = newdecl.µtype
+	|| NewType = NewDecl.ASMRegType
+	dest.µtype = NewType
 	|| From = .µGetASM(F, dest)
-	if From.µtype == dest.µtype
+	if From.µtype == newtype
 		return From // already done!
 
-	|| NewType = NewDecl.ASMRegType
 	if !from.Reg												// x = 0|float|
 		from.µtype = NewType
 		return from
@@ -610,8 +610,10 @@ function DoGlobal (|assembler| self, |AsmReg| Dest, |message| exp, |scdecl| D, |
 			return .CopyMemory(0, Exp, dest, CopyTo, nil, D)
 		
 		|| addr = .GlobAddr(d, exp, dest)
+			if dest isnt addrrequest
 			addr.µtype = d.µtype
-			addr = addr.HaveAddr
+			addr = addr.HaveAddr	// The thing asking for the addrrequest, should capture the type found.
+									// but what if its not an addrrequest?
 		return addr
 	
 	|asmreg| addr
@@ -633,6 +635,7 @@ function AddressOf (fn_asm)
 	(Dest is AddrNeed)
 	rz = .µGetASM(exp, dest)
 	target debug: if (rz isnt ContainsAddr)
+	rz.µtype = DataTypeCode._voidptr // reset it
 	(rz isnt ContainsAddr)
 	(rz isnt AddrRequest)
 	(rz isnt AddrForceRequest)
