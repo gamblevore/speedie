@@ -304,15 +304,6 @@ inline void JB_Decr(JB_Object* self) {
 }
 
 
-inline void JB_SetSquash (JB_Object* Self, JB_Squash* Where, JB_Object* Value) {
-	JB_Squash V2 = Value;
-	JB_Incr_(Value);
-	auto Old = *Where + Self;
-	*Where = V2;
-	JB_Decr(Old);
-}
-
-
 inline void JB_Clear_(JB_Object** Place) {
     #if DEBUG
 		JB_TotalSanity(JB_TotalSanity_Force);
@@ -334,6 +325,7 @@ inline JB_Object* JB_SafeDecr_(JB_Object* self) {
     return self;
 }
 
+
 inline JB_Object* JB_FreeIfDead(JB_Object* self) {
     #if DEBUG
 		JB_TotalSanity(JB_TotalSanity_Force);
@@ -347,7 +339,16 @@ inline JB_Object* JB_FreeIfDead(JB_Object* self) {
 }
 
 
-inline void JB_SetRef_(JB_Object** Place, JB_Object* New) {
+inline void JB_SetSquash (JB_Object* Self, JB_Squash* Where, JB_Object* Value) {
+	JB_Squash V2 = Value;
+	JB_Incr_(Value);
+	auto Old = Where->UnSquash(Self);
+	*Where = V2;
+	JB_Decr(Old);
+}
+
+
+inline void JB_SetRef_ (JB_Object** Place, JB_Object* New) {
 	JB_Incr(New);
     JB_Object* Old = *Place;
 	*Place = New;
