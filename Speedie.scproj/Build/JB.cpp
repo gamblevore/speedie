@@ -27,7 +27,7 @@
 
 extern "C" {
 
-extern JB_StringC* JB_LUB[2386];
+extern JB_StringC* JB_LUB[2384];
 
 extern Object_Behaviour JB_Object_FuncTable_;
 
@@ -2687,7 +2687,7 @@ void SC_Comp__VariousSelfTests() {
 		JB_String* _tmPf0 = JB_Str_OperatorMul(SC__Cpp_FindGlobalsCpp, 12);
 		JB_Incr(_tmPf0);
 		if (SC_Str_CompressTest_((_tmPf0), false, 3)) {
-			JB_PrintLine(JB_LUB[2385]);
+			JB_PrintLine(JB_LUB[1270]);
 		}
 		JB_Decr(_tmPf0);
 	}
@@ -11836,8 +11836,7 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1850], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1673], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Base__LoadCppPart))))));
 	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1657], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
-	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[1774], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
-	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[2384], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
+	(JB_Dict_ValueSet(SC_RootCollectTable, JB_LUB[2194], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
 	//dispatch;
 	JB_SetRef(SC_ClsCollectTable, (JB_Dict_Constructor(nil)));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1658], JB_Wrap_ConstructorVoidPtr(nil, ((void*)(&SC_Func__NewConstructor)))));
@@ -11881,8 +11880,7 @@ int JB_SP_AppInitSub_() {
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2156], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Class__SetSize))))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1961], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_DontRemove))))));
 	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1657], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
-	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[1774], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
-	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2384], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
+	(JB_Dict_ValueSet(SC_ClsCollectTable, JB_LUB[2194], JB_Wrap_ConstructorVoidPtr(nil, ((void*)((&SC_Mod__ConstantCollector))))));
 	//dispatch;
 	//;
 	JB_SetRef(SC_fs_tmp_num, JB_FS_Constructor(nil));
@@ -12070,10 +12068,10 @@ bool SC_ClassOrModuleLinkage_numeric(SCFunction* Fn, Message* Node, SCNode* Name
 			return nil;
 		}
 		((SCClass*)Name_space)->TypeInfo = 0;
-		if ((JB_Msg_SyntaxEquals(Type, JB_LUB[1756], false)) or (JB_Msg_SyntaxEquals(Type, JB_LUB[2194], false))) {
+		if (JB_Msg_SyntaxEquals(Type, JB_LUB[1756], false)) {
 			(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Symbol, true));
 		}
-		 else if ((JB_Msg_SyntaxEquals(Type, JB_LUB[1774], false)) or (JB_Msg_SyntaxEquals(Type, JB_LUB[2384], false))) {
+		 else if ((JB_Msg_SyntaxEquals(Type, JB_LUB[1774], false)) or (JB_Msg_SyntaxEquals(Type, JB_LUB[2194], false))) {
 			(SC_Class_SyntaxIsSet(((SCClass*)Name_space), kSC__ClassInfo_Flags, true));
 		}
 		 else {
@@ -37337,7 +37335,7 @@ void SC_Msg_Clean(Message* Self, bool Erl) {
 					 else if (SC__SC_UniqueNum and (JB_FreeIfDead(((JB_String*)JB_Dict_Value0(SC__AutoComplete_SpdFunctions, S))) != nil)) {
 						SC__SC_UniqueNum = 0;
 					}
-					 else if ((JB_Str_Equals(S, JB_LUB[1706], false)) or ((JB_Str_Equals(S, JB_LUB[1774], false)) or ((JB_Str_Equals(S, JB_LUB[1657], false)) or (JB_Str_Equals(S, JB_LUB[2384], false))))) {
+					 else if ((JB_Str_Equals(S, JB_LUB[1706], false)) or ((JB_Str_Equals(S, JB_LUB[1657], false)) or (JB_Str_Equals(S, JB_LUB[2194], false)))) {
 						JB_SetRef(IgnoreArg, ((Message*)JB_List_Last(Curr)));
 					}
 					 else if (JB_Str_Equals(S, JB_LUB[2328], false)) {
@@ -61818,4 +61816,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4484035006557758514 -72781533799211036
+// -4484035006557758514 -2867929602405910470

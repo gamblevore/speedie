@@ -2191,7 +2191,7 @@
 "subm"
 "super"
 "swap"
-"symbol"
+"flag_constants"
 "syntax"
 "syntax/setter/operator/render/behaviour/virtual/constructor/destructor"
 "syntaxcompare"
@@ -2381,4 +2381,3 @@
 "Todo:"
 ", passed to: "
 "()"
-"flag_constants"
