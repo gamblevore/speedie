@@ -19,8 +19,17 @@ JBClass( JB_List, JB_Object,
 	JB_List*		Prev;
 	JB_List*		Next;
 	JB_List*		Child;
+//	JB_Squash		Obj;
+//	uint			PlaceHolder; // why not.
 );
 
+/*
+inline void JB_List_ObjSet ( JB_List* Self, JB_Object* Obj ) {
+	JB_SetSquash(Self, &Self->Obj, Obj);
+}
+inline JB_Object* JB_List_Obj ( JB_List* Self ) {
+	return Self->Obj.UnSquash(Self);
+}*/
 
 JB_List* JB_List_FlatPrev0( JB_List* self );
 JB_List* JB_List_FlatPrev( JB_List* self, bool Down );

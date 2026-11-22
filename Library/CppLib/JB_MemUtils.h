@@ -33,8 +33,14 @@ struct JB_Squash {
 	inline JB_Squash(uint64 V) { Value=V; }
 	inline JB_Squash(JB_Object* V) { Value=((uint64)V)>>kUltraShift; }
 	inline operator uint64() const { return Value; }
-	inline JB_Object* operator + (uint64 Base)  const { return (JB_Object*)(Base | (Value << kUltraShift)); }
-	inline JB_Object* operator + (JB_Object* V) const { return (JB_Object*)((((uint64)V)&~(kUltraAlloc-1)) | (Value << kUltraShift)); };
+	inline JB_Object* UnSquash (uint64 Base)  const {
+		auto V = Value;
+		return V ? (JB_Object*)(Base | (Value << kUltraShift)) : 0;
+	}
+	inline JB_Object* UnSquash (JB_Object* Base) const {
+		auto V = Value;
+		return V? (JB_Object*)((((uint64)Base)&~(kUltraAlloc-1)) | (V << kUltraShift)) : 0;
+	};
 };
 
 

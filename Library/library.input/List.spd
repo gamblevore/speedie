@@ -27,6 +27,8 @@ class list
 
 	destructor							{ cpp_wrapper JB_List_Destructor }
 	
+//	function Obj (|object?|)			{cpp_wrapper (JB_List_Obj)}
+//	setter Obj	 (|object?|)			{cpp_wrapper (JB_List_ObjSet)}
 	function Parent (||)				{cpp_wrapper JB_List_Parent; nil checker}
 	function Parent (assigns:|...?|)
 		nil self // for .remove
