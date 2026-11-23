@@ -364,7 +364,7 @@ function PerryIDE.SpeedieMsgReceive (|SpdProcess| c)
 		reason = msg.firstname
 		msg = msg.second // in case of garbled result?
 		if msg.name[0, "autocomplete"] and (.LastAutoCompleteDate != date.int)
-			msg.name = "" // returns
+			msg.name = ""
 	
 	.LogOneComm(msg, "\1b ", c)
 	|| f = msg.first
@@ -557,12 +557,13 @@ function PerryIDE.BuildCmd (|string| cmd,  |message| where,  |string| name,  |st
 	if (where == @tmp) and cmd[0, "autocomplete"]
 		return .BuildTmp(reason, where, name)
 	
-	if cmd ~= "callfrom"
-		|| Decl = where.Ancestor(@decl)
-		if Where == @decl
-			decl = where
-		if decl
-			return .BuildNormalCommand("decl", decl,  nil, "",  reason)
+	if cmd ~= "callfrom" or "define"
+		if cmd ~= "callfrom"
+			cmd = "decl"
+			if Where != @decl
+				|| Decl = where.Ancestor(@decl)
+					where = decl
+		return .BuildNormalCommand(Cmd,  where,  nil, "",  reason)
 
 
 function PerryIDE.BuildNormalCommand (|string| cmd,  |message| where,  |message| spd_func,  |string| name,  |string| reason,  |message|)

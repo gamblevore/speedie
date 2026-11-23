@@ -7,7 +7,6 @@
 	* cake crashing a lot
 
 * multiple matching functions in GUI during spd --self, printed from cmd-line prints like shit
-* perry cant cmd-click on a property?
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
