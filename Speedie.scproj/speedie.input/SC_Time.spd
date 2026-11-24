@@ -97,7 +97,7 @@ function compiler.CompileTime
 
 	|| Elapsed = .CompileAll ~ timeit
 	.PrintCompileTime(elapsed)
-
+	
 	require stderr.ok
 	TransCompiler.ExportAndInstall(elapsed)
 

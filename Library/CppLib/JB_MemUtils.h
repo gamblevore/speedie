@@ -34,12 +34,12 @@ struct JB_Squash {
 	inline JB_Squash(JB_Object* V) { Value=((uint64)V)>>kUltraShift; }
 	inline operator uint64() const { return Value; }
 	inline JB_Object* UnSquash (uint64 Base)  const {
-		auto V = Value;
-		return V ? (JB_Object*)(Base | (Value << kUltraShift)) : 0;
+		auto V = Value; // ternaries only needed if the object is optional.
+		return (JB_Object*)(Base | (V << kUltraShift));
 	}
 	inline JB_Object* UnSquash (JB_Object* Base) const {
 		auto V = Value;
-		return V? (JB_Object*)((((uint64)Base)&~(kUltraAlloc-1)) | (V << kUltraShift)) : 0;
+		return (JB_Object*)((((uint64)Base)&~(kUltraAlloc-1)) | (V << kUltraShift));
 	};
 };
 
