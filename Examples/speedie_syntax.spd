@@ -6,6 +6,7 @@
 targets: flow
 
 main
+	printline string.ascii_chart
 	|| list = &Syntax.TypeList[0]
 	for i in 63
 		|| item = list[i]
@@ -186,3 +187,37 @@ dispatch DoAction (|rpghero|self, |string| Reason)
 			.IsDucking = true
 
 
+function @string.ASCII_Chart (|string|)
+	opt norefcounts // compiles to 256 bytes of CakeASM. nice!
+	|| fs = FastString.shared
+	|| sp = ' '
+	for y in 32
+		for x in 4
+			|| c = y+x*32
+			
+			fs.AppendDecimal(c, 3)
+			fs <~ sp
+			fs <~ "x"
+			fs.AppendHex(c, 2)
+			fs <~ sp
+
+			|| l = fs.length
+			if c == '\t'
+				fs <~ `\t`
+			  elseif c == '\n'
+				fs <~ `\n`
+			  elseif c == '\r'
+				fs <~ `\r`
+			  elseif c == sp
+				fs <~ `' '`
+			  else
+				if c <= sp
+					c = sp
+				fs <~ c|byte|
+			if x < 3
+				fs <~ (sp, (7+l)-fs.length)
+				
+		fs <~ '\n'
+	return fs
+	
+	
