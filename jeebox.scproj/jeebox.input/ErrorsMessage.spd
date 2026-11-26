@@ -28,7 +28,7 @@ extend_module ErrorReceiver
 		if !errs // oof. So we made an error while trying to make an error? that will be a pain to handle
 			|error--| last = rec.LastError
 				last.Severity = ErrorSeverity.Problem
-			.NewProblem(nil, "Errors in Speedie-Format, could not be parsed", path)
+			.newerror(nil, desc, path)
 			return
 		
 		|message--| s = errs.first
