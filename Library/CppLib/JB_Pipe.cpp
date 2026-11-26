@@ -32,9 +32,10 @@
 #define kMsgPassAllow   1
 #define kStdOutSilence  4
 #define kStdOutPassThru 8
-#define kStdOutNil      12
+#define kStdOutAny      12
 #define kStdErrSilence  16
 #define kStdErrPassThru 32
+#define kStdErrSpeedie  64
 #define kStdErrModes    48
 #define kOwnGroup		128		// unused right now.
 
@@ -254,9 +255,12 @@ int JB_Str_System(JB_String* self) { // needz escape params manually...
 
 
 int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* ErrsIn, int Mode, Date TimeOut) {
+	if (Out)  Mode&=~kStdOutAny; else if (!(Mode&kStdOutAny)) Mode |= kStdOutPassThru;
+
 	if (ErrsIn) Mode&=~kStdErrModes; else if (!(Mode&kStdErrModes)) Mode |= kStdErrPassThru;
-	if (Out)  Mode&=~kStdOutNil; else if (!(Mode&kStdOutNil)) Mode |= kStdOutPassThru;
-	auto Sh = JB_Sh_Constructor(0, self, Mode&~kStdErrPassThru, R, nil);
+	Mode |= (Mode&kStdErrSpeedie)>>1; // kStdErrSpeedie implies kStdErrPassThru
+	
+	auto Sh = JB_Sh_Constructor(0, self, Mode&~kStdErrPassThru, R, nil); // clear passthru, so we handle it.
 	byte Error = JB_Sh_StartProcess(Sh);
 	if (Error) {
 		JB_SetRef(Sh, 0);
@@ -289,12 +293,12 @@ int JB_Str_Execute (JB_String* self, Array* R, FastString* Out, FastString* Errs
 		JB_Date__Sleep(1);
 	}
 
-	if (JB_FS_Length(Errs) and (Mode&kStdErrModes)==kStdErrPassThru) {
-		// Do we want to pass through, or capture?
-		// capture makes more sense. Leave it like this for now.
-		void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
-		JB_Rec__NewErrorSub(nil, JB_FS_GetResult(Errs), nil, 4);
+	if ((Mode&kStdErrModes) == kStdErrPassThru) {
+		void JB_Rec__ExecuteError(JB_String* Path, JB_String* Desc, int Mode);
+		if (JB_FS_Length(Errs))
+			JB_Rec__ExecuteError(self, JB_FS_GetResult(Errs), Mode);
 	}
+
 	if (!ErrsIn and Errs)
 		JB_FS_Destructor(Errs);
 	

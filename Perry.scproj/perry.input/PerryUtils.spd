@@ -102,25 +102,11 @@ function @error.From (|message?| self, |error|)
 	opt norefcounts
 	require self
 	if self != @arg
-		return .AsError
+		return .DecodeSpeedieError
 	rz = error()
 	for s in self
-		rz <~ s.AsError
+		rz <~ s.DecodeSpeedieError
 	
-	
-function message.AsError (|error|)
-	opt norefcounts
-	rz = error(nil|message|)
-	|| arg = .Last
-	if arg == @arg
-		rz.position = arg["pos"].int|int|
-		rz.path	= arg["file"].value
-		rz.severity = arg["severity"].int|errorseverity|
-		rz.name	= arg[@str].name
-	  else
-		rz.name = .name
-		rz.path = ""
-
 
 function perryide.ask (|message| args)
 	opt norefcounts

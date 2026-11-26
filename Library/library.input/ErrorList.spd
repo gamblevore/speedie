@@ -188,16 +188,23 @@ class ErrorReceiver
 		return .errorcount + .problemcount
 	
 	
-	function CanAddMore (|errorseverity| level=ErrorSeverity.error, |bool|)
+	function CanAddMore (|errorseverity| Level=ErrorSeverity.error, |ErrorSeverity|)
+		if Level < ErrorSeverity.Critical					// Keep criticals...
+			|| Lower = .LowerErrorsTo
+				Level = lower|int| min Level
+			
 		if (level >= 16)
 			_MemoryStillOK = false
-			return true // we need to report out of memory errors, if possible.
+			return Level									// We need to report out of memory errors, if possible.
 		require .LowerErrorsTo < ErrorSeverity.IgnoreAllErrors
+
 		if level == ErrorSeverity.problem
-			return (.problemcount < .maxproblems)
-		if level >= ErrorSeverity.error // a warning
-			return (.ErrorCount < .MaxErrors)
-		return (.WarnCount < .MaxErrors)
+			require .problemcount < .maxproblems
+		  elseif level >= ErrorSeverity.error
+			require .ErrorCount < .MaxErrors
+		  else												// A warning
+			require .WarnCount < .MaxErrors
+		return Level
 	
 	
 	Syntax UsingComplete (|object| idk=nil)

@@ -38,11 +38,12 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 
 	  elseif (self == "digest")
 		|| f = self[@sstr]
-			|| IsOK = stderr.mark
+			|| rec = StdErr
+			|| IsOK = rec.mark
 			using self
 				f.name = f.name.digest
-				if !IsOK and stderr.CanAddMore
-					|| err = stderr.errors.last
+				if !IsOK and rec.CanAddMore
+					|| err = rec.errors.last
 						err.shiftposition(f.position)
 				
 		.become(@bra)

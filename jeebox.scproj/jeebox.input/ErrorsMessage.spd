@@ -16,17 +16,57 @@ extend_module ErrorReceiver
 	inline NewCritical (|Message| node=nil, |string?| Desc=nil, |string?| path=nil)
 		.NewErrorSub(node, desc, path, ErrorSeverity.Critical)
 
+	autogen ExecuteError (|string| Path, |string| Desc, |ProcessMode| Mode)
+		visible
+		|errorreceiver--| Rec = StdErr
+		|| Sev = rec.CanAddMore							#require
+		
+		if Mode isnt StdErrSpeedie						// its a speedie error! Lets try to parse!
+			return .NewErrorSub(nil, desc, path, sev)
+		
+		|| Errs = desc.parse
+		if !errs // oof. So we made an error while trying to make an error? that will be a pain to handle
+			|error--| last = rec.LastError
+				last.Severity = ErrorSeverity.Problem
+			.NewProblem(nil, "Errors in Speedie-Format, could not be parsed", path)
+			return
+		
+		|message--| s = errs.first
+		while s
+			if (s == @tmp and "error") and rec.CanAddMore(sev)
+				|error--| err = s.DecodeSpeedieError  
+				rec <~ err
+			s++
+
+
+	
 	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
 		opt norefcounts
+		|| Rec = StdErr
 		if sev < ErrorSeverity.Critical // keep criticals...
-			|| Lower = stderr.LowerErrorsTo
+			|| Lower = rec.LowerErrorsTo
 				sev = lower|int| min sev
-		if stderr.CanAddMore(sev)
+		if rec.CanAddMore(sev)
 			if !desc
 				desc = node.MiniName("Unexpected ")
 			if path == nil
 				path = ""
-			nil|errorreceiver| <~ Error(node.FindNotInserted, desc, sev, path)
+			rec <~ Error(node.FindNotInserted, desc, sev, path)
+
+
+
+function message.DecodeSpeedieError (|error|)
+	opt norefcounts
+	rz = error(nil|message|)
+	|| arg = .Last
+	if arg == @arg
+		rz.position = arg["pos"].int|int|
+		rz.path	= arg["file"].value
+		rz.severity = arg["severity"].int|errorseverity|
+		rz.name	= arg[@str].name
+	  else
+		rz.name = .name
+		rz.path = ""
 
 
 

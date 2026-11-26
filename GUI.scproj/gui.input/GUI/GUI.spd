@@ -43,7 +43,7 @@ module GUI
 	|bool|						AControlWasResized
 	|bool|						TextInputEnabled
 	|bool|						TextInputEnabledAtStart
-	|byte|						TouchCount=3		// draw the first few frames always
+	|byte|						TouchCount = 3		// draw the first few frames always
 													// helps with startup events! at least on osx
 	|byte|						SingleFrameDepth
 	|byte|						TouchFingersDown

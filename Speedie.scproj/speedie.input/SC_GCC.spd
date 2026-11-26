@@ -559,7 +559,7 @@ function string.BatchSpds (|[file]|)
 	
 
 function File.TestCakeVM (|file| CakeProj, |bool|)
-	|| mode = processmode.StdErrCapture
+	|| mode = processmode.StdErrCapture + processmode.StdErrSpeedie
 	|| args = ["--nocolor", "--perry", CakeProj]
 	|| Status = .Execute(args, nil, mode)
 	return stderr.ok
@@ -570,7 +570,7 @@ function file.TestCakeProjects (|bool|)
 	|| list = "CakeTest".BatchSpds
 	|| OK = 0
 	for c in list
-		|| args = [c, "--bake", "--perry"]
+		|| args = [c, "--bake"]
 		|| str = .ExecuteStr(args, nil, mode)
 		if str == "Success"
 			OK++
@@ -609,7 +609,7 @@ function File.TestSpeedie (|string| v, |bool|)
 	
 	/////	/////	/////	/////
 	|| errs = FastString()
-	.execute(cmd_args, nil, errs, 0) // <------ CALL SPEEDIE
+	.execute(cmd_args, nil, errs, processmode.StdErrSpeedie) // <------ CALL SPEEDIE
 	if errs.Length
 		printline errs
 	/////	/////	/////	/////

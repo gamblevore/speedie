@@ -145,7 +145,7 @@ class DictionaryReader
 function String.ReplaceAll (|{string}| Dict, |ErrorReceiver| Rec=StdErr, |string|)
 	cpp_wrapper JB_Str_MultiReplaceAll
 
-function SetDecodeEntities (|{string}|Dict, |bool| Value)
+function SetDecodeEntities (|{string}| Dict, |bool| Value)
 	cpp_wrapper JB_MSR_DecodeEntitySet
 
 function SetEscapeCode (|{string}| Dict, |bool| Value)
