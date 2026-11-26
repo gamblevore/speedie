@@ -1074,6 +1074,7 @@ JB_Msg_ConvertJSONToJB
 JB_Msg_Copy
 JB_Msg_CopyAllInto
 JB_Msg_CopyWithoutUsing
+JB_Msg_DecodeSpeedieError
 JB_Msg_DeepEquals
 JB_Msg_Destructor
 JB_Msg_Dict
@@ -1214,6 +1215,7 @@ JB_Rec_Render
 JB_Rec_RenderErrors
 JB_Rec_SyntaxUsing
 JB_Rec__CrashLog
+JB_Rec__ExecuteError
 JB_Rec__NewErrorSub
 JB_RefCount
 JB_RetroFloat_Constructor

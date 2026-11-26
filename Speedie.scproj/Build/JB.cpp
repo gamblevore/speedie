@@ -18419,6 +18419,10 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X) {
 
 
 
+bool JB_PIDM_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M) {
+	return ((bool)(((int)Self) & ((int)M)));
+}
+
 
 int SC_SCBlockage_BlockCombine(SCBlockage Self, SCBlockage B) {
 	if (B == Self) {
@@ -30192,21 +30196,36 @@ int JB_Rec_BadCount(JB_ErrorReceiver* Self) {
 	return Self->ErrorCount + Self->ProblemCount;
 }
 
-bool JB_Rec_CanAddMore(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level) {
+ErrorSeverity JB_Rec_CanAddMore(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level) {
+	if (Level < kJB__ErrorSeverity_Critical) {
+		uint Lower = Self->LowerErrorsTo;
+		if (Lower) {
+			Level = JB_int_OperatorMin(((int)Lower), Level);
+		}
+	}
 	if (Level >= 16) {
 		JB__Rec__MemoryStillOK = false;
-		return true;
+		return Level;
 	}
 	if (Self->LowerErrorsTo >= kJB__ErrorSeverity_IgnoreAllErrors) {
-		return nil;
+		return 0;
 	}
 	if (Level == kJB__ErrorSeverity_Problem) {
-		return (Self->ProblemCount < Self->MaxProblems);
+		if (Self->ProblemCount >= Self->MaxProblems) {
+			return 0;
+		}
 	}
-	if (Level >= kJB__ErrorSeverity_Error) {
-		return (Self->ErrorCount < Self->MaxErrors);
+	 else if (Level >= kJB__ErrorSeverity_Error) {
+		if (Self->ErrorCount >= Self->MaxErrors) {
+			return 0;
+		}
 	}
-	return (Self->WarnCount < Self->MaxErrors);
+	 else {
+		if (Self->WarnCount >= Self->MaxErrors) {
+			return 0;
+		}
+	}
+	return Level;
 }
 
 void JB_Rec_Clear(JB_ErrorReceiver* Self) {
@@ -30485,6 +30504,38 @@ bool SC_Rec_TooMany(JB_ErrorReceiver* Self) {
 	return Self->ErrorCount >= 50;
 }
 
+void JB_Rec__ExecuteError(JB_String* Path, JB_String* Desc, uint /*ProcessMode*/ Mode) {
+	//visible;
+	JB_ErrorReceiver* Rec = JB_StdErr;
+	uint Sev = JB_Rec_CanAddMore(Rec, kJB__ErrorSeverity_Error);
+	if (!Sev) {
+		return;
+	}
+	if (!JB_PIDM_SyntaxIs(Mode, kJB__PIDM_StdErrSpeedie)) {
+		return JB_Rec__NewErrorSub(nil, Desc, Path, Sev);
+	}
+	Message* Errs = JB_Str_Parse(Desc, kJB_SyxNil, false);
+	JB_Incr(Errs);
+	if (!Errs) {
+		JB_Error* Last = JB_Rec_LastError(Rec);
+		if (Last) {
+			Last->Severity = kJB__ErrorSeverity_Problem;
+		}
+		JB_Rec__NewError(nil, Desc, Path);
+		JB_EarlyDecr(Errs);
+		return;
+	}
+	Message* S = ((Message*)JB_List_First(Errs));
+	while (S) {
+		if (((JB_Msg_EqualsSyx(S, kJB_SyxTmp)) and (JB_Msg_SyntaxEquals(S, JB_LUB[1737], false))) and JB_Rec_CanAddMore(Rec, Sev)) {
+			JB_Error* Err = JB_Msg_DecodeSpeedieError(S);
+			JB_Rec_AppendErr(Rec, Err);
+		}
+		S = ((Message*)JB_List_NextSib(S));
+	};
+	JB_Decr(Errs);
+}
+
 int JB_Rec__Init_() {
 	{
 		JB__Rec__MemoryStillOK = true;
@@ -30503,20 +30554,21 @@ void JB_Rec__NewError(Message* Node, JB_String* Desc, JB_String* Path) {
 }
 
 void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev) {
+	JB_ErrorReceiver* Rec = JB_StdErr;
 	if (Sev < kJB__ErrorSeverity_Critical) {
-		uint Lower = JB_StdErr->LowerErrorsTo;
+		uint Lower = Rec->LowerErrorsTo;
 		if (Lower) {
 			Sev = JB_int_OperatorMin(((int)Lower), Sev);
 		}
 	}
-	if (JB_Rec_CanAddMore(JB_StdErr, Sev)) {
+	if (JB_Rec_CanAddMore(Rec, Sev)) {
 		if (!JB_Str_Exists(Desc)) {
 			Desc = JB_Msg_MiniName(Node, JB_LUB[1381]);
 		}
 		if (Path == nil) {
 			Path = JB_LUB[0];
 		}
-		JB_Rec_AppendErr(((JB_ErrorReceiver*)nil), JB_Err_Constructor(nil, JB_Msg_FindNotInserted(Node), Desc, Sev, Path));
+		JB_Rec_AppendErr(Rec, JB_Err_Constructor(nil, JB_Msg_FindNotInserted(Node), Desc, Sev, Path));
 	}
 }
 
@@ -38266,6 +38318,23 @@ Message* SC_Msg_DeclName(Message* Self) {
 	return nil;
 }
 
+JB_Error* JB_Msg_DecodeSpeedieError(Message* Self) {
+	JB_Error* Rz = nil;
+	Rz = JB_Err_Constructor(nil, ((Message*)nil), JB_LUB[0], kJB__ErrorSeverity_Error, JB_LUB[0]);
+	Message* Arg = ((Message*)JB_List_Last(Self));
+	if (JB_Msg_EqualsSyx(Arg, kJB_SyxArg)) {
+		Rz->Position = ((int)JB_Msg_Int(JB_Msg_SyntaxAccess(Arg, JB_LUB[2050]), 0));
+		JB_SetRef(Rz->Path, JB_Msg_Value(JB_Msg_SyntaxAccess(Arg, JB_LUB[1765])));
+		Rz->Severity = ((ErrorSeverity)JB_Msg_Int(JB_Msg_SyntaxAccess(Arg, JB_LUB[2151]), 0));
+		JB_SetRef(Rz->Name, JB_Msg_Name(JB_Msg_NeedSyx(Arg, kJB_SyxStr)));
+	}
+	 else {
+		JB_SetRef(Rz->Name, Self->Name);
+		JB_SetRef(Rz->Path, JB_LUB[0]);
+	}
+	return Rz;
+}
+
 bool JB_Msg_DeepEquals(Message* Self, Message* B, bool Aware) {
 	Message* A = Self;
 	Message* A2 = ((Message*)JB_List_FlatAfter(Self));
@@ -43273,13 +43342,14 @@ Message* SC_Msg_ReplaceInbuiltSub(Message* Self, SCDecl* Self_decl) {
 	 else if ((JB_Msg_SyntaxEquals(Self, JB_LUB[1700], false))) {
 		Message* F = JB_Msg_NeedSyx(Self, kJB_SyxSStr);
 		if (F) {
-			ErrorMarker IsOK = JB_Rec_Mark(JB_StdErr);
+			JB_ErrorReceiver* Rec = JB_StdErr;
+			ErrorMarker IsOK = JB_Rec_Mark(Rec);
 			if (true) {
 				MessagePosition _usingf0 = ((MessagePosition){});
 				JB_Msg_SyntaxUsing(Self, (&_usingf0));
 				JB_SetRef(F->Name, JB_Str_Digest(F->Name));
-				if ((!JB_ErrorMarker_SyntaxCast(IsOK)) and JB_Rec_CanAddMore(JB_StdErr, kJB__ErrorSeverity_Error)) {
-					JB_Error* Err = ((JB_Error*)JB_List_Last(JB_StdErr->Errors));
+				if ((!JB_ErrorMarker_SyntaxCast(IsOK)) and JB_Rec_CanAddMore(Rec, kJB__ErrorSeverity_Error)) {
+					JB_Error* Err = ((JB_Error*)JB_List_Last(Rec->Errors));
 					if (Err) {
 						JB_Err_ShiftPosition(Err, F->Position);
 					}
@@ -51467,10 +51537,11 @@ bool SC_File_TestCakeProjects(JB_File* Self) {
 }
 
 bool SC_File_TestCakeVM(JB_File* Self, JB_File* CakeProj) {
-	uint Mode = kJB__PIDM_StdErrCapture;
+	uint Mode = kJB__PIDM_StdErrCapture + kJB__PIDM_StdErrSpeedie;
 	Array* Args = (JB_Array_Constructor0(nil));
 	JB_Incr(Args);
 	JB_Array_Append(Args, JB_LUB[354]);
+	JB_Array_Append(Args, JB_LUB[357]);
 	JB_Array_Append(Args, CakeProj);
 	ExitCode Status = JB_Str_Execute(Self, Args, nil, nil, Mode, 0);
 	JB_EarlyDecr(Args);
@@ -51506,7 +51577,7 @@ bool SC_File_TestSpeedie(JB_File* Self, JB_String* V) {
 	}
 	FastString* Errs = JB_FS_Constructor(nil);
 	JB_Incr(Errs);
-	JB_Str_Execute(Self, Cmd_args, nil, Errs, 0, 0);
+	JB_Str_Execute(Self, Cmd_args, nil, Errs, kJB__PIDM_StdErrSpeedie, 0);
 	JB_Decr(Cmd_args);
 	if (Errs->Length) {
 		JB_PrintFS(Errs);
@@ -61816,4 +61887,4 @@ SortComparison SC_Mod__Sorter(SCModule* Self, SCModule* B) {
 
 }
 
-// -4484035006557758514 -2867929602405910470
+// -4004062816992856022 -2867929602405910470

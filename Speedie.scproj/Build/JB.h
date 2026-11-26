@@ -2365,8 +2365,8 @@ extern Array* SC__NilReason_values;
 #define kJB__PIDM_StdOutSilence ((uint)4)
 #define kJB__PIDM_StdOutPassThru ((uint)8)
 #define kJB__PIDM_StdErrSilence ((uint)16)
-#define kJB__PIDM_StdErrPassThru ((uint)32)
 #define kJB__PIDM_StdErrCapture ((uint)32)
+#define kJB__PIDM_StdErrSpeedie ((uint)64)
 #define kJB__PIDM_Silence ((uint)20)
 #define kJB__PIDM_PassThru ((uint)40)
 #define kJB__PIDM_OwnGroup ((uint)128)
@@ -5204,6 +5204,8 @@ bool SC_OpMode_SyntaxIs(OpMode Self, OpMode X);
 
 
 // ProcessMode
+bool JB_PIDM_SyntaxIs(uint /*ProcessMode*/ Self, uint /*ProcessMode*/ M);
+
 
 
 // SCBlockage
@@ -7316,7 +7318,7 @@ JB_Object* JB_DictionaryReader_NextValue(DictionaryReader* Self);
 // JB_ErrorReceiver
 int JB_Rec_BadCount(JB_ErrorReceiver* Self);
 
-bool JB_Rec_CanAddMore(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level);
+ErrorSeverity JB_Rec_CanAddMore(JB_ErrorReceiver* Self, uint /*ErrorSeverity*/ Level);
 
 void JB_Rec_Clear(JB_ErrorReceiver* Self);
 
@@ -7359,6 +7361,8 @@ JB_ErrorReceiver* JB_Rec_SyntaxUsing(JB_ErrorReceiver* Self);
 void JB_Rec_SyntaxUsingComplete(JB_ErrorReceiver* Self, JB_Object* Idk);
 
 bool SC_Rec_TooMany(JB_ErrorReceiver* Self);
+
+void JB_Rec__ExecuteError(JB_String* Path, JB_String* Desc, uint /*ProcessMode*/ Mode);
 
 int JB_Rec__Init_();
 
@@ -8480,6 +8484,8 @@ void SC_Msg_DeclAddNumbInt(Message* Self, int64 Num, SCNode* Name_space);
 SCFunction* SC_Msg_DeclFunc(Message* Self);
 
 Message* SC_Msg_DeclName(Message* Self);
+
+JB_Error* JB_Msg_DecodeSpeedieError(Message* Self);
 
 bool JB_Msg_DeepEquals(Message* Self, Message* B, bool Aware);
 
