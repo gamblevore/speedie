@@ -21,41 +21,45 @@ extend_module ErrorReceiver
 		|errorreceiver--| Rec = StdErr
 		|| Sev = rec.CanAddMore							#require
 		
-		if Mode isnt StdErrSpeedie						// its a speedie error! Lets try to parse!
+		if Mode isnt StdErrSpeedie
 			return .NewErrorSub(nil, desc, path, sev)
 		
-		|| Errs = desc.parse
-		if !errs // oof. So we made an error while trying to make an error? that will be a pain to handle
+		|| Errs = desc.parse							// its a speedie error! Lets try to parse!
+			|message--| s = errs.first
+			while s
+				if (s == @tmp and "error") and rec.CanAddMore(sev)
+					|error--| err = s.DecodeSpeedieError
+					rec <~ err
+				s++
+		  else											// We made an error during an error?
 			|error--| last = rec.LastError
 				last.Severity = ErrorSeverity.Problem
 			.newerror(nil, desc, path)
-			return
-		
-		|message--| s = errs.first
-		while s
-			if (s == @tmp and "error") and rec.CanAddMore(sev)
-				|error--| err = s.DecodeSpeedieError  
-				rec <~ err
-			s++
 
 
 	
-	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| sev)
+	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| severity)
 		opt norefcounts
 		|| Rec = StdErr
-		if sev < ErrorSeverity.Critical // keep criticals...
-			|| Lower = rec.LowerErrorsTo
-				sev = lower|int| min sev
-		if rec.CanAddMore(sev)
-			if !desc
-				desc = node.MiniName("Unexpected ")
-			if path == nil
-				path = ""
-			rec <~ Error(node.FindNotInserted, desc, sev, path)
+		severity = rec.canaddmore(severity)$
+		if !desc
+			desc = node.MiniName("Unexpected ")
+		if path == nil
+			path = ""
+		rec <~ Error(node.FindNotInserted, desc, severity, path)
 
 
 
-function message.DecodeSpeedieError (|error|)
+autogen message.DecodeSpeedieError (|error|)
+	description `Parses a message like this:
+	error
+		"Can’t find 'ScreenWindow' on module 'GUI'."
+		file "/path/file.txt"
+		pos 123
+		severity 4
+
+To create a real error, which then can be added to StdErr (if you want).
+`
 	opt norefcounts
 	rz = error(nil|message|)
 	|| arg = .Last

@@ -24,36 +24,36 @@ function string.PathIsCode (|bool|)
 	return .IsProj or .IsSpd
 
 
-function @string.ASCII_Chart (|int| StartAt=32, |string|)
-	|| fs = FastString()
-	|| remain = 128-StartAt
-	|| mul = remain/4
-	for y in mul
+
+function @string.ASCII_Chart (|string|)
+	opt norefcounts // compiles to 256 bytes of CakeASM. nice!
+	|| fs = FastString.shared
+	|| sp = ' '
+	for y in 32
 		for x in 4
-			|| c = StartAt+y+x*mul
+			|| c = y+x*32
 			
 			fs.AppendDecimal(c, 3)
-			fs <~ '\1E'
+			fs <~ sp
 			fs <~ "x"
 			fs.AppendHex(c, 2)
-			fs <~ '\1E'
+			fs <~ sp
 
-			|| l = 2
-			if c == '\t' 
-				fs <~ `TB`
+			|| l = fs.length
+			if c == '\t'
+				fs <~ `\t`
 			  elseif c == '\n'
-				fs <~ `NL`
+				fs <~ `\n`
 			  elseif c == '\r'
-				fs <~ `CR`
-			  elseif c == ' '
-				fs <~ `SP`
+				fs <~ `\r`
+			  elseif c == sp
+				fs <~ `' '`
 			  else
-				if c <= 32
-					c = '\1E'
+				if c <= sp
+					c = sp
 				fs <~ c|byte|
-				l = 1
 			if x < 3
-				fs <~ ('\1E', 7-l)
+				fs <~ (sp, (7+l)-fs.length)
 				
 		fs <~ '\n'
 	return fs
@@ -80,12 +80,7 @@ function message.GoodArgName (|bool| NeedName=false, |string|)
 		error (self, "No name found")
 		return string.Error
 	return name
-	
 
-//function message.SmartName (assigns:|string|)
-//	if .name != value
-//		.name = value // save memory for often generated strings
-	
 	
 function message.GoodArgNameSub (|string|)
 	opt norefcounts
