@@ -208,10 +208,10 @@ dataType Keys (int)
 			// this probably affects everything, even typing
 		
 				
-		libinternal ResetKeyboard		()
+		libinternal ResetKeyboard
 			cpp_wrapper SDL_ResetKeyboard
 		
-		function State (|?&int| n, |&byte|)
+		libinternal State (|?&int| n, |&byte|)
 			cpp_wrapper SDL_GetKeyboardState
 		
 		libinternal Count (|int|)
