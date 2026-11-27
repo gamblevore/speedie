@@ -42,7 +42,7 @@ function Message.ReplaceInbuiltSub (|scdecl?| self_decl, |message|)
 			|| IsOK = rec.mark
 			using self
 				f.name = f.name.digest
-				if !IsOK and rec.CanAddMore
+				if !IsOK
 					|| err = rec.errors.last
 						err.shiftposition(f.position)
 				
