@@ -89,7 +89,7 @@ struct Pico
 
 	function Get (|float| T, |string|)
 		nil checker
-		if (T > 0) or (.canget > 0)				// important that Pico pauses if asked! Or else we get hot-loops...
+		if (T > 0) or (.canget > 0)
 			|picomessage| msg
 			.__get(msg, T)
 			return string.FromPico(msg)

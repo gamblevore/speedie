@@ -24,7 +24,10 @@ static uint64  TotalStringBytes;
 
 JB_String* JB_Str__Freeable(uint8* p, int n) {
     JB_String* Str = JB_New( JB_String );
-	TotalStringBytes += JB_msize(p); // or else pico makes us think we are losing memory!
+    int64 Actual = JB_msize(p);
+    if (Actual < n)
+		debugger; // oof
+	TotalStringBytes += Actual; // or else pico makes us think we are losing memory!
     Str->Addr = (uint8*)p;
     Str->Length = n;
     return Str;

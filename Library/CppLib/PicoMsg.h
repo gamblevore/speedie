@@ -381,7 +381,9 @@ struct PicoBuff {
 
 
 struct PicoComms : PicoConfig {
-	static PicoComms* New (PicoComms* M, int noise, bool isparent, int size, const char* name, int ID) {
+	static PicoComms* NewPico (PicoComms* M, int noise, bool isparent, int size, const char* name, int ID) {
+		if (ID <= 0 or ID > 64)
+			return 0; // should never happen unless memory is corrupted.
 		M = (PicoComms*)&pico_all[--ID];
 		return M->Init(noise, isparent, size, name);
 	}
@@ -509,10 +511,10 @@ struct PicoComms : PicoConfig {
 	bool StartThread (PicoThreadFn fn, uint Mode, const char** Args, int Noise) {
 		if (!alloc_msg_buffs()) return false;
 
-		int child = pico_list.Reserve();
-		if (!child) return false;
+		int PicoID = pico_list.Reserve();
+		if (!PicoID) return false;
 		
-		PicoComms* C = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Thread", ChildID);
+		PicoComms* C = PicoComms::NewPico(nullptr, Noise, false, 1<<Bits, "Thread", PicoID);
 		Socket = -1;  C->Socket = -1;
 		Sending->RefCount++;     Reading->RefCount++; 
 		C->Sending = Reading; C->Reading = Sending;
@@ -542,7 +544,7 @@ struct PicoComms : PicoConfig {
 		int PairID = pico_list.Reserve();
 		if (!PairID) {GiveUp(Socks); return nullptr;}
 		
-		PicoComms* Rz = PicoComms::New(nullptr, Noise, false, 1<<Bits, "Pair", PairID);
+		PicoComms* Rz = PicoComms::NewPico(nullptr, Noise, false, 1<<Bits, "Pair", PairID);
 		add_msg_buffs(Socks[0]);
 		Rz->add_msg_buffs(Socks[1]);
 		return Rz;
@@ -1248,7 +1250,7 @@ extern "C" PicoComms* PicoCreate (const char* Name, int BufferByteSize=0)  _pico
 /// Can specify input buffer size. Passing `0` defaults to `PicoDefaultInitSize` (1MB, unless overridden).
 	int ID = pico_list.Reserve();
 	if (ID)
-		return PicoComms::New(nullptr, PicoNoiseEvents, true, BufferByteSize, Name, ID);
+		return PicoComms::NewPico(nullptr, PicoNoiseEvents, true, BufferByteSize, Name, ID);
 	return nullptr;
 )
 

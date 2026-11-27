@@ -19,18 +19,32 @@ dispatch DebuggerActions (PerryResponse)
 
 
 
-
 function cakevm.SendStack (|cakestack| stack, |spdprocess| perry, |string| name, |int| ErrorCode)
 	opt norefcounts
 	if ErrorCode
 		name = "crash"
 	|| j = .StartStack(name, ErrorCode)
 	|| file = .StackToPerry(stack, j)
-	perry <~ j
-	if !ErrorCode and file
-		perry.SendBreaks(file)
+	if j.TestAndSend(perry)
+		if !ErrorCode and file
+			perry.SendBreaks(file)
+	  else
+		target debug
+			debugger
+			j = .StartStack(name, ErrorCode)
+			file = .StackToPerry(stack, j)
+	
+		
 
 
+function jbin.TestAndSend (|spdprocess| Spd, |bool|)
+	|| s = self|string|.parse
+		spd <~ self
+		rz = true
+	  else
+		log app.stacktrace, "BadJbin"
+	.Length = 0	
+		
 
 function cakevm.BreakOrNot (|cakestack| stack, |uint| Break, |uint|)
 	|| Mode = StepAction.curr
@@ -410,7 +424,7 @@ function xvar.ExpandObjectMemory (|jbin| j, |&uint64| Items, |message?| xp, |int
 		|| OK = j.RenderListItem(Items, i)
 		j.addint(i-1)
 		if !OK
-			j.add(@thg, "bad")
+			j.add(@thg, "Bad")
 		
 		j.exit
 		Items++
@@ -468,7 +482,7 @@ function xvar.ExpandArray (|jbin| j, |Array| R, |message?| xp, |int| depth, |boo
 		|| OK = j.RenderListItem(Where, i)
 		j.addint(i)
 		if !OK
-			j.add(@thg, "bad")
+			j.add(@thg, "Bad")
 		
 		j.exit
 		i++
@@ -542,7 +556,7 @@ function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 	if ok
 		ok = .ExpandGoodVar(j, where|&&byte|[], type, xp, Depth+1)
 	if !ok
-		j.add(@thg, "bad")
+		j.add(@thg, "Bad")
 
 	j.exit
 

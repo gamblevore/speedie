@@ -14,26 +14,21 @@
 
 extern "C" {
 
-    struct NodeArrayShift;
 	typedef void (*TokErrorEvent)(int Start, int ExpectedBits, int RealBits );
 	typedef Message* (*fpTok)( int TokenAfter, Message* Parent );
 	
 	
 	JBClass( TokHan, JB_Object,
-		fpTok			Func[kTokHanSize];
 		int             BitTypes;
+		fpTok			Func[kTokHanSize];
 	);
 	
 	
 	JBClass( Tokeniser, JB_Object,
-// could be "owned"
-		TokErrorEvent		ErrorEvent;
-        Dictionary*			WordDict;
-
-// these could be moved into an object for concurrency... make it thread-local... function passes it to "self" param...
-        int					ErrorStart;
-		
 		int					NextStart;
+        Dictionary*			WordDict;
+		TokErrorEvent		ErrorEvent;
+        int					ErrorStart;
 	);
 	
 	

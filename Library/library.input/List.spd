@@ -556,5 +556,6 @@ class list
 			return list
 
 		function Sorter (SorterComparer of list)
+			embedded
 			return .position < b.position
 

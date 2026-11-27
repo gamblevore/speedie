@@ -130,7 +130,7 @@ extend PerryIDE
 		return .projname.trimext + s
 		
 	function ErrorListFB (|message| msg, |bool|)			// errorfb, errorsfb
-		|| RealErrors	= msg ~!= "check"
+		|| RealErrors	= msg ~= "check"
 		.ClearErrors(RealErrors)
 
 		|| NoErrors = .ShowCompileErrorsFB(msg, RealErrors)

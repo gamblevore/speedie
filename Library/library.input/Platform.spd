@@ -5,13 +5,13 @@
 
 
 module Platform
-	function BackTrace (|&nil| space, |$int| size, |&cstring|) 
+	function BackTrace (|&nil| Space, |$int| Size, |&cstring|) 
 		cpp_wrapper JB_App__BackTrace
 
 	function Name (|string|)
 		cpp_wrapper JB_Platform
 
-	autogen cpu (|int|)
+	autogen CPU (|int|)
 		cpp_wrapper JB_Platform__CPU
 	
 	inline CPU_Intel (|bool|)
@@ -63,22 +63,25 @@ module Platform
 		asm HALT(0xBADA55)
 
 
-	function Log (|string| s)
+	function Log (|string| Message, |string?| Title = nil)
 		visible
 		opt norefcounts
-		// logging should merge with stderr logging? cos we'll want that too... usually.
+		// Logging should merge with stderr logging? cos we'll want that too... usually.
 		
-		|| L = ._Logger init openlog()
+		|| L = ._Logger init ._openlog
 		if l.isopen
-			L.write(s)
 			|| fs = FastString.shared
-			fs <~ ('-', 20)
+			fs <~ '\n'
+			fs <~ ('-', 10)
+			fs <~ Title
+			fs <~ ('-', 10)
 			fs <~ '\n'
 			L.write(fs|string|)
 			fs.Length = 0
+			L.write(Message)
 
 	
-	libinternal OpenLog (|file|)
+	libinternal _OpenLog (|file|)
 		|string| appname = app.name + ".log"
 		|file--| l = "/tmp/logs/".filechild(appname)
 		._Logger = l

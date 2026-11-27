@@ -234,12 +234,6 @@ void JB_Mem__ClassLeakCounter ();
 JB_Class* JB_AllClasses();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#ifdef JB_DEBUG_ON
-    void JB_Sanity(JB_Object* obj);
-#else
-    #define JB_Sanity( obj )
-#endif
-void JB_SanityCheck(AllocationBlock* Block);
 typedef bool (*fpDebug)(void* Space, void* Result);
 int JB_LeakTrace(u16 Flag);
 typedef void (*fpListAllClasses)(JB_Class* M);

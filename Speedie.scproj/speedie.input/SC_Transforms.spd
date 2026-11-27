@@ -1024,11 +1024,17 @@ function scmodule.AddSyxConst (|string| name, |int64| value, |message| where, |s
 function Tran_Log (TranFunc)
 	opt norefcounts
 	using (node)
+						// this seems better... than tran_print
+						// probably tranprint should use this instead.
+						// like Platform.print, Platform.printline, Platform.printerror
+						// Platform.log
 		|| f = node.first
-		node <~ (@Thg, "platform")			// this seems better... than tran_print
-		node.msg(@prm) <~ f					// probably tranprint should use this instead.
-		node.type = @dot					// like Platform.print, Platform.printline, Platform.printerror
-	TypeOfExpr( node, name_space )			// Platform.log
+		|| plat = node.msg(@thg, "platform")
+		|| prm = node.msg(@prm)
+/		while (|| p = plat.prev)
+			prm.first = p
+		node.type = @dot
+	TypeOfExpr( node, name_space )
 
 
 

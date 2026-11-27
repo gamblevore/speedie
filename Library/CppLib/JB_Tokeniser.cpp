@@ -8,52 +8,44 @@
 
 
 #include "JB_Umbrella.hpp"
-//#define __NEED_LIB_GLOBS__
-// #include "/usr/local/speedie/Speedie.scproj/BuildTest/JB.h"
 
 extern "C" {
 
 ////////////////////////////////////////////////////////////////////////////////
 		// Module
 ////////////////////////////////////////////////////////////////////////////////
-Tokeniser OurModule;
-#define self (&OurModule)
-static JB_String* PzData;
+static Tokeniser Tok;
+static JB_String* _PzData;
+
 ////////////////////////////////////////////////////////////////////////////////
 JB_String* JB_Tk__GetData () {
-    return PzData;
+    return _PzData;
 }
 
+
 int JB_Tk__ErrorStart () {
-    return self->ErrorStart;
+    return Tok.ErrorStart;
 }
 
 void JB_Tk__ErrorStartSet (int Start) {
-    self->ErrorStart = Start;
+    Tok.ErrorStart = Start;
 }
 
 byte JB_Tk__Byte (int S) {
-	return JB_Str_ByteValue(PzData, S);
+	return JB_Str_ByteValue(_PzData, S);
 }
 
 JB_String* JB_Tk__Range (int S, int E) {
-	return JB_Str_Range(PzData, S, E);
+	return JB_Str_Range(_PzData, S, E);
 }
-
-
-/// stuff
 
 
 ////////////////////////////////////////////////////////////////////////////////
 
 inline bool Running_( u32 NextStart ) {
-	return  (NextStart < PzData->Length)  and  (self->ErrorStart < 0);
+	return  (NextStart < _PzData->Length)  and  (Tok.ErrorStart < 0);
 }
 
-
-////////////////////////////////////////////////////////////////////////////////
-
-struct Message;
 void JB_Tk__ErrorEvent(int A, int B, int C);
 
 
@@ -61,32 +53,33 @@ void JB_Tk__ErrorEvent(int A, int B, int C);
 ////////////////////////////////////////////////////////////////////////////////
 
 bool JB_Tk__CppInited() {
-    if (JB_RefCount(self)) {
+    if (JB_RefCount(&Tok)) {
         return true;
     }
     
-    JB_SetRefCount(self, 1000);
     Dictionary* Dict = JB_Dict_Constructor(0);
-	self->WordDict = Dict;
+	Tok.WordDict = Dict;
+    JB_SetRefCount(&Tok, 1000);
+    JB_SetRefCount(Dict, 1000);
     JB_Dict_ValueSet(Dict, JB_Str__Empty(), JB_NewEmpty(TokHan));
     return false;
 }
 
 
 void JB_Tk__Clear(  ) { // never called
-	JB_SetRef( PzData, 0 );
-	JB_SetRef( self->WordDict, 0 );
-    JB_Zero(self);
+	JB_SetRef( _PzData, 0 );
+	JB_SetRef( Tok.WordDict, 0 );
+    JB_Zero(&Tok);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
 
 
 int JB_Tk__NextByte() {
-    byte* B = PzData->Addr; 
+    byte* B = _PzData->Addr; 
     if (B) {
-        int L = PzData->Length;
-        int N = self->NextStart;
+        int L = _PzData->Length;
+        int N = Tok.NextStart;
         if (N < L) {
             byte b = B[N];
             return b;
@@ -97,11 +90,11 @@ int JB_Tk__NextByte() {
 
 
 bool JB_Tk__EatString(JB_String* S) {
-    byte* DataAddr = PzData->Addr; 
+    byte* DataAddr = _PzData->Addr; 
     if (DataAddr) {
         int SLength = S->Length;
-        int DataPos = self->NextStart; 
-        if (DataPos + SLength <= PzData->Length) {   
+        int DataPos = Tok.NextStart; 
+        if (DataPos + SLength <= _PzData->Length) {   
             DataAddr += DataPos; 
 
             for (int i = 0; i < SLength; i++) {
@@ -110,7 +103,7 @@ bool JB_Tk__EatString(JB_String* S) {
                 }
             }
 
-            self->NextStart += SLength;
+            Tok.NextStart += SLength;
             return true;
         }
     }
@@ -120,28 +113,31 @@ bool JB_Tk__EatString(JB_String* S) {
 
 
 void JB_Tk__NextStartSet( u32 NextStart ) {
-	if ( NextStart < PzData->Length ) { // 0 - 1 = 4billion!
-		self->NextStart = NextStart;
+	if ( NextStart < _PzData->Length ) { // 0 - 1 = 4billion!
+		Tok.NextStart = NextStart;
 	} else {
-        self->NextStart = PzData->Length; // Not Running
+        Tok.NextStart = _PzData->Length; // Not Running
 	}
 }
 
 
 int JB_Tk__NextStart(  ) {
-    return self->NextStart;
+    return Tok.NextStart;
 }
 
 
-void JB_Tk__StartParse( JB_String* Data ) {
-	self->NextStart = 0;
-	self->ErrorStart = -1;
+void JB_Tk__StartParse (JB_String* Data) {
+	Tok.NextStart = 0;
+	Tok.ErrorStart = -1;
 	if ( ! Data ) {
-		JB_SetRef( PzData, JB_Str__Empty() );
+		JB_SetRef( _PzData, JB_Str__Empty() );
 		return;
 	}
-
-	JB_SetRef( PzData, Data );
+#if DEBUG
+	if ((Tok.WordDict->Width) != 255) // hmmm???
+		debugger;
+#endif
+	JB_SetRef( _PzData, Data );
 	JB_String BOM = {};
 	BOM.Length = 3;
 	BOM.Addr = (u8*)"\xEF\xBB\xBF";
@@ -177,7 +173,7 @@ void TH_Copy_( TokHan* T, TokHan* F ) {
 
 
 TokHan* JB_Tk__Token(JB_String* s) {
-    return (TokHan*)JB_Dict_Value(self->WordDict, s, 0);
+    return (TokHan*)JB_Dict_Value(Tok.WordDict, s, 0);
 }
 
 
@@ -185,7 +181,7 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
     if (!New_) {
         return;
     }
-    auto Debug = self;
+    auto Debug = &Tok;
     JB_Object** Place = JB_Dict_MakePlace(Debug->WordDict, TokStr);
     dbgexpect(Place);
     TokHan* Old_ = (TokHan*)(*Place);
@@ -211,7 +207,7 @@ void JB_Tk__TokenSet( JB_String* TokStr, TokHan* New_ ) {
 //////////////////////////////////////////////////////////////////////////////////////////
 
 int JB_Tk__CleanSpacesSub ( int S ) {
-	JB_String* D = PzData;
+	JB_String* D = _PzData;
 
     uint8* A = D->Addr;
 	int N = D->Length;
@@ -229,25 +225,25 @@ int JB_Tk__CleanSpacesSub ( int S ) {
 		}
 	}
 
-	self->NextStart = N;
+	Tok.NextStart = N;
 	return S;
 }
 
 
 int JB_Tk__ClearIndent() {
 	// merge with CleanSpacesSub?
-	JB_String* D = PzData;
+	JB_String* D = _PzData;
 
     uint8* A = D->Addr;
 	uint8* Finish = A + D->Length;
-	A += self->NextStart;
+	A += Tok.NextStart;
 	int Count = 0;
 	
 	while (A < Finish) {
 		if (*A != '\t') {
 			while (A < Finish) {
 				if (*A != ' ') {
-					self->NextStart = (int)(A - D->Addr); 
+					Tok.NextStart = (int)(A - D->Addr); 
 					return Count;
 				}
 				Count++;
@@ -263,37 +259,37 @@ int JB_Tk__ClearIndent() {
 
 
 int JB_Tk__CleanSpaces() {
-	return self->NextStart = JB_Tk__CleanSpacesSub(self->NextStart);
+	return Tok.NextStart = JB_Tk__CleanSpacesSub(Tok.NextStart);
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
 Message* JB_Tk__Process( u32 AskBits, long Mode, Message* Parent ) {
-	if_rare ( self->ErrorStart >= 0 )
+	if_rare ( Tok.ErrorStart >= 0 )
 		return 0;
 	
-	u32 Start = JB_Tk__CleanSpacesSub( self->NextStart );
-	MiniStr AL = Mini(PzData, Start);
-	ObjLength Found = JB_Dict_LongestKey_( self->WordDict, AL );
+	u32 Start = JB_Tk__CleanSpacesSub( Tok.NextStart );
+	MiniStr AL = Mini(_PzData, Start);
+	ObjLength Found = JB_Dict_LongestKey_( Tok.WordDict, AL );
 	TokHan* FatData = (TokHan*)Found.Obj;
 	
 	u32 FoundBits = FatData->BitTypes;
 	u32 MatchBits = FoundBits & AskBits;
 	
 	if ( MatchBits ) {
-		u32 Undo = self->NextStart;
-		self->NextStart = Start + Found.Length;
+		u32 Undo = Tok.NextStart;
+		Tok.NextStart = Start + Found.Length;
 		fpTok Func = FatData->Func[JB_Int_Log2(MatchBits)];
 		Message* Result = (Message*)((Func)( Start, Parent ));
 		if ( Result )
 			return Result;
 		
-		self->NextStart = Undo;
+		Tok.NextStart = Undo;
 	}
 	
 	if_rare ( Mode == 1 or FoundBits == -1)
-		if ( self->ErrorStart < 0 )
+		if ( Tok.ErrorStart < 0 )
 			JB_Tk__ErrorEvent( Start, AskBits, FoundBits );
 	
 	return 0;
@@ -304,26 +300,21 @@ Message* JB_Tk__Process( u32 AskBits, long Mode, Message* Parent ) {
 
 
 bool JB_Tk__Running(  ) {
-	return Running_( self->NextStart );
-}
-
-inline bool bole(Message* X) {
-	JB_FreeIfDead((JB_Object*)X);
-	return X;
+	return Running_( Tok.NextStart );
 }
 
 bool JB_Tk__Expect( u32 AskBits ) {
-	return bole(JB_Tk__Process( AskBits, 1, nullptr ));
+	return JB_FreeIfDead((JB_Object*)JB_Tk__Process( AskBits, 1, nullptr ));
 }
 
 bool JB_Tk__Allow( u32 AskBits ) {
-	return bole(JB_Tk__Process( AskBits, 0, nullptr ));
+	return JB_FreeIfDead((JB_Object*)JB_Tk__Process( AskBits, 0, nullptr ));
 }
 
 
 bool JB_Tk__Consume( u32 AskBits, int Expect ) {
 	bool FoundAny = false;
-	while ( bole(JB_Tk__Process( AskBits, Expect, nullptr ) ) ) {
+	while ( JB_FreeIfDead((JB_Object*)JB_Tk__Process( AskBits, Expect, nullptr ) ) ) {
 		FoundAny = true;
 	};
 	return FoundAny;
@@ -331,9 +322,9 @@ bool JB_Tk__Consume( u32 AskBits, int Expect ) {
 
 
 bool JB_Tk__CheckEnded ( u32 AskBits ) { // has to be called with an "ender". ") } > ]", "CR/LF", ","
-	int NextStart = self->NextStart;
+	int NextStart = Tok.NextStart;
 	bool Result = JB_Tk__Allow(AskBits) or !JB_Tk__Running();
-	self->NextStart = NextStart;
+	Tok.NextStart = NextStart;
 	return Result;
 }
 
@@ -345,9 +336,9 @@ bool JB_Tk__CheckEnded ( u32 AskBits ) { // has to be called with an "ender". ")
 
 
 void JB_Tk__TokenNilSet( JB_String* Key, JB_Object* Value ) {
-    JB_Object* Curr = JB_Dict_Value( self->WordDict, Key, 0 );
+    JB_Object* Curr = JB_Dict_Value( Tok.WordDict, Key, 0 );
     if (!Curr) {
-        JB_Dict_ValueSet(self->WordDict, Key, Value);
+        JB_Dict_ValueSet(Tok.WordDict, Key, Value);
     }
 }
 

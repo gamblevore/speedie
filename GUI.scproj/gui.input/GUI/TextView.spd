@@ -1102,9 +1102,9 @@ class TextView (GUIControl)
 	
 	function ClearErrors (|bool| ParseOnly = false, |ErrorSeverity| AtLeast=0)
 		opt norefcounts
-		|| e = .MyError$
-		if !Parseonly or e is parse
-			.MyError = nil
+		|| e = .MyError
+			if !Parseonly or e is parse
+				.MyError = nil
 
 		|| s = .Selectedline
 		for d.fast in .WrappedLines

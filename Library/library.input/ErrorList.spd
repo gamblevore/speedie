@@ -47,7 +47,7 @@ class ErrorReceiver
 			self = stderr
 		if .errorcount
 			return false
-		return _CriticalsOK
+		return _MemoryOK
 	
 	
 	function HasProblems (|bool|)
@@ -198,8 +198,11 @@ class ErrorReceiver
 			require Lower < ErrorSeverity.IgnoreAllErrors
 			if lower
 				Level = lower|int| min Level
-		  else
-			_CriticalsOK = false							// Keep criticals...
+//		  else
+//			_MemoryOK = false // don't add this.
+		// a critical error, isn't the same as a memory-error
+		// for example, a verification app may find a critical error in the data it is verifying
+		// but the verifier itself is just fine.
 
 		if level == ErrorSeverity.problem
 			require .ProblemCount < .MaxProblems
@@ -231,7 +234,7 @@ class ErrorReceiver
 
 
 	module
-		|bool| _CriticalsOK = true
+		|bool| _MemoryOK = true
 			
 		
 	iterator
