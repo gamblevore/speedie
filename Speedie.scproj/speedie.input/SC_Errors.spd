@@ -134,6 +134,7 @@ function FindBytePos (|Message?| Node, |Message?|)
 
 extend Error
 	function SCGrabLine (|faststring| fs, |bool| Usecolor)
+		// seems almsot identical to .GrabLine. Merge?
 		if Usecolor
 			fs <~ TerminalColor.Normal
 
