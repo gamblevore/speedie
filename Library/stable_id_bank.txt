@@ -8,10 +8,8 @@ GUI_App__AskSave
 GUI_App__Beep
 GUI_App__CurrDisplaySize
 GUI_App__Cycle
-GUI_App__FrontDialog
 GUI_App__FullScreenSet
 GUI_App__GetScreen
-GUI_App__HintSet
 GUI_App__Init
 GUI_App__IsFullScreen
 GUI_App__IsTyping
@@ -19,15 +17,12 @@ GUI_App__Loop
 GUI_App__MouseButtons
 GUI_App__MouseXY
 GUI_App__OpenDocument
-GUI_App__QuitReason
-GUI_App__Resized
 GUI_App__Run
 GUI_App__SavePrefs
 GUI_App__ScalingSet
 GUI_App__SyntaxExpect
 GUI_App__Title
 GUI_App__TitleSet
-GUI_App__vsyncSet
 GUI_Bar_Constructor
 GUI_Bar_Destructor
 GUI_Bar_Draw
@@ -582,6 +577,7 @@ GUI_ctrl_DeclutteredSet
 GUI_ctrl_Destructor
 GUI_ctrl_DoExplode
 GUI_ctrl_Draw
+GUI_ctrl_EdgeSet
 GUI_ctrl_EntireScreenSet
 GUI_ctrl_Gesture
 GUI_ctrl_GotFocus
@@ -653,7 +649,6 @@ GUI_inl_Destructor
 GUI_inl_Edit
 GUI_inl_SyntaxIs
 GUI_inl_SyntaxIsSet
-GUI_ivec4_Msg
 GUI_ivec4_TextCorner
 GUI_vec4_BoxVsPlane
 GUI_vec4_PreMul
@@ -818,7 +813,6 @@ JB_Err_ShiftPosition
 JB_Err_SignalName
 JB_Err_SyntaxIs
 JB_Err_SyntaxIsSet
-JB_Err_UpgradeWithNode
 JB_Err__CantParseNum
 JB_ErrorSeverity_Render
 JB_ErrorSeverity_SyntaxUsing
@@ -873,7 +867,6 @@ JB_FS_LengthSet
 JB_FS_LineIndent
 JB_FS_MsgErrorName
 JB_FS_NeedSpare
-JB_FS_RemoveByte
 JB_FS_Render
 JB_FS_Reserve
 JB_FS_Size
@@ -1077,7 +1070,6 @@ JB_Msg_CopyWithoutUsing
 JB_Msg_DecodeSpeedieError
 JB_Msg_DeepEquals
 JB_Msg_Destructor
-JB_Msg_Dict
 JB_Msg_EqualsSyx
 JB_Msg_Expect
 JB_Msg_ExpectLast
@@ -1098,7 +1090,6 @@ JB_Msg_Int
 JB_Msg_IntRange
 JB_Msg_IsContainer
 JB_Msg_Last
-JB_Msg_LinesOfContent
 JB_Msg_Locate
 JB_Msg_MiniName
 JB_Msg_NeedSyx
@@ -1134,7 +1125,6 @@ JB_Msg_ValueSet
 JB_Msg_WithinType
 JB_Msg_XMLToJeebox
 JB_Msg_Yes
-JB_Msg__Sorter
 JB_Msg__TreeCompare
 JB_MzSt_Clear
 JB_MzSt_Constructor
@@ -1331,7 +1321,6 @@ JB_Str_CopyFromCString
 JB_Str_CopyFromPtr
 JB_Str_Count
 JB_Str_Decompress
-JB_Str_Dict
 JB_Str_Digest
 JB_Str_EndsWith
 JB_Str_Equals
@@ -1414,7 +1403,6 @@ JB_Str_Reveal
 JB_Str_Reverse
 JB_Str_Rotate
 JB_Str_SetExt
-JB_Str_Sort
 JB_Str_SpacesToTabs
 JB_Str_SplitSub
 JB_Str_Squeeze
@@ -1506,7 +1494,6 @@ JB_Tree_ShuffleNow
 JB_Tree_Sort
 JB_Tree_StepN
 JB_Tree_Trim
-JB_Tree__Sorter
 JB_Tree_stepbool
 JB_Validator_All
 JB_Validator_Allow
@@ -1858,7 +1845,6 @@ SDL_GetClipboardText
 SDL_GetCurrentDisplayMode
 SDL_GetDisplayBounds
 SDL_GetError
-SDL_GetKeyboardState
 SDL_GetMouseState
 SDL_GetNumTouchFingers
 SDL_GetRendererOutputSize

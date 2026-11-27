@@ -2529,7 +2529,7 @@ extern JB_String* SC__Cpp_CppLicenceStr;
 #define kSC__Cpp_kNeedsNoBrackets ((int)2)
 #define kJB__Wrap_kNothing ((int)0)
 #define kJB__Wrap_kFree ((int)1)
-#define JB__Rec__MemoryStillOK JB__.Rec__MemoryStillOK
+#define JB__Rec__MemoryOK JB__.Rec__MemoryOK
 #define kJB__Rec_InternalError ((JB_StringC*)JB_LUB[898])
 #define kJB__fix_TypeValue ((int)0)
 #define kJB__fix_TypeObj ((int)1)
@@ -2604,7 +2604,7 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
-	bool Rec__MemoryStillOK;
+	bool Rec__MemoryOK;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;
@@ -2640,17 +2640,15 @@ struct JB_Globals {
 	JB_String* File__Speedie;
 	FP_fnIDGenerator Tk_Splitter;
 	FP_SorterComparer File__Sorter;
-	FP_SorterComparer Tree__Sorter;
 	FP_SorterComparer ID__ByID;
 	FP_SorterComparer ID__ByFreq;
 	FP_SorterComparer Str__Sorter;
-	FP_SorterComparer Msg__Sorter;
 	RandomXOR* Random;
 	PicoComms* Proc__ForceParent;
 	RandomXOR RandomShared;
 	RandomXOR zalgo_R;
-	MessagePosition Tk_Using;
 	CompressionStats MzSt_All;
+	MessagePosition Tk_Using;
 	uint64 Mem__MDummy[2];
 	byte CharSet_Props[256];
 	SyntaxObj* Syx_TypeList[64];
@@ -3599,6 +3597,8 @@ Ind JB_Tk__XMLWordEnd(int From);
 
 
 // Platform
+JB_File* JB_Platform___OpenLog();
+
 bool JB_Platform__CPU_ARM();
 
 bool JB_Platform__CPU_Intel();
@@ -3609,9 +3609,7 @@ bool JB_Platform__CPU_Spd();
 
 int JB_Platform__Init_();
 
-void JB_Platform__Log(JB_String* S);
-
-JB_File* JB_Platform__OpenLog();
+void JB_Platform__Log(JB_String* Message, JB_String* Title);
 
 int JB_Platform__PointerBytes();
 
@@ -7370,7 +7368,7 @@ void JB_Rec__NewCritical(Message* Node, JB_String* Desc, JB_String* Path);
 
 void JB_Rec__NewError(Message* Node, JB_String* Desc, JB_String* Path);
 
-void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Sev);
+void JB_Rec__NewErrorSub(Message* Node, JB_String* Desc, JB_String* Path, uint /*ErrorSeverity*/ Severity);
 
 void JB_Rec__NewProblem(Message* Node, JB_String* Desc, JB_String* Path);
 
@@ -10238,6 +10236,8 @@ bool JB_File_DirectoryContains(JB_File* Self, JB_String* Path);
 
 bool JB_File_FileExistance(JB_File* Self);
 
+bool JB_File_IsOpen(JB_File* Self);
+
 ErrorInt JB_File_LinkToSet(JB_File* Self, JB_String* Value);
 
 Array* JB_File_List(JB_File* Self, int Mode);
@@ -10245,8 +10245,6 @@ Array* JB_File_List(JB_File* Self, int Mode);
 Array* JB_File_ListFiles(JB_File* Self, int Mode);
 
 bool JB_File_MustExist(JB_File* Self, JB_String* Operation);
-
-bool JB_File_Opened(JB_File* Self);
 
 bool JB_File_NewerThanFile(JB_File* Self, JB_File* F);
 
@@ -10279,8 +10277,6 @@ bool SC_File_TestCakeVM(JB_File* Self, JB_File* CakeProj);
 bool SC_File_TestSpeedie(JB_File* Self, JB_String* V);
 
 JB_String* JB_File__FindSpeedie(JB_String* Start);
-
-JB_File* JB_File__Logs();
 
 JB_File* JB_File__Prefs(JB_String* Name);
 
@@ -11588,7 +11584,7 @@ struct JB_Globals {
 	byte __Dummy__;
 	ErrorFlags Tk__ErrorFlags;
 	bool Tk__DotInsertAllow;
-	bool Rec__MemoryStillOK;
+	bool Rec__MemoryOK;
 	bool Proc_CheckedParent;
 	bool Err_KeepStackTrace;
 	u16 API_NilHappened_;

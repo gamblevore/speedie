@@ -3,10 +3,6 @@
 							/// Get perry ASMing ///
 
 * int8 instead of bool. (why not byte even)
-* invalid message sent back?
-* Too aggressive with error keeping (easy to fix? but hard to reproduce)
-	* log (str) // fixable
-		* log (str, "x") // buggers
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
 

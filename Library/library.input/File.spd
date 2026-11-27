@@ -75,7 +75,7 @@ class File (stringshared)
 	function HardLinkTo (assigns:|string|, |bool|)
 		cpp_wrapper JB_File_HardLinkTo
 
-	function IsOpen (|bool|)
+	inline IsOpen (|bool|)
 		return .descriptor >= 0
 	
 	inline Opened (|bool|) // isopen

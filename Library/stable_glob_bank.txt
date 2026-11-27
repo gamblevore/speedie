@@ -21,7 +21,7 @@ JB__Tk__ErrorFlags
 GUI__ScrollInfo_JustClicked_
 GUI__Key_Debug
 GUI__SystemCursor_Curr
-JB__Rec__MemoryStillOK
+JB__Rec__MemoryOK
 JB__Proc_CheckedParent
 JB__Err_KeepStackTrace
 GUI__App_DrawFrameLength
@@ -59,8 +59,6 @@ JB_Str__Sorter
 GUI_Img_ActiveEdges
 GUI_Img_RoundRectDrawer
 GUI_Ray__DistanceSorter
-JB_Tree__Sorter
-JB_Msg__Sorter
 GUI_Img_ClippedRectDrawer
 GUI_Img_CurlieQueDrawer
 JB_ID__ByID
