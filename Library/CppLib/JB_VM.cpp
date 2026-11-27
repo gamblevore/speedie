@@ -92,14 +92,25 @@ static CakeStack* GetMaxStack (CakeVM* V) {
 
 
 VMOpt int64 JB_ASM_Debug (CakeVM* V, ASM* Code, CakeRegister* r) {
+	if (V->VFlags&VM_CurrentlyViewing)
+		return 0;
+	V->VFlags |= VM_CurrentlyViewing;
 	auto Break = Code[1024*256]; 
-	((CakeStack*)(r))[-1].Code = Code;						// save cutely.
+	((CakeStack*)(r))[-1].Code = Code;				// Save cutely.
 	r = VMClearHigh(r);
 	auto Stack = GetMaxStack(V);
 	
 //	auto Stack2 = (CakeStack*)(r-1);
-	return (V->__VIEW__)(V, Stack, 0, Break);
+	int CurrLevel = V->BreakState;
+	JB_ASM_SetDebug(V, 1);							// no debug during debug. (We call the VM to render objs)
+	int64 Rz = (V->__VIEW__)(V, Stack, 0, Break); 
+	JB_ASM_SetDebug(V, CurrLevel);
+	V->VFlags &= ~VM_CurrentlyViewing;				// Protect against pico reactivations...
+	// If this isnt enough, I really think "just disable ObjRender" is the answer.
+	return Rz;
 }
+
+
 
 
 int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code, uint Break) {
@@ -110,39 +121,41 @@ int64 JB_ASM_NoBreak (CakeVM* VM, CakeStack* R, int Code, uint Break) {
 uint* JB_ASM_SetDebug (CakeVM* V, int Level) {
 	auto Rz = VMCodePtr(V) + CakeCodeMax;
 	int CurrLevel = V->BreakState;
-	if (CurrLevel == Level) // no point locking this...
-		return Rz;			// even if we did... the calling code can mess things up
-							// with no races in here.
-							// so the calling code would need locks or the logic-sorted out.
+	if (CurrLevel == Level)
+		return Rz;
+	
+	
 	if_rare (!CanDebug(V))
 		return 0;
 
 	bool Expected = false;
-	if_rare (!((V->Lock).compare_exchange_strong(Expected, true)))
+	if_rare (!((V->DebugLock).compare_exchange_strong(Expected, true)))
 		return 0;	// allow pico to loop until we are able to set it properly.
 	
 
 	V->BreakState = Level;
 	auto J = V->JumpTable;
-	void* Break = J[512+(Level>2)];
 	
-	#if VMDEBUG
-		uint64 Protect = (uint64)((void*)VMClearHigh(J));
-		uint64 Page = sysconf(_SC_PAGESIZE);
-		Protect = Protect &~ (Page-1);
-		int Err = mprotect((void*)Protect, Page, PROT_READ|PROT_WRITE);
-	#endif
+#if VMDEBUG
+	uint64 Protect = (uint64)((void*)VMClearHigh(J));
+	uint64 Page = sysconf(_SC_PAGESIZE);
+	Protect = Protect &~ (Page-1);
+	int Err = mprotect((void*)Protect, Page, PROT_READ|PROT_WRITE);
+#endif
 	
-	if (Level <= 1)
+	if (Level <= 1) {
 		memcpy(J, V->OriginalJumpTable, 256*sizeof(void*));		
-	  else
-		for_(256)
+	} else {
+		void* Break = J[512+(Level>2)];
+		for_(256) {
 			J[i] = Break;
+		}
+	}
 
-	#if VMDEBUG
-		Err = mprotect((void*)Protect, Page, PROT_READ);
-	#endif
-	V->Lock = false;
+#if VMDEBUG // protect Jump-table from damage.
+	Err = mprotect((void*)Protect, Page, PROT_READ);
+#endif
+	V->DebugLock = false;
 	
 	return Rz;
 }
@@ -179,7 +192,7 @@ ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __c
 	EXIT:;
 	return &vm.Registers[2].Ivec;
 	
-	ALWAYSBREAK:;									// Assume was in debug mode
+	ALWAYSBREAK:;										// Assume was in debug mode
 	++(Code[CakeCodeMax-1]);
 	goto BREAK;
 
@@ -199,7 +212,7 @@ ivec4* __CAKE_VM__ (CakeVM& vm, ASM* Code, CakeRegister* r) { // __cakevm__, __c
 			goto *JumpTable[256+(Op>>24)];			// Resume
 		if_rare (!(BreakValue<<2)) {				// Accidental trap from 2GB loop.
 			Code[CakeCodeMax-1] = BreakValue-0x20000001; // Reset to a big number 
-			if (!(vm.VFlags & kJB_VM_TrapTooFar))
+			if (!(vm.VFlags & VM_TrapTooFar))
 				goto *JumpTable[256+(Op>>24)];		// Resume
 		}
 	}
@@ -274,7 +287,7 @@ ASM* JB_ASM_Code (CakeVM* V, int Length) {
 CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	const int Page = 16 * 1024;
 	int AllocSize = CakeStackSize + CakeCodeMax*4;
-	if (Flags&kJB_VM_AskDebug)
+	if (Flags&VM_AskDebug)
 		AllocSize += CakeCodeMax*4;
 	
 	Flags |= PROT_READ | PROT_WRITE;
@@ -286,7 +299,7 @@ CakeVM* JB_ASM__VM (int Flags) {				// 256K is around 1600 ~fns deep.
 	
 	auto HighBit = 1ull << 63ull;
 	V = (CakeVM*)(((int64)V)&~HighBit);
-	if (Flags&kJB_VM_AskDebug)
+	if (Flags&VM_AskDebug)
 		V = (CakeVM*)(((int64)(V)) | HighBit);
 	
 	V->BreakState = 1;

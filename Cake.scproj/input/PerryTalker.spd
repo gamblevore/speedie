@@ -67,11 +67,8 @@ function cakevm.BreakOrNot (|cakestack| stack, |uint| Break, |uint|)
 
 
 
-|byte| AlreadyInView = 0 // object.ObjRender can come back in __perryview__!
 function __PerryView__ (cakevm.CakeChef)
 	description "We just hit a breakpoint! (or crashed)"
-	require !AlreadyInView
-	AlreadyInView++
 	target debug
 		|| ASMIndex = .Index(stack.code)
 	
@@ -89,7 +86,6 @@ function __PerryView__ (cakevm.CakeChef)
 		if !ErrorCode and Break.Runs and p.CantGet
 			if Break&1								// Needs run
 				p <~ "run"
-			AlreadyInView--
 			return 0
 			
 		|| m = p.Get(5.0)

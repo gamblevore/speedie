@@ -71,10 +71,4 @@ function cakevm.BreakParentStack (|cakestack| stack)
 			debugger.StackTrap = P
 	
 
-function cakevm.SetBreakLevel (|int| level, |&uint|)
-//	debugger.UserBreakLevel = level
-	while
-		|| B = .SetDebug(level)
-			return B
-
 

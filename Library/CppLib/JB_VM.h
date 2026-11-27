@@ -23,9 +23,10 @@
 typedef u64 (*Fn0 )();
 
 
-#define kJB_VM_WantProtect 8
-#define kJB_VM_TrapTooFar 16
-#define kJB_VM_AskDebug 32
+#define VM_WantProtect 8
+#define VM_TrapTooFar 16
+#define VM_AskDebug 32
+#define VM_CurrentlyViewing 64
 
 
 #define VMOpt static inline __attribute__((__always_inline__))

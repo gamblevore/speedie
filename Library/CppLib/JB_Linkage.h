@@ -126,7 +126,7 @@ struct CakeVM {
 #endif
 	
     u16				VFlags;
-std::atomic<bool>	Lock;
+std::atomic<bool>	DebugLock;
 	u8				BreakState;
     u32				ExitGuard;
 	CakeRegister	Registers[];

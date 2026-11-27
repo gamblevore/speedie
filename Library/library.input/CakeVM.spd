@@ -52,8 +52,13 @@ target cpp or vm {
 		cpp_wrapper JB_ASM_LinkPico
 	
 	inline Pause
-		while !.SetDebug(kBreakAlways)
-			0
+		.SetBreakLevel(kBreakAlways)
+
+	function SetBreakLevel (|int| level, |&uint|)
+	//	debugger.UserBreakLevel = level
+		while
+			|| B = .SetDebug(level)
+				return B
 
 	function Index		(|&uint| Code, |ind|)
 		cpp_wrapper JB_ASM_Index
