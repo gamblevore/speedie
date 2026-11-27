@@ -3,9 +3,19 @@
 module GUI
 	linkage
 		cpp_part App
+
+	|date|						OpenedTime
+	|date|						DrawFinish
+	|date|						FrameStart = 1
+	|date|						FrameLastDelay = 1
+	|date|						BlurBackgroundStart
+	|date|						ForeGroundTime
+	|date|						FastToolTipDate
+	|date|						ChangeSelFlash
+
 	|image|						Screen = image("read")
 	|error|						ToolTip = error()
-	|date|						OpenedTime
+	
 	|GUIPasteEvent|				AppDocumentOpen
 	|string|					LastSearch
 	|uint|						EventCount
@@ -21,23 +31,16 @@ module GUI
 	|ivec2|						CurrMouseXY
 	|ivec2|						TryResizeLater
 
-	|date|						DrawFinish
-	|date|						FrameStart = 1
-	|date|						FrameLastDelay = 1
 	|byte|						DrawState
 	|uint16|					DrawFrameLength
 
-	|date|						BlurBackgroundStart
 	|float|						Scale
 	|bool|						_MouseMoveInited
 	|bool|						StartedProperly
 	|bool|						BlockTextInput
-	|date|						ForeGroundTime
 	|bool|						FlashSelector
 	|GUIActivity|				_QuitReason
 	|GUIActivity|				DuringAction
-	|date|						FastToolTipDate
-	|date|						ChangeSelFlash
 	|bool|						NeedMouseMove
 	|bool|						ControlResizedSafely
 	|bool|						AControlWasResized
@@ -841,7 +844,7 @@ module GUI
 			rz = .SingleFrameSub
 			.SingleFrameDepth--
 
-			|| NowQuit = .quitreason
+			|| NowQuit = .QuitReason
 			gui.quitreason = NowQuit ||| (WasQuitting &~ GUIActivity.exiting)
 			return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
 
@@ -850,7 +853,7 @@ module GUI
 		opt norefcounts
 		if .ForeGroundTime.GuiAgo < 0.1s // attempt to fix key-stickyness. we still getting this SDL2 bug!
 			keys.Reset
-			keys.Resetkeyboard
+			keys.ResetKeyboard
 		
 		|| HasWindow = window.front!=nil
 		|| EnoughTime = .DelayEvents
