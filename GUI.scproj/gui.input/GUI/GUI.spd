@@ -225,7 +225,7 @@ module GUI
 		modified.touch
 
 	
-	function Resized (|guicontrol| modified)
+	libinternal Resized (|guicontrol| modified)
 		opt norefcounts
 		.AControlWasResized = true
 		|| w = modified.window
@@ -353,13 +353,13 @@ module GUI
 		return true
 		
 
-	function Hint (|stringzeroterminated| Hint, assigns:|bool|)
+	libinternal Hint (|stringzeroterminated| Hint, assigns:|bool|)
 		|byte[2]| cvalue
 		cvalue[0] = '0' + value
 		.SetHint(hint, (&cvalue[0])|cstring|)
 	
 	
-	function vsync (assigns:|bool|)
+	libinternal vsync (assigns:|bool|)
 		.hint("SDL_RENDER_VSYNC") = value
 	
 	
@@ -368,7 +368,8 @@ module GUI
 			app.prefs["screen"] = GUI.Screenraw.Msg
 			app.Prefs.save
 
-	function ivec4.Msg (|message|)
+
+	libinternal ivec4.Msg (|message|)
 		rz = @list.msg
 		for i in 4
 			rz <~ self[i]
@@ -483,12 +484,7 @@ module GUI
 				app.alert(s)
 
 
-	inline DialogIsOpen (|bool|)
-		opt norefcounts
-		return .FrontDialog
-
-
-	function FrontDialog (|window|)
+	libinternal FrontDialog (|window|)
 		opt norefcounts
 		for w in window.all
 			if w.IsDialog
@@ -714,7 +710,7 @@ module GUI
 		.DuringAction = GUIActivity.Drawing
 		|| CanBlur = !app.prefs["noblur"]
 		
-		if !.DialogIsOpen
+		if !.FrontDialog
 			.BlurBackgroundStart = 0
 		
 		.TouchCount = 0
@@ -802,7 +798,7 @@ module GUI
 
 		|| wf = Window.front$
 		.DuringAction = guiactivity.Simulation
-		|| FrontIsDialog = .DialogIsOpen
+		|| FrontIsDialog = .FrontDialog
 		if FrontIsDialog or wf.AnyFrameStepsNeeded()
 			keys.FlushKeys
 
@@ -838,15 +834,15 @@ module GUI
 
 	
 	libinternal SingleFrameNested (|bool|)
-		if .SingleFrameDepth <= 4
-			.SingleFrameDepth++
-			|| WasQuitting = .quitreason
-			rz = .SingleFrameSub
-			.SingleFrameDepth--
+		require .SingleFrameDepth <= 4
+		.SingleFrameDepth++
+		|| WasQuitting = .quitreason
+		.SingleFrameSub
+		.SingleFrameDepth--
 
-			|| NowQuit = .QuitReason
-			gui.quitreason = NowQuit ||| (WasQuitting &~ GUIActivity.exiting)
-			return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
+		|| NowQuit = .QuitReason
+		gui.quitreason = NowQuit ||| (WasQuitting &~ GUIActivity.exiting)
+		return (NowQuit isnt exitorterminate and wasquitting isnt terminating)
 
 
 	libinternal SingleFrameSub (|bool|)
@@ -880,9 +876,9 @@ module GUI
 		// we could just draw immediately? but then delay the next drawstart?
 		// perhaps 1-frame faster reaction on screen?
 		|| d = date.now
-		|uint64| ago = d - .DrawFinish				// super dooper unsigned clock saver
+		|uint64| ago = d - .DrawFinish					// super dooper unsigned clock saver
 		rz = .DrawFrameLength|int64| - ago
-		require rz < 128							// 512th of a second
+		require rz < 128								// 512th of a second
 		.DrawState &= ~2
 		.DrawFinish = d
 		.EndFrame(.Raw!)
@@ -890,7 +886,7 @@ module GUI
 
 	libinternal DelayEvents (|bool|)
 		|| CanSleep = !SDL_Event.HasAny
-		|int64| L = 256										// 256th of a second
+		|int64| L = 256									// 256th of a second
 		if .IsBackground and !.DroppingInto
 			l = .DrawFrameLength*9
 
@@ -985,7 +981,7 @@ module GUI
 		._QuitReason = value
 	
 		
-	function QuitReason (|guiactivity|)
+	inline QuitReason (|guiactivity|)
 		return ._QuitReason
 	
 	
@@ -1125,7 +1121,7 @@ module GUI
 
 		beep._OK = 0		
 		.FlashSelector = false
-		if !.DialogIsOpen
+		if !.FrontDialog
 			for w in window.all
 				w.__AppForegroundChange__(!back)
 		.touch
@@ -1209,9 +1205,8 @@ module GUI
 		|| mina = (π/180.0)|float|
 		if rot.length > mina or pinch.length > 0.002
 			return w.__Gesture__(nil, rot*math.itau, pinch)|int|
-						
-		
-		
+
+	
 	libinternal WindowEvent (|&SDL_Event| ev, |guiactivity|)
 		opt norefcounts
 		|| wev = ev.window

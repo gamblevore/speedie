@@ -508,7 +508,6 @@ class GUIControl (list)
 	
 
 	setter Edge (|int| i, |controlpoint|)
-		inlined
 		if .edge(i) != value
 			._Size[i] = value
 			GUI.resized(self)
