@@ -2,11 +2,20 @@
 
 							/// Get perry ASMing ///
 
-* BoolNot bugs
+* int8 instead of bool. (why not byte even)
+* invalid message sent back?
+* Too aggressive with error keeping (easy to fix? but hard to reproduce)
+	* log (str) // fixable
+		* log (str, "x") // buggers
 * Chained obj destructor bug in branch_test.spd
 	* cake crashing a lot
 
-* multiple matching functions in GUI during spd --self, printed from cmd-line prints like shit
+//	libinternal OpenLog (|file|) // crashes autocomplete
+//		|| appname =
+//		|| l = "/tmp/logs/".filechild(app.name + ".log")!
+//		._Logger = l
+//		l.OpenEmpty
+//		return l
 
 * asmreg.New. Should we always keep ALL the consts? Really? its nice for debugging, but...
 	* Strange const rendering. Do the params not reflect the actual Const value?
@@ -30,7 +39,6 @@
 * double-click line should select line, not white-space going all over the wierd place.
 * Running/closing tetris should have anims like hypercard? zoom open? IDK? even FFX had zoom anims.
 * Jumping to different positions in same file should remember last... (like from clicking multiple items in find)
-* Too aggressive with error keeping
 * Undo still thinks its changed when its not, and we undid ALL changes!
 * Tabbing to create function params does not work if its at the last line
 * Perhaps case-sensitivity bitching is... unnecessary. Or could be optional.
