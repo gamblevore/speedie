@@ -76,10 +76,10 @@ class File (stringshared)
 		cpp_wrapper JB_File_HardLinkTo
 
 	function IsOpen (|bool|)
-		disabled "Use .opened"
+		return .descriptor >= 0
 	
 	inline Opened (|bool|) // isopen
-		return .descriptor >= 0
+		disabled "Use .IsOpen"
 	
 	syntax cast (|Cstring|)
 		cpp_part CastZero // files ARE zeroterminated always
@@ -479,8 +479,8 @@ Creates an error, if the file is bigger than the 'Limit' param."
 		function HomePath (|string|)
 			cpp_wrapper JB_File__Home
 
-		function Trash (|string|name="", |file|)
-			rz = .TrashPath.PathFix.file
+		function Trash (|string?| name=nil, |file|)
+			rz = .TrashPath.file
 			if name
 				rz = rz.uniquechild(name)
 
@@ -492,9 +492,6 @@ Creates an error, if the file is bigger than the 'Limit' param."
 
 		inline Desktop (|file|)
 			return "~/Desktop/".file
-
-		inline Logs (|file|)
-			return "/tmp/logs/".file
 
 		function Prefs (|string?| name=nil, |file|)
 			description "Pass a name, to get a child within the prefs folder. Otherwise returns the prefs folder."

@@ -102,7 +102,7 @@ class ErrorReceiver
 	setter LogFile (|string|)
 		opt norefcounts
 		ifn Value contains "/"
-			value = file.Logs[value]
+			value = "/tmp/logs/".child(value)
 		if value
 			._LogObj = value.file
 			._LogFunc = LogFileWriter
@@ -113,7 +113,7 @@ class ErrorReceiver
 		visible class~file
 		|| f = ._LogObj
 		if f isa file
-			if !f.Opened
+			if !f.IsOpen
 				f.OpenEmpty
 			f.write(data)
 			

@@ -62,20 +62,37 @@ module Platform
 	inline HALT_Clean
 		asm HALT(0xBADA55)
 
-		
+
 	function Log (|string| s)
 		visible
 		opt norefcounts
 		// logging should merge with stderr logging? cos we'll want that too... usually.
-		// should not printline... that should be it's own function...
+		
 		|| L = ._Logger init openlog()
-		L.write(s)
-		L.write("\n")
+		if l.isopen
+			L.write(s)
+			|| fs = FastString.shared
+			fs <~ ('-', 20)
+			fs <~ '\n'
+			L.write(fs|string|)
+			fs.Length = 0
+
 	
 	libinternal OpenLog (|file|)
-		rz = file.logs[app.name + ".log"]!
-		._Logger = rz
-		rz.OpenEmpty
+		|string| appname = app.name + ".log"
+		|file--| l = "/tmp/logs/".filechild(appname)
+		._Logger = l
+		l.OpenEmpty
+		return l
+
+	
+//	libinternal OpenLog (|file|) // crashes autocomplete
+//		|| appname =
+//		|| l = "/tmp/logs/".filechild(app.name + ".log")!
+//		._Logger = l
+//		l.OpenEmpty
+//		return l
+
 	
 	|file| _Logger
 		

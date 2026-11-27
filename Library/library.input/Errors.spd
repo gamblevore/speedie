@@ -12,7 +12,7 @@ class Error (Message)
 	contains	Error
 	
 	|String|				Path
-	|String|				OriginalData
+	|String|				OriginalData // only used by grabline / lineidentifiers. I could grab these numbers at the time?
 	|String|				StackTrace
 	|message?|				Node
 	|date|					When
@@ -56,7 +56,7 @@ class Error (Message)
 		.type = @sstr
 	
 	
-	function UpgradeWithNode
+	libinternal UpgradeWithNode
 		opt norefcounts
 		|| node = .node
 		if !node
@@ -80,7 +80,7 @@ class Error (Message)
 			return data.Count(charset.line, 0, .Position)
 
 	inline HasPosition (|bool|)
-		return .Position >= 0 
+		return .Position >= 0
 		
 	function ShiftPosition (|int| i)
 		opt norefcounts
@@ -131,6 +131,7 @@ class Error (Message)
 
 
 	function LineIdentifiers (|faststring| fs, |string| path, |bool|)
+		opt norefcounts
 		require (.HasPosition)
 		|| d = .OriginalData								#require
 

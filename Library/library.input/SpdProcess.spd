@@ -64,12 +64,17 @@ class SpdProcess (UnixProcess)
 		// this should take a Date. seems easier?
 		// pico could use dates internally... at least for this?
 		// that, or we do the conversion in here.
-		opt norefcounts
 		if self
 			if .status.NotStarted
 				.start
 			|| str = .pico.get(T)
-				rz = str.parse
+			if !str
+				return nil
+			|message--| msg = str.parse
+			if !msg
+				log "ParseError"
+				log (str)
+			return msg
 	
 
 	inline LastSend (|date|)
