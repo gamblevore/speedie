@@ -148,6 +148,11 @@ struct VirtualJBString // fakejbstring
 	|int|		RefCount
 	|int|		Length
 	|&byte|		Addr
+	
+	module
+		inline New (|&byte| a, |int| n, |VirtualJBString|)
+			rz.addr = a
+			rz.Length = n
 
 
 libinternal cstring.Temp (|VirtualJBString|)
