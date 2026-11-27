@@ -47,7 +47,7 @@ class ErrorReceiver
 			self = stderr
 		if .errorcount
 			return false
-		return _MemoryStillOK
+		return _CriticalsOK
 	
 	
 	function HasProblems (|bool|)
@@ -188,22 +188,24 @@ class ErrorReceiver
 		return .errorcount + .problemcount
 	
 	
-	function CanAddMore (|errorseverity| Level=ErrorSeverity.error, |ErrorSeverity|)
-		if Level < ErrorSeverity.Critical					// Keep criticals...
-			|| Lower = .LowerErrorsTo
+	function CanAddMore (|ErrorSeverity| Level=ErrorSeverity.error, |ErrorSeverity|)
+		opt norefcounts
+		if self == nil
+			self = stderr
+		|| Lower = .LowerErrorsTo
+
+		if Level < ErrorSeverity.Critical
+			require Lower < ErrorSeverity.IgnoreAllErrors
+			if lower
 				Level = lower|int| min Level
-			
-		if (level >= 16)
-			_MemoryStillOK = false
-			return Level									// We need to report out of memory errors, if possible.
-		require .LowerErrorsTo < ErrorSeverity.IgnoreAllErrors
+		  else
+			_CriticalsOK = false							// Keep criticals...
 
 		if level == ErrorSeverity.problem
-			require .problemcount < .maxproblems
-		  elseif level >= ErrorSeverity.error
-			require .ErrorCount < .MaxErrors
-		  else												// A warning
-			require .WarnCount < .MaxErrors
+			require .ProblemCount < .MaxProblems
+		  else
+			|| C = (level >= ErrorSeverity.error)(.ErrorCount, .WarnCount)
+			require C < .maxErrors
 		return Level
 	
 	
@@ -222,13 +224,14 @@ class ErrorReceiver
 	function LastError (|error|)
 		visible
 		opt norefcounts
-		for err.backwards in .errors
-			if Err.iserror
-				return err
+		if self
+			for err.backwards in .errors
+				if Err.iserror
+					return err
 
 
 	module
-		|bool| _MemoryStillOK = true
+		|bool| _CriticalsOK = true
 			
 		
 	iterator

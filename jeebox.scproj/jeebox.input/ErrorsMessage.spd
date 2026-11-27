@@ -18,8 +18,7 @@ extend_module ErrorReceiver
 
 	autogen ExecuteError (|string| Path, |string| Desc, |ProcessMode| Mode)
 		visible
-		|errorreceiver--| Rec = StdErr
-		|| Sev = rec.CanAddMore							#require
+		|| Sev = nil|errorreceiver|.CanAddMore							#require
 		
 		if Mode isnt StdErrSpeedie
 			return .NewErrorSub(nil, desc, path, sev)
@@ -27,21 +26,21 @@ extend_module ErrorReceiver
 		|| Errs = desc.parse							// its a speedie error! Lets try to parse!
 			|message--| s = errs.first
 			while s
-				if (s == @tmp and "error") and rec.CanAddMore(sev)
+				if (s == @tmp and "error") and nil|errorreceiver|.CanAddMore(sev)
 					|error--| err = s.DecodeSpeedieError
-					rec <~ err
+					nil|errorreceiver| <~ err
 				s++
 		  else											// We made an error during an error?
-			|error--| last = rec.LastError
+			|error--| last = nil|errorreceiver|.LastError
 				last.Severity = ErrorSeverity.Problem
 			.newerror(nil, desc, path)
 
 
 	
-	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| severity)
+	autogen NewErrorSub (|Message| node, |string?| Desc, |string?| path, |errorseverity| Severity)
 		opt norefcounts
 		|| Rec = StdErr
-		severity = rec.canaddmore(severity)$
+		severity = rec.CanAddMore(severity)$
 		if !desc
 			desc = node.MiniName("Unexpected ")
 		if path == nil
@@ -51,16 +50,18 @@ extend_module ErrorReceiver
 
 
 autogen message.DecodeSpeedieError (|error|)
-	description `Parses a message like this:
+	description `Parses a message to create a real error, which then can be added to StdErr (if you want).
+
+The messages take this form:
+
 	error
 		"Can’t find 'ScreenWindow' on module 'GUI'."
 		file "/path/file.txt"
 		pos 123
 		severity 4
 
-To create a real error, which then can be added to StdErr (if you want).
 `
-	opt norefcounts
+	opt NoRefCounts
 	rz = error(nil|message|)
 	|| arg = .Last
 	if arg == @arg
