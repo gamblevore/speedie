@@ -48,6 +48,7 @@ role JBin (Faststring)
 		.enter(type, name)
 		return self
 	
+
 	inline Enter			(|syntax| type=@arg, |string?| name=nil, |jbinleaver|)
 		return .add(type, name, true)
 
@@ -139,12 +140,13 @@ role JBin (Faststring)
 		super.Length = NewLength
 		return Gained
 	
-	inline Length (|int|)
+	inline Length (|int|) // why did I do this? It just goes to the super??
 		return super.Length
 	inline Length (assigns:|int|)
 		super.Length = value
 	inline Flush
-		super.Flush
+		super.Flush // Do you even flush jbin? Not in cake?
+		
 	inline GetResult (|string|)
 		return super.GetResult
 

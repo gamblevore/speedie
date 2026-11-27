@@ -183,8 +183,8 @@ static bool ResizeTo_Sub (FastString* fs, int NewLength) {
 bool JB_FS_ResizeTo_ (FastString* fs, int NewLength) {
 	if_usual (ResizeTo_Sub(fs, NewLength))
 		return true;
-	if (fs->_Lock==1)
-		fs->_Lock = 2;
+	if (fs->_Lock & 1)
+		fs->_Lock |= 2;
 	return false;
 }
 
@@ -259,17 +259,6 @@ int JB_FS_Last (FastString* self, int off) {
 	if ((uint)i < N)
 		return self->_Addr[i];
 	return -1;
-}
-
-    
-void JB_FS_RemoveByte(FastString* self, byte B) {
-    uint8* Addr = self->_Addr;
-    if (Addr) {
-        int Len_m_1 = self->Length - 1;
-        if (Addr[Len_m_1] == B) {
-            self->Length = Len_m_1;
-        }
-    }
 }
 
 
@@ -588,21 +577,21 @@ int64 JB_FS_StreamLength(FastString* self) {
 	return 0;
 }
 
-void JB_FS_LengthSet(FastString* fs, int NewLength) {
-    if ((u32)NewLength < (u32)fs->_Size) {
-        fs->Length = NewLength;
+void JB_FS_LengthSet (FastString* Self, int NewLength) {
+    if ((u32)NewLength < (u32)Self->_Size) {
+        Self->Length = NewLength;
     }
-	FS_SanityCheck_(fs);
+	FS_SanityCheck_(Self);
 }
 
-bool JB_FS_Flush(FastString* fs) {
-    JB_File* File = fs->File;
+bool JB_FS_Flush (FastString* Self) {
+    JB_File* File = Self->File;
     if ( File ) {
-        int N = fs->Length;
+        int N = Self->Length;
         if ( N ) {
-            N = (int)JB_File_WriteRaw_( File, fs->_Addr, N );
-            fs->_WrittenLength += N;
-            fs->Length = 0;
+            N = (int)JB_File_WriteRaw_( File, Self->_Addr, N );
+            Self->_WrittenLength += N;
+            Self->Length = 0;
         }
 		JB_File_Flush(File);
 		return true;
@@ -690,7 +679,7 @@ JB_String* JB_FS_GetResult(FastString* self) {
 
 
 
-FastString* JB_FS__FastNew(FastString* other) {
+FastString* JB_FS__FastNew (FastString* other) {
     if (other)
         return other;
     

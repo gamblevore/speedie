@@ -67,8 +67,11 @@ function cakevm.BreakOrNot (|cakestack| stack, |uint| Break, |uint|)
 
 
 
+|byte| AlreadyInView = 0 // object.ObjRender can come back in __perryview__!
 function __PerryView__ (cakevm.CakeChef)
 	description "We just hit a breakpoint! (or crashed)"
+	require !AlreadyInView
+	AlreadyInView++
 	target debug
 		|| ASMIndex = .Index(stack.code)
 	
@@ -86,6 +89,7 @@ function __PerryView__ (cakevm.CakeChef)
 		if !ErrorCode and Break.Runs and p.CantGet
 			if Break&1								// Needs run
 				p <~ "run"
+			AlreadyInView--
 			return 0
 			
 		|| m = p.Get(5.0)
@@ -126,7 +130,7 @@ function Spdprocess.SendBreaks (|filewithdata| F, |bool| All=false)
 	|| CakeBreak = cake.ActiveBreaks
 	|| L = debugger.dbgLength
 	
-	|jbin| j = xvar.Printer
+	|| j = xvar.StackPrinter
 	j.Start(@tmp, "breakpoint")
 	j.AddStr(f)
 	j.AddHint(all|int|)
@@ -231,7 +235,7 @@ function EditAction (PerryResponse)
 	|| Where = stack + v
 	
 	while
-		xvar.Printer.Length = 0
+		xvar.VarPrinter.Length = 0
 		path++
 		if !path
 			v.SetValue(Where, m.first)
@@ -242,7 +246,7 @@ function EditAction (PerryResponse)
 		v = .GetProperty(v, path)							#loop
 		where = where|&byte| + v.Position
 
-	xvar.Printer.Length = 0
+	xvar.VarPrinter.Length = 0
 	return StepAction.DoNothing
 
 
@@ -264,7 +268,8 @@ function cakevm.Respond (|message| m, |cakestack| stack, |StepAction|)
 
 
 function cakevm.StartStack (|string| name, |int| ErrorCode,  |jbin--|)
-	|jbin--| j = XVar.printer
+	opt norefcounts
+	|| j = XVar.stackprinter
 	j.Start(@tmp, name)
 	{
 		j.Enter(@list)
@@ -530,8 +535,8 @@ function xvar.ExpandGoodVar (|jbin| j, |?&byte| Obj, |xtype?| Type, |message?| x
 function xvar.DescribeJBin (|jbin| j, |!&nil| Where, |message?| xp, |int| Depth)
 	opt norefcounts
 	j.Enter(@tmp, .name)
-	
 	|| Src = .SrcMap
+
 	j.AddStr(src.file)
 	j.Addhint(src.Position)
 	

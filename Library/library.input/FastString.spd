@@ -87,7 +87,7 @@ class FastString {
 	function IndentLine						{ cpp_wrapper JB_FS_LineIndent }
 	function AppendIndent					{ cpp_wrapper JB_FS_AppendIndent }
 	function Flush	(|bool|)				{ cpp_wrapper JB_FS_Flush }
-	function Remove (|Byte| b)				{ cpp_wrapper JB_FS_RemoveByte }
+
 	function GetResult (|string|)
 		nil self
 		cpp_wrapper JB_FS_GetResult

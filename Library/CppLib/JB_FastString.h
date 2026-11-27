@@ -39,7 +39,6 @@ void JB_FS_AppendCString(FastString* self, const char* c);
 JB_String* JB_FS_AppendVArg (FastString* fs, JB_String* Fmt, ...);
 bool JB_FS_ResizeTo_(FastString* fs, int NewLength);
 uint8* JB_FS_NeedSpare(FastString* fs, int Extra);
-void JB_FS_RemoveByte(FastString* self, byte B);
 
     
 FastString* JB_FS__FastNew(FastString* Old);
@@ -101,7 +100,6 @@ void JB_FS_Destructor(FastString* self);
 JB_String* JB_FS_GetResult(FastString* self);
 JB_String* JB_FS_Copy(FastString* fs);
 uint8* JB_FS_GrowBy(FastString* fs, int Needs);
-
 
 #define FS_SanityCheck_(fs)
 

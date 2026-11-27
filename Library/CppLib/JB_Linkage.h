@@ -108,7 +108,7 @@ struct CakeRegister {
 
 struct CakeVM {
     int				CakeFail;
-    int				UserFlags;
+    uint			UserRibbons; // like flags but cuter
     JB_ASM_Break	__VIEW__;
     CakeStack*		ProposedStack;
     byte*			LibGlobs;
@@ -117,13 +117,13 @@ struct CakeVM {
     byte*			AllocBase;
     PicoAction		Pico;
 	void* const*	OriginalJumpTable;
-	#if VMDEBUG
-		byte			PagePad[16*1024];
-	#endif
+#if VMDEBUG
+	byte			PagePad[16*1024];
+#endif
 	void*			JumpTable[514];
-	#if VMDEBUG
-		byte			PagePad2[16*1024];
-	#endif
+#if VMDEBUG
+	byte			PagePad2[16*1024];
+#endif
 	
     u16				VFlags;
 std::atomic<bool>	Lock;

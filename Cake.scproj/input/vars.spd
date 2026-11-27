@@ -65,12 +65,14 @@ class XVar (list)
 
 	function Print (|!&CakeStack| Stack, |int| TabTo=0)
 		opt norefcounts
-		.RenderForPrint(Printer, Stack.reg0, true, TabTo, RainbowTerm)
-		printline Printer|&nil||string|
-		printer.Length = 0
+		|| fs = VarPrinter
+		.RenderForPrint(fs, Stack.reg0, true, TabTo, RainbowTerm)
+		printline fs|&nil||string|
+		fs.Length = 0
 		
 	module
-		|| Printer = faststring()
+		|jbin| VarPrinter = faststring()
+		|jbin| StackPrinter = faststring()
 		|| Expansion = message()
 	
 	
@@ -438,9 +440,9 @@ class XVar (list)
 		opt norefcounts
 		if .Reg
 			require fs.TestMem(Where, 16, "BadStack")				// We still need to check for readability, though!
-
+		
 		|| w = .Weird
-		if W is Reference								// Barestructs already handled in rendervalue
+		if W is Reference											// Barestructs already handled in rendervalue
 			|| Ptr = Where|&uint64|[]
 			Ptr = (Ptr<<1)>>1										// Clear high bit.
 			if !Ptr

@@ -3,7 +3,7 @@
 
 struct CakeVM {
 |int|			CakeFail
-|int|			UserFlags
+|uint|			UserRibbons
 |CakeChef|		__VIEW__
 |&CakeStack|	ProposedStack
 
