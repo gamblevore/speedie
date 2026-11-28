@@ -77,16 +77,21 @@ function DylibCheckSub (|int|)
 			return -1
 	
 	|| n = .DylibCount // assume n > 0, compiler verified
-	|| Got = 0
+	|| New = 0
 	|| Missed = 0
+	|| Already = 0
 	for i in n
 		if !.DylibFuncs[i]
 			|| Found = .DylibFail(.DylibSymbols[i])
-				Got = 1
+				New = 1
 				.DylibSymbols[i] = Found
 			  else
 				Missed = 1
-	return Got - Missed
+		  else
+			Already++
+	if !New and !Missed
+		return already
+	return New - Missed
 
 
 
