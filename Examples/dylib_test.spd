@@ -2,11 +2,25 @@
 
 // Demonstrates loading a dynamic library, and using it, from within speedie
 // Most features work, however this is still a new feature and will change.
-// Variadic parameters won't be added soon.
+// Variadic parameters won't be added soon (maybe never).
+
+// look at dylib.spd to see part of the implementation and future ideas for this.
+// Sorry Mr tsoding, if you found this in this state.
+// I know you love to load libs and call C code from any language.
+
+// The other way to call external code is to compile projects without the "Cake" mode
+// which is currently unfinished (not working) anyhow. So compiling with GCC.
+// I think theres some examples of how to set C++ linker options via speedie.
+
+//    /usr/local/speedie/GUI.scproj/gui.input/gui.conf
+
+// that file has an example of how to specify linker options
+
 
 
 dylib libxml2 `libxml2`
-	cpp_func xmlReadFile			(|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument| )
+	// path `libxml2` // this would look better.
+	cpp_func xmlReadFile			(|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument|)
 	cpp_func xmlDocGetRootElement	(|&xmlDocument| doc, |&xmlNode|)
 	cpp_func xmlFreeDoc				(|&xmlDocument| doc)
 	cpp_func xmlCleanupParser
@@ -61,17 +75,4 @@ main  (|file.existing| xml_file)
 
 	libxml.xmlFreeDoc(doc)
 	libxml.xmlCleanupParser()
-
-
-
-// One feature that won't be added soon, is variadic parameters. This rules out
-// libcurl, sadly. Unless they add a curl_easy_setopt_generic() feature
-// that takes a void* instead of a variadic param. The difficulty is that
-// I want ALL of speedie to work the same via C++ or Cake. But making variadic
-// params work in Cake is not easy, because I have to make it work on:
-// (Win32 + Linux + Mac) * (ARM64 + x86), which is up to 6 versions of variadic
-// ASM code I have to write. And in the past, such things have taken up to 2
-// weeks per ASM function.
-
-// I'll need help on those, if anyone wants to add variadic ASM for Cake's VM.
 
