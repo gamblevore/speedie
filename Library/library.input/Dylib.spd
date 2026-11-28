@@ -19,7 +19,7 @@
 	but a function can't be loaded. So we do this.
 	
 
-dylib Curl
+dylib XML
 	cpp_func xmlReadFile (|cstring| path, |?&nil| IDK, |int| Flags,  |?&xmlDocument|)
 	
 	syntax DylibFail (|string| Symbol, |?&nil|)
